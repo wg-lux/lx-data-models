@@ -1,0 +1,7 @@
+name: tag_data
+description: Commonly used tags.
+version: 0.1.0
+depends_on: []
+modules: []
+data:
+  - ./default.yaml

@@ -1,0 +1,11 @@
+name: lx_knowledge_base
+description: |
+  A sample knowledge base module containing our current working state.
+version: 0.1.0
+modules:
+  - information_source_data
+  - utils
+  - lx_hardware
+  - example_terminology
+
+data: { files: [], dirs: [] }

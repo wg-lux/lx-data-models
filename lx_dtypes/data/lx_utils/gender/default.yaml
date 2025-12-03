@@ -1,0 +1,5 @@
+model: gender
+fields:
+  name: male
+  abbreviation: M
+  description: Male
