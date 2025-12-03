@@ -39,7 +39,6 @@ dev = [
   "pytest-cov>=6.1.1",
   "pytest-env>=1.1.5",
   "pytest-mypy-plugins>=3.2.0",
-  "pytest-django>=4.11.1",
   "pytest-xdist>=3.8.0",
   "pip>=25.2",
   "ruff>=0.14.0",
@@ -48,21 +47,23 @@ dev = [
   "twine>=6.2.0",
 ]
 
-
 [project.urls]
 Homepage = "https://info.coloreg.de"
 Repository = "https://github.com/wg-lux/lx-data-models"
 
-
-
-
-
 [tool.mypy]
+exclude = '^(.venv|venv|env)/'
 plugins = [""]
 strict = true
-exclude = '^(.venv|venv|env)/'
 
-# [tool.pytest.ini_options]
+[tool.pytest.ini_options]
+addopts = """
+    --cov=lx_dtypes
+    --cov-report=term-missing
+    --cov-report=xml
+    --cov-fail-under=70
+"""
+testpaths = ["tests"]
 
 [tool.hatch.build]
 exclude = [

@@ -6,7 +6,9 @@
 	],
 	"settings": {
 		"python.defaultInterpreterPath": ".devenv/state/venv/bin/python",
-		"python.analysis.extraPaths": [ "" ],
+		"python.analysis.extraPaths": [
+			""
+		],
 		"python.testing.unittestEnabled": false,
 		"python.analysis.typeCheckingMode": "strict",
 		"python.testing.pytestEnabled": true,
@@ -16,7 +18,7 @@
 		"python.formatting.provider": "black",
 		"editor.formatOnSave": true,
 		"editor.codeActionsOnSave": {
-		"source.organizeImports": "explicit"
+			"source.organizeImports": "explicit"
 		},
 	}
 }

@@ -6,6 +6,7 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validato
 
 
 class AppBaseModel(BaseModel):
+    source_file: Path | None = None
     created_at: AwareDatetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     model_config = ConfigDict(
         # 1. Strips leading/trailing whitespace automatically ("  val  " -> "val")
@@ -23,9 +24,13 @@ class AppBaseModel(BaseModel):
         """Load model instance from a YAML file."""
         import yaml
 
+        path = path.expanduser().resolve()
         with path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-        return cls.model_validate(data)
+        instance = cls.model_validate(data)
+
+        instance.source_file = path
+        return instance
 
 
 class BaseModelMixin(AppBaseModel):

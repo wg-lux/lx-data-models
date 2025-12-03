@@ -1,0 +1,2 @@
+# Ignore generated log files written by the custom logger
+*.log

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from lx_dtypes.models import KnowledgeBaseConfig
-from lx_dtypes.models.base_models.path import FilesAndDirsModel
+from lx_dtypes.models.knowledge_base import DataLoader
 
 MAIN_KNOWLEDGE_BASE_CONFIG_FILE_PATH = Path("./lx_dtypes/data/sample_knowledge_base/config.yaml")
 
@@ -16,9 +16,11 @@ class TestKnowledgeBaseConfig:
         assert isinstance(kb_config.depends_on, list)
         assert isinstance(kb_config.modules, list)
 
-    def test_initialize_modules(self, config_file_path: Path = MAIN_KNOWLEDGE_BASE_CONFIG_FILE_PATH):
-        kb_config = KnowledgeBaseConfig.from_yaml_file(config_file_path)
-        kb_modules = kb_config.initialize_modules()
-
-        for _module_name, module_config in kb_modules.items():
-            assert isinstance(module_config, KnowledgeBaseConfig)
+    def test_creation_from_dataloader(
+        self,
+        uninitialized_demo_kb_config: KnowledgeBaseConfig,
+    ):
+        assert isinstance(uninitialized_demo_kb_config, KnowledgeBaseConfig)
+        assert uninitialized_demo_kb_config.name == "lx_knowledge_base"
+        assert isinstance(uninitialized_demo_kb_config.depends_on, list)
+        assert isinstance(uninitialized_demo_kb_config.modules, list)

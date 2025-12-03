@@ -2,5 +2,7 @@ name: lx_hardware
 description: |
   A sample knowledge base module containing our current working state.
 version: 0.1.0
-modules: {}
+modules: []
 data: { files: [], dirs: [] }
+depends_on:
+  - lx_utils

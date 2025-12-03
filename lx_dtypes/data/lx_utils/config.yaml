@@ -2,3 +2,6 @@ name: lx_utils
 description: ""
 version: 0.1.0
 modules: []
+depends_on:
+  - information_source_data
+data: { files: [], dirs: [] }
