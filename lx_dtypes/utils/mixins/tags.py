@@ -7,7 +7,7 @@ def _list_of_strings() -> List[str]:
     return []
 
 
-class TaggedBaseModelMixin:
+class TaggedMixin:
     tags: List[str] = Field(default_factory=_list_of_strings)
 
     @field_validator("tags")

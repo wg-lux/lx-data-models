@@ -17,7 +17,7 @@ def test_scoped_logger_writes_yaml_per_test(tmp_path: Path):
     entry = logger.log("hello world", level=LogLevel.DEBUG, context=context)
 
     expected_dir = tmp_path / "tests" / "TestScopedLogger"
-    expected_file = expected_dir / f"{entry.timestamp.date().isoformat()}_test_scoped_logger_writes_yaml_per_test.yaml"
+    expected_file = expected_dir / f"{entry.timestamp.date().isoformat()}_test_scoped_logger_writes_yaml_per_test.log.yaml"
     assert expected_file.exists()
 
     docs = list(yaml.safe_load_all(expected_file.read_text(encoding="utf-8")))
@@ -33,7 +33,7 @@ def test_get_logger_default_level(tmp_path: Path):
 
     entry = logger.log("script executed")
 
-    log_path = tmp_path / "scripts" / f"{entry.timestamp.date().isoformat()}.log"
+    log_path = tmp_path / "scripts" / f"{entry.timestamp.date().isoformat()}.log.jsonl"
     assert log_path.exists()
 
     payload = json.loads(log_path.read_text().strip().splitlines()[-1])
@@ -46,7 +46,7 @@ def test_get_logger_default_path(tmp_path: Path):
 
     entry = logger.log("default path log")
 
-    log_path = tmp_path / "tests" / f"{entry.timestamp.date().isoformat()}.log"
+    log_path = tmp_path / "tests" / f"{entry.timestamp.date().isoformat()}.log.jsonl"
     assert log_path.exists()
 
     payload = json.loads(log_path.read_text(encoding="utf-8").strip().splitlines()[-1])

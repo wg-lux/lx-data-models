@@ -2,11 +2,7 @@ import pytest
 
 from lx_dtypes.models import KnowledgeBaseConfig
 from lx_dtypes.models.knowledge_base import DataLoader
-
-
-@pytest.fixture
-def empty_data_loader() -> DataLoader:
-    return DataLoader(input_dirs=[])
+from lx_dtypes.utils.dataloader import resolve_kb_module_load_order
 
 
 class TestDataLoader:
@@ -20,20 +16,6 @@ class TestDataLoader:
         for config_file in config_files:
             assert config_file.name == "config.yaml"
             assert config_file.exists()
-
-    def test_initialized_config_orders_dependencies(
-        self,
-        yaml_data_loader: DataLoader,
-    ) -> None:
-        kb_config = yaml_data_loader.get_initialized_config("lx_knowledge_base")
-
-        assert isinstance(kb_config.modules, list)
-        assert kb_config.modules == [
-            "information_source_data",
-            "lx_utils",
-            "lx_hardware",
-            "example_terminology",
-        ]
 
     def test_get_initialized_config_missing_module(self, empty_data_loader: DataLoader) -> None:
         with pytest.raises(ValueError, match="is not loaded"):
@@ -62,3 +44,47 @@ class TestDataLoader:
 
         with pytest.raises(ValueError, match="Circular dependency"):
             empty_data_loader.get_initialized_config("root")
+
+    def test_collect_modules_with_dependencies(
+        self,
+        empty_data_loader: DataLoader,
+    ) -> None:
+        mod_a = KnowledgeBaseConfig(name="mod_a", version="1.0.0", depends_on=["mod_b"], modules=[])
+        mod_b = KnowledgeBaseConfig(name="mod_b", version="1.0.0", depends_on=["mod_c"], modules=[])
+        mod_c = KnowledgeBaseConfig(name="mod_c", version="1.0.0", modules=[])
+        empty_data_loader.module_configs = {
+            mod_a.name: mod_a,
+            mod_b.name: mod_b,
+            mod_c.name: mod_c,
+        }
+
+        collected = empty_data_loader._collect_modules_with_dependencies(["mod_a"])  # type: ignore
+        assert set(collected.keys()) == {"mod_a", "mod_b", "mod_c"}
+
+        collected = empty_data_loader._collect_modules_with_dependencies(["mod_b", "mod_a"])  # type: ignore
+        assert set(collected.keys()) == {"mod_a", "mod_b", "mod_c"}
+
+    def test_resolve_module_load_order(
+        self,
+    ) -> None:
+        mod_a = KnowledgeBaseConfig(name="mod_a", version="1.0.0", depends_on=["mod_b"], modules=[])
+        mod_b = KnowledgeBaseConfig(name="mod_b", version="1.0.0", depends_on=["mod_c"], modules=[])
+        mod_c = KnowledgeBaseConfig(name="mod_c", version="1.0.0", modules=[])
+
+        modules_dict = {
+            mod_a.name: mod_a,
+            mod_b.name: mod_b,
+            mod_c.name: mod_c,
+        }
+
+        load_order = resolve_kb_module_load_order(
+            modules=modules_dict,
+            preferred_order=["mod_a", "mod_b", "mod_c"],
+        )
+        assert load_order == ["mod_c", "mod_b", "mod_a"]
+
+        load_order = resolve_kb_module_load_order(
+            modules=modules_dict,
+            preferred_order=["mod_c", "mod_b", "mod_a"],
+        )
+        assert load_order == ["mod_c", "mod_b", "mod_a"]

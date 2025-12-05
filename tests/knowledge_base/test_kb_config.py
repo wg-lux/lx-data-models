@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from lx_dtypes.models import KnowledgeBaseConfig
-from lx_dtypes.models.knowledge_base import DataLoader
 
 MAIN_KNOWLEDGE_BASE_CONFIG_FILE_PATH = Path("./lx_dtypes/data/sample_knowledge_base/config.yaml")
 

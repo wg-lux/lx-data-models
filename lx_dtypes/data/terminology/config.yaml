@@ -1,4 +1,7 @@
 name: example_terminology
 description: ""
 version: 0.1.0
-modules: []
+modules:
+  - lx_events
+  - lx_examinations
+  - lx_findings
