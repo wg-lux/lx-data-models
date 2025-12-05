@@ -27,9 +27,9 @@ class AppBaseModel(BaseModel):
         path = path.expanduser().resolve()
         with path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
+        data["source_file"] = path
         instance = cls.model_validate(data)
 
-        instance.source_file = path
         return instance
 
 

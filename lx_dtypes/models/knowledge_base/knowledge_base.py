@@ -36,3 +36,19 @@ class KnowledgeBase(BaseModelMixin):
     examination_types: Dict[str, "ExaminationTypeShallow"] = Field(default_factory=dict)
     indications: Dict[str, "IndicationShallow"] = Field(default_factory=dict)
     indication_types: Dict[str, "IndicationTypeShallow"] = Field(default_factory=dict)
+
+    def import_knowledge_base(self, other: "KnowledgeBase") -> None:
+        """Merge another KnowledgeBase into this one.
+
+        Args:
+            other (KnowledgeBase): The other KnowledgeBase to merge.
+        """
+        self.findings.update(other.findings)
+        self.finding_types.update(other.finding_types)
+        self.classifications.update(other.classifications)
+        self.classification_types.update(other.classification_types)
+        self.classification_choices.update(other.classification_choices)
+        self.examinations.update(other.examinations)
+        self.examination_types.update(other.examination_types)
+        self.indications.update(other.indications)
+        self.indication_types.update(other.indication_types)

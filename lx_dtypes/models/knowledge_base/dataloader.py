@@ -21,6 +21,15 @@ class DataLoader(BaseModelMixin):
     input_dirs: List[Path] = Field(default_factory=_default_dataloader_dirs_factory)
     module_configs: Dict[str, KnowledgeBaseConfig] = Field(default_factory=dict)
 
+    def add_module_to_knowledge_base(self, kb: KnowledgeBase, module_name: str) -> None:
+        """Add a module's data to the given knowledge base.
+
+        Args:
+            kb (KnowledgeBase): The knowledge base to add the module's data to.
+            module_name (str): The name of the module to add.
+        """
+        initialized_config = self.get_initialized_config(module_name)
+
     def generate_knowledge_base(self, module_name: str) -> "KnowledgeBase":
         """Load a module configuration by name.
 
@@ -32,13 +41,16 @@ class DataLoader(BaseModelMixin):
         """
         from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
 
-        result = KnowledgeBase(name=module_name)
+        knowledge_base = KnowledgeBase(name=module_name)
         if not self.module_configs:
             self.load_module_configs()
 
-        # main_config = self.get_initialized_config(module_name)
+        config = self.get_initialized_config(module_name)
+        modules = config.modules
+        for mod_name in modules:
+            submodule_config = self.get_initialized_config(mod_name)
 
-        return result
+        return knowledge_base
 
     def fetch_config_yamls(self) -> List[Path]:
         """Screens the input directories to ensure they exist.
@@ -69,6 +81,8 @@ class DataLoader(BaseModelMixin):
         config_files = self.fetch_config_yamls()
         for config_file in config_files:
             kb_config = KnowledgeBaseConfig.from_yaml_file(config_file)
+            kb_config.data.source_file = config_file
+            kb_config.normalize_data_paths(config_file)
             self.module_configs[kb_config.name] = kb_config
 
     def get_initialized_config(self, module_name: str) -> "KnowledgeBaseConfig":

@@ -3,7 +3,7 @@ from pathlib import Path
 from pytest import fixture
 
 from lx_dtypes.models.knowledge_base import DataLoader
-from lx_dtypes.utils.logging import LogScope, ScopedLogWriter, get_logger
+from lx_dtypes.utils.logging import LogLevel, LogScope, ScopedLogWriter, get_logger
 
 LOG_DIR = Path("./lx_dtypes/data/logs/")
 YAML_REPOSITORY_DIRS = [
@@ -38,6 +38,22 @@ def logger() -> ScopedLogWriter:
         output_format="yaml",
     )
     return scoped_logger
+
+
+@fixture
+def log_writer(logger: ScopedLogWriter, request):
+    base_context = {
+        "test": request.node.nodeid,
+        "test_class": request.cls.__name__ if request.cls else None,
+        "test_name": request.function.__name__,
+    }
+    base_context = {k: v for k, v in base_context.items() if v}
+
+    def emit(message: str, *, level: LogLevel = LogLevel.INFO, context: dict | None = None):
+        merged = {**base_context, **(context or {})}
+        return logger.log(message, level=level, context=merged)
+
+    return emit
 
 
 @fixture(scope="session")

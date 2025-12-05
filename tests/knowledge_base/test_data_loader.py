@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from lx_dtypes.models import KnowledgeBaseConfig
@@ -45,6 +47,14 @@ class TestDataLoader:
         with pytest.raises(ValueError, match="Circular dependency"):
             empty_data_loader.get_initialized_config("root")
 
+    def test_get_initialized_config_empty_modules(self, empty_data_loader: DataLoader) -> None:
+        kb = KnowledgeBaseConfig(name="root", version="1.0.0", modules=[], depends_on=[])
+        empty_data_loader.module_configs = {
+            kb.name: kb,
+        }
+        initialized_kb = empty_data_loader.get_initialized_config("root")
+        assert initialized_kb.modules == []
+
     def test_collect_modules_with_dependencies(
         self,
         empty_data_loader: DataLoader,
@@ -88,3 +98,13 @@ class TestDataLoader:
             preferred_order=["mod_c", "mod_b", "mod_a"],
         )
         assert load_order == ["mod_c", "mod_b", "mod_a"]
+
+    def test_get_initialized_default_kb(self, yaml_data_loader: DataLoader) -> None:
+        kb_config = yaml_data_loader.get_initialized_config("lx_knowledge_base")
+
+        assert kb_config.modules is not None
+
+    def test_non_existing_input_dir_provided(self) -> None:
+        loader = DataLoader(input_dirs=[Path("./non_existing_dir/")])
+        config_files = loader.fetch_config_yamls()
+        assert config_files == []
