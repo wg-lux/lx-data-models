@@ -1,0 +1,48 @@
+- model: examination
+  name: colonoscopy
+  description: Colonoscopy examination.
+  finding_names:
+    # baseline
+    - examination_setting
+    - bowel_preparation_lc
+    - bowel_preparation_tc
+    - bowel_preparation_rc
+    - bowel_preparation_simplified
+    - colonoscopy_deepest_viewed_location
+    # observations
+    - complication_generic
+    - colon_polyp
+    - colon_post_intervention_wound
+    - colon_tumor_mass
+    - colon_inflammation
+    - colon_erosion
+    - colon_ulcer
+    - colon_scar
+    - anal_fissure
+    - anal_hemorrhoids
+    # hidden
+    - rectum_anus
+    - rectum
+    - sigmoid_colon
+    - descending_colon
+    - left_flexure
+    - transverse_colon
+    - right_flexure
+    - ascending_colon
+    - cecum
+    - appendiceal_orifice
+    - ileocecal_valve
+    - terminal_ileum
+  type_names:
+    - endoscopic_procedure
+  indication_names:
+    - colonoscopy_generic
+    - colonoscopy_screening
+    - colonoscopy_lesion_removal_small
+    - colonoscopy_lesion_removal_large
+    - colonoscopy_lesion_removal_emr
+    - colonoscopy_diagnostic_acute_symptomatic
+    - colonoscopy_diagnostic_chronic_symptomatic
+    - colonoscopy_surveillance_post_polypectomy
+    - colonoscopy_surveillance_ibd
+    - colonoscopy_surveillance_cancer_history

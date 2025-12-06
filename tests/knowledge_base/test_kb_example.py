@@ -18,7 +18,7 @@ class TestKnowledgeBaseModel:
         assert source_file is not None
         # log_writer(f"Knowledge Base '{demo_kb_config_name}' source file: {source_file}")
 
-        for i, module_name in enumerate(module_names):
+        for _, module_name in enumerate(module_names):
             module_config = yaml_data_loader.get_initialized_config(module_name)
             assert module_config is not None
 

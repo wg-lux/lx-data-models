@@ -3,13 +3,36 @@ from typing import Any, Dict, List, Union
 
 import yaml
 
-from lx_dtypes.models.shallow import CitationShallow, InformationSourceShallow
+from lx_dtypes.models.shallow import CitationShallow, ExaminationShallow, InformationSourceShallow
+from lx_dtypes.models.shallow.classification import ClassificationShallow, ClassificationTypeShallow
+from lx_dtypes.models.shallow.examination import ExaminationTypeShallow
+from lx_dtypes.models.shallow.finding import FindingShallow, FindingTypeShallow
+from lx_dtypes.models.shallow.indication import IndicationShallow, IndicationTypeShallow
 
-model_types = Union[type[InformationSourceShallow], type[CitationShallow]]
+model_types = Union[
+    type[InformationSourceShallow],
+    type[CitationShallow],
+    type[ExaminationShallow],
+    type[ExaminationTypeShallow],
+    type[FindingShallow],
+    type[FindingTypeShallow],
+    type[ClassificationShallow],
+    type[ClassificationTypeShallow],
+    type[IndicationShallow],
+    type[IndicationTypeShallow],
+]
 
 model_lookup: Dict[str, model_types] = {
     "information_source": InformationSourceShallow,
     "citation": CitationShallow,
+    "examination": ExaminationShallow,
+    "examination_type": ExaminationTypeShallow,
+    "finding": FindingShallow,
+    "finding_type": FindingTypeShallow,
+    "classification": ClassificationShallow,
+    "classification_type": ClassificationTypeShallow,
+    "indication": IndicationShallow,
+    "indication_type": IndicationTypeShallow,
 }
 
 allowed_types = [v for _, v in model_lookup.items()]

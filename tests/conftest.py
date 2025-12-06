@@ -100,3 +100,13 @@ def sample_information_source_yaml_filepath():
 @fixture(scope="session")
 def sample_citations_yaml_filepath():
     return Path("./lx_dtypes/data/citations/data/sample_references.yaml")
+
+
+@fixture(scope="session")
+def sample_examinations_yaml_filepath():
+    return Path("./lx_dtypes/data/terminology/lx_examinations/data/colonoscopy.yaml")
+
+
+@fixture(scope="session")
+def sample_examination_types_yaml_filepath():
+    return Path("./lx_dtypes/data/terminology/lx_examinations/data/examination_types.yaml")
