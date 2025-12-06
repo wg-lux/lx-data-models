@@ -6,6 +6,13 @@ def list_of_str_factory() -> List[str]:
     return _list
 
 
+def information_source_type_by_name_factory():
+    from lx_dtypes.models.core.information_source import InformationSourceType
+
+    _dict: Dict[str, InformationSourceType] = {}
+    return _dict
+
+
 def classification_by_name_factory():
     from lx_dtypes.models.core.classification import Classification
 

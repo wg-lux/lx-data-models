@@ -1,31 +1,18 @@
-from typing import Dict, List
+from typing import Dict
 
 from pydantic import Field
 
-from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.utils.mixins.base_model import BaseModelMixin
-from lx_dtypes.utils.mixins.tags import TaggedMixin
+from lx_dtypes.models.shallow.classification import ClassificationShallow, ClassificationTypeShallow
 
 from .classification_choice import ClassificationChoice
 
 
-class ClassificationType(BaseModelMixin, TaggedMixin):
+class ClassificationType(ClassificationTypeShallow):
     pass
 
 
-class Classification(BaseModelMixin, TaggedMixin):
+class Classification(ClassificationShallow):
     """Model representing a finding classification."""
 
     classification_choices: Dict[str, ClassificationChoice] = Field(default_factory=dict)
     types: Dict[str, ClassificationType] = Field(default_factory=dict)
-
-
-class ClassificationShallow(BaseModelMixin, TaggedMixin):
-    """
-    Model representing a classification using only shallow references:
-    - classification_choices is a list of classification choice IDs (names as str)
-    - types is a list of classification type IDs (names as str)
-    """
-
-    classification_choices: List[str] = Field(default_factory=list_of_str_factory)
-    types: List[str] = Field(default_factory=list_of_str_factory)

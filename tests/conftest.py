@@ -1,7 +1,9 @@
 from pathlib import Path
+from typing import Callable
 
-from pytest import fixture
+from pytest import FixtureRequest, fixture
 
+from lx_dtypes.models.base_models.log import Log
 from lx_dtypes.models.knowledge_base import DataLoader
 from lx_dtypes.utils.logging import LogLevel, LogScope, ScopedLogWriter, get_logger
 
@@ -41,15 +43,30 @@ def logger() -> ScopedLogWriter:
 
 
 @fixture
-def log_writer(logger: ScopedLogWriter, request):
-    base_context = {
-        "test": request.node.nodeid,
-        "test_class": request.cls.__name__ if request.cls else None,
-        "test_name": request.function.__name__,
-    }
-    base_context = {k: v for k, v in base_context.items() if v}
+def log_writer(logger: ScopedLogWriter, request: FixtureRequest) -> Callable[..., Log]:
+    nodeid = request.node.nodeid  # type: ignore[attr-defined]
+    request_cls = request.cls  # type: ignore[attr-defined]
+    if request_cls is not None:
+        test_class = request_cls.__name__  # type: ignore[attr-defined]
+        assert isinstance(test_class, str)
+    else:
+        test_class = None
+    test_name = request.function.__name__
 
-    def emit(message: str, *, level: LogLevel = LogLevel.INFO, context: dict | None = None):
+    if not isinstance(nodeid, str):  # pytest guarantees str but mypy does not
+        raise TypeError("pytest nodeid must be a string")
+
+    base_context: dict[str, str] = {
+        "test": nodeid,
+        "test_name": test_name,
+    }
+
+    def emit(
+        message: str,
+        *,
+        level: LogLevel = LogLevel.INFO,
+        context: dict[str, str] | None = None,
+    ) -> Log:
         merged = {**base_context, **(context or {})}
         return logger.log(message, level=level, context=merged)
 
@@ -73,3 +90,13 @@ def initialized_demo_kb_config(yaml_data_loader: DataLoader, demo_kb_config_name
     kb_config = yaml_data_loader.get_initialized_config(demo_kb_config_name)
 
     return kb_config
+
+
+@fixture(scope="session")
+def sample_information_source_yaml_filepath():
+    return Path("./lx_dtypes/data/information_source_data/data/unknown.yaml")
+
+
+@fixture(scope="session")
+def sample_citations_yaml_filepath():
+    return Path("./lx_dtypes/data/citations/data/sample_references.yaml")

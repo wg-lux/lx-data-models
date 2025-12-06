@@ -4,6 +4,7 @@ description: |
 version: 0.1.0
 modules:
   - information_source_data
+  - citations
   - lx_utils
   - lx_hardware
   - example_terminology

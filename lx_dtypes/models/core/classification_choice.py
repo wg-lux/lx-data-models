@@ -1,7 +1,7 @@
-from lx_dtypes.utils.mixins import BaseModelMixin
+from lx_dtypes.models.shallow.classification_choice import ClassificationChoiceShallow
 
 
-class ClassificationChoice(BaseModelMixin):
+class ClassificationChoice(ClassificationChoiceShallow):
     """Model representing a classification choice."""
 
     pass

@@ -23,3 +23,19 @@ class TestKnowledgeBaseConfig:
         assert uninitialized_demo_kb_config.name == "lx_knowledge_base"
         assert isinstance(uninitialized_demo_kb_config.depends_on, list)
         assert isinstance(uninitialized_demo_kb_config.modules, list)
+
+    def test_normalize_data_paths_no_config_file_error(
+        self,
+        uninitialized_demo_kb_config: KnowledgeBaseConfig,
+    ):
+        kb_config = uninitialized_demo_kb_config.model_copy(deep=True)
+        kb_config.source_file = None
+        kb_config.data.source_file = None
+
+        # kb_config.normalize_data_paths(config_file=None) should raise ValueError
+        try:
+            kb_config.normalize_data_paths(config_file=None)
+        except ValueError as e:
+            assert str(e) == "source_file must be set to normalize data paths"
+        else:
+            assert False, "Expected ValueError was not raised"

@@ -18,5 +18,5 @@ class ClassificationShallow(BaseModelMixin, TaggedMixin):
     - types is a list of classification type IDs (names as str)
     """
 
-    classification_choices: List[str] = Field(default_factory=list_of_str_factory)
-    types: List[str] = Field(default_factory=list_of_str_factory)
+    classification_choice_names: List[str] = Field(default_factory=list_of_str_factory)
+    type_names: List[str] = Field(default_factory=list_of_str_factory)

@@ -1,10 +1,13 @@
+from .citation import CitationShallow
 from .classification import ClassificationShallow, ClassificationTypeShallow
 from .classification_choice import ClassificationChoiceShallow
 from .examination import ExaminationShallow, ExaminationTypeShallow
 from .finding import FindingShallow, FindingTypeShallow
 from .indication import IndicationShallow, IndicationTypeShallow
+from .information_source import InformationSourceShallow, InformationSourceTypeShallow
 
 __all__ = [
+    "CitationShallow",
     "ClassificationChoiceShallow",
     "ClassificationShallow",
     "ClassificationTypeShallow",
@@ -14,4 +17,6 @@ __all__ = [
     "FindingTypeShallow",
     "IndicationShallow",
     "IndicationTypeShallow",
+    "InformationSourceShallow",
+    "InformationSourceTypeShallow",
 ]

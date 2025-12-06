@@ -18,5 +18,5 @@ class FindingShallow(BaseModelMixin, TaggedMixin):
     - types is a list of finding type IDs (names as str)
     """
 
-    classifications: List[str] = Field(default_factory=list_of_str_factory)
-    types: List[str] = Field(default_factory=list_of_str_factory)
+    classification_names: List[str] = Field(default_factory=list_of_str_factory)
+    typen_names: List[str] = Field(default_factory=list_of_str_factory)

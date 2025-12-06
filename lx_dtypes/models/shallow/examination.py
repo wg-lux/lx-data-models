@@ -19,6 +19,6 @@ class ExaminationShallow(BaseModelMixin, TaggedMixin):
     - indications is a list of indication IDs (names as str)
     """
 
-    findings: List[str] = Field(default_factory=list_of_str_factory)
-    types: List[str] = Field(default_factory=list_of_str_factory)
-    indications: List[str] = Field(default_factory=list_of_str_factory)
+    finding_names: List[str] = Field(default_factory=list_of_str_factory)
+    type_names: List[str] = Field(default_factory=list_of_str_factory)
+    indication_names: List[str] = Field(default_factory=list_of_str_factory)

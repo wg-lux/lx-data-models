@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
 
 from lx_dtypes.models.shallow import (
+    CitationShallow,
     ClassificationChoiceShallow,
     ClassificationShallow,
     ClassificationTypeShallow,
@@ -27,6 +28,7 @@ class KnowledgeBase(BaseModelMixin):
 
     config: Optional["KnowledgeBaseConfig"] = None
 
+    citations: Dict[str, "CitationShallow"] = Field(default_factory=dict)
     findings: Dict[str, "FindingShallow"] = Field(default_factory=dict)
     finding_types: Dict[str, "FindingTypeShallow"] = Field(default_factory=dict)
     classifications: Dict[str, "ClassificationShallow"] = Field(default_factory=dict)
@@ -45,6 +47,7 @@ class KnowledgeBase(BaseModelMixin):
         """
         self.findings.update(other.findings)
         self.finding_types.update(other.finding_types)
+        self.citations.update(other.citations)
         self.classifications.update(other.classifications)
         self.classification_types.update(other.classification_types)
         self.classification_choices.update(other.classification_choices)
