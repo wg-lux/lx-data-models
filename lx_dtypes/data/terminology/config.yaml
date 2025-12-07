@@ -4,3 +4,4 @@ version: 0.1.0
 modules:
   - lx_examinations
   - lx_findings
+  - lx_interventions

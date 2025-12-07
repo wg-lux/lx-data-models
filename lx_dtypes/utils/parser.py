@@ -8,6 +8,7 @@ from lx_dtypes.models.shallow.classification import ClassificationShallow, Class
 from lx_dtypes.models.shallow.examination import ExaminationTypeShallow
 from lx_dtypes.models.shallow.finding import FindingShallow, FindingTypeShallow
 from lx_dtypes.models.shallow.indication import IndicationShallow, IndicationTypeShallow
+from lx_dtypes.models.shallow.intervention import InterventionShallow, InterventionTypeShallow
 
 model_types = Union[
     type[InformationSourceShallow],
@@ -20,6 +21,8 @@ model_types = Union[
     type[ClassificationTypeShallow],
     type[IndicationShallow],
     type[IndicationTypeShallow],
+    type[InterventionShallow],
+    type[InterventionTypeShallow],
 ]
 
 model_lookup: Dict[str, model_types] = {
@@ -33,6 +36,8 @@ model_lookup: Dict[str, model_types] = {
     "classification_type": ClassificationTypeShallow,
     "indication": IndicationShallow,
     "indication_type": IndicationTypeShallow,
+    "intervention": InterventionShallow,
+    "intervention_type": InterventionTypeShallow,
 }
 
 allowed_types = [v for _, v in model_lookup.items()]

@@ -18,3 +18,4 @@ class IndicationShallow(BaseModelMixin, TaggedMixin):
     """
 
     type_names: List[str] = Field(default_factory=list_of_str_factory)
+    expected_intervention_names: List[str] = Field(default_factory=list_of_str_factory)

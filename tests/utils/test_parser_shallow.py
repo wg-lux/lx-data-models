@@ -1,7 +1,8 @@
 from pathlib import Path
 from typing import Callable
 
-from lx_dtypes.models.shallow import CitationShallow, ExaminationShallow, ExaminationTypeShallow, InformationSourceShallow
+from lx_dtypes.models.shallow import CitationShallow, ExaminationShallow, ExaminationTypeShallow, IndicationShallow, InformationSourceShallow
+from lx_dtypes.models.shallow.intervention import InterventionShallow
 from lx_dtypes.utils.logging import Log
 from lx_dtypes.utils.parser import parse_shallow_object
 
@@ -43,3 +44,21 @@ class TestParser:
             assert isinstance(obj, ExaminationTypeShallow)
 
         log_writer(f"Parsed {len(parsed_objects)} ExaminationShallow objects from {sample_examination_types_yaml_filepath}")
+
+    def test_parse_indication_shallow(self, sample_indications_yaml_filepath: Path, log_writer: Callable[..., Log]):
+        parsed_objects = list(parse_shallow_object(sample_indications_yaml_filepath))
+        assert len(parsed_objects) > 0
+        for obj in parsed_objects:
+            assert obj.source_file == sample_indications_yaml_filepath
+            assert isinstance(obj, IndicationShallow)
+
+        log_writer(f"Parsed {len(parsed_objects)} IndicationShallow objects from {sample_indications_yaml_filepath}")
+
+    def test_parse_intervention_shallow(self, sample_interventions_yaml_filepath: Path, log_writer: Callable[..., Log]):
+        parsed_objects = list(parse_shallow_object(sample_interventions_yaml_filepath))
+        assert len(parsed_objects) > 0
+        for obj in parsed_objects:
+            assert obj.source_file == sample_interventions_yaml_filepath
+            assert isinstance(obj, InterventionShallow)
+
+        log_writer(f"Parsed {len(parsed_objects)} InterventionShallow objects from {sample_interventions_yaml_filepath}")

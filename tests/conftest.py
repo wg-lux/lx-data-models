@@ -110,3 +110,13 @@ def sample_examinations_yaml_filepath():
 @fixture(scope="session")
 def sample_examination_types_yaml_filepath():
     return Path("./lx_dtypes/data/terminology/lx_examinations/data/examination_types.yaml")
+
+
+@fixture(scope="session")
+def sample_indications_yaml_filepath():
+    return Path("./lx_dtypes/data/terminology/lx_examinations/data/colonoscopy_indications.yaml")
+
+
+@fixture(scope="session")
+def sample_interventions_yaml_filepath():
+    return Path("./lx_dtypes/data/terminology/lx_interventions/00_generic_endoscopy_ablation.yaml")

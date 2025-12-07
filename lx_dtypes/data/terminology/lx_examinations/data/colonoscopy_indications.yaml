@@ -1,0 +1,94 @@
+- model: indication
+  name: colonoscopy_generic
+  description: Generic indication for colonoscopy examination.
+
+- model: indication
+  name: colonoscopy_screening
+  description: Indication for colonoscopy examination for screening purposes.
+  expected_intervention_names:
+    - endoscopy_cold_snare_resection_generic
+    - endoscopy_injection_liftup
+    - endoscopy_biopsy_grasper_generic
+    - endoscopy_hemoclip_generic
+
+- model: indication
+  name: colonoscopy_lesion_removal_small
+  description: Indication for colonoscopy examination for removal of small lesions (e.g., polyps).
+  expected_intervention_names:
+    - endoscopy_cold_snare_resection_generic
+    - endoscopy_diathermic_snare_resection_generic
+    - endoscopy_injection_liftup
+    - endoscopy_injection_vasoactive
+    - endoscopy_biopsy_grasper_generic
+    - endoscopy_hemoclip_generic
+
+- model: indication
+  name: colonoscopy_lesion_removal_large
+  description: Indication for colonoscopy examination for removal of large lesions (e.g., polyps).
+  expected_intervention_names:
+    - "endoscopy_injection_vasoactive"
+    - "endoscopy_injection_liftup"
+    - "endoscopy_hemoclip_generic"
+    - "endoscopy_over_the_scope_clip_generic"
+    - "endoscopy_emr_generic"
+    - "endoscopy_esd_generic"
+    - "endoscopy_eftr_generic"
+
+- model: indication
+  name: colonoscopy_lesion_removal_emr
+  description: Indication for colonoscopy examination for endoscopic mucosal resection (EMR) of lesions.
+  expected_intervention_names:
+    - "endoscopy_emr_generic"
+    - "endoscopy_injection_vasoactive"
+    - "endoscopy_injection_liftup"
+    - "endoscopy_hemoclip_generic"
+    - "endoscopy_over_the_scope_clip_generic"
+
+- model: indication
+  name: colonoscopy_diagnostic_acute_symptomatic
+  description: Indication for colonoscopy examination for diagnostic purposes in acute symptomatic patients.
+  expected_intervention_names:
+    - endoscopy_cold_snare_resection_generic
+    - endoscopy_diathermic_snare_resection_generic
+    - endoscopy_injection_liftup
+    - endoscopy_injection_vasoactive
+    - endoscopy_biopsy_grasper_generic
+    - endoscopy_hemoclip_generic
+
+- model: indication
+  name: colonoscopy_diagnostic_chronic_symptomatic
+  description: Indication for colonoscopy examination for diagnostic purposes in chronic symptomatic patients.
+  expected_intervention_names:
+    - endoscopy_cold_snare_resection_generic
+    - endoscopy_diathermic_snare_resection_generic
+    - endoscopy_injection_liftup
+    - endoscopy_injection_vasoactive
+    - endoscopy_biopsy_grasper_generic
+    - endoscopy_hemoclip_generic
+
+- model: indication
+  name: colonoscopy_surveillance_post_polypectomy
+  description: Indication for colonoscopy examination for surveillance following polypectomy.
+  expected_intervention_names:
+    - "endoscopy_cold_snare_resection_generic"
+    - "endoscopy_injection_liftup"
+    - "endoscopy_biopsy_grasper_generic"
+    - "endoscopy_hemoclip_generic"
+
+- model: indication
+  name: colonoscopy_surveillance_ibd
+  description: Indication for colonoscopy examination for surveillance in patients with inflammatory bowel disease (IBD).
+  expected_intervention_names:
+    - "endoscopy_cold_snare_resection_generic"
+    - "endoscopy_injection_liftup"
+    - "endoscopy_biopsy_grasper_generic"
+    - "endoscopy_hemoclip_generic"
+
+- model: indication
+  name: colonoscopy_surveillance_cancer_history
+  description: Indication for colonoscopy examination for surveillance in patients with a history of colorectal cancer
+  expected_intervention_names:
+    - "endoscopy_cold_snare_resection_generic"
+    - "endoscopy_injection_liftup"
+    - "endoscopy_biopsy_grasper_generic"
+    - "endoscopy_hemoclip_generic"

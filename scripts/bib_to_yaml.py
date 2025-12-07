@@ -7,10 +7,10 @@ import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
-import bibtexparser
+import bibtexparser  # type: ignore[import]
 import yaml
-from bibtexparser.bparser import BibTexParser
-from bibtexparser.customization import convert_to_unicode
+from bibtexparser.bparser import BibTexParser  # type: ignore[import]
+from bibtexparser.customization import convert_to_unicode  # type: ignore[import]
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = REPO_ROOT / "lx_dtypes" / "data" / "citations" / "sample_references.bib"
@@ -110,7 +110,7 @@ def _extract_keywords(value: str | None) -> List[str]:
     cleaned = _clean_text(value)
     if not cleaned:
         return []
-    keywords = []
+    keywords: List[str] = []
     for token in re.split(r"[,;]", cleaned):
         normalized = _normalize_whitespace(token)
         if normalized:
@@ -154,11 +154,20 @@ def load_bib_entries(source: Path) -> List[Dict[str, Any]]:
         raise FileNotFoundError(f"BibTeX file not found: {source}")
 
     parser = BibTexParser(common_strings=True)
-    parser.customization = convert_to_unicode
+    parser.customization = convert_to_unicode  # type: ignore[attr-defined]
     with source.open("r", encoding="utf-8") as handle:
-        database = bibtexparser.load(handle, parser=parser)
+        database: bibtexparser.bibdatabase.BibDatabase = bibtexparser.load(handle, parser=parser)  # type: ignore[attr-defined]
 
-    return database.entries
+    entries: List[Dict[str, Any]] = []
+
+    assert isinstance(entries, list)
+    for entry in database.entries:  # type: ignore[attr-defined]
+        assert isinstance(entry, dict)
+        for k, _ in entry.items():  # type: ignore[attr-defined]
+            assert isinstance(k, str)
+        entries.append(entry)  # type: ignore[attr-defined]
+
+    return entries
 
 
 def convert_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
