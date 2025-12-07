@@ -1,0 +1,8 @@
+- model: finding
+  name: "complication_generic"
+  name_de: "Komplikation (generisch)"
+  name_en: "Complication (generic)"
+  type_names:
+    - complication
+  classification_names:
+    - complication_generic_type

@@ -1,9 +1,9 @@
-name: lx_examinations
+name: lx_classifications
 description: ""
 version: 0.1.0
 modules: []
 depends_on:
-  - lx_findings
+  - lx_interventions
 data:
   dirs:
     - ./data

@@ -62,3 +62,37 @@ class TestParser:
             assert isinstance(obj, InterventionShallow)
 
         log_writer(f"Parsed {len(parsed_objects)} InterventionShallow objects from {sample_interventions_yaml_filepath}")
+
+    def test_parse_finding_shallow(self, sample_findings_yaml_filepath: Path, log_writer: Callable[..., Log]):
+        parsed_objects = list(parse_shallow_object(sample_findings_yaml_filepath))
+        assert len(parsed_objects) > 0
+        for obj in parsed_objects:
+            assert obj.source_file == sample_findings_yaml_filepath
+            from lx_dtypes.models.shallow.finding import FindingShallow
+
+            assert isinstance(obj, FindingShallow)
+
+        log_writer(f"Parsed {len(parsed_objects)} FindingShallow objects from {sample_findings_yaml_filepath}")
+
+    def test_parse_classification_shallow(self, sample_classifications_yaml_filepath: Path, log_writer: Callable[..., Log]):
+        parsed_objects = list(parse_shallow_object(sample_classifications_yaml_filepath))
+        assert len(parsed_objects) > 0
+        for obj in parsed_objects:
+            assert obj.source_file == sample_classifications_yaml_filepath
+            from lx_dtypes.models.shallow.classification import ClassificationShallow
+
+            if isinstance(obj, ClassificationShallow):
+                log_writer(f"Parsed ClassificationShallow object: {obj.name}")
+
+        log_writer(f"Parsed {len(parsed_objects)} ClassificationShallow objects from {sample_classifications_yaml_filepath}")
+
+    def test_parse_classification_choice_shallow(self, sample_classification_choices_yaml_filepath: Path, log_writer: Callable[..., Log]):
+        parsed_objects = list(parse_shallow_object(sample_classification_choices_yaml_filepath))
+        assert len(parsed_objects) > 0
+        for obj in parsed_objects:
+            assert obj.source_file == sample_classification_choices_yaml_filepath
+            from lx_dtypes.models.shallow.classification_choice import ClassificationChoiceShallow
+
+            assert isinstance(obj, ClassificationChoiceShallow)
+
+        log_writer(f"Parsed {len(parsed_objects)} ClassificationChoiceShallow objects from {sample_classification_choices_yaml_filepath}")

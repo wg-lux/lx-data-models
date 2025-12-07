@@ -1,0 +1,25 @@
+- model: classification_choice
+  name: "histology_dysplasia_default"
+  type_names:
+    - histology
+  choice_names:
+    - histology_dysplasia_none
+    - histology_dysplasia_low_grade
+    - histology_dysplasia_high_grade
+
+- model: classification
+  name: "histology_dignity_default"
+  type_names:
+    - histology
+  choice_names:
+    - histology_dignity_benign
+    - histology_dignity_malign
+
+- model: classification_choice
+  name: "histology_in_sano_default"
+  type_names:
+    - histology
+  choice_names:
+    - "yes"
+    - "no"
+    - "na"

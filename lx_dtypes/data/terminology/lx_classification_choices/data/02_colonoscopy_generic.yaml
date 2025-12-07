@@ -1,0 +1,14 @@
+- model: classification_choice
+  name: "colonoscopy_incomplete_insufficient_preparation"
+
+- model: classification_choice
+  name: "colonoscopy_incomplete_complication"
+
+- model: classification_choice
+  name: "colonoscopy_incomplete_pain"
+
+- model: classification_choice
+  name: "colonoscopy_incomplete_stenosis"
+
+- model: classification_choice
+  name: "colonoscopy_incomplete_other"

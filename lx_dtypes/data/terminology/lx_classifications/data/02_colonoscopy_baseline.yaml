@@ -1,0 +1,77 @@
+- model: classification
+  name: "colonoscopy_location_default"
+  name_de: "Koloskopie Standard"
+  name_en: "Colonoscopy Default"
+  type_names: ["location"]
+  choice_names:
+    [
+      "terminal_ileum",
+      "cecum",
+      "ascending_colon",
+      "right_flexure",
+      "transverse_colon",
+      "left_flexure",
+      "descending_colon",
+      "sigmoid_colon",
+      "rectum",
+      "anal_canal",
+    ]
+
+- model: classification
+  name: "colonoscopy_location_coarse"
+  name_de: "Koloskopie Grob"
+  name_en: "Colonoscopy Coarse"
+  type_names: ["location"]
+  choice_names: ["left_colon", "right_colon", "rectum"]
+
+- model: classification
+  name: "bowel_prep_boston"
+  type_names: ["bowel_prep"]
+  name_de: "Boston Bowel Preparation Scale"
+  name_en: "Boston Bowel Preparation Scale"
+  choice_names:
+    [
+      "bowel_prep_boston_0",
+      "bowel_prep_boston_1",
+      "bowel_prep_boston_2",
+      "bowel_prep_boston_3",
+    ]
+
+- model: classification
+  name: "bowel_prep_boston_simplified"
+  type_names: ["bowel_prep"]
+  name_de: "Boston Bowel Preparation Scale"
+  name_en: "Boston Bowel Preparation Scale"
+  choice_names:
+    [
+      "bowel_prep_boston_0",
+      "bowel_prep_boston_1",
+      "bowel_prep_boston_2",
+      "bowel_prep_boston_3",
+    ]
+
+#Aronchick
+- model: classification
+  name: "bowel_prep_aronchick"
+  type_names: ["bowel_prep"]
+  name_de: "Aronchick Bowel Preparation Scale"
+  name_en: "Aronchick Bowel Preparation Scale"
+  choice_names:
+    [
+      "bowel_prep_aronchick_0",
+      "bowel_prep_aronchick_1",
+      "bowel_prep_aronchick_2",
+      "bowel_prep_aronchick_3",
+    ]
+
+- model: classification
+  name: "colonoscopy_not_complete_reason"
+  type_names: []
+  choice_names:
+    [
+      "colonoscopy_incomplete_insufficient_preparation",
+      "colonoscopy_incomplete_complication",
+      "colonoscopy_incomplete_pain",
+      "colonoscopy_incomplete_stenosis",
+      "colonoscopy_incomplete_other",
+    ]

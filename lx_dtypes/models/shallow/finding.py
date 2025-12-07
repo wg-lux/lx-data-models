@@ -19,4 +19,5 @@ class FindingShallow(BaseModelMixin, TaggedMixin):
     """
 
     classification_names: List[str] = Field(default_factory=list_of_str_factory)
-    typen_names: List[str] = Field(default_factory=list_of_str_factory)
+    type_names: List[str] = Field(default_factory=list_of_str_factory)
+    intervention_names: List[str] = Field(default_factory=list_of_str_factory)

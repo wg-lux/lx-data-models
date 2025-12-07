@@ -1,0 +1,11 @@
+- model: classification
+  name: "hemorrhoids_grade"
+  type_names: []
+  choice_names:
+    [
+      "hemorrhoids_grade_0_no_hemorrhoids",
+      "hemorrhoids_grade_1",
+      "hemorrhoids_grade_2",
+      "hemorrhoids_grade_3",
+      "hemorrhoids_grade_4",
+    ]

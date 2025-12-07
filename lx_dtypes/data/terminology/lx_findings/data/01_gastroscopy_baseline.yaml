@@ -1,0 +1,80 @@
+- model: finding
+  name: "gastroscopy_esophagus_mucosa"
+  name_de: "Speiseröhren-Schleimhaut"
+  name_en: "Esophagus Mucosa"
+  type_names:
+    - baseline
+  classification_names: [] #TODO
+  intervention_names: []
+
+- model: finding
+  name: "gastroscopy_gastroesophageal_junction"
+  name_de: "Gastroösophagealer Übergang"
+  name_en: "Gastroesophageal Junction"
+  type_names:
+    - baseline
+  classification_names: []
+  intervention_names: []
+
+- model: finding
+  name: "gastroscopy_fundus_mucosa"
+  name_de: "Magenfundus-Schleimhaut"
+  name_en: "Gastric Fundus Mucosa"
+  type_names:
+    - baseline
+  classification_names: []
+  intervention_names: []
+
+- model: finding
+  name: "gastroscopy_corpus_mucosa"
+  name_de: "Magenkörper-Schleimhaut"
+  name_en: "Gastric Corpus Mucosa"
+  type_names:
+    - baseline
+  classification_names: []
+  intervention_names: []
+
+- model: finding
+  name: "gastroscopy_antrum_mucosa"
+  name_de: "Antrum-Schleimhaut"
+  name_en: "Antrum Mucosa"
+  type_names:
+    - baseline
+  classification_names: []
+  intervention_names: []
+
+- model: finding
+  name: "gastroscopy_pylorus"
+  name_de: "Pylorus"
+  name_en: "Pylorus"
+  type_names:
+    - baseline
+  classification_names: []
+  intervention_names: []
+
+- model: finding
+  name: "gastroscopy_angulus_flexure_mucosa"
+  name_de: "Angulusfalte"
+  name_en: "Angulus Flexure"
+  type_names:
+    - baseline
+  classification_names: []
+  intervention_names: []
+
+- model: finding
+  name: "gastroscopy_duodenum_bulbus_mucosa"
+  name_de: "Duodenum-Bulbus"
+  name_en: "Duodenum Bulbus"
+  type_names:
+    - baseline
+  classification_names: []
+  intervention_names: []
+
+- model: finding
+  name: "gastroscopy_duodenum_mucosa"
+  name_de: "Duodenum-Schleimhaut"
+  name_en: "Duodenum Mucosa"
+  type_names:
+    - baseline
+  classification_names: []
+  intervention_names: []

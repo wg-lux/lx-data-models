@@ -1,0 +1,31 @@
+- model: classification_choice
+  name: "histology_dysplasia_none"
+  description: "Histology: No dysplasia"
+
+- model: classification_choice
+  name: "histology_dysplasia_low_grade"
+  description: "Histology: Low-grade dysplasia"
+
+- model: classification_choice
+  name: "histology_dysplasia_high_grade"
+  description: "Histology: High-grade dysplasia"
+
+- model: classification_choice
+  name: "histology_dignity_benign"
+  description: "Histology: Benign"
+
+- model: classification_choice
+  name: "histology_dignity_malign"
+  description: "Histology: Malign"
+
+- model: classification_choice
+  name: "histology_non_pathological"
+  description: "Histology: Non-pathological"
+
+- model: classification_choice
+  name: "histology_unknown"
+  description: "Histology: Unknown"
+
+- model: classification_choice
+  name: "histology_other"
+  description: "Histology: Other"

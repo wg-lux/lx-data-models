@@ -1,0 +1,17 @@
+- model: classification_choice
+  name: "examination_setting_generic_location_inpatient"
+
+- model: classification_choice
+  name: "examination_setting_generic_location_outpatient"
+
+- model: classification_choice
+  name: "sedation_propofol"
+
+- model: classification_choice
+  name: "sedation_midazolam"
+
+- model: classification_choice
+  name: "sedation_propofol_midazolam"
+
+- model: classification_choice
+  name: "sedation_other"

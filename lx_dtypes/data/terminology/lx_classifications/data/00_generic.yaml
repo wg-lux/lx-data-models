@@ -1,0 +1,39 @@
+- model: classification
+  name: "visualized"
+  type_names:
+    - inferrable
+  choice_names:
+    - "yes"
+    - "no"
+
+- model: classification
+  name: "examination_setting_generic_location"
+  type_names: []
+  choice_names:
+    - examination_setting_generic_location_inpatient
+    - examination_setting_generic_location_outpatient
+
+- model: classification
+  name: "sedation_performed"
+  type_names: []
+  choice_names:
+    - "yes"
+    - "no"
+
+- model: classification
+  name: "examination_setting_generic_sedation"
+  type_names: []
+  choice_names:
+    - "sedation_propofol"
+    - "sedation_midazolam"
+    - "sedation_propofol_midazolam"
+    - "sedation_other"
+
+- model: classification
+  name: "complication_generic_type"
+  type_names: []
+  choice_names:
+    - complication_generic_type_cardiorespiratory
+    - complication_generic_type_bleeding
+    - complication_generic_type_perforation
+    - complication_generic_type_other

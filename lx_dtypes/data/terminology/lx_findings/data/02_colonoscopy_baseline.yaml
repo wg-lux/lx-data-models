@@ -1,0 +1,48 @@
+- model: finding
+  name: "bowel_preparation_lc"
+  name_de: "Darmvorbereitung (Linkes Kolon)"
+  name_en: "Bowel Preparation (Left Colon)"
+  type_names:
+    - baseline
+  classification_names:
+    - bowel_prep_boston
+    - bowel_prep_aronchick
+
+- model: finding
+  name: "bowel_preparation_tc"
+  name_de: "Darmvorbereitung (Kolon Transversum)"
+  name_en: "Bowel Preparation (Transverse Colon)"
+  type_names:
+    - baseline
+  classification_names:
+    - bowel_prep_boston
+    - bowel_prep_aronchick
+
+- model: finding
+  name: "bowel_preparation_rc"
+  name_de: "Darmvorbereitung (Rechtes Kolon)"
+  name_en: "Bowel Preparation (Right Colon)"
+  type_names:
+    - baseline
+  classification_names:
+    - bowel_prep_boston
+    - bowel_prep_aronchick
+
+- model: finding
+  name: "bowel_preparation_simplified"
+  name_de: "Darmvorbereitung (Vereinfacht)"
+  name_en: "Bowel Preparation (Simplified)"
+  type_names:
+    - baseline
+  classification_names:
+    - bowel_prep_boston_simplified
+
+- model: finding
+  name: "colonoscopy_deepest_viewed_location"
+  name_de: "Tiefste betrachtete Stelle während einer Koloskopie"
+  name_en: "Deepest viewed location during colonoscopy"
+  type_names:
+    - baseline
+  classification_names:
+    - colonoscopy_location_default
+    - colonoscopy_not_complete_reason #TODO Requirement should make sure, that a patientfindingclassification with reason is available if location is not cecum / appendix / terminal ileum

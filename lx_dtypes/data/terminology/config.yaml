@@ -5,3 +5,5 @@ modules:
   - lx_examinations
   - lx_findings
   - lx_interventions
+  - lx_classifications
+  - lx_classification_choices

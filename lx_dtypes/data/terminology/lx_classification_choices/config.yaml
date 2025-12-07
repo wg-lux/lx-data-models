@@ -1,0 +1,6 @@
+name: lx_classification_choices
+description: ""
+version: 0.1.0
+data:
+  dirs:
+    - ./data
