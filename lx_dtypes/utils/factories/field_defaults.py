@@ -1,6 +1,17 @@
 from typing import Dict, List
 
 
+def str_unknown_factory() -> str:
+    return "unknown"
+
+
+def uuid_factory() -> str:
+    """Generate a UUID string."""
+    import uuid
+
+    return str(uuid.uuid4())
+
+
 def list_of_str_factory() -> List[str]:
     _list: List[str] = []
     return _list

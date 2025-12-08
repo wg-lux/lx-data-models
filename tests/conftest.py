@@ -21,6 +21,9 @@ from .fixtures.paths import (
     sample_interventions_yaml_filepath,
     yaml_repo_dirs,
 )
+from .fixtures.patient import sample_patient
+from .fixtures.patient_ledger import sample_patient_ledger
+from .fixtures.person import sample_person, sample_person_no_dob_no_gender
 
 SAMPLE_KNOWLEDGE_BASE_NAME = "lx_knowledge_base"
 
@@ -49,4 +52,9 @@ __all__ = [
     "sample_information_source_yaml_filepath",
     "sample_interventions_yaml_filepath",
     "yaml_repo_dirs",
+    "sample_person_no_dob_no_gender",
+    "sample_person",
+    "sample_patient",
+    "demo_kb_config_name",
+    "sample_patient_ledger",
 ]
