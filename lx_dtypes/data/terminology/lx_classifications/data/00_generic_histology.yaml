@@ -1,4 +1,4 @@
-- model: classification_choice
+- model: classification
   name: "histology_dysplasia_default"
   type_names:
     - histology
@@ -15,7 +15,7 @@
     - histology_dignity_benign
     - histology_dignity_malign
 
-- model: classification_choice
+- model: classification
   name: "histology_in_sano_default"
   type_names:
     - histology

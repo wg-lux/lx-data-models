@@ -27,6 +27,22 @@ model_types = Union[
     type[InterventionTypeShallow],
 ]
 
+ShallowModel = Union[
+    InformationSourceShallow,
+    CitationShallow,
+    ExaminationShallow,
+    ExaminationTypeShallow,
+    FindingShallow,
+    FindingTypeShallow,
+    ClassificationShallow,
+    ClassificationChoiceShallow,
+    ClassificationTypeShallow,
+    IndicationShallow,
+    IndicationTypeShallow,
+    InterventionShallow,
+    InterventionTypeShallow,
+]
+
 model_lookup: Dict[str, model_types] = {
     "information_source": InformationSourceShallow,
     "citation": CitationShallow,
@@ -46,7 +62,7 @@ model_lookup: Dict[str, model_types] = {
 allowed_types = [v for _, v in model_lookup.items()]
 
 
-def parse_shallow_object(file_path: Path):
+def parse_shallow_object(file_path: Path) -> List[ShallowModel]:
     if not file_path.exists() or not file_path.is_file():
         raise ValueError(f"The provided path {file_path} does not exist or is not a file.")
 
@@ -54,10 +70,10 @@ def parse_shallow_object(file_path: Path):
 
     # each yaml file is a list of objects
     with file_path.open("r", encoding="utf-8") as f:
-        data: List[Dict[str, Any]] = yaml.safe_load(f)  # simplified typ
+        data: List[Dict[str, Any]] = yaml.safe_load(f) or []  # simplified typ
 
     assert isinstance(data, list), "YAML file must contain a list of objects."
-
+    results: List[ShallowModel] = list()
     for item in data:
         assert isinstance(item, dict), "Each item in the list must be a dictionary."
 
@@ -73,4 +89,5 @@ def parse_shallow_object(file_path: Path):
         result_type = type(result)
         assert result_type in allowed_types, f"Parsed object type {result_type} is not allowed."
 
-        yield result
+        results.append(result)
+    return results

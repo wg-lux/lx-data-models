@@ -4,6 +4,8 @@ version: 0.1.0
 modules: []
 depends_on:
   - lx_findings
+  - lx_indications
+  - lx_interventions
 data:
   dirs:
     - ./data

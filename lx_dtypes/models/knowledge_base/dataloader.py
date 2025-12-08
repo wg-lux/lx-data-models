@@ -3,7 +3,6 @@ from typing import Dict, List, Set
 
 from pydantic import Field
 
-from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
 from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
 from lx_dtypes.utils.dataloader import resolve_kb_module_load_order
 from lx_dtypes.utils.mixins import BaseModelMixin
@@ -21,36 +20,27 @@ class DataLoader(BaseModelMixin):
     input_dirs: List[Path] = Field(default_factory=_default_dataloader_dirs_factory)
     module_configs: Dict[str, KnowledgeBaseConfig] = Field(default_factory=dict)
 
-    def add_module_to_knowledge_base(self, kb: KnowledgeBase, module_name: str) -> None:
-        """Add a module's data to the given knowledge base.
+    def load_knowledge_base(self, module_name: str):
+        """Load a knowledge base by module name.
 
         Args:
-            kb (KnowledgeBase): The knowledge base to add the module's data to.
-            module_name (str): The name of the module to add.
-        """
-        initialized_config = self.get_initialized_config(module_name)
-
-    def generate_knowledge_base(self, module_name: str) -> "KnowledgeBase":
-        """Load a module configuration by name.
-
-        Args:
-            module_name (str): The name of the module to load.
+            module_name (str): The name of the knowledge base module to load.
 
         Returns:
-            KnowledgeBaseConfig: The loaded module configuration.
+            KnowledgeBase: The loaded knowledge base.
         """
         from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
 
-        knowledge_base = KnowledgeBase(name=module_name)
-        if not self.module_configs:
-            self.load_module_configs()
+        kb_config = self.get_initialized_config(module_name)
+        kb = KnowledgeBase(name=kb_config.name, config=kb_config)
 
-        config = self.get_initialized_config(module_name)
-        modules = config.modules
-        for mod_name in modules:
-            submodule_config = self.get_initialized_config(mod_name)
+        ordered_submodules = kb_config.modules
 
-        return knowledge_base
+        for sm_name in ordered_submodules:
+            sm_config = self.get_initialized_config(sm_name)
+            sm_kb = KnowledgeBase.create_from_config(sm_config)
+            kb.import_knowledge_base(sm_kb)
+        return kb
 
     def fetch_config_yamls(self) -> List[Path]:
         """Screens the input directories to ensure they exist.
@@ -99,10 +89,36 @@ class DataLoader(BaseModelMixin):
         if not requested_modules:
             return kb_config
 
-        temp_module_dict = self._collect_modules_with_dependencies(requested_modules)
-        load_order = resolve_kb_module_load_order(temp_module_dict, requested_modules)
+        expanded_modules = self._expand_module_hierarchy(requested_modules)
+
+        temp_module_dict = self._collect_modules_with_dependencies(expanded_modules)
+        load_order = resolve_kb_module_load_order(temp_module_dict, expanded_modules)
         kb_config.modules = load_order
         return kb_config
+
+    def _expand_module_hierarchy(self, module_names: List[str]) -> List[str]:
+        """Return a flattened list of modules including nested declarations."""
+
+        expanded: List[str] = []
+        seen: Set[str] = set()
+
+        def visit(name: str):
+            if name in seen:
+                return
+            seen.add(name)
+            expanded.append(name)
+
+            nested_config = self.module_configs.get(name)
+            if nested_config is None:
+                raise ValueError(f"Module '{name}' is referenced but not loaded.")
+
+            for child_name in nested_config.modules:
+                visit(child_name)
+
+        for module_name in module_names:
+            visit(module_name)
+
+        return expanded
 
     def _collect_modules_with_dependencies(self, module_names: List[str]) -> Dict[str, "KnowledgeBaseConfig"]:
         """Return all module configs reachable from ``module_names`` via depends_on graph."""

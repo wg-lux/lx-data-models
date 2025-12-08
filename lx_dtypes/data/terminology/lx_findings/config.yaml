@@ -8,3 +8,4 @@ data:
   dirs:
     - ./data
     - ./former_events
+    - ./finding_types

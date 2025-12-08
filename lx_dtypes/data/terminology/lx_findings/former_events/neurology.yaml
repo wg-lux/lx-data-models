@@ -1,0 +1,9 @@
+- model: finding
+  name: "stroke"
+  tags:
+    - event
+
+- model: finding
+  name: "transient_ischemic_attack"
+  tags:
+    - event

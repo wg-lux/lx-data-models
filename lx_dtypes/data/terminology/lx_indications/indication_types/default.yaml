@@ -1,0 +1,3 @@
+- model: indication_type
+  name: "default_indication_type"
+  description: "Default indication type"

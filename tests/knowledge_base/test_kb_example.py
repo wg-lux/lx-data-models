@@ -1,33 +1,37 @@
 from typing import Callable
 
-from lx_dtypes.models.knowledge_base import DataLoader
+from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
 from lx_dtypes.utils.logging import Log
-from lx_dtypes.utils.parser import parse_shallow_object
 
 
 class TestKnowledgeBaseModel:
-    def test_load_default_kb(self, yaml_data_loader: DataLoader, demo_kb_config_name: str, log_writer: Callable[..., Log]):
-        kb_config = yaml_data_loader.get_initialized_config(demo_kb_config_name)
-        module_names = kb_config.modules
-        assert len(module_names) > 0
-        msg = "\n-------------START OF KNOWLEDGE BASE MODULES PARSING LOG--------------\n"
-        msg += f"Knowledge Base '{demo_kb_config_name}' loading with modules: {module_names}\n"
+    def test_load_default_kb(self, lx_knowledge_base: KnowledgeBase, log_writer: Callable[..., Log]):
+        kb = lx_knowledge_base
 
-        # logger.log(kb_config.model_dump_json())
-        source_file = kb_config.source_file
-        assert source_file is not None
-        # log_writer(f"Knowledge Base '{demo_kb_config_name}' source file: {source_file}")
+        # TODO REMOVE LATER
+        # Dump loaded KB to YAML for inspection
+        # output_path = Path("./loaded_kb_dump.yaml")
+        # dumped_model = kb.model_dump(mode="json")  # , exclude_defaults=True, exclude_none=True, exclude_unset=True)
+        # with output_path.open("w", encoding="utf-8") as f:
+        #     yaml.safe_dump(dumped_model, f, sort_keys=False, indent=2)
 
-        for _, module_name in enumerate(module_names):
-            module_config = yaml_data_loader.get_initialized_config(module_name)
-            assert module_config is not None
+        assert len(kb.citations) > 0
+        assert len(kb.information_sources) > 0
+        assert len(kb.examinations) > 0
+        assert len(kb.examination_types) > 0
+        assert len(kb.indications) > 0
+        assert len(kb.indication_types) > 0
+        assert len(kb.findings) > 0
+        assert len(kb.finding_types) > 0
+        assert len(kb.classifications) > 0
+        assert len(kb.classification_types) > 0
+        assert len(kb.classification_choices) > 0
+        assert len(kb.interventions) > 0
+        assert len(kb.intervention_types) > 0
 
-            submodule_files = module_config.data.get_files_with_suffix(".yaml")
+        counts = kb.count_entries()
 
-            for sm_file in submodule_files:
-                parsed_object_generator = parse_shallow_object(sm_file)
-                sample = [_ for _ in parsed_object_generator]
-                assert len(sample) > 0
-                msg += f"  - Parsed object from {sm_file}: {sample}\n"
-
-        log_writer(f"Knowledge Base '{demo_kb_config_name}' modules parsed:\n{msg}")
+        log_str = "".join([f"{key}: {value}" for key, value in counts.items()])
+        log_writer(
+            message="Loaded knowledge base entry counts:\n" + log_str,
+        )

@@ -3,7 +3,8 @@ description: ""
 version: 0.1.0
 modules: []
 depends_on:
-  - lx_interventions
+  - lx_classification_choices
 data:
   dirs:
     - ./data
+    - ./classification_types

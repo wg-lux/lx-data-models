@@ -5,6 +5,7 @@ from .examination import ExaminationShallow, ExaminationTypeShallow
 from .finding import FindingShallow, FindingTypeShallow
 from .indication import IndicationShallow, IndicationTypeShallow
 from .information_source import InformationSourceShallow, InformationSourceTypeShallow
+from .intervention import InterventionShallow, InterventionTypeShallow
 
 __all__ = [
     "CitationShallow",
@@ -19,4 +20,6 @@ __all__ = [
     "IndicationTypeShallow",
     "InformationSourceShallow",
     "InformationSourceTypeShallow",
+    "InterventionShallow",
+    "InterventionTypeShallow",
 ]
