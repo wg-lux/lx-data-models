@@ -34,15 +34,23 @@ class KnowledgeBase(BaseModelMixin):
     findings: Dict[str, "FindingShallow"] = Field(default_factory=dict)
     finding_types: Dict[str, "FindingTypeShallow"] = Field(default_factory=dict)
     classifications: Dict[str, "ClassificationShallow"] = Field(default_factory=dict)
-    classification_types: Dict[str, "ClassificationTypeShallow"] = Field(default_factory=dict)
-    classification_choices: Dict[str, "ClassificationChoiceShallow"] = Field(default_factory=dict)
+    classification_types: Dict[str, "ClassificationTypeShallow"] = Field(
+        default_factory=dict
+    )
+    classification_choices: Dict[str, "ClassificationChoiceShallow"] = Field(
+        default_factory=dict
+    )
     examinations: Dict[str, "ExaminationShallow"] = Field(default_factory=dict)
     examination_types: Dict[str, "ExaminationTypeShallow"] = Field(default_factory=dict)
     indications: Dict[str, "IndicationShallow"] = Field(default_factory=dict)
     indication_types: Dict[str, "IndicationTypeShallow"] = Field(default_factory=dict)
     interventions: Dict[str, "InterventionShallow"] = Field(default_factory=dict)
-    intervention_types: Dict[str, "InterventionTypeShallow"] = Field(default_factory=dict)
-    information_sources: Dict[str, "InformationSourceShallow"] = Field(default_factory=dict)
+    intervention_types: Dict[str, "InterventionTypeShallow"] = Field(
+        default_factory=dict
+    )
+    information_sources: Dict[str, "InformationSourceShallow"] = Field(
+        default_factory=dict
+    )
 
     @classmethod
     def create_from_config(cls, config: "KnowledgeBaseConfig") -> "KnowledgeBase":
@@ -98,7 +106,9 @@ class KnowledgeBase(BaseModelMixin):
                 elif isinstance(parsed_object, InformationSourceShallow):  # type: ignore[unreachable]
                     kb.information_sources[parsed_object.name] = parsed_object
                 else:
-                    raise TypeError(f"Unsupported shallow model type: {type(parsed_object)}")
+                    raise TypeError(
+                        f"Unsupported shallow model type: {type(parsed_object)}"
+                    )
         return kb
 
     def import_knowledge_base(self, other: "KnowledgeBase") -> None:
@@ -121,19 +131,6 @@ class KnowledgeBase(BaseModelMixin):
         self.intervention_types.update(other.intervention_types)
         self.information_sources.update(other.information_sources)
 
-    def get_citation(self, name: str) -> "CitationShallow":
-        """Get a citation by name.
-
-        Args:
-            name (str): The name of the citation.
-        Returns:
-            CitationShallow: The citation with the given name.
-        """
-        citation = self.citations.get(name)
-        if citation is None:
-            raise KeyError(f"Citation '{name}' not found in knowledge base.")
-        return citation
-
     def count_entries(self) -> Dict[str, int]:
         """Count the number of entries in each category of the knowledge base.
 
@@ -155,3 +152,152 @@ class KnowledgeBase(BaseModelMixin):
             "intervention_types": len(self.intervention_types),
             "information_sources": len(self.information_sources),
         }
+
+    def get_citation(self, name: str) -> "CitationShallow":
+        """Get a citation by name.
+
+        Args:
+            name (str): The name of the citation.
+        Returns:
+            CitationShallow: The citation with the given name.
+        """
+        citation = self.citations.get(name)
+        if citation is None:
+            raise KeyError(f"Citation '{name}' not found in knowledge base.")
+        return citation
+
+    def get_finding(self, name: str) -> "FindingShallow":
+        """Get a finding by name.
+
+        Args:
+            name (str): The name of the finding.
+        Returns:
+            FindingShallow: The finding with the given name.
+        """
+        finding = self.findings.get(name)
+        if finding is None:
+            raise KeyError(f"Finding '{name}' not found in knowledge base.")
+        return finding
+
+    def get_finding_type(self, name: str) -> "FindingTypeShallow":
+        """Get a finding type by name.
+        Args:
+            name (str): The name of the finding type.
+        Returns:
+            FindingTypeShallow: The finding type with the given name.
+        """
+        finding_type = self.finding_types.get(name)
+        if finding_type is None:
+            raise KeyError(f"Finding type '{name}' not found in knowledge base.")
+        return finding_type
+
+    def get_classification(self, name: str) -> "ClassificationShallow":
+        classification = self.classifications.get(name)
+        if classification is None:
+            raise KeyError(f"Classification '{name}' not found in knowledge base.")
+        return classification
+
+    def get_classification_type(self, name: str) -> "ClassificationTypeShallow":
+        classification_type = self.classification_types.get(name)
+        if classification_type is None:
+            raise KeyError(f"Classification type '{name}' not found in knowledge base.")
+        return classification_type
+
+    def get_classification_choice(self, name: str) -> "ClassificationChoiceShallow":
+        classification_choice = self.classification_choices.get(name)
+        if classification_choice is None:
+            raise KeyError(
+                f"Classification choice '{name}' not found in knowledge base."
+            )
+        return classification_choice
+
+    def get_examination(self, name: str) -> "ExaminationShallow":
+        """Get an examination by name.
+
+        Args:
+            name (str): The name of the examination.
+        Returns:
+            ExaminationShallow: The examination with the given name.
+        """
+        examination = self.examinations.get(name)
+        if examination is None:
+            raise KeyError(f"Examination '{name}' not found in knowledge base.")
+        return examination
+
+    def get_examination_type(self, name: str) -> "ExaminationTypeShallow":
+        """Get an examination type by name.
+
+        Args:
+            name (str): The name of the examination type.
+        Returns:
+            ExaminationTypeShallow: The examination type with the given name.
+        """
+        examination_type = self.examination_types.get(name)
+        if examination_type is None:
+            raise KeyError(f"Examination type '{name}' not found in knowledge base.")
+        return examination_type
+
+    def get_intervention(self, name: str) -> "InterventionShallow":
+        """Get an intervention by name.
+
+        Args:
+            name (str): The name of the intervention.
+        Returns:
+            InterventionShallow: The intervention with the given name.
+        """
+        intervention = self.interventions.get(name)
+        if intervention is None:
+            raise KeyError(f"Intervention '{name}' not found in knowledge base.")
+        return intervention
+
+    def get_intervention_type(self, name: str) -> "InterventionTypeShallow":
+        """Get an intervention type by name.
+
+        Args:
+            name (str): The name of the intervention type.
+        Returns:
+            InterventionTypeShallow: The intervention type with the given name.
+        """
+        intervention_type = self.intervention_types.get(name)
+        if intervention_type is None:
+            raise KeyError(f"Intervention type '{name}' not found in knowledge base.")
+        return intervention_type
+
+    def get_indication(self, name: str) -> "IndicationShallow":
+        """Get an indication by name.
+
+        Args:
+            name (str): The name of the indication.
+        Returns:
+            IndicationShallow: The indication with the given name.
+        """
+        indication = self.indications.get(name)
+        if indication is None:
+            raise KeyError(f"Indication '{name}' not found in knowledge base.")
+        return indication
+
+    def get_indication_type(self, name: str) -> "IndicationTypeShallow":
+        """Get an indication type by name.
+
+        Args:
+            name (str): The name of the indication type.
+        Returns:
+            IndicationTypeShallow: The indication type with the given name.
+        """
+        indication_type = self.indication_types.get(name)
+        if indication_type is None:
+            raise KeyError(f"Indication type '{name}' not found in knowledge base.")
+        return indication_type
+
+    def get_information_source(self, name: str) -> "InformationSourceShallow":
+        """Get an information source by name.
+
+        Args:
+            name (str): The name of the information source.
+        Returns:
+            InformationSourceShallow: The information source with the given name.
+        """
+        information_source = self.information_sources.get(name)
+        if information_source is None:
+            raise KeyError(f"Information source '{name}' not found in knowledge base.")
+        return information_source

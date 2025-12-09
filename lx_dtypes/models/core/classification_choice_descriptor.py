@@ -1,0 +1,5 @@
+from lx_dtypes.models.shallow.classification_choice_descriptor import ClassificationChoiceDescriptorShallow
+
+
+class ClassificationChoiceDescriptor(ClassificationChoiceDescriptorShallow):
+    pass

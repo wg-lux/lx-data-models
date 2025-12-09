@@ -1,5 +1,5 @@
-from lx_dtypes.models.base_models.patient import Patient
 from lx_dtypes.models.base_models.person import Person
+from lx_dtypes.models.patient.patient import Patient
 
 
 class TestPatientModel:

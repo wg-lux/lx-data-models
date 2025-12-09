@@ -17,6 +17,34 @@ def list_of_str_factory() -> List[str]:
     return _list
 
 
+def list_of_classification_choice_descriptor_factory():
+    from lx_dtypes.models.core.classification_choice_descriptor import ClassificationChoiceDescriptor
+
+    _list: List["ClassificationChoiceDescriptor"] = []
+    return _list
+
+
+def list_of_patient_finding_classification_choice_descriptor_factory():
+    from lx_dtypes.models.patient.patient_classification_choice_descriptor import PatientFindingClassificationChoiceDescriptor
+
+    _list: List["PatientFindingClassificationChoiceDescriptor"] = []
+    return _list
+
+
+def list_of_patient_finding_classifications_factory():
+    from lx_dtypes.models.patient.patient_finding_classifications import PatientFindingClassifications
+
+    _list: List["PatientFindingClassifications"] = []
+    return _list
+
+
+def list_of_patient_finding_classification_choice_factory():
+    from lx_dtypes.models.patient.patient_finding_classification_choice import PatientFindingClassificationChoice
+
+    _list: List["PatientFindingClassificationChoice"] = []
+    return _list
+
+
 def information_source_type_by_name_factory():
     from lx_dtypes.models.core.information_source import InformationSourceType
 
