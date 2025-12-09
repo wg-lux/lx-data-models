@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Optional, Self, Union
 
-from pydantic import Field
+import yaml
+from pydantic import Field, field_serializer
 
 from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
 from lx_dtypes.models.shallow import (
@@ -19,7 +20,7 @@ from lx_dtypes.models.shallow import (
     InterventionShallow,
     InterventionTypeShallow,
 )
-from lx_dtypes.utils.mixins import BaseModelMixin
+from lx_dtypes.utils.mixins.base_model import BaseModelMixin
 
 
 class KnowledgeBase(BaseModelMixin):
@@ -130,6 +131,29 @@ class KnowledgeBase(BaseModelMixin):
         self.interventions.update(other.interventions)
         self.intervention_types.update(other.intervention_types)
         self.information_sources.update(other.information_sources)
+
+    def export_yaml(self, export_dir: Path, filename: str = "knowledge_base") -> None:
+        """Export the knowledge base to the specified directory.
+
+        Args:
+            export_dir (Path): The directory to export the knowledge base to.
+        """
+        from lx_dtypes.utils.export.export_knowledge_base import export_knowledge_base
+
+        export_knowledge_base(self, export_dir, filename=filename)
+
+    @classmethod
+    def create_from_yaml(cls, yaml_path: Path) -> Self:
+        """Load a knowledge base from a YAML dump.
+
+        Args:
+            yaml_path (Path): The path to the YAML file.
+        """
+        with open(yaml_path, "r", encoding="utf-8") as f:
+            data_dict = yaml.safe_load(f)
+
+        kb = cls.model_validate(data_dict)
+        return kb
 
     def count_entries(self) -> Dict[str, int]:
         """Count the number of entries in each category of the knowledge base.
@@ -301,3 +325,137 @@ class KnowledgeBase(BaseModelMixin):
         if information_source is None:
             raise KeyError(f"Information source '{name}' not found in knowledge base.")
         return information_source
+
+    @field_serializer("citations")
+    def serialize_citations(
+        self, citations: Dict[str, "CitationShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: citation.model_dump() for name, citation in citations.items()
+        }
+        return r
+
+    @field_serializer("findings")
+    def serialize_findings(
+        self, findings: Dict[str, "FindingShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: finding.model_dump() for name, finding in findings.items()
+        }
+        return r
+
+    @field_serializer("finding_types")
+    def serialize_finding_types(
+        self, finding_types: Dict[str, "FindingTypeShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: finding_type.model_dump()
+            for name, finding_type in finding_types.items()
+        }
+        return r
+
+    @field_serializer("classifications")
+    def serialize_classifications(
+        self, classifications: Dict[str, "ClassificationShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: classification.model_dump()
+            for name, classification in classifications.items()
+        }
+        return r
+
+    @field_serializer("classification_types")
+    def serialize_classification_types(
+        self, classification_types: Dict[str, "ClassificationTypeShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: classification_type.model_dump()
+            for name, classification_type in classification_types.items()
+        }
+        return r
+
+    @field_serializer("classification_choices")
+    def serialize_classification_choices(
+        self, classification_choices: Dict[str, "ClassificationChoiceShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: classification_choice.model_dump()
+            for name, classification_choice in classification_choices.items()
+        }
+        return r
+
+    @field_serializer("examinations")
+    def serialize_examinations(
+        self, examinations: Dict[str, "ExaminationShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: examination.model_dump() for name, examination in examinations.items()
+        }
+        return r
+
+    @field_serializer("examination_types")
+    def serialize_examination_types(
+        self, examination_types: Dict[str, "ExaminationTypeShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: examination_type.model_dump()
+            for name, examination_type in examination_types.items()
+        }
+        return r
+
+    @field_serializer("interventions")
+    def serialize_interventions(
+        self, interventions: Dict[str, "InterventionShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: intervention.model_dump()
+            for name, intervention in interventions.items()
+        }
+        return r
+
+    @field_serializer("intervention_types")
+    def serialize_intervention_types(
+        self, intervention_types: Dict[str, "InterventionTypeShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: intervention_type.model_dump()
+            for name, intervention_type in intervention_types.items()
+        }
+        return r
+
+    @field_serializer("indications")
+    def serialize_indications(
+        self, indications: Dict[str, "IndicationShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: indication.model_dump() for name, indication in indications.items()
+        }
+        return r
+
+    @field_serializer("indication_types")
+    def serialize_indication_types(
+        self, indication_types: Dict[str, "IndicationTypeShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: indication_type.model_dump()
+            for name, indication_type in indication_types.items()
+        }
+        return r
+
+    @field_serializer("information_sources")
+    def serialize_information_sources(
+        self, information_sources: Dict[str, "InformationSourceShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: information_source.model_dump()
+            for name, information_source in information_sources.items()
+        }
+        return r
+
+    @field_serializer("config")
+    def serialize_config(
+        self, config: Optional["KnowledgeBaseConfig"]
+    ) -> Optional[Dict[str, Any]]:
+        if config is None:
+            return None
+        return config.model_dump()

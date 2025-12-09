@@ -1,13 +1,17 @@
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Self
+from typing import Any, Dict, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
+
+from lx_dtypes.utils.json_encoders import serialize_path
 
 
 class AppBaseModel(BaseModel):
     source_file: Path | None = None
-    created_at: AwareDatetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: AwareDatetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     model_config = ConfigDict(
         # 1. Strips leading/trailing whitespace automatically ("  val  " -> "val")
         str_strip_whitespace=True,
@@ -17,6 +21,16 @@ class AppBaseModel(BaseModel):
         validate_default=True,
         # 4. Allows population by alias (e.g. accepting "camelCase" input)
         populate_by_name=True,
+        ser_json_timedelta="iso8601",
+        ser_json_temporal="iso8601",
+        val_temporal_unit="seconds",
+        ser_json_bytes="utf8",
+        val_json_bytes="utf8",
+        ser_json_inf_nan="strings",
+        regex_engine="rust-regex",
+        validate_by_name=False,
+        serialize_by_alias=False,
+        json_encoders={Path: serialize_path},
     )
 
     @classmethod
@@ -31,6 +45,25 @@ class AppBaseModel(BaseModel):
         instance = cls.model_validate(data)
 
         return instance
+
+    def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+        """Override the default model_dump to exclude certain fields and set defaults."""
+
+        kwargs.setdefault("mode", "json")
+        kwargs.setdefault("by_alias", True)
+        kwargs.setdefault("exclude_none", True)
+        kwargs.setdefault(
+            "exclude",
+            {"source_file", "created_at"} | set(kwargs.get("exclude", [])),
+        )
+        kwargs.setdefault("exclude_defaults", True)
+        kwargs.setdefault("round_trip", True)
+
+        dump = super().model_dump(*args, **kwargs)
+        dump.pop("source_file", None)
+        dump.pop("created_at", None)
+
+        return dump
 
 
 class BaseModelMixin(AppBaseModel):

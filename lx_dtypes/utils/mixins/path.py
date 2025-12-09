@@ -1,14 +1,16 @@
 from pathlib import Path
 from typing import Iterable, List, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import Field, field_validator
+
+from .base_model import AppBaseModel
 
 
 def _empty_path_list() -> List[Path]:
     return []
 
 
-class PathMixin(BaseModel):
+class PathMixin(AppBaseModel):
     file: Optional[Path] = None
     dir: Optional[Path] = None
     files: List[Path] = Field(default_factory=_empty_path_list)

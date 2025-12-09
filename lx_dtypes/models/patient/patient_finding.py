@@ -2,8 +2,10 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import Field
 
+from lx_dtypes.models.patient.patient_finding_classification_choice import (
+    PatientFindingClassificationChoice,
+)
 from lx_dtypes.utils.factories.field_defaults import (
-    list_of_patient_finding_classifications_factory,
     uuid_factory,
 )
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
@@ -16,9 +18,7 @@ class PatientFinding(AppBaseModel):
     patient_uuid: str
     patient_examination_uuid: Optional[str] = None
     finding_name: str
-    classifications: List[PatientFindingClassifications] = Field(
-        default_factory=list_of_patient_finding_classifications_factory
-    )
+    classifications: Optional[PatientFindingClassifications] = None
 
     @classmethod
     def create(
@@ -43,7 +43,31 @@ class PatientFinding(AppBaseModel):
             "patient_uuid": patient_uuid,
             "finding_name": finding_name,
             "patient_examination_uuid": patient_examination_uuid,
-            "classifications": [],
         }
         instance = cls.model_validate(model_dict)
+        _ = instance.get_or_create_classifications()
         return instance
+
+    def get_or_create_classifications(self) -> PatientFindingClassifications:
+        if self.classifications is None:
+            self.classifications = PatientFindingClassifications(
+                patient_uuid=self.patient_uuid,
+                patient_examination_uuid=self.patient_examination_uuid,
+                patient_finding_uuid=self.uuid,
+                finding_name=self.finding_name,
+            )
+        return self.classifications
+
+    def add_classification_choice(
+        self, classification_choice: "PatientFindingClassificationChoice"
+    ):
+        classifications = self.get_or_create_classifications()
+
+        assert (
+            classification_choice.patient_finding_classifications_uuid
+            == classifications.uuid
+        )
+        assert classification_choice.patient_finding_uuid == self.uuid
+        assert classification_choice.patient_uuid == self.patient_uuid
+
+        classifications.choices.append(classification_choice)

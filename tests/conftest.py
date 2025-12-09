@@ -9,6 +9,9 @@ from .fixtures.dataloader import (
 from .fixtures.knowledge_base import lx_knowledge_base
 from .fixtures.logs import log_writer, logger
 from .fixtures.object_names import (
+    classification_choice_name_lesion_size_oval_mm,
+    classification_choice_name_paris_1s,
+    classification_name_lesion_size_mm,
     examination_name_colonoscopy,
     finding_name_colon_polyp,
 )
@@ -75,4 +78,7 @@ __all__ = [
     "finding_name_colon_polyp",
     "sample_patient_examination",
     "sample_patient_finding_colon_polyp",
+    "classification_name_lesion_size_mm",
+    "classification_choice_name_lesion_size_oval_mm",
+    "classification_choice_name_paris_1s",
 ]

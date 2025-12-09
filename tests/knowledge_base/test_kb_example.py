@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Callable
 
 from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
@@ -5,15 +6,18 @@ from lx_dtypes.utils.logging import Log
 
 
 class TestKnowledgeBaseModel:
-    def test_load_default_kb(self, lx_knowledge_base: KnowledgeBase, log_writer: Callable[..., Log]):
+    def test_load_default_kb(
+        self,
+        lx_knowledge_base: KnowledgeBase,
+        log_writer: Callable[..., Log],
+        tmp_path: Path,
+    ):
         kb = lx_knowledge_base
 
-        # TODO REMOVE LATER
         # Dump loaded KB to YAML for inspection
-        # output_path = Path("./loaded_kb_dump.yaml")
-        # dumped_model = kb.model_dump(mode="json")  # , exclude_defaults=True, exclude_none=True, exclude_unset=True)
-        # with output_path.open("w", encoding="utf-8") as f:
-        #     yaml.safe_dump(dumped_model, f, sort_keys=False, indent=2)
+        output_dir = Path(".")
+
+        kb.export_yaml(export_dir=output_dir)
 
         assert len(kb.citations) > 0
         assert len(kb.information_sources) > 0
@@ -35,3 +39,14 @@ class TestKnowledgeBaseModel:
         log_writer(
             message="Loaded knowledge base entry counts:\n" + log_str,
         )
+
+        kb.export_yaml(export_dir=tmp_path, filename="exported_kb")
+        exported_yaml_path = tmp_path / "exported_kb.yaml"
+        assert exported_yaml_path.exists()
+        # Load back the exported YAML to verify
+        new_kb = KnowledgeBase.create_from_yaml(exported_yaml_path)
+
+        initial_dump = kb.model_dump()
+        new_dump = new_kb.model_dump()
+
+        assert initial_dump == new_dump

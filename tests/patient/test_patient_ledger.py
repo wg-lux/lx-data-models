@@ -33,3 +33,9 @@ class TestPatientLedgerModel:
             )
         else:
             assert False, "Expected KeyError was not raised."
+
+    def test_patient_ledger_examination_exists_not(
+        self, sample_patient_ledger: PatientLedger
+    ):
+        ledger = sample_patient_ledger
+        assert not ledger._examination_exists("non-existent-exam-uuid")  # type: ignore

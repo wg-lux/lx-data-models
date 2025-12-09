@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from lx_dtypes.utils.mixins.base_model import AppBaseModel
 from lx_dtypes.utils.mixins.path import PathMixin
 
 
@@ -13,7 +12,6 @@ class TestPathMixin:
         test_file_path_str = str(test_file)
 
         class TestModel(
-            AppBaseModel,
             PathMixin,
         ):
             pass

@@ -68,10 +68,9 @@ class TestPatientInterfaceModel:
         ]
         assert finding_name_colon_polyp in findings_names
 
-    def test_pi_get_pf_by_pe_and_f_uuid(
+    def test_interface_get_pf_by_pe_and_f_uuid(
         self,
         sample_patient_finding_colon_polyp: Tuple[PatientFinding, PatientInterface],
-        finding_name_colon_polyp: str,
     ):
         # First, create the finding
         finding, sample_patient_interface = sample_patient_finding_colon_polyp
@@ -85,3 +84,122 @@ class TestPatientInterfaceModel:
             finding_uuid=finding_uuid,
         )
         assert retrieved_finding == finding
+
+    def test_patient_finding_get_or_create_classifications(
+        self,
+        sample_patient_finding_colon_polyp: Tuple[PatientFinding, PatientInterface],
+    ):
+        finding, _sample_patient_interface = sample_patient_finding_colon_polyp
+        classifications = finding.classifications
+        assert classifications is not None
+        assert classifications.patient_finding_uuid == finding.uuid
+        assert (
+            classifications.patient_examination_uuid == finding.patient_examination_uuid
+        )
+        assert classifications.patient_uuid == finding.patient_uuid
+
+    def test_patient_interface_add_classification_choice_to_finding(
+        self,
+        sample_patient_finding_colon_polyp: Tuple[PatientFinding, PatientInterface],
+        classification_choice_name_lesion_size_oval_mm: str,
+        classification_name_lesion_size_mm: str,
+    ):
+        patient_finding, patient_interface = sample_patient_finding_colon_polyp
+        examination_id = patient_finding.patient_examination_uuid
+        assert examination_id is not None
+
+        patient_interface.add_classification_choice_to_finding(
+            examination_uuid=examination_id,
+            finding_uuid=patient_finding.uuid,
+            classification_name=classification_name_lesion_size_mm,
+            choice_name=classification_choice_name_lesion_size_oval_mm,
+        )
+
+        examination = patient_interface.get_patient_examination_by_uuid(examination_id)
+        finding = examination.get_finding_by_uuid(patient_finding.uuid)
+        classifications = finding.get_or_create_classifications()
+        choice_names = [choice.name for choice in classifications.choices]
+        assert classification_choice_name_lesion_size_oval_mm in choice_names
+
+    def test_patient_interface_add_invalid_classification_choice_to_finding_raises(
+        self,
+        sample_patient_finding_colon_polyp: Tuple[PatientFinding, PatientInterface],
+    ):
+        patient_finding, patient_interface = sample_patient_finding_colon_polyp
+        examination_id = patient_finding.patient_examination_uuid
+        assert examination_id is not None
+
+        invalid_classification_name = "NonExistentClassification"
+        invalid_choice_name = "NonExistentChoice"
+
+        try:
+            patient_interface.add_classification_choice_to_finding(
+                examination_uuid=examination_id,
+                finding_uuid=patient_finding.uuid,
+                classification_name=invalid_classification_name,
+                choice_name=invalid_choice_name,
+            )
+        except ValueError as e:
+            assert (
+                str(e)
+                == f"Classification '{invalid_classification_name}' does not exist in the knowledge base."
+            )
+        else:
+            assert False, "Expected ValueError was not raised."
+
+    def test_patient_interface_add_invalid_choice_to_finding_raises(
+        self,
+        sample_patient_finding_colon_polyp: Tuple[PatientFinding, PatientInterface],
+        classification_name_lesion_size_mm: str,
+    ):
+        patient_finding, patient_interface = sample_patient_finding_colon_polyp
+        examination_id = patient_finding.patient_examination_uuid
+        assert examination_id is not None
+
+        invalid_choice_name = "NonExistentChoice"
+
+        try:
+            patient_interface.add_classification_choice_to_finding(
+                examination_uuid=examination_id,
+                finding_uuid=patient_finding.uuid,
+                classification_name=classification_name_lesion_size_mm,
+                choice_name=invalid_choice_name,
+            )
+        except ValueError as e:
+            assert (
+                str(e)
+                == f"Classification choice '{invalid_choice_name}' does not exist in the knowledge base."
+            )
+        else:
+            assert False, "Expected ValueError was not raised."
+
+    def test_patient_interface_add_choice_not_in_valid_choices_raises(
+        self,
+        sample_patient_finding_colon_polyp: Tuple[PatientFinding, PatientInterface],
+        classification_name_lesion_size_mm: str,
+        classification_choice_name_paris_1s: str,
+    ):
+        patient_finding, patient_interface = sample_patient_finding_colon_polyp
+        examination_id = patient_finding.patient_examination_uuid
+        assert examination_id is not None
+
+        invalid_choice_name = classification_choice_name_paris_1s
+
+        try:
+            patient_interface.add_classification_choice_to_finding(
+                examination_uuid=examination_id,
+                finding_uuid=patient_finding.uuid,
+                classification_name=classification_name_lesion_size_mm,
+                choice_name=invalid_choice_name,
+            )
+        except ValueError as e:
+            classification_object = patient_interface.knowledge_base.get_classification(
+                classification_name_lesion_size_mm
+            )
+            valid_choices = classification_object.choice_names
+            assert str(e) == (
+                f"Choice '{invalid_choice_name}' is not a valid choice for classification "
+                f"'{classification_name_lesion_size_mm}'. Valid choices are: {valid_choices}"
+            )
+        else:
+            assert False, "Expected ValueError was not raised."

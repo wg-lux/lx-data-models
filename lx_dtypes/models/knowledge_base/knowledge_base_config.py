@@ -1,7 +1,7 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
-from pydantic import Field
+from pydantic import Field, field_serializer
 
 from lx_dtypes.models.base_models.path import FilesAndDirsModel
 from lx_dtypes.utils.mixins import BaseModelMixin, TaggedMixin
@@ -36,3 +36,8 @@ class KnowledgeBaseConfig(BaseModelMixin, TaggedMixin):
             config_file = self.source_file
         module_base_dir = config_file.parent
         self.data.resolve_paths(module_base_dir)
+
+    @field_serializer("data")
+    def serialize_data(self, data: FilesAndDirsModel) -> Dict[str, Any]:
+        r = data.model_dump()
+        return r
