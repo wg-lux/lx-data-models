@@ -24,9 +24,9 @@ class PatientLedger(AppBaseModel):
 
     def get_examination_by_uuid(self, examination_uuid: str) -> PatientExamination:
         examination = self.examinations.get(examination_uuid)
-        assert (
-            examination is not None
-        ), f"Examination with UUID {examination_uuid} not found."
+        assert examination is not None, (
+            f"Examination with UUID {examination_uuid} not found."
+        )
         return examination
 
     def get_examinations_by_patient_uuid(

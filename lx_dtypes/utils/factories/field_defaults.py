@@ -53,30 +53,30 @@ def list_of_patient_finding_factory() -> List["PatientFinding"]:
     return _list
 
 
-def list_of_classification_choice_descriptor_factory() -> (
-    List["ClassificationChoiceDescriptor"]
-):
+def list_of_classification_choice_descriptor_factory() -> List[
+    "ClassificationChoiceDescriptor"
+]:
     _list: List["ClassificationChoiceDescriptor"] = []
     return _list
 
 
-def list_of_patient_finding_classification_choice_descriptor_factory() -> (
-    List["PatientFindingClassificationChoiceDescriptor"]
-):
+def list_of_patient_finding_classification_choice_descriptor_factory() -> List[
+    "PatientFindingClassificationChoiceDescriptor"
+]:
     _list: List["PatientFindingClassificationChoiceDescriptor"] = []
     return _list
 
 
-def list_of_patient_finding_classifications_factory() -> (
-    List["PatientFindingClassifications"]
-):
+def list_of_patient_finding_classifications_factory() -> List[
+    "PatientFindingClassifications"
+]:
     _list: List["PatientFindingClassifications"] = []
     return _list
 
 
-def list_of_patient_finding_classification_choice_factory() -> (
-    List["PatientFindingClassificationChoice"]
-):
+def list_of_patient_finding_classification_choice_factory() -> List[
+    "PatientFindingClassificationChoice"
+]:
     _list: List["PatientFindingClassificationChoice"] = []
     return _list
 
