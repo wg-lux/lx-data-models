@@ -60,6 +60,9 @@ jobs:
         with:
           packages-dir: dist
           repository-url: https://test.pypi.org/legacy/
+          # Twine 5.x (bundled with the action) cannot parse Metadata-Version 2.4,
+          # so rely on the earlier `twine check` step instead.
+          verify-metadata: false
 
   publish-pypi:
     name: Upload to PyPI
@@ -80,3 +83,6 @@ jobs:
         uses: pypa/gh-action-pypi-publish@v1.10.1
         with:
           packages-dir: dist
+          # Twine 5.x (bundled with the action) cannot parse Metadata-Version 2.4,
+          # so rely on the earlier `twine check` step instead.
+          verify-metadata: false

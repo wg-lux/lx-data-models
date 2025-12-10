@@ -1,10 +1,11 @@
-"""Public exports for the lx_dtypes package."""
-
-from importlib import metadata as _metadata
+from importlib import metadata
 
 try:
-    __version__ = _metadata.version("lx-dtypes")
-except _metadata.PackageNotFoundError:  # pragma: no cover - only during local dev
+    dist_name = (
+        __package__.replace(  # pragma: no cover - only during local dev # type: ignore
+            "_", "-"
+        )
+    )
+    __version__ = metadata.version(dist_name)
+except metadata.PackageNotFoundError:
     __version__ = "0.0.0"
-
-__all__ = ["__version__"]
