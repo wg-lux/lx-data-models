@@ -63,7 +63,6 @@ in
   };
 
   scripts = {
-
     export-nix-vars.exec = ''
       cat > .devenv-vars.json << EOF
       {
@@ -82,6 +81,11 @@ in
     hello.package = pkgs.zsh;
     hello.exec = "uv run python hello.py";
     pyshell.exec = "uv run python manage.py shell";
+
+    mkdocs.exec = ''
+      uv run make -C docs html
+      uv run make -C docs linkcheck
+    '';
   };
 
   tasks = {
@@ -104,7 +108,7 @@ in
 
   enterShell = ''
 
-    export SYNC_CMD="uv sync --extra dev"
+    export SYNC_CMD="uv sync --extra dev --extra docs"
 
     # Ensure dependencies are synced using uv
     # Check if venv exists. If not, run sync verbosely. If it exists, sync quietly.

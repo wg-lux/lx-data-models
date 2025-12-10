@@ -8,7 +8,7 @@ Understanding *when* things happen is key to using the tools below.
 
 -----
 
-### 1\. The "Golden Standard" Base Model
+### 1. The "Golden Standard" Base Model
 
 Start every project with this. It handles string hygiene and configuration globally, so you don't have to repeat it.
 
@@ -24,13 +24,13 @@ class AppBaseModel(BaseModel):
         # 3. Validates default values (ensures your defaults aren't broken)
         validate_default=True,
         # 4. Allows population by alias (e.g. accepting "camelCase" input)
-        populate_by_name=True
+        populate_by_name=True,
     )
 ```
 
 -----
 
-### 2\. DateTime & Timezones (Strict Mode)
+### 2. DateTime & Timezones (Strict Mode)
 
 Never use naive datetimes. Always use `AwareDatetime` and `default_factory`.
 
@@ -41,7 +41,7 @@ from pydantic import Field, AwareDatetime
 class TimestampModel(AppBaseModel):
     # ✅ CORRECT: Enforces timezone info in input
     event_time: AwareDatetime
-    
+
     # ✅ CORRECT: Dynamic default (calculated at runtime)
     # Stores as UTC, ensuring database consistency
     created_at: AwareDatetime = Field(
@@ -49,12 +49,12 @@ class TimestampModel(AppBaseModel):
     )
 
     # ❌ WRONG: Static default (calculated at server startup)
-    # created_at: datetime = datetime.now() 
+    # created_at: datetime = datetime.now()
 ```
 
 -----
 
-### 3\. Reusable Fields (Mixins)
+### 3. Reusable Fields (Mixins)
 
 Use Mixins for fields that appear across multiple models (like your `name_de`/`name_en` requirement).
 
@@ -84,7 +84,7 @@ class Product(LocalizedNameMixin, AppBaseModel):
 
 -----
 
-### 4\. Advanced Validation Patterns
+### 4. Advanced Validation Patterns
 
 #### A. Sorting & Uniqueness (Lists)
 
@@ -135,7 +135,7 @@ class Inventory(BaseModel):
 
 -----
 
-### 5\. Computed Fields (Derived Data)
+### 5. Computed Fields (Derived Data)
 
 Use this for fields that shouldn't be saved to the DB, but should appear in the API response.
 
@@ -155,7 +155,7 @@ class Rectangle(AppBaseModel):
 
 -----
 
-### 6\. Managing Aliases (Frontend vs Backend)
+### 6. Managing Aliases (Frontend vs Backend)
 
 Handle `camelCase` (JS frontend) vs `snake_case` (Python backend).
 
@@ -165,7 +165,7 @@ from pydantic import Field
 class User(AppBaseModel):
     # Python sees: first_name
     # JSON input/output can be: firstName
-    first_name: str = Field(alias="firstName") 
+    first_name: str = Field(alias="firstName")
 
 # Usage
 # User(firstName="John") -> sets user.first_name to "John"
@@ -249,10 +249,10 @@ Best practices:
 ### Summary Table: Validator Modes
 
 | Decorator | Mode | Use Case |
-| :--- | :--- | :--- |
-| `@field_validator` | `after` (default) | Validating business logic (e.g., "age \> 18"). Data is already Python types. |
+| --- | --- | --- |
+| `@field_validator` | `after` (default) | Validating business logic (e.g., "age > 18"). Data is already Python types. |
 | `@field_validator` | `before` | Pre-processing raw data (e.g., parsing a comma-separated string into a list). |
-| `@model_validator` | `after` | Multi-field logic (e.g., "start\_date must be before end\_date"). |
+| `@model_validator` | `after` | Multi-field logic (e.g., "start_date must be before end_date"). |
 | `@model_validator` | `before` | Reshaping the entire incoming JSON structure before Pydantic touches it. |
 
 ### Next Step

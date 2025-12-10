@@ -4,25 +4,23 @@ Here are the best practices for implementing date and datetime fields in Pydanti
 
 -----
 
-### 1\. Always Use Strong Typing (Not Strings)
+# 1. Always Use Strong Typing (Not Strings)
 
 Never define a date field as a `str`, even if the input is a string from a JSON payload. Use Python’s standard library types. Pydantic will automatically parse ISO 8601 strings into these objects.
 
-  * **`datetime.date`**: For birthdays, holidays, or specific calendar days (no time component).
-  * **`datetime.datetime`**: For timestamps, log events, or scheduled appointments.
-  * **`datetime.time`**: For opening hours or recurring daily events.
+- **`datetime.date`**: For birthdays, holidays, or specific calendar days (no time component).
+- **`datetime.datetime`**: For timestamps, log events, or scheduled appointments.
+- **`datetime.time`**: For opening hours or recurring daily events.
 
-### 2\. Enforce Timezone Awareness (Crucial)
+# 2. Enforce Timezone Awareness (Crucial)
 
 The most common bug in backend systems is mixing **Naive** (no timezone info) and **Aware** (timezone info included) datetimes.
 
 **Best Practice:**
 
-  * Store everything in **UTC**.
-  * Reject naive datetimes at the API boundary.
-  * Use Pydantic's `AwareDatetime` type (introduced in V2).
-
-<!-- end list -->
+- Store everything in **UTC**.
+- Reject naive datetimes at the API boundary.
+- Use Pydantic's `AwareDatetime` type (introduced in V2).
 
 ```python
 from datetime import datetime, timezone
@@ -30,8 +28,8 @@ from pydantic import BaseModel, AwareDatetime
 
 class Event(BaseModel):
     # BAD: Accepts naive datetimes, defaults to local time
-    # created_at: datetime 
-    
+    # created_at: datetime
+
     # GOOD: Ensures the datetime has timezone info
     start_time: AwareDatetime
 
@@ -46,15 +44,15 @@ except Exception as e:
 Event(start_time=datetime(2023, 1, 1, 12, 0, tzinfo=timezone.utc))
 ```
 
-### 3\. Stick to ISO 8601 Standards
+# 3. Stick to ISO 8601 Standards
 
 Pydantic is optimized to parse ISO 8601 formats (e.g., `YYYY-MM-DDTHH:MM:SSZ`).
 
-  * **Input:** Encourage clients to send ISO strings.
-  * **Output:** Pydantic serializes to ISO strings by default.
-  * **Avoid Custom Formats:** Avoid configuring Pydantic to parse format strings like `DD/MM/YYYY`. It makes your API brittle and region-dependent. If you *must* handle a legacy format, use a `BeforeValidator`.
+- **Input:** Encourage clients to send ISO strings.
+- **Output:** Pydantic serializes to ISO strings by default.
+- **Avoid Custom Formats:** Avoid configuring Pydantic to parse format strings like `DD/MM/YYYY`. It makes your API brittle and region-dependent. If you *must* handle a legacy format, use a `BeforeValidator`.
 
-### 4\. Validating Business Logic (Past/Future)
+# 4. Validating Business Logic (Past/Future)
 
 Use the `@field_validator` decorator to enforce logical constraints, such as ensuring a birth date is in the past or a scheduled task is in the future.
 
@@ -77,7 +75,7 @@ class UserProfile(BaseModel):
         return v
 ```
 
-### 5\. Handling "Now" and Defaults
+# 5. Handling "Now" and Defaults
 
 **Never** set a mutable default (like `datetime.now()`) directly in the field definition. Python evaluates default arguments once at definition time, not at instantiation time.
 
@@ -85,7 +83,7 @@ class UserProfile(BaseModel):
 
 ```python
 class Log(BaseModel):
-    timestamp: datetime = datetime.now() # ❌ Fixed to when the server started
+    timestamp: datetime = datetime.now()  # ❌ Fixed to when the server started
 ```
 
 **The Right Way (Field with `default_factory`):**
@@ -99,7 +97,7 @@ class Log(BaseModel):
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 ```
 
-### 6\. Serialization (JSON Output)
+# 6. Serialization (JSON Output)
 
 When you convert your model to JSON (e.g., sending a response in FastAPI), Pydantic converts datetime objects to strings.
 
@@ -117,10 +115,10 @@ class Meeting(BaseModel):
         return dt.strftime('%Y-%m-%d %H:%M')
 ```
 
-### Summary Checklist
+# Summary Checklist
 
 | Feature | Recommendation | Why? |
-| :--- | :--- | :--- |
+| --- | --- | --- |
 | **Type** | `AwareDatetime` | Prevents timezone confusion. |
 | **Defaults** | `Field(default_factory=...)` | Prevents stale timestamps. |
 | **Validation** | `@field_validator` | Enforces logic (e.g., "date must be future"). |
@@ -129,7 +127,7 @@ class Meeting(BaseModel):
 
 -----
 
-### 7\. Example: Putting it all together
+# 7. Example: Putting it all together
 
 Here is a complete, production-ready example using Pydantic V2 features.
 
@@ -141,12 +139,12 @@ from pydantic import BaseModel, Field, AwareDatetime, field_validator
 class Appointment(BaseModel):
     # 1. Use AwareDatetime to enforce timezone
     start_time: AwareDatetime
-    
+
     # 2. Use default_factory for creation times
     created_at: AwareDatetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
-    
+
     description: str
 
     # 3. Validation logic
@@ -162,7 +160,7 @@ class Appointment(BaseModel):
 
 # Valid Input (ISO String with Timezone)
 data = {
-    "start_time": "2030-12-01T14:00:00Z", 
+    "start_time": "2030-12-01T14:00:00Z",
     "description": "Dentist"
 }
 appt = Appointment(**data)
@@ -175,6 +173,6 @@ except Exception as e:
     print(f"\nCaught Expected Error: {e}")
 ```
 
-### Next Step
+# Next Step
 
 Would you like me to write a custom validator for a specific date scenario you are facing, such as handling recurring events or age verification logic?
