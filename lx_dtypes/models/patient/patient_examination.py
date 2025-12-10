@@ -2,10 +2,15 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import Field
 
-from lx_dtypes.utils.factories.field_defaults import uuid_factory
+from lx_dtypes.utils.factories.field_defaults import (
+    list_of_patient_finding_factory,
+    list_of_patient_indication_factory,
+    uuid_factory,
+)
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
 from .patient_finding import PatientFinding
+from .patient_indication import PatientIndication
 
 
 class PatientExamination(AppBaseModel):
@@ -13,7 +18,12 @@ class PatientExamination(AppBaseModel):
     patient_uuid: str
     examination_name: str
     examination_template: Optional[str] = None
-    findings: List[PatientFinding]
+    findings: List[PatientFinding] = Field(
+        default_factory=list_of_patient_finding_factory
+    )
+    indications: List[PatientIndication] = Field(
+        default_factory=list_of_patient_indication_factory
+    )
 
     @classmethod
     def create(
@@ -57,3 +67,29 @@ class PatientExamination(AppBaseModel):
                 f"Finding with UUID {finding_uuid} not found in examination {self.uuid}."
             )
         return finding
+
+    def delete_finding(self, finding_uuid: str):
+        finding = self.get_finding_by_uuid(finding_uuid)
+        self.findings.remove(finding)
+
+    def create_indication(self, indication_name: str) -> PatientIndication:
+        indication = PatientIndication.create(
+            patient_uuid=self.patient_uuid,
+            indication_name=indication_name,
+        )
+        self.indications.append(indication)
+        return indication
+
+    def get_indication_by_uuid(self, indication_uuid: str) -> PatientIndication:
+        indication = next(
+            (i for i in self.indications if i.uuid == indication_uuid), None
+        )
+        if indication is None:
+            raise ValueError(
+                f"Indication with UUID {indication_uuid} not found in examination {self.uuid}."
+            )
+        return indication
+
+    def delete_indication(self, indication_uuid: str):
+        indication = self.get_indication_by_uuid(indication_uuid)
+        self.indications.remove(indication)

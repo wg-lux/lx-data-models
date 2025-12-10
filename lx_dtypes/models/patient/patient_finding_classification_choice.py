@@ -63,3 +63,4 @@ class PatientFindingClassificationChoice(AppBaseModel):
         }
         instance = cls.model_validate(model_dict)
         return instance
+

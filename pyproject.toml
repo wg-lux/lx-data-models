@@ -59,6 +59,8 @@ strict = true
 
 [tool.pytest.ini_options]
 addopts = """
+    -n auto
+    --dist=loadscope
     --cov=lx_dtypes
     --cov-report=term-missing
     --cov-report=xml

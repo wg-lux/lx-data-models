@@ -11,9 +11,11 @@ from .fixtures.logs import log_writer, logger
 from .fixtures.object_names import (
     classification_choice_name_lesion_size_oval_mm,
     classification_choice_name_paris_1s,
+    classification_name_colon_lesion_paris,
     classification_name_lesion_size_mm,
     examination_name_colonoscopy,
     finding_name_colon_polyp,
+    indication_name_screening_colonoscopy,
 )
 from .fixtures.paths import (
     log_dir,
@@ -32,6 +34,7 @@ from .fixtures.patient import sample_patient
 from .fixtures.patient_examination import (
     sample_patient_examination,
     sample_patient_finding_colon_polyp,
+    sample_patient_finding_with_classification_choice,
 )
 from .fixtures.patient_interface import sample_patient_interface
 from .fixtures.patient_ledger import (
@@ -81,4 +84,7 @@ __all__ = [
     "classification_name_lesion_size_mm",
     "classification_choice_name_lesion_size_oval_mm",
     "classification_choice_name_paris_1s",
+    "indication_name_screening_colonoscopy",
+    "sample_patient_finding_with_classification_choice",
+    "classification_name_colon_lesion_paris",
 ]

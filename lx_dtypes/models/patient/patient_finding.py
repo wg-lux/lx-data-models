@@ -71,3 +71,7 @@ class PatientFinding(AppBaseModel):
         assert classification_choice.patient_uuid == self.patient_uuid
 
         classifications.choices.append(classification_choice)
+
+    def delete_classification_choice(self, classification_choice_uuid: str):
+        classifications = self.get_or_create_classifications()
+        classifications.delete_choice(classification_choice_uuid)

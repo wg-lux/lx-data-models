@@ -17,29 +17,51 @@ def list_of_str_factory() -> List[str]:
     return _list
 
 
+def list_of_patient_indication_factory():
+    from lx_dtypes.models.patient.patient_indication import PatientIndication
+
+    _list: List["PatientIndication"] = []
+    return _list
+
+
+def list_of_patient_finding_factory():
+    from lx_dtypes.models.patient.patient_finding import PatientFinding
+
+    _list: List["PatientFinding"] = []
+    return _list
+
+
 def list_of_classification_choice_descriptor_factory():
-    from lx_dtypes.models.core.classification_choice_descriptor import ClassificationChoiceDescriptor
+    from lx_dtypes.models.core.classification_choice_descriptor import (
+        ClassificationChoiceDescriptor,
+    )
 
     _list: List["ClassificationChoiceDescriptor"] = []
     return _list
 
 
 def list_of_patient_finding_classification_choice_descriptor_factory():
-    from lx_dtypes.models.patient.patient_classification_choice_descriptor import PatientFindingClassificationChoiceDescriptor
+    from lx_dtypes.models.patient.patient_classification_choice_descriptor import (
+        PatientFindingClassificationChoiceDescriptor,
+    )
 
     _list: List["PatientFindingClassificationChoiceDescriptor"] = []
     return _list
 
 
 def list_of_patient_finding_classifications_factory():
-    from lx_dtypes.models.patient.patient_finding_classifications import PatientFindingClassifications
+    from lx_dtypes.models.patient.patient_finding_classifications import (
+        PatientFindingClassifications,
+    )
 
     _list: List["PatientFindingClassifications"] = []
     return _list
 
 
 def list_of_patient_finding_classification_choice_factory():
-    from lx_dtypes.models.patient.patient_finding_classification_choice import PatientFindingClassificationChoice
+    from lx_dtypes.models.patient.patient_finding_classification_choice import (
+        PatientFindingClassificationChoice,
+    )
 
     _list: List["PatientFindingClassificationChoice"] = []
     return _list

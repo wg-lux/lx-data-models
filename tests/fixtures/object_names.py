@@ -17,6 +17,11 @@ def classification_name_lesion_size_mm() -> str:
 
 
 @fixture(scope="session")
+def classification_name_colon_lesion_paris() -> str:
+    return "colon_lesion_paris"
+
+
+@fixture(scope="session")
 def classification_choice_name_lesion_size_oval_mm() -> str:
     return "lesion_size_oval_mm"
 
@@ -24,3 +29,8 @@ def classification_choice_name_lesion_size_oval_mm() -> str:
 @fixture(scope="session")
 def classification_choice_name_paris_1s() -> str:
     return "colon_lesion_paris_Is"
+
+
+@fixture(scope="session")
+def indication_name_screening_colonoscopy() -> str:
+    return "colonoscopy_screening"
