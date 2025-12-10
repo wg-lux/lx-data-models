@@ -1,8 +1,9 @@
-name: lx_classification_choices
+name: lx_descriptors
 description: ""
 version: 0.1.0
+modules: []
 depends_on:
-  - lx_descriptors
+  - lx_units
 data:
   dirs:
     - ./data

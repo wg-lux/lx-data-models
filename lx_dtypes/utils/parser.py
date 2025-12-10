@@ -20,6 +20,7 @@ from lx_dtypes.models.shallow.intervention import (
     InterventionShallow,
     InterventionTypeShallow,
 )
+from lx_dtypes.models.shallow.unit import UnitShallow, UnitTypeShallow
 
 model_types = Union[
     type[InformationSourceShallow],
@@ -35,6 +36,8 @@ model_types = Union[
     type[IndicationTypeShallow],
     type[InterventionShallow],
     type[InterventionTypeShallow],
+    type[UnitShallow],
+    type[UnitTypeShallow],
 ]
 
 ShallowModel = Union[
@@ -51,6 +54,8 @@ ShallowModel = Union[
     IndicationTypeShallow,
     InterventionShallow,
     InterventionTypeShallow,
+    UnitShallow,
+    UnitTypeShallow,
 ]
 
 model_lookup: Dict[str, model_types] = {
@@ -67,6 +72,8 @@ model_lookup: Dict[str, model_types] = {
     "indication_type": IndicationTypeShallow,
     "intervention": InterventionShallow,
     "intervention_type": InterventionTypeShallow,
+    "unit": UnitShallow,
+    "unit_type": UnitTypeShallow,
 }
 
 allowed_types = [v for _, v in model_lookup.items()]

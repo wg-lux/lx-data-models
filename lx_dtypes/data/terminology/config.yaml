@@ -7,3 +7,4 @@ modules:
   - lx_interventions
   - lx_classifications
   - lx_classification_choices
+  - lx_descriptors

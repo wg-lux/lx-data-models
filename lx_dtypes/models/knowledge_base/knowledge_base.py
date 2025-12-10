@@ -19,6 +19,8 @@ from lx_dtypes.models.shallow import (
     InformationSourceShallow,
     InterventionShallow,
     InterventionTypeShallow,
+    UnitShallow,
+    UnitTypeShallow,
 )
 from lx_dtypes.utils.mixins.base_model import BaseModelMixin
 
@@ -52,6 +54,8 @@ class KnowledgeBase(BaseModelMixin):
     information_sources: Dict[str, "InformationSourceShallow"] = Field(
         default_factory=dict
     )
+    units: Dict[str, "UnitShallow"] = Field(default_factory=dict)
+    unit_types: Dict[str, "UnitTypeShallow"] = Field(default_factory=dict)
 
     @classmethod
     def create_from_config(cls, config: "KnowledgeBaseConfig") -> "KnowledgeBase":
@@ -104,8 +108,12 @@ class KnowledgeBase(BaseModelMixin):
                     kb.interventions[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, InterventionTypeShallow):
                     kb.intervention_types[parsed_object.name] = parsed_object
-                elif isinstance(parsed_object, InformationSourceShallow):  # type: ignore[unreachable]
+                elif isinstance(parsed_object, InformationSourceShallow):
                     kb.information_sources[parsed_object.name] = parsed_object
+                elif isinstance(parsed_object, UnitShallow):
+                    kb.units[parsed_object.name] = parsed_object
+                elif isinstance(parsed_object, UnitTypeShallow):  # type: ignore[unreachable]
+                    kb.unit_types[parsed_object.name] = parsed_object
                 else:
                     raise TypeError(
                         f"Unsupported shallow model type: {type(parsed_object)}"
@@ -131,6 +139,8 @@ class KnowledgeBase(BaseModelMixin):
         self.interventions.update(other.interventions)
         self.intervention_types.update(other.intervention_types)
         self.information_sources.update(other.information_sources)
+        self.units.update(other.units)
+        self.unit_types.update(other.unit_types)
 
     def export_yaml(self, export_dir: Path, filename: str = "knowledge_base") -> None:
         """Export the knowledge base to the specified directory.
@@ -459,3 +469,17 @@ class KnowledgeBase(BaseModelMixin):
         if config is None:
             return None
         return config.model_dump()
+
+    @field_serializer("units")
+    def serialize_units(self, units: Dict[str, "UnitShallow"]) -> Dict[str, Any]:
+        r: Dict[str, Any] = {name: unit.model_dump() for name, unit in units.items()}
+        return r
+
+    @field_serializer("unit_types")
+    def serialize_unit_types(
+        self, unit_types: Dict[str, "UnitTypeShallow"]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: unit_type.model_dump() for name, unit_type in unit_types.items()
+        }
+        return r

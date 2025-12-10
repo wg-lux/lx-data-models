@@ -17,6 +17,13 @@ def list_of_str_factory() -> List[str]:
     return _list
 
 
+def list_of_unit_types_factory():
+    from lx_dtypes.models.core.unit import UnitType
+
+    _list: List["UnitType"] = []
+    return _list
+
+
 def list_of_patient_indication_factory():
     from lx_dtypes.models.patient.patient_indication import PatientIndication
 

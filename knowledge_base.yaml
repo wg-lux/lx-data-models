@@ -7951,6 +7951,8 @@ config:
   - lx_hardware
   - example_terminology
   - lx_interventions
+  - lx_units
+  - lx_descriptors
   - lx_classification_choices
   - lx_classifications
   - lx_findings
@@ -9023,3 +9025,228 @@ interventions:
 name: lx_knowledge_base
 name_de: lx_knowledge_base
 name_en: lx_knowledge_base
+unit_types: {}
+units:
+  centimeter:
+    abbreviation: cm
+    description: centimeters
+    name: centimeter
+    name_de: Zentimeter
+    name_en: Centimeter
+  cubic_meter:
+    abbreviation: "m\xB3"
+    description: cubic meters
+    name: cubic_meter
+    name_de: Kubikmeter
+    name_en: Cubic Meter
+  days:
+    abbreviation: d
+    name: days
+    name_de: Tage
+    name_en: Days
+  dose:
+    abbreviation: ''
+    name: dose
+    name_de: Dosierung(en)
+    name_en: dose(s)
+  femtoliter:
+    abbreviation: fl
+    description: femtoliters
+    name: femtoliter
+    name_de: Femtoliter
+    name_en: Femtolitre
+  gram:
+    abbreviation: g
+    description: grams
+    name: gram
+    name_de: Gramm
+    name_en: Gram
+  gram per deciliter:
+    name: gram per deciliter
+    name_de: Gramm pro Deziliter
+    name_en: gram per deciliter
+  gram per liter:
+    abbreviation: g/L
+    name: gram per liter
+    name_de: Gramm pro Liter
+    name_en: gram per liter
+  hours:
+    abbreviation: h
+    name: hours
+    name_de: Stunden
+    name_en: Hours
+  kilogram:
+    abbreviation: kg
+    description: kilograms
+    name: kilogram
+    name_de: Kilogramm
+    name_en: Kilogram
+  kilometer:
+    abbreviation: km
+    description: kilometers
+    name: kilometer
+    name_de: Kilometer
+    name_en: Kilometer
+  kilowatt-hours:
+    abbreviation: kWh
+    description: kilowatt-hours
+    name: kilowatt-hours
+    name_de: Kilowattstunden
+    name_en: Kilowatt-hours
+  liter:
+    abbreviation: l
+    description: liters
+    name: liter
+    name_de: Liter
+    name_en: Liter
+  liters-per-minute:
+    abbreviation: l/min
+    description: liters per minute
+    name: liters-per-minute
+    name_de: Liter pro Minute
+    name_en: Liters per Minute
+  meter:
+    abbreviation: m
+    description: meters
+    name: meter
+    name_de: Meter
+    name_en: Meter
+  microgram:
+    abbreviation: "\xB5g"
+    description: micrograms
+    name: microgram
+    name_de: Mikrogramm
+    name_en: Microgram
+  microgram per deciliter:
+    abbreviation: "\xB5g/dL"
+    description: Micrograms per deciliter, a unit of measurement for concentration.
+    name: microgram per deciliter
+    name_de: Mikrogramm pro Deziliter
+    name_en: microgram per deciliter
+  microgram per mililiter:
+    abbreviation: "\xB5g/ml"
+    name: microgram per mililiter
+    name_de: Microgramm pro Mililiter
+    name_en: microgram per mililiter
+  microinternational units per mililiter:
+    abbreviation: "\xB5U/ml"
+    name: microinternational units per mililiter
+    name_de: Mikro-Internationale Einheiten pro Mililiter
+    name_en: micro-international units per mililiter
+  micromole per liter:
+    abbreviation: "\xB5mol/L"
+    name: micromole per liter
+    name_de: Mikromol pro Liter
+    name_en: micromole per liter
+  miliequivalent per liter:
+    abbreviation: mEq/L
+    description: miliequivalents per liter, used for electrolytes concentration.
+    name: miliequivalent per liter
+    name_de: "mili\xE4quivalent pro Liter"
+    name_en: miliequivalent per liter
+  miligram:
+    abbreviation: mg
+    description: miligrams
+    name: miligram
+    name_de: miligramm
+    name_en: miligram
+  miligram per deciliter:
+    abbreviation: mg/dL
+    description: miligrams per deciliter, commonly used for various blood measurements.
+    name: miligram per deciliter
+    name_de: miligramm pro Deziliter
+    name_en: miligram per deciliter
+  miligram per liter:
+    abbreviation: mg/L
+    description: miligrams per liter, a unit of measurement for concentration in blood.
+    name: miligram per liter
+    name_de: miligramm pro Liter
+    name_en: miligram per liter
+  mililiter:
+    abbreviation: ml
+    description: mililiters
+    name: mililiter
+    name_de: mililiter
+    name_en: mililiter
+  mililiter per minute per 1.73m^2:
+    abbreviation: "ml/min/1.73m\xB2"
+    name: mililiter per minute per 1.73m^2
+    name_de: "ml/min/1.73m\xB2"
+    name_en: "ml/min/1.73m\xB2"
+  milimeter:
+    abbreviation: mm
+    description: milimeters
+    name: milimeter
+    name_de: milimeter
+    name_en: milimeter
+  milimole per liter:
+    abbreviation: mmol/L
+    description: milimoles per liter, a unit of measurement for concentration in blood.
+    name: milimole per liter
+    name_de: milimol pro Liter
+    name_en: milimole per liter
+  minutes:
+    abbreviation: min
+    name: minutes
+    name_de: Minuten
+    name_en: Minutes
+  months:
+    abbreviation: mo
+    name: months
+    name_de: Monate
+    name_en: Months
+  nanogram per deciliter:
+    name: nanogram per deciliter
+    name_de: Nanogramm pro Deziliter
+    name_en: nanogram per deciliter
+  nanogram per mililiter:
+    abbreviation: ng/ml
+    name: nanogram per mililiter
+    name_de: Nanogramm pro Mililiter
+    name_en: nanogram per mililiter
+  percent:
+    abbreviation: '%'
+    name: percent
+    name_de: Prozent
+    name_en: percent
+  picogram:
+    abbreviation: pg
+    name: picogram
+    name_de: Picogramm
+    name_en: Picogram
+  picogram per mililiter:
+    abbreviation: pg/ml
+    name: picogram per mililiter
+    name_de: Pikogramm pro Mililiter
+    name_en: picogram per mililiter
+  ratio:
+    abbreviation: ''
+    name: ratio
+    name_de: Ratio
+    name_en: ratio
+  seconds:
+    abbreviation: s
+    name: seconds
+    name_de: Sekunden
+    name_en: Sekunden
+  units per liter:
+    abbreviation: U/l
+    name: units per liter
+    name_de: units pro Liter
+    name_en: units per liter
+  weeks:
+    abbreviation: w
+    name: weeks
+    name_de: Wochen
+    name_en: Weeks
+  x 10^9 per liter:
+    abbreviation: x 10^9/L
+    description: Number of cells per liter, often used for blood cell counts.
+    name: x 10^9 per liter
+    name_de: x 10^9 pro Liter
+    name_en: x 10^9 per liter
+  years:
+    abbreviation: y
+    name: years
+    name_de: Jahre
+    name_en: Years
