@@ -87,9 +87,9 @@ def parse_shallow_object(file_path: Path) -> List[ShallowModel]:
             f"The provided path {file_path} does not exist or is not a file."
         )
 
-    assert file_path.suffix == ".yaml" or file_path.suffix == ".yml", (
-        "File must be a YAML file."
-    )
+    assert (
+        file_path.suffix == ".yaml" or file_path.suffix == ".yml"
+    ), "File must be a YAML file."
 
     # each yaml file is a list of objects
     with file_path.open("r", encoding="utf-8") as f:
@@ -110,9 +110,9 @@ def parse_shallow_object(file_path: Path) -> List[ShallowModel]:
         item["source_file"] = file_path  # set source_file for reference
         result = TargetModel.model_validate(item)
         result_type = type(result)
-        assert result_type in allowed_types, (
-            f"Parsed object type {result_type} is not allowed."
-        )
+        assert (
+            result_type in allowed_types
+        ), f"Parsed object type {result_type} is not allowed."
 
         results.append(result)
     return results

@@ -13,4 +13,6 @@ def sample_person_no_dob_no_gender() -> Person:
 @fixture(scope="session")
 def sample_person() -> Person:
     dob = date(1985, 7, 20)
-    return Person(first_name="Alice", last_name="Johnson", dob=dob, email=None, gender="female")
+    return Person(
+        first_name="Alice", last_name="Johnson", dob=dob, email=None, gender="female"
+    )

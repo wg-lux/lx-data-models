@@ -15,4 +15,6 @@ class IndicationType(IndicationTypeShallow):
 class Indication(IndicationShallow):
     """Model representing an indication."""
 
-    types: Dict[str, IndicationType] = Field(default_factory=indication_type_by_name_factory)
+    types: Dict[str, IndicationType] = Field(
+        default_factory=indication_type_by_name_factory
+    )

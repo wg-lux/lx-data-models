@@ -1,6 +1,10 @@
 from lx_dtypes.models.knowledge_base import KnowledgeBase
+from lx_dtypes.models.patient.patient import Patient
 from lx_dtypes.models.patient.patient_examination import PatientExamination
 from lx_dtypes.models.patient.patient_finding import PatientFinding
+from lx_dtypes.models.patient.patient_finding_classification_choice import (
+    PatientFindingClassificationChoice,
+)
 from lx_dtypes.models.patient.patient_ledger import PatientLedger
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
@@ -61,7 +65,7 @@ class PatientInterface(AppBaseModel):
         return patient_interface_indication_exists(self, indication_name)
 
     # Get Methods
-    def get_patient_by_uuid(self, patient_uuid: str):
+    def get_patient_by_uuid(self, patient_uuid: str) -> Patient:
         patient = self.patient_ledger.get_patient_by_uuid(patient_uuid)
         return patient
 
@@ -85,7 +89,7 @@ class PatientInterface(AppBaseModel):
         finding_uuid: str,
         classification_name: str,
         choice_name: str,
-    ):
+    ) -> PatientFindingClassificationChoice:
         return add_classification_choice_to_finding(
             patient_interface=self,
             examination_uuid=examination_uuid,
@@ -98,7 +102,7 @@ class PatientInterface(AppBaseModel):
         self,
         examination_uuid: str,
         indication_name: str,
-    ):
+    ) -> PatientExamination:
         return add_indication_to_examination(
             patient_interface=self,
             examination_uuid=examination_uuid,
@@ -106,13 +110,15 @@ class PatientInterface(AppBaseModel):
         )
 
     # Delete Methods
-    def delete_examination(self, examination_uuid: str):
+    def delete_examination(self, examination_uuid: str) -> None:
         self.patient_ledger.delete_patient_examination(examination_uuid)
 
-    def delete_patient(self, patient_uuid: str):
+    def delete_patient(self, patient_uuid: str) -> None:
         self.patient_ledger.delete_patient(patient_uuid)
 
-    def delete_finding_from_examination(self, examination_uuid: str, finding_uuid: str):
+    def delete_finding_from_examination(
+        self, examination_uuid: str, finding_uuid: str
+    ) -> None:
         examination = self.get_patient_examination_by_uuid(examination_uuid)
         examination.delete_finding(finding_uuid)
 
@@ -121,7 +127,7 @@ class PatientInterface(AppBaseModel):
         examination_uuid: str,
         finding_uuid: str,
         choice_uuid: str,
-    ):
+    ) -> None:
         examination = self.get_patient_examination_by_uuid(examination_uuid)
         finding = examination.get_finding_by_uuid(finding_uuid)
         finding.delete_classification_choice(choice_uuid)
@@ -130,6 +136,6 @@ class PatientInterface(AppBaseModel):
         self,
         examination_uuid: str,
         indication_uuid: str,
-    ):
+    ) -> None:
         examination = self.get_patient_examination_by_uuid(examination_uuid)
         examination.delete_indication(indication_uuid)

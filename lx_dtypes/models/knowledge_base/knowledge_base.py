@@ -112,7 +112,7 @@ class KnowledgeBase(BaseModelMixin):
                     kb.information_sources[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, UnitShallow):
                     kb.units[parsed_object.name] = parsed_object
-                elif isinstance(parsed_object, UnitTypeShallow):  # type: ignore[unreachable]
+                elif isinstance(parsed_object, UnitTypeShallow):  # type: ignore
                     kb.unit_types[parsed_object.name] = parsed_object
                 else:
                     raise TypeError(

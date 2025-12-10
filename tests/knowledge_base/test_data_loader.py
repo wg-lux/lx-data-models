@@ -19,13 +19,19 @@ class TestDataLoader:
             assert config_file.name == "config.yaml"
             assert config_file.exists()
 
-    def test_get_initialized_config_missing_module(self, empty_data_loader: DataLoader) -> None:
+    def test_get_initialized_config_missing_module(
+        self, empty_data_loader: DataLoader
+    ) -> None:
         with pytest.raises(ValueError, match="is not loaded"):
             empty_data_loader.get_initialized_config("unknown")
 
-    def test_get_initialized_config_missing_dependency(self, empty_data_loader: DataLoader) -> None:
+    def test_get_initialized_config_missing_dependency(
+        self, empty_data_loader: DataLoader
+    ) -> None:
         root = KnowledgeBaseConfig(name="root", version="1.0.0", modules=["mod_a"])
-        mod_a = KnowledgeBaseConfig(name="mod_a", version="1.0.0", depends_on=["ghost"], modules=[])
+        mod_a = KnowledgeBaseConfig(
+            name="mod_a", version="1.0.0", depends_on=["ghost"], modules=[]
+        )
         empty_data_loader.module_configs = {
             root.name: root,
             mod_a.name: mod_a,
@@ -34,10 +40,16 @@ class TestDataLoader:
         with pytest.raises(ValueError, match="referenced but no configuration"):
             empty_data_loader.get_initialized_config("root")
 
-    def test_get_initialized_config_circular_dependency(self, empty_data_loader: DataLoader) -> None:
+    def test_get_initialized_config_circular_dependency(
+        self, empty_data_loader: DataLoader
+    ) -> None:
         root = KnowledgeBaseConfig(name="root", version="1.0.0", modules=["mod_a"])
-        mod_a = KnowledgeBaseConfig(name="mod_a", version="1.0.0", depends_on=["mod_b"], modules=[])
-        mod_b = KnowledgeBaseConfig(name="mod_b", version="1.0.0", depends_on=["mod_a"], modules=[])
+        mod_a = KnowledgeBaseConfig(
+            name="mod_a", version="1.0.0", depends_on=["mod_b"], modules=[]
+        )
+        mod_b = KnowledgeBaseConfig(
+            name="mod_b", version="1.0.0", depends_on=["mod_a"], modules=[]
+        )
         empty_data_loader.module_configs = {
             root.name: root,
             mod_a.name: mod_a,
@@ -47,8 +59,12 @@ class TestDataLoader:
         with pytest.raises(ValueError, match="Circular dependency"):
             empty_data_loader.get_initialized_config("root")
 
-    def test_get_initialized_config_empty_modules(self, empty_data_loader: DataLoader) -> None:
-        kb = KnowledgeBaseConfig(name="root", version="1.0.0", modules=[], depends_on=[])
+    def test_get_initialized_config_empty_modules(
+        self, empty_data_loader: DataLoader
+    ) -> None:
+        kb = KnowledgeBaseConfig(
+            name="root", version="1.0.0", modules=[], depends_on=[]
+        )
         empty_data_loader.module_configs = {
             kb.name: kb,
         }
@@ -59,8 +75,12 @@ class TestDataLoader:
         self,
         empty_data_loader: DataLoader,
     ) -> None:
-        mod_a = KnowledgeBaseConfig(name="mod_a", version="1.0.0", depends_on=["mod_b"], modules=[])
-        mod_b = KnowledgeBaseConfig(name="mod_b", version="1.0.0", depends_on=["mod_c"], modules=[])
+        mod_a = KnowledgeBaseConfig(
+            name="mod_a", version="1.0.0", depends_on=["mod_b"], modules=[]
+        )
+        mod_b = KnowledgeBaseConfig(
+            name="mod_b", version="1.0.0", depends_on=["mod_c"], modules=[]
+        )
         mod_c = KnowledgeBaseConfig(name="mod_c", version="1.0.0", modules=[])
         empty_data_loader.module_configs = {
             mod_a.name: mod_a,
@@ -71,14 +91,20 @@ class TestDataLoader:
         collected = empty_data_loader._collect_modules_with_dependencies(["mod_a"])  # type: ignore
         assert set(collected.keys()) == {"mod_a", "mod_b", "mod_c"}
 
-        collected = empty_data_loader._collect_modules_with_dependencies(["mod_b", "mod_a"])  # type: ignore
+        collected = empty_data_loader._collect_modules_with_dependencies(
+            ["mod_b", "mod_a"]
+        )  # type: ignore
         assert set(collected.keys()) == {"mod_a", "mod_b", "mod_c"}
 
     def test_resolve_module_load_order(
         self,
     ) -> None:
-        mod_a = KnowledgeBaseConfig(name="mod_a", version="1.0.0", depends_on=["mod_b"], modules=[])
-        mod_b = KnowledgeBaseConfig(name="mod_b", version="1.0.0", depends_on=["mod_c"], modules=[])
+        mod_a = KnowledgeBaseConfig(
+            name="mod_a", version="1.0.0", depends_on=["mod_b"], modules=[]
+        )
+        mod_b = KnowledgeBaseConfig(
+            name="mod_b", version="1.0.0", depends_on=["mod_c"], modules=[]
+        )
         mod_c = KnowledgeBaseConfig(name="mod_c", version="1.0.0", modules=[])
 
         modules_dict = {

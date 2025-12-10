@@ -17,7 +17,10 @@ def test_scoped_logger_writes_yaml_per_test(tmp_path: Path):
     entry = logger.log("hello world", level=LogLevel.DEBUG, context=context)
 
     expected_dir = tmp_path / "tests" / "TestScopedLogger"
-    expected_file = expected_dir / f"{entry.timestamp.date().isoformat()}_test_scoped_logger_writes_yaml_per_test.log.yaml"
+    expected_file = (
+        expected_dir
+        / f"{entry.timestamp.date().isoformat()}_test_scoped_logger_writes_yaml_per_test.log.yaml"
+    )
     assert expected_file.exists()
 
     docs = list(yaml.safe_load_all(expected_file.read_text(encoding="utf-8")))

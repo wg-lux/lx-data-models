@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Self, Union
 
 from pydantic import Field
 
@@ -26,7 +26,7 @@ class PatientFinding(AppBaseModel):
         patient_uuid: str,
         finding_name: str,
         patient_examination_uuid: Optional[str] = None,
-    ):
+    ) -> Self:
         """Factory method to create a PatientFinding instance.
 
         Args:
@@ -60,7 +60,7 @@ class PatientFinding(AppBaseModel):
 
     def add_classification_choice(
         self, classification_choice: "PatientFindingClassificationChoice"
-    ):
+    ) -> None:
         classifications = self.get_or_create_classifications()
 
         assert (
@@ -72,6 +72,6 @@ class PatientFinding(AppBaseModel):
 
         classifications.choices.append(classification_choice)
 
-    def delete_classification_choice(self, classification_choice_uuid: str):
+    def delete_classification_choice(self, classification_choice_uuid: str) -> None:
         classifications = self.get_or_create_classifications()
         classifications.delete_choice(classification_choice_uuid)

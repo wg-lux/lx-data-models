@@ -29,6 +29,6 @@ class PatientFindingClassifications(AppBaseModel):
                 return choice
         raise ValueError(f"Choice with UUID '{choice_uuid}' not found.")
 
-    def delete_choice(self, choice_uuid: str):
+    def delete_choice(self, choice_uuid: str) -> None:
         choice = self.get_choice_by_uuid(choice_uuid)
         self.choices.remove(choice)

@@ -37,29 +37,41 @@ def sample_examinations_yaml_filepath():
 
 @fixture(scope="session")
 def sample_examination_types_yaml_filepath():
-    return Path("./lx_dtypes/data/terminology/lx_examinations/data/examination_types.yaml")
+    return Path(
+        "./lx_dtypes/data/terminology/lx_examinations/data/examination_types.yaml"
+    )
 
 
 @fixture(scope="session")
 def sample_indications_yaml_filepath():
-    return Path("./lx_dtypes/data/terminology/lx_indications/data/colonoscopy_indications.yaml")
+    return Path(
+        "./lx_dtypes/data/terminology/lx_indications/data/colonoscopy_indications.yaml"
+    )
 
 
 @fixture(scope="session")
 def sample_interventions_yaml_filepath():
-    return Path("./lx_dtypes/data/terminology/lx_interventions/data/00_generic_endoscopy_ablation.yaml")
+    return Path(
+        "./lx_dtypes/data/terminology/lx_interventions/data/00_generic_endoscopy_ablation.yaml"
+    )
 
 
 @fixture(scope="session")
 def sample_findings_yaml_filepath():
-    return Path("./lx_dtypes/data/terminology/lx_findings/data/02_colonoscopy_observation.yaml")
+    return Path(
+        "./lx_dtypes/data/terminology/lx_findings/data/02_colonoscopy_observation.yaml"
+    )
 
 
 @fixture(scope="session")
 def sample_classifications_yaml_filepath():
-    return Path("./lx_dtypes/data/terminology/lx_classifications/data/02_colonoscopy_polyp.yaml")
+    return Path(
+        "./lx_dtypes/data/terminology/lx_classifications/data/02_colonoscopy_polyp.yaml"
+    )
 
 
 @fixture(scope="session")
 def sample_classification_choices_yaml_filepath():
-    return Path("./lx_dtypes/data/terminology/lx_classification_choices/data/02_colonoscopy_polyp_morphology.yaml")
+    return Path(
+        "./lx_dtypes/data/terminology/lx_classification_choices/data/02_colonoscopy_polyp_morphology.yaml"
+    )

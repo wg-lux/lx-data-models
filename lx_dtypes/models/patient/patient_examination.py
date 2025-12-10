@@ -68,7 +68,7 @@ class PatientExamination(AppBaseModel):
             )
         return finding
 
-    def delete_finding(self, finding_uuid: str):
+    def delete_finding(self, finding_uuid: str) -> None:
         finding = self.get_finding_by_uuid(finding_uuid)
         self.findings.remove(finding)
 
@@ -90,6 +90,6 @@ class PatientExamination(AppBaseModel):
             )
         return indication
 
-    def delete_indication(self, indication_uuid: str):
+    def delete_indication(self, indication_uuid: str) -> None:
         indication = self.get_indication_by_uuid(indication_uuid)
         self.indications.remove(indication)

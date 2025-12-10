@@ -51,6 +51,9 @@ pre-commit install
 pre-commit run --all-files
 ```
 
+The provided configuration runs `ruff` (lint + format), `mypy`, and the full
+`pytest` suite before every commit, ensuring local parity with the CI jobs.
+
 ## Documentation Workflow
 
 1. Install the documentation extras (already included in `.[dev]`):

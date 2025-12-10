@@ -13,7 +13,9 @@ class TestPersonModel:
         assert person.gender == "female"
         assert person.uuid is not None
 
-    def test_person_model_no_dob_no_gender(self, sample_person_no_dob_no_gender: Person):
+    def test_person_model_no_dob_no_gender(
+        self, sample_person_no_dob_no_gender: Person
+    ):
         person = sample_person_no_dob_no_gender
         assert person.first_name == "John"
         assert person.last_name == "Doe"

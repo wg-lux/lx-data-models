@@ -7,7 +7,9 @@ from lx_dtypes.models.patient_interface import PatientInterface
 
 
 @fixture(scope="function")
-def sample_patient_interface(sample_patient_ledger: PatientLedger, lx_knowledge_base: KnowledgeBase) -> PatientInterface:
+def sample_patient_interface(
+    sample_patient_ledger: PatientLedger, lx_knowledge_base: KnowledgeBase
+) -> PatientInterface:
     patient_interface = PatientInterface(
         knowledge_base=lx_knowledge_base,
         patient_ledger=sample_patient_ledger,

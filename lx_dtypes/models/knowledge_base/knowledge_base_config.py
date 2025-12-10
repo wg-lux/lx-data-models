@@ -7,11 +7,11 @@ from lx_dtypes.models.base_models.path import FilesAndDirsModel
 from lx_dtypes.utils.mixins import BaseModelMixin, TaggedMixin
 
 
-def _default_data_model_factory():
+def _default_data_model_factory() -> FilesAndDirsModel:
     return FilesAndDirsModel()
 
 
-def _default_empty_list_factory():
+def _default_empty_list_factory() -> List[str]:
     _list: List[str] = []
     return _list
 

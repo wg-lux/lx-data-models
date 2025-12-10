@@ -13,7 +13,9 @@ from bibtexparser.bparser import BibTexParser  # type: ignore[import]
 from bibtexparser.customization import convert_to_unicode  # type: ignore[import]
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SOURCE = REPO_ROOT / "lx_dtypes" / "data" / "citations" / "sample_references.bib"
+DEFAULT_SOURCE = (
+    REPO_ROOT / "lx_dtypes" / "data" / "citations" / "sample_references.bib"
+)
 DEFAULT_TARGET_DIR = REPO_ROOT / "lx_dtypes" / "data" / "citations" / "data"
 DEFAULT_OUTPUT_NAME = "sample_references.yaml"
 
@@ -53,14 +55,30 @@ LATEX_REPLACEMENTS = {
     r"\_": "_",
 }
 
-IDENTIFIER_FIELDS = ("issn", "isbn", "pmid", "pmcid", "urldate", "shorttitle", "copyright", "note")
+IDENTIFIER_FIELDS = (
+    "issn",
+    "isbn",
+    "pmid",
+    "pmcid",
+    "urldate",
+    "shorttitle",
+    "copyright",
+    "note",
+)
 
 AUTHOR_SPLIT_RE = re.compile(r"\s+and\s+", flags=re.IGNORECASE)
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Convert BibTeX files into YAML for the data loader.")
-    parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE, help="Path to the BibTeX file to convert.")
+    parser = argparse.ArgumentParser(
+        description="Convert BibTeX files into YAML for the data loader."
+    )
+    parser.add_argument(
+        "--source",
+        type=Path,
+        default=DEFAULT_SOURCE,
+        help="Path to the BibTeX file to convert.",
+    )
     parser.add_argument(
         "--target-dir",
         type=Path,
@@ -103,7 +121,13 @@ def _split_authors(value: str | None) -> List[str]:
     cleaned = _clean_text(value)
     if not cleaned:
         return []
-    return [author for author in (_normalize_whitespace(part) for part in AUTHOR_SPLIT_RE.split(cleaned)) if author]
+    return [
+        author
+        for author in (
+            _normalize_whitespace(part) for part in AUTHOR_SPLIT_RE.split(cleaned)
+        )
+        if author
+    ]
 
 
 def _extract_keywords(value: str | None) -> List[str]:
@@ -156,7 +180,9 @@ def load_bib_entries(source: Path) -> List[Dict[str, Any]]:
     parser = BibTexParser(common_strings=True)
     parser.customization = convert_to_unicode  # type: ignore[attr-defined]
     with source.open("r", encoding="utf-8") as handle:
-        database: bibtexparser.bibdatabase.BibDatabase = bibtexparser.load(handle, parser=parser)  # type: ignore[attr-defined]
+        database: bibtexparser.bibdatabase.BibDatabase = bibtexparser.load(
+            handle, parser=parser
+        )  # type: ignore[attr-defined]
 
     entries: List[Dict[str, Any]] = []
 
@@ -215,7 +241,9 @@ def convert_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
     return {key: value for key, value in record.items() if value not in (None, [], {})}
 
 
-def write_yaml(records: Iterable[Dict[str, Any]], target_dir: Path, file_name: str) -> Path:
+def write_yaml(
+    records: Iterable[Dict[str, Any]], target_dir: Path, file_name: str
+) -> Path:
     target_dir.mkdir(parents=True, exist_ok=True)
     target_path = target_dir / file_name
     with target_path.open("w", encoding="utf-8") as handle:
@@ -229,7 +257,10 @@ def main() -> None:
     if not entries:
         raise ValueError(f"No entries found in {args.source}")
 
-    converted = sorted((convert_entry(entry) for entry in entries), key=lambda item: item["citation_key"])
+    converted = sorted(
+        (convert_entry(entry) for entry in entries),
+        key=lambda item: item["citation_key"],
+    )
     target_path = write_yaml(converted, args.target_dir, args.output_name)
     print(f"Wrote {len(converted)} citations to {target_path}")
 

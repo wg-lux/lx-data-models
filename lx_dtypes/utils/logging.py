@@ -29,7 +29,11 @@ class ScopedLogWriter:
         self._scope_dir = self._root_dir / scope.value
         self._scope_dir.mkdir(parents=True, exist_ok=True)
         self._filename_factory = filename_factory
-        keys = tuple(context_path_keys) if context_path_keys is not None else ("test", "origin", "source")
+        keys = (
+            tuple(context_path_keys)
+            if context_path_keys is not None
+            else ("test", "origin", "source")
+        )
         self._context_path_keys: Tuple[str, ...] = keys
         self._output_format = output_format
         self._file_extension = "log.jsonl" if output_format == "jsonl" else "log.yaml"
@@ -99,7 +103,11 @@ class ScopedLogWriter:
             target_dir /= segment
         target_dir.mkdir(parents=True, exist_ok=True)
 
-        filename = self._filename_factory(entry) if self._filename_factory else self._default_filename(entry, test_name)
+        filename = (
+            self._filename_factory(entry)
+            if self._filename_factory
+            else self._default_filename(entry, test_name)
+        )
         return target_dir / filename
 
     def log(
@@ -116,7 +124,11 @@ class ScopedLogWriter:
     def _write_entry(self, entry: Log) -> None:
         log_file = self._log_path(entry)
         serialized = self._serialize_entry(entry)
-        needs_separator = self._output_format == "yaml" and log_file.exists() and log_file.stat().st_size > 0
+        needs_separator = (
+            self._output_format == "yaml"
+            and log_file.exists()
+            and log_file.stat().st_size > 0
+        )
 
         with log_file.open("a", encoding="utf-8") as fh:
             if needs_separator:

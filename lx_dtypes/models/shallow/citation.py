@@ -30,7 +30,7 @@ class CitationShallow(BaseModelMixin, TaggedMixin):
 
     @model_validator(mode="before")
     @classmethod
-    def ensure_name(cls, data: Dict[str, Any]):
+    def ensure_name(cls, data: Dict[str, Any]) -> Dict[str, Any]:
         """Value for ``name`` defaults to the citation key or title."""
 
         assert isinstance(data, dict)

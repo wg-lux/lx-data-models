@@ -2,7 +2,10 @@ from typing import Dict
 
 from pydantic import Field
 
-from lx_dtypes.models.shallow.examination import ExaminationShallow, ExaminationTypeShallow
+from lx_dtypes.models.shallow.examination import (
+    ExaminationShallow,
+    ExaminationTypeShallow,
+)
 
 from .finding import Finding
 from .indication import Indication

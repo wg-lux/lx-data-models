@@ -2,7 +2,9 @@ from heapq import heappop, heappush
 from typing import TYPE_CHECKING, Dict, List, Set, Tuple
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
+    from lx_dtypes.models.knowledge_base.knowledge_base_config import (
+        KnowledgeBaseConfig,
+    )
 
 
 def resolve_kb_module_load_order(

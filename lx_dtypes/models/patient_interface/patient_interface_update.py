@@ -1,6 +1,10 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from lx_dtypes.models.patient.patient_examination import PatientExamination
+    from lx_dtypes.models.patient.patient_finding_classification_choice import (
+        PatientFindingClassificationChoice,
+    )
     from lx_dtypes.models.patient_interface import PatientInterface
 
 
@@ -10,7 +14,7 @@ def add_classification_choice_to_finding(
     finding_uuid: str,
     classification_name: str,
     choice_name: str,
-):
+) -> "PatientFindingClassificationChoice":
     from lx_dtypes.models.patient.patient_finding_classification_choice import (
         PatientFindingClassificationChoice,
     )
@@ -60,7 +64,7 @@ def add_indication_to_examination(
     patient_interface: "PatientInterface",
     examination_uuid: str,
     indication_name: str,
-):
+) -> "PatientExamination":
     if not patient_interface.indication_exists(indication_name):
         raise ValueError(
             f"Indication '{indication_name}' does not exist in the knowledge base."

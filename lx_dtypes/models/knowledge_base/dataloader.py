@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Set
+from typing import TYPE_CHECKING, Dict, List, Set
 
 from pydantic import Field
 
@@ -7,8 +7,11 @@ from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseC
 from lx_dtypes.utils.dataloader import resolve_kb_module_load_order
 from lx_dtypes.utils.mixins import BaseModelMixin
 
+if TYPE_CHECKING:
+    from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
 
-def _default_dataloader_dirs_factory():
+
+def _default_dataloader_dirs_factory() -> List[Path]:
     return [Path("./data/")]
 
 
@@ -20,7 +23,7 @@ class DataLoader(BaseModelMixin):
     input_dirs: List[Path] = Field(default_factory=_default_dataloader_dirs_factory)
     module_configs: Dict[str, KnowledgeBaseConfig] = Field(default_factory=dict)
 
-    def load_knowledge_base(self, module_name: str):
+    def load_knowledge_base(self, module_name: str) -> "KnowledgeBase":
         """Load a knowledge base by module name.
 
         Args:
@@ -60,13 +63,15 @@ class DataLoader(BaseModelMixin):
 
         return config_files
 
-    def load_module_configs(self):
+    def load_module_configs(self) -> None:
         """Resolve the load order of modules based on dependencies.
 
         Returns:
             List[str]: Ordered list of module names to load.
         """
-        from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
+        from lx_dtypes.models.knowledge_base.knowledge_base_config import (
+            KnowledgeBaseConfig,
+        )
 
         config_files = self.fetch_config_yamls()
         for config_file in config_files:
@@ -80,12 +85,16 @@ class DataLoader(BaseModelMixin):
 
         stored_config = self.module_configs.get(module_name)
         if stored_config is None:
-            raise ValueError(f"Module '{module_name}' is not loaded. Call 'load_module_configs' first.")
+            raise ValueError(
+                f"Module '{module_name}' is not loaded. Call 'load_module_configs' first."
+            )
 
         kb_config = stored_config.model_copy(deep=True)
 
         # Preserve declared order but ensure dependencies are placed ahead of dependents.
-        requested_modules = list(dict.fromkeys([*kb_config.depends_on, *kb_config.modules]))
+        requested_modules = list(
+            dict.fromkeys([*kb_config.depends_on, *kb_config.modules])
+        )
         if not requested_modules:
             return kb_config
 
@@ -102,7 +111,7 @@ class DataLoader(BaseModelMixin):
         expanded: List[str] = []
         seen: Set[str] = set()
 
-        def visit(name: str):
+        def visit(name: str) -> None:
             if name in seen:
                 return
             seen.add(name)
@@ -120,21 +129,27 @@ class DataLoader(BaseModelMixin):
 
         return expanded
 
-    def _collect_modules_with_dependencies(self, module_names: List[str]) -> Dict[str, "KnowledgeBaseConfig"]:
+    def _collect_modules_with_dependencies(
+        self, module_names: List[str]
+    ) -> Dict[str, "KnowledgeBaseConfig"]:
         """Return all module configs reachable from ``module_names`` via depends_on graph."""
 
         resolved: Dict[str, KnowledgeBaseConfig] = {}
         visiting: Set[str] = set()
 
-        def visit(name: str):
+        def visit(name: str) -> None:
             if name in resolved:
                 return
             if name in visiting:
-                raise ValueError(f"Circular dependency detected while visiting '{name}'.")
+                raise ValueError(
+                    f"Circular dependency detected while visiting '{name}'."
+                )
 
             dependency_config = self.module_configs.get(name)
             if dependency_config is None:
-                raise ValueError(f"Module '{name}' is referenced but no configuration was loaded for it.")
+                raise ValueError(
+                    f"Module '{name}' is referenced but no configuration was loaded for it."
+                )
 
             visiting.add(name)
             for dependency in dependency_config.depends_on:

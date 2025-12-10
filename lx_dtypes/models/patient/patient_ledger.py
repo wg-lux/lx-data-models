@@ -14,7 +14,7 @@ class PatientLedger(AppBaseModel):
     patients: Dict[str, Patient] = Field(default_factory=dict)
     examinations: Dict[str, PatientExamination] = Field(default_factory=dict)
 
-    def add_patient(self, patient: Patient):
+    def add_patient(self, patient: Patient) -> None:
         self.patients[patient.uuid] = patient
 
     def get_patient_by_uuid(self, patient_uuid: str) -> Patient:
@@ -24,9 +24,9 @@ class PatientLedger(AppBaseModel):
 
     def get_examination_by_uuid(self, examination_uuid: str) -> PatientExamination:
         examination = self.examinations.get(examination_uuid)
-        assert examination is not None, (
-            f"Examination with UUID {examination_uuid} not found."
-        )
+        assert (
+            examination is not None
+        ), f"Examination with UUID {examination_uuid} not found."
         return examination
 
     def get_examinations_by_patient_uuid(
@@ -47,7 +47,7 @@ class PatientLedger(AppBaseModel):
         ]
         return examination_uuids
 
-    def add_patient_examination(self, examination: PatientExamination):
+    def add_patient_examination(self, examination: PatientExamination) -> None:
         patient_uuid = examination.patient_uuid
         if not self._patient_exists(patient_uuid):
             raise ValueError(
@@ -56,7 +56,7 @@ class PatientLedger(AppBaseModel):
 
         self.examinations[examination.uuid] = examination
 
-    def delete_patient_examination(self, examination_uuid: str):
+    def delete_patient_examination(self, examination_uuid: str) -> None:
         if not self._examination_exists(examination_uuid):
             raise ValueError(
                 f"Examination with UUID {examination_uuid} does not exist in the ledger."
@@ -64,7 +64,7 @@ class PatientLedger(AppBaseModel):
 
         del self.examinations[examination_uuid]
 
-    def delete_patient(self, patient_uuid: str):
+    def delete_patient(self, patient_uuid: str) -> None:
         if not self._patient_exists(patient_uuid):
             raise ValueError(
                 f"Patient with UUID {patient_uuid} does not exist in the ledger."
