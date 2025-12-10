@@ -3,8 +3,11 @@ repos:
     rev: v0.6.9
     hooks:
       - id: ruff
-        args: ["--fix"]
+        args: ["--fix", "lx_dtypes", "tests"]
+        pass_filenames: false
       - id: ruff-format
+        args: ["lx_dtypes", "tests"]
+        pass_filenames: false
   - repo: local
     hooks:
       - id: mypy

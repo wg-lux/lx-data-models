@@ -51,8 +51,11 @@ pre-commit install
 pre-commit run --all-files
 ```
 
-The provided configuration runs `ruff` (lint + format), `mypy`, and the full
-`pytest` suite before every commit, ensuring local parity with the CI jobs.
+The provided configuration runs the same commands as CI, but with local
+auto-fix for lint/format issues: `ruff --fix lx_dtypes tests`, `ruff format
+lx_dtypes tests`, `mypy lx_dtypes`, and the full `pytest` suite. Because the
+hooks run against the whole repository (`pass_filenames: false`), a passing
+local run guarantees that CI will agree.
 
 ## Documentation Workflow
 
