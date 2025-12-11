@@ -13,7 +13,7 @@ dependencies = [
   "bibtexparser>=1.4.0",
   "icecream>=2.1.4",
   "numpy>=2.2.3",
-  "opencv-python>=4.11.0.86",
+  "opencv-python>=4.12.0.88",
   "openpyxl>=3.1.5",
   "pandas>=2.2.3",
   "pillow>=11.3.0",
@@ -21,7 +21,7 @@ dependencies = [
   "python-ffmpeg>=2.0.12",
   "pyyaml>=6.0.2",
   "requests>=2.32.3",
-  "scikit-learn>=1.5.2",
+  "scikit-learn>=1.8.0",
   "scipy>=1.16.1",
   "types-pyyaml>=6.0.12.20250915",
 ]
@@ -50,7 +50,7 @@ dev = [
   "mypy>=1.16.0",
   "pip>=25.2",
   "pre-commit>=4.5.0",
-  "pytest>=8.3.5",
+  "pytest>=9.0.2",
   "pytest-cov>=6.1.1",
   "pytest-env>=1.1.5",
   "pytest-mypy-plugins>=3.2.0",
@@ -59,7 +59,7 @@ dev = [
   "sphinx-copybutton>=0.5.2",
   "sphinx>=8.2.3",
   "furo>=2025.9.25",
-  "ruff>=0.14.0",
+  "ruff>=0.14.8",
   "twine>=6.2.0",
 ]
 
