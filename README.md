@@ -5,6 +5,12 @@
 [![Docs](https://github.com/wg-lux/lx-data-models/actions/workflows/docs.yml/badge.svg)](https://github.com/wg-lux/lx-data-models/actions/workflows/docs.yml)
 [![Publish](https://github.com/wg-lux/lx-data-models/actions/workflows/publish.yml/badge.svg)](https://github.com/wg-lux/lx-data-models/actions/workflows/publish.yml)
 
+*CodeCov (Main)*
+[![codecov](https://codecov.io/github/wg-lux/lx-data-models/graph/badge.svg?token=132HVE8KSF)](https://codecov.io/github/wg-lux/lx-data-models)
+
+*CodeCov (Dev)*
+[![codecov](https://codecov.io/github/wg-lux/lx-data-models/branch/dev/graph/badge.svg?token=132HVE8KSF)](https://codecov.io/github/wg-lux/lx-data-models)
+
 `lx-dtypes` provides strongly typed, Pydantic-powered data models for Lux Group
 medical research projects. The package ships opinionated validators, utilities
 for ingestion/export, and a common vocabulary so downstream services can reason
