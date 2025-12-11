@@ -36,6 +36,8 @@ let
 
   _module.args.buildInputs = baseBuildInputs;
 
+  SYNC_CMD = "uv sync --extra dev --extra docs";
+
 in
 {
 
@@ -86,6 +88,9 @@ in
       uv run make -C docs html
       uv run make -C docs linkcheck
     '';
+    uvsnc.exec = ''
+      ${SYNC_CMD}
+    '';
   };
 
   tasks = {
@@ -108,7 +113,7 @@ in
 
   enterShell = ''
 
-    export SYNC_CMD="uv sync --extra dev --extra docs"
+    export SYNC_CMD="${SYNC_CMD}"
 
     # Ensure dependencies are synced using uv
     # Check if venv exists. If not, run sync verbosely. If it exists, sync quietly.
