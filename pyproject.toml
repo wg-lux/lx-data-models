@@ -57,7 +57,7 @@ dev = [
   "pytest-xdist>=3.8.0",
   "sphinx-autodoc-typehints>=3.5.2",
   "sphinx-copybutton>=0.5.2",
-  "sphinx>=8.2.3",
+  "sphinx>=8.2.3,<9.0",
   "furo>=2025.9.25",
   "ruff>=0.14.8",
   "twine>=6.2.0",
@@ -68,7 +68,7 @@ docs = [
   "myst-parser>=4.0.1",
   "sphinx-autodoc-typehints>=3.5.2",
   "sphinx-copybutton>=0.5.2",
-  "sphinx>=8.2.3",
+  "sphinx>=8.2.3,<9.0",
   "furo>=2025.9.25",
 ]
 
