@@ -7,12 +7,9 @@
 
 *CodeCov (Main)*
 [![codecov](https://codecov.io/github/wg-lux/lx-data-models/graph/badge.svg?token=132HVE8KSF)](https://codecov.io/github/wg-lux/lx-data-models)
-![Codecov icicle graph](https://codecov.io/github/wg-lux/lx-data-models/graphs/icicle.svg?token=132HVE8KSF)
 
 *CodeCov (Dev)*
 [![codecov](https://codecov.io/github/wg-lux/lx-data-models/branch/dev/graph/badge.svg?token=132HVE8KSF)](https://codecov.io/github/wg-lux/lx-data-models)
-![Codecov icicle graph](https://codecov.io/github/wg-lux/lx-data-models/graphs/icicle.svg?token=132HVE8KSF)
-
 
 `lx-dtypes` provides strongly typed, Pydantic-powered data models for Lux Group
 medical research projects. The package ships opinionated validators, utilities
