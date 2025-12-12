@@ -91,6 +91,9 @@ addopts = """
     --cov-report=xml
     --cov-fail-under=70
 """
+markers = [
+  "localfiles: depends on files present only on dev machines",
+]
 testpaths = ["tests"]
 
 [tool.ruff]

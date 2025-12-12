@@ -8,15 +8,11 @@ from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
 class ClassificationTypeShallow(BaseModelMixin, TaggedMixin):
-    pass
+    """Label metadata for a classification type without nested relations."""
 
 
 class ClassificationShallow(BaseModelMixin, TaggedMixin):
-    """
-    Model representing a classification using only shallow references:
-    - classification_choices is a list of classification choice IDs (names as str)
-    - types is a list of classification type IDs (names as str)
-    """
+    """Classification stub that links to choice and type names only."""
 
     choice_names: List[str] = Field(default_factory=list_of_str_factory)
     type_names: List[str] = Field(default_factory=list_of_str_factory)

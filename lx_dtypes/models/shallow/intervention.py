@@ -8,11 +8,21 @@ from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
 class InterventionTypeShallow(BaseModelMixin, TaggedMixin):
-    pass
+    """Taggable shell for intervention type metadata."""
 
 
 class InterventionShallow(BaseModelMixin):
-    """Model representing a medical intervention."""
+    """
+    Shallow Model to represent a medical intervention.
+    Attributes:
+        name (str): The name of the classification choice.
+        name_de (str | None): The German name of the classification choice.
+        name_en (str | None): The English name of the classification choice.
+        description (str | None): The description of the classification choice.
+        expected_intervention_names (list[str]): Names of expected interventions.
+        causes_finding_names (list[str]): Names of findings caused by this intervention.
+        type_names (list[str]): Names of associated intervention types.
+    """
 
     expected_intervention_names: List[str] = Field(default_factory=list_of_str_factory)
     causes_finding_names: List[str] = Field(

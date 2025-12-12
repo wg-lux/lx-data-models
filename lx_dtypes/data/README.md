@@ -1,23 +1,49 @@
 # Knowledge Base Data
-This module serves as template to illustrate a sample terminology.
+This directory bundles the canonical data modules that ship with LX data models. Every subdirectory that contains a `config.yaml` is a loadable module and can declare dependencies on siblings so the loader can resolve an ordered data graph.
 
 *Content*
-- [1. Configuration](#1-configuration)
-- [2. Sample Knowledge Base Structure](#2-sample-knowledge-base-structure)
-- [3. Overrides and Extensions](#3-overrides-and-extensions)
+- [1. Module Overview](#1-module-overview)
+- [2. Detailed Module Notes](#2-detailed-module-notes)
+- [3. Extending Or Overriding](#3-extending-or-overriding)
 
-## 1\. Configuration
-A knowledge base module requires a 'config.yaml' file at its root to define metadata and settings.
+## 1. Module Overview
+| Module Path | Purpose | Key Data | Depends On |
+| --- | --- | --- | --- |
+| `sample_knowledge_base/` | Top-level package that mirrors the current working knowledge base. Aggregates all core modules through `modules` field. | Pulls in everything below; no direct data files. | `information_source_data`, `citations`, `lx_utils`, `lx_hardware`, `example_terminology` |
+| `information_source_data/` | Seeds canonical information sources so downstream modules can reference consistent IDs. | `data/unknown.yaml`. | None |
+| `citations/` | Bibliography references shared across models. | `data/sample_references.yaml`, `sample_references.bib`. | None |
+| `lx_utils/` | Cross-cutting utility enumerations (genders, tags, units, etc.). | Nested `gender/`, `tag/`, `unit/` submodules each with `default.yaml`. | `information_source_data` |
+| `lx_hardware/` | Placeholder hardware knowledge base; currently empty but structured for overrides. | Declares empty `files`/`dirs`. | `lx_utils` |
+| `terminology/` (`example_terminology`) | Grouping module that wires up the clinical terminology stack. | Delegates to `lx_*` submodules listed below. | None |
+| `terminology/lx_units/` | Canonical units referenced by descriptors. | `data/`. | None |
+| `terminology/lx_descriptors/` | Descriptor vocabulary with localized labels and metadata. | `data/`. | `lx_units` |
+| `terminology/lx_classification_choices/` | Atomic choices used by classifications. | `data/`. | `lx_descriptors` |
+| `terminology/lx_classifications/` | Classification definitions and types. | `data/`, `classification_types/`. | `lx_classification_choices` |
+| `terminology/lx_interventions/` | Intervention catalog and type data. | `data/`, `intervention_types/`. | None |
+| `terminology/lx_findings/` | Finding catalog plus finding/former_event/type folders. | `data/`, `finding_types/`, `former_events/`. | `lx_classifications` |
+| `terminology/lx_indications/` | Indication catalog plus types. | `data/`, `indication_types/`. | `lx_interventions`, `lx_classifications` |
+| `terminology/lx_examinations/` | Examination definitions that stitch findings, indications, interventions. | `data/`. | `lx_findings`, `lx_indications`, `lx_interventions` |
+| `logs/` | Golden log snapshots for tests, grouped by suite. | `tests/` with dated YAML logs, `scripts/` placeholder. | None (test fixture only) |
+| `endoreg/` | Placeholder for center-specific overrides. | Empty `center/` folder. | None |
+| `mock/` | Reserved for ad-hoc mock data during development. | Currently empty. | None |
 
-Field descriptions:
-- **name**: The name of the terminology module.
-- **version**: The version of the terminology module.
-- **description**: A brief description of the terminology module.
-- **modules**: A list of sub-modules included in this terminology module. Each sub-module should have its own directory with relevant models and data including a config.yaml file. Order of modules matters for loading precedence.
-- **data_sources**: A list of data sources used by this terminology module. Each data source should be an absolute or relative path to a directory or .yaml File. Directories are recursively loaded (ordered by filename, ascending).
+The dependency column mirrors the `depends_on` stanza in each module's `config.yaml`. Load order is depth-first according to those relationships, so higher-level packs such as `sample_knowledge_base` or `example_terminology` are thin orchestrators.
 
-## 2\. Sample Knowledge Base Structure
-'./sample_knowledge_base/' contains a sample knowledge base module with the following structure:
+## 2. Detailed Module Notes
+- **Configuration contracts**: Every module root carries a `config.yaml` that at minimum defines `name`, `version`, and optional `modules`, `depends_on`, and `data` entries. Relative `data.dirs` paths are resolved from the module directory, and folders are scanned recursively in ascending filename order.
+- **Sample knowledge base**: `sample_knowledge_base/config.yaml` lists the exact module order used in tests. Add custom modules by appending to its `modules` array or by creating a new top-level module that depends on this one.
+- **Utility submodules**: Under `lx_utils/`, each child (`gender`, `tag`, `unit`) is an independent module so that downstream packs can cherry-pick only the enumerations they need. Their `config.yaml` files omit `depends_on` unless coupling is required.
+- **Terminology stack**: `terminology/config.yaml` introduces the alias `example_terminology`, which subsequently imports the six `lx_*` terminology modules. This indirection allows you to swap entire terminology bundles by changing a single module reference.
+- **Logs as fixtures**: The `logs/tests/` tree stores YAML exports generated by the automated suites (`TestKnowledgeBaseModel`, `TestLogWriter`, `TestParser`, etc.). While not consumed by the knowledge base loader, keeping them under `data/` simplifies packaging when fixtures must accompany deployments.
+- **Placeholders**: `endoreg/` and `mock/` intentionally ship empty so integrators can copy the directory layout when creating client-specific overrides without touching the shared modules.
 
-## 3\. Overrides and Extensions
-To extend or override data in this knowledge base module, create a new module that lists this knowledge base as a dependency in its 'config.yaml' file under the 'depends_on' field. Your module's data will load after the dependencies, allowing you to override or extend existing entries.
+## 3. Extending Or Overriding
+To extend this corpus, create a new module directory beside the existing ones:
+
+1. Add a `config.yaml` that declares `depends_on` entries for every module you need (for instance, `$new_module` might depend on `sample_knowledge_base`).
+2. Point `data.dirs` at the folders that contain your YAML payloads. Use the same folder conventions (`data/`, `*_types/`, etc.) to stay compatible with the loader.
+3. Register the module by either
+	- referencing it from another module's `modules` array (e.g., append to `sample_knowledge_base/config.yaml`), or
+	- loading it explicitly when constructing the knowledge base in code.
+
+Because dependencies are DAG-based and processed in order, later modules can override IDs defined by earlier ones. For example, placing `$custom_findings` after `terminology/lx_findings` allows you to tweak a subset of findings without copying the entire catalog.

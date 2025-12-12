@@ -1,9 +1,19 @@
-from typing import Dict
+from datetime import date
+from typing import Dict, Optional, TypedDict
 
 from pydantic import Field
 
 from lx_dtypes.models.base_models.person import Person
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
+
+
+class PatientDataDict(TypedDict):
+    first_name: Optional[str]
+    last_name: str
+    dob: date
+    center: str
+    gender: str
+    external_ids: Optional[Dict[str, str]]
 
 
 class Patient(Person):

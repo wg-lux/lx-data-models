@@ -8,15 +8,22 @@ from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
 class ExaminationTypeShallow(BaseModelMixin, TaggedMixin):
-    pass
+    """Taggable shell for examination types."""
 
 
 class ExaminationShallow(BaseModelMixin, TaggedMixin):
     """
-    Model representing an examination using only shallow references:
-    - findings is a list of finding IDs (names as str)
-    - types is a list of examination type IDs (names as str)
-    - indications is a list of indication IDs (names as str)
+    Links examinations to finding, type, and indication names without nesting.
+
+    Attributes:
+        name (str): The name of the classification choice.
+        name_de (str | None): The German name of the classification choice.
+        name_en (str | None): The English name of the classification choice.
+        description (str | None): The description of the classification choice.
+        finding_names (list[str]): Names of associated findings.
+        type_names (list[str]): Names of associated examination types.
+        indication_names (list[str]): Names of associated indications.
+
     """
 
     finding_names: List[str] = Field(default_factory=list_of_str_factory)

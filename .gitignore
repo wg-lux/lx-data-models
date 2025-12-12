@@ -3,6 +3,7 @@
 .direnv/
 *log.yaml
 junit.xml
+data/smartie
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

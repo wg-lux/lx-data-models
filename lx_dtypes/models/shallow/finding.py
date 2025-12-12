@@ -8,14 +8,22 @@ from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
 class FindingTypeShallow(BaseModelMixin, TaggedMixin):
-    pass
+    """Metadata shell for finding types."""
 
 
 class FindingShallow(BaseModelMixin, TaggedMixin):
     """
-    Model representing a finding using only shallow references:
-    - classifications is a list of of classification IDs (names as str)
-    - types is a list of finding type IDs (names as str)
+    Shallow model representing a medical finding.
+
+    Attributes:
+        name (str): The name of the classification choice.
+        name_de (str | None): The German name of the classification choice.
+        name_en (str | None): The English name of the classification choice.
+        description (str | None): The description of the classification choice.
+        classification_names (list[str]): Names of associated classifications.
+        type_names (list[str]): Names of associated finding types.
+        intervention_names (list[str]): Names of associated interventions.
+
     """
 
     classification_names: List[str] = Field(default_factory=list_of_str_factory)

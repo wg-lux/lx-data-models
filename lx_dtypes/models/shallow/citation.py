@@ -8,7 +8,29 @@ from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
 class CitationShallow(BaseModelMixin, TaggedMixin):
-    """Shallow wrapper for citations without nested relations."""
+    """Shallow BaseModel for citations without nested relations.
+    Captures key bibliographic details and identifiers.
+
+    Attributes:
+        citation_key (str): Unique key for the citation.
+        title (str): Title of the cited work.
+        abstract (str | None): Abstract or summary of the work.
+        authors (List[str]): List of authors of the work.
+        publication_year (int | None): Year of publication.
+        publication_month (str | None): Month of publication.
+        journal (str | None): Journal name if applicable.
+        publisher (str | None): Publisher of the work.
+        volume (str | None): Volume number if applicable.
+        issue (str | None): Issue number if applicable.
+        pages (str | None): Page range if applicable.
+        doi (str | None): Digital Object Identifier.
+        url (str | None): URL to access the work online.
+        entry_type (str | None): Type of citation entry (e.g., article, book).
+        language (str | None): Language of the work.
+        keywords (List[str]): List of keywords associated with the work.
+        identifiers (Dict[str, str]): Additional identifiers (e.g., ISBN, PubMed ID).
+
+    """
 
     citation_key: str
     title: str

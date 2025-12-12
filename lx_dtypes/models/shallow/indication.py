@@ -8,13 +8,21 @@ from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
 class IndicationTypeShallow(BaseModelMixin, TaggedMixin):
-    pass
+    """Taggable metadata container for indication types."""
 
 
 class IndicationShallow(BaseModelMixin, TaggedMixin):
     """
-    Model representing an indication using only shallow references:
-    - types is a list of indication type IDs (names as str)
+    Shallow model representing a medical indication.
+
+    Attributes:
+        name (str): The name of the classification choice.
+        name_de (str | None): The German name of the classification choice.
+        name_en (str | None): The English name of the classification choice.
+        description (str | None): The description of the classification choice.
+        type_names (list[str]): Names of associated indication types.
+        expected_intervention_names (list[str]): Names of expected interventions.
+
     """
 
     type_names: List[str] = Field(default_factory=list_of_str_factory)

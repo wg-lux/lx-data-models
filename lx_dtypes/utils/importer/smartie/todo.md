@@ -1,0 +1,17 @@
+# Overview
+- [ ] Create Examinations
+- [ ] Create Patient Findings
+    - [ ] bbps_simplified / worst
+    - [ ] bbps_detailed / segmental
+    - withdrawaltime
+    - indication_rev
+    - deepest point
+    - sedation
+- [ ] Create Examination Indications
+- [ ] Create Polyp
+    - [ ] morphology
+    - [ ] size
+    - [ ] location
+    - [ ] pathology
+- [ ] Create Interventions
+- [ ] Processor
