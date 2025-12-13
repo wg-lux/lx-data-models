@@ -129,6 +129,7 @@ SMARTIE_CLASSIFICATION_CHOICE_ENUM = Enum(
     {
         "YES": "yes",
         "NO": "no",
+        "UNKNOWN": "unknown",
         "SEDATION_PROPOFOL": "sedation_propofol",
         "SEDATION_MIDAZOLAM": "sedation_midazolam",
         "SEDATION_PROPOFOL_MIDAZOLAM": "sedation_propofol_midazolam",
@@ -142,6 +143,17 @@ SMARTIE_CLASSIFICATION_CHOICE_ENUM = Enum(
         "BBPS_2": "bowel_prep_boston_2",
         "BBPS_3": "bowel_prep_boston_3",
         "MINUTES_NUMERIC": "minutes_numeric_value",
+        # LOCATION
+        "LOC_TERMINAL_ILEUM": "terminal_ileum",
+        "LOC_CECUM": "cecum",
+        "LOC_ASCENDING_COLON": "ascending_colon",
+        "LOC_RIGHT_FLEXURE": "right_flexure",
+        "LOC_TRANSVERSE_COLON": "transverse_colon",
+        "LOC_LEFT_FLEXURE": "left_flexure",
+        "LOC_DESCENDING_COLON": "descending_colon",
+        "LOC_SIGMOID_COLON": "sigmoid_colon",
+        "LOC_RECTUM": "rectum",
+        "LOC_ANAL_CANAL": "anal_canal",
     },
 )
 

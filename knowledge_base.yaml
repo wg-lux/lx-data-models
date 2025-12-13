@@ -7817,6 +7817,7 @@ classifications:
     - sigmoid_colon
     - rectum
     - anal_canal
+    - unknown
     name: colonoscopy_location_default
     name_de: Koloskopie Standard
     name_en: Colonoscopy Default

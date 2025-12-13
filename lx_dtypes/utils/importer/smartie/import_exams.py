@@ -13,12 +13,8 @@ from lx_dtypes.models.patient.patient_examination import (
 # )
 from lx_dtypes.models.patient.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface.main import PatientInterface
-from lx_dtypes.utils.importer.smartie.mappings import (
-    smartie_exam_map_bbps,
-    smartie_exam_map_hardware,
-    smartie_exam_map_sedation,
-    smartie_exam_map_withdrawal_time,
-)
+
+from .map_utils import EXAM_MAP_FUNCTIONS
 
 # from .mappings import smartie_map_gender
 from .names import (
@@ -39,28 +35,12 @@ def smartie_findings_exam_to_ledger(
     record_uuid: str,
 ) -> None:
     """ """
-    smartie_exam_map_sedation(
-        exam=exam,
-        record_uuid=record_uuid,
-        patient_interface=patient_interface,
-    )
-
-    smartie_exam_map_hardware(
-        exam=exam,
-        record_uuid=record_uuid,
-        patient_interface=patient_interface,
-    )
-    smartie_exam_map_bbps(
-        exam=exam,
-        record_uuid=record_uuid,
-        patient_interface=patient_interface,
-    )
-    smartie_exam_map_withdrawal_time(
-        exam=exam,
-        record_uuid=record_uuid,
-        patient_interface=patient_interface,
-    )
-    # smartie_exam_map_deepest_point()
+    for map_func in EXAM_MAP_FUNCTIONS:
+        map_func(
+            exam=exam,
+            record_uuid=record_uuid,
+            patient_interface=patient_interface,
+        )
 
 
 def smartie_centers_and_examiners_to_ledger(

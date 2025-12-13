@@ -15,6 +15,7 @@
       "sigmoid_colon",
       "rectum",
       "anal_canal",
+      "unknown"
     ]
 
 - model: classification
