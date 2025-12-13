@@ -21,6 +21,7 @@ if TYPE_CHECKING:
         PatientFindingClassifications,
     )
     from lx_dtypes.models.patient.patient_indication import PatientIndication
+    # from lx_dtypes.models.examiner
 
 
 def str_unknown_factory() -> Literal["unknown"]:

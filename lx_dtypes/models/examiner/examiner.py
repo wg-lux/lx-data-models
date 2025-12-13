@@ -10,8 +10,8 @@ from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 class ExaminerDataDict(TypedDict):
     first_name: Optional[str]
     last_name: str
-    dob: date
-    center: str
+    dob: NotRequired[Optional[date]]
+    center_name: str
     gender: NotRequired[Optional[str]]
     external_ids: Optional[Dict[str, str]]
     uuid: NotRequired[str]

@@ -1,14 +1,13 @@
 from pathlib import Path
 
-import pytest
-
+# import pytest
 from lx_dtypes.models.knowledge_base import KnowledgeBase
 from lx_dtypes.models.patient_interface import PatientInterface
 from lx_dtypes.utils.importer.smartie.schema import (
     SmartieExaminationSchema,
 )
 
-pytestmark = pytest.mark.localfiles
+# pytestmark = pytest.mark.localfiles
 
 DATA_DIR = Path("./data/smartie")
 FILENAME_EXAMS_ITT = DATA_DIR / "exams_itt_clean.csv"
@@ -39,15 +38,15 @@ class TestImportExams:
         )
         exams_pp.export_exam_findings_to_interface(interface_pp)
 
-        #### test export for debugging ####
-        import yaml
+        ### test export for debugging ####
+        # import yaml
 
-        ledger = interface_itt.patient_ledger
-        ledger_dump = ledger.model_dump(
-            exclude_none=True, exclude_defaults=True, round_trip=True
-        )
+        # ledger = interface_itt.patient_ledger
+        # ledger_dump = ledger.model_dump(
+        #     exclude_none=True, exclude_defaults=True, round_trip=True
+        # )
 
-        tmp_out_file = "./data/smartie/test_output_ledger_itt.yaml"
+        # tmp_out_file = "./data/smartie/test_output_ledger_itt.yaml"
 
-        with open(tmp_out_file, "w", encoding="utf-8") as f:
-            yaml.dump(ledger_dump, f)
+        # with open(tmp_out_file, "w", encoding="utf-8") as f:
+        #     yaml.dump(ledger_dump, f)

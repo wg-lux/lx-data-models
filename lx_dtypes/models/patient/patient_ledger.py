@@ -1,12 +1,16 @@
-from typing import Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List
 
 from pydantic import Field, field_serializer
 
 from lx_dtypes.models.core.center import Center
+from lx_dtypes.models.examiner.examiner import Examiner
 from lx_dtypes.models.patient.patient import Patient
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
 from .patient_examination import PatientExamination
+
+if TYPE_CHECKING:  # pragma: no cover
+    from lx_dtypes.models.examiner.examiner import Examiner, ExaminerDataDict
 
 
 class PatientLedger(AppBaseModel):
@@ -43,6 +47,17 @@ class PatientLedger(AppBaseModel):
     def add_patient(self, patient: Patient) -> None:
         self.patients[patient.uuid] = patient
 
+    def add_examiner(self, center_uuid: str, examiner_dict: "ExaminerDataDict") -> None:
+        center_name = examiner_dict["center_name"]
+
+        if not self._center_exists(center_uuid):
+            center = Center(name=center_name, uuid=center_uuid)
+            self.centers[center_uuid] = center
+
+        _examiner = Examiner.model_validate(examiner_dict)
+        self.centers[center_uuid].examiners[_examiner.uuid] = _examiner
+        return
+
     def get_patient_by_uuid(self, patient_uuid: str) -> Patient:
         patient = self.patients.get(patient_uuid)
         assert patient is not None, f"Patient with UUID {patient_uuid} not found."
@@ -54,6 +69,16 @@ class PatientLedger(AppBaseModel):
             f"Examination with UUID {examination_uuid} not found."
         )
         return examination
+
+    def get_center_by_uuid(self, center_uuid: str) -> Center:
+        center = self.centers.get(center_uuid)
+        assert center is not None, f"Center with UUID {center_uuid} not found."
+        return center
+
+    def get_center_by_name(self, center_name: str) -> Center:
+        center = next((c for c in self.centers.values() if c.name == center_name), None)
+        assert center is not None, f"Center with name {center_name} not found."
+        return center
 
     def get_examinations_by_patient_uuid(
         self, patient_uuid: str
@@ -113,5 +138,17 @@ class PatientLedger(AppBaseModel):
     def _examination_exists(self, examination_uuid: str) -> bool:
         examination = self.examinations.get(examination_uuid)
         if examination is None:
+            return False
+        return True
+
+    def _center_exists(self, center_uuid: str) -> bool:
+        center = self.centers.get(center_uuid)
+        if center is None:
+            return False
+        return True
+
+    def _center_exists_by_name(self, center_name: str) -> bool:
+        center = next((c for c in self.centers.values() if c.name == center_name), None)
+        if center is None:
             return False
         return True

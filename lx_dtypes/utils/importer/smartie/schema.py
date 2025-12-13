@@ -21,6 +21,40 @@ def int_str_dict_factory() -> dict[int, str]:
     return {}
 
 
+def smartie_centers_and_examiners_to_ledger(
+    exams: List["SmartieExaminationSchema"],
+    ledger: PatientLedger,
+    examiner_abbr2uuid: dict[str, str],
+    center_abbr2uuid: dict[str, str],
+) -> None:
+    from lx_dtypes.models.examiner.examiner import ExaminerDataDict
+
+    for exam in exams:
+        examiner_abbr = exam.examiner
+        examiner_uuid = examiner_abbr2uuid.get(examiner_abbr)
+        center_name = exam.center
+        center_uuid = center_abbr2uuid.get(center_name)
+
+        if examiner_uuid is None:
+            raise ValueError(
+                f"UUID mapping missing for examiner abbreviation {examiner_abbr}."
+            )
+        if center_uuid is None:
+            raise ValueError(
+                f"UUID mapping missing for center abbreviation {center_name}."
+            )
+
+        examiner_dict = ExaminerDataDict(
+            first_name="unknown",
+            last_name="unknown",
+            external_ids={"smartie_examiner_abbr": examiner_abbr},
+            center_name=center_name,
+            uuid=examiner_uuid,
+        )
+
+        ledger.add_examiner(center_uuid, examiner_dict)
+
+
 class SmartieExaminations(AppBaseModel):
     examinations: List["SmartieExaminationSchema"]
     exam_id2uuid: Optional[dict[int, str]] = Field(default_factory=int_str_dict_factory)
@@ -30,6 +64,8 @@ class SmartieExaminations(AppBaseModel):
     person_id2uuid: Optional[dict[int, str]] = Field(
         default_factory=int_str_dict_factory
     )
+    examiner_abbr2uuid: Optional[dict[str, str]] = Field(default_factory=dict)
+    center_abbr2uuid: Optional[dict[str, str]] = Field(default_factory=dict)
 
     def initialize_mappings(self) -> None:
         # check if already initialized
@@ -39,17 +75,28 @@ class SmartieExaminations(AppBaseModel):
         # exam_ids: Set[int] = set()
         record_ids: Set[int] = set()
         person_ids: Set[int] = set()
+        examiner_abbreviations: Set[str] = set()
+        centers: Set[str] = set()
+
         for exam in self.examinations:
             # exam_ids.add(exam.exam_id)
             record_ids.add(exam.record_id)
             person_ids.add(exam.person_id)
+            examiner_abbreviations.add(exam.examiner)
+            centers.add(exam.center)
 
         record_id2uuid: Dict[int, str] = {rid: str(uuid4()) for rid in record_ids}
         person_id2uuid: Dict[int, str] = {pid: str(uuid4()) for pid in person_ids}
+        examiner_abbr2uuid: Dict[str, str] = {
+            abbr: str(uuid4()) for abbr in examiner_abbreviations
+        }
+        center_abbr2uuid: Dict[str, str] = {abbr: str(uuid4()) for abbr in centers}
 
         # self.exam_id2uuid = exam_id2uuid
         self.record_id2uuid = record_id2uuid
         self.person_id2uuid = person_id2uuid
+        self.examiner_abbr2uuid = examiner_abbr2uuid
+        self.center_abbr2uuid = center_abbr2uuid
 
     def validate_record_ids_unique(self) -> None:
         record_ids = [exam.record_id for exam in self.examinations]
@@ -68,7 +115,18 @@ class SmartieExaminations(AppBaseModel):
             name=name,
         )
         person_id2uuid = self.person_id2uuid
+        examiner_abbr2uuid = self.examiner_abbr2uuid
+        center_abbr2uuid = self.center_abbr2uuid
         assert person_id2uuid is not None
+        assert examiner_abbr2uuid is not None
+        assert center_abbr2uuid is not None
+
+        smartie_centers_and_examiners_to_ledger(
+            exams=self.examinations,
+            ledger=ledger,
+            examiner_abbr2uuid=examiner_abbr2uuid,
+            center_abbr2uuid=center_abbr2uuid,
+        )
 
         smartie_patients_to_ledger(
             exams=self.examinations,
