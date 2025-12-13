@@ -38,3 +38,9 @@
     - complication_generic_type_bleeding
     - complication_generic_type_perforation
     - complication_generic_type_other
+
+- model: classification
+  name: "time_minutes_generic"
+  type_names: []
+  choice_names:
+    - minutes_numeric_value

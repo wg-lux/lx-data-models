@@ -104,7 +104,9 @@ SMARTIE_FINDING_ENUM = Enum(
         "BP_RC": "bowel_preparation_rc",
         "DEEPEST_INSERTION": "colonoscopy_deepest_viewed_location",
         # Hardware
-        "ENDOSCOPY_HARDWARE_USED": "endoscopy_hardware_used",  # TODO: add to data
+        "ENDOSCOPY_HARDWARE_USED": "endoscopy_hardware_used",
+        # Withdrawal Time
+        "WITHDRAWAL_TIME_MINUTES": "colonoscopy_withdrawal_time_minutes",
     },
 )
 
@@ -118,6 +120,7 @@ SMARTIE_CLASSIFICATION_ENUM = Enum(
         "LOCATION_DEFAULT": "colonoscopy_location_default",
         "REASON_INCOMPLETE": "colonoscopy_not_complete_reason",
         "HARDWARE_ENDOSCOPE_PROCESSOR": "endoscopy_hardware_endoscope_processor_model",
+        "TIME_MINUTES_GENERIC": "time_minutes_generic",
     },
 )
 
@@ -138,5 +141,13 @@ SMARTIE_CLASSIFICATION_CHOICE_ENUM = Enum(
         "BBPS_1": "bowel_prep_boston_1",
         "BBPS_2": "bowel_prep_boston_2",
         "BBPS_3": "bowel_prep_boston_3",
+        "MINUTES_NUMERIC": "minutes_numeric_value",
+    },
+)
+
+SMARTIE_DESCRIPTOR_ENUM = Enum(
+    "SMARTIE_DESCRIPTOR_ENUM",
+    {
+        "TIME_MINUTES_NUMERIC": "minutes_numeric_value",
     },
 )

@@ -14,6 +14,9 @@ from lx_dtypes.models.shallow.classification import (
     ClassificationTypeShallow,
 )
 from lx_dtypes.models.shallow.classification_choice import ClassificationChoiceShallow
+from lx_dtypes.models.shallow.classification_choice_descriptor import (
+    ClassificationChoiceDescriptorShallow,
+)
 from lx_dtypes.models.shallow.examination import ExaminationTypeShallow
 from lx_dtypes.models.shallow.finding import FindingShallow, FindingTypeShallow
 from lx_dtypes.models.shallow.indication import IndicationShallow, IndicationTypeShallow
@@ -33,6 +36,7 @@ model_types = Union[
     type[FindingTypeShallow],
     type[ClassificationShallow],
     type[ClassificationChoiceShallow],
+    type[ClassificationChoiceDescriptorShallow],
     type[ClassificationTypeShallow],
     type[IndicationShallow],
     type[IndicationTypeShallow],
@@ -52,6 +56,7 @@ ShallowModel = Union[
     FindingTypeShallow,
     ClassificationShallow,
     ClassificationChoiceShallow,
+    ClassificationChoiceDescriptorShallow,
     ClassificationTypeShallow,
     IndicationShallow,
     IndicationTypeShallow,
@@ -71,6 +76,7 @@ model_lookup: Dict[str, model_types] = {
     "finding_type": FindingTypeShallow,
     "classification": ClassificationShallow,
     "classification_choice": ClassificationChoiceShallow,
+    "classification_choice_descriptor": ClassificationChoiceDescriptorShallow,
     "classification_type": ClassificationTypeShallow,
     "indication": IndicationShallow,
     "indication_type": IndicationTypeShallow,

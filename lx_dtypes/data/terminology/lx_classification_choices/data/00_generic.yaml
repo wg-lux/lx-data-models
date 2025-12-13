@@ -9,3 +9,8 @@
 
 - model: classification_choice
   name: "unknown"
+
+- model: classification_choice
+  name: "minutes_numeric_value"
+  classification_choice_descriptor_names:
+    - minutes_numeric_value

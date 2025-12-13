@@ -46,3 +46,12 @@
   classification_names:
     - colonoscopy_location_default
     - colonoscopy_not_complete_reason #TODO Requirement should make sure, that a patientfindingclassification with reason is available if location is not cecum / appendix / terminal ileum
+
+- model: finding
+  name: "colonoscopy_withdrawal_time_minutes"
+  name_de: "Koloskopie Rückzugszeit (Minuten)"
+  name_en: "Colonoscopy Withdrawal Time (minutes)"
+  type_names:
+    - baseline
+  classification_names:
+    - time_minutes_generic

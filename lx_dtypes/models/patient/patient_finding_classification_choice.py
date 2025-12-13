@@ -69,3 +69,11 @@ class PatientFindingClassificationChoice(AppBaseModel):
         }
         instance = cls.model_validate(model_dict)
         return instance
+
+    def get_descriptor_by_uuid(
+        self, descriptor_uuid: str
+    ) -> PatientFindingClassificationChoiceDescriptor:
+        for descriptor in self.descriptors:
+            if descriptor.uuid == descriptor_uuid:
+                return descriptor
+        raise ValueError(f"Descriptor with UUID '{descriptor_uuid}' not found.")

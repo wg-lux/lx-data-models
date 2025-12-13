@@ -7,6 +7,7 @@ from pydantic import Field, field_serializer
 from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
 from lx_dtypes.models.shallow import (
     CitationShallow,
+    ClassificationChoiceDescriptorShallow,
     ClassificationChoiceShallow,
     ClassificationShallow,
     ClassificationTypeShallow,
@@ -43,6 +44,9 @@ class KnowledgeBase(BaseModelMixin):
     classification_choices: Dict[str, "ClassificationChoiceShallow"] = Field(
         default_factory=dict
     )
+    classification_choice_descriptors: Dict[
+        str, "ClassificationChoiceDescriptorShallow"
+    ] = Field(default_factory=dict)
     examinations: Dict[str, "ExaminationShallow"] = Field(default_factory=dict)
     examination_types: Dict[str, "ExaminationTypeShallow"] = Field(default_factory=dict)
     indications: Dict[str, "IndicationShallow"] = Field(default_factory=dict)
@@ -96,6 +100,11 @@ class KnowledgeBase(BaseModelMixin):
                     kb.classification_types[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, ClassificationChoiceShallow):
                     kb.classification_choices[parsed_object.name] = parsed_object
+                elif isinstance(parsed_object, ClassificationChoiceDescriptorShallow):
+                    kb.classification_choice_descriptors[parsed_object.name] = (
+                        parsed_object
+                    )
+
                 elif isinstance(parsed_object, ExaminationShallow):
                     kb.examinations[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, ExaminationTypeShallow):
@@ -132,6 +141,9 @@ class KnowledgeBase(BaseModelMixin):
         self.classifications.update(other.classifications)
         self.classification_types.update(other.classification_types)
         self.classification_choices.update(other.classification_choices)
+        self.classification_choice_descriptors.update(
+            other.classification_choice_descriptors
+        )
         self.examinations.update(other.examinations)
         self.examination_types.update(other.examination_types)
         self.indications.update(other.indications)
@@ -185,6 +197,11 @@ class KnowledgeBase(BaseModelMixin):
             "interventions": len(self.interventions),
             "intervention_types": len(self.intervention_types),
             "information_sources": len(self.information_sources),
+            "units": len(self.units),
+            "unit_types": len(self.unit_types),
+            "classification_choice_descriptors": len(
+                self.classification_choice_descriptors
+            ),
         }
 
     def get_citation(self, name: str) -> "CitationShallow":
@@ -244,6 +261,23 @@ class KnowledgeBase(BaseModelMixin):
                 f"Classification choice '{name}' not found in knowledge base."
             )
         return classification_choice
+
+    def get_classification_choice_descriptor(
+        self, name: str
+    ) -> "ClassificationChoiceDescriptorShallow":
+        """Get a classification choice descriptor by name.
+
+        Args:
+            name (str): The name of the classification choice descriptor.
+        Returns:
+            ClassificationChoiceDescriptorShallow: The descriptor with the given name.
+        """
+        descriptor = self.classification_choice_descriptors.get(name)
+        if descriptor is None:
+            raise KeyError(
+                f"Classification choice descriptor '{name}' not found in knowledge base."
+            )
+        return descriptor
 
     def get_examination(self, name: str) -> "ExaminationShallow":
         """Get an examination by name.
@@ -391,6 +425,19 @@ class KnowledgeBase(BaseModelMixin):
         r: Dict[str, Any] = {
             name: classification_choice.model_dump()
             for name, classification_choice in classification_choices.items()
+        }
+        return r
+
+    @field_serializer("classification_choice_descriptors")
+    def serialize_classification_choice_descriptors(
+        self,
+        classification_choice_descriptors: Dict[
+            str, "ClassificationChoiceDescriptorShallow"
+        ],
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            name: descriptor.model_dump(exclude_defaults=True, exclude_none=True)
+            for name, descriptor in classification_choice_descriptors.items()
         }
         return r
 

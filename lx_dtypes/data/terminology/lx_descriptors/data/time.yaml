@@ -1,0 +1,5 @@
+- model: classification_choice_descriptor
+  name: "minutes_numeric_value"
+  description: "Numeric value representing minutes."
+  unit_name: "minutes"
+  descriptor_type: "numeric"

@@ -7176,6 +7176,15 @@ citations:
     - colorectal cancer screening
     title: No Effect of Computer-Aided Diagnosis on Colonoscopic Adenoma Detection
       in a Large Pragmatic Multicenter Randomized Study
+classification_choice_descriptors:
+  minutes_numeric_value:
+    default_value_num: .nan
+    description: Numeric value representing minutes.
+    descriptor_type: numeric
+    name: minutes_numeric_value
+    name_de: minutes_numeric_value
+    name_en: minutes_numeric_value
+    unit_name: minutes
 classification_choices:
   anal_canal:
     name: anal_canal
@@ -7575,6 +7584,12 @@ classification_choices:
     name: lesion_surface_ulcerated
     name_de: lesion_surface_ulcerated
     name_en: lesion_surface_ulcerated
+  minutes_numeric_value:
+    classification_choice_descriptor_names:
+    - minutes_numeric_value
+    name: minutes_numeric_value
+    name_de: minutes_numeric_value
+    name_en: minutes_numeric_value
   na:
     name: na
     name_de: na
@@ -7964,6 +7979,12 @@ classifications:
     name: sedation_performed
     name_de: sedation_performed
     name_en: sedation_performed
+  time_minutes_generic:
+    choice_names:
+    - minutes_numeric_value
+    name: time_minutes_generic
+    name_de: time_minutes_generic
+    name_en: time_minutes_generic
   visualized:
     choice_names:
     - 'yes'
@@ -8011,6 +8032,7 @@ examinations:
     - bowel_preparation_tc
     - bowel_preparation_rc
     - bowel_preparation_simplified
+    - colonoscopy_withdrawal_time_minutes
     - colonoscopy_deepest_viewed_location
     - complication_generic
     - colon_polyp
@@ -8240,6 +8262,14 @@ findings:
     name: colonoscopy_deepest_viewed_location
     name_de: "Tiefste betrachtete Stelle w\xE4hrend einer Koloskopie"
     name_en: Deepest viewed location during colonoscopy
+    type_names:
+    - baseline
+  colonoscopy_withdrawal_time_minutes:
+    classification_names:
+    - time_minutes_generic
+    name: colonoscopy_withdrawal_time_minutes
+    name_de: "Koloskopie R\xFCckzugszeit (Minuten)"
+    name_en: Colonoscopy Withdrawal Time (minutes)
     type_names:
     - baseline
   complication_coro_stent_thrombosis:

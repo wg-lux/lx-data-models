@@ -40,7 +40,7 @@ class ClassificationChoiceDescriptorShallow(BaseModelMixin):
     numeric_min: float = Field(default_factory=lambda: float("-inf"))
     numeric_max: float = Field(default_factory=lambda: float("inf"))
     numeric_distribution: Literal["normal", "uniform", "exponential", "unknown"] = (
-        Field(default_factory=lambda: "normal")
+        Field(default_factory=lambda: "unknown")
     )
     numeric_distribution_params: Dict[str, Union[str, float, int]] = Field(
         default_factory=dict

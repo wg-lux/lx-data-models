@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from pydantic import Field
 
@@ -14,4 +14,4 @@ class PatientFindingClassificationChoiceDescriptor(AppBaseModel):
     patient_finding_classifications_uuid: str
     patient_finding_classification_choice_uuid: str
     descriptor_name: str
-    descriptor_value: Union[str, int, float, bool, None] = None
+    descriptor_value: Union[str, int, float, bool, List[str]]
