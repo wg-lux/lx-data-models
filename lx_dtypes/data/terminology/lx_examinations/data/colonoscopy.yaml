@@ -3,6 +3,7 @@
   description: Colonoscopy examination.
   finding_names:
     # baseline
+    - endoscopy_hardware_used
     - examination_setting
     - bowel_preparation_lc
     - bowel_preparation_tc

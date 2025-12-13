@@ -7,28 +7,29 @@ from lx_dtypes.models.base_models.person import Person
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
 
-class PatientDataDict(TypedDict):
-    first_name: str
+class ExaminerDataDict(TypedDict):
+    first_name: Optional[str]
     last_name: str
     dob: date
-    center_name: str
-    gender: str
+    center: str
+    gender: NotRequired[Optional[str]]
     external_ids: Optional[Dict[str, str]]
     uuid: NotRequired[str]
 
 
-class Patient(Person):
+class Examiner(Person):
     center_name: str = Field(default_factory=str_unknown_factory)
     external_ids: Dict[str, str] = Field(default_factory=dict)
 
     @classmethod
-    def create_from_person(cls, person: Person) -> "Patient":
-        """Create a Patient instance from a Person instance.
+    def create_from_person(cls, person: Person) -> "Examiner":
+        """Create an Examiner instance from a Person instance.
 
         Args:
             person (Person): The Person instance to convert.
         Returns:
-            Patient: The created Patient instance.
+            Examiner: The created Examiner instance.
         """
-        patient_dict = person.model_dump()
-        return cls(**patient_dict)
+        examiner_dict = person.model_dump()
+
+        return cls.model_validate(examiner_dict)

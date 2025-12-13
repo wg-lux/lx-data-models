@@ -7583,6 +7583,22 @@ classification_choices:
     name: 'no'
     name_de: 'no'
     name_en: 'no'
+  olympus_cv_170:
+    name: olympus_cv_170
+    name_de: olympus_cv_170
+    name_en: olympus_cv_170
+  olympus_cv_180:
+    name: olympus_cv_180
+    name_de: olympus_cv_180
+    name_en: olympus_cv_180
+  olympus_cv_190:
+    name: olympus_cv_190
+    name_de: olympus_cv_190
+    name_en: olympus_cv_190
+  pentax_epk_i7000:
+    name: pentax_epk_i7000
+    name_de: pentax_epk_i7000
+    name_en: pentax_epk_i7000
   rectum:
     name: rectum
     name_de: rectum
@@ -7615,6 +7631,10 @@ classification_choices:
     name: sigmoid_colon
     name_de: sigmoid_colon
     name_en: sigmoid_colon
+  storz_image_1s:
+    name: storz_image_1s
+    name_de: storz_image_1s
+    name_en: storz_image_1s
   terminal_ileum:
     name: terminal_ileum
     name_de: terminal_ileum
@@ -7821,6 +7841,17 @@ classifications:
     name: complication_generic_type
     name_de: complication_generic_type
     name_en: complication_generic_type
+  endoscopy_hardware_endoscope_processor_model:
+    choice_names:
+    - storz_image_1s
+    - olympus_cv_170
+    - olympus_cv_180
+    - olympus_cv_190
+    - pentax_epk_i7000
+    description: Classification of different endoscopy processor models.
+    name: endoscopy_hardware_endoscope_processor_model
+    name_de: endoscopy_hardware_endoscope_processor_model
+    name_en: endoscopy_hardware_endoscope_processor_model
   examination_setting_generic_location:
     choice_names:
     - examination_setting_generic_location_inpatient
@@ -7929,6 +7960,7 @@ classifications:
     choice_names:
     - 'yes'
     - 'no'
+    - unknown
     name: sedation_performed
     name_de: sedation_performed
     name_en: sedation_performed
@@ -7973,6 +8005,7 @@ examinations:
   colonoscopy:
     description: Colonoscopy examination.
     finding_names:
+    - endoscopy_hardware_used
     - examination_setting
     - bowel_preparation_lc
     - bowel_preparation_tc
@@ -8252,6 +8285,14 @@ findings:
     type_names:
     - anatomy
     - hidden
+  endoscopy_hardware_used:
+    classification_names:
+    - endoscopy_hardware_endoscope_processor_model
+    description: Endoscopy hardware used during the examination (e.g., endoscope,
+      processor)
+    name: endoscopy_hardware_used
+    name_de: endoscopy_hardware_used
+    name_en: endoscopy_hardware_used
   examination_setting:
     classification_names:
     - examination_setting_generic_location

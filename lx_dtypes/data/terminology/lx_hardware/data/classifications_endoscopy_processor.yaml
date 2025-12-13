@@ -1,0 +1,9 @@
+- model: classification
+  name: "endoscopy_hardware_endoscope_processor_model"
+  description: "Classification of different endoscopy processor models."
+  choice_names:
+    - storz_image_1s
+    - olympus_cv_170
+    - olympus_cv_180
+    - olympus_cv_190
+    - pentax_epk_i7000

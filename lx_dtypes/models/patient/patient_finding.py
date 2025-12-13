@@ -1,6 +1,6 @@
-from typing import Dict, List, Optional, Self, Union
+from typing import Any, Dict, List, NotRequired, Optional, Self, TypedDict, Union
 
-from pydantic import Field
+from pydantic import Field, field_serializer
 
 from lx_dtypes.models.patient.patient_finding_classification_choice import (
     PatientFindingClassificationChoice,
@@ -13,12 +13,29 @@ from lx_dtypes.utils.mixins.base_model import AppBaseModel
 from .patient_finding_classifications import PatientFindingClassifications
 
 
+class PatientFindingDataDict(TypedDict):
+    uuid: NotRequired[str]
+    patient_uuid: str
+    patient_examination_uuid: Optional[str]
+    finding_name: str
+    classifications: NotRequired[PatientFindingClassifications]
+    # examination_template: NotRequired[Optional[str]]
+
+
 class PatientFinding(AppBaseModel):
     uuid: str = Field(default_factory=uuid_factory)
     patient_uuid: str
     patient_examination_uuid: Optional[str] = None
     finding_name: str
     classifications: Optional[PatientFindingClassifications] = None
+
+    @field_serializer("classifications")
+    def serialize_classifications(
+        self, classifications: Optional[PatientFindingClassifications]
+    ) -> Optional[Dict[str, Any]]:
+        if classifications is None:
+            return None
+        return classifications.model_dump()
 
     @classmethod
     def create(

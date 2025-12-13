@@ -62,6 +62,22 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
+### Initialized Models
+Some pydantic models with ForwardRefs require initialization before use.
+Import initialized models from `lx_dtypes.utils.initialized_models`
+
+If you encounter this error when using a model, you may add it there.
+
+Example for the PatientLedger model which references Examiner. This would cause a circular import, therefore we just use the Examiner model during TYPE_CHECKING in the PatientLedger model file and rebuild the model here.
+```python
+from lx_dtypes.models.examiner import (
+    Examiner,  # for model rebuild # type: ignore # noqa: F401
+)
+
+PatientLedger.model_rebuild()
+
+```
+
 ### Test & Lint
 
 ```bash
@@ -82,6 +98,8 @@ make -C docs html
 
 Use `make -C docs linkcheck` to verify outbound references before publishing to
 Read the Docs or GitHub Pages.
+
+
 
 ## Release Process
 1. Update `CHANGELOG.md` and bump the version in `pyproject.toml`.

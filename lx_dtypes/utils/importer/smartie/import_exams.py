@@ -1,16 +1,169 @@
-from datetime import datetime
+import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, List
 
-from lx_dtypes.models.patient.patient_ledger import PatientLedger
+from lx_dtypes.models.patient.patient_examination import (
+    PatientExamination,
+    # PatientExaminationDataDict,
+)
 
-from .names import OMIT_COLS_EXAMS
+# from lx_dtypes.models.patient.patient_finding import (
+#     PatientFinding,
+#     PatientFindingDataDict,
+# )
+from lx_dtypes.models.patient.patient_ledger import PatientLedger
+from lx_dtypes.models.patient_interface.main import PatientInterface
+from lx_dtypes.utils.importer.smartie.mappings import smartie_exam_map_sedation
+
+# from .mappings import smartie_map_gender
+from .names import (
+    OMIT_COLS_EXAMS,
+    SMARTIE_CLASSIFICATION_CHOICE_ENUM,
+    SMARTIE_CLASSIFICATION_ENUM,
+    SMARTIE_EXAMINATION_ENUM,
+    SMARTIE_FINDING_ENUM,
+)
 
 if TYPE_CHECKING:
     from lx_dtypes.utils.importer.smartie.schema import (
         SmartieExaminations,
         SmartieExaminationSchema,
     )
+
+
+def smartie_exam_map_hardware(
+    exam: "SmartieExaminationSchema",
+    record_uuid: str,
+    patient_interface: PatientInterface,
+) -> None:
+    """Map hardware findings from Smartie exam to patient interface.
+
+    Args:
+        exam (SmartieExaminationSchema): The Smartie examination data.
+        record_uuid (str): The UUID of the patient examination record.
+        patient_interface (PatientInterface): The patient interface to add findings to.
+    """
+    processor_model = exam.processor
+    if not processor_model:
+        return
+
+    finding_name = SMARTIE_FINDING_ENUM.ENDOSCOPY_HARDWARE_USED.value
+    classification_name = SMARTIE_CLASSIFICATION_ENUM.HARDWARE_ENDOSCOPE_PROCESSOR.value
+
+    if processor_model == "Storz Image 1 S":
+        classification_value = (
+            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_STORZ.value
+        )
+    elif processor_model == "Pentax EPK i7000":
+        classification_value = (
+            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_PENTAX.value
+        )
+    elif processor_model == "Olympus CV-170":
+        classification_value = (
+            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_OLYMPUS_170.value
+        )
+    elif processor_model == "Olympus CV-190":
+        classification_value = (
+            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_OLYMPUS_190.value
+        )
+    else:
+        raise ValueError(f"Unknown processor model: {processor_model}")
+
+    finding = patient_interface.create_examination_finding(
+        examination_uuid=record_uuid,
+        finding_name=finding_name,
+    )
+
+    patient_interface.add_classification_choice_to_finding(
+        examination_uuid=record_uuid,
+        finding_uuid=finding.uuid,
+        classification_name=classification_name,
+        choice_name=classification_value,
+    )
+
+
+def smartie_findings_exam_to_ledger(
+    exam: "SmartieExaminationSchema",
+    patient_interface: PatientInterface,
+    record_uuid: str,
+) -> None:
+    """ """
+    smartie_exam_map_sedation(
+        exam=exam,
+        record_uuid=record_uuid,
+        patient_interface=patient_interface,
+    )
+
+    smartie_exam_map_hardware(
+        exam=exam,
+        record_uuid=record_uuid,
+        patient_interface=patient_interface,
+    )
+    # smartie_exam_map_bbps()
+    # smartie_exam_map_withdrawal_time()
+    # smartie_exam_par_deepest_point()
+
+
+def smartie_findings_exams_to_ledger(
+    exams: List["SmartieExaminationSchema"],
+    patient_interface: PatientInterface,
+    person_id2uuid: dict[int, str],
+    record_id2uuid: dict[int, str],
+) -> None:
+    for exam in exams:
+        person_uuid = person_id2uuid.get(exam.person_id)
+        record_uuid = record_id2uuid.get(exam.record_id)
+        if person_uuid is None or record_uuid is None:
+            raise ValueError(
+                f"UUID mapping missing for person_id {exam.person_id} or record_id {exam.record_id}."
+            )
+        smartie_findings_exam_to_ledger(exam, patient_interface, record_uuid)
+
+
+def smartie_exam_to_ledger(
+    exam: "SmartieExaminationSchema",
+    ledger: PatientLedger,
+    record_uuid: str,
+    person_uuid: str,
+) -> None:
+    examination_name = SMARTIE_EXAMINATION_ENUM.COLONOSCOPY.value
+    exam_date = exam.exam_date
+    # convert to timezone aware datetime
+    exam_dt = datetime.datetime(
+        year=exam_date.year,
+        month=exam_date.month,
+        day=exam_date.day,
+        tzinfo=datetime.timezone.utc,
+    )
+    patient_examination = PatientExamination.create(
+        patient_uuid=person_uuid,
+        examination_uuid=record_uuid,
+        examination_name=examination_name,
+        date=exam_dt,
+    )
+
+    examination_indication_name = exam.std_indication
+    _ = patient_examination.create_indication(
+        indication_name=examination_indication_name
+    )
+
+    ledger.add_patient_examination(patient_examination)
+
+
+def smartie_exams_to_ledger(
+    exams: List["SmartieExaminationSchema"],
+    ledger: PatientLedger,
+    person_id2uuid: dict[int, str],
+    record_id2uuid: dict[int, str],
+) -> None:
+    for exam in exams:
+        person_uuid = person_id2uuid.get(exam.person_id)
+        record_uuid = record_id2uuid.get(exam.record_id)
+        if person_uuid is None or record_uuid is None:
+            raise ValueError(
+                f"UUID mapping missing for person_id {exam.person_id} or record_id {exam.record_id}."
+            )
+        smartie_exam_to_ledger(exam, ledger, record_uuid, person_uuid)
 
 
 def smartie_patients_to_ledger(
@@ -77,11 +230,11 @@ def load_smartie_exams_csv(
 
             # Preprocess certain fields
             if "birthdate" in row:
-                row["birthdate"] = datetime.strptime(
+                row["birthdate"] = datetime.datetime.strptime(
                     row["birthdate"].split(" ")[0], "%Y-%m-%d"
                 ).date()
             if "exam_date" in row:
-                row["exam_date"] = datetime.strptime(
+                row["exam_date"] = datetime.datetime.strptime(
                     row["exam_date"].split(" ")[0], "%Y-%m-%d"
                 ).date()
             if "sedation" in row:

@@ -6,9 +6,15 @@ from pydantic import Field
 
 from lx_dtypes.models.patient.patient import Patient, PatientDataDict
 from lx_dtypes.models.patient.patient_ledger import PatientLedger
+from lx_dtypes.models.patient_interface.main import PatientInterface
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
-from .import_exams import load_smartie_exams_csv, smartie_patients_to_ledger
+from .import_exams import (
+    load_smartie_exams_csv,
+    smartie_exams_to_ledger,
+    smartie_findings_exams_to_ledger,
+    smartie_patients_to_ledger,
+)
 
 
 def int_str_dict_factory() -> dict[int, str]:
@@ -70,7 +76,53 @@ class SmartieExaminations(AppBaseModel):
             person_id2uuid=person_id2uuid,
         )
 
+        record_id2uuid = self.record_id2uuid
+        assert record_id2uuid is not None
+
+        smartie_exams_to_ledger(
+            exams=self.examinations,
+            ledger=ledger,
+            person_id2uuid=person_id2uuid,
+            record_id2uuid=record_id2uuid,
+        )
+
         return ledger
+
+    def _validate_interface_integrity(
+        self, patient_interface: PatientInterface
+    ) -> None:
+        ledger = patient_interface.patient_ledger
+
+        person_id2uuid = self.person_id2uuid
+        assert person_id2uuid is not None
+        for _person_id, patient_uuid in person_id2uuid.items():
+            _ = ledger.get_patient_by_uuid(patient_uuid)
+        record_id2uuid = self.record_id2uuid
+        assert record_id2uuid is not None
+        for _record_id, examination_uuid in record_id2uuid.items():
+            _ = ledger.get_examination_by_uuid(examination_uuid)
+
+    def export_exam_findings_to_interface(
+        self, patient_interface: PatientInterface
+    ) -> None:
+        """Add findings to examinations in the ledger using a generic patient interface.
+
+        Args:
+            patient_interface (PatientInterface): The patient interface to interact with the ledger.
+        """
+        self._validate_interface_integrity(patient_interface)
+
+        person_id2uuid = self.person_id2uuid
+        assert person_id2uuid is not None
+        record_id2uuid = self.record_id2uuid
+        assert record_id2uuid is not None
+
+        smartie_findings_exams_to_ledger(
+            exams=self.examinations,
+            patient_interface=patient_interface,
+            person_id2uuid=person_id2uuid,
+            record_id2uuid=record_id2uuid,
+        )
 
 
 class SmartieExaminationSchema(AppBaseModel):
@@ -123,9 +175,10 @@ class SmartieExaminationSchema(AppBaseModel):
             first_name="unknown",
             last_name="unknown",
             dob=self.birthdate,
-            center=self.center,
+            center_name=self.center,
             gender=gender,
             external_ids=external_ids,
+            uuid=new_uuid,
         )
 
         patient = Patient.model_validate(patient_dict)

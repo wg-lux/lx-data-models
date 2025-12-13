@@ -6,6 +6,7 @@ depends_on:
   - lx_findings
   - lx_indications
   - lx_interventions
+  - lx_hardware
 data:
   dirs:
     - ./data

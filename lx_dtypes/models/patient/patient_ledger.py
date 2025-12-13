@@ -1,7 +1,8 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
-from pydantic import Field
+from pydantic import Field, field_serializer
 
+from lx_dtypes.models.core.center import Center
 from lx_dtypes.models.patient.patient import Patient
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
@@ -13,6 +14,31 @@ class PatientLedger(AppBaseModel):
 
     patients: Dict[str, Patient] = Field(default_factory=dict)
     examinations: Dict[str, PatientExamination] = Field(default_factory=dict)
+    centers: Dict[str, Center] = Field(default_factory=dict)
+
+    @field_serializer("patients")
+    def serialize_patients(self, patients: Dict[str, Patient]) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            patient_uuid: patient.model_dump()
+            for patient_uuid, patient in patients.items()
+        }
+        return r
+
+    @field_serializer("examinations")
+    def serialize_examinations(
+        self, examinations: Dict[str, PatientExamination]
+    ) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            exam_uuid: exam.model_dump() for exam_uuid, exam in examinations.items()
+        }
+        return r
+
+    @field_serializer("centers")
+    def serialize_centers(self, centers: Dict[str, Center]) -> Dict[str, Any]:
+        r: Dict[str, Any] = {
+            center_uuid: center.model_dump() for center_uuid, center in centers.items()
+        }
+        return r
 
     def add_patient(self, patient: Patient) -> None:
         self.patients[patient.uuid] = patient

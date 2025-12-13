@@ -8,6 +8,7 @@ from lx_dtypes.models.shallow import (
     ExaminationShallow,
     InformationSourceShallow,
 )
+from lx_dtypes.models.shallow.center import CenterShallow
 from lx_dtypes.models.shallow.classification import (
     ClassificationShallow,
     ClassificationTypeShallow,
@@ -23,6 +24,7 @@ from lx_dtypes.models.shallow.intervention import (
 from lx_dtypes.models.shallow.unit import UnitShallow, UnitTypeShallow
 
 model_types = Union[
+    type[CenterShallow],
     type[InformationSourceShallow],
     type[CitationShallow],
     type[ExaminationShallow],
@@ -41,6 +43,7 @@ model_types = Union[
 ]
 
 ShallowModel = Union[
+    CenterShallow,
     InformationSourceShallow,
     CitationShallow,
     ExaminationShallow,
@@ -59,6 +62,7 @@ ShallowModel = Union[
 ]
 
 model_lookup: Dict[str, model_types] = {
+    "center": CenterShallow,
     "information_source": InformationSourceShallow,
     "citation": CitationShallow,
     "examination": ExaminationShallow,

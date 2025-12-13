@@ -1,3 +1,5 @@
+from enum import Enum
+
 COLUMNS_EXAMS = {
     "record_id",
     "person_id",
@@ -77,3 +79,60 @@ OMIT_COLS_EXAMS = {
     "malign_detected",
     "Unnamed: 0.1",
 }
+AI_TAG_ENUM = Enum(
+    "AI_TAG_ENUM",
+    {
+        "AI_USED": "polyp_detection_ai_used",
+        "AI_NOT_USED": "polyp_detection_ai_not_used",
+    },
+)
+
+SMARTIE_EXAMINATION_ENUM = Enum(
+    "SMARTIE_EXAMINATION_ENUM",
+    {
+        "COLONOSCOPY": "colonoscopy",
+    },
+)
+
+SMARTIE_FINDING_ENUM = Enum(
+    "SMARTIE_FINDING_ENUM",
+    {
+        "SEDATION": "sedation_endoscopy",
+        "BP_SIMPLIFIED": "bowel_preparation_simplified",
+        "BP_LC": "bowel_preparation_lc",
+        "BP_TC": "bowel_preparation_tc",
+        "BP_RC": "bowel_preparation_rc",
+        "DEEPEST_INSERTION": "colonoscopy_deepest_viewed_location",
+        # Hardware
+        "ENDOSCOPY_HARDWARE_USED": "endoscopy_hardware_used",  # TODO: add to data
+    },
+)
+
+SMARTIE_CLASSIFICATION_ENUM = Enum(
+    "SMARTIE_CLASSIFICATION_ENUM",
+    {
+        "BBPS_SIMPLIFIED": "bowel_prep_boston_simplified",
+        "BBPS": "bowel_prep_boston",
+        "SEDATION_PERFORMED": "sedation_performed",
+        "SEDATION": "examination_setting_generic_sedation",
+        "LOCATION_DEFAULT": "colonoscopy_location_default",
+        "REASON_INCOMPLETE": "colonoscopy_not_complete_reason",
+        "HARDWARE_ENDOSCOPE_PROCESSOR": "endoscopy_hardware_endoscope_processor_model",
+    },
+)
+
+SMARTIE_CLASSIFICATION_CHOICE_ENUM = Enum(
+    "SMARTIE_CLASSIFICATION_CHOICE_ENUM",
+    {
+        "YES": "yes",
+        "NO": "no",
+        "SEDATION_PROPOFOL": "sedation_propofol",
+        "SEDATION_MIDAZOLAM": "sedation_midazolam",
+        "SEDATION_PROPOFOL_MIDAZOLAM": "sedation_propofol_midazolam",
+        "SEDATION_OTHER": "sedation_other",
+        "HARDWARE_ENDOSCOPE_STORZ": "storz_image_1s",
+        "HARDWARE_ENDOSCOPE_PENTAX": "pentax_epk_i7000",
+        "HARDWARE_ENDOSCOPE_OLYMPUS_170": "olympus_cv_170",
+        "HARDWARE_ENDOSCOPE_OLYMPUS_190": "olympus_cv_190",
+    },
+)

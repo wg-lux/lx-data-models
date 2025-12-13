@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
-from pydantic import Field
+from pydantic import Field, field_serializer
 
 from lx_dtypes.utils.factories.field_defaults import (
     list_of_patient_finding_classification_choice_factory,
@@ -20,6 +20,12 @@ class PatientFindingClassifications(AppBaseModel):
     choices: List[PatientFindingClassificationChoice] = Field(
         default_factory=list_of_patient_finding_classification_choice_factory
     )
+
+    @field_serializer("choices")
+    def serialize_choices(
+        self, choices: List[PatientFindingClassificationChoice]
+    ) -> List[Dict[str, Any]]:
+        return [choice.model_dump() for choice in choices]
 
     def get_choice_by_uuid(
         self, choice_uuid: str

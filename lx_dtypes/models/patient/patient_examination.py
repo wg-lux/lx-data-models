@@ -1,6 +1,7 @@
-from typing import Dict, List, Optional, Union
+from datetime import datetime
+from typing import Any, Dict, List, Optional, TypedDict
 
-from pydantic import Field
+from pydantic import Field, field_serializer
 
 from lx_dtypes.utils.factories.field_defaults import (
     list_of_patient_finding_factory,
@@ -13,9 +14,33 @@ from .patient_finding import PatientFinding
 from .patient_indication import PatientIndication
 
 
+class PatientExaminationDataDict(TypedDict):
+    uuid: str
+    patient_uuid: str
+    examination_name: str
+    examination_template: Optional[str]
+    date: Optional[datetime]
+    findings: List[PatientFinding]
+    indications: List[PatientIndication]
+
+
 class PatientExamination(AppBaseModel):
+    """
+    Represents a patient's examination, including findings and indications.
+
+    Attributes:
+        uuid (str): Unique identifier for the patient examination.
+        patient_uuid (str): Unique identifier for the patient.
+        date (datetime | None): Date of the examination (if multiple, day of the examination start).
+        examination_name (str): Name of the examination.
+        examination_template (str | None): Template used for the examination.
+        findings (list[PatientFinding]): List of findings associated with the examination.
+        indications (list[PatientIndication]): List of indications associated with the examination.
+    """
+
     uuid: str = Field(default_factory=uuid_factory)
     patient_uuid: str
+    date: Optional[datetime] = None
     examination_name: str
     examination_template: Optional[str] = None
     findings: List[PatientFinding] = Field(
@@ -25,12 +50,26 @@ class PatientExamination(AppBaseModel):
         default_factory=list_of_patient_indication_factory
     )
 
+    @field_serializer("findings")
+    def serialize_findings(
+        self, findings: List[PatientFinding]
+    ) -> List[Dict[str, Any]]:
+        return [finding.model_dump() for finding in findings]
+
+    @field_serializer("indications")
+    def serialize_indications(
+        self, indications: List[PatientIndication]
+    ) -> List[Dict[str, Any]]:
+        return [indication.model_dump() for indication in indications]
+
     @classmethod
     def create(
         cls,
         patient_uuid: str,
         examination_name: str,
+        examination_uuid: Optional[str] = None,
         examination_template: Optional[str] = None,
+        date: Optional[datetime] = None,
     ) -> "PatientExamination":
         """Factory method to create a PatientExamination instance.
 
@@ -38,16 +77,21 @@ class PatientExamination(AppBaseModel):
             patient_uuid (str): The UUID of the patient.
             examination_name (str): The name of the examination.
             examination_template (Optional[str]): The template used for the examination.
+            date (Optional[datetime]): The date of the examination.
+            examination_uuid (Optional[str]): The UUID of the examination.
 
         Returns:
             PatientExamination: The created PatientExamination instance.
         """
-        model_dict: Dict[str, Union[str, None, List[PatientFinding]]] = {
-            "patient_uuid": patient_uuid,
-            "examination_name": examination_name,
-            "examination_template": examination_template,
-            "findings": [],
-        }
+        model_dict = PatientExaminationDataDict(
+            patient_uuid=patient_uuid,
+            uuid=examination_uuid if examination_uuid else uuid_factory(),
+            examination_name=examination_name,
+            examination_template=examination_template,
+            date=date,
+            findings=[],
+            indications=[],
+        )
         instance = cls.model_validate(model_dict)
         return instance
 

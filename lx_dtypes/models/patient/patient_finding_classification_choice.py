@@ -1,6 +1,6 @@
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
-from pydantic import Field
+from pydantic import Field, field_serializer
 
 from lx_dtypes.utils.factories.field_defaults import (
     list_of_patient_finding_classification_choice_descriptor_factory,
@@ -24,6 +24,12 @@ class PatientFindingClassificationChoice(AppBaseModel):
     descriptors: List[PatientFindingClassificationChoiceDescriptor] = Field(
         default_factory=list_of_patient_finding_classification_choice_descriptor_factory
     )
+
+    @field_serializer("descriptors")
+    def serialize_descriptors(
+        self, descriptors: List[PatientFindingClassificationChoiceDescriptor]
+    ) -> List[Dict[str, Any]]:
+        return [descriptor.model_dump() for descriptor in descriptors]
 
     @classmethod
     def create(

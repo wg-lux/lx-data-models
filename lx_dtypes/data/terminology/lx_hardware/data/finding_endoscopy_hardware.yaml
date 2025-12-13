@@ -1,0 +1,6 @@
+- model: finding
+  name: "endoscopy_hardware_used"
+  description: "Endoscopy hardware used during the examination (e.g., endoscope, processor)"
+  classification_names: 
+    - endoscopy_hardware_endoscope_processor_model
+    

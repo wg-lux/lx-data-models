@@ -19,6 +19,7 @@
   choice_names:
     - "yes"
     - "no"
+    - "unknown"
 
 - model: classification
   name: "examination_setting_generic_sedation"

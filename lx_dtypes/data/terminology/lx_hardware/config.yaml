@@ -3,6 +3,6 @@ description: |
   A sample knowledge base module containing our current working state.
 version: 0.1.0
 modules: []
-data: { files: [], dirs: [] }
+data: { files: [], dirs: ["./data"] }
 depends_on:
   - lx_utils

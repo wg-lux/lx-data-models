@@ -1,0 +1,14 @@
+- model: classification_choice
+  name: "storz_image_1s"
+
+- model: classification_choice
+  name: "olympus_cv_170"
+
+- model: classification_choice
+  name: "olympus_cv_180"
+
+- model: classification_choice
+  name: "olympus_cv_190"
+
+- model: classification_choice
+  name: "pentax_epk_i7000"
