@@ -11,6 +11,7 @@ from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
 from .import_exams import (
     load_smartie_exams_csv,
+    smartie_centers_and_examiners_to_ledger,
     smartie_exams_to_ledger,
     smartie_findings_exams_to_ledger,
     smartie_patients_to_ledger,
@@ -19,40 +20,6 @@ from .import_exams import (
 
 def int_str_dict_factory() -> dict[int, str]:
     return {}
-
-
-def smartie_centers_and_examiners_to_ledger(
-    exams: List["SmartieExaminationSchema"],
-    ledger: PatientLedger,
-    examiner_abbr2uuid: dict[str, str],
-    center_abbr2uuid: dict[str, str],
-) -> None:
-    from lx_dtypes.models.examiner.examiner import ExaminerDataDict
-
-    for exam in exams:
-        examiner_abbr = exam.examiner
-        examiner_uuid = examiner_abbr2uuid.get(examiner_abbr)
-        center_name = exam.center
-        center_uuid = center_abbr2uuid.get(center_name)
-
-        if examiner_uuid is None:
-            raise ValueError(
-                f"UUID mapping missing for examiner abbreviation {examiner_abbr}."
-            )
-        if center_uuid is None:
-            raise ValueError(
-                f"UUID mapping missing for center abbreviation {center_name}."
-            )
-
-        examiner_dict = ExaminerDataDict(
-            first_name="unknown",
-            last_name="unknown",
-            external_ids={"smartie_examiner_abbr": examiner_abbr},
-            center_name=center_name,
-            uuid=examiner_uuid,
-        )
-
-        ledger.add_examiner(center_uuid, examiner_dict)
 
 
 class SmartieExaminations(AppBaseModel):

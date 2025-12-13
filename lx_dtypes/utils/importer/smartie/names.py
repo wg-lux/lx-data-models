@@ -134,5 +134,9 @@ SMARTIE_CLASSIFICATION_CHOICE_ENUM = Enum(
         "HARDWARE_ENDOSCOPE_PENTAX": "pentax_epk_i7000",
         "HARDWARE_ENDOSCOPE_OLYMPUS_170": "olympus_cv_170",
         "HARDWARE_ENDOSCOPE_OLYMPUS_190": "olympus_cv_190",
+        "BBPS_0": "bowel_prep_boston_0",
+        "BBPS_1": "bowel_prep_boston_1",
+        "BBPS_2": "bowel_prep_boston_2",
+        "BBPS_3": "bowel_prep_boston_3",
     },
 )

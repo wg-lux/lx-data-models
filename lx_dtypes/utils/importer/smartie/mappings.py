@@ -114,3 +114,57 @@ def smartie_exam_map_sedation(
     )
 
     return
+
+
+###############
+
+
+def smartie_exam_map_hardware(
+    exam: "SmartieExaminationSchema",
+    record_uuid: str,
+    patient_interface: PatientInterface,
+) -> None:
+    """Map hardware findings from Smartie exam to patient interface.
+
+    Args:
+        exam (SmartieExaminationSchema): The Smartie examination data.
+        record_uuid (str): The UUID of the patient examination record.
+        patient_interface (PatientInterface): The patient interface to add findings to.
+    """
+    processor_model = exam.processor
+    if not processor_model:
+        return
+
+    finding_name = SMARTIE_FINDING_ENUM.ENDOSCOPY_HARDWARE_USED.value
+    classification_name = SMARTIE_CLASSIFICATION_ENUM.HARDWARE_ENDOSCOPE_PROCESSOR.value
+
+    if processor_model == "Storz Image 1 S":
+        classification_value = (
+            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_STORZ.value
+        )
+    elif processor_model == "Pentax EPK i7000":
+        classification_value = (
+            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_PENTAX.value
+        )
+    elif processor_model == "Olympus CV-170":
+        classification_value = (
+            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_OLYMPUS_170.value
+        )
+    elif processor_model == "Olympus CV-190":
+        classification_value = (
+            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_OLYMPUS_190.value
+        )
+    else:
+        raise ValueError(f"Unknown processor model: {processor_model}")
+
+    finding = patient_interface.create_examination_finding(
+        examination_uuid=record_uuid,
+        finding_name=finding_name,
+    )
+
+    patient_interface.add_classification_choice_to_finding(
+        examination_uuid=record_uuid,
+        finding_uuid=finding.uuid,
+        classification_name=classification_name,
+        choice_name=classification_value,
+    )

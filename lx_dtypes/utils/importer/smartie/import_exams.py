@@ -1,6 +1,6 @@
 import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
 from lx_dtypes.models.patient.patient_examination import (
     PatientExamination,
@@ -11,9 +11,13 @@ from lx_dtypes.models.patient.patient_examination import (
 #     PatientFinding,
 #     PatientFindingDataDict,
 # )
+from lx_dtypes.models.patient.patient_finding import PatientFinding
 from lx_dtypes.models.patient.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface.main import PatientInterface
-from lx_dtypes.utils.importer.smartie.mappings import smartie_exam_map_sedation
+from lx_dtypes.utils.importer.smartie.mappings import (
+    smartie_exam_map_hardware,
+    smartie_exam_map_sedation,
+)
 
 # from .mappings import smartie_map_gender
 from .names import (
@@ -31,55 +35,122 @@ if TYPE_CHECKING:
     )
 
 
-def smartie_exam_map_hardware(
-    exam: "SmartieExaminationSchema",
-    record_uuid: str,
-    patient_interface: PatientInterface,
+def smartie_validate_bbps_input(
+    bbps_simplified_value: Optional[int] = None,
+    bbps_individual: Optional[Tuple[int, int, int]] = None,
 ) -> None:
-    """Map hardware findings from Smartie exam to patient interface.
+    _simplified_available = bbps_simplified_value is not None
+    if _simplified_available:
+        assert isinstance(bbps_simplified_value, int)
+        # assert in 0-3
+        assert 0 <= bbps_simplified_value <= 3
 
-    Args:
-        exam (SmartieExaminationSchema): The Smartie examination data.
-        record_uuid (str): The UUID of the patient examination record.
-        patient_interface (PatientInterface): The patient interface to add findings to.
-    """
-    processor_model = exam.processor
-    if not processor_model:
-        return
+    _individual_available = bbps_individual is not None
+    if _individual_available:
+        _lowest = 3
+        _total = 0
+        assert isinstance(bbps_individual, tuple)
+        assert len(bbps_individual) == 3
+        for score in bbps_individual:
+            assert 0 <= score <= 3
+            if score < _lowest:
+                _lowest = score
+            _total += score
+        # cross check with simplified and total
+        if _simplified_available:
+            assert bbps_simplified_value == _lowest
 
-    finding_name = SMARTIE_FINDING_ENUM.ENDOSCOPY_HARDWARE_USED.value
-    classification_name = SMARTIE_CLASSIFICATION_ENUM.HARDWARE_ENDOSCOPE_PROCESSOR.value
 
-    if processor_model == "Storz Image 1 S":
-        classification_value = (
-            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_STORZ.value
-        )
-    elif processor_model == "Pentax EPK i7000":
-        classification_value = (
-            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_PENTAX.value
-        )
-    elif processor_model == "Olympus CV-170":
-        classification_value = (
-            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_OLYMPUS_170.value
-        )
-    elif processor_model == "Olympus CV-190":
-        classification_value = (
-            SMARTIE_CLASSIFICATION_CHOICE_ENUM.HARDWARE_ENDOSCOPE_OLYMPUS_190.value
-        )
+def smartie_map_bbps_choice(bbps_value: int) -> str:
+    if bbps_value == 0:
+        return SMARTIE_CLASSIFICATION_CHOICE_ENUM.BBPS_0.value
+    elif bbps_value == 1:
+        return SMARTIE_CLASSIFICATION_CHOICE_ENUM.BBPS_1.value
+    elif bbps_value == 2:
+        return SMARTIE_CLASSIFICATION_CHOICE_ENUM.BBPS_2.value
+    elif bbps_value == 3:
+        return SMARTIE_CLASSIFICATION_CHOICE_ENUM.BBPS_3.value
     else:
-        raise ValueError(f"Unknown processor model: {processor_model}")
+        raise ValueError(f"Invalid BBPS simplified value: {bbps_value}")
 
-    finding = patient_interface.create_examination_finding(
-        examination_uuid=record_uuid,
+
+def smartie_map_bbps_simplified(
+    bbps_value: int,
+    patient_interface: PatientInterface,
+    examination_uuid: str,
+) -> None:
+    finding_name = SMARTIE_FINDING_ENUM.BP_SIMPLIFIED.value
+    classification_name = SMARTIE_CLASSIFICATION_ENUM.BBPS_SIMPLIFIED.value
+    choice_name = smartie_map_bbps_choice(bbps_value)
+
+    finding_uuid = patient_interface.create_examination_finding(
+        examination_uuid=examination_uuid,
         finding_name=finding_name,
-    )
+    ).uuid
 
     patient_interface.add_classification_choice_to_finding(
-        examination_uuid=record_uuid,
-        finding_uuid=finding.uuid,
+        examination_uuid=examination_uuid,
+        finding_uuid=finding_uuid,
         classification_name=classification_name,
-        choice_name=classification_value,
+        choice_name=choice_name,
     )
+
+
+def smartie_map_bbps_individual(
+    bbps_values: Tuple[int, int, int],
+    patient_interface: PatientInterface,
+    examination_uuid: str,
+) -> None:
+    """bbps values are expected to be ordered (left, transverse, right)"""
+    finding_name_bp_lc = SMARTIE_FINDING_ENUM.BP_LC.value
+    finding_name_bp_tc = SMARTIE_FINDING_ENUM.BP_TC.value
+    finding_name_bp_rc = SMARTIE_FINDING_ENUM.BP_RC.value
+
+    finding_names = [
+        finding_name_bp_lc,
+        finding_name_bp_tc,
+        finding_name_bp_rc,
+    ]
+
+    findings: List[PatientFinding] = []
+    for idx, segment_value in enumerate(bbps_values):
+        finding = patient_interface.create_examination_finding(
+            examination_uuid=examination_uuid,
+            finding_name=finding_names[idx],
+        )
+        findings.append(finding)
+
+        classification_name = SMARTIE_CLASSIFICATION_ENUM.BBPS.value
+        choice_name = smartie_map_bbps_choice(segment_value)
+
+        patient_interface.add_classification_choice_to_finding(
+            examination_uuid=examination_uuid,
+            finding_uuid=finding.uuid,
+            classification_name=classification_name,
+            choice_name=choice_name,
+        )
+
+
+def smartie_exam_map_bbps(
+    exam: "SmartieExaminationSchema",
+    patient_interface: PatientInterface,
+    record_uuid: str,
+) -> None:
+    """ """
+    bbps_simplified_value = exam.bbps_worst
+    bbps_individual = exam.bbps
+
+    smartie_validate_bbps_input(
+        bbps_simplified_value=bbps_simplified_value,
+        bbps_individual=bbps_individual,
+    )
+
+    if bbps_simplified_value is not None:
+        smartie_map_bbps_simplified(
+            bbps_value=bbps_simplified_value,
+            patient_interface=patient_interface,
+            examination_uuid=record_uuid,
+        )
 
 
 def smartie_findings_exam_to_ledger(
@@ -99,9 +170,47 @@ def smartie_findings_exam_to_ledger(
         record_uuid=record_uuid,
         patient_interface=patient_interface,
     )
-    # smartie_exam_map_bbps()
+    smartie_exam_map_bbps(
+        exam=exam,
+        record_uuid=record_uuid,
+        patient_interface=patient_interface,
+    )
     # smartie_exam_map_withdrawal_time()
-    # smartie_exam_par_deepest_point()
+    # smartie_exam_map_deepest_point()
+
+
+def smartie_centers_and_examiners_to_ledger(
+    exams: List["SmartieExaminationSchema"],
+    ledger: PatientLedger,
+    examiner_abbr2uuid: dict[str, str],
+    center_abbr2uuid: dict[str, str],
+) -> None:
+    from lx_dtypes.models.examiner.examiner import ExaminerDataDict
+
+    for exam in exams:
+        examiner_abbr = exam.examiner
+        examiner_uuid = examiner_abbr2uuid.get(examiner_abbr)
+        center_name = exam.center
+        center_uuid = center_abbr2uuid.get(center_name)
+
+        if examiner_uuid is None:
+            raise ValueError(
+                f"UUID mapping missing for examiner abbreviation {examiner_abbr}."
+            )
+        if center_uuid is None:
+            raise ValueError(
+                f"UUID mapping missing for center abbreviation {center_name}."
+            )
+
+        examiner_dict = ExaminerDataDict(
+            first_name="unknown",
+            last_name="unknown",
+            external_ids={"smartie_examiner_abbr": examiner_abbr},
+            center_name=center_name,
+            uuid=examiner_uuid,
+        )
+
+        ledger.add_examiner(center_uuid, examiner_dict)
 
 
 def smartie_findings_exams_to_ledger(
@@ -241,12 +350,21 @@ def load_smartie_exams_csv(
                 row["sedation"] = (
                     row["sedation"].strip("{}").split(",") if row["sedation"] else []
                 )
+            if "bbps_worst" in row:
+                _v = int(float(row["bbps_worst"]))
+                if _v < 0:
+                    row.pop("bbps_worst")
             if "bbps" in row:
-                row["bbps"] = (
-                    tuple(int(x) for x in row["bbps"].strip("{}").split(","))
-                    if row["bbps"]
-                    else (0, 0, 0)
-                )
+                if row["bbps"]:
+                    _value = tuple(int(x) for x in row["bbps"].strip("{}").split(","))
+                    row["bbps"] = _value
+                else:
+                    row.pop("bbps")
+                    continue
+
+                # if any segment is -1, remove the entire field
+                if any(x == -1 for x in _value):
+                    row.pop("bbps")
 
             for col in OMIT_COLS_EXAMS:
                 if col in row:
