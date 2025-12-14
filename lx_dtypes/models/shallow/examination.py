@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, TypedDict
 
 from pydantic import Field
 
@@ -7,8 +7,29 @@ from lx_dtypes.utils.mixins.base_model import BaseModelMixin
 from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
+class ExaminationTypeShallowDataDict(TypedDict):
+    name: str
+    description: str
+
+
+class ExaminationShallowDataDict(TypedDict):
+    name: str
+    description: str
+    finding_names: List[str]
+    type_names: List[str]
+    indication_names: List[str]
+
+
 class ExaminationTypeShallow(BaseModelMixin, TaggedMixin):
     """Taggable shell for examination types."""
+
+    @property
+    def ddict_shallow(self) -> type[ExaminationTypeShallowDataDict]:
+        return ExaminationTypeShallowDataDict
+
+    def to_ddict_shallow(self) -> ExaminationTypeShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict
 
 
 class ExaminationShallow(BaseModelMixin, TaggedMixin):
@@ -29,3 +50,11 @@ class ExaminationShallow(BaseModelMixin, TaggedMixin):
     finding_names: List[str] = Field(default_factory=list_of_str_factory)
     type_names: List[str] = Field(default_factory=list_of_str_factory)
     indication_names: List[str] = Field(default_factory=list_of_str_factory)
+
+    @property
+    def ddict_shallow(self) -> type[ExaminationShallowDataDict]:
+        return ExaminationShallowDataDict
+
+    def to_ddict_shallow(self) -> ExaminationShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict

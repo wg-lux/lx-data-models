@@ -1,9 +1,29 @@
-from typing import Dict, Literal, Optional, Union
+from typing import Dict, Literal, Optional, TypedDict, Union
 
 from pydantic import Field
 
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 from lx_dtypes.utils.mixins.base_model import BaseModelMixin
+
+
+class ClassificationChoiceDescriptorShallowDataDict(TypedDict):
+    name: str
+    description: str
+    descriptor_type: Literal["numeric", "text", "boolean", "selection"]
+    unit_name: Optional[str]
+    numeric_min: float
+    numeric_max: float
+    numeric_distribution: Literal["normal", "uniform", "exponential", "unknown"]
+    numeric_distribution_params: Dict[str, Union[str, float, int]]
+    text_max_length: int
+    default_value_str: str
+    default_value_num: float
+    default_value_bool: bool
+    selection_options: list[str]
+    selection_multiple: bool
+    selection_multiple_n_min: int
+    selection_multiple_n_max: int
+    selection_default_options: Dict[str, float]
 
 
 class ClassificationChoiceDescriptorShallow(BaseModelMixin):
@@ -56,3 +76,11 @@ class ClassificationChoiceDescriptorShallow(BaseModelMixin):
     selection_default_options: Dict[str, float] = Field(
         default_factory=dict
     )  # option name -> probability
+
+    @property
+    def ddict_shallow(self) -> type[ClassificationChoiceDescriptorShallowDataDict]:
+        return ClassificationChoiceDescriptorShallowDataDict
+
+    def to_ddict_shallow(self) -> ClassificationChoiceDescriptorShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict

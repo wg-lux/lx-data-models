@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Optional, Self, Union
+from typing import Any, Dict, Optional, Self, TypedDict, Union
 
 import yaml
 from pydantic import Field, field_serializer
@@ -7,23 +7,61 @@ from pydantic import Field, field_serializer
 from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
 from lx_dtypes.models.shallow import (
     CitationShallow,
+    CitationShallowDataDict,
     ClassificationChoiceDescriptorShallow,
+    ClassificationChoiceDescriptorShallowDataDict,
     ClassificationChoiceShallow,
+    ClassificationChoiceShallowDataDict,
     ClassificationShallow,
+    ClassificationShallowDataDict,
     ClassificationTypeShallow,
+    ClassificationTypeShallowDataDict,
     ExaminationShallow,
+    ExaminationShallowDataDict,
     ExaminationTypeShallow,
+    ExaminationTypeShallowDataDict,
     FindingShallow,
+    FindingShallowDataDict,
     FindingTypeShallow,
+    FindingTypeShallowDataDict,
     IndicationShallow,
+    IndicationShallowDataDict,
     IndicationTypeShallow,
+    IndicationTypeShallowDataDict,
     InformationSourceShallow,
+    InformationSourceShallowDataDict,
     InterventionShallow,
+    InterventionShallowDataDict,
     InterventionTypeShallow,
+    InterventionTypeShallowDataDict,
     UnitShallow,
+    UnitShallowDataDict,
     UnitTypeShallow,
+    UnitTypeShallowDataDict,
 )
 from lx_dtypes.utils.mixins.base_model import BaseModelMixin
+
+
+class KnowledgeBaseDataDict(TypedDict):
+    config: Optional[Dict[str, Any]]
+    citations: Dict[str, CitationShallowDataDict]
+    findings: Dict[str, FindingShallowDataDict]
+    finding_types: Dict[str, FindingTypeShallowDataDict]
+    classifications: Dict[str, ClassificationShallowDataDict]
+    classification_types: Dict[str, ClassificationTypeShallowDataDict]
+    classification_choices: Dict[str, ClassificationChoiceShallowDataDict]
+    classification_choice_descriptors: Dict[
+        str, ClassificationChoiceDescriptorShallowDataDict
+    ]
+    examinations: Dict[str, ExaminationShallowDataDict]
+    examination_types: Dict[str, ExaminationTypeShallowDataDict]
+    indications: Dict[str, IndicationShallowDataDict]
+    indication_types: Dict[str, IndicationTypeShallowDataDict]
+    interventions: Dict[str, InterventionShallowDataDict]
+    intervention_types: Dict[str, InterventionTypeShallowDataDict]
+    information_sources: Dict[str, InformationSourceShallowDataDict]
+    units: Dict[str, UnitShallowDataDict]
+    unit_types: Dict[str, UnitTypeShallowDataDict]
 
 
 class KnowledgeBase(BaseModelMixin):
@@ -60,6 +98,14 @@ class KnowledgeBase(BaseModelMixin):
     )
     units: Dict[str, "UnitShallow"] = Field(default_factory=dict)
     unit_types: Dict[str, "UnitTypeShallow"] = Field(default_factory=dict)
+
+    @property
+    def ddict(self) -> type[KnowledgeBaseDataDict]:
+        return KnowledgeBaseDataDict
+
+    def to_ddict(self) -> KnowledgeBaseDataDict:
+        data_dict = self.ddict(**self.model_dump())
+        return data_dict
 
     @classmethod
     def create_from_config(cls, config: "KnowledgeBaseConfig") -> "KnowledgeBase":
@@ -373,27 +419,23 @@ class KnowledgeBase(BaseModelMixin):
     @field_serializer("citations")
     def serialize_citations(
         self, citations: Dict[str, "CitationShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: citation.model_dump() for name, citation in citations.items()
-        }
+    ) -> Dict[str, CitationShallowDataDict]:
+        r = {name: citation.to_ddict_shallow() for name, citation in citations.items()}
         return r
 
     @field_serializer("findings")
     def serialize_findings(
         self, findings: Dict[str, "FindingShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: finding.model_dump() for name, finding in findings.items()
-        }
+    ) -> Dict[str, FindingShallowDataDict]:
+        r = {name: finding.to_ddict_shallow() for name, finding in findings.items()}
         return r
 
     @field_serializer("finding_types")
     def serialize_finding_types(
         self, finding_types: Dict[str, "FindingTypeShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: finding_type.model_dump()
+    ) -> Dict[str, FindingTypeShallowDataDict]:
+        r = {
+            name: finding_type.to_ddict_shallow()
             for name, finding_type in finding_types.items()
         }
         return r
@@ -401,9 +443,9 @@ class KnowledgeBase(BaseModelMixin):
     @field_serializer("classifications")
     def serialize_classifications(
         self, classifications: Dict[str, "ClassificationShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: classification.model_dump()
+    ) -> Dict[str, ClassificationShallowDataDict]:
+        r = {
+            name: classification.to_ddict_shallow()
             for name, classification in classifications.items()
         }
         return r
@@ -411,9 +453,9 @@ class KnowledgeBase(BaseModelMixin):
     @field_serializer("classification_types")
     def serialize_classification_types(
         self, classification_types: Dict[str, "ClassificationTypeShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: classification_type.model_dump()
+    ) -> Dict[str, ClassificationTypeShallowDataDict]:
+        r = {
+            name: classification_type.to_ddict_shallow()
             for name, classification_type in classification_types.items()
         }
         return r
@@ -421,9 +463,9 @@ class KnowledgeBase(BaseModelMixin):
     @field_serializer("classification_choices")
     def serialize_classification_choices(
         self, classification_choices: Dict[str, "ClassificationChoiceShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: classification_choice.model_dump()
+    ) -> Dict[str, ClassificationChoiceShallowDataDict]:
+        r = {
+            name: classification_choice.to_ddict_shallow()
             for name, classification_choice in classification_choices.items()
         }
         return r
@@ -434,9 +476,9 @@ class KnowledgeBase(BaseModelMixin):
         classification_choice_descriptors: Dict[
             str, "ClassificationChoiceDescriptorShallow"
         ],
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: descriptor.model_dump(exclude_defaults=True, exclude_none=True)
+    ) -> Dict[str, ClassificationChoiceDescriptorShallowDataDict]:
+        r = {
+            name: descriptor.to_ddict_shallow()
             for name, descriptor in classification_choice_descriptors.items()
         }
         return r
@@ -444,18 +486,19 @@ class KnowledgeBase(BaseModelMixin):
     @field_serializer("examinations")
     def serialize_examinations(
         self, examinations: Dict[str, "ExaminationShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: examination.model_dump() for name, examination in examinations.items()
+    ) -> Dict[str, ExaminationShallowDataDict]:
+        r = {
+            name: examination.to_ddict_shallow()
+            for name, examination in examinations.items()
         }
         return r
 
     @field_serializer("examination_types")
     def serialize_examination_types(
         self, examination_types: Dict[str, "ExaminationTypeShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: examination_type.model_dump()
+    ) -> Dict[str, ExaminationTypeShallowDataDict]:
+        r = {
+            name: examination_type.to_ddict_shallow()
             for name, examination_type in examination_types.items()
         }
         return r
@@ -463,9 +506,9 @@ class KnowledgeBase(BaseModelMixin):
     @field_serializer("interventions")
     def serialize_interventions(
         self, interventions: Dict[str, "InterventionShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: intervention.model_dump()
+    ) -> Dict[str, InterventionShallowDataDict]:
+        r = {
+            name: intervention.to_ddict_shallow()
             for name, intervention in interventions.items()
         }
         return r
@@ -473,9 +516,9 @@ class KnowledgeBase(BaseModelMixin):
     @field_serializer("intervention_types")
     def serialize_intervention_types(
         self, intervention_types: Dict[str, "InterventionTypeShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: intervention_type.model_dump()
+    ) -> Dict[str, InterventionTypeShallowDataDict]:
+        r = {
+            name: intervention_type.to_ddict_shallow()
             for name, intervention_type in intervention_types.items()
         }
         return r
@@ -483,18 +526,19 @@ class KnowledgeBase(BaseModelMixin):
     @field_serializer("indications")
     def serialize_indications(
         self, indications: Dict[str, "IndicationShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: indication.model_dump() for name, indication in indications.items()
+    ) -> Dict[str, IndicationShallowDataDict]:
+        r = {
+            name: indication.to_ddict_shallow()
+            for name, indication in indications.items()
         }
         return r
 
     @field_serializer("indication_types")
     def serialize_indication_types(
         self, indication_types: Dict[str, "IndicationTypeShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: indication_type.model_dump()
+    ) -> Dict[str, IndicationTypeShallowDataDict]:
+        r = {
+            name: indication_type.to_ddict_shallow()
             for name, indication_type in indication_types.items()
         }
         return r
@@ -502,9 +546,9 @@ class KnowledgeBase(BaseModelMixin):
     @field_serializer("information_sources")
     def serialize_information_sources(
         self, information_sources: Dict[str, "InformationSourceShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: information_source.model_dump()
+    ) -> Dict[str, InformationSourceShallowDataDict]:
+        r = {
+            name: information_source.to_ddict_shallow()
             for name, information_source in information_sources.items()
         }
         return r
@@ -518,15 +562,17 @@ class KnowledgeBase(BaseModelMixin):
         return config.model_dump()
 
     @field_serializer("units")
-    def serialize_units(self, units: Dict[str, "UnitShallow"]) -> Dict[str, Any]:
-        r: Dict[str, Any] = {name: unit.model_dump() for name, unit in units.items()}
+    def serialize_units(
+        self, units: Dict[str, "UnitShallow"]
+    ) -> Dict[str, UnitShallowDataDict]:
+        r = {name: unit.to_ddict_shallow() for name, unit in units.items()}
         return r
 
     @field_serializer("unit_types")
     def serialize_unit_types(
         self, unit_types: Dict[str, "UnitTypeShallow"]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            name: unit_type.model_dump() for name, unit_type in unit_types.items()
+    ) -> Dict[str, UnitTypeShallowDataDict]:
+        r = {
+            name: unit_type.to_ddict_shallow() for name, unit_type in unit_types.items()
         }
         return r

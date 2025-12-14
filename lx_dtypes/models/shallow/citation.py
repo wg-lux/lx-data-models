@@ -1,10 +1,27 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, TypedDict
 
 from pydantic import Field, model_validator
 
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 from lx_dtypes.utils.mixins.base_model import BaseModelMixin
 from lx_dtypes.utils.mixins.tags import TaggedMixin
+
+
+class CitationShallowDataDict(TypedDict):
+    citation_key: str
+    title: str
+    abstract: str | None
+    authors: List[str]
+    publication_year: int | None
+    publication_month: str | None
+    journal: str | None
+    publisher: str | None
+    volume: str | None
+    issue: str | None
+    pages: str | None
+    doi: str | None
+    url: str | None
+    entry_type: str | None
 
 
 class CitationShallow(BaseModelMixin, TaggedMixin):
@@ -50,6 +67,10 @@ class CitationShallow(BaseModelMixin, TaggedMixin):
     keywords: List[str] = Field(default_factory=list_of_str_factory)
     identifiers: Dict[str, str] = Field(default_factory=dict)
 
+    @property
+    def ddict_shallow(self) -> type[CitationShallowDataDict]:
+        return CitationShallowDataDict
+
     @model_validator(mode="before")
     @classmethod
     def ensure_name(cls, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -60,3 +81,7 @@ class CitationShallow(BaseModelMixin, TaggedMixin):
         if not new_data.get("name"):
             new_data["name"] = new_data.get("citation_key") or new_data.get("title")
         return new_data
+
+    def to_ddict_shallow(self) -> CitationShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict

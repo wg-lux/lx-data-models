@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, TypedDict
 
 from pydantic import Field
 
@@ -7,8 +7,28 @@ from lx_dtypes.utils.mixins.base_model import BaseModelMixin
 from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
+class IndicationTypeShallowDataDict(TypedDict):
+    name: str
+    description: str
+
+
+class IndicationShallowDataDict(TypedDict):
+    name: str
+    description: str
+    type_names: List[str]
+    expected_intervention_names: List[str]
+
+
 class IndicationTypeShallow(BaseModelMixin, TaggedMixin):
     """Taggable metadata container for indication types."""
+
+    @property
+    def ddict_shallow(self) -> type[IndicationTypeShallowDataDict]:
+        return IndicationTypeShallowDataDict
+
+    def to_ddict_shallow(self) -> IndicationTypeShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict
 
 
 class IndicationShallow(BaseModelMixin, TaggedMixin):
@@ -27,3 +47,11 @@ class IndicationShallow(BaseModelMixin, TaggedMixin):
 
     type_names: List[str] = Field(default_factory=list_of_str_factory)
     expected_intervention_names: List[str] = Field(default_factory=list_of_str_factory)
+
+    @property
+    def ddict_shallow(self) -> type[IndicationShallowDataDict]:
+        return IndicationShallowDataDict
+
+    def to_ddict_shallow(self) -> IndicationShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict

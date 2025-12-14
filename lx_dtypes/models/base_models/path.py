@@ -1,9 +1,16 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, TypedDict
 
 from lx_dtypes.utils.mixins import PathMixin
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 from lx_dtypes.utils.paths import get_files_from_dir_recursive
+
+
+class FilesAndDirsDataDict(TypedDict):
+    file: Optional[str]
+    dir: Optional[str]
+    files: List[str]
+    dirs: List[str]
 
 
 class FilesAndDirsModel(PathMixin, AppBaseModel):

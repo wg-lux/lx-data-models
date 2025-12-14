@@ -3,6 +3,7 @@ from pathlib import Path
 # import pytest
 from lx_dtypes.models.knowledge_base import KnowledgeBase
 from lx_dtypes.models.patient_interface import PatientInterface
+from lx_dtypes.stats.interface_export import ledger2dataset
 from lx_dtypes.utils.importer.smartie.schema import (
     SmartieExaminationSchema,
 )
@@ -15,7 +16,8 @@ FILENAME_EXAMS_PP = DATA_DIR / "exams_pp_clean.csv"
 FILENAME_POLYPS_ITT = DATA_DIR / "polyps_itt_clean.csv"
 FILENAME_POLYPS_PP = DATA_DIR / "polyps_pp_clean.csv"
 
-# def import_exams_file
+EXPORT_DIR = DATA_DIR / "exported"
+EXPORT_DIR.mkdir(exist_ok=True)
 
 
 class TestImportExams:
@@ -29,6 +31,14 @@ class TestImportExams:
         )
         exams_itt.export_exam_findings_to_interface(interface_itt)
 
+        dfs = ledger2dataset(interface_itt)
+
+        for i, df in enumerate(dfs):
+            assert not df.empty
+            # dump to csv for manual inspection
+            out_file = EXPORT_DIR / f"smartie_itt_export_{i}.csv"
+            df.to_csv(out_file, index=False)
+
         exams_pp = SmartieExaminationSchema.load_csv(str(FILENAME_EXAMS_PP))
         assert len(exams_pp.examinations) > 0
         _exams_pp_ledger = exams_pp.create_ledger(name="SmartieExamsPP")
@@ -38,15 +48,13 @@ class TestImportExams:
         )
         exams_pp.export_exam_findings_to_interface(interface_pp)
 
-        # test export for debugging ####
-        import yaml
+        # # test export for debugging ####
+        # import yaml
 
-        ledger = interface_itt.patient_ledger
-        ledger_dump = ledger.model_dump(
-            exclude_none=True, exclude_defaults=True, round_trip=True
-        )
+        # ledger = interface_itt.patient_ledger
+        # ledger_dump = ledger.to_ddict()
 
-        tmp_out_file = "./data/smartie/test_output_ledger_itt.yaml"
+        # tmp_out_file = "./data/smartie/test_output_ledger_itt.yaml"
 
-        with open(tmp_out_file, "w", encoding="utf-8") as f:
-            yaml.dump(ledger_dump, f)
+        # with open(tmp_out_file, "w", encoding="utf-8") as f:
+        #     yaml.dump(ledger_dump, f)

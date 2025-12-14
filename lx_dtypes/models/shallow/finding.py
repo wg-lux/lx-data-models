@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, TypedDict
 
 from pydantic import Field
 
@@ -7,8 +7,29 @@ from lx_dtypes.utils.mixins.base_model import BaseModelMixin
 from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
+class FindingTypeShallowDataDict(TypedDict):
+    name: str
+    description: str
+
+
+class FindingShallowDataDict(TypedDict):
+    name: str
+    description: str
+    classification_names: List[str]
+    type_names: List[str]
+    intervention_names: List[str]
+
+
 class FindingTypeShallow(BaseModelMixin, TaggedMixin):
     """Metadata shell for finding types."""
+
+    @property
+    def ddict_shallow(self) -> type[FindingTypeShallowDataDict]:
+        return FindingTypeShallowDataDict
+
+    def to_ddict_shallow(self) -> FindingTypeShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict
 
 
 class FindingShallow(BaseModelMixin, TaggedMixin):
@@ -29,3 +50,11 @@ class FindingShallow(BaseModelMixin, TaggedMixin):
     classification_names: List[str] = Field(default_factory=list_of_str_factory)
     type_names: List[str] = Field(default_factory=list_of_str_factory)
     intervention_names: List[str] = Field(default_factory=list_of_str_factory)
+
+    @property
+    def ddict_shallow(self) -> type[FindingShallowDataDict]:
+        return FindingShallowDataDict
+
+    def to_ddict_shallow(self) -> FindingShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict

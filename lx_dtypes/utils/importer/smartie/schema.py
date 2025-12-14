@@ -199,7 +199,7 @@ class SmartieExaminationSchema(AppBaseModel):
         patient_dict = PatientDataDict(
             first_name="unknown",
             last_name="unknown",
-            dob=self.birthdate,
+            dob=self.birthdate.isoformat(),
             center_name=self.center,
             gender=gender,
             external_ids=external_ids,

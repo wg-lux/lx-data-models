@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import List, Optional, TypedDict
 
-from pydantic import Field, field_serializer
+from pydantic import Field, field_serializer, field_validator
 
 from lx_dtypes.utils.factories.field_defaults import (
     list_of_patient_finding_factory,
@@ -10,8 +10,18 @@ from lx_dtypes.utils.factories.field_defaults import (
 )
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
-from .patient_finding import PatientFinding
-from .patient_indication import PatientIndication
+from .patient_finding import PatientFinding, PatientFindingDataDict
+from .patient_indication import PatientIndication, PatientIndicationDataDict
+
+
+class PatientExaminationShallowDataDict(TypedDict):
+    uuid: str
+    patient_uuid: str
+    examination_name: str
+    examination_template: Optional[str]
+    date: Optional[str]
+    findings_uuids: List[str]
+    indications_uuids: List[str]
 
 
 class PatientExaminationDataDict(TypedDict):
@@ -19,12 +29,44 @@ class PatientExaminationDataDict(TypedDict):
     patient_uuid: str
     examination_name: str
     examination_template: Optional[str]
-    date: Optional[datetime]
-    findings: List[PatientFinding]
-    indications: List[PatientIndication]
+    date: Optional[str]
+    findings: List[PatientFindingDataDict]
+    indications: List[PatientIndicationDataDict]
 
 
-class PatientExamination(AppBaseModel):
+class PatientExaminationShallow(AppBaseModel):
+    """Shallow representation of a PatientExamination."""
+
+    uuid: str = Field(default_factory=uuid_factory)
+    patient_uuid: str
+    examination_name: str
+    examination_template: Optional[str] = None
+    date: Optional[datetime] = None
+    findings_uuids: List[str] = Field(default_factory=list)
+    indications_uuids: List[str] = Field(default_factory=list)
+
+    @field_validator("date", mode="before")
+    def validate_date(cls, value: Optional[str]) -> Optional[datetime]:
+        if value is None:
+            return value
+        return datetime.fromisoformat(value)
+
+    @field_serializer("date")
+    def serialize_date(self, date: Optional[datetime]) -> Optional[str]:
+        if date is None:
+            return None
+        return date.isoformat()
+
+    @property
+    def ddict_shallow(self) -> type[PatientExaminationShallowDataDict]:
+        return PatientExaminationShallowDataDict
+
+    def to_ddict_shallow(self) -> PatientExaminationShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict
+
+
+class PatientExamination(PatientExaminationShallow):
     """
     Represents a patient's examination, including findings and indications.
 
@@ -38,29 +80,47 @@ class PatientExamination(AppBaseModel):
         indications (list[PatientIndication]): List of indications associated with the examination.
     """
 
-    uuid: str = Field(default_factory=uuid_factory)
-    patient_uuid: str
-    date: Optional[datetime] = None
-    examination_name: str
-    examination_template: Optional[str] = None
     findings: List[PatientFinding] = Field(
         default_factory=list_of_patient_finding_factory
     )
+
     indications: List[PatientIndication] = Field(
         default_factory=list_of_patient_indication_factory
     )
 
+    @property
+    def ddict(self) -> type[PatientExaminationDataDict]:
+        return PatientExaminationDataDict
+
     @field_serializer("findings")
     def serialize_findings(
         self, findings: List[PatientFinding]
-    ) -> List[Dict[str, Any]]:
-        return [finding.model_dump() for finding in findings]
+    ) -> List[PatientFindingDataDict]:
+        return [finding.to_ddict() for finding in findings]
 
     @field_serializer("indications")
     def serialize_indications(
         self, indications: List[PatientIndication]
-    ) -> List[Dict[str, Any]]:
-        return [indication.model_dump() for indication in indications]
+    ) -> List[PatientIndicationDataDict]:
+        return [indication.to_ddict() for indication in indications]
+
+    def to_ddict(self) -> PatientExaminationDataDict:
+        data_dict = self.ddict(**self.model_dump())
+        return data_dict
+
+    def to_ddict_shallow(self) -> PatientExaminationShallowDataDict:
+        findings_uuids = [finding.uuid for finding in self.findings]
+        indications_uuids = [indication.uuid for indication in self.indications]
+        data_dict = self.ddict_shallow(
+            uuid=self.uuid,
+            patient_uuid=self.patient_uuid,
+            examination_name=self.examination_name,
+            examination_template=self.examination_template,
+            date=self.serialize_date(self.date),
+            findings_uuids=findings_uuids,
+            indications_uuids=indications_uuids,
+        )
+        return data_dict
 
     @classmethod
     def create(
@@ -83,12 +143,13 @@ class PatientExamination(AppBaseModel):
         Returns:
             PatientExamination: The created PatientExamination instance.
         """
+        date_str = date.isoformat() if date else None
         model_dict = PatientExaminationDataDict(
             patient_uuid=patient_uuid,
             uuid=examination_uuid if examination_uuid else uuid_factory(),
             examination_name=examination_name,
             examination_template=examination_template,
-            date=date,
+            date=date_str,
             findings=[],
             indications=[],
         )

@@ -31,6 +31,8 @@ class AppBaseModel(BaseModel):
         validate_by_name=False,
         serialize_by_alias=False,
         json_encoders={Path: serialize_path},
+        # revalidate_instances = "always",
+        # arbitrary_types_allowed=True,
     )
 
     @classmethod

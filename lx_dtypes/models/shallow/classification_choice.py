@@ -1,5 +1,16 @@
+from typing import Optional, TypedDict
+
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 from lx_dtypes.utils.mixins import BaseModelMixin
+
+
+class ClassificationChoiceShallowDataDict(TypedDict):
+    name: str
+    name_de: Optional[str]
+    name_en: Optional[str]
+    description: Optional[str]
+    classification_choice_descriptor_names: list[str]
+    type_names: list[str]
 
 
 class ClassificationChoiceShallow(BaseModelMixin):
@@ -19,3 +30,11 @@ class ClassificationChoiceShallow(BaseModelMixin):
 
     classification_choice_descriptor_names: list[str] = list_of_str_factory()
     type_names: list[str] = list_of_str_factory()
+
+    @property
+    def ddict_shallow(self) -> type[ClassificationChoiceShallowDataDict]:
+        return ClassificationChoiceShallowDataDict
+
+    def to_ddict_shallow(self) -> ClassificationChoiceShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict

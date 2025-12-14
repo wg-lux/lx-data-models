@@ -1,16 +1,22 @@
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, TypedDict
 
 from pydantic import Field, field_serializer
 
-from lx_dtypes.models.core.center import Center
+from lx_dtypes.models.core.center import Center, CenterDataDict
 from lx_dtypes.models.examiner.examiner import Examiner
-from lx_dtypes.models.patient.patient import Patient
+from lx_dtypes.models.patient.patient import Patient, PatientDataDict
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
-from .patient_examination import PatientExamination
+from .patient_examination import PatientExamination, PatientExaminationDataDict
 
 if TYPE_CHECKING:  # pragma: no cover
     from lx_dtypes.models.examiner.examiner import Examiner, ExaminerDataDict
+
+
+class PatientLedgerDataDict(TypedDict):
+    patients: Dict[str, PatientDataDict]
+    examinations: Dict[str, PatientExaminationDataDict]
+    centers: Dict[str, CenterDataDict]
 
 
 class PatientLedger(AppBaseModel):
@@ -20,10 +26,14 @@ class PatientLedger(AppBaseModel):
     examinations: Dict[str, PatientExamination] = Field(default_factory=dict)
     centers: Dict[str, Center] = Field(default_factory=dict)
 
+    @property
+    def ddict(self) -> type[PatientLedgerDataDict]:
+        return PatientLedgerDataDict
+
     @field_serializer("patients")
     def serialize_patients(self, patients: Dict[str, Patient]) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            patient_uuid: patient.model_dump()
+        r: Dict[str, PatientDataDict] = {
+            patient_uuid: patient.to_ddict()
             for patient_uuid, patient in patients.items()
         }
         return r
@@ -31,18 +41,22 @@ class PatientLedger(AppBaseModel):
     @field_serializer("examinations")
     def serialize_examinations(
         self, examinations: Dict[str, PatientExamination]
-    ) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            exam_uuid: exam.model_dump() for exam_uuid, exam in examinations.items()
+    ) -> Dict[str, PatientExaminationDataDict]:
+        r: Dict[str, PatientExaminationDataDict] = {
+            exam_uuid: exam.to_ddict() for exam_uuid, exam in examinations.items()
         }
         return r
 
     @field_serializer("centers")
     def serialize_centers(self, centers: Dict[str, Center]) -> Dict[str, Any]:
-        r: Dict[str, Any] = {
-            center_uuid: center.model_dump() for center_uuid, center in centers.items()
+        r: Dict[str, CenterDataDict] = {
+            center_uuid: center.to_ddict() for center_uuid, center in centers.items()
         }
         return r
+
+    def to_ddict(self) -> PatientLedgerDataDict:
+        data_dict = self.ddict(**self.model_dump())
+        return data_dict
 
     def add_patient(self, patient: Patient) -> None:
         self.patients[patient.uuid] = patient

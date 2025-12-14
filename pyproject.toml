@@ -16,6 +16,8 @@ dependencies = [
   "opencv-python>=4.12.0.88",
   "openpyxl>=3.1.5",
   "pandas>=2.2.3",
+  "pandas-stubs>=2.3.3.251201",
+  "pandera[pandas,io,mypy]>=0.27.0",
   "pillow>=11.3.0",
   "pydantic>=2.10.6",
   "python-ffmpeg>=2.0.12",
@@ -78,7 +80,7 @@ Repository = "https://github.com/wg-lux/lx-data-models"
 
 [tool.mypy]
 exclude = '^(\.venv|venv|env)/'
-plugins = []
+plugins = ["pandera.mypy"]
 strict = true
 warn_unused_ignores = false
 

@@ -1,7 +1,17 @@
-from lx_dtypes.models.shallow.citation import CitationShallow
+from lx_dtypes.models.shallow.citation import CitationShallow, CitationShallowDataDict
+
+
+class CitationDataDict(CitationShallowDataDict):
+    pass
 
 
 class Citation(CitationShallow):
     """Rich representation of a bibliographic citation."""
 
-    pass
+    @property
+    def ddict(self) -> type[CitationDataDict]:
+        return CitationDataDict
+
+    def to_ddict(self) -> CitationDataDict:
+        data_dict = self.ddict(**self.model_dump())
+        return data_dict

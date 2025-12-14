@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, NotRequired, Optional, Self, TypedDict, Union
+from typing import Dict, List, NotRequired, Optional, Self, TypedDict, Union
 
 from pydantic import Field, field_serializer
 
@@ -10,7 +10,10 @@ from lx_dtypes.utils.factories.field_defaults import (
 )
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
-from .patient_finding_classifications import PatientFindingClassifications
+from .patient_finding_classifications import (
+    PatientFindingClassifications,
+    PatientFindingClassificationsDataDict,
+)
 
 
 class PatientFindingDataDict(TypedDict):
@@ -18,24 +21,69 @@ class PatientFindingDataDict(TypedDict):
     patient_uuid: str
     patient_examination_uuid: Optional[str]
     finding_name: str
-    classifications: NotRequired[PatientFindingClassifications]
-    # examination_template: NotRequired[Optional[str]]
+    classifications: NotRequired[PatientFindingClassificationsDataDict]
+    classifications_uuid: NotRequired[str]
 
 
-class PatientFinding(AppBaseModel):
+class PatientFindingShallowDataDict(TypedDict):
+    uuid: NotRequired[str]
+    patient_uuid: str
+    patient_examination_uuid: Optional[str]
+    finding_name: str
+    classifications_uuid: NotRequired[str]
+
+
+class PatientFindingShallow(AppBaseModel):
     uuid: str = Field(default_factory=uuid_factory)
     patient_uuid: str
     patient_examination_uuid: Optional[str] = None
     finding_name: str
+    classifications_uuid: Optional[str] = None
+
+    @property
+    def ddict_shallow(self) -> type[PatientFindingShallowDataDict]:
+        return PatientFindingShallowDataDict
+
+    def to_ddict_shallow(self) -> PatientFindingShallowDataDict:
+        data_dict = self.ddict_shallow(**self.model_dump())
+        return data_dict
+
+
+class PatientFinding(PatientFindingShallow):
     classifications: Optional[PatientFindingClassifications] = None
+
+    @property
+    def ddict(self) -> type[PatientFindingDataDict]:
+        return PatientFindingDataDict
 
     @field_serializer("classifications")
     def serialize_classifications(
         self, classifications: Optional[PatientFindingClassifications]
-    ) -> Optional[Dict[str, Any]]:
+    ) -> PatientFindingClassificationsDataDict:
         if classifications is None:
-            return None
-        return classifications.model_dump()
+            classifications = self.get_or_create_classifications()
+
+        return classifications.to_ddict()
+
+    def to_ddict(self) -> PatientFindingDataDict:
+        data_dict = self.ddict(**self.model_dump())
+        return data_dict
+
+    def to_ddict_shallow(self) -> PatientFindingShallowDataDict:
+        classifications_uuid = (
+            self.classifications.uuid
+            if self.classifications
+            else self.classifications_uuid
+        )
+        assert classifications_uuid is not None, "classifications_uuid must be set"
+        data_dict = self.ddict_shallow(
+            uuid=self.uuid,
+            patient_uuid=self.patient_uuid,
+            patient_examination_uuid=self.patient_examination_uuid,
+            finding_name=self.finding_name,
+            classifications_uuid=classifications_uuid,
+        )
+        return data_dict
 
     @classmethod
     def create(
