@@ -5,6 +5,7 @@
 junit.xml
 data/smartie
 knowledge_base.yaml
+.devenv.flake.nix
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
