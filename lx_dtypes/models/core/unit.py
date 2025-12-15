@@ -1,27 +1,22 @@
-from typing import List, TypedDict, Union
+from typing import List
 
 from pydantic import Field, field_serializer
 
 from lx_dtypes.models.shallow.unit import (
     UnitShallow,
+    UnitShallowDataDict,
     UnitTypeShallow,
+    UnitTypeShallowDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_unit_types_factory
 
 
-class UnitTypeDataDict(TypedDict):
-    name: str
-    name_de: Union[str, None]
-    name_en: Union[str, None]
-    description: Union[str, None]
+class UnitTypeDataDict(UnitTypeShallowDataDict):
+    pass
 
 
-class UnitDataDict(TypedDict):
-    name: str
-    name_de: Union[str, None]
-    name_en: Union[str, None]
-    description: Union[str, None]
-    abbreviation: Union[str, None]
+class UnitDataDict(UnitShallowDataDict):
+    pass
     types: List[UnitTypeDataDict]
 
 
@@ -50,3 +45,12 @@ class Unit(UnitShallow):
     def to_ddict(self) -> UnitDataDict:
         data_dict = self.ddict(**self.model_dump())
         return data_dict
+
+    def to_ddict_shallow(self) -> UnitShallowDataDict:
+        dump = self.model_dump()
+        shallow_data = {
+            key: dump[key]
+            for key in self.ddict_shallow.__annotations__.keys()
+            if key in dump
+        }
+        return self.ddict_shallow(**shallow_data)

@@ -1,9 +1,11 @@
 from pathlib import Path
-from typing import Any, Dict, Optional, Self, TypedDict, Union
+from typing import Any, Dict, List, Optional, Self, TypedDict, Union
 
 import yaml
 from pydantic import Field, field_serializer
 
+# if TYPE_CHECKING:
+#     from lx_dtypes.stats.dataset import KnowledgeBaseDataset
 from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
 from lx_dtypes.models.shallow import (
     CitationShallow,
@@ -40,6 +42,27 @@ from lx_dtypes.models.shallow import (
     UnitTypeShallowDataDict,
 )
 from lx_dtypes.utils.mixins.base_model import BaseModelMixin
+
+
+class KnowledgeBaseRecordLists(TypedDict):
+    citations: List[CitationShallowDataDict]
+    findings: List[FindingShallowDataDict]
+    finding_types: List[FindingTypeShallowDataDict]
+    classifications: List[ClassificationShallowDataDict]
+    classification_types: List[ClassificationTypeShallowDataDict]
+    classification_choices: List[ClassificationChoiceShallowDataDict]
+    classification_choice_descriptors: List[
+        ClassificationChoiceDescriptorShallowDataDict
+    ]
+    examinations: List[ExaminationShallowDataDict]
+    examination_types: List[ExaminationTypeShallowDataDict]
+    indications: List[IndicationShallowDataDict]
+    indication_types: List[IndicationTypeShallowDataDict]
+    interventions: List[InterventionShallowDataDict]
+    intervention_types: List[InterventionTypeShallowDataDict]
+    information_sources: List[InformationSourceShallowDataDict]
+    units: List[UnitShallowDataDict]
+    unit_types: List[UnitTypeShallowDataDict]
 
 
 class KnowledgeBaseDataDict(TypedDict):
@@ -576,3 +599,63 @@ class KnowledgeBase(BaseModelMixin):
             name: unit_type.to_ddict_shallow() for name, unit_type in unit_types.items()
         }
         return r
+
+    def export_record_lists(self) -> KnowledgeBaseRecordLists:
+        citation_records = [r.to_ddict_shallow() for r in self.citations.values()]
+        finding_records = [r.to_ddict_shallow() for r in self.findings.values()]
+        finding_type_records = [
+            r.to_ddict_shallow() for r in self.finding_types.values()
+        ]
+        classification_records = [
+            r.to_ddict_shallow() for r in self.classifications.values()
+        ]
+        classification_type_records = [
+            r.to_ddict_shallow() for r in self.classification_types.values()
+        ]
+        classification_choice_records = [
+            r.to_ddict_shallow() for r in self.classification_choices.values()
+        ]
+        classification_choice_descriptor_records = [
+            r.to_ddict_shallow()
+            for r in self.classification_choice_descriptors.values()
+        ]
+        examination_records = [r.to_ddict_shallow() for r in self.examinations.values()]
+        examination_type_records = [
+            r.to_ddict_shallow() for r in self.examination_types.values()
+        ]
+        indication_records = [r.to_ddict_shallow() for r in self.indications.values()]
+        indication_type_records = [
+            r.to_ddict_shallow() for r in self.indication_types.values()
+        ]
+        intervention_records = [
+            r.to_ddict_shallow() for r in self.interventions.values()
+        ]
+        intervention_type_records = [
+            r.to_ddict_shallow() for r in self.intervention_types.values()
+        ]
+        information_source_records = [
+            r.to_ddict_shallow() for r in self.information_sources.values()
+        ]
+        unit_records = [r.to_ddict_shallow() for r in self.units.values()]
+        unit_type_records = [r.to_ddict_shallow() for r in self.unit_types.values()]
+
+        record_lists = KnowledgeBaseRecordLists(
+            citations=citation_records,
+            findings=finding_records,
+            finding_types=finding_type_records,
+            classifications=classification_records,
+            classification_types=classification_type_records,
+            classification_choices=classification_choice_records,
+            classification_choice_descriptors=classification_choice_descriptor_records,
+            examinations=examination_records,
+            examination_types=examination_type_records,
+            indications=indication_records,
+            indication_types=indication_type_records,
+            interventions=intervention_records,
+            intervention_types=intervention_type_records,
+            information_sources=information_source_records,
+            units=unit_records,
+            unit_types=unit_type_records,
+        )
+
+        return record_lists

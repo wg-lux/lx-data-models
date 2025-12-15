@@ -8,6 +8,11 @@ from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
 class CitationShallowDataDict(TypedDict):
+    tags: List[str]
+    name: str
+    name_de: str
+    name_en: str
+    description: str | None
     citation_key: str
     title: str
     abstract: str | None
@@ -22,6 +27,9 @@ class CitationShallowDataDict(TypedDict):
     doi: str | None
     url: str | None
     entry_type: str | None
+    language: str | None
+    keywords: List[str]
+    identifiers: Dict[str, str]
 
 
 class CitationShallow(BaseModelMixin, TaggedMixin):
@@ -82,6 +90,20 @@ class CitationShallow(BaseModelMixin, TaggedMixin):
             new_data["name"] = new_data.get("citation_key") or new_data.get("title")
         return new_data
 
+    @model_validator(mode="before")
+    @classmethod
+    def np_nan_to_none(cls, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert any numpy NaN values to None."""
+
+        import numpy as np
+
+        assert isinstance(data, dict)
+        new_data = data.copy()
+        for key, value in new_data.items():
+            if isinstance(value, float) and np.isnan(value):
+                new_data[key] = None
+        return new_data
+
     def to_ddict_shallow(self) -> CitationShallowDataDict:
-        data_dict = self.ddict_shallow(**self.model_dump())
+        data_dict = self.ddict_shallow(**self.model_dump(exclude_none=False))
         return data_dict

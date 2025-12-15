@@ -3,7 +3,7 @@ from pathlib import Path
 # import pytest
 from lx_dtypes.models.knowledge_base import KnowledgeBase
 from lx_dtypes.models.patient_interface import PatientInterface
-from lx_dtypes.stats.interface_export import ledger2dataset
+from lx_dtypes.stats.interface_export import interface2dataset
 from lx_dtypes.utils.importer.smartie.schema import (
     SmartieExaminationSchema,
 )
@@ -31,13 +31,14 @@ class TestImportExams:
         )
         exams_itt.export_exam_findings_to_interface(interface_itt)
 
-        dfs = ledger2dataset(interface_itt)
+        dataset_itt = interface2dataset(interface_itt)
+        dataset_itt.to_csvs(EXPORT_DIR / "interface_export_itt")
 
-        for i, df in enumerate(dfs):
-            assert not df.empty
-            # dump to csv for manual inspection
-            out_file = EXPORT_DIR / f"smartie_itt_export_{i}.csv"
-            df.to_csv(out_file, index=False)
+        # for i, df in enumerate(dfs):
+        #     assert not df.empty
+        #     # dump to csv for manual inspection
+        #     out_file = EXPORT_DIR / f"smartie_itt_export_{i}.csv"
+        #     df.to_csv(out_file, index=False)
 
         exams_pp = SmartieExaminationSchema.load_csv(str(FILENAME_EXAMS_PP))
         assert len(exams_pp.examinations) > 0

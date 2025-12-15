@@ -14,9 +14,12 @@ class UnitTypeShallowDataDict(TypedDict):
 
 class UnitShallowDataDict(TypedDict):
     name: str
+    name_de: Optional[str]
+    name_en: Optional[str]
     description: str
     abbreviation: Optional[str]
     type_names: List[str]
+    tags: List[str]
 
 
 class UnitTypeShallow(BaseModelMixin, TaggedMixin):

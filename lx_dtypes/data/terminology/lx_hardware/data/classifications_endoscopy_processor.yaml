@@ -1,4 +1,4 @@
-- model: classification
+- model: classification #TODO Redundant with other file here?
   name: "endoscopy_hardware_endoscope_processor_model"
   description: "Classification of different endoscopy processor models."
   choice_names:

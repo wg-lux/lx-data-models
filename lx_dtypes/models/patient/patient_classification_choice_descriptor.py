@@ -4,6 +4,7 @@ from pydantic import Field, field_serializer
 
 from lx_dtypes.models.core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
+    ClassificationChoiceDescriptorDataDict,
 )
 from lx_dtypes.models.shallow.classification_choice_descriptor import (
     ClassificationChoiceDescriptorShallowDataDict,
@@ -68,9 +69,11 @@ class PatientFindingClassificationChoiceDescriptor(
 
     @field_serializer("descriptor")
     def serialize_descriptor(
-        self, descriptor: ClassificationChoiceDescriptor
-    ) -> ClassificationChoiceDescriptorShallowDataDict:
-        return descriptor.to_ddict_shallow()
+        self, descriptor: Optional[ClassificationChoiceDescriptor]
+    ) -> Optional[ClassificationChoiceDescriptorDataDict]:
+        if descriptor is None:
+            return None
+        return descriptor.to_ddict()
 
     def to_ddict(self) -> PatientFindingClassificationChoiceDescriptorDataDict:
         data_dict = self.ddict(**self.model_dump())
@@ -79,5 +82,12 @@ class PatientFindingClassificationChoiceDescriptor(
     def to_ddict_shallow(
         self,
     ) -> PatientFindingClassificationChoiceDescriptorShallowDataDict:
-        data_dict = self.ddict_shallow(**self.model_dump())
-        return data_dict
+        dump = self.model_dump()
+        descriptor_name = self.descriptor.name if self.descriptor is not None else ""
+        dump["descriptor_name"] = descriptor_name
+        shallow_data = {
+            key: dump[key]
+            for key in self.ddict_shallow.__annotations__.keys()
+            if key in dump
+        }
+        return self.ddict_shallow(**shallow_data)

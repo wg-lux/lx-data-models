@@ -1,6 +1,5 @@
-from typing import Any, Callable, ClassVar, cast
+from typing import Any, ClassVar
 
-import pandera.engines.pandas_engine as pandas_engine
 import pandera.pandas as pa
 
 from lx_dtypes.models.examiner.examiner import ExaminerShallow
@@ -18,14 +17,7 @@ from lx_dtypes.models.patient.patient_finding_classifications import (
 )
 from lx_dtypes.models.shallow.center import CenterShallow
 
-PANDERA_PYDANTIC_MODEL = cast(
-    Callable[[type[Any]], Any],
-    getattr(pandas_engine, "PydanticModel"),
-)
-
-COERCE = True
-
-# DOCS: https://pandera.readthedocs.io/en/stable/pydantic_integration.html#pydantic-integration
+from .common import COERCE, PANDERA_PYDANTIC_MODEL
 
 
 # Patient
@@ -35,21 +27,18 @@ class PatientShallowSchema(pa.DataFrameModel):
         coerce = COERCE
 
 
-# Examination
 class PatientExaminationShallowSchema(pa.DataFrameModel):
     class Config:  # type:ignore
         dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(PatientExaminationShallow)
         coerce = COERCE
 
 
-# Finding
 class PatientFindingShallowSchema(pa.DataFrameModel):
     class Config:  # type:ignore
         dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(PatientFindingShallow)
         coerce = COERCE
 
 
-# Classifications
 class PatientFindingClassificationsShallowSchema(pa.DataFrameModel):
     class Config:  # type:ignore
         dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(
@@ -58,7 +47,6 @@ class PatientFindingClassificationsShallowSchema(pa.DataFrameModel):
         coerce = COERCE
 
 
-# Choices
 class PatientFindingClassificationChoiceShallowSchema(pa.DataFrameModel):
     class Config:  # type:ignore
         dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(
@@ -67,7 +55,6 @@ class PatientFindingClassificationChoiceShallowSchema(pa.DataFrameModel):
         coerce = COERCE
 
 
-# Descriptors
 class PatientFindingClassificationChoiceDescriptorShallowSchema(pa.DataFrameModel):
     class Config:  # type:ignore
         dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(
@@ -76,7 +63,6 @@ class PatientFindingClassificationChoiceDescriptorShallowSchema(pa.DataFrameMode
         coerce = COERCE
 
 
-# Center
 class CenterShallowSchema(pa.DataFrameModel):
     class Config:  # type:ignore
         dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(CenterShallow)

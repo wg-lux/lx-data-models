@@ -91,7 +91,7 @@ class TestDataLoader:
         collected = empty_data_loader._collect_modules_with_dependencies(["mod_a"])  # type: ignore
         assert set(collected.keys()) == {"mod_a", "mod_b", "mod_c"}
 
-        collected = empty_data_loader._collect_modules_with_dependencies(
+        collected = empty_data_loader._collect_modules_with_dependencies(  # type:ignore
             ["mod_b", "mod_a"]
         )  # type: ignore
         assert set(collected.keys()) == {"mod_a", "mod_b", "mod_c"}

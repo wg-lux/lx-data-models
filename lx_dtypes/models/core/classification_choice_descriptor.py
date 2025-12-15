@@ -31,3 +31,14 @@ class ClassificationChoiceDescriptor(ClassificationChoiceDescriptorShallow):
     def to_ddict(self) -> ClassificationChoiceDescriptorDataDict:
         data_dict = self.ddict(**self.model_dump())
         return data_dict
+
+    def to_ddict_shallow(
+        self,
+    ) -> ClassificationChoiceDescriptorShallowDataDict:
+        dump = self.model_dump()
+        shallow_data = {
+            key: dump[key]
+            for key in self.ddict_shallow.__annotations__.keys()
+            if key in dump
+        }
+        return self.ddict_shallow(**shallow_data)

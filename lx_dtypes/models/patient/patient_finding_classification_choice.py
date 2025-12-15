@@ -4,6 +4,7 @@ from pydantic import Field, field_serializer
 
 from lx_dtypes.utils.factories.field_defaults import (
     list_of_patient_finding_classification_choice_descriptor_factory,
+    list_of_str_factory,
     uuid_factory,
 )
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
@@ -12,17 +13,6 @@ from .patient_classification_choice_descriptor import (
     PatientFindingClassificationChoiceDescriptor,
     PatientFindingClassificationChoiceDescriptorDataDict,
 )
-
-
-class PatientFindingClassificationChoiceDataDict(TypedDict):
-    uuid: NotRequired[str]
-    name: str
-    patient_uuid: str
-    patient_examination_uuid: Optional[str]
-    patient_finding_uuid: str
-    patient_finding_classifications_uuid: str
-    classification_name: str
-    descriptors: NotRequired[List[PatientFindingClassificationChoiceDescriptorDataDict]]
 
 
 class PatientFindingClassificationChoiceShallowDataDict(TypedDict):
@@ -36,6 +26,10 @@ class PatientFindingClassificationChoiceShallowDataDict(TypedDict):
     descriptor_uuids: List[str]
 
 
+class PatientFindingClassificationChoiceDataDict(TypedDict):
+    descriptors: NotRequired[List[PatientFindingClassificationChoiceDescriptorDataDict]]
+
+
 class PatientFindingClassificationChoiceShallow(AppBaseModel):
     uuid: str = Field(default_factory=uuid_factory)
     name: str
@@ -44,14 +38,14 @@ class PatientFindingClassificationChoiceShallow(AppBaseModel):
     patient_finding_uuid: str
     patient_finding_classifications_uuid: str
     classification_name: str
-    descriptor_uuids: List[str] = Field(default_factory=list)
+    descriptor_uuids: List[str] = Field(default_factory=list_of_str_factory)
 
     @property
     def ddict_shallow(self) -> type[PatientFindingClassificationChoiceShallowDataDict]:
         return PatientFindingClassificationChoiceShallowDataDict
 
     def to_ddict_shallow(self) -> PatientFindingClassificationChoiceShallowDataDict:
-        data_dict = self.ddict_shallow(**self.model_dump())
+        data_dict = self.ddict_shallow(**self.model_dump(exclude_defaults=False))
         return data_dict
 
 

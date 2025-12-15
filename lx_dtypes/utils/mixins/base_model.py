@@ -7,6 +7,31 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validato
 from lx_dtypes.utils.json_encoders import serialize_path
 
 
+class DatasetBaseModel(BaseModel):
+    """Base model for datasets with common configurations."""
+
+    model_config = ConfigDict(
+        # 1. Strips leading/trailing whitespace automatically ("  val  " -> "val")
+        str_strip_whitespace=True,
+        # 2. Rejects extra fields not defined in the model (Security/Strictness)
+        extra="forbid",
+        # 3. Validates default values (ensures your defaults aren't broken)
+        validate_default=True,
+        # 4. Allows population by alias (e.g. accepting "camelCase" input)
+        populate_by_name=True,
+        ser_json_timedelta="iso8601",
+        ser_json_temporal="iso8601",
+        val_temporal_unit="seconds",
+        ser_json_bytes="utf8",
+        val_json_bytes="utf8",
+        ser_json_inf_nan="strings",
+        regex_engine="rust-regex",
+        validate_by_name=False,
+        serialize_by_alias=False,
+        json_encoders={Path: serialize_path},
+    )
+
+
 class AppBaseModel(BaseModel):
     source_file: Path | None = None
     created_at: AwareDatetime = Field(
@@ -53,12 +78,12 @@ class AppBaseModel(BaseModel):
 
         kwargs.setdefault("mode", "json")
         kwargs.setdefault("by_alias", True)
-        kwargs.setdefault("exclude_none", True)
+        kwargs.setdefault("exclude_none", False)
         kwargs.setdefault(
             "exclude",
             {"source_file", "created_at"} | set(kwargs.get("exclude", [])),
         )
-        kwargs.setdefault("exclude_defaults", True)
+        kwargs.setdefault("exclude_defaults", False)
         kwargs.setdefault("round_trip", True)
 
         dump = super().model_dump(*args, **kwargs)

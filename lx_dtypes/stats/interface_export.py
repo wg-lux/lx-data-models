@@ -2,9 +2,9 @@ from typing import List
 
 # import numpy as np
 import pandas as pd
-from pandera.typing.pandas import DataFrame
 
 from lx_dtypes.models.examiner.examiner import ExaminerShallowDataDict
+from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
 from lx_dtypes.models.patient.patient_classification_choice_descriptor import (
     PatientFindingClassificationChoiceDescriptorShallowDataDict,
 )
@@ -20,39 +20,43 @@ from lx_dtypes.models.patient.patient_finding_classification_choice import (
 from lx_dtypes.models.patient.patient_finding_classifications import (
     PatientFindingClassificationsShallowDataDict,
 )
+from lx_dtypes.models.patient.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface import PatientInterface
 from lx_dtypes.models.shallow.center import CenterShallowDataDict
 
+from .dataset import InterfaceExportDataset, KnowledgeBaseDataset, PatientLedgerDataset
 from .schemas import (
     CenterShallowSchema,
+    # Knowledge Base
+    CitationShallowSchema,
+    ClassificationChoiceDescriptorShallowSchema,
+    ClassificationChoiceShallowSchema,
+    ClassificationShallowSchema,
+    ClassificationTypeShallowSchema,
+    ExaminationShallowSchema,
+    ExaminationTypeShallowSchema,
     ExaminerShallowSchema,
+    FindingShallowSchema,
+    FindingTypeShallowSchema,
+    IndicationShallowSchema,
+    IndicationTypeShallowSchema,
+    InformationSourceShallowSchema,
+    InterventionShallowSchema,
+    InterventionTypeShallowSchema,
     PatientExaminationShallowSchema,
     PatientFindingClassificationChoiceDescriptorShallowSchema,
     PatientFindingClassificationChoiceShallowSchema,
     PatientFindingClassificationsShallowSchema,
     PatientFindingShallowSchema,
     PatientShallowSchema,
+    # UnitShallowSchema,
+    # UnitTypeShallowSchema,
 )
 
 
 def ledger2dataset(
-    patient_interface: PatientInterface,
-) -> tuple[
-    DataFrame[PatientShallowSchema],
-    DataFrame[PatientExaminationShallowSchema],
-    DataFrame[PatientFindingShallowSchema],
-    DataFrame[PatientFindingClassificationsShallowSchema],
-    DataFrame[PatientFindingClassificationChoiceShallowSchema],
-    DataFrame[PatientFindingClassificationChoiceDescriptorShallowSchema],
-    DataFrame[CenterShallowSchema],
-    DataFrame[ExaminerShallowSchema],
-]:
-    ################ KNOWLEDGE BASE
-    # kb = patient_interface.knowledge_base
-
-    ################ LEDGER
-    ledger = patient_interface.patient_ledger
-
+    ledger: PatientLedger,
+) -> PatientLedgerDataset:
     patient_dicts = [p.to_ddict_shallow() for _, p in ledger.patients.items()]
     examination_dicts: List[PatientExaminationShallowDataDict] = []
     finding_dicts: List[PatientFindingShallowDataDict] = []
@@ -104,13 +108,104 @@ def ledger2dataset(
     df_centers = CenterShallowSchema.validate(pd.DataFrame(center_dicts))
     df_examiners = ExaminerShallowSchema.validate(pd.DataFrame(examiner_dicts))
 
-    return (
-        df_patients,
-        df_examinations,
-        df_findings,
-        df_classifications,
-        df_choices,
-        df_descriptors,
-        df_centers,
-        df_examiners,
+    dataset = PatientLedgerDataset(
+        patients=df_patients,
+        examinations=df_examinations,
+        findings=df_findings,
+        classifications=df_classifications,
+        classification_choices=df_choices,
+        classification_choice_descriptors=df_descriptors,
+        centers=df_centers,
+        examiners=df_examiners,
     )
+
+    return dataset
+
+
+def kb2dataset(kb: KnowledgeBase) -> KnowledgeBaseDataset:
+    record_lists_dict = kb.export_record_lists()
+    citations = CitationShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["citations"])
+    )
+    classification_types = ClassificationTypeShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["classification_types"])
+    )
+    classifications = ClassificationShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["classifications"])
+    )
+    classification_choices = ClassificationChoiceShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["classification_choices"])
+    )
+    classification_choice_descriptors = (
+        ClassificationChoiceDescriptorShallowSchema.validate(
+            pd.DataFrame(record_lists_dict["classification_choice_descriptors"])
+        )
+    )
+    examination_types = ExaminationTypeShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["examination_types"])
+    )
+    examinations = ExaminationShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["examinations"])
+    )
+    finding_types = FindingTypeShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["finding_types"])
+    )
+    findings = FindingShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["findings"])
+    )
+    indication_types = IndicationTypeShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["indication_types"])
+    )
+    indications = IndicationShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["indications"])
+    )
+    information_sources = InformationSourceShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["information_sources"])
+    )
+    intervention_types = InterventionTypeShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["intervention_types"])
+    )
+    interventions = InterventionShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["interventions"])
+    )
+    # unit_types = UnitTypeShallowSchema.validate(
+    #     pd.DataFrame(record_lists_dict["unit_types"])
+    # )
+    # units = UnitShallowSchema.validate(pd.DataFrame(record_lists_dict["units"]))
+    dataset = KnowledgeBaseDataset(
+        citations=citations,
+        classification_types=classification_types,
+        classifications=classifications,
+        classification_choices=classification_choices,
+        classification_choice_descriptors=classification_choice_descriptors,
+        examination_types=examination_types,
+        examinations=examinations,
+        finding_types=finding_types,
+        findings=findings,
+        indication_types=indication_types,
+        indications=indications,
+        information_sources=information_sources,
+        intervention_types=intervention_types,
+        interventions=interventions,
+        # unit_types=unit_types,
+        # units=units,
+    )
+    return dataset
+
+
+def interface2dataset(
+    patient_interface: PatientInterface,
+) -> InterfaceExportDataset:
+    ################ KNOWLEDGE BASE
+    # kb = patient_interface.knowledge_base
+
+    ################ LEDGER
+    ledger = patient_interface.patient_ledger
+    ledger_dataset = ledger2dataset(ledger=ledger)
+    kb_dataset = kb2dataset(kb=patient_interface.knowledge_base)
+
+    dataset = InterfaceExportDataset(
+        knowledge_base=kb_dataset,
+        patient_ledger=ledger_dataset,
+    )
+    return dataset
