@@ -9,7 +9,7 @@ from lx_dtypes.models.patient.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface.main import PatientInterface
 from lx_dtypes.utils.mixins.base_model import AppBaseModel
 
-from .import_exams import (
+from ..import_exams import (
     load_smartie_exams_csv,
     smartie_centers_and_examiners_to_ledger,
     smartie_exams_to_ledger,
