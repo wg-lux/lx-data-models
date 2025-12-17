@@ -1,14 +1,14 @@
 from pathlib import Path
 from typing import Callable
 
-from lx_dtypes.models.shallow import (
+from lx_dtypes.models.core import (
     CitationShallow,
     ExaminationShallow,
     ExaminationTypeShallow,
     IndicationShallow,
     InformationSourceShallow,
 )
-from lx_dtypes.models.shallow.intervention import InterventionShallow
+from lx_dtypes.models.core.intervention_shallow import InterventionShallow
 from lx_dtypes.utils.logging import Log
 from lx_dtypes.utils.parser import parse_shallow_object
 
@@ -108,7 +108,7 @@ class TestParser:
         assert len(parsed_objects) > 0
         for obj in parsed_objects:
             assert obj.source_file == sample_findings_yaml_filepath
-            from lx_dtypes.models.shallow.finding import FindingShallow
+            from lx_dtypes.models.core.finding_shallow import FindingShallow
 
             assert isinstance(obj, FindingShallow)
 
@@ -125,7 +125,9 @@ class TestParser:
         assert len(parsed_objects) > 0
         for obj in parsed_objects:
             assert obj.source_file == sample_classifications_yaml_filepath
-            from lx_dtypes.models.shallow.classification import ClassificationShallow
+            from lx_dtypes.models.core.classification_shallow import (
+                ClassificationShallow,
+            )
 
             if isinstance(obj, ClassificationShallow):
                 log_writer(f"Parsed ClassificationShallow object: {obj.name}")
@@ -145,7 +147,7 @@ class TestParser:
         assert len(parsed_objects) > 0
         for obj in parsed_objects:
             assert obj.source_file == sample_classification_choices_yaml_filepath
-            from lx_dtypes.models.shallow.classification_choice import (
+            from lx_dtypes.models.core.classification_choice_shallow import (
                 ClassificationChoiceShallow,
             )
 

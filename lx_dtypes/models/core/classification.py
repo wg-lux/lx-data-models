@@ -2,7 +2,7 @@ from typing import Dict
 
 from pydantic import Field
 
-from lx_dtypes.models.shallow.classification import (
+from lx_dtypes.models.core.classification_shallow import (
     ClassificationShallow,
     ClassificationShallowDataDict,
     ClassificationTypeShallow,

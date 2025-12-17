@@ -7,7 +7,7 @@ from pydantic import Field, field_serializer
 # if TYPE_CHECKING:
 #     from lx_dtypes.stats.dataset import KnowledgeBaseDataset
 from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
-from lx_dtypes.models.shallow import (
+from lx_dtypes.models.core import (
     CitationShallow,
     CitationShallowDataDict,
     ClassificationChoiceDescriptorShallow,

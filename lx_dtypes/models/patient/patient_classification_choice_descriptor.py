@@ -6,7 +6,7 @@ from lx_dtypes.models.core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
     ClassificationChoiceDescriptorDataDict,
 )
-from lx_dtypes.models.shallow.classification_choice_descriptor import (
+from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallowDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import uuid_factory

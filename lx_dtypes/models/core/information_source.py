@@ -2,7 +2,7 @@ from typing import Dict
 
 from pydantic import Field, field_serializer
 
-from lx_dtypes.models.shallow.information_source import (
+from lx_dtypes.models.core.information_source_shallow import (
     InformationSourceShallow,
     InformationSourceShallowDataDict,
     InformationSourceTypeShallow,

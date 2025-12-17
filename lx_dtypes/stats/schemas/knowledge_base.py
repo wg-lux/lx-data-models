@@ -2,7 +2,7 @@ from typing import Any, ClassVar
 
 import pandera.pandas as pa
 
-from lx_dtypes.models.shallow import (
+from lx_dtypes.models.core import (
     CitationShallow,
     ClassificationChoiceDescriptorShallow,
     ClassificationChoiceShallow,

@@ -2,7 +2,7 @@ from typing import Dict
 
 from pydantic import Field, field_serializer
 
-from lx_dtypes.models.shallow.examination import (
+from lx_dtypes.models.core.examination_shallow import (
     ExaminationShallow,
     ExaminationShallowDataDict,
     ExaminationTypeShallow,

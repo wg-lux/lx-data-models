@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import Field, field_serializer
 
-from lx_dtypes.models.shallow.classification_choice import (
+from lx_dtypes.models.core.classification_choice_shallow import (
     ClassificationChoiceShallow,
     ClassificationChoiceShallowDataDict,
 )

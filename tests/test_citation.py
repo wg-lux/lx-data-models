@@ -1,6 +1,6 @@
 class TestCitation:
     def test_citation_no_key_titel_name(self):
-        from lx_dtypes.models.shallow.citation import CitationShallow
+        from lx_dtypes.models.core.citation_shallow import CitationShallow
 
         citation_data = {
             "title": "asd",

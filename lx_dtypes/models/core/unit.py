@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import Field, field_serializer
 
-from lx_dtypes.models.shallow.unit import (
+from lx_dtypes.models.core.unit_shallow import (
     UnitShallow,
     UnitShallowDataDict,
     UnitTypeShallow,

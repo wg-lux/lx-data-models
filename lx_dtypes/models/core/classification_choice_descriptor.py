@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import field_serializer
 
 from lx_dtypes.models.core.unit import Unit, UnitDataDict
-from lx_dtypes.models.shallow.classification_choice_descriptor import (
+from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallow,
     ClassificationChoiceDescriptorShallowDataDict,
 )

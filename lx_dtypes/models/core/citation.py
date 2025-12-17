@@ -1,4 +1,7 @@
-from lx_dtypes.models.shallow.citation import CitationShallow, CitationShallowDataDict
+from lx_dtypes.models.core.citation_shallow import (
+    CitationShallow,
+    CitationShallowDataDict,
+)
 
 
 class CitationDataDict(CitationShallowDataDict):

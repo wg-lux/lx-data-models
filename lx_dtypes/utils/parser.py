@@ -3,28 +3,33 @@ from typing import Any, Dict, List, Union
 
 import yaml
 
-from lx_dtypes.models.shallow import (
+from lx_dtypes.models.core import (
     CitationShallow,
     ExaminationShallow,
     InformationSourceShallow,
 )
-from lx_dtypes.models.shallow.center import CenterShallow
-from lx_dtypes.models.shallow.classification import (
+from lx_dtypes.models.core.center_shallow import CenterShallow
+from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
+    ClassificationChoiceDescriptorShallow,
+)
+from lx_dtypes.models.core.classification_choice_shallow import (
+    ClassificationChoiceShallow,
+)
+from lx_dtypes.models.core.classification_shallow import (
     ClassificationShallow,
     ClassificationTypeShallow,
 )
-from lx_dtypes.models.shallow.classification_choice import ClassificationChoiceShallow
-from lx_dtypes.models.shallow.classification_choice_descriptor import (
-    ClassificationChoiceDescriptorShallow,
+from lx_dtypes.models.core.examination_shallow import ExaminationTypeShallow
+from lx_dtypes.models.core.finding_shallow import FindingShallow, FindingTypeShallow
+from lx_dtypes.models.core.indication_shallow import (
+    IndicationShallow,
+    IndicationTypeShallow,
 )
-from lx_dtypes.models.shallow.examination import ExaminationTypeShallow
-from lx_dtypes.models.shallow.finding import FindingShallow, FindingTypeShallow
-from lx_dtypes.models.shallow.indication import IndicationShallow, IndicationTypeShallow
-from lx_dtypes.models.shallow.intervention import (
+from lx_dtypes.models.core.intervention_shallow import (
     InterventionShallow,
     InterventionTypeShallow,
 )
-from lx_dtypes.models.shallow.unit import UnitShallow, UnitTypeShallow
+from lx_dtypes.models.core.unit_shallow import UnitShallow, UnitTypeShallow
 
 model_types = Union[
     type[CenterShallow],

@@ -22,7 +22,7 @@ from lx_dtypes.models.patient.patient_finding_classifications import (
 )
 from lx_dtypes.models.patient.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface import PatientInterface
-from lx_dtypes.models.shallow.center import CenterShallowDataDict
+from lx_dtypes.models.core.center_shallow import CenterShallowDataDict
 
 from .dataset import InterfaceExportDataset, KnowledgeBaseDataset, PatientLedgerDataset
 from .schemas import (

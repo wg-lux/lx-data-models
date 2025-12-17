@@ -15,7 +15,7 @@ from lx_dtypes.models.patient.patient_finding_classification_choice import (
 from lx_dtypes.models.patient.patient_finding_classifications import (
     PatientFindingClassificationsShallow,
 )
-from lx_dtypes.models.shallow.center import CenterShallow
+from lx_dtypes.models.core.center_shallow import CenterShallow
 
 from .common import COERCE, PANDERA_PYDANTIC_MODEL
 

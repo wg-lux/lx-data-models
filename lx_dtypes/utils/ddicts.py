@@ -11,15 +11,15 @@ from lx_dtypes.models.core.classification_choice import (
 from lx_dtypes.models.core.classification_choice_descriptor import (
     ClassificationChoiceDescriptorDataDict,
 )
-from lx_dtypes.models.shallow.center import CenterShallowDataDict
-from lx_dtypes.models.shallow.citation import CitationShallowDataDict
-from lx_dtypes.models.shallow.classification import (
+from lx_dtypes.models.core.center_shallow import CenterShallowDataDict
+from lx_dtypes.models.core.citation_shallow import CitationShallowDataDict
+from lx_dtypes.models.core.classification_shallow import (
     ClassificationShallowDataDict,
 )
-from lx_dtypes.models.shallow.classification_choice import (
+from lx_dtypes.models.core.classification_choice_shallow import (
     ClassificationChoiceShallowDataDict,
 )
-from lx_dtypes.models.shallow.classification_choice_descriptor import (
+from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallowDataDict,
 )
 
