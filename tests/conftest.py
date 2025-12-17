@@ -6,6 +6,7 @@ from .fixtures.dataloader import (
     uninitialized_demo_kb_config,
     yaml_data_loader,
 )
+from .fixtures.django import ninja_test_client
 from .fixtures.knowledge_base import lx_knowledge_base
 from .fixtures.logs import log_writer, logger
 from .fixtures.object_names import (
@@ -87,4 +88,5 @@ __all__ = [
     "indication_name_screening_colonoscopy",
     "sample_patient_finding_with_classification_choice",
     "classification_name_colon_lesion_paris",
+    "ninja_test_client",
 ]

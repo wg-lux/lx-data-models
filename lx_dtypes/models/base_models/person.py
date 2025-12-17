@@ -1,5 +1,6 @@
 from datetime import date
 from typing import Literal, Optional, Union
+from uuid import UUID
 
 from pydantic import Field, field_serializer, field_validator
 
@@ -34,3 +35,9 @@ class Person(AppBaseModel):
         if dob is None:
             return None
         return dob.isoformat()
+
+    @field_validator("uuid", mode="before")
+    def validate_uuid(cls, value: UUID | str) -> str:
+        if isinstance(value, UUID):
+            return str(value)
+        return value

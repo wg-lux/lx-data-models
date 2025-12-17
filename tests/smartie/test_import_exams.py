@@ -34,12 +34,6 @@ class TestImportExams:
         dataset_itt = interface2dataset(interface_itt)
         dataset_itt.to_csvs(EXPORT_DIR / "interface_export_itt")
 
-        # for i, df in enumerate(dfs):
-        #     assert not df.empty
-        #     # dump to csv for manual inspection
-        #     out_file = EXPORT_DIR / f"smartie_itt_export_{i}.csv"
-        #     df.to_csv(out_file, index=False)
-
         exams_pp = SmartieExaminationSchema.load_csv(str(FILENAME_EXAMS_PP))
         assert len(exams_pp.examinations) > 0
         _exams_pp_ledger = exams_pp.create_ledger(name="SmartieExamsPP")

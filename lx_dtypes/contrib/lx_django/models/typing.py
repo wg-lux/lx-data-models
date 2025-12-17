@@ -1,0 +1,30 @@
+import datetime
+import uuid as uuid_module
+from typing import TYPE_CHECKING, Any, Dict, TypeAlias
+
+from django.db import models
+
+if TYPE_CHECKING:
+    UUIDFieldType: TypeAlias = models.UUIDField[uuid_module.UUID, uuid_module.UUID]
+    OptionalCharFieldType: TypeAlias = models.CharField[str | None, str | None]
+    CharFieldType: TypeAlias = models.CharField[str, str]
+    OptionalEmailFieldType: TypeAlias = models.EmailField[str | None, str | None]
+    OptionalDateFieldType: TypeAlias = models.DateField[
+        datetime.date | None, datetime.date | None
+    ]
+    JSONFieldType: TypeAlias = models.JSONField[Dict[str, Any], Dict[str, Any]]
+    DateTimeField: TypeAlias = models.DateTimeField[
+        datetime.datetime, datetime.datetime
+    ]
+    OptionalDateTimeField: TypeAlias = models.DateTimeField[
+        datetime.datetime | None, datetime.datetime | None
+    ]
+else:  # Runtime fallbacks keep Django field classes unsubscripted
+    UUIDFieldType: TypeAlias = models.UUIDField
+    OptionalCharFieldType: TypeAlias = models.CharField
+    CharFieldType: TypeAlias = models.CharField
+    OptionalEmailFieldType: TypeAlias = models.EmailField
+    OptionalDateFieldType: TypeAlias = models.DateField
+    JSONFieldType: TypeAlias = models.JSONField
+    DateTimeField: TypeAlias = models.DateTimeField
+    OptionalDateTimeField: TypeAlias = models.DateTimeField

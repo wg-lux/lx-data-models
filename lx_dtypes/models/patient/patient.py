@@ -43,7 +43,6 @@ class PatientShallow(Person):
 
 
 class Patient(PatientShallow):
-    center_name: str = Field(default_factory=str_unknown_factory)
     external_ids: Dict[str, str] = Field(default_factory=dict)
 
     @property

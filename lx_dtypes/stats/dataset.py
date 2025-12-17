@@ -1,7 +1,10 @@
 from pathlib import Path
 
+# from typing import Any
+import pandas as pd
 from pandera.typing import DataFrame
 
+# from pydantic import field_serializer#
 from lx_dtypes.utils.mixins.base_model import DatasetBaseModel
 
 from .schemas import (
@@ -65,8 +68,11 @@ class KnowledgeBaseDataset(DatasetBaseModel):
             directory_path (Path): The path to the directory where CSV files will be saved.
         """
         directory_path.mkdir(exist_ok=True)
-        for field_name, df in self.model_dump().items():
-            # assert isinstance(df, DataFrame)
+        model_fields = self.model_fields_set
+        for field_name in model_fields:
+            df = getattr(self, field_name, None)
+            if not isinstance(df, pd.DataFrame):
+                continue
             file_path = directory_path / f"{field_name}.csv"
             df.to_csv(file_path, index=False)
 
@@ -95,8 +101,11 @@ class PatientLedgerDataset(DatasetBaseModel):
             directory_path (Path): The path to the directory where CSV files will be saved.
         """
         directory_path.mkdir(exist_ok=True)
-        for field_name, df in self.model_dump().items():
-            # assert isinstance(df, DataFrame)
+        model_fields = self.model_fields_set
+        for field_name in model_fields:
+            df = getattr(self, field_name, None)
+            if not isinstance(df, pd.DataFrame):
+                continue
             file_path = directory_path / f"{field_name}.csv"
             df.to_csv(file_path, index=False)
 

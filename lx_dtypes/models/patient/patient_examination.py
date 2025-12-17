@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from typing import List, Optional, TypedDict
 
 from pydantic import Field, field_serializer, field_validator
@@ -41,18 +41,22 @@ class PatientExaminationShallow(AppBaseModel):
     patient_uuid: str
     examination_name: str
     examination_template: Optional[str] = None
-    date: Optional[datetime] = None
+    date: Optional[datetime.datetime] = None
     findings_uuids: List[str] = Field(default_factory=list)
     indications_uuids: List[str] = Field(default_factory=list)
 
     @field_validator("date", mode="before")
-    def validate_date(cls, value: Optional[str]) -> Optional[datetime]:
+    def validate_date(
+        cls, value: Optional[str | datetime.datetime]
+    ) -> Optional[datetime.datetime]:
         if value is None:
             return value
-        return datetime.fromisoformat(value)
+        if isinstance(value, datetime.datetime):
+            return value
+        return datetime.datetime.fromisoformat(value)
 
     @field_serializer("date")
-    def serialize_date(self, date: Optional[datetime]) -> Optional[str]:
+    def serialize_date(self, date: Optional[datetime.datetime]) -> Optional[str]:
         if date is None:
             return None
         return date.isoformat()
@@ -129,7 +133,7 @@ class PatientExamination(PatientExaminationShallow):
         examination_name: str,
         examination_uuid: Optional[str] = None,
         examination_template: Optional[str] = None,
-        date: Optional[datetime] = None,
+        date: Optional[datetime.datetime] = None,
     ) -> "PatientExamination":
         """Factory method to create a PatientExamination instance.
 
