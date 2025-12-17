@@ -3,6 +3,7 @@ from typing import List
 # import numpy as np
 import pandas as pd
 
+from lx_dtypes.models.core.center_shallow import CenterShallowDataDict
 from lx_dtypes.models.examiner.examiner import ExaminerShallowDataDict
 from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
 from lx_dtypes.models.patient.patient_classification_choice_descriptor import (
@@ -22,7 +23,6 @@ from lx_dtypes.models.patient.patient_finding_classifications import (
 )
 from lx_dtypes.models.patient.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface import PatientInterface
-from lx_dtypes.models.core.center_shallow import CenterShallowDataDict
 
 from .dataset import InterfaceExportDataset, KnowledgeBaseDataset, PatientLedgerDataset
 from .schemas import (
@@ -49,8 +49,8 @@ from .schemas import (
     PatientFindingClassificationsShallowSchema,
     PatientFindingShallowSchema,
     PatientShallowSchema,
-    # UnitShallowSchema,
-    # UnitTypeShallowSchema,
+    UnitShallowSchema,
+    UnitTypeShallowSchema,
 )
 
 
@@ -168,10 +168,10 @@ def kb2dataset(kb: KnowledgeBase) -> KnowledgeBaseDataset:
     interventions = InterventionShallowSchema.validate(
         pd.DataFrame(record_lists_dict["interventions"])
     )
-    # unit_types = UnitTypeShallowSchema.validate(
-    #     pd.DataFrame(record_lists_dict["unit_types"])
-    # )
-    # units = UnitShallowSchema.validate(pd.DataFrame(record_lists_dict["units"]))
+    unit_types = UnitTypeShallowSchema.validate(
+        pd.DataFrame(record_lists_dict["unit_types"])
+    )
+    units = UnitShallowSchema.validate(pd.DataFrame(record_lists_dict["units"]))
     dataset = KnowledgeBaseDataset(
         citations=citations,
         classification_types=classification_types,
@@ -187,8 +187,8 @@ def kb2dataset(kb: KnowledgeBase) -> KnowledgeBaseDataset:
         information_sources=information_sources,
         intervention_types=intervention_types,
         interventions=interventions,
-        # unit_types=unit_types,
-        # units=units,
+        unit_types=unit_types,
+        units=units,
     )
     return dataset
 

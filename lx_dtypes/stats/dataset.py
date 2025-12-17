@@ -31,8 +31,8 @@ from .schemas import (
     PatientFindingClassificationsShallowSchema,
     PatientFindingShallowSchema,
     PatientShallowSchema,
-    # UnitShallowSchema,
-    # UnitTypeShallowSchema,
+    UnitShallowSchema,
+    UnitTypeShallowSchema,
 )
 
 
@@ -57,8 +57,8 @@ class KnowledgeBaseDataset(DatasetBaseModel):
     information_sources: DataFrame[InformationSourceShallowSchema]
     intervention_types: DataFrame[InterventionTypeShallowSchema]
     interventions: DataFrame[InterventionShallowSchema]
-    # unit_types: DataFrame[UnitTypeShallowSchema]
-    # units: DataFrame[UnitShallowSchema]
+    unit_types: DataFrame[UnitTypeShallowSchema]
+    units: DataFrame[UnitShallowSchema]
 
     def to_csvs(self, directory_path: Path) -> None:
         """

@@ -1,9 +1,7 @@
-name: lx_units
+name: lx_unit_types
 description: Unit utility data.
 version: 0.1.0
 modules: []
-depends_on:
-  - lx_unit_types
 data:
   dirs:
     - ./data
