@@ -2,9 +2,11 @@ from django.db import models
 
 from lx_dtypes.models.core.classification import (
     ClassificationDataDict,
+    ClassificationTypeDataDict,
 )
 from lx_dtypes.models.core.classification_shallow import (
     ClassificationShallowDataDict,
+    ClassificationTypeShallowDataDict,
 )
 
 from ..base_model.base_model import AppBaseModelNamesUUIDTags
@@ -13,8 +15,14 @@ from ..typing import (
 )
 
 
-class ClassificationTypes(AppBaseModelNamesUUIDTags):
-    pass
+class ClassificationType(AppBaseModelNamesUUIDTags):
+    @property
+    def ddict_shallow(self) -> type[ClassificationTypeShallowDataDict]:
+        return ClassificationTypeShallowDataDict
+
+    @property
+    def ddict(self) -> type[ClassificationTypeDataDict]:
+        return ClassificationTypeDataDict
 
 
 class Classification(AppBaseModelNamesUUIDTags):

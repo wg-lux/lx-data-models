@@ -13,7 +13,7 @@ from ..typing import (
 )
 
 
-class InterventionTypes(AppBaseModelNamesUUIDTags):
+class InterventionType(AppBaseModelNamesUUIDTags):
     pass
 
 

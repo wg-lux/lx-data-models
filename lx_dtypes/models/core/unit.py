@@ -42,11 +42,17 @@ class Unit(UnitShallow):
         result = [unit_type.to_ddict() for unit_type in types]
         return result
 
+    def _sync_shallow_fields(self) -> None:
+        """Sync shallow fields from deep fields."""
+        if self.types:
+            self.type_names = [unit_type.name for unit_type in self.types]
+
     def to_ddict(self) -> UnitDataDict:
         data_dict = self.ddict(**self.model_dump())
         return data_dict
 
     def to_ddict_shallow(self) -> UnitShallowDataDict:
+        self._sync_shallow_fields()
         dump = self.model_dump()
         shallow_data = {
             key: dump[key]

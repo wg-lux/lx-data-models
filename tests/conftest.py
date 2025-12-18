@@ -51,6 +51,7 @@ from .fixtures.patient_ledger import (
     sample_patient_ledger_patient_uuid,
 )
 from .fixtures.person import sample_person, sample_person_no_dob_no_gender
+from .fixtures.unit import sample_unit, sample_unit_type
 
 SAMPLE_KNOWLEDGE_BASE_NAME = "lx_knowledge_base"
 
@@ -105,4 +106,6 @@ __all__ = [
     "sample_classification",
     "sample_intervention_type",
     "sample_intervention",
+    "sample_unit_type",
+    "sample_unit",
 ]
