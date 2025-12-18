@@ -45,6 +45,25 @@ class Classification(ClassificationShallow):
     def ddict(self) -> type[ClassificationDataDict]:
         return ClassificationDataDict
 
+    def _sync_shallow_fields(self) -> None:
+        """Sync shallow fields from nested relations."""
+        if self.classification_choices.keys():
+            self.choice_names = list(self.classification_choices.keys())
+
+        if self.types.keys():
+            self.type_names = list(self.types.keys())
+
     def to_ddict(self) -> ClassificationDataDict:
         data_dict = self.ddict(**self.model_dump())
         return data_dict
+
+    def to_ddict_shallow(self) -> ClassificationShallowDataDict:
+        self._sync_shallow_fields()
+        dump = self.model_dump()
+        shallow_data = {
+            key: dump[key]
+            for key in self.ddict_shallow.__annotations__.keys()
+            if key in dump
+        }
+
+        return self.ddict_shallow(**shallow_data)

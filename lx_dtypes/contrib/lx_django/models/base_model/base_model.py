@@ -43,7 +43,9 @@ class AppBaseModelUUIDTags(AppBaseModel):
     """Abstract base model with name and UUID fields."""
 
     uuid: UUIDFieldType = models.UUIDField(
-        default=uuid_module.uuid4, editable=False, unique=True
+        default=uuid_module.uuid4,
+        editable=False,
+        unique=True,
     )
     tags: CharFieldType = models.CharField(max_length=1024, blank=True)
 

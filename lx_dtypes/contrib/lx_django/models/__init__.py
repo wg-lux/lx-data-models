@@ -1,4 +1,5 @@
 from .core.center import Center
+from .core.classification import Classification
 from .core.classification_choice import ClassificationChoice
 from .core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
@@ -12,4 +13,5 @@ __all__ = [
     "Center",
     "ClassificationChoiceDescriptor",
     "ClassificationChoice",
+    "Classification",
 ]

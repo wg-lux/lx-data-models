@@ -15,7 +15,11 @@ from lx_dtypes.contrib.lx_django.models import (
 from lx_dtypes.contrib.lx_django.models import (
     Patient as DjangoPatientModel,
 )
+from lx_dtypes.contrib.lx_django.models.core.classification import (
+    Classification as DjangoClassificationModel,
+)
 from lx_dtypes.models.core.center import Center
+from lx_dtypes.models.core.classification import Classification
 from lx_dtypes.models.core.classification_choice import ClassificationChoice
 from lx_dtypes.models.core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
@@ -103,7 +107,17 @@ class TestModelSync:
             == sample_classification_choice.to_ddict_shallow()
         )
 
-    # def test_classification_sync(self, sample_classification: Classification) -> None:
+    def test_classification_sync(self, sample_classification: Classification) -> None:
+        ddict = sample_classification.to_ddict_shallow()
+        django_classification = DjangoClassificationModel.objects.create(**ddict)
+        django_classification.refresh_from_db()
+        classification_dict = django_classification.to_ddict_shallow()
+        # Convert the Django model instance back to a Pydantic model
+        converted_classification = Classification.model_validate(classification_dict)
+        assert (
+            converted_classification.to_ddict_shallow()
+            == sample_classification.to_ddict_shallow()
+        )
 
     # def test_finding_sync(self, sample_finding: Finding) -> None:
 
