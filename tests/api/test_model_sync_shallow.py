@@ -4,6 +4,9 @@ from lx_dtypes.contrib.lx_django.models import (
     Center as DjangoCenterModel,
 )
 from lx_dtypes.contrib.lx_django.models import (
+    ClassificationChoice as DjangoClassificationChoiceModel,
+)
+from lx_dtypes.contrib.lx_django.models import (
     ClassificationChoiceDescriptor as DjangoClassificationChoiceDescriptorModel,
 )
 from lx_dtypes.contrib.lx_django.models import (
@@ -13,42 +16,45 @@ from lx_dtypes.contrib.lx_django.models import (
     Patient as DjangoPatientModel,
 )
 from lx_dtypes.models.core.center import Center
+from lx_dtypes.models.core.classification_choice import ClassificationChoice
 from lx_dtypes.models.core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
 )
 from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallow,
 )
-from lx_dtypes.models.examiner.examiner import Examiner
-from lx_dtypes.models.patient.patient import Patient
+from lx_dtypes.models.examiner.examiner import Examiner, ExaminerShallow
+from lx_dtypes.models.patient.patient import Patient, PatientShallow
 
 
 # TODO add transform utils based on those tests
 @pytest.mark.django_db
 class TestModelSync:
     def test_patient_sync(self, sample_patient: Patient) -> None:
-        ddict = sample_patient.to_ddict()
+        ddict = sample_patient.to_ddict_shallow()
         _django_patient = DjangoPatientModel.objects.create(**ddict)
         uuid = ddict.get("uuid")
         assert uuid is not None
         retrieved_patient = DjangoPatientModel.objects.get(uuid=uuid)
         assert str(retrieved_patient.uuid) == sample_patient.uuid
-        patient_dict = retrieved_patient.to_ddict()
+        patient_dict = retrieved_patient.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
-        converted_patient = Patient.model_validate(patient_dict)
-        assert converted_patient.to_ddict() == sample_patient.to_ddict()
+        converted_patient = PatientShallow.model_validate(patient_dict)
+        assert converted_patient.to_ddict_shallow() == sample_patient.to_ddict_shallow()
 
     def test_examiner_sync(self, sample_examiner: Examiner) -> None:
-        ddict = sample_examiner.to_ddict()
+        ddict = sample_examiner.to_ddict_shallow()
         _django_examiner = DjangoExaminerModel.objects.create(**ddict)
         uuid = ddict.get("uuid")
         assert uuid is not None
         retrieved_examiner = DjangoExaminerModel.objects.get(uuid=uuid)
         assert str(retrieved_examiner.uuid) == sample_examiner.uuid
-        examiner_dict = retrieved_examiner.to_ddict()
+        examiner_dict = retrieved_examiner.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
-        converted_examiner = Examiner.model_validate(examiner_dict)
-        assert converted_examiner.to_ddict() == sample_examiner.to_ddict()
+        converted_examiner = ExaminerShallow.model_validate(examiner_dict)
+        assert (
+            converted_examiner.to_ddict_shallow() == sample_examiner.to_ddict_shallow()
+        )
 
     def test_center_sync(self, sample_center: Center) -> None:
         ddict = sample_center.to_ddict_shallow()
@@ -83,7 +89,19 @@ class TestModelSync:
             == sample_classification_choice_descriptor_numeric.to_ddict_shallow()
         )
 
-    # def test_classification_choice_sync(self, sample_classification_choice: ClassificationChoice) -> None:
+    def test_classification_choice_sync(
+        self, sample_classification_choice: ClassificationChoice
+    ) -> None:
+        ddict = sample_classification_choice.to_ddict_shallow()
+        django_cc = DjangoClassificationChoiceModel.objects.create(**ddict)
+        django_cc.refresh_from_db()
+        cc_dict = django_cc.to_ddict_shallow()
+        # Convert the Django model instance back to a Pydantic model
+        converted_cc = ClassificationChoice.model_validate(cc_dict)
+        assert (
+            converted_cc.to_ddict_shallow()
+            == sample_classification_choice.to_ddict_shallow()
+        )
 
     # def test_classification_sync(self, sample_classification: Classification) -> None:
 

@@ -47,8 +47,23 @@ class AppBaseModelUUIDTags(AppBaseModel):
     )
     tags: CharFieldType = models.CharField(max_length=1024, blank=True)
 
-    def str_list_to_list(self, str: str) -> List[str]:
-        return [tag.strip() for tag in str.strip("[]").split(",") if tag.strip()]
+    def str_list_to_list(self, value: Any) -> List[str]:
+        if value is None:
+            return []
+        if isinstance(value, list):
+            return [str(item).strip() for item in value if str(item).strip()]
+
+        text = str(value).strip()
+        if not text:
+            return []
+
+        tokens = text.strip("[]")
+        items = []
+        for token in tokens.split(","):
+            cleaned = token.strip().strip("'\"")
+            if cleaned:
+                items.append(cleaned)
+        return items
 
     def _to_ddict(
         self,

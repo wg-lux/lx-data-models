@@ -1,6 +1,7 @@
 from pytest import fixture
 
 from .fixtures.center import sample_center
+from .fixtures.classification_choice import sample_classification_choice
 from .fixtures.classification_choice_descriptor import (
     sample_classification_choice_descriptor_numeric,
 )
@@ -97,4 +98,5 @@ __all__ = [
     "sample_examiner",
     "sample_center",
     "sample_classification_choice_descriptor_numeric",
+    "sample_classification_choice",
 ]

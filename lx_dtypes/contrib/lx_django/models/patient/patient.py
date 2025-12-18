@@ -24,14 +24,13 @@ class Patient(PersonModel):
     class Meta(PersonModel.Meta):
         pass
 
-    def to_ddict(self) -> PatientDataDict:
+    def to_ddict_shallow(self) -> PatientDataDict:
         """Convert the Patient model instance to a PatientDataDict.
 
         Returns:
             PatientDataDict: The converted data dictionary.
         """
         data_dict = self._to_ddict()
-        data_dict["center_name"] = self.center_name
-        data_dict["external_ids"] = self.external_ids
+        data_dict.pop("external_ids", None)
         ddict = self.ddict(**data_dict)
         return ddict

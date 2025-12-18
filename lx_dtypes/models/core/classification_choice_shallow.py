@@ -1,13 +1,12 @@
-from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 from lx_dtypes.models.base_models.base_model import (
     AppBaseModelNamesUUIDTags,
     AppBaseModelNamesUUIDTagsDataDict,
 )
+from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 
 
 class ClassificationChoiceShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
     classification_choice_descriptor_names: list[str]
-    type_names: list[str]
 
 
 class ClassificationChoiceShallow(AppBaseModelNamesUUIDTags):
@@ -26,7 +25,6 @@ class ClassificationChoiceShallow(AppBaseModelNamesUUIDTags):
     """
 
     classification_choice_descriptor_names: list[str] = list_of_str_factory()
-    type_names: list[str] = list_of_str_factory()
 
     @property
     def ddict_shallow(self) -> type[ClassificationChoiceShallowDataDict]:
