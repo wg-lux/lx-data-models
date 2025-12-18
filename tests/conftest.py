@@ -14,6 +14,7 @@ from .fixtures.dataloader import (
 )
 from .fixtures.django import ninja_test_client
 from .fixtures.examiner import sample_examiner
+from .fixtures.intervention import sample_intervention, sample_intervention_type
 from .fixtures.knowledge_base import lx_knowledge_base
 from .fixtures.logs import log_writer, logger
 from .fixtures.object_names import (
@@ -102,4 +103,6 @@ __all__ = [
     "sample_classification_choice",
     "sample_classification_type",
     "sample_classification",
+    "sample_intervention_type",
+    "sample_intervention",
 ]

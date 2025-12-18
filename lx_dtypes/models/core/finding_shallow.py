@@ -1,19 +1,19 @@
-from typing import List, TypedDict
+from typing import List
 
 from pydantic import Field
 
+from lx_dtypes.models.base_models.base_model import (
+    AppBaseModelNamesUUIDTags,
+    AppBaseModelNamesUUIDTagsDataDict,
+)
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
 
 
-class FindingTypeShallowDataDict(TypedDict):
-    name: str
-    description: str
+class FindingTypeShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+    pass
 
 
-class FindingShallowDataDict(TypedDict):
-    name: str
-    description: str
+class FindingShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
     classification_names: List[str]
     type_names: List[str]
     intervention_names: List[str]

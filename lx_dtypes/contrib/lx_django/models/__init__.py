@@ -4,6 +4,7 @@ from .core.classification_choice import ClassificationChoice
 from .core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
 )
+from .core.intervention import Intervention
 from .examiner.examiner import Examiner
 from .patient.patient import Patient
 
@@ -14,4 +15,5 @@ __all__ = [
     "ClassificationChoiceDescriptor",
     "ClassificationChoice",
     "Classification",
+    "Intervention",
 ]

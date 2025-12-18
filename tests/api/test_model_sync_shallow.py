@@ -18,6 +18,9 @@ from lx_dtypes.contrib.lx_django.models import (
 from lx_dtypes.contrib.lx_django.models.core.classification import (
     Classification as DjangoClassificationModel,
 )
+from lx_dtypes.contrib.lx_django.models.core.intervention import (
+    Intervention as DjangoInterventionModel,
+)
 from lx_dtypes.models.core.center import Center
 from lx_dtypes.models.core.classification import Classification
 from lx_dtypes.models.core.classification_choice import ClassificationChoice
@@ -27,6 +30,8 @@ from lx_dtypes.models.core.classification_choice_descriptor import (
 from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallow,
 )
+from lx_dtypes.models.core.intervention import Intervention
+from lx_dtypes.models.core.intervention_shallow import InterventionShallow
 from lx_dtypes.models.examiner.examiner import Examiner, ExaminerShallow
 from lx_dtypes.models.patient.patient import Patient, PatientShallow
 
@@ -119,19 +124,29 @@ class TestModelSync:
             == sample_classification.to_ddict_shallow()
         )
 
+    # def test_unit_sync(self, sample_unit: Unit) -> None:
+
+    def test_intervention_sync(self, sample_intervention: Intervention) -> None:
+        ddict = sample_intervention.to_ddict_shallow()
+        django_intervention = DjangoInterventionModel.objects.create(**ddict)
+        django_intervention.refresh_from_db()
+        intervention_dict = django_intervention.to_ddict_shallow()
+        # Convert the Django model instance back to a Pydantic model
+        converted_intervention = InterventionShallow.model_validate(intervention_dict)
+        assert (
+            converted_intervention.to_ddict_shallow()
+            == sample_intervention.to_ddict_shallow()
+        )
+
     # def test_finding_sync(self, sample_finding: Finding) -> None:
+
+    # def test_indication_sync(self, sample_indication: Indication) -> None:
 
     # def test_examination_sync(self, sample_exam: Exam) -> None:
 
     # def test_citation_sync(self, sample_citation: Citation) -> None:
 
-    # def test_indication_sync(self, sample_indication: Indication) -> None:
-
-    # def test_intervention_sync(self, sample_intervention: Intervention) -> None:
-
     # def test_information_source_sync(self, sample_information_source: InformationSource) -> None:
-
-    # def test_unit_sync(self, sample_unit: Unit) -> None:
 
     # def test_patient_examination_sync(self, sample_patient_examination: PatientExamination) -> None:
 

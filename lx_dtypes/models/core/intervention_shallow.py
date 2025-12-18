@@ -1,21 +1,19 @@
-from typing import List, TypedDict
+from typing import List
 
 from pydantic import Field
 
+from lx_dtypes.models.base_models.base_model import (
+    AppBaseModelNamesUUIDTags,
+    AppBaseModelNamesUUIDTagsDataDict,
+)
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
 
 
-class InterventionTypeShallowDataDict(TypedDict):
-    name: str
-    description: str
+class InterventionTypeShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+    pass
 
 
-class InterventionShallowDataDict(TypedDict):
-    name: str
-    description: str
-    expected_intervention_names: List[str]
-    causes_finding_names: List[str]
+class InterventionShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
     type_names: List[str]
 
 
@@ -44,10 +42,6 @@ class InterventionShallow(AppBaseModelNamesUUIDTags):
         type_names (list[str]): Names of associated intervention types.
     """
 
-    expected_intervention_names: List[str] = Field(default_factory=list_of_str_factory)
-    causes_finding_names: List[str] = Field(
-        default_factory=list_of_str_factory
-    )  # TODO implement in source yamls
     type_names: List[str] = Field(default_factory=list_of_str_factory)
 
     @property

@@ -66,6 +66,7 @@ class Examiner(ExaminerShallow):
         Returns:
             ExaminerShallowDataDict: The converted shallow data dictionary.
         """
+        # self._sync_shallow_fields()
         dump = self.model_dump()
         shallow_data = {
             key: dump[key]
