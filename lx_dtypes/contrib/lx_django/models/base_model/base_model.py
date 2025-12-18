@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid as uuid_module
-from typing import Any, ClassVar, Dict, List
+from typing import Any, ClassVar, Dict, List, Union
 
 from django.db import models
 
@@ -47,7 +47,7 @@ class AppBaseModelUUIDTags(AppBaseModel):
     )
     tags: CharFieldType = models.CharField(max_length=1024, blank=True)
 
-    def str_list_to_list(self, value: Any) -> List[str]:
+    def str_list_to_list(self, value: Union[str, List[str], None]) -> List[str]:
         if value is None:
             return []
         if isinstance(value, list):
@@ -58,7 +58,7 @@ class AppBaseModelUUIDTags(AppBaseModel):
             return []
 
         tokens = text.strip("[]")
-        items = []
+        items: List[str] = []
         for token in tokens.split(","):
             cleaned = token.strip().strip("'\"")
             if cleaned:
