@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from lx_dtypes.models.core.finding import FindingType
     from lx_dtypes.models.core.indication import Indication, IndicationType
     from lx_dtypes.models.core.information_source import InformationSourceType
-    from lx_dtypes.models.core.intervention import InterventionType
+    from lx_dtypes.models.core.intervention import Intervention, InterventionType
     from lx_dtypes.models.core.unit import UnitType
     from lx_dtypes.models.examiner.examiner import Examiner
     from lx_dtypes.models.patient.patient_classification_choice_descriptor import (
@@ -22,8 +22,6 @@ if TYPE_CHECKING:
         PatientFindingClassifications,
     )
     from lx_dtypes.models.patient.patient_indication import PatientIndication
-
-    # from lx_dtypes.models.examiner
 
 
 def str_unknown_factory() -> Literal["unknown"]:
@@ -59,6 +57,11 @@ def list_of_patient_finding_factory() -> List["PatientFinding"]:
 
 def list_of_examiner_factory() -> List["Examiner"]:
     _list: List["Examiner"] = []
+    return _list
+
+
+def list_of_intervention_factory() -> List["Intervention"]:
+    _list: List["Intervention"] = []
     return _list
 
 
@@ -122,6 +125,11 @@ def indication_by_name_factory() -> Dict[str, "Indication"]:
 
 def indication_type_by_name_factory() -> Dict[str, "IndicationType"]:
     _dict: Dict[str, "IndicationType"] = {}
+    return _dict
+
+
+def intervention_by_name_factory() -> Dict[str, "Intervention"]:
+    _dict: Dict[str, "Intervention"] = {}
     return _dict
 
 

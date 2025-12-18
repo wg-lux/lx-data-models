@@ -5,6 +5,7 @@ from .core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
 )
 from .core.finding import Finding, FindingType
+from .core.indication import Indication, IndicationType
 from .core.intervention import Intervention, InterventionType
 from .core.unit import Unit, UnitType
 from .examiner.examiner import Examiner
@@ -24,4 +25,6 @@ __all__ = [
     "UnitType",
     "Finding",
     "FindingType",
+    "Indication",
+    "IndicationType",
 ]

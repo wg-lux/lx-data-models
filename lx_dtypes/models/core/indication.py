@@ -8,7 +8,11 @@ from lx_dtypes.models.core.indication_shallow import (
     IndicationTypeShallow,
     IndicationTypeShallowDataDict,
 )
-from lx_dtypes.utils.factories.field_defaults import indication_type_by_name_factory
+from lx_dtypes.models.core.intervention import Intervention
+from lx_dtypes.utils.factories.field_defaults import (
+    indication_type_by_name_factory,
+    intervention_by_name_factory,
+)
 
 
 class IndicationTypeDataDict(IndicationTypeShallowDataDict):
@@ -38,6 +42,18 @@ class Indication(IndicationShallow):
         default_factory=indication_type_by_name_factory
     )
 
+    expected_interventions: Dict[str, Intervention] = Field(
+        default_factory=intervention_by_name_factory
+    )
+
+    def _sync_shallow_fields(self) -> None:
+        """Sync shallow fields from deep fields."""
+        if self.types:
+            self.type_names = list(self.types.keys())
+
+        if self.expected_interventions:
+            self.expected_intervention_names = list(self.expected_interventions.keys())
+
     @field_serializer("types")
     def serialize_types(
         self, types: Dict[str, "IndicationType"]
@@ -54,3 +70,14 @@ class Indication(IndicationShallow):
     def to_ddict(self) -> IndicationDataDict:
         data_dict = self.ddict(**self.model_dump())
         return data_dict
+
+    def to_ddict_shallow(self) -> IndicationShallowDataDict:
+        self._sync_shallow_fields()
+        dump = self.model_dump()
+        shallow_data = {
+            key: dump[key]
+            for key in self.ddict_shallow.__annotations__.keys()
+            if key in dump
+        }
+
+        return self.ddict_shallow(**shallow_data)
