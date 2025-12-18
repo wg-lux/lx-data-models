@@ -7,7 +7,7 @@ from pydantic import Field
 from lx_dtypes.models.patient.patient import Patient, PatientDataDict
 from lx_dtypes.models.patient.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface.main import PatientInterface
-from lx_dtypes.utils.mixins.base_model import AppBaseModel
+from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from ..import_exams import (
     load_smartie_exams_csv,
@@ -204,6 +204,7 @@ class SmartieExaminationSchema(AppBaseModel):
             gender=gender,
             external_ids=external_ids,
             uuid=new_uuid,
+            tags=["imported_from_smartie"],
         )
 
         patient = Patient.model_validate(patient_dict)

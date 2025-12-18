@@ -69,9 +69,11 @@ def smartie_centers_and_examiners_to_ledger(
         examiner_dict = ExaminerDataDict(
             first_name="unknown",
             last_name="unknown",
+            gender="unknown",
             external_ids={"smartie_examiner_abbr": examiner_abbr},
             center_name=center_name,
             uuid=examiner_uuid,
+            tags=[],
         )
 
         ledger.add_examiner(center_uuid, examiner_dict)

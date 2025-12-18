@@ -11,7 +11,7 @@ from lx_dtypes.models.patient.patient_finding_classification_choice import (
     PatientFindingClassificationChoice,
 )
 from lx_dtypes.models.patient.patient_ledger import PatientLedger
-from lx_dtypes.utils.mixins.base_model import AppBaseModel
+from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from .patient_interface_create import (
     create_examination_finding,

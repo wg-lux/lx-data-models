@@ -1,4 +1,4 @@
-from .patient import Patient
+from .patient.patient import Patient
 
 __all__ = [
     "Patient",

@@ -1,18 +1,15 @@
-from typing import Any, Dict, List, TypedDict
+from typing import Any, Dict, List
 
 from pydantic import Field, model_validator
 
+from lx_dtypes.models.base_models.base_model import (
+    AppBaseModelNamesUUIDTags,
+    AppBaseModelNamesUUIDTagsDataDict,
+)
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.utils.mixins.base_model import BaseModelMixin
-from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
-class CitationShallowDataDict(TypedDict):
-    tags: List[str]
-    name: str
-    name_de: str
-    name_en: str
-    description: str | None
+class CitationShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
     citation_key: str
     title: str
     abstract: str | None
@@ -32,7 +29,7 @@ class CitationShallowDataDict(TypedDict):
     identifiers: Dict[str, str]
 
 
-class CitationShallow(BaseModelMixin, TaggedMixin):
+class CitationShallow(AppBaseModelNamesUUIDTags):
     """Shallow BaseModel for citations without nested relations.
     Captures key bibliographic details and identifiers.
 

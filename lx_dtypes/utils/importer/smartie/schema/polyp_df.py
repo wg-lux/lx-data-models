@@ -1,4 +1,4 @@
-from lx_dtypes.utils.mixins.base_model import AppBaseModel
+from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 POLYP_DF_COLUMNS = [
     "record_id",

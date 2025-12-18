@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING, Dict, List, Set
 
 from pydantic import Field
 
+from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
 from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
 from lx_dtypes.utils.dataloader import resolve_kb_module_load_order
-from lx_dtypes.utils.mixins import BaseModelMixin
 
 if TYPE_CHECKING:
     from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
@@ -15,7 +15,7 @@ def _default_dataloader_dirs_factory() -> List[Path]:
     return [Path("./data/")]
 
 
-class DataLoader(BaseModelMixin):
+class DataLoader(AppBaseModelNamesUUIDTags):
     """Model representing a data loader configuration."""
 
     # override name field to automatically yield a fixed name

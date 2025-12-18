@@ -1,19 +1,16 @@
-from typing import Optional, TypedDict
-
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.utils.mixins import BaseModelMixin
+from lx_dtypes.models.base_models.base_model import (
+    AppBaseModelNamesUUIDTags,
+    AppBaseModelNamesUUIDTagsDataDict,
+)
 
 
-class ClassificationChoiceShallowDataDict(TypedDict):
-    name: str
-    name_de: Optional[str]
-    name_en: Optional[str]
-    description: Optional[str]
+class ClassificationChoiceShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
     classification_choice_descriptor_names: list[str]
     type_names: list[str]
 
 
-class ClassificationChoiceShallow(BaseModelMixin):
+class ClassificationChoiceShallow(AppBaseModelNamesUUIDTags):
     """
     Shallow reference to descriptors and types used by a classification choice.
     Inherits from BaseModelMixin for common model functionality.

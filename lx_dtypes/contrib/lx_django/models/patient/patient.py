@@ -2,16 +2,18 @@ from django.db import models
 
 from lx_dtypes.models.patient.patient import PatientDataDict
 
-from .base_models import PersonModel
-from .typing import (
+from ..base_model.person import PersonModel
+from ..typing import (
     JSONFieldType,
     OptionalCharFieldType,
 )
 
 
 class Patient(PersonModel):
-    center_name: OptionalCharFieldType = models.CharField(
-        max_length=255, null=True, blank=True
+    center_name: OptionalCharFieldType = (
+        models.CharField(  # TODO make foreign key to center model
+            max_length=255, null=True, blank=True
+        )
     )
     external_ids: JSONFieldType = models.JSONField(null=True, blank=True, default=dict)
 

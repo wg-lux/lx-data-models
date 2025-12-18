@@ -3,7 +3,7 @@ from typing import Dict, Self, TypedDict
 from pydantic import Field
 
 from lx_dtypes.utils.factories.field_defaults import uuid_factory
-from lx_dtypes.utils.mixins.base_model import AppBaseModel
+from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 
 class PatientIndicationDataDict(TypedDict):

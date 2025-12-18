@@ -3,8 +3,7 @@ from typing import List, Optional, TypedDict
 from pydantic import Field
 
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.utils.mixins.base_model import BaseModelMixin
-from lx_dtypes.utils.mixins.tags import TaggedMixin
+from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
 
 
 class UnitTypeShallowDataDict(TypedDict):
@@ -22,7 +21,7 @@ class UnitShallowDataDict(TypedDict):
     tags: List[str]
 
 
-class UnitTypeShallow(BaseModelMixin, TaggedMixin):
+class UnitTypeShallow(AppBaseModelNamesUUIDTags):
     """Taggable metadata container for unit types."""
 
     @property
@@ -34,7 +33,7 @@ class UnitTypeShallow(BaseModelMixin, TaggedMixin):
         return data_dict
 
 
-class UnitShallow(BaseModelMixin):
+class UnitShallow(AppBaseModelNamesUUIDTags):
     """
     Shallow model representing a measurement unit.
     Attributes:

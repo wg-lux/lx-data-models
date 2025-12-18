@@ -1,0 +1,83 @@
+from __future__ import annotations
+
+import uuid as uuid_module
+from typing import Any, ClassVar, Dict
+
+from django.db import models
+
+from ..typing import CharFieldType, DateTimeField, OptionalCharFieldType, UUIDFieldType
+
+GENDER_CHOICES = {
+    "female": "Female",
+    "male": "Male",
+    "other": "Other",
+    "unknown": "Unknown",
+}
+
+
+class AppBaseModel(models.Model):
+    """Abstract base model with common fields."""
+
+    created_at: ClassVar[DateTimeField] = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
+    def _to_ddict(self) -> Dict[str, Any]:
+        """Cleans the model instance data for dictionary representation.
+
+        Returns:
+            dict: Cleaned data dictionary.
+        """
+        data: Dict[str, Any] = {}
+        for field in self._meta.fields:
+            value = getattr(self, field.name)
+            if value is not None:
+                data[field.name] = value
+        if "id" in data:
+            del data["id"]
+        return data
+
+
+class AppBaseModelUUIDTags(AppBaseModel):
+    """Abstract base model with name and UUID fields."""
+
+    uuid: UUIDFieldType = models.UUIDField(
+        default=uuid_module.uuid4, editable=False, unique=True
+    )
+    tags: CharFieldType = models.CharField(max_length=1024, blank=True)
+
+    def _to_ddict(
+        self,
+    ) -> Dict[str, Any]:  # TODO Change when we have proper ManyToMany field for tags
+        data = super()._to_ddict()
+        # replace "[" and "]" from tags string to convert it to list
+        tags = data.get("tags", "")
+        if tags:
+            assert isinstance(tags, str)
+            tags = [tag.strip() for tag in tags.strip("[]").split(",") if tag.strip()]
+        else:
+            tags = []
+        data["tags"] = tags
+        return data
+
+    class Meta(AppBaseModel.Meta):
+        abstract = True
+
+
+class AppBaseModelNamesUUIDTags(AppBaseModelUUIDTags):
+    """Abstract base model with name and UUID fields."""
+
+    name: CharFieldType = models.CharField(max_length=255)
+    name_de: OptionalCharFieldType = models.CharField(
+        max_length=255, null=True, blank=True
+    )
+    name_en: OptionalCharFieldType = models.CharField(
+        max_length=255, null=True, blank=True
+    )
+    description: OptionalCharFieldType = models.CharField(
+        max_length=1024, null=True, blank=True
+    )
+
+    class Meta(AppBaseModelUUIDTags.Meta):
+        abstract = True

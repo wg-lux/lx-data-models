@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import Field, field_serializer
 
+from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
 from lx_dtypes.models.base_models.path import FilesAndDirsModel
-from lx_dtypes.utils.mixins import BaseModelMixin, TaggedMixin
 
 
 def _default_data_model_factory() -> FilesAndDirsModel:
@@ -16,7 +16,7 @@ def _default_empty_list_factory() -> List[str]:
     return _list
 
 
-class KnowledgeBaseConfig(BaseModelMixin, TaggedMixin):
+class KnowledgeBaseConfig(AppBaseModelNamesUUIDTags):
     """Model representing a knowledge base configuration."""
 
     depends_on: list[str] = Field(default_factory=_default_empty_list_factory)

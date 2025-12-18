@@ -6,7 +6,7 @@ from lx_dtypes.utils.factories.field_defaults import (
     list_of_patient_finding_classification_choice_factory,
     uuid_factory,
 )
-from lx_dtypes.utils.mixins.base_model import AppBaseModel
+from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from .patient_finding_classification_choice import (
     PatientFindingClassificationChoice,

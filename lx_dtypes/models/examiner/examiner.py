@@ -1,29 +1,17 @@
-from datetime import date
-from typing import Dict, NotRequired, Optional, TypedDict
+from typing import Dict, Optional
 
 from pydantic import Field
 
-from lx_dtypes.models.base_models.person import Person
+from lx_dtypes.models.base_models.person import Person, PersonDataDict
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
 
-class ExaminerShallowDataDict(TypedDict):
-    first_name: Optional[str]
-    last_name: str
-    dob: NotRequired[Optional[date]]
+class ExaminerShallowDataDict(PersonDataDict):
     center_name: str
-    gender: NotRequired[Optional[str]]
-    uuid: NotRequired[str]
 
 
-class ExaminerDataDict(TypedDict):
-    first_name: Optional[str]
-    last_name: str
-    dob: NotRequired[Optional[date]]
-    center_name: str
-    gender: NotRequired[Optional[str]]
+class ExaminerDataDict(ExaminerShallowDataDict):
     external_ids: Optional[Dict[str, str]]
-    uuid: NotRequired[str]
 
 
 class ExaminerShallow(Person):

@@ -5,7 +5,7 @@ import pandas as pd
 from pandera.typing import DataFrame
 
 # from pydantic import field_serializer#
-from lx_dtypes.utils.mixins.base_model import DatasetBaseModel
+from lx_dtypes.models.base_models.base_model import DatasetBaseModel
 
 from .schemas import (
     CenterShallowSchema,

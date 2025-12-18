@@ -3,8 +3,7 @@ from typing import List, TypedDict
 from pydantic import Field
 
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.utils.mixins.base_model import BaseModelMixin
-from lx_dtypes.utils.mixins.tags import TaggedMixin
+from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
 
 
 class InterventionTypeShallowDataDict(TypedDict):
@@ -20,7 +19,7 @@ class InterventionShallowDataDict(TypedDict):
     type_names: List[str]
 
 
-class InterventionTypeShallow(BaseModelMixin, TaggedMixin):
+class InterventionTypeShallow(AppBaseModelNamesUUIDTags):
     """Taggable shell for intervention type metadata."""
 
     @property
@@ -32,7 +31,7 @@ class InterventionTypeShallow(BaseModelMixin, TaggedMixin):
         return data_dict
 
 
-class InterventionShallow(BaseModelMixin):
+class InterventionShallow(AppBaseModelNamesUUIDTags):
     """
     Shallow Model to represent a medical intervention.
     Attributes:

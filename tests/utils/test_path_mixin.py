@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from lx_dtypes.utils.mixins.path import PathMixin
+from lx_dtypes.models.base_models.base_model import PathMixin
 
 
 class TestPathMixin:

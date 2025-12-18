@@ -3,8 +3,7 @@ from typing import List, TypedDict
 from pydantic import Field
 
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.utils.mixins.base_model import BaseModelMixin
-from lx_dtypes.utils.mixins.tags import TaggedMixin
+from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
 
 
 class IndicationTypeShallowDataDict(TypedDict):
@@ -19,7 +18,7 @@ class IndicationShallowDataDict(TypedDict):
     expected_intervention_names: List[str]
 
 
-class IndicationTypeShallow(BaseModelMixin, TaggedMixin):
+class IndicationTypeShallow(AppBaseModelNamesUUIDTags):
     """Taggable metadata container for indication types."""
 
     @property
@@ -31,7 +30,7 @@ class IndicationTypeShallow(BaseModelMixin, TaggedMixin):
         return data_dict
 
 
-class IndicationShallow(BaseModelMixin, TaggedMixin):
+class IndicationShallow(AppBaseModelNamesUUIDTags):
     """
     Shallow model representing a medical indication.
 

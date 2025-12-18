@@ -10,7 +10,7 @@ from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallowDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import uuid_factory
-from lx_dtypes.utils.mixins.base_model import AppBaseModel
+from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 
 class PatientFindingClassificationChoiceDescriptorDataDict(TypedDict):

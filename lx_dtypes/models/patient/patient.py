@@ -1,28 +1,17 @@
-from typing import Dict, NotRequired, Optional, TypedDict
+from typing import Dict, NotRequired, Optional
 
 from pydantic import Field
 
-from lx_dtypes.models.base_models.person import Person
+from lx_dtypes.models.base_models.person import Person, PersonDataDict
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
 
-class PatientDataDict(TypedDict):
-    uuid: NotRequired[str]
-    first_name: str
-    last_name: str
-    dob: Optional[str]
+class PatientDataShallowDict(PersonDataDict):
     center_name: str
-    gender: str
+
+
+class PatientDataDict(PatientDataShallowDict):
     external_ids: NotRequired[Optional[Dict[str, str]]]
-
-
-class PatientDataShallowDict(TypedDict):
-    uuid: NotRequired[str]
-    first_name: str
-    last_name: str
-    dob: Optional[str]
-    center_name: str
-    gender: str
 
 
 class PatientShallow(Person):

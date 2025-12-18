@@ -3,8 +3,7 @@ from typing import List, TypedDict
 from pydantic import Field
 
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.utils.mixins.base_model import BaseModelMixin
-from lx_dtypes.utils.mixins.tags import TaggedMixin
+from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
 
 
 class InformationSourceTypeShallowDataDict(TypedDict):
@@ -18,7 +17,7 @@ class InformationSourceShallowDataDict(TypedDict):
     type_names: List[str]
 
 
-class InformationSourceTypeShallow(BaseModelMixin, TaggedMixin):
+class InformationSourceTypeShallow(AppBaseModelNamesUUIDTags):
     """Simple container for information source type metadata."""
 
     @property
@@ -30,7 +29,7 @@ class InformationSourceTypeShallow(BaseModelMixin, TaggedMixin):
         return data_dict
 
 
-class InformationSourceShallow(BaseModelMixin, TaggedMixin):
+class InformationSourceShallow(AppBaseModelNamesUUIDTags):
     """
     Shallow Model representing an information source.
 

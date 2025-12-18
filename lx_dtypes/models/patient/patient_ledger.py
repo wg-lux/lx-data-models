@@ -5,7 +5,7 @@ from pydantic import Field, field_serializer
 from lx_dtypes.models.core.center import Center, CenterDataDict
 from lx_dtypes.models.examiner.examiner import Examiner
 from lx_dtypes.models.patient.patient import Patient, PatientDataDict
-from lx_dtypes.utils.mixins.base_model import AppBaseModel
+from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from .patient_examination import PatientExamination, PatientExaminationDataDict
 

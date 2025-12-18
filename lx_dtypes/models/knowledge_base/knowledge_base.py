@@ -4,9 +4,6 @@ from typing import Any, Dict, List, Optional, Self, TypedDict, Union
 import yaml
 from pydantic import Field, field_serializer
 
-# if TYPE_CHECKING:
-#     from lx_dtypes.stats.dataset import KnowledgeBaseDataset
-from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
 from lx_dtypes.models.core import (
     CitationShallow,
     CitationShallowDataDict,
@@ -41,7 +38,11 @@ from lx_dtypes.models.core import (
     UnitTypeShallow,
     UnitTypeShallowDataDict,
 )
-from lx_dtypes.utils.mixins.base_model import BaseModelMixin
+
+# if TYPE_CHECKING:
+#     from lx_dtypes.stats.dataset import KnowledgeBaseDataset
+from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
+from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
 
 
 class KnowledgeBaseRecordLists(TypedDict):
@@ -87,7 +88,7 @@ class KnowledgeBaseDataDict(TypedDict):
     unit_types: Dict[str, UnitTypeShallowDataDict]
 
 
-class KnowledgeBase(BaseModelMixin):
+class KnowledgeBase(AppBaseModelNamesUUIDTags):
     """
     Model representing a knowledge base.
 

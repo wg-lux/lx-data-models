@@ -1,25 +1,25 @@
-from typing import List, TypedDict
+from typing import List
 
 from pydantic import Field
 
+from lx_dtypes.models.base_models.base_model import (
+    AppBaseModelNamesUUIDTags,
+    AppBaseModelNamesUUIDTagsDataDict,
+)
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
-from lx_dtypes.utils.mixins.base_model import BaseModelMixin
-from lx_dtypes.utils.mixins.tags import TaggedMixin
 
 
-class ClassificationTypeShallowDataDict(TypedDict):
-    name: str
-    description: str
+class ClassificationTypeShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+    pass
 
 
-class ClassificationShallowDataDict(TypedDict):
-    name: str
-    description: str
+class ClassificationShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+    pass
     choice_names: List[str]
     type_names: List[str]
 
 
-class ClassificationTypeShallow(BaseModelMixin, TaggedMixin):
+class ClassificationTypeShallow(AppBaseModelNamesUUIDTags):
     """Label metadata for a classification type without nested relations."""
 
     @property
@@ -31,7 +31,7 @@ class ClassificationTypeShallow(BaseModelMixin, TaggedMixin):
         return data_dict
 
 
-class ClassificationShallow(BaseModelMixin, TaggedMixin):
+class ClassificationShallow(AppBaseModelNamesUUIDTags):
     """Classification stub that links to choice and type names only."""
 
     choice_names: List[str] = Field(default_factory=list_of_str_factory)

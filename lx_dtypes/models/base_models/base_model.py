@@ -1,10 +1,22 @@
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Self
+from typing import Any, Dict, Iterable, List, Optional, Self, TypedDict
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_validator,
+)
 
+from lx_dtypes.utils.factories.field_defaults import list_of_str_factory, uuid_factory
 from lx_dtypes.utils.json_encoders import serialize_path
+
+
+def _empty_path_list() -> List[Path]:
+    return []
 
 
 class DatasetBaseModel(BaseModel):
@@ -31,6 +43,12 @@ class DatasetBaseModel(BaseModel):
         json_encoders={Path: serialize_path},
         # from_attributes=True,
     )
+
+
+class AppBaseModelDataDict(TypedDict):
+    # source_file: Optional[str]
+    # created_at: str
+    pass
 
 
 class AppBaseModel(BaseModel):
@@ -94,7 +112,26 @@ class AppBaseModel(BaseModel):
         return dump
 
 
-class BaseModelMixin(AppBaseModel):
+class AppBaseModelUUIDTagsDataDict(AppBaseModelDataDict):
+    uuid: str
+    tags: List[str]
+
+
+class AppBaseModelUUIDTags(AppBaseModel):
+    """Abstract base model with UUID field."""
+
+    uuid: str = Field(default_factory=uuid_factory)
+    tags: List[str] = Field(default_factory=list_of_str_factory)
+
+
+class AppBaseModelNamesUUIDTagsDataDict(AppBaseModelUUIDTagsDataDict):
+    name: str
+    name_de: Optional[str]
+    name_en: Optional[str]
+    description: Optional[str]
+
+
+class AppBaseModelNamesUUIDTags(AppBaseModelUUIDTags):
     name: str
     name_de: str | None = None
     name_en: str | None = None
@@ -108,3 +145,34 @@ class BaseModelMixin(AppBaseModel):
         if not self.name_de:
             self.name_de = self.name
         return self
+
+
+class PathMixin(AppBaseModel):
+    file: Optional[Path] = None
+    dir: Optional[Path] = None
+    files: List[Path] = Field(default_factory=_empty_path_list)
+    dirs: List[Path] = Field(default_factory=_empty_path_list)
+
+    @staticmethod
+    def _ensure_path(value: Path | str) -> Path:
+        if isinstance(value, Path):
+            return value
+        assert isinstance(value, str)
+        return Path(value)
+
+    @field_validator("file", "dir", mode="before")
+    @classmethod
+    def validate_single_path(cls, value: Path | str | None) -> Path | None:
+        if not value:
+            return None
+
+        return cls._ensure_path(value)
+
+    @field_validator("files", "dirs", mode="before")
+    @classmethod
+    def validate_paths(cls, value: Iterable[Path | str] | None) -> List[Path]:
+        if value is None:
+            return []
+        if isinstance(value, list):
+            return [cls._ensure_path(item) for item in value]
+        raise TypeError("Expected a list of paths")
