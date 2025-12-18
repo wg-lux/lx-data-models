@@ -19,6 +19,11 @@ if TYPE_CHECKING:
     OptionalDateTimeField: TypeAlias = models.DateTimeField[
         datetime.datetime | None, datetime.datetime | None
     ]
+    FloatFieldType: TypeAlias = models.FloatField[float, float]
+    OptionalFloatFieldType: TypeAlias = models.FloatField[float | None, float | None]
+    IntegerFieldType: TypeAlias = models.IntegerField[int, int]
+    OptionalIntegerFieldType: TypeAlias = models.IntegerField[int | None, int | None]
+    BooleanFieldType: TypeAlias = models.BooleanField[bool, bool]
 else:  # Runtime fallbacks keep Django field classes unsubscripted
     UUIDFieldType: TypeAlias = models.UUIDField
     OptionalCharFieldType: TypeAlias = models.CharField
@@ -28,3 +33,8 @@ else:  # Runtime fallbacks keep Django field classes unsubscripted
     JSONFieldType: TypeAlias = models.JSONField
     DateTimeField: TypeAlias = models.DateTimeField
     OptionalDateTimeField: TypeAlias = models.DateTimeField
+    FloatFieldType: TypeAlias = models.FloatField
+    OptionalFloatFieldType: TypeAlias = models.FloatField
+    IntegerFieldType: TypeAlias = models.IntegerField
+    OptionalIntegerFieldType: TypeAlias = models.IntegerField
+    BooleanFieldType: TypeAlias = models.BooleanField

@@ -4,16 +4,26 @@ from lx_dtypes.contrib.lx_django.models import (
     Center as DjangoCenterModel,
 )
 from lx_dtypes.contrib.lx_django.models import (
+    ClassificationChoiceDescriptor as DjangoClassificationChoiceDescriptorModel,
+)
+from lx_dtypes.contrib.lx_django.models import (
     Examiner as DjangoExaminerModel,
 )
 from lx_dtypes.contrib.lx_django.models import (
     Patient as DjangoPatientModel,
 )
 from lx_dtypes.models.core.center import Center
+from lx_dtypes.models.core.classification_choice_descriptor import (
+    ClassificationChoiceDescriptor,
+)
+from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
+    ClassificationChoiceDescriptorShallow,
+)
 from lx_dtypes.models.examiner.examiner import Examiner
 from lx_dtypes.models.patient.patient import Patient
 
 
+# TODO add transform utils based on those tests
 @pytest.mark.django_db
 class TestModelSync:
     def test_patient_sync(self, sample_patient: Patient) -> None:
@@ -52,15 +62,34 @@ class TestModelSync:
         converted_center = Center.model_validate(center_dict)
         assert converted_center.to_ddict_shallow() == sample_center.to_ddict_shallow()
 
-    # def test_examination_sync(self, sample_exam: Exam) -> None:
-
-    # def test_finding_sync(self, sample_finding: Finding) -> None:
-
-    # def test_classification_sync(self, sample_classification: Classification) -> None:
+    def test_classification_choice_descriptor_sync(
+        self,
+        sample_classification_choice_descriptor_numeric: ClassificationChoiceDescriptor,
+    ) -> None:
+        ddict = sample_classification_choice_descriptor_numeric.to_ddict_shallow()
+        _django_ccd = DjangoClassificationChoiceDescriptorModel.objects.create(**ddict)
+        uuid = ddict.get("uuid")
+        assert uuid is not None
+        retrieved_ccd = DjangoClassificationChoiceDescriptorModel.objects.get(uuid=uuid)
+        assert (
+            str(retrieved_ccd.uuid)
+            == sample_classification_choice_descriptor_numeric.uuid
+        )
+        ccd_dict = retrieved_ccd.to_ddict_shallow()
+        # Convert the Django model instance back to a Pydantic model
+        converted_ccd = ClassificationChoiceDescriptorShallow.model_validate(ccd_dict)
+        assert (
+            converted_ccd.to_ddict_shallow()
+            == sample_classification_choice_descriptor_numeric.to_ddict_shallow()
+        )
 
     # def test_classification_choice_sync(self, sample_classification_choice: ClassificationChoice) -> None:
 
-    # def test_classification_choice_descriptor_sync(self, sample_classification_choice_descriptor: ClassificationChoiceDescriptor) -> None:
+    # def test_classification_sync(self, sample_classification: Classification) -> None:
+
+    # def test_finding_sync(self, sample_finding: Finding) -> None:
+
+    # def test_examination_sync(self, sample_exam: Exam) -> None:
 
     # def test_citation_sync(self, sample_citation: Citation) -> None:
 

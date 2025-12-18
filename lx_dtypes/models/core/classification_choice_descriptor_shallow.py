@@ -68,7 +68,7 @@ class ClassificationChoiceDescriptorShallow(AppBaseModelNamesUUIDTags):
     )  # TODO Improve typing when we know which descriptors are expected by the implemented distributions
     text_max_length: int = Field(default_factory=lambda: 255)
     default_value_str: str = Field(default_factory=str_unknown_factory)
-    default_value_num: float = Field(default_factory=lambda: float("nan"))
+    default_value_num: float = Field(default_factory=lambda: float(-999))
     default_value_bool: bool = False
     selection_options: list[str] = Field(default_factory=list)
     selection_multiple: bool = False

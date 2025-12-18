@@ -1,6 +1,9 @@
 from pytest import fixture
 
 from .fixtures.center import sample_center
+from .fixtures.classification_choice_descriptor import (
+    sample_classification_choice_descriptor_numeric,
+)
 from .fixtures.dataloader import (
     empty_data_loader,
     initialized_demo_kb_config,
@@ -93,4 +96,5 @@ __all__ = [
     "ninja_test_client",
     "sample_examiner",
     "sample_center",
+    "sample_classification_choice_descriptor_numeric",
 ]
