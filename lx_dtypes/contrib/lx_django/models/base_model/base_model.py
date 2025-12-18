@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid as uuid_module
-from typing import Any, ClassVar, Dict
+from typing import Any, ClassVar, Dict, List
 
 from django.db import models
 
@@ -47,6 +47,9 @@ class AppBaseModelUUIDTags(AppBaseModel):
     )
     tags: CharFieldType = models.CharField(max_length=1024, blank=True)
 
+    def str_list_to_list(self, str: str) -> List[str]:
+        return [tag.strip() for tag in str.strip("[]").split(",") if tag.strip()]
+
     def _to_ddict(
         self,
     ) -> Dict[str, Any]:  # TODO Change when we have proper ManyToMany field for tags
@@ -55,10 +58,12 @@ class AppBaseModelUUIDTags(AppBaseModel):
         tags = data.get("tags", "")
         if tags:
             assert isinstance(tags, str)
-            tags = [tag.strip() for tag in tags.strip("[]").split(",") if tag.strip()]
+            tags = self.str_list_to_list(tags)
         else:
             tags = []
         data["tags"] = tags
+
+        data["uuid"] = str(data["uuid"])
         return data
 
     class Meta(AppBaseModel.Meta):

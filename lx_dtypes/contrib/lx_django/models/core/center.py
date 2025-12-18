@@ -1,23 +1,27 @@
-from django.db import models
 import uuid as uuid_module
+
+from django.db import models
+
 from lx_dtypes.models.core.center import CenterDataDict
+from lx_dtypes.models.core.center_shallow import CenterShallowDataDict
 
 from ..base_model.base_model import AppBaseModelNamesUUIDTags
-from ..typing import (
-    UUIDFieldType,
-    OptionalCharFieldType,
-)
+from ..typing import OptionalCharFieldType, UUIDFieldType
 
 
 class Center(AppBaseModelNamesUUIDTags):
     uuid: UUIDFieldType = models.UUIDField(
         default=uuid_module.uuid4, editable=False, unique=True
     )
-    examiners: OptionalCharFieldType = (
+    examiner_uuids: OptionalCharFieldType = (
         models.CharField(  # TODO make foreign key to examiner model
             max_length=255, null=True, blank=True
         )
     )
+
+    @property
+    def ddict_shallow(self) -> type[CenterShallowDataDict]:
+        return CenterShallowDataDict
 
     @property
     def ddict(self) -> type[CenterDataDict]:
@@ -26,14 +30,17 @@ class Center(AppBaseModelNamesUUIDTags):
     class Meta(AppBaseModelNamesUUIDTags.Meta):
         pass
 
-    # def to_ddict(self) -> CenterDataDict:
-    #     """Convert the Patient model instance to a PatientDataDict.
+    def to_ddict_shallow(self) -> CenterShallowDataDict:
+        """Convert the Center model instance to a CenterDataDict.
 
-    #     Returns:
-    #         PatientDataDict: The converted data dictionary.
-    #     """
-    #     data_dict = self._to_ddict()
-    #     data_dict["center_name"] = self.center_name
-    #     data_dict["external_ids"] = self.external_ids
-    #     ddict = self.ddict(**data_dict)
-    #     return ddict
+        Returns:
+            CenterDataDict: The converted data dictionary.
+        """
+        data_dict = self._to_ddict()
+        examiner_uuids = self.examiner_uuids
+        if examiner_uuids:
+            data_dict["examiner_uuids"] = self.str_list_to_list(examiner_uuids)
+        else:
+            data_dict["examiner_uuids"] = []
+        ddict = self.ddict_shallow(**data_dict)
+        return ddict

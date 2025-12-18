@@ -1,6 +1,6 @@
 from django.db import models
 
-from lx_dtypes.models.patient.patient import PatientDataDict
+from lx_dtypes.models.examiner.examiner import ExaminerDataDict
 
 from ..base_model.person import PersonModel
 from ..typing import (
@@ -18,13 +18,13 @@ class Examiner(PersonModel):
     external_ids: JSONFieldType = models.JSONField(null=True, blank=True, default=dict)
 
     @property
-    def ddict(self) -> type[PatientDataDict]:
-        return PatientDataDict
+    def ddict(self) -> type[ExaminerDataDict]:
+        return ExaminerDataDict
 
     class Meta(PersonModel.Meta):
         pass
 
-    def to_ddict(self) -> PatientDataDict:
+    def to_ddict(self) -> ExaminerDataDict:
         """Convert the Patient model instance to a PatientDataDict.
 
         Returns:

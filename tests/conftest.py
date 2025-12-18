@@ -1,5 +1,6 @@
 from pytest import fixture
 
+from .fixtures.center import sample_center
 from .fixtures.dataloader import (
     empty_data_loader,
     initialized_demo_kb_config,
@@ -7,6 +8,7 @@ from .fixtures.dataloader import (
     yaml_data_loader,
 )
 from .fixtures.django import ninja_test_client
+from .fixtures.examiner import sample_examiner
 from .fixtures.knowledge_base import lx_knowledge_base
 from .fixtures.logs import log_writer, logger
 from .fixtures.object_names import (
@@ -89,4 +91,6 @@ __all__ = [
     "sample_patient_finding_with_classification_choice",
     "classification_name_colon_lesion_paris",
     "ninja_test_client",
+    "sample_examiner",
+    "sample_center",
 ]
