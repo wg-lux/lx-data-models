@@ -133,6 +133,11 @@ def intervention_by_name_factory() -> Dict[str, "Intervention"]:
     return _dict
 
 
+def intervention_type_by_name_factory() -> Dict[str, "InterventionType"]:
+    _dict: Dict[str, "InterventionType"] = {}
+    return _dict
+
+
 def examiner_by_uuid_factory() -> Dict[str, "Examiner"]:
     _dict: Dict[str, "Examiner"] = {}
     return _dict

@@ -18,6 +18,9 @@ from lx_dtypes.contrib.lx_django.models import (
 from lx_dtypes.contrib.lx_django.models.core.classification import (
     Classification as DjangoClassificationModel,
 )
+from lx_dtypes.contrib.lx_django.models.core.examination import (
+    Examination as DjangoExaminationModel,
+)
 from lx_dtypes.contrib.lx_django.models.core.finding import (
     Finding as DjangoFindingModel,
 )
@@ -44,6 +47,8 @@ from lx_dtypes.models.core.classification_choice_shallow import (
     ClassificationChoiceShallow,
 )
 from lx_dtypes.models.core.classification_shallow import ClassificationShallow
+from lx_dtypes.models.core.examination import Examination
+from lx_dtypes.models.core.examination_shallow import ExaminationShallow
 from lx_dtypes.models.core.finding import Finding
 from lx_dtypes.models.core.finding_shallow import FindingShallow
 from lx_dtypes.models.core.indication import Indication
@@ -188,7 +193,17 @@ class TestModelSync:
             == sample_indication.to_ddict_shallow()
         )
 
-    # def test_examination_sync(self, sample_exam: Exam) -> None:
+    def test_examination_sync(self, sample_examination: Examination) -> None:
+        ddict = sample_examination.to_ddict_shallow()
+        django_examination = DjangoExaminationModel.objects.create(**ddict)
+        django_examination.refresh_from_db()
+        examination_dict = django_examination.to_ddict_shallow()
+        # Convert the Django model instance back to a Pydantic model
+        converted_examination = ExaminationShallow.model_validate(examination_dict)
+        assert (
+            converted_examination.to_ddict_shallow()
+            == sample_examination.to_ddict_shallow()
+        )
 
     # def test_citation_sync(self, sample_citation: Citation) -> None:
 

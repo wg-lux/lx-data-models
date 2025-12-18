@@ -1,6 +1,8 @@
 from pytest import fixture
 
+from lx_dtypes.models.core.classification import Classification
 from lx_dtypes.models.core.finding import Finding, FindingType
+from lx_dtypes.models.core.intervention import Intervention
 
 
 @fixture
@@ -14,10 +16,13 @@ def sample_finding_type() -> FindingType:
 @fixture
 def sample_finding(
     sample_finding_type: FindingType,
+    sample_classification: Classification,
+    sample_intervention: Intervention,
 ) -> Finding:
-    finding_type_name = sample_finding_type.name
     return Finding(
         name="Sample Finding",
         description="A sample finding for testing.",
-        type_names=[finding_type_name],
+        types={sample_finding_type.name: sample_finding_type},
+        classifications={sample_classification.name: sample_classification},
+        interventions={sample_intervention.name: sample_intervention},
     )

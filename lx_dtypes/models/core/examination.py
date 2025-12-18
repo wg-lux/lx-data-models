@@ -72,6 +72,28 @@ class Examination(ExaminationShallow):
     def ddict(self) -> type[ExaminationDataDict]:
         return ExaminationDataDict
 
+    def _sync_shallow_fields(self) -> None:
+        """Sync shallow fields from deep fields."""
+        if self.findings:
+            self.finding_names = list(self.findings.keys())
+
+        if self.types:
+            self.type_names = list(self.types.keys())
+
+        if self.indications:
+            self.indication_names = list(self.indications.keys())
+
     def to_ddict(self) -> ExaminationDataDict:
         data_dict = self.ddict(**self.model_dump())
         return data_dict
+
+    def to_ddict_shallow(self) -> ExaminationShallowDataDict:
+        self._sync_shallow_fields()
+        dump = self.model_dump()
+        shallow_data = {
+            key: dump[key]
+            for key in self.ddict_shallow.__annotations__.keys()
+            if key in dump
+        }
+
+        return self.ddict_shallow(**shallow_data)

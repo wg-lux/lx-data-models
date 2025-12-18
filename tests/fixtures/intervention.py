@@ -16,5 +16,5 @@ def sample_intervention(sample_intervention_type: InterventionType) -> Intervent
     return Intervention(
         name="Sample Intervention",
         description="A sample intervention for testing purposes.",
-        types=[sample_intervention_type],
+        types={sample_intervention_type.name: sample_intervention_type},
     )

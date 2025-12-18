@@ -1,8 +1,8 @@
-from typing import List
+from typing import Dict
 
 from pydantic import Field
 
-from lx_dtypes.utils.factories.field_defaults import list_of_intervention_type_factory
+from lx_dtypes.utils.factories.field_defaults import intervention_type_by_name_factory
 
 from .intervention_shallow import (
     InterventionShallow,
@@ -17,7 +17,7 @@ class InterventionTypeDataDict(InterventionTypeShallowDataDict):
 
 
 class InterventionDataDict(InterventionShallowDataDict):
-    types: List[InterventionTypeDataDict]
+    types: Dict[str, InterventionTypeDataDict]
 
 
 class InterventionType(InterventionTypeShallow):
@@ -50,15 +50,17 @@ class Intervention(InterventionShallow):
         type_names (list[str]): Names of associated intervention types.
     """
 
-    types: List[InterventionType] = Field(
-        default_factory=list_of_intervention_type_factory
+    types: Dict[str, InterventionType] = Field(
+        default_factory=intervention_type_by_name_factory
     )
 
     def _sync_shallow_fields(self) -> None:
         """Sync shallow fields from related models."""
         # TODO maybe protect if already set?
         if self.types:
-            self.type_names = [type_.name for type_ in self.types]
+            self.type_names = [
+                intervention_type.name for intervention_type in self.types.values()
+            ]
         else:
             self.type_names = []
 

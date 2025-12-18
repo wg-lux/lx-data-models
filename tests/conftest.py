@@ -13,6 +13,7 @@ from .fixtures.dataloader import (
     yaml_data_loader,
 )
 from .fixtures.django import ninja_test_client
+from .fixtures.examination import sample_examination, sample_examination_type
 from .fixtures.examiner import sample_examiner
 from .fixtures.finding import sample_finding, sample_finding_type
 from .fixtures.indication import sample_indication, sample_indication_type
@@ -114,4 +115,6 @@ __all__ = [
     "sample_finding",
     "sample_indication_type",
     "sample_indication",
+    "sample_examination_type",
+    "sample_examination",
 ]
