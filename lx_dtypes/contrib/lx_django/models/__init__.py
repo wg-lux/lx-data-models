@@ -1,4 +1,5 @@
 from .core.center import Center
+from .core.citation import Citation
 from .core.classification import Classification, ClassificationType
 from .core.classification_choice import ClassificationChoice
 from .core.classification_choice_descriptor import (
@@ -30,4 +31,5 @@ __all__ = [
     "ExaminationType",
     "Indication",
     "IndicationType",
+    "Citation",
 ]

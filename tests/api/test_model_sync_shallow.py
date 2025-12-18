@@ -15,6 +15,9 @@ from lx_dtypes.contrib.lx_django.models import (
 from lx_dtypes.contrib.lx_django.models import (
     Patient as DjangoPatientModel,
 )
+from lx_dtypes.contrib.lx_django.models.core.citation import (
+    Citation as DjangoCitationModel,
+)
 from lx_dtypes.contrib.lx_django.models.core.classification import (
     Classification as DjangoClassificationModel,
 )
@@ -35,6 +38,8 @@ from lx_dtypes.contrib.lx_django.models.core.unit import (
 )
 from lx_dtypes.models.core.center import Center
 from lx_dtypes.models.core.center_shallow import CenterShallow
+from lx_dtypes.models.core.citation import Citation
+from lx_dtypes.models.core.citation_shallow import CitationShallow
 from lx_dtypes.models.core.classification import Classification
 from lx_dtypes.models.core.classification_choice import ClassificationChoice
 from lx_dtypes.models.core.classification_choice_descriptor import (
@@ -64,6 +69,7 @@ from lx_dtypes.models.patient.patient import Patient, PatientShallow
 # TODO add transform utils based on those tests
 @pytest.mark.django_db
 class TestModelSync:
+    # TODO Move to ledger test file when created
     def test_patient_sync(self, sample_patient: Patient) -> None:
         ddict = sample_patient.to_ddict_shallow()
         _django_patient = DjangoPatientModel.objects.create(**ddict)
@@ -76,6 +82,7 @@ class TestModelSync:
         converted_patient = PatientShallow.model_validate(patient_dict)
         assert converted_patient.to_ddict_shallow() == sample_patient.to_ddict_shallow()
 
+    # TODO Move to ledger test file when created
     def test_examiner_sync(self, sample_examiner: Examiner) -> None:
         ddict = sample_examiner.to_ddict_shallow()
         _django_examiner = DjangoExaminerModel.objects.create(**ddict)
@@ -205,7 +212,16 @@ class TestModelSync:
             == sample_examination.to_ddict_shallow()
         )
 
-    # def test_citation_sync(self, sample_citation: Citation) -> None:
+    def test_citation_sync(self, sample_citation: Citation) -> None:
+        ddict = sample_citation.to_ddict_shallow()
+        django_citation = DjangoCitationModel.objects.create(**ddict)
+        django_citation.refresh_from_db()
+        citation_dict = django_citation.to_ddict_shallow()
+        # Convert the Django model instance back to a Pydantic model
+        converted_citation = CitationShallow.model_validate(citation_dict)
+        assert (
+            converted_citation.to_ddict_shallow() == sample_citation.to_ddict_shallow()
+        )
 
     # def test_information_source_sync(self, sample_information_source: InformationSource) -> None:
 

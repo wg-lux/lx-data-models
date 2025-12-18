@@ -1,6 +1,7 @@
 from pytest import fixture
 
 from .fixtures.center import sample_center
+from .fixtures.citation import sample_citation
 from .fixtures.classification import sample_classification, sample_classification_type
 from .fixtures.classification_choice import sample_classification_choice
 from .fixtures.classification_choice_descriptor import (
@@ -117,4 +118,5 @@ __all__ = [
     "sample_indication",
     "sample_examination_type",
     "sample_examination",
+    "sample_citation",
 ]
