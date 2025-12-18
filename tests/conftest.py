@@ -14,6 +14,7 @@ from .fixtures.dataloader import (
 )
 from .fixtures.django import ninja_test_client
 from .fixtures.examiner import sample_examiner
+from .fixtures.finding import sample_finding, sample_finding_type
 from .fixtures.intervention import sample_intervention, sample_intervention_type
 from .fixtures.knowledge_base import lx_knowledge_base
 from .fixtures.logs import log_writer, logger
@@ -108,4 +109,6 @@ __all__ = [
     "sample_intervention",
     "sample_unit_type",
     "sample_unit",
+    "sample_finding_type",
+    "sample_finding",
 ]

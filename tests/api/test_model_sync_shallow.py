@@ -18,6 +18,9 @@ from lx_dtypes.contrib.lx_django.models import (
 from lx_dtypes.contrib.lx_django.models.core.classification import (
     Classification as DjangoClassificationModel,
 )
+from lx_dtypes.contrib.lx_django.models.core.finding import (
+    Finding as DjangoFindingModel,
+)
 from lx_dtypes.contrib.lx_django.models.core.intervention import (
     Intervention as DjangoInterventionModel,
 )
@@ -38,6 +41,8 @@ from lx_dtypes.models.core.classification_choice_shallow import (
     ClassificationChoiceShallow,
 )
 from lx_dtypes.models.core.classification_shallow import ClassificationShallow
+from lx_dtypes.models.core.finding import Finding
+from lx_dtypes.models.core.finding_shallow import FindingShallow
 from lx_dtypes.models.core.intervention import Intervention
 from lx_dtypes.models.core.intervention_shallow import InterventionShallow
 from lx_dtypes.models.core.unit import Unit
@@ -157,7 +162,14 @@ class TestModelSync:
             == sample_intervention.to_ddict_shallow()
         )
 
-    # def test_finding_sync(self, sample_finding: Finding) -> None:
+    def test_finding_sync(self, sample_finding: Finding) -> None:
+        ddict = sample_finding.to_ddict_shallow()
+        django_finding = DjangoFindingModel.objects.create(**ddict)
+        django_finding.refresh_from_db()
+        finding_dict = django_finding.to_ddict_shallow()
+        # Convert the Django model instance back to a Pydantic model
+        converted_finding = FindingShallow.model_validate(finding_dict)
+        assert converted_finding.to_ddict_shallow() == sample_finding.to_ddict_shallow()
 
     # def test_indication_sync(self, sample_indication: Indication) -> None:
 
