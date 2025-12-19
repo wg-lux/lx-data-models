@@ -43,6 +43,11 @@ class InformationSource(InformationSourceShallow):
         default_factory=information_source_type_by_name_factory
     )
 
+    def _sync_shallow_fields(self) -> None:
+        """Sync shallow fields from deep fields."""
+        if self.types:
+            self.type_names = list(self.types.keys())
+
     @property
     def ddict(self) -> type[InformationSourceDataDict]:
         return InformationSourceDataDict
@@ -59,3 +64,14 @@ class InformationSource(InformationSourceShallow):
             type_name: information_source_type.to_ddict()
             for type_name, information_source_type in types.items()
         }
+
+    def to_ddict_shallow(self) -> InformationSourceShallowDataDict:
+        self._sync_shallow_fields()
+        dump = self.model_dump()
+        shallow_data = {
+            key: dump[key]
+            for key in self.ddict_shallow.__annotations__.keys()
+            if key in dump
+        }
+
+        return self.ddict_shallow(**shallow_data)

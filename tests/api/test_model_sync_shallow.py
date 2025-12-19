@@ -30,6 +30,9 @@ from lx_dtypes.contrib.lx_django.models.core.finding import (
 from lx_dtypes.contrib.lx_django.models.core.indication import (
     Indication as DjangoIndicationModel,
 )
+from lx_dtypes.contrib.lx_django.models.core.information_source import (
+    InformationSource as DjangoInformationSourceModel,
+)
 from lx_dtypes.contrib.lx_django.models.core.intervention import (
     Intervention as DjangoInterventionModel,
 )
@@ -58,6 +61,8 @@ from lx_dtypes.models.core.finding import Finding
 from lx_dtypes.models.core.finding_shallow import FindingShallow
 from lx_dtypes.models.core.indication import Indication
 from lx_dtypes.models.core.indication_shallow import IndicationShallow
+from lx_dtypes.models.core.information_source import InformationSource
+from lx_dtypes.models.core.information_source_shallow import InformationSourceShallow
 from lx_dtypes.models.core.intervention import Intervention
 from lx_dtypes.models.core.intervention_shallow import InterventionShallow
 from lx_dtypes.models.core.unit import Unit
@@ -223,7 +228,21 @@ class TestModelSync:
             converted_citation.to_ddict_shallow() == sample_citation.to_ddict_shallow()
         )
 
-    # def test_information_source_sync(self, sample_information_source: InformationSource) -> None:
+    def test_information_source_sync(
+        self, sample_information_source: InformationSource
+    ) -> None:
+        ddict = sample_information_source.to_ddict_shallow()
+        django_information_source = DjangoInformationSourceModel.objects.create(**ddict)
+        django_information_source.refresh_from_db()
+        information_source_dict = django_information_source.to_ddict_shallow()
+        # Convert the Django model instance back to a Pydantic model
+        converted_information_source = InformationSourceShallow.model_validate(
+            information_source_dict
+        )
+        assert (
+            converted_information_source.to_ddict_shallow()
+            == sample_information_source.to_ddict_shallow()
+        )
 
     # def test_patient_examination_sync(self, sample_patient_examination: PatientExamination) -> None:
 

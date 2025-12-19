@@ -8,6 +8,7 @@ from .core.classification_choice_descriptor import (
 from .core.examination import Examination, ExaminationType
 from .core.finding import Finding, FindingType
 from .core.indication import Indication, IndicationType
+from .core.information_source import InformationSource, InformationSourceType
 from .core.intervention import Intervention, InterventionType
 from .core.unit import Unit, UnitType
 from .examiner.examiner import Examiner
@@ -32,4 +33,6 @@ __all__ = [
     "Indication",
     "IndicationType",
     "Citation",
+    "InformationSource",
+    "InformationSourceType",
 ]

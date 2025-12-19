@@ -18,6 +18,10 @@ from .fixtures.examination import sample_examination, sample_examination_type
 from .fixtures.examiner import sample_examiner
 from .fixtures.finding import sample_finding, sample_finding_type
 from .fixtures.indication import sample_indication, sample_indication_type
+from .fixtures.information_source import (
+    sample_information_source,
+    sample_information_source_type,
+)
 from .fixtures.intervention import sample_intervention, sample_intervention_type
 from .fixtures.knowledge_base import lx_knowledge_base
 from .fixtures.logs import log_writer, logger
@@ -119,4 +123,6 @@ __all__ = [
     "sample_examination_type",
     "sample_examination",
     "sample_citation",
+    "sample_information_source_type",
+    "sample_information_source",
 ]

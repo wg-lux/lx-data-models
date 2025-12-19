@@ -127,6 +127,17 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
     def ddict(self) -> type[KnowledgeBaseDataDict]:
         return KnowledgeBaseDataDict
 
+    @property
+    def config_safe(self) -> KnowledgeBaseConfig:
+        """Get the knowledge base config, raising an error if it is not set.
+
+        Returns:
+            KnowledgeBaseConfig: The knowledge base config.
+        """
+        if self.config is None:
+            raise ValueError("KnowledgeBase config is not set.")
+        return self.config
+
     def to_ddict(self) -> KnowledgeBaseDataDict:
         data_dict = self.ddict(**self.model_dump())
         return data_dict
