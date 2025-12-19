@@ -7,17 +7,17 @@ from lx_dtypes.models.core.intervention_shallow import (
     InterventionShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import (
     CharFieldType,
 )
 
 
-class InterventionType(AppBaseModelNamesUUIDTags):
+class InterventionType(KnowledgeBaseModel):
     pass
 
 
-class Intervention(AppBaseModelNamesUUIDTags):
+class Intervention(KnowledgeBaseModel):
     type_names: CharFieldType = models.CharField(
         max_length=2000, null=True, blank=True
     )  # store as comma-separated UUIDs

@@ -11,7 +11,11 @@ from pydantic import (
     model_validator,
 )
 
-from lx_dtypes.utils.factories.field_defaults import list_of_str_factory, uuid_factory
+from lx_dtypes.utils.factories.field_defaults import (
+    list_of_str_factory,
+    str_unknown_factory,
+    uuid_factory,
+)
 from lx_dtypes.utils.json_encoders import serialize_path
 
 
@@ -145,6 +149,14 @@ class AppBaseModelNamesUUIDTags(AppBaseModelUUIDTags):
         if not self.name_de:
             self.name_de = self.name
         return self
+
+
+class KnowledgeBaseModelDataDict(AppBaseModelNamesUUIDTagsDataDict):
+    kb_module_name: str
+
+
+class KnowledgeBaseModel(AppBaseModelNamesUUIDTags):
+    kb_module_name: str = Field(default_factory=str_unknown_factory)
 
 
 class PathMixin(AppBaseModel):

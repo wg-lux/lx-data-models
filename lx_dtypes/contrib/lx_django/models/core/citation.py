@@ -7,7 +7,7 @@ from lx_dtypes.models.core.citation_shallow import (
     CitationShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import (
     CharFieldType,
     IntegerFieldType,
@@ -16,7 +16,7 @@ from ..typing import (
 )
 
 
-class Citation(AppBaseModelNamesUUIDTags):
+class Citation(KnowledgeBaseModel):
     """Model representing a Citation."""
 
     citation_key: CharFieldType = models.CharField(max_length=255, unique=True)

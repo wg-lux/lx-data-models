@@ -9,13 +9,13 @@ from lx_dtypes.models.core.indication_shallow import (
     IndicationTypeShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import (
     CharFieldType,
 )
 
 
-class IndicationType(AppBaseModelNamesUUIDTags):
+class IndicationType(KnowledgeBaseModel):
     @property
     def ddict_shallow(self) -> type[IndicationTypeShallowDataDict]:
         return IndicationTypeShallowDataDict
@@ -25,7 +25,7 @@ class IndicationType(AppBaseModelNamesUUIDTags):
         return IndicationTypeDataDict
 
 
-class Indication(AppBaseModelNamesUUIDTags):
+class Indication(KnowledgeBaseModel):
     expected_intervention_names: CharFieldType = models.CharField(
         max_length=2000, null=True, blank=True
     )  # store as comma-separated UUIDs

@@ -7,13 +7,13 @@ from lx_dtypes.models.core.classification_choice_shallow import (
     ClassificationChoiceShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import (
     CharFieldType,
 )
 
 
-class ClassificationChoice(AppBaseModelNamesUUIDTags):
+class ClassificationChoice(KnowledgeBaseModel):
     classification_choice_descriptor_names: CharFieldType = models.CharField(
         max_length=2000, null=True, blank=True
     )  # store as comma-separated UUIDs

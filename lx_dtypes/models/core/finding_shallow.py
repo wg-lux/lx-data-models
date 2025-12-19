@@ -3,23 +3,23 @@ from typing import List
 from pydantic import Field
 
 from lx_dtypes.models.base_models.base_model import (
-    AppBaseModelNamesUUIDTags,
-    AppBaseModelNamesUUIDTagsDataDict,
+    KnowledgeBaseModel,
+    KnowledgeBaseModelDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 
 
-class FindingTypeShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+class FindingTypeShallowDataDict(KnowledgeBaseModelDataDict):
     pass
 
 
-class FindingShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+class FindingShallowDataDict(KnowledgeBaseModelDataDict):
     classification_names: List[str]
     type_names: List[str]
     intervention_names: List[str]
 
 
-class FindingTypeShallow(AppBaseModelNamesUUIDTags):
+class FindingTypeShallow(KnowledgeBaseModel):
     """Metadata shell for finding types."""
 
     @property
@@ -31,7 +31,7 @@ class FindingTypeShallow(AppBaseModelNamesUUIDTags):
         return data_dict
 
 
-class FindingShallow(AppBaseModelNamesUUIDTags):
+class FindingShallow(KnowledgeBaseModel):
     """
     Shallow model representing a medical finding.
 

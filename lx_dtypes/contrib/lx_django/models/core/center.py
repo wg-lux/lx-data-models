@@ -3,11 +3,11 @@ from django.db import models
 from lx_dtypes.models.core.center import CenterDataDict
 from lx_dtypes.models.core.center_shallow import CenterShallowDataDict
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import OptionalCharFieldType
 
 
-class Center(AppBaseModelNamesUUIDTags):
+class Center(KnowledgeBaseModel):
     examiner_uuids: OptionalCharFieldType = (
         models.CharField(  # TODO make foreign key to examiner model
             max_length=255, null=True, blank=True
@@ -22,7 +22,7 @@ class Center(AppBaseModelNamesUUIDTags):
     def ddict(self) -> type[CenterDataDict]:
         return CenterDataDict
 
-    class Meta(AppBaseModelNamesUUIDTags.Meta):
+    class Meta(KnowledgeBaseModel.Meta):
         pass
 
     def to_ddict_shallow(self) -> CenterShallowDataDict:

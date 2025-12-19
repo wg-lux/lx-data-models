@@ -30,6 +30,7 @@ from lx_dtypes.models.core.intervention_shallow import (
     InterventionTypeShallow,
 )
 from lx_dtypes.models.core.unit_shallow import UnitShallow, UnitTypeShallow
+from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
 model_types = Union[
     type[CenterShallow],
@@ -96,7 +97,9 @@ allowed_types = [v for _, v in model_lookup.items()]
 reverse_model_lookup: Dict[model_types, str] = {v: k for k, v in model_lookup.items()}
 
 
-def parse_shallow_object(file_path: Path) -> List[ShallowModel]:
+def parse_shallow_object(
+    file_path: Path, kb_module_name: str = str_unknown_factory()
+) -> List[ShallowModel]:
     if not file_path.exists() or not file_path.is_file():
         raise ValueError(
             f"The provided path {file_path} does not exist or is not a file."
@@ -122,6 +125,7 @@ def parse_shallow_object(file_path: Path) -> List[ShallowModel]:
         assert TargetModel is not None, f"Unknown model type: {target_model_name}"
 
         item.pop("model")  # remove the model field before validation
+        item["kb_module_name"] = kb_module_name  # set the kb_module for reference
         item["source_file"] = file_path  # set source_file for reference
         result = TargetModel.model_validate(item)
         result_type = type(result)

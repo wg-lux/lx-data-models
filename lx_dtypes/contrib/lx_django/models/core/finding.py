@@ -6,11 +6,11 @@ from lx_dtypes.models.core.finding_shallow import (
     FindingTypeShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import OptionalCharFieldType
 
 
-class FindingType(AppBaseModelNamesUUIDTags):
+class FindingType(KnowledgeBaseModel):
     pass
 
     @property
@@ -22,7 +22,7 @@ class FindingType(AppBaseModelNamesUUIDTags):
         return FindingTypeShallowDataDict
 
 
-class Finding(AppBaseModelNamesUUIDTags):
+class Finding(KnowledgeBaseModel):
     classification_names: OptionalCharFieldType = models.CharField(
         max_length=2000, null=True, blank=True
     )  # store as comma-separated UUIDs

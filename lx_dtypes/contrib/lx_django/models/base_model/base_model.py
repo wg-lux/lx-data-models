@@ -103,3 +103,15 @@ class AppBaseModelNamesUUIDTags(AppBaseModelUUIDTags):
 
     class Meta(AppBaseModelUUIDTags.Meta):
         abstract = True
+
+
+class KnowledgeBaseModel(AppBaseModelNamesUUIDTags):
+    """Abstract base model with UUID field."""
+
+    kb_module_name: CharFieldType = models.CharField(
+        max_length=255,
+        default="unknown",
+    )
+
+    class Meta(AppBaseModelNamesUUIDTags.Meta):
+        abstract = True

@@ -9,11 +9,11 @@ from lx_dtypes.models.core.unit_shallow import (
     UnitTypeShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import CharFieldType, OptionalCharFieldType
 
 
-class UnitType(AppBaseModelNamesUUIDTags):
+class UnitType(KnowledgeBaseModel):
     @property
     def ddict_shallow(self) -> type[UnitTypeShallowDataDict]:
         return UnitTypeShallowDataDict
@@ -23,7 +23,7 @@ class UnitType(AppBaseModelNamesUUIDTags):
         return UnitTypeDataDict
 
 
-class Unit(AppBaseModelNamesUUIDTags):
+class Unit(KnowledgeBaseModel):
     abbreviation: OptionalCharFieldType = models.CharField(
         max_length=100, null=True, blank=True
     )

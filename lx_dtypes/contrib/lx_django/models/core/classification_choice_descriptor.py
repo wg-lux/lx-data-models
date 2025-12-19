@@ -7,7 +7,7 @@ from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import (
     BooleanFieldType,
     CharFieldType,
@@ -20,7 +20,7 @@ from ..typing import (
 )
 
 
-class ClassificationChoiceDescriptor(AppBaseModelNamesUUIDTags):
+class ClassificationChoiceDescriptor(KnowledgeBaseModel):
     descriptor_type: OptionalCharFieldType = models.CharField(
         max_length=50,
         null=True,

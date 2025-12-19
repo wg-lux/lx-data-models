@@ -9,13 +9,13 @@ from lx_dtypes.models.core.classification_shallow import (
     ClassificationTypeShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import (
     CharFieldType,
 )
 
 
-class ClassificationType(AppBaseModelNamesUUIDTags):
+class ClassificationType(KnowledgeBaseModel):
     @property
     def ddict_shallow(self) -> type[ClassificationTypeShallowDataDict]:
         return ClassificationTypeShallowDataDict
@@ -25,7 +25,7 @@ class ClassificationType(AppBaseModelNamesUUIDTags):
         return ClassificationTypeDataDict
 
 
-class Classification(AppBaseModelNamesUUIDTags):
+class Classification(KnowledgeBaseModel):
     choice_names: CharFieldType = models.CharField(
         max_length=2000, null=True, blank=True
     )  # store as comma-separated UUIDs

@@ -3,22 +3,22 @@ from typing import List, Optional
 from pydantic import Field
 
 from lx_dtypes.models.base_models.base_model import (
-    AppBaseModelNamesUUIDTags,
-    AppBaseModelNamesUUIDTagsDataDict,
+    KnowledgeBaseModel,
+    KnowledgeBaseModelDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 
 
-class UnitTypeShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+class UnitTypeShallowDataDict(KnowledgeBaseModelDataDict):
     pass
 
 
-class UnitShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+class UnitShallowDataDict(KnowledgeBaseModelDataDict):
     abbreviation: Optional[str]
     type_names: List[str]
 
 
-class UnitTypeShallow(AppBaseModelNamesUUIDTags):
+class UnitTypeShallow(KnowledgeBaseModel):
     """Taggable metadata container for unit types."""
 
     @property
@@ -30,7 +30,7 @@ class UnitTypeShallow(AppBaseModelNamesUUIDTags):
         return data_dict
 
 
-class UnitShallow(AppBaseModelNamesUUIDTags):
+class UnitShallow(KnowledgeBaseModel):
     """
     Shallow model representing a measurement unit.
     Attributes:

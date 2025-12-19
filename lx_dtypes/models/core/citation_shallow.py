@@ -3,13 +3,13 @@ from typing import Any, Dict, List
 from pydantic import Field, model_validator
 
 from lx_dtypes.models.base_models.base_model import (
-    AppBaseModelNamesUUIDTags,
-    AppBaseModelNamesUUIDTagsDataDict,
+    KnowledgeBaseModel,
+    KnowledgeBaseModelDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 
 
-class CitationShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+class CitationShallowDataDict(KnowledgeBaseModelDataDict):
     citation_key: str
     title: str
     abstract: str | None
@@ -29,7 +29,7 @@ class CitationShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
     identifiers: Dict[str, str]
 
 
-class CitationShallow(AppBaseModelNamesUUIDTags):
+class CitationShallow(KnowledgeBaseModel):
     """Shallow BaseModel for citations without nested relations.
     Captures key bibliographic details and identifiers.
 

@@ -9,13 +9,13 @@ from lx_dtypes.models.core.examination_shallow import (
     ExaminationTypeShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import (
     CharFieldType,
 )
 
 
-class ExaminationType(AppBaseModelNamesUUIDTags):
+class ExaminationType(KnowledgeBaseModel):
     @property
     def ddict_shallow(self) -> type[ExaminationTypeShallowDataDict]:
         return ExaminationTypeShallowDataDict
@@ -25,7 +25,7 @@ class ExaminationType(AppBaseModelNamesUUIDTags):
         return ExaminationTypeDataDict
 
 
-class Examination(AppBaseModelNamesUUIDTags):
+class Examination(KnowledgeBaseModel):
     finding_names: CharFieldType = models.CharField(
         max_length=2000, null=True, blank=True
     )  # store as comma-separated UUIDs

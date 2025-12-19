@@ -9,13 +9,13 @@ from lx_dtypes.models.core.information_source_shallow import (
     InformationSourceTypeShallowDataDict,
 )
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import (
     CharFieldType,
 )
 
 
-class InformationSourceType(AppBaseModelNamesUUIDTags):
+class InformationSourceType(KnowledgeBaseModel):
     @property
     def ddict_shallow(self) -> type[InformationSourceTypeShallowDataDict]:
         return InformationSourceTypeShallowDataDict
@@ -25,7 +25,7 @@ class InformationSourceType(AppBaseModelNamesUUIDTags):
         return InformationSourceTypeDataDict
 
 
-class InformationSource(AppBaseModelNamesUUIDTags):
+class InformationSource(KnowledgeBaseModel):
     type_names: CharFieldType = models.CharField(
         max_length=2000, null=True, blank=True
     )  # store as comma-separated UUIDs

@@ -3,23 +3,23 @@ from typing import List
 from pydantic import Field
 
 from lx_dtypes.models.base_models.base_model import (
-    AppBaseModelNamesUUIDTags,
-    AppBaseModelNamesUUIDTagsDataDict,
+    KnowledgeBaseModel,
+    KnowledgeBaseModelDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 
 
-class ExaminationTypeShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+class ExaminationTypeShallowDataDict(KnowledgeBaseModelDataDict):
     pass
 
 
-class ExaminationShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
+class ExaminationShallowDataDict(KnowledgeBaseModelDataDict):
     finding_names: List[str]
     type_names: List[str]
     indication_names: List[str]
 
 
-class ExaminationTypeShallow(AppBaseModelNamesUUIDTags):
+class ExaminationTypeShallow(KnowledgeBaseModel):
     """Taggable shell for examination types."""
 
     @property
@@ -31,7 +31,7 @@ class ExaminationTypeShallow(AppBaseModelNamesUUIDTags):
         return data_dict
 
 
-class ExaminationShallow(AppBaseModelNamesUUIDTags):
+class ExaminationShallow(KnowledgeBaseModel):
     """
     Links examinations to finding, type, and indication names without nesting.
 
