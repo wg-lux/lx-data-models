@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING, Self
+
 from django.db import models
 
 from lx_dtypes.models.core.classification_choice import (
@@ -8,15 +10,26 @@ from lx_dtypes.models.core.classification_choice_shallow import (
 )
 
 from ..base_model.base_model import KnowledgeBaseModel
-from ..typing import (
-    CharFieldType,
-)
+
+if TYPE_CHECKING:
+    from .classification import Classification
+    from .classification_choice_descriptor import ClassificationChoiceDescriptor
 
 
 class ClassificationChoice(KnowledgeBaseModel):
-    classification_choice_descriptor_names: CharFieldType = models.CharField(
-        max_length=2000, null=True, blank=True
-    )  # store as comma-separated UUIDs
+    classification_choice_descriptors: models.ManyToManyField[
+        "ClassificationChoiceDescriptor", "ClassificationChoiceDescriptor"
+    ] = models.ManyToManyField(
+        "ClassificationChoiceDescriptor",
+        related_name="classification_choices",
+        blank=True,
+    )
+    # classification_choice_descriptor_names: OptionalCharFieldType = models.CharField(
+    #     max_length=2000, null=True, blank=True
+    # )  # store as comma-separated UUIDs
+
+    if TYPE_CHECKING:
+        classifications: models.Manager["Classification"]
 
     @property
     def ddict_shallow(self) -> type[ClassificationChoiceShallowDataDict]:
@@ -26,15 +39,69 @@ class ClassificationChoice(KnowledgeBaseModel):
     def ddict(self) -> type[ClassificationChoiceDataDict]:
         return ClassificationChoiceDataDict
 
+    @classmethod
+    def sync_from_ddict_shallow(
+        cls,
+        ddict: ClassificationChoiceShallowDataDict,
+    ) -> Self:
+        """Create a ClassificationChoice model instance from a ClassificationChoiceShallowDataDict.
+
+        Args:
+            ddict (ClassificationChoiceShallowDataDict): The data dictionary to create the model instance from.
+        Returns:
+            ClassificationChoice: The created ClassificationChoice model instance.
+        """
+        descriptor_names = ddict["classification_choice_descriptor_names"]
+        defaults = dict(ddict)
+        defaults.pop("classification_choice_descriptor_names", None)
+
+        obj, created = cls.objects.get_or_create(uuid=ddict["uuid"], defaults=defaults)
+
+        if not created:
+            for key, value in defaults.items():
+                setattr(obj, key, value)
+
+        obj.update_classification_choice_descriptors_by_names(descriptor_names)
+
+        return obj
+
+    # TODO def sync_to_ddict_shallow()
+
+    def update_classification_choice_descriptors_by_names(
+        self,
+        descriptor_names: list[str],
+    ) -> None:
+        """Update the classification_choice_descriptors ManyToManyField based on a list of names.
+
+        Args:
+            descriptor_names (list[str]): List of classification choice descriptor names.
+        """
+        from .classification_choice_descriptor import ClassificationChoiceDescriptor
+
+        descriptors = ClassificationChoiceDescriptor.objects.filter(
+            name__in=descriptor_names
+        )
+        retrieved_descriptor_names = set(descriptor.name for descriptor in descriptors)
+        missing_names = set(descriptor_names) - retrieved_descriptor_names
+        if missing_names:
+            raise ValueError(
+                f"ClassificationChoiceDescriptors with names {missing_names} do not exist."
+            )
+        self.classification_choice_descriptors.set(descriptors)
+        self.save()
+
     def to_ddict_shallow(self) -> ClassificationChoiceShallowDataDict:
         """Convert the ClassificationChoice model instance to a ClassificationChoiceShallowDataDict.
 
         Returns:
             ClassificationChoiceShallowDataDict: The converted data dictionary.
         """
-        data_dict = self._to_ddict()
-        data_dict["classification_choice_descriptor_names"] = self.str_list_to_list(
-            self.classification_choice_descriptor_names
-        )
-        ddict = self.ddict_shallow(**data_dict)
-        return ddict
+        ddict = self._to_ddict()
+        ddict.pop("classification_choice_descriptors", None)
+        # Serialize classification_choice_descriptor_names
+        desc_names = [
+            desc.name for desc in self.classification_choice_descriptors.all()
+        ]
+        ddict["classification_choice_descriptor_names"] = desc_names
+        ddict = self.ddict_shallow(**ddict)  # type: ignore[assignment]
+        return ddict  # type: ignore[return-value]

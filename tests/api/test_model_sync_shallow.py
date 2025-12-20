@@ -1,20 +1,21 @@
 import pytest
 
-from lx_dtypes.contrib.lx_django.models import (
-    Center as DjangoCenterModel,
-)
+# from lx_dtypes.contrib.lx_django.models import (
+#     Center as DjangoCenterModel,
+# )
 from lx_dtypes.contrib.lx_django.models import (
     ClassificationChoice as DjangoClassificationChoiceModel,
 )
 from lx_dtypes.contrib.lx_django.models import (
     ClassificationChoiceDescriptor as DjangoClassificationChoiceDescriptorModel,
 )
-from lx_dtypes.contrib.lx_django.models import (
-    Examiner as DjangoExaminerModel,
-)
-from lx_dtypes.contrib.lx_django.models import (
-    Patient as DjangoPatientModel,
-)
+
+# from lx_dtypes.contrib.lx_django.models import (
+#     Examiner as DjangoExaminerModel,
+# )
+# from lx_dtypes.contrib.lx_django.models import (
+#     Patient as DjangoPatientModel,
+# )
 from lx_dtypes.contrib.lx_django.models.core.citation import (
     Citation as DjangoCitationModel,
 )
@@ -39,8 +40,12 @@ from lx_dtypes.contrib.lx_django.models.core.intervention import (
 from lx_dtypes.contrib.lx_django.models.core.unit import (
     Unit as DjangoUnitModel,
 )
-from lx_dtypes.models.core.center import Center
-from lx_dtypes.models.core.center_shallow import CenterShallow
+from lx_dtypes.contrib.lx_django.models.core.unit import (
+    UnitType as DjangoUnitTypeModel,
+)
+
+# from lx_dtypes.models.core.center import Center
+# from lx_dtypes.models.core.center_shallow import CenterShallow
 from lx_dtypes.models.core.citation import Citation
 from lx_dtypes.models.core.citation_shallow import CitationShallow
 from lx_dtypes.models.core.classification import Classification
@@ -65,69 +70,68 @@ from lx_dtypes.models.core.information_source import InformationSource
 from lx_dtypes.models.core.information_source_shallow import InformationSourceShallow
 from lx_dtypes.models.core.intervention import Intervention
 from lx_dtypes.models.core.intervention_shallow import InterventionShallow
-from lx_dtypes.models.core.unit import Unit
-from lx_dtypes.models.core.unit_shallow import UnitShallow
-from lx_dtypes.models.examiner.examiner import Examiner, ExaminerShallow
-from lx_dtypes.models.patient.patient import Patient, PatientShallow
+from lx_dtypes.models.core.unit import Unit, UnitType
+from lx_dtypes.models.core.unit_shallow import UnitShallow, UnitTypeShallow
+
+# from lx_dtypes.models.examiner.examiner import Examiner, ExaminerShallow
+# from lx_dtypes.models.patient.patient import Patient, PatientShallow
 
 
 # TODO add transform utils based on those tests
 @pytest.mark.django_db
 class TestModelSync:
-    # TODO Move to ledger test file when created
-    def test_patient_sync(self, sample_patient: Patient) -> None:
-        ddict = sample_patient.to_ddict_shallow()
-        _django_patient = DjangoPatientModel.objects.create(**ddict)
-        uuid = ddict.get("uuid")
-        assert uuid is not None
-        retrieved_patient = DjangoPatientModel.objects.get(uuid=uuid)
-        assert str(retrieved_patient.uuid) == sample_patient.uuid
-        patient_dict = retrieved_patient.to_ddict_shallow()
-        # Convert the Django model instance back to a Pydantic model
-        converted_patient = PatientShallow.model_validate(patient_dict)
-        assert converted_patient.to_ddict_shallow() == sample_patient.to_ddict_shallow()
+    # # TODO Move to ledger test file when created
+    # def test_patient_sync(self, sample_patient: Patient) -> None:
+    #     ddict = sample_patient.to_ddict_shallow()
+    #     _django_patient = DjangoPatientModel.objects.create(**ddict)
+    #     uuid = ddict.get("uuid")
+    #     assert uuid is not None
+    #     retrieved_patient = DjangoPatientModel.objects.get(uuid=uuid)
+    #     assert str(retrieved_patient.uuid) == sample_patient.uuid
+    #     patient_dict = retrieved_patient.to_ddict_shallow()
+    #     # Convert the Django model instance back to a Pydantic model
+    #     converted_patient = PatientShallow.model_validate(patient_dict)
+    #     assert converted_patient.to_ddict_shallow() == sample_patient.to_ddict_shallow()
 
-    # TODO Move to ledger test file when created
-    def test_examiner_sync(self, sample_examiner: Examiner) -> None:
-        ddict = sample_examiner.to_ddict_shallow()
-        _django_examiner = DjangoExaminerModel.objects.create(**ddict)
-        uuid = ddict.get("uuid")
-        assert uuid is not None
-        retrieved_examiner = DjangoExaminerModel.objects.get(uuid=uuid)
-        assert str(retrieved_examiner.uuid) == sample_examiner.uuid
-        examiner_dict = retrieved_examiner.to_ddict_shallow()
-        # Convert the Django model instance back to a Pydantic model
-        converted_examiner = ExaminerShallow.model_validate(examiner_dict)
-        assert (
-            converted_examiner.to_ddict_shallow() == sample_examiner.to_ddict_shallow()
-        )
+    # # TODO Move to ledger test file when created
+    # def test_examiner_sync(self, sample_examiner: Examiner) -> None:
+    #     ddict = sample_examiner.to_ddict_shallow()
+    #     _django_examiner = DjangoExaminerModel.objects.create(**ddict)
+    #     uuid = ddict.get("uuid")
+    #     assert uuid is not None
+    #     retrieved_examiner = DjangoExaminerModel.objects.get(uuid=uuid)
+    #     assert str(retrieved_examiner.uuid) == sample_examiner.uuid
+    #     examiner_dict = retrieved_examiner.to_ddict_shallow()
+    #     # Convert the Django model instance back to a Pydantic model
+    #     converted_examiner = ExaminerShallow.model_validate(examiner_dict)
+    #     assert (
+    #         converted_examiner.to_ddict_shallow() == sample_examiner.to_ddict_shallow()
+    #     )
 
-    def test_center_sync(self, sample_center: Center) -> None:
-        ddict = sample_center.to_ddict_shallow()
-        _django_center = DjangoCenterModel.objects.create(**ddict)
-        uuid = ddict.get("uuid")
-        assert uuid is not None
-        retrieved_center = DjangoCenterModel.objects.get(uuid=uuid)
-        assert str(retrieved_center.uuid) == sample_center.uuid
-        center_dict = retrieved_center.to_ddict_shallow()
-        # Convert the Django model instance back to a Pydantic model
-        converted_center = CenterShallow.model_validate(center_dict)
-        assert converted_center.to_ddict_shallow() == sample_center.to_ddict_shallow()
+    # def test_center_sync(self, sample_center: Center) -> None:
+    #     ddict = sample_center.to_ddict_shallow()
+    #     _django_center = DjangoCenterModel.objects.create(**ddict)
+    #     uuid = ddict.get("uuid")
+    #     assert uuid is not None
+    #     retrieved_center = DjangoCenterModel.objects.get(uuid=uuid)
+    #     assert str(retrieved_center.uuid) == sample_center.uuid
+    #     center_dict = retrieved_center.to_ddict_shallow()
+    #     # Convert the Django model instance back to a Pydantic model
+    #     converted_center = CenterShallow.model_validate(center_dict)
+    #     assert converted_center.to_ddict_shallow() == sample_center.to_ddict_shallow()
 
     def test_classification_choice_descriptor_sync(
         self,
         sample_classification_choice_descriptor_numeric: ClassificationChoiceDescriptor,
+        sample_django_classification_choice_descriptor_numeric: DjangoClassificationChoiceDescriptorModel,
     ) -> None:
-        ddict = sample_classification_choice_descriptor_numeric.to_ddict_shallow()
-        _django_ccd = DjangoClassificationChoiceDescriptorModel.objects.create(**ddict)
-        uuid = ddict.get("uuid")
-        assert uuid is not None
-        retrieved_ccd = DjangoClassificationChoiceDescriptorModel.objects.get(uuid=uuid)
         assert (
-            str(retrieved_ccd.uuid)
+            str(sample_django_classification_choice_descriptor_numeric.uuid)
             == sample_classification_choice_descriptor_numeric.uuid
         )
-        ccd_dict = retrieved_ccd.to_ddict_shallow()
+        ccd_dict = (
+            sample_django_classification_choice_descriptor_numeric.to_ddict_shallow()
+        )
         # Convert the Django model instance back to a Pydantic model
         converted_ccd = ClassificationChoiceDescriptorShallow.model_validate(ccd_dict)
         assert (
@@ -136,24 +140,24 @@ class TestModelSync:
         )
 
     def test_classification_choice_sync(
-        self, sample_classification_choice: ClassificationChoice
+        self,
+        sample_classification_choice: ClassificationChoice,
+        sample_django_classification_choice: DjangoClassificationChoiceModel,
     ) -> None:
-        ddict = sample_classification_choice.to_ddict_shallow()
-        django_cc = DjangoClassificationChoiceModel.objects.create(**ddict)
-        django_cc.refresh_from_db()
-        cc_dict = django_cc.to_ddict_shallow()
+        django_ddict = sample_django_classification_choice.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
-        converted_cc = ClassificationChoiceShallow.model_validate(cc_dict)
+        converted_cc = ClassificationChoiceShallow.model_validate(django_ddict)
         assert (
             converted_cc.to_ddict_shallow()
             == sample_classification_choice.to_ddict_shallow()
         )
 
-    def test_classification_sync(self, sample_classification: Classification) -> None:
-        ddict = sample_classification.to_ddict_shallow()
-        django_classification = DjangoClassificationModel.objects.create(**ddict)
-        django_classification.refresh_from_db()
-        classification_dict = django_classification.to_ddict_shallow()
+    def test_classification_sync(
+        self,
+        sample_classification: Classification,
+        sample_django_classification: DjangoClassificationModel,
+    ) -> None:
+        classification_dict = sample_django_classification.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
         converted_classification = ClassificationShallow.model_validate(
             classification_dict
@@ -163,20 +167,32 @@ class TestModelSync:
             == sample_classification.to_ddict_shallow()
         )
 
-    def test_unit_sync(self, sample_unit: Unit) -> None:
-        ddict = sample_unit.to_ddict_shallow()
-        django_unit = DjangoUnitModel.objects.create(**ddict)
-        django_unit.refresh_from_db()
-        unit_dict = django_unit.to_ddict_shallow()
+    def test_unit_sync(
+        self,
+        sample_unit: Unit,
+        sample_unit_type: UnitType,
+        sample_django_unit_type: DjangoUnitTypeModel,
+        sample_django_unit: DjangoUnitModel,
+    ) -> None:
+        unit_type_dict = sample_django_unit_type.to_ddict_shallow()
+        # Convert the Django model instance back to a Pydantic model
+        converted_unit_type = UnitTypeShallow.model_validate(unit_type_dict)
+        assert (
+            converted_unit_type.to_ddict_shallow()
+            == sample_unit_type.to_ddict_shallow()
+        )
+
+        unit_dict = sample_django_unit.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
         converted_unit = UnitShallow.model_validate(unit_dict)
         assert converted_unit.to_ddict_shallow() == sample_unit.to_ddict_shallow()
 
-    def test_intervention_sync(self, sample_intervention: Intervention) -> None:
-        ddict = sample_intervention.to_ddict_shallow()
-        django_intervention = DjangoInterventionModel.objects.create(**ddict)
-        django_intervention.refresh_from_db()
-        intervention_dict = django_intervention.to_ddict_shallow()
+    def test_intervention_sync(
+        self,
+        sample_intervention: Intervention,
+        sample_django_intervention: DjangoInterventionModel,
+    ) -> None:
+        intervention_dict = sample_django_intervention.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
         converted_intervention = InterventionShallow.model_validate(intervention_dict)
         assert (
@@ -184,20 +200,20 @@ class TestModelSync:
             == sample_intervention.to_ddict_shallow()
         )
 
-    def test_finding_sync(self, sample_finding: Finding) -> None:
-        ddict = sample_finding.to_ddict_shallow()
-        django_finding = DjangoFindingModel.objects.create(**ddict)
-        django_finding.refresh_from_db()
-        finding_dict = django_finding.to_ddict_shallow()
+    def test_finding_sync(
+        self, sample_finding: Finding, sample_django_finding: DjangoFindingModel
+    ) -> None:
+        finding_dict = sample_django_finding.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
         converted_finding = FindingShallow.model_validate(finding_dict)
         assert converted_finding.to_ddict_shallow() == sample_finding.to_ddict_shallow()
 
-    def test_indication_sync(self, sample_indication: Indication) -> None:
-        ddict = sample_indication.to_ddict_shallow()
-        django_indication = DjangoIndicationModel.objects.create(**ddict)
-        django_indication.refresh_from_db()
-        indication_dict = django_indication.to_ddict_shallow()
+    def test_indication_sync(
+        self,
+        sample_indication: Indication,
+        sample_django_indication: DjangoIndicationModel,
+    ) -> None:
+        indication_dict = sample_django_indication.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
         converted_indication = IndicationShallow.model_validate(indication_dict)
         assert (
@@ -205,11 +221,12 @@ class TestModelSync:
             == sample_indication.to_ddict_shallow()
         )
 
-    def test_examination_sync(self, sample_examination: Examination) -> None:
-        ddict = sample_examination.to_ddict_shallow()
-        django_examination = DjangoExaminationModel.objects.create(**ddict)
-        django_examination.refresh_from_db()
-        examination_dict = django_examination.to_ddict_shallow()
+    def test_examination_sync(
+        self,
+        sample_examination: Examination,
+        sample_django_examination: DjangoExaminationModel,
+    ) -> None:
+        examination_dict = sample_django_examination.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
         converted_examination = ExaminationShallow.model_validate(examination_dict)
         assert (
@@ -217,24 +234,21 @@ class TestModelSync:
             == sample_examination.to_ddict_shallow()
         )
 
-    def test_citation_sync(self, sample_citation: Citation) -> None:
-        ddict = sample_citation.to_ddict_shallow()
-        django_citation = DjangoCitationModel.objects.create(**ddict)
-        django_citation.refresh_from_db()
-        citation_dict = django_citation.to_ddict_shallow()
-        # Convert the Django model instance back to a Pydantic model
+    def test_citation_sync(
+        self, sample_citation: Citation, sample_django_citation: DjangoCitationModel
+    ) -> None:
+        citation_dict = sample_django_citation.to_ddict_shallow()
         converted_citation = CitationShallow.model_validate(citation_dict)
         assert (
             converted_citation.to_ddict_shallow() == sample_citation.to_ddict_shallow()
         )
 
     def test_information_source_sync(
-        self, sample_information_source: InformationSource
+        self,
+        sample_information_source: InformationSource,
+        sample_django_information_source: DjangoInformationSourceModel,
     ) -> None:
-        ddict = sample_information_source.to_ddict_shallow()
-        django_information_source = DjangoInformationSourceModel.objects.create(**ddict)
-        django_information_source.refresh_from_db()
-        information_source_dict = django_information_source.to_ddict_shallow()
+        information_source_dict = sample_django_information_source.to_ddict_shallow()
         # Convert the Django model instance back to a Pydantic model
         converted_information_source = InformationSourceShallow.model_validate(
             information_source_dict

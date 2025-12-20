@@ -16,7 +16,19 @@ class TestSyncKnowledgeBase:
         log_writer: Callable[..., Log],
     ) -> None:
         kb = lx_knowledge_base
-        kb_config = kb.config_safe
+        kb_entries_by_module_name = kb.kb_entries_by_module_name()
 
-        for module in kb_config.modules:
-            log_writer(module)
+        kb_config = kb.config
+        assert kb_config is not None
+
+        ordered_module_names = kb_config.modules
+
+        for module_name in ordered_module_names:
+            assert module_name in kb_entries_by_module_name
+            #
+
+        # for module_name, entries in kb_entries_by_module_name.items():
+        #     log_writer(
+        #         f"Module '{module_name}' has {len(entries)} entries.",
+        #         context={"module_name": module_name, "entry_count": str(len(entries))},
+        #     )

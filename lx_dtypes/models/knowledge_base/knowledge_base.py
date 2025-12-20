@@ -1,9 +1,22 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Self, TypedDict, Union
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Self,
+    Tuple,
+    TypedDict,
+    Union,
+)
 
 import yaml
 from pydantic import Field, field_serializer
 
+from lx_dtypes.models.base_models.base_model import (
+    AppBaseModelNamesUUIDTags,
+    KnowledgeBaseModel,
+)
 from lx_dtypes.models.core import (
     CitationShallow,
     CitationShallowDataDict,
@@ -42,7 +55,7 @@ from lx_dtypes.models.core import (
 # if TYPE_CHECKING:
 #     from lx_dtypes.stats.dataset import KnowledgeBaseDataset
 from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
-from lx_dtypes.models.base_models.base_model import AppBaseModelNamesUUIDTags
+from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
 
 class KnowledgeBaseRecordLists(TypedDict):
@@ -167,7 +180,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         for sm_file in submodule_files:
             from lx_dtypes.utils.parser import parse_shallow_object
 
-            parsed_object_generator = parse_shallow_object(sm_file)
+            parsed_object_generator = parse_shallow_object(sm_file, kb_module_name=name)
             for parsed_object in parsed_object_generator:
                 if isinstance(parsed_object, CitationShallow):
                     kb.citations[parsed_object.name] = parsed_object
@@ -671,3 +684,48 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         )
 
         return record_lists
+
+    def kb_entries_by_module_name(
+        self,
+    ) -> Dict[str, List[Tuple[str, KnowledgeBaseModel]]]:
+        """Get knowledge base entries (Shallow Models) organized by their module names."""
+
+        export_attrs = [
+            "citations",
+            "findings",
+            "finding_types",
+            "classifications",
+            "classification_types",
+            "classification_choices",
+            "classification_choice_descriptors",
+            "examinations",
+            "examination_types",
+            "indications",
+            "indication_types",
+            "interventions",
+            "intervention_types",
+            "information_sources",
+            "units",
+            "unit_types",
+        ]
+
+        cfg = self.config_safe
+        module_names = cfg.modules
+        entries_by_module: Dict[str, List[Tuple[str, KnowledgeBaseModel]]] = {
+            module_name: [] for module_name in module_names
+        }
+        entries_by_module[str_unknown_factory()] = []
+
+        for attr in export_attrs:
+            kb_dict: Dict[str, KnowledgeBaseModel] = getattr(self, attr)
+            kb_entry_list: List[KnowledgeBaseModel] = list(kb_dict.values())
+            assert isinstance(kb_entry_list, list)
+            for entry in kb_entry_list:
+                module_name = entry.kb_module_name
+                if module_name not in entries_by_module:
+                    raise KeyError(
+                        f"Module name '{module_name}' not found in knowledge base config."
+                    )
+                entries_by_module[module_name].append((attr, entry))
+
+        return entries_by_module

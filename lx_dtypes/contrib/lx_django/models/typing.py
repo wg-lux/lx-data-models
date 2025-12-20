@@ -13,6 +13,9 @@ if TYPE_CHECKING:
         datetime.date | None, datetime.date | None
     ]
     JSONFieldType: TypeAlias = models.JSONField[Dict[str, Any], Dict[str, Any]]
+    OptionalJSONFieldType: TypeAlias = models.JSONField[
+        Dict[str, Any] | None, Dict[str, Any] | None
+    ]
     DateTimeField: TypeAlias = models.DateTimeField[
         datetime.datetime, datetime.datetime
     ]
@@ -31,6 +34,7 @@ else:  # Runtime fallbacks keep Django field classes unsubscripted
     OptionalEmailFieldType: TypeAlias = models.EmailField
     OptionalDateFieldType: TypeAlias = models.DateField
     JSONFieldType: TypeAlias = models.JSONField
+    OptionalJSONFieldType: TypeAlias = models.JSONField
     DateTimeField: TypeAlias = models.DateTimeField
     OptionalDateTimeField: TypeAlias = models.DateTimeField
     FloatFieldType: TypeAlias = models.FloatField

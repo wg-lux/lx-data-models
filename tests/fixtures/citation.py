@@ -1,5 +1,8 @@
 from pytest import fixture
 
+from lx_dtypes.contrib.lx_django.models.core.citation import (
+    Citation as DjangoCitationModel,
+)
 from lx_dtypes.models.core.citation import Citation
 
 
@@ -17,3 +20,11 @@ def sample_citation() -> Citation:
         url="https://example.com/sample-citation",
         keywords=["testing", "sample", "citation"],
     )
+
+
+@fixture(scope="function")
+def sample_django_citation(sample_citation: Citation) -> DjangoCitationModel:
+    ddict = sample_citation.to_ddict_shallow()
+    django_citation = DjangoCitationModel.sync_from_ddict_shallow(ddict)
+    django_citation.refresh_from_db()
+    return django_citation

@@ -4,8 +4,8 @@ from lx_dtypes.models.patient.patient import PatientDataDict
 
 from ..base_model.person import PersonModel
 from ..typing import (
-    JSONFieldType,
     OptionalCharFieldType,
+    OptionalJSONFieldType,
 )
 
 
@@ -15,7 +15,9 @@ class Patient(PersonModel):
             max_length=255, null=True, blank=True
         )
     )
-    external_ids: JSONFieldType = models.JSONField(null=True, blank=True, default=dict)
+    external_ids: OptionalJSONFieldType = models.JSONField(
+        null=True, blank=True, default=dict
+    )
 
     @property
     def ddict(self) -> type[PatientDataDict]:

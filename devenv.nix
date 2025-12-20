@@ -94,6 +94,8 @@ in
       uv run python manage.py makemigrations ${DJANGO_APP_NAME}
     '';
 
+    mp.exec = "uv run python -m mypy lx_dtypes";
+
     mkdocs.exec = ''
       uv run make -C docs html
       uv run make -C docs linkcheck

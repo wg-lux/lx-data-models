@@ -10,9 +10,9 @@ from lx_dtypes.models.core.citation_shallow import (
 from ..base_model.base_model import KnowledgeBaseModel
 from ..typing import (
     CharFieldType,
-    IntegerFieldType,
     JSONFieldType,
     OptionalCharFieldType,
+    OptionalIntegerFieldType,
 )
 
 
@@ -27,7 +27,9 @@ class Citation(KnowledgeBaseModel):
     authors: CharFieldType = models.CharField(
         max_length=2000, blank=True
     )  # store as comma-separated names
-    publication_year: IntegerFieldType = models.IntegerField(null=True, blank=True)
+    publication_year: OptionalIntegerFieldType = models.IntegerField(
+        null=True, blank=True
+    )
     publication_month: OptionalCharFieldType = models.CharField(
         max_length=20, null=True, blank=True
     )
@@ -60,6 +62,27 @@ class Citation(KnowledgeBaseModel):
         max_length=2000, blank=True
     )  # store as comma-separated keywords
     identifiers: JSONFieldType = models.JSONField(default=dict, blank=True)
+
+    @classmethod
+    def sync_from_ddict_shallow(cls, ddict: CitationShallowDataDict) -> "Citation":
+        """Create a Citation model instance from a CitationShallowDataDict.
+
+        Args:
+            ddict (CitationShallowDataDict): The data dictionary to create the model instance from.
+        Returns:
+            Citation: The created Citation model instance.
+        """
+        defaults = dict(ddict)
+        defaults["authors"] = cls.str_list_to_list(ddict.get("authors", []))
+        defaults["keywords"] = cls.str_list_to_list(ddict.get("keywords", []))
+
+        obj, created = cls.objects.get_or_create(uuid=ddict["uuid"], defaults=defaults)
+        if not created:
+            for key, value in defaults.items():
+                setattr(obj, key, value)
+            obj.save()
+
+        return obj
 
     @property
     def ddict_shallow(self) -> type[CitationShallowDataDict]:

@@ -13,7 +13,8 @@ dependencies = [
   "bibtexparser>=1.4.0",
   "django>=6.0",
   "django-ninja>=1.5.1",
-  "django-stubs>=5.2.8",
+  "django-stubs[compatible-mypy]>=5.2.8",
+  "django-stubs-ext>=5.2.8",
   "icecream>=2.1.4",
   "numpy>=2.2.3",
   "opencv-python>=4.12.0.88",
@@ -82,14 +83,31 @@ docs = [
 Homepage = "https://info.coloreg.de"
 Repository = "https://github.com/wg-lux/lx-data-models"
 
+[tool.pyright]
+# These settings help fix the "Unknown" errors specifically
+# reportMissingTypeStubs = false
+# reportUnknownMemberType = false
+# reportUnknownVariableType = false
+
+exclude = [
+  "**/migrations/**",
+  "**/manage.py",
+  "**/settings.py",
+]
+useLibraryCodeForTypes = true
+
 [tool.mypy]
 exclude = '^(\.venv|venv|env)/'
-plugins = ["pandera.mypy"]
+mypy_path = "."
+plugins = ["pandera.mypy", "mypy_django_plugin.main"]
 strict = true
 warn_unused_ignores = false
 
+[tool.django-stubs]
+django_settings_module = "lx_dtypes.django_settings"
+
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "tests.django_settings"
+DJANGO_SETTINGS_MODULE = "lx_dtypes.django_settings"
 addopts = """
     -n auto
     --dist=loadscope
