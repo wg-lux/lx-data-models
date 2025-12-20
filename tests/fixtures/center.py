@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from lx_dtypes.models.core.center import Center
+from lx_dtypes.models.ledger.center import Center
 
 
 @fixture(scope="session")

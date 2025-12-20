@@ -1,4 +1,4 @@
-from .center import Center
+from ..ledger.center import Center
 from .citation import Citation
 from .citation_shallow import CitationShallow, CitationShallowDataDict
 from .classification import Classification, ClassificationType

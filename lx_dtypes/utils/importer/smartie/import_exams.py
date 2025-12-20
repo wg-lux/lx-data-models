@@ -2,7 +2,7 @@ import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, List
 
-from lx_dtypes.models.patient.patient_examination import (
+from lx_dtypes.models.ledger.patient_examination import (
     PatientExamination,
     # PatientExaminationDataDict,
 )
@@ -11,7 +11,7 @@ from lx_dtypes.models.patient.patient_examination import (
 #     PatientFinding,
 #     PatientFindingDataDict,
 # )
-from lx_dtypes.models.patient.patient_ledger import PatientLedger
+from lx_dtypes.models.ledger.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface.main import PatientInterface
 
 from .map_utils import EXAM_MAP_FUNCTIONS
@@ -49,7 +49,7 @@ def smartie_centers_and_examiners_to_ledger(
     examiner_abbr2uuid: dict[str, str],
     center_abbr2uuid: dict[str, str],
 ) -> None:
-    from lx_dtypes.models.examiner.examiner import ExaminerDataDict
+    from lx_dtypes.models.ledger.examiner import ExaminerDataDict
 
     for exam in exams:
         examiner_abbr = exam.examiner

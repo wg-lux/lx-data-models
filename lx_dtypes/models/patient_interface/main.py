@@ -1,16 +1,16 @@
 from typing import List, Union
 
 from lx_dtypes.models.knowledge_base import KnowledgeBase
-from lx_dtypes.models.patient.patient import Patient
-from lx_dtypes.models.patient.patient_classification_choice_descriptor import (
+from lx_dtypes.models.ledger.patient import Patient
+from lx_dtypes.models.ledger.patient_classification_choice_descriptor import (
     PatientFindingClassificationChoiceDescriptor,
 )
-from lx_dtypes.models.patient.patient_examination import PatientExamination
-from lx_dtypes.models.patient.patient_finding import PatientFinding
-from lx_dtypes.models.patient.patient_finding_classification_choice import (
+from lx_dtypes.models.ledger.patient_examination import PatientExamination
+from lx_dtypes.models.ledger.patient_finding import PatientFinding
+from lx_dtypes.models.ledger.patient_finding_classification_choice import (
     PatientFindingClassificationChoice,
 )
-from lx_dtypes.models.patient.patient_ledger import PatientLedger
+from lx_dtypes.models.ledger.patient_ledger import PatientLedger
 from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from .patient_interface_create import (

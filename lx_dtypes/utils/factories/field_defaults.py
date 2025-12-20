@@ -10,18 +10,18 @@ if TYPE_CHECKING:
     from lx_dtypes.models.core.information_source import InformationSourceType
     from lx_dtypes.models.core.intervention import Intervention, InterventionType
     from lx_dtypes.models.core.unit import UnitType
-    from lx_dtypes.models.examiner.examiner import Examiner
-    from lx_dtypes.models.patient.patient_classification_choice_descriptor import (
+    from lx_dtypes.models.ledger.examiner import Examiner
+    from lx_dtypes.models.ledger.patient_classification_choice_descriptor import (
         PatientFindingClassificationChoiceDescriptor,
     )
-    from lx_dtypes.models.patient.patient_finding import PatientFinding
-    from lx_dtypes.models.patient.patient_finding_classification_choice import (
+    from lx_dtypes.models.ledger.patient_finding import PatientFinding
+    from lx_dtypes.models.ledger.patient_finding_classification_choice import (
         PatientFindingClassificationChoice,
     )
-    from lx_dtypes.models.patient.patient_finding_classifications import (
+    from lx_dtypes.models.ledger.patient_finding_classifications import (
         PatientFindingClassifications,
     )
-    from lx_dtypes.models.patient.patient_indication import PatientIndication
+    from lx_dtypes.models.ledger.patient_indication import PatientIndication
 
 
 def str_unknown_factory() -> Literal["unknown"]:

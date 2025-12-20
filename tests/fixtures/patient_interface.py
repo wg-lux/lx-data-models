@@ -1,8 +1,8 @@
 from pytest import fixture
 
 from lx_dtypes.models.knowledge_base import KnowledgeBase
-from lx_dtypes.models.patient.patient import Patient
-from lx_dtypes.models.patient.patient_ledger import PatientLedger
+from lx_dtypes.models.ledger.patient import Patient
+from lx_dtypes.models.ledger.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface import PatientInterface
 
 

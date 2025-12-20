@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.patient.patient_examination import PatientExamination
-    from lx_dtypes.models.patient.patient_finding_classification_choice import (
+    from lx_dtypes.models.ledger.patient_examination import PatientExamination
+    from lx_dtypes.models.ledger.patient_finding_classification_choice import (
         PatientFindingClassificationChoice,
     )
     from lx_dtypes.models.patient_interface import PatientInterface
@@ -15,7 +15,7 @@ def add_classification_choice_to_finding(
     classification_name: str,
     choice_name: str,
 ) -> "PatientFindingClassificationChoice":
-    from lx_dtypes.models.patient.patient_finding_classification_choice import (
+    from lx_dtypes.models.ledger.patient_finding_classification_choice import (
         PatientFindingClassificationChoice,
     )
 

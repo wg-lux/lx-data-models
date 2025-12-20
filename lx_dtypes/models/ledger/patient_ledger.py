@@ -2,15 +2,15 @@ from typing import TYPE_CHECKING, Any, Dict, List, TypedDict
 
 from pydantic import Field, field_serializer
 
-from lx_dtypes.models.core.center import Center, CenterDataDict
-from lx_dtypes.models.examiner.examiner import Examiner
-from lx_dtypes.models.patient.patient import Patient, PatientDataDict
+from lx_dtypes.models.ledger.center import Center, CenterDataDict
+from lx_dtypes.models.ledger.examiner import Examiner
+from lx_dtypes.models.ledger.patient import Patient, PatientDataDict
 from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from .patient_examination import PatientExamination, PatientExaminationDataDict
 
 if TYPE_CHECKING:  # pragma: no cover
-    from lx_dtypes.models.examiner.examiner import Examiner, ExaminerDataDict
+    from lx_dtypes.models.ledger.examiner import Examiner, ExaminerDataDict
 
 
 class PatientLedgerDataDict(TypedDict):

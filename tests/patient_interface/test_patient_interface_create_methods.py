@@ -1,7 +1,7 @@
 from typing import Tuple
 
-from lx_dtypes.models.patient.patient_examination import PatientExamination
-from lx_dtypes.models.patient.patient_finding import PatientFinding
+from lx_dtypes.models.ledger.patient_examination import PatientExamination
+from lx_dtypes.models.ledger.patient_finding import PatientFinding
 from lx_dtypes.models.patient_interface import PatientInterface
 
 

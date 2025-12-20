@@ -1,7 +1,7 @@
 from pytest import fixture
 
 from lx_dtypes.models.base_models.person import Person
-from lx_dtypes.models.examiner.examiner import (
+from lx_dtypes.models.ledger.examiner import (
     Examiner,
 )
 

@@ -2,7 +2,7 @@ from typing import Dict, List, NotRequired, Optional, Self, TypedDict, Union
 
 from pydantic import Field, field_serializer
 
-from lx_dtypes.models.patient.patient_finding_classification_choice import (
+from lx_dtypes.models.ledger.patient_finding_classification_choice import (
     PatientFindingClassificationChoice,
 )
 from lx_dtypes.utils.factories.field_defaults import (

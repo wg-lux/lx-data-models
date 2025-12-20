@@ -11,8 +11,8 @@ from .core.indication import Indication, IndicationType
 from .core.information_source import InformationSource, InformationSourceType
 from .core.intervention import Intervention, InterventionType
 from .core.unit import Unit, UnitType
-from .examiner.examiner import Examiner
-from .patient.patient import Patient
+from .ledger.examiner import Examiner
+from .ledger.patient import Patient
 
 __all__ = [
     "Patient",

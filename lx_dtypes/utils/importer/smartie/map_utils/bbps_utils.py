@@ -1,6 +1,6 @@
 from typing import List, Optional, Tuple
 
-from lx_dtypes.models.patient.patient_finding import PatientFinding
+from lx_dtypes.models.ledger.patient_finding import PatientFinding
 from lx_dtypes.models.patient_interface.main import PatientInterface
 from lx_dtypes.utils.importer.smartie.names import (
     SMARTIE_CLASSIFICATION_CHOICE_ENUM,

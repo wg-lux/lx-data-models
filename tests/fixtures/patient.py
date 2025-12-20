@@ -1,7 +1,7 @@
 from pytest import fixture
 
 from lx_dtypes.models.base_models.person import Person
-from lx_dtypes.models.patient.patient import (
+from lx_dtypes.models.ledger.patient import (
     Patient,
     PatientDataDict,
     PatientDataShallowDict,

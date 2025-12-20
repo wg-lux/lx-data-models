@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from lx_dtypes.models.patient.patient import Patient
+from lx_dtypes.models.ledger.patient import Patient
 from lx_dtypes.utils.initialized_models import PatientLedger
 
 

@@ -95,6 +95,7 @@ in
     '';
 
     mp.exec = "uv run python -m mypy lx_dtypes";
+    pc.exec = "pre-commit run --all-files";
 
     mkdocs.exec = ''
       uv run make -C docs html

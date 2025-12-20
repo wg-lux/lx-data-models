@@ -1,15 +1,15 @@
 from django.db import models
 
-from lx_dtypes.models.examiner.examiner import ExaminerDataDict
+from lx_dtypes.models.ledger.patient import PatientDataDict
 
 from ..base_model.person import PersonModel
 from ..typing import (
-    OptionalJSONFieldType,
     OptionalCharFieldType,
+    OptionalJSONFieldType,
 )
 
 
-class Examiner(PersonModel):
+class Patient(PersonModel):
     center_name: OptionalCharFieldType = (
         models.CharField(  # TODO make foreign key to center model
             max_length=255, null=True, blank=True
@@ -20,13 +20,13 @@ class Examiner(PersonModel):
     )
 
     @property
-    def ddict(self) -> type[ExaminerDataDict]:
-        return ExaminerDataDict
+    def ddict(self) -> type[PatientDataDict]:
+        return PatientDataDict
 
     class Meta(PersonModel.Meta):
         pass
 
-    def to_ddict_shallow(self) -> ExaminerDataDict:
+    def to_ddict_shallow(self) -> PatientDataDict:
         """Convert the Patient model instance to a PatientDataDict.
 
         Returns:

@@ -1,15 +1,15 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.patient.patient_examination import PatientExamination
-    from lx_dtypes.models.patient.patient_finding import PatientFinding
+    from lx_dtypes.models.ledger.patient_examination import PatientExamination
+    from lx_dtypes.models.ledger.patient_finding import PatientFinding
     from lx_dtypes.models.patient_interface import PatientInterface
 
 
 def create_patient_examination(
     patient_interface: "PatientInterface", patient_uuid: str, examination_name: str
 ) -> "PatientExamination":
-    from lx_dtypes.models.patient.patient_examination import PatientExamination
+    from lx_dtypes.models.ledger.patient_examination import PatientExamination
 
     if not patient_interface.examination_exists(examination_name):
         raise ValueError(

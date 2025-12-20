@@ -4,24 +4,24 @@ from typing import List
 import pandas as pd
 
 from lx_dtypes.models.core.center_shallow import CenterShallowDataDict
-from lx_dtypes.models.examiner.examiner import ExaminerShallowDataDict
+from lx_dtypes.models.ledger.examiner import ExaminerShallowDataDict
 from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
-from lx_dtypes.models.patient.patient_classification_choice_descriptor import (
+from lx_dtypes.models.ledger.patient_classification_choice_descriptor import (
     PatientFindingClassificationChoiceDescriptorShallowDataDict,
 )
 
 # from lx_dtypes.models.patient.patient import PatientDataDictShallow
-from lx_dtypes.models.patient.patient_examination import (
+from lx_dtypes.models.ledger.patient_examination import (
     PatientExaminationShallowDataDict,
 )
-from lx_dtypes.models.patient.patient_finding import PatientFindingShallowDataDict
-from lx_dtypes.models.patient.patient_finding_classification_choice import (
+from lx_dtypes.models.ledger.patient_finding import PatientFindingShallowDataDict
+from lx_dtypes.models.ledger.patient_finding_classification_choice import (
     PatientFindingClassificationChoiceShallowDataDict,
 )
-from lx_dtypes.models.patient.patient_finding_classifications import (
+from lx_dtypes.models.ledger.patient_finding_classifications import (
     PatientFindingClassificationsShallowDataDict,
 )
-from lx_dtypes.models.patient.patient_ledger import PatientLedger
+from lx_dtypes.models.ledger.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface import PatientInterface
 
 from .dataset import InterfaceExportDataset, KnowledgeBaseDataset, PatientLedgerDataset

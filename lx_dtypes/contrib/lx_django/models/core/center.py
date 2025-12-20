@@ -1,6 +1,6 @@
 from django.db import models
 
-from lx_dtypes.models.core.center import CenterDataDict
+from lx_dtypes.models.ledger.center import CenterDataDict
 from lx_dtypes.models.core.center_shallow import CenterShallowDataDict
 
 from ..base_model.base_model import KnowledgeBaseModel

@@ -4,8 +4,8 @@ from uuid import uuid4
 
 from pydantic import Field
 
-from lx_dtypes.models.patient.patient import Patient, PatientDataDict
-from lx_dtypes.models.patient.patient_ledger import PatientLedger
+from lx_dtypes.models.ledger.patient import Patient, PatientDataDict
+from lx_dtypes.models.ledger.patient_ledger import PatientLedger
 from lx_dtypes.models.patient_interface.main import PatientInterface
 from lx_dtypes.models.base_models.base_model import AppBaseModel
 

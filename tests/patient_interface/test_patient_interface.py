@@ -1,4 +1,4 @@
-from lx_dtypes.models.patient.patient import Patient
+from lx_dtypes.models.ledger.patient import Patient
 from lx_dtypes.models.patient_interface import PatientInterface
 
 

@@ -2,17 +2,17 @@ from typing import Any, ClassVar
 
 import pandera.pandas as pa
 
-from lx_dtypes.models.examiner.examiner import ExaminerShallow
-from lx_dtypes.models.patient.patient import PatientShallow
-from lx_dtypes.models.patient.patient_classification_choice_descriptor import (
+from lx_dtypes.models.ledger.examiner import ExaminerShallow
+from lx_dtypes.models.ledger.patient import PatientShallow
+from lx_dtypes.models.ledger.patient_classification_choice_descriptor import (
     PatientFindingClassificationChoiceDescriptorShallow,
 )
-from lx_dtypes.models.patient.patient_examination import PatientExaminationShallow
-from lx_dtypes.models.patient.patient_finding import PatientFindingShallow
-from lx_dtypes.models.patient.patient_finding_classification_choice import (
+from lx_dtypes.models.ledger.patient_examination import PatientExaminationShallow
+from lx_dtypes.models.ledger.patient_finding import PatientFindingShallow
+from lx_dtypes.models.ledger.patient_finding_classification_choice import (
     PatientFindingClassificationChoiceShallow,
 )
-from lx_dtypes.models.patient.patient_finding_classifications import (
+from lx_dtypes.models.ledger.patient_finding_classifications import (
     PatientFindingClassificationsShallow,
 )
 from lx_dtypes.models.core.center_shallow import CenterShallow
