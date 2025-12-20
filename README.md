@@ -62,6 +62,32 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
+## Migrations
+
+The following command shortcuts are available for managing migratons, see line below for what they do:
+
+mkmigrations
+	
+ "uv run python manage.py makemigrations ${DJANGO_APP_NAME}";
+
+migrate
+
+ "uv run python manage.py migrate";
+
+runserver 
+
+ "uv run python manage.py runserver";
+
+resetdb
+
+ "rm -f db.sqlite3";
+
+resetmigrations
+
+	rm -rf ${DJANGO_APP_DIR}/migrations/;
+	uv run python manage.py makemigrations ${DJANGO_APP_NAME};
+
+
 ### Initialized Models
 Some pydantic models with ForwardRefs require initialization before use.
 Import initialized models from `lx_dtypes.utils.initialized_models`
