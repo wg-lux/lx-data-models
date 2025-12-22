@@ -2,6 +2,7 @@ from typing import Any, ClassVar
 
 import pandera.pandas as pa
 
+from lx_dtypes.models.ledger.center_shallow import CenterShallow
 from lx_dtypes.models.ledger.examiner import ExaminerShallow
 from lx_dtypes.models.ledger.patient import PatientShallow
 from lx_dtypes.models.ledger.patient_classification_choice_descriptor import (
@@ -15,7 +16,6 @@ from lx_dtypes.models.ledger.patient_finding_classification_choice import (
 from lx_dtypes.models.ledger.patient_finding_classifications import (
     PatientFindingClassificationsShallow,
 )
-from lx_dtypes.models.core.center_shallow import CenterShallow
 
 from .common import COERCE, PANDERA_PYDANTIC_MODEL
 

@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from .fixtures.center import sample_center
+from .fixtures.center import sample_center, sample_center_with_examiners
 from .fixtures.citation import sample_citation, sample_django_citation
 from .fixtures.classification import (
     sample_classification,
@@ -78,7 +78,7 @@ from .fixtures.paths import (
     sample_interventions_yaml_filepath,
     yaml_repo_dirs,
 )
-from .fixtures.patient import sample_patient
+from .fixtures.patient import sample_patient, sample_patient_with_center
 from .fixtures.patient_examination import (
     sample_patient_examination,
     sample_patient_finding_colon_polyp,
@@ -178,4 +178,6 @@ __all__ = [
     "sample_django_citation",
     "sample_django_information_source_type",
     "sample_django_information_source",
+    "sample_center_with_examiners",
+    "sample_patient_with_center",
 ]

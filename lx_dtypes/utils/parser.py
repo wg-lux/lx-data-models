@@ -8,7 +8,6 @@ from lx_dtypes.models.core import (
     ExaminationShallow,
     InformationSourceShallow,
 )
-from lx_dtypes.models.core.center_shallow import CenterShallow
 from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallow,
 )
@@ -30,6 +29,7 @@ from lx_dtypes.models.core.intervention_shallow import (
     InterventionTypeShallow,
 )
 from lx_dtypes.models.core.unit_shallow import UnitShallow, UnitTypeShallow
+from lx_dtypes.models.ledger.center_shallow import CenterShallow
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
 model_types = Union[

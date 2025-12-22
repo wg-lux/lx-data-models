@@ -3,9 +3,9 @@ from typing import List
 # import numpy as np
 import pandas as pd
 
-from lx_dtypes.models.core.center_shallow import CenterShallowDataDict
-from lx_dtypes.models.ledger.examiner import ExaminerShallowDataDict
 from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
+from lx_dtypes.models.ledger.center_shallow import CenterShallowDataDict
+from lx_dtypes.models.ledger.examiner import ExaminerShallowDataDict
 from lx_dtypes.models.ledger.patient_classification_choice_descriptor import (
     PatientFindingClassificationChoiceDescriptorShallowDataDict,
 )

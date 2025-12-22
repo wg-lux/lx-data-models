@@ -51,6 +51,7 @@ from lx_dtypes.models.core import (
     UnitTypeShallow,
     UnitTypeShallowDataDict,
 )
+from lx_dtypes.typing.helper import KB_MODEL_NAMES_LITERAL, KB_MODEL_NAMES_ORDERED
 
 if TYPE_CHECKING:
     from lx_dtypes.typing.pydantic.knowledge_base_shallow import (
@@ -689,32 +690,17 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
 
     def kb_entries_by_module_name(
         self,
-    ) -> Dict[str, List[Tuple[str, "KB_SHALLOW_UNION_PYDANTIC_LIST"]]]:
+    ) -> Dict[
+        str, List[Tuple[KB_MODEL_NAMES_LITERAL, "KB_SHALLOW_UNION_PYDANTIC_LIST"]]
+    ]:
         """Get knowledge base entries (Shallow Models) organized by their module names."""
 
-        export_attrs = [
-            "citation",
-            "finding",
-            "finding_type",
-            "classification",
-            "classification_type",
-            "classification_choice",
-            "classification_choice_descriptor",
-            "examination",
-            "examination_type",
-            "indication",
-            "indication_type",
-            "intervention",
-            "intervention_type",
-            "information_source",
-            "unit",
-            "unit_type",
-        ]
+        export_attrs = KB_MODEL_NAMES_ORDERED
 
         cfg = self.config_safe
         module_names = cfg.modules
         entries_by_module: Dict[
-            str, List[Tuple[str, "KB_SHALLOW_UNION_PYDANTIC_LIST"]]
+            str, List[Tuple[KB_MODEL_NAMES_LITERAL, "KB_SHALLOW_UNION_PYDANTIC_LIST"]]
         ] = {module_name: [] for module_name in module_names}
         entries_by_module[str_unknown_factory()] = []
 
@@ -726,6 +712,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
             assert isinstance(kb_entry_list, list)
             for entry in kb_entry_list:
                 module_name = entry.kb_module_name
+
                 if module_name not in entries_by_module:
                     raise KeyError(
                         f"Module name '{module_name}' not found in knowledge base config."

@@ -1,6 +1,9 @@
+from typing import Tuple
+
 from pytest import fixture
 
 from lx_dtypes.models.base_models.person import Person
+from lx_dtypes.models.ledger.center import Center
 from lx_dtypes.models.ledger.patient import (
     Patient,
     PatientDataDict,
@@ -32,3 +35,11 @@ def sample_patient_data_dict() -> PatientDataDict:
         center_name="unknown",
     )
     return ddict
+
+
+@fixture(scope="session")
+def sample_patient_with_center(
+    sample_center: Center, sample_patient: Patient
+) -> Tuple[Patient, Center]:
+    sample_patient.center_name = sample_center.name
+    return sample_patient, sample_center

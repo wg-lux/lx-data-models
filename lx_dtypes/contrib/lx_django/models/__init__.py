@@ -1,4 +1,3 @@
-from .core.center import Center
 from .core.citation import Citation
 from .core.classification import Classification, ClassificationType
 from .core.classification_choice import ClassificationChoice
@@ -11,6 +10,7 @@ from .core.indication import Indication, IndicationType
 from .core.information_source import InformationSource, InformationSourceType
 from .core.intervention import Intervention, InterventionType
 from .core.unit import Unit, UnitType
+from .ledger.center import Center
 from .ledger.examiner import Examiner
 from .ledger.patient import Patient
 

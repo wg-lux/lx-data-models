@@ -3,17 +3,17 @@ from typing import List
 from pydantic import Field
 
 from lx_dtypes.models.base_models.base_model import (
-    KnowledgeBaseModel,
-    KnowledgeBaseModelDataDict,
+    AppBaseModelNamesUUIDTags,
+    AppBaseModelNamesUUIDTagsDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory, uuid_factory
 
 
-class CenterShallowDataDict(KnowledgeBaseModelDataDict):
+class CenterShallowDataDict(AppBaseModelNamesUUIDTagsDataDict):
     examiner_uuids: List[str]
 
 
-class CenterShallow(KnowledgeBaseModel):
+class CenterShallow(AppBaseModelNamesUUIDTags):
     """Center shallow model."""
 
     uuid: str = Field(default_factory=uuid_factory)

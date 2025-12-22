@@ -2,14 +2,13 @@ from typing import Any, Dict
 
 from pydantic import Field, field_serializer
 
-from lx_dtypes.models.core.center_shallow import CenterShallow, CenterShallowDataDict
+from lx_dtypes.models.ledger.center_shallow import CenterShallow, CenterShallowDataDict
 from lx_dtypes.models.ledger.examiner import Examiner, ExaminerDataDict
 from lx_dtypes.utils.factories.field_defaults import (
     examiner_by_uuid_factory,
 )
 
 
-# TODO Move Outside Core since this is not a kb model
 class CenterDataDict(CenterShallowDataDict):
     examiners: Dict[str, ExaminerDataDict]
 

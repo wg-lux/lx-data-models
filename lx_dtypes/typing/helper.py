@@ -1,4 +1,30 @@
-from typing import Literal
+from typing import List, Literal
+
+LEDGER_MODEL_NAMES_LITERAL = Literal[
+    "center",
+    "examiner",
+    "patient",
+    "patient_examination",
+    "patient_indication",
+    "patient_finding",
+    "patient_finding_classifications",
+    "patient_finding_classification_choice",
+    "patient_finding_classification_choice_descriptor",
+    # patient_intervention", #TODO: implement patient intervention model
+]
+
+LEDGER_MODEL_NAMES_ORDERED: List[LEDGER_MODEL_NAMES_LITERAL] = [
+    "center",
+    "examiner",
+    "patient",
+    "patient_examination",
+    "patient_indication",
+    "patient_finding",
+    "patient_finding_classifications",
+    "patient_finding_classification_choice",
+    "patient_finding_classification_choice_descriptor",
+    # patient_intervention", #TODO: implement patient intervention model
+]
 
 KB_MODEL_NAMES_LITERAL = Literal[
     "citation",
@@ -17,6 +43,25 @@ KB_MODEL_NAMES_LITERAL = Literal[
     "unit",
     "unit_type",
     "information_source",
+]
+
+KB_MODEL_NAMES_ORDERED: List[KB_MODEL_NAMES_LITERAL] = [
+    "information_source",
+    "citation",
+    "unit_type",
+    "unit",
+    "classification_choice_descriptor",
+    "classification_choice",
+    "classification_type",
+    "classification",
+    "finding_type",
+    "finding",
+    "intervention_type",
+    "intervention",
+    "indication_type",
+    "indication",
+    "examination_type",
+    "examination",
 ]
 
 # from lx_dtypes.contrib.lx_django.models.core.citation import (
