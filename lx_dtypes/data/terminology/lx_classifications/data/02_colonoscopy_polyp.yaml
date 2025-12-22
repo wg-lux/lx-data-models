@@ -1,6 +1,6 @@
 - model: classification
   name: "colon_lesion_paris"
-  type_names: ["shape", "morphology"]
+  type_names: ["morphology"]
   name_de: "Formklassifikation Kolonläsion"
   name_en: "Colon Lesion Shape Classification"
   choice_names: [
@@ -42,7 +42,7 @@
 
 - model: classification
   name: "colon_lesion_lst"
-  type_names: ["shape", "morphology"]
+  type_names: ["morphology"]
   name_de: "Oberflächenklassifikation Kolonläsion"
   name_en: "Colon Lesion Surface Classification"
   choice_names:

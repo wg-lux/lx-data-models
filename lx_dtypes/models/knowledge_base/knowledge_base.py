@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import (
+    TYPE_CHECKING,
     Any,
     Dict,
     List,
@@ -15,7 +16,6 @@ from pydantic import Field, field_serializer
 
 from lx_dtypes.models.base_models.base_model import (
     AppBaseModelNamesUUIDTags,
-    KnowledgeBaseModel,
 )
 from lx_dtypes.models.core import (
     CitationShallow,
@@ -52,7 +52,10 @@ from lx_dtypes.models.core import (
     UnitTypeShallowDataDict,
 )
 
-# if TYPE_CHECKING:
+if TYPE_CHECKING:
+    from lx_dtypes.typing.pydantic.knowledge_base_shallow import (
+        KB_SHALLOW_UNION_PYDANTIC_LIST,
+    )
 #     from lx_dtypes.stats.dataset import KnowledgeBaseDataset
 from lx_dtypes.models.knowledge_base.knowledge_base_config import KnowledgeBaseConfig
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
@@ -109,32 +112,32 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
 
     config: Optional[KnowledgeBaseConfig] = None
 
-    citations: Dict[str, "CitationShallow"] = Field(default_factory=dict)
-    findings: Dict[str, "FindingShallow"] = Field(default_factory=dict)
-    finding_types: Dict[str, "FindingTypeShallow"] = Field(default_factory=dict)
-    classifications: Dict[str, "ClassificationShallow"] = Field(default_factory=dict)
-    classification_types: Dict[str, "ClassificationTypeShallow"] = Field(
+    citation: Dict[str, "CitationShallow"] = Field(default_factory=dict)
+    finding: Dict[str, "FindingShallow"] = Field(default_factory=dict)
+    finding_type: Dict[str, "FindingTypeShallow"] = Field(default_factory=dict)
+    classification: Dict[str, "ClassificationShallow"] = Field(default_factory=dict)
+    classification_type: Dict[str, "ClassificationTypeShallow"] = Field(
         default_factory=dict
     )
-    classification_choices: Dict[str, "ClassificationChoiceShallow"] = Field(
+    classification_choice: Dict[str, "ClassificationChoiceShallow"] = Field(
         default_factory=dict
     )
-    classification_choice_descriptors: Dict[
+    classification_choice_descriptor: Dict[
         str, "ClassificationChoiceDescriptorShallow"
     ] = Field(default_factory=dict)
-    examinations: Dict[str, "ExaminationShallow"] = Field(default_factory=dict)
-    examination_types: Dict[str, "ExaminationTypeShallow"] = Field(default_factory=dict)
-    indications: Dict[str, "IndicationShallow"] = Field(default_factory=dict)
-    indication_types: Dict[str, "IndicationTypeShallow"] = Field(default_factory=dict)
-    interventions: Dict[str, "InterventionShallow"] = Field(default_factory=dict)
-    intervention_types: Dict[str, "InterventionTypeShallow"] = Field(
+    examination: Dict[str, "ExaminationShallow"] = Field(default_factory=dict)
+    examination_type: Dict[str, "ExaminationTypeShallow"] = Field(default_factory=dict)
+    indication: Dict[str, "IndicationShallow"] = Field(default_factory=dict)
+    indication_type: Dict[str, "IndicationTypeShallow"] = Field(default_factory=dict)
+    intervention: Dict[str, "InterventionShallow"] = Field(default_factory=dict)
+    intervention_type: Dict[str, "InterventionTypeShallow"] = Field(
         default_factory=dict
     )
-    information_sources: Dict[str, "InformationSourceShallow"] = Field(
+    information_source: Dict[str, "InformationSourceShallow"] = Field(
         default_factory=dict
     )
-    units: Dict[str, "UnitShallow"] = Field(default_factory=dict)
-    unit_types: Dict[str, "UnitTypeShallow"] = Field(default_factory=dict)
+    unit: Dict[str, "UnitShallow"] = Field(default_factory=dict)
+    unit_type: Dict[str, "UnitTypeShallow"] = Field(default_factory=dict)
 
     @property
     def ddict(self) -> type[KnowledgeBaseDataDict]:
@@ -183,40 +186,40 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
             parsed_object_generator = parse_shallow_object(sm_file, kb_module_name=name)
             for parsed_object in parsed_object_generator:
                 if isinstance(parsed_object, CitationShallow):
-                    kb.citations[parsed_object.name] = parsed_object
+                    kb.citation[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, FindingShallow):
-                    kb.findings[parsed_object.name] = parsed_object
+                    kb.finding[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, FindingTypeShallow):
-                    kb.finding_types[parsed_object.name] = parsed_object
+                    kb.finding_type[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, ClassificationShallow):
-                    kb.classifications[parsed_object.name] = parsed_object
+                    kb.classification[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, ClassificationTypeShallow):
-                    kb.classification_types[parsed_object.name] = parsed_object
+                    kb.classification_type[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, ClassificationChoiceShallow):
-                    kb.classification_choices[parsed_object.name] = parsed_object
+                    kb.classification_choice[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, ClassificationChoiceDescriptorShallow):
-                    kb.classification_choice_descriptors[parsed_object.name] = (
+                    kb.classification_choice_descriptor[parsed_object.name] = (
                         parsed_object
                     )
 
                 elif isinstance(parsed_object, ExaminationShallow):
-                    kb.examinations[parsed_object.name] = parsed_object
+                    kb.examination[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, ExaminationTypeShallow):
-                    kb.examination_types[parsed_object.name] = parsed_object
+                    kb.examination_type[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, IndicationShallow):
-                    kb.indications[parsed_object.name] = parsed_object
+                    kb.indication[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, IndicationTypeShallow):
-                    kb.indication_types[parsed_object.name] = parsed_object
+                    kb.indication_type[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, InterventionShallow):
-                    kb.interventions[parsed_object.name] = parsed_object
+                    kb.intervention[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, InterventionTypeShallow):
-                    kb.intervention_types[parsed_object.name] = parsed_object
+                    kb.intervention_type[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, InformationSourceShallow):
-                    kb.information_sources[parsed_object.name] = parsed_object
+                    kb.information_source[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, UnitShallow):
-                    kb.units[parsed_object.name] = parsed_object
+                    kb.unit[parsed_object.name] = parsed_object
                 elif isinstance(parsed_object, UnitTypeShallow):  # type: ignore
-                    kb.unit_types[parsed_object.name] = parsed_object
+                    kb.unit_type[parsed_object.name] = parsed_object
                 else:
                     raise TypeError(
                         f"Unsupported shallow model type: {type(parsed_object)}"
@@ -229,24 +232,24 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Args:
             other (KnowledgeBase): The other KnowledgeBase to merge.
         """
-        self.findings.update(other.findings)
-        self.finding_types.update(other.finding_types)
-        self.citations.update(other.citations)
-        self.classifications.update(other.classifications)
-        self.classification_types.update(other.classification_types)
-        self.classification_choices.update(other.classification_choices)
-        self.classification_choice_descriptors.update(
-            other.classification_choice_descriptors
+        self.finding.update(other.finding)
+        self.finding_type.update(other.finding_type)
+        self.citation.update(other.citation)
+        self.classification.update(other.classification)
+        self.classification_type.update(other.classification_type)
+        self.classification_choice.update(other.classification_choice)
+        self.classification_choice_descriptor.update(
+            other.classification_choice_descriptor
         )
-        self.examinations.update(other.examinations)
-        self.examination_types.update(other.examination_types)
-        self.indications.update(other.indications)
-        self.indication_types.update(other.indication_types)
-        self.interventions.update(other.interventions)
-        self.intervention_types.update(other.intervention_types)
-        self.information_sources.update(other.information_sources)
-        self.units.update(other.units)
-        self.unit_types.update(other.unit_types)
+        self.examination.update(other.examination)
+        self.examination_type.update(other.examination_type)
+        self.indication.update(other.indication)
+        self.indication_type.update(other.indication_type)
+        self.intervention.update(other.intervention)
+        self.intervention_type.update(other.intervention_type)
+        self.information_source.update(other.information_source)
+        self.unit.update(other.unit)
+        self.unit_type.update(other.unit_type)
 
     def export_yaml(self, export_dir: Path, filename: str = "knowledge_base") -> None:
         """Export the knowledge base to the specified directory.
@@ -278,23 +281,23 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
             Dict[str, int]: A dictionary with the counts of each category.
         """
         return {
-            "citations": len(self.citations),
-            "findings": len(self.findings),
-            "finding_types": len(self.finding_types),
-            "classifications": len(self.classifications),
-            "classification_types": len(self.classification_types),
-            "classification_choices": len(self.classification_choices),
-            "examinations": len(self.examinations),
-            "examination_types": len(self.examination_types),
-            "indications": len(self.indications),
-            "indication_types": len(self.indication_types),
-            "interventions": len(self.interventions),
-            "intervention_types": len(self.intervention_types),
-            "information_sources": len(self.information_sources),
-            "units": len(self.units),
-            "unit_types": len(self.unit_types),
-            "classification_choice_descriptors": len(
-                self.classification_choice_descriptors
+            "citation": len(self.citation),
+            "finding": len(self.finding),
+            "finding_type": len(self.finding_type),
+            "classification": len(self.classification),
+            "classification_type": len(self.classification_type),
+            "classification_choice": len(self.classification_choice),
+            "examination": len(self.examination),
+            "examination_type": len(self.examination_type),
+            "indication": len(self.indication),
+            "indication_type": len(self.indication_type),
+            "intervention": len(self.intervention),
+            "intervention_type": len(self.intervention_type),
+            "information_source": len(self.information_source),
+            "unit": len(self.unit),
+            "unit_type": len(self.unit_type),
+            "classification_choice_descriptor": len(
+                self.classification_choice_descriptor
             ),
         }
 
@@ -306,7 +309,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             CitationShallow: The citation with the given name.
         """
-        citation = self.citations.get(name)
+        citation = self.citation.get(name)
         if citation is None:
             raise KeyError(f"Citation '{name}' not found in knowledge base.")
         return citation
@@ -319,7 +322,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             FindingShallow: The finding with the given name.
         """
-        finding = self.findings.get(name)
+        finding = self.finding.get(name)
         if finding is None:
             raise KeyError(f"Finding '{name}' not found in knowledge base.")
         return finding
@@ -331,25 +334,25 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             FindingTypeShallow: The finding type with the given name.
         """
-        finding_type = self.finding_types.get(name)
+        finding_type = self.finding_type.get(name)
         if finding_type is None:
             raise KeyError(f"Finding type '{name}' not found in knowledge base.")
         return finding_type
 
     def get_classification(self, name: str) -> "ClassificationShallow":
-        classification = self.classifications.get(name)
+        classification = self.classification.get(name)
         if classification is None:
             raise KeyError(f"Classification '{name}' not found in knowledge base.")
         return classification
 
     def get_classification_type(self, name: str) -> "ClassificationTypeShallow":
-        classification_type = self.classification_types.get(name)
+        classification_type = self.classification_type.get(name)
         if classification_type is None:
             raise KeyError(f"Classification type '{name}' not found in knowledge base.")
         return classification_type
 
     def get_classification_choice(self, name: str) -> "ClassificationChoiceShallow":
-        classification_choice = self.classification_choices.get(name)
+        classification_choice = self.classification_choice.get(name)
         if classification_choice is None:
             raise KeyError(
                 f"Classification choice '{name}' not found in knowledge base."
@@ -366,7 +369,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             ClassificationChoiceDescriptorShallow: The descriptor with the given name.
         """
-        descriptor = self.classification_choice_descriptors.get(name)
+        descriptor = self.classification_choice_descriptor.get(name)
         if descriptor is None:
             raise KeyError(
                 f"Classification choice descriptor '{name}' not found in knowledge base."
@@ -381,7 +384,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             ExaminationShallow: The examination with the given name.
         """
-        examination = self.examinations.get(name)
+        examination = self.examination.get(name)
         if examination is None:
             raise KeyError(f"Examination '{name}' not found in knowledge base.")
         return examination
@@ -394,7 +397,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             ExaminationTypeShallow: The examination type with the given name.
         """
-        examination_type = self.examination_types.get(name)
+        examination_type = self.examination_type.get(name)
         if examination_type is None:
             raise KeyError(f"Examination type '{name}' not found in knowledge base.")
         return examination_type
@@ -407,7 +410,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             InterventionShallow: The intervention with the given name.
         """
-        intervention = self.interventions.get(name)
+        intervention = self.intervention.get(name)
         if intervention is None:
             raise KeyError(f"Intervention '{name}' not found in knowledge base.")
         return intervention
@@ -420,7 +423,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             InterventionTypeShallow: The intervention type with the given name.
         """
-        intervention_type = self.intervention_types.get(name)
+        intervention_type = self.intervention_type.get(name)
         if intervention_type is None:
             raise KeyError(f"Intervention type '{name}' not found in knowledge base.")
         return intervention_type
@@ -433,7 +436,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             IndicationShallow: The indication with the given name.
         """
-        indication = self.indications.get(name)
+        indication = self.indication.get(name)
         if indication is None:
             raise KeyError(f"Indication '{name}' not found in knowledge base.")
         return indication
@@ -446,7 +449,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             IndicationTypeShallow: The indication type with the given name.
         """
-        indication_type = self.indication_types.get(name)
+        indication_type = self.indication_type.get(name)
         if indication_type is None:
             raise KeyError(f"Indication type '{name}' not found in knowledge base.")
         return indication_type
@@ -459,26 +462,26 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         Returns:
             InformationSourceShallow: The information source with the given name.
         """
-        information_source = self.information_sources.get(name)
+        information_source = self.information_source.get(name)
         if information_source is None:
             raise KeyError(f"Information source '{name}' not found in knowledge base.")
         return information_source
 
-    @field_serializer("citations")
+    @field_serializer("citation")
     def serialize_citations(
         self, citations: Dict[str, "CitationShallow"]
     ) -> Dict[str, CitationShallowDataDict]:
         r = {name: citation.to_ddict_shallow() for name, citation in citations.items()}
         return r
 
-    @field_serializer("findings")
+    @field_serializer("finding")
     def serialize_findings(
         self, findings: Dict[str, "FindingShallow"]
     ) -> Dict[str, FindingShallowDataDict]:
         r = {name: finding.to_ddict_shallow() for name, finding in findings.items()}
         return r
 
-    @field_serializer("finding_types")
+    @field_serializer("finding_type")
     def serialize_finding_types(
         self, finding_types: Dict[str, "FindingTypeShallow"]
     ) -> Dict[str, FindingTypeShallowDataDict]:
@@ -488,7 +491,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("classifications")
+    @field_serializer("classification")
     def serialize_classifications(
         self, classifications: Dict[str, "ClassificationShallow"]
     ) -> Dict[str, ClassificationShallowDataDict]:
@@ -498,7 +501,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("classification_types")
+    @field_serializer("classification_type")
     def serialize_classification_types(
         self, classification_types: Dict[str, "ClassificationTypeShallow"]
     ) -> Dict[str, ClassificationTypeShallowDataDict]:
@@ -508,7 +511,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("classification_choices")
+    @field_serializer("classification_choice")
     def serialize_classification_choices(
         self, classification_choices: Dict[str, "ClassificationChoiceShallow"]
     ) -> Dict[str, ClassificationChoiceShallowDataDict]:
@@ -518,7 +521,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("classification_choice_descriptors")
+    @field_serializer("classification_choice_descriptor")
     def serialize_classification_choice_descriptors(
         self,
         classification_choice_descriptors: Dict[
@@ -531,7 +534,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("examinations")
+    @field_serializer("examination")
     def serialize_examinations(
         self, examinations: Dict[str, "ExaminationShallow"]
     ) -> Dict[str, ExaminationShallowDataDict]:
@@ -541,7 +544,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("examination_types")
+    @field_serializer("examination_type")
     def serialize_examination_types(
         self, examination_types: Dict[str, "ExaminationTypeShallow"]
     ) -> Dict[str, ExaminationTypeShallowDataDict]:
@@ -551,7 +554,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("interventions")
+    @field_serializer("intervention")
     def serialize_interventions(
         self, interventions: Dict[str, "InterventionShallow"]
     ) -> Dict[str, InterventionShallowDataDict]:
@@ -561,7 +564,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("intervention_types")
+    @field_serializer("intervention_type")
     def serialize_intervention_types(
         self, intervention_types: Dict[str, "InterventionTypeShallow"]
     ) -> Dict[str, InterventionTypeShallowDataDict]:
@@ -571,7 +574,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("indications")
+    @field_serializer("indication")
     def serialize_indications(
         self, indications: Dict[str, "IndicationShallow"]
     ) -> Dict[str, IndicationShallowDataDict]:
@@ -581,7 +584,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("indication_types")
+    @field_serializer("indication_type")
     def serialize_indication_types(
         self, indication_types: Dict[str, "IndicationTypeShallow"]
     ) -> Dict[str, IndicationTypeShallowDataDict]:
@@ -591,7 +594,7 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         }
         return r
 
-    @field_serializer("information_sources")
+    @field_serializer("information_source")
     def serialize_information_sources(
         self, information_sources: Dict[str, "InformationSourceShallow"]
     ) -> Dict[str, InformationSourceShallowDataDict]:
@@ -609,14 +612,14 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
             return None
         return config.model_dump()
 
-    @field_serializer("units")
+    @field_serializer("unit")
     def serialize_units(
         self, units: Dict[str, "UnitShallow"]
     ) -> Dict[str, UnitShallowDataDict]:
         r = {name: unit.to_ddict_shallow() for name, unit in units.items()}
         return r
 
-    @field_serializer("unit_types")
+    @field_serializer("unit_type")
     def serialize_unit_types(
         self, unit_types: Dict[str, "UnitTypeShallow"]
     ) -> Dict[str, UnitTypeShallowDataDict]:
@@ -626,43 +629,42 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
         return r
 
     def export_record_lists(self) -> KnowledgeBaseRecordLists:
-        citation_records = [r.to_ddict_shallow() for r in self.citations.values()]
-        finding_records = [r.to_ddict_shallow() for r in self.findings.values()]
+        citation_records = [r.to_ddict_shallow() for r in self.citation.values()]
+        finding_records = [r.to_ddict_shallow() for r in self.finding.values()]
         finding_type_records = [
-            r.to_ddict_shallow() for r in self.finding_types.values()
+            r.to_ddict_shallow() for r in self.finding_type.values()
         ]
         classification_records = [
-            r.to_ddict_shallow() for r in self.classifications.values()
+            r.to_ddict_shallow() for r in self.classification.values()
         ]
         classification_type_records = [
-            r.to_ddict_shallow() for r in self.classification_types.values()
+            r.to_ddict_shallow() for r in self.classification_type.values()
         ]
         classification_choice_records = [
-            r.to_ddict_shallow() for r in self.classification_choices.values()
+            r.to_ddict_shallow() for r in self.classification_choice.values()
         ]
         classification_choice_descriptor_records = [
-            r.to_ddict_shallow()
-            for r in self.classification_choice_descriptors.values()
+            r.to_ddict_shallow() for r in self.classification_choice_descriptor.values()
         ]
-        examination_records = [r.to_ddict_shallow() for r in self.examinations.values()]
+        examination_records = [r.to_ddict_shallow() for r in self.examination.values()]
         examination_type_records = [
-            r.to_ddict_shallow() for r in self.examination_types.values()
+            r.to_ddict_shallow() for r in self.examination_type.values()
         ]
-        indication_records = [r.to_ddict_shallow() for r in self.indications.values()]
+        indication_records = [r.to_ddict_shallow() for r in self.indication.values()]
         indication_type_records = [
-            r.to_ddict_shallow() for r in self.indication_types.values()
+            r.to_ddict_shallow() for r in self.indication_type.values()
         ]
         intervention_records = [
-            r.to_ddict_shallow() for r in self.interventions.values()
+            r.to_ddict_shallow() for r in self.intervention.values()
         ]
         intervention_type_records = [
-            r.to_ddict_shallow() for r in self.intervention_types.values()
+            r.to_ddict_shallow() for r in self.intervention_type.values()
         ]
         information_source_records = [
-            r.to_ddict_shallow() for r in self.information_sources.values()
+            r.to_ddict_shallow() for r in self.information_source.values()
         ]
-        unit_records = [r.to_ddict_shallow() for r in self.units.values()]
-        unit_type_records = [r.to_ddict_shallow() for r in self.unit_types.values()]
+        unit_records = [r.to_ddict_shallow() for r in self.unit.values()]
+        unit_type_records = [r.to_ddict_shallow() for r in self.unit_type.values()]
 
         record_lists = KnowledgeBaseRecordLists(
             citations=citation_records,
@@ -687,38 +689,40 @@ class KnowledgeBase(AppBaseModelNamesUUIDTags):
 
     def kb_entries_by_module_name(
         self,
-    ) -> Dict[str, List[Tuple[str, KnowledgeBaseModel]]]:
+    ) -> Dict[str, List[Tuple[str, "KB_SHALLOW_UNION_PYDANTIC_LIST"]]]:
         """Get knowledge base entries (Shallow Models) organized by their module names."""
 
         export_attrs = [
-            "citations",
-            "findings",
-            "finding_types",
-            "classifications",
-            "classification_types",
-            "classification_choices",
-            "classification_choice_descriptors",
-            "examinations",
-            "examination_types",
-            "indications",
-            "indication_types",
-            "interventions",
-            "intervention_types",
-            "information_sources",
-            "units",
-            "unit_types",
+            "citation",
+            "finding",
+            "finding_type",
+            "classification",
+            "classification_type",
+            "classification_choice",
+            "classification_choice_descriptor",
+            "examination",
+            "examination_type",
+            "indication",
+            "indication_type",
+            "intervention",
+            "intervention_type",
+            "information_source",
+            "unit",
+            "unit_type",
         ]
 
         cfg = self.config_safe
         module_names = cfg.modules
-        entries_by_module: Dict[str, List[Tuple[str, KnowledgeBaseModel]]] = {
-            module_name: [] for module_name in module_names
-        }
+        entries_by_module: Dict[
+            str, List[Tuple[str, "KB_SHALLOW_UNION_PYDANTIC_LIST"]]
+        ] = {module_name: [] for module_name in module_names}
         entries_by_module[str_unknown_factory()] = []
 
         for attr in export_attrs:
-            kb_dict: Dict[str, KnowledgeBaseModel] = getattr(self, attr)
-            kb_entry_list: List[KnowledgeBaseModel] = list(kb_dict.values())
+            kb_dict: Dict[str, "KB_SHALLOW_UNION_PYDANTIC_LIST"] = getattr(self, attr)
+            kb_entry_list: List["KB_SHALLOW_UNION_PYDANTIC_LIST"] = list(
+                kb_dict.values()
+            )
             assert isinstance(kb_entry_list, list)
             for entry in kb_entry_list:
                 module_name = entry.kb_module_name

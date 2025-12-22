@@ -1,2 +1,29 @@
 - model: classification_type
   name: "default_classification_type"
+
+- model: classification_type
+  name: "inferrable"
+
+- model: classification_type
+  name: "histology"
+
+- model: classification_type
+  name: "size"
+
+- model: classification_type
+  name: "planarity"
+
+- model: classification_type
+  name: "morphology"
+
+- model: classification_type
+  name: "location"
+
+- model: classification_type
+  name: "bowel_prep"
+
+- model: classification_type
+  name: "capillary_pattern"
+
+- model: classification_type
+  name: "colon_lesion_advanced_imaging"

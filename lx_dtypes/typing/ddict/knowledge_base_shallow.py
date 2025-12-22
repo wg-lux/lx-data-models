@@ -1,6 +1,5 @@
-from typing import Dict, Union
+from typing import TypedDict, Union
 
-from lx_dtypes.models.base_models.base_model import KnowledgeBaseModelDataDict
 from lx_dtypes.models.core.citation_shallow import CitationShallowDataDict
 from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallowDataDict,
@@ -34,7 +33,6 @@ from lx_dtypes.models.core.unit_shallow import (
 )
 
 KB_SHALLOW_DDICT_LIST = [
-    KnowledgeBaseModelDataDict,
     CitationShallowDataDict,
     ClassificationShallowDataDict,
     ClassificationTypeShallowDataDict,
@@ -53,7 +51,6 @@ KB_SHALLOW_DDICT_LIST = [
 ]
 
 KB_SHALLOW_UNION_DDICT_LIST = Union[
-    KnowledgeBaseModelDataDict,
     CitationShallowDataDict,
     ClassificationShallowDataDict,
     ClassificationTypeShallowDataDict,
@@ -72,7 +69,6 @@ KB_SHALLOW_UNION_DDICT_LIST = Union[
 ]
 
 KB_SHALLOW_UNION_DDICT_TYPE_LIST = Union[
-    type[KnowledgeBaseModelDataDict],
     type[CitationShallowDataDict],
     type[ClassificationShallowDataDict],
     type[ClassificationTypeShallowDataDict],
@@ -90,20 +86,41 @@ KB_SHALLOW_UNION_DDICT_TYPE_LIST = Union[
     type[UnitTypeShallowDataDict],
 ]
 
-KB_SHALLOW_DDICT_BY_NAME: Dict[str, KB_SHALLOW_UNION_DDICT_TYPE_LIST] = {
-    "citation_shallow": CitationShallowDataDict,
-    "classification_shallow": ClassificationShallowDataDict,
-    "classification_type_shallow": ClassificationTypeShallowDataDict,
-    "classification_choice_shallow": ClassificationChoiceShallowDataDict,
-    "classification_choice_descriptor_shallow": ClassificationChoiceDescriptorShallowDataDict,
-    "examination_shallow": ExaminationShallowDataDict,
-    "examination_type_shallow": ExaminationTypeShallowDataDict,
-    "finding_shallow": FindingShallowDataDict,
-    "finding_type_shallow": FindingTypeShallowDataDict,
-    "indication_shallow": IndicationShallowDataDict,
-    "indication_type_shallow": IndicationTypeShallowDataDict,
-    "intervention_shallow": InterventionShallowDataDict,
-    "intervention_type_shallow": InterventionTypeShallowDataDict,
-    "unit_shallow": UnitShallowDataDict,
-    "unit_type_shallow": UnitTypeShallowDataDict,
-}
+
+class KB_SHALLOW_DDICT_BY_NAME_TYPE(TypedDict):
+    citation: type[CitationShallowDataDict]
+    classification: type[ClassificationShallowDataDict]
+    classification_type: type[ClassificationTypeShallowDataDict]
+    classification_choice: type[ClassificationChoiceShallowDataDict]
+    classification_choice_descriptor: type[
+        ClassificationChoiceDescriptorShallowDataDict
+    ]
+    examination: type[ExaminationShallowDataDict]
+    examination_type: type[ExaminationTypeShallowDataDict]
+    finding: type[FindingShallowDataDict]
+    finding_type: type[FindingTypeShallowDataDict]
+    indication: type[IndicationShallowDataDict]
+    indication_type: type[IndicationTypeShallowDataDict]
+    intervention: type[InterventionShallowDataDict]
+    intervention_type: type[InterventionTypeShallowDataDict]
+    unit: type[UnitShallowDataDict]
+    unit_type: type[UnitTypeShallowDataDict]
+
+
+KB_SHALLOW_DDICT_BY_NAME = KB_SHALLOW_DDICT_BY_NAME_TYPE(
+    citation=CitationShallowDataDict,
+    classification=ClassificationShallowDataDict,
+    classification_type=ClassificationTypeShallowDataDict,
+    classification_choice=ClassificationChoiceShallowDataDict,
+    classification_choice_descriptor=ClassificationChoiceDescriptorShallowDataDict,
+    examination=ExaminationShallowDataDict,
+    examination_type=ExaminationTypeShallowDataDict,
+    finding=FindingShallowDataDict,
+    finding_type=FindingTypeShallowDataDict,
+    indication=IndicationShallowDataDict,
+    indication_type=IndicationTypeShallowDataDict,
+    intervention=InterventionShallowDataDict,
+    intervention_type=InterventionTypeShallowDataDict,
+    unit=UnitShallowDataDict,
+    unit_type=UnitTypeShallowDataDict,
+)

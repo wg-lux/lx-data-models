@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import TypedDict, Union
 
 from lx_dtypes.models.core.citation import CitationDataDict
 from lx_dtypes.models.core.classification import (
@@ -86,20 +86,39 @@ KB_DEEP_UNION_DDICT_TYPE_LIST = Union[
     type[UnitTypeDataDict],
 ]
 
-KB_DEEP_DDICT_BY_NAME: Dict[str, KB_DEEP_UNION_DDICT_TYPE_LIST] = {
-    "citation": CitationDataDict,
-    "classification": ClassificationDataDict,
-    "classification_type": ClassificationTypeDataDict,
-    "classification_choice": ClassificationChoiceDataDict,
-    "classification_choice_descriptor": ClassificationChoiceDescriptorDataDict,
-    "examination": ExaminationDataDict,
-    "examination_type": ExaminationTypeDataDict,
-    "finding": FindingDataDict,
-    "finding_type": FindingTypeDataDict,
-    "indication": IndicationDataDict,
-    "indication_type": IndicationTypeDataDict,
-    "intervention": InterventionDataDict,
-    "intervention_type": InterventionTypeDataDict,
-    "unit": UnitDataDict,
-    "unit_type": UnitTypeDataDict,
-}
+
+class KB_DEEP_DDICT_BY_NAME_TYPE(TypedDict):
+    citation: type[CitationDataDict]
+    classification: type[ClassificationDataDict]
+    classification_type: type[ClassificationTypeDataDict]
+    classification_choice: type[ClassificationChoiceDataDict]
+    classification_choice_descriptor: type[ClassificationChoiceDescriptorDataDict]
+    examination: type[ExaminationDataDict]
+    examination_type: type[ExaminationTypeDataDict]
+    finding: type[FindingDataDict]
+    finding_type: type[FindingTypeDataDict]
+    indication: type[IndicationDataDict]
+    indication_type: type[IndicationTypeDataDict]
+    intervention: type[InterventionDataDict]
+    intervention_type: type[InterventionTypeDataDict]
+    unit: type[UnitDataDict]
+    unit_type: type[UnitTypeDataDict]
+
+
+KB_DEEP_DDICT_BY_NAME = KB_DEEP_DDICT_BY_NAME_TYPE(
+    citation=CitationDataDict,
+    classification=ClassificationDataDict,
+    classification_type=ClassificationTypeDataDict,
+    classification_choice=ClassificationChoiceDataDict,
+    classification_choice_descriptor=ClassificationChoiceDescriptorDataDict,
+    examination=ExaminationDataDict,
+    examination_type=ExaminationTypeDataDict,
+    finding=FindingDataDict,
+    finding_type=FindingTypeDataDict,
+    indication=IndicationDataDict,
+    indication_type=IndicationTypeDataDict,
+    intervention=InterventionDataDict,
+    intervention_type=InterventionTypeDataDict,
+    unit=UnitDataDict,
+    unit_type=UnitTypeDataDict,
+)

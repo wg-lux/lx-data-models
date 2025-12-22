@@ -113,15 +113,22 @@ class ClassificationChoiceDescriptor(KnowledgeBaseModel):
         Returns:
             ClassificationChoiceDescriptor: The created ClassificationChoiceDescriptor model instance.
         """
+        from .unit import Unit
+
         unit_name = ddict["unit_name"]
         defaults = dict(ddict)
         defaults.pop("unit_name", None)
+        descriptor_name = ddict.get("name", "<unknown>")
+        module_name = ddict.get("kb_module_name", "<unknown>")
         if unit_name:
             try:
                 unit = Unit.get_by_name(unit_name)
                 defaults["unit"] = unit
             except Unit.DoesNotExist:
-                raise ValueError(f"Unit with name '{unit_name}' does not exist.")
+                raise ValueError(
+                    f"ClassificationChoiceDescriptor '{descriptor_name}' "
+                    f"(module '{module_name}') references missing unit '{unit_name}'."
+                )
 
         obj, created = cls.objects.get_or_create(uuid=ddict["uuid"], defaults=defaults)
 

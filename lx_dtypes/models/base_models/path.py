@@ -31,6 +31,9 @@ class FilesAndDirsModel(PathMixin, AppBaseModel):
 
     def get_files_with_suffix(self, suffix: Optional[str]) -> List[Path]:
         """Get all files with the specified suffix.
+        First, all specified files are gathered, then files are ordered by
+        filename (alphabetically). It is encouraged to keep import order in mind when
+        naming files (e.g., prefixing with numbers).
 
         Args:
             suffix (str): The suffix to filter files by.
@@ -48,5 +51,8 @@ class FilesAndDirsModel(PathMixin, AppBaseModel):
             all_files += get_files_from_dir_recursive(self.dir)
 
         filtered_files = [file for file in all_files if file.suffix == suffix]
+
+        # sort by filename
+        filtered_files.sort(key=lambda x: x.name)
 
         return filtered_files

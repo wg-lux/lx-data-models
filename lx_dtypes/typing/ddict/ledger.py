@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import TypedDict, Union
 
 from lx_dtypes.models.ledger.center import CenterDataDict
 from lx_dtypes.models.ledger.examiner import ExaminerDataDict
@@ -52,14 +52,33 @@ LEDGER_UNION_DDICT_TYPE_LIST = Union[
     type[PatientIndicationDataDict],
 ]
 
-LEDGER_DDICT_BY_NAME: Dict[str, LEDGER_UNION_DDICT_TYPE_LIST] = {
-    "center": CenterDataDict,
-    "examiner": ExaminerDataDict,
-    "patient": PatientDataDict,
-    "patient_examination": PatientExaminationDataDict,
-    "patient_finding": PatientFindingDataDict,
-    "patient_finding_classifications": PatientFindingClassificationsDataDict,
-    "patient_finding_classification_choice": PatientFindingClassificationChoiceDataDict,
-    "patient_finding_classification_choice_descriptor": PatientFindingClassificationChoiceDescriptorDataDict,
-    "patient_indication": PatientIndicationDataDict,
-}
+
+class LEDGER_DDICT_BY_NAME_TYPE(TypedDict):
+    center: type[CenterDataDict]
+    examiner: type[ExaminerDataDict]
+    patient: type[PatientDataDict]
+    patient_examination: type[PatientExaminationDataDict]
+    patient_finding: type[PatientFindingDataDict]
+    patient_finding_classifications: type[PatientFindingClassificationsDataDict]
+    patient_finding_classification_choice: type[
+        PatientFindingClassificationChoiceDataDict
+    ]
+    patient_finding_classification_choice_descriptor: type[
+        PatientFindingClassificationChoiceDescriptorDataDict
+    ]
+    patient_indication: type[PatientIndicationDataDict]
+
+
+LEDGER_DDICT_BY_NAME = LEDGER_DDICT_BY_NAME_TYPE(
+    center=CenterDataDict,
+    examiner=ExaminerDataDict,
+    patient=PatientDataDict,
+    patient_examination=PatientExaminationDataDict,
+    patient_finding=PatientFindingDataDict,
+    patient_finding_classifications=PatientFindingClassificationsDataDict,
+    patient_finding_classification_choice=PatientFindingClassificationChoiceDataDict,
+    patient_finding_classification_choice_descriptor=PatientFindingClassificationChoiceDescriptorDataDict,
+    patient_indication=PatientIndicationDataDict,
+)
+
+LEDGER_DDICT_BY_NAME_REVERSED = {v: k for k, v in LEDGER_DDICT_BY_NAME.items()}

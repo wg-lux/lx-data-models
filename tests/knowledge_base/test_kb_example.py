@@ -19,19 +19,19 @@ class TestKnowledgeBaseModel:
 
         kb.export_yaml(export_dir=output_dir)
 
-        assert len(kb.citations) > 0
-        assert len(kb.information_sources) > 0
-        assert len(kb.examinations) > 0
-        assert len(kb.examination_types) > 0
-        assert len(kb.indications) > 0
-        assert len(kb.indication_types) > 0
-        assert len(kb.findings) > 0
-        assert len(kb.finding_types) > 0
-        assert len(kb.classifications) > 0
-        assert len(kb.classification_types) > 0
-        assert len(kb.classification_choices) > 0
-        assert len(kb.interventions) > 0
-        assert len(kb.intervention_types) > 0
+        assert len(kb.citation) > 0
+        assert len(kb.information_source) > 0
+        assert len(kb.examination) > 0
+        assert len(kb.examination_type) > 0
+        assert len(kb.indication) > 0
+        assert len(kb.indication_type) > 0
+        assert len(kb.finding) > 0
+        assert len(kb.finding_type) > 0
+        assert len(kb.classification) > 0
+        assert len(kb.classification_type) > 0
+        assert len(kb.classification_choice) > 0
+        assert len(kb.intervention) > 0
+        assert len(kb.intervention_type) > 0
 
         counts = kb.count_entries()
 
@@ -48,8 +48,8 @@ class TestKnowledgeBaseModel:
 
         # FIXME currently failing (most likely due to default values in descriptors)
         initial_dump = kb.model_dump()
-        initial_dump.pop("classification_choice_descriptors")
+        initial_dump.pop("classification_choice_descriptor")
         new_dump = new_kb.model_dump()
-        new_dump.pop("classification_choice_descriptors")
+        new_dump.pop("classification_choice_descriptor")
 
         assert initial_dump == new_dump
