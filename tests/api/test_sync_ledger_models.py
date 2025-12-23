@@ -1,16 +1,16 @@
 from typing import Tuple
 
 import pytest
-
-from lx_dtypes.contrib.lx_django.models import (
+from lx_dtypes.lx_django.models import (
     Center as DjangoCenterModel,
 )
-from lx_dtypes.contrib.lx_django.models import (
+from lx_dtypes.lx_django.models import (
     Examiner as DjangoExaminerModel,
 )
-from lx_dtypes.contrib.lx_django.models import (
+from lx_dtypes.lx_django.models import (
     Patient as DjangoPatientModel,
 )
+
 from lx_dtypes.models.ledger.center import Center
 from lx_dtypes.models.ledger.center_shallow import CenterShallow
 from lx_dtypes.models.ledger.examiner import ExaminerShallow

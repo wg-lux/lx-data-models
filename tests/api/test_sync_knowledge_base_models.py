@@ -1,38 +1,38 @@
 import pytest
-
-from lx_dtypes.contrib.lx_django.models import (
+from lx_dtypes.lx_django.models import (
     ClassificationChoice as DjangoClassificationChoiceModel,
 )
-from lx_dtypes.contrib.lx_django.models import (
+from lx_dtypes.lx_django.models import (
     ClassificationChoiceDescriptor as DjangoClassificationChoiceDescriptorModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.citation import (
+from lx_dtypes.lx_django.models.core.citation import (
     Citation as DjangoCitationModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.classification import (
+from lx_dtypes.lx_django.models.core.classification import (
     Classification as DjangoClassificationModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.examination import (
+from lx_dtypes.lx_django.models.core.examination import (
     Examination as DjangoExaminationModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.finding import (
+from lx_dtypes.lx_django.models.core.finding import (
     Finding as DjangoFindingModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.indication import (
+from lx_dtypes.lx_django.models.core.indication import (
     Indication as DjangoIndicationModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.information_source import (
+from lx_dtypes.lx_django.models.core.information_source import (
     InformationSource as DjangoInformationSourceModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.intervention import (
+from lx_dtypes.lx_django.models.core.intervention import (
     Intervention as DjangoInterventionModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.unit import (
+from lx_dtypes.lx_django.models.core.unit import (
     Unit as DjangoUnitModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.unit import (
+from lx_dtypes.lx_django.models.core.unit import (
     UnitType as DjangoUnitTypeModel,
 )
+
 from lx_dtypes.models.core.citation import Citation
 from lx_dtypes.models.core.citation_shallow import CitationShallow
 from lx_dtypes.models.core.classification import Classification

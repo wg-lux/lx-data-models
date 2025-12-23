@@ -1,11 +1,11 @@
-from pytest import fixture
-
-from lx_dtypes.contrib.lx_django.models.core.information_source import (
+from lx_dtypes.lx_django.models.core.information_source import (
     InformationSource as DjangoInformationSourceModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.information_source import (
+from lx_dtypes.lx_django.models.core.information_source import (
     InformationSourceType as DjangoInformationSourceTypeModel,
 )
+from pytest import fixture
+
 from lx_dtypes.models.core.information_source import (
     InformationSource,
     InformationSourceType,

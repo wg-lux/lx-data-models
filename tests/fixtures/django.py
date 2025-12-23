@@ -1,10 +1,9 @@
 from typing import cast
 
+from lx_dtypes.lx_django.api import api
+from lx_dtypes.lx_django.api.stubs import TypedNinjaAPIClient
 from ninja.testing import TestClient
 from pytest import fixture
-
-from lx_dtypes.contrib.lx_django.api import api
-from lx_dtypes.contrib.lx_django.api.stubs import TypedNinjaAPIClient
 
 # https://docs.djangoproject.com/en/5.2/topics/testing/tools
 

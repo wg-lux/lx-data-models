@@ -1,11 +1,11 @@
-from pytest import fixture
-
-from lx_dtypes.contrib.lx_django.models.core.unit import (
+from lx_dtypes.lx_django.models.core.unit import (
     Unit as DjangoUnitModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.unit import (
+from lx_dtypes.lx_django.models.core.unit import (
     UnitType as DjangoUnitTypeModel,
 )
+from pytest import fixture
+
 from lx_dtypes.models.core.unit import Unit, UnitType
 
 

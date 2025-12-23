@@ -1,11 +1,11 @@
-from pytest import fixture
-
-from lx_dtypes.contrib.lx_django.models.core.intervention import (
+from lx_dtypes.lx_django.models.core.intervention import (
     Intervention as DjangoInterventionModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.intervention import (
+from lx_dtypes.lx_django.models.core.intervention import (
     InterventionType as DjangoInterventionTypeModel,
 )
+from pytest import fixture
+
 from lx_dtypes.models.core.intervention import Intervention, InterventionType
 
 

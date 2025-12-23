@@ -1,17 +1,17 @@
-from pytest import fixture
-
-from lx_dtypes.contrib.lx_django.models.core.classification import (
+from lx_dtypes.lx_django.models.core.classification import (
     Classification as DjangoClassificationModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.finding import (
+from lx_dtypes.lx_django.models.core.finding import (
     Finding as DjangoFindingModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.finding import (
+from lx_dtypes.lx_django.models.core.finding import (
     FindingType as DjangoFindingTypeModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.intervention import (
+from lx_dtypes.lx_django.models.core.intervention import (
     Intervention as DjangoInterventionModel,
 )
+from pytest import fixture
+
 from lx_dtypes.models.core.classification import Classification
 from lx_dtypes.models.core.finding import Finding, FindingType
 from lx_dtypes.models.core.intervention import Intervention

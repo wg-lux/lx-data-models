@@ -19,7 +19,7 @@ django_stubs_ext.monkeypatch()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DJANGO_APP_MODULE = "lx_dtypes.contrib.lx_django"
+DJANGO_APP_MODULE = "lx_dtypes.lx_django"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/

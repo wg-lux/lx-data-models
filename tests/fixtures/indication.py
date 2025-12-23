@@ -1,14 +1,14 @@
-from pytest import fixture
-
-from lx_dtypes.contrib.lx_django.models.core.indication import (
+from lx_dtypes.lx_django.models.core.indication import (
     Indication as DjangoIndicationModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.indication import (
+from lx_dtypes.lx_django.models.core.indication import (
     IndicationType as DjangoIndicationTypeModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.intervention import (
+from lx_dtypes.lx_django.models.core.intervention import (
     Intervention as DjangoInterventionModel,
 )
+from pytest import fixture
+
 from lx_dtypes.models.core.indication import Indication, IndicationType
 from lx_dtypes.models.core.intervention import Intervention
 

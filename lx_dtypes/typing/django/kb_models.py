@@ -1,6 +1,6 @@
 from typing import TypedDict, Union
 
-from lx_dtypes.contrib.lx_django.models import (
+from lx_dtypes.lx_django.models import (
     Citation,
     Classification,
     ClassificationChoice,

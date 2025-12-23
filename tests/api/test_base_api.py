@@ -1,4 +1,4 @@
-from lx_dtypes.contrib.lx_django.api.stubs import TypedNinjaAPIClient
+from lx_dtypes.lx_django.api.stubs import TypedNinjaAPIClient
 
 # https://docs.djangoproject.com/en/5.2/topics/testing/tools/
 

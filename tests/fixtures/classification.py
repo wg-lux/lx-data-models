@@ -1,14 +1,16 @@
+from lx_dtypes.lx_django.models.core.classification import (
+    Classification as DjangoClassificationModel,
+)
+from lx_dtypes.lx_django.models.core.classification import (
+    ClassificationType as DjangoClassificationTypeModel,
+)
+from lx_dtypes.lx_django.models.core.classification_choice import (
+    ClassificationChoice as DjangoClassificationChoiceModel,
+)
 from pytest import fixture
 
 from lx_dtypes.models.core.classification import Classification, ClassificationType
 from lx_dtypes.models.core.classification_choice import ClassificationChoice
-from lx_dtypes.contrib.lx_django.models.core.classification_choice import (
-    ClassificationChoice as DjangoClassificationChoiceModel,
-)
-from lx_dtypes.contrib.lx_django.models.core.classification import (
-    Classification as DjangoClassificationModel,
-    ClassificationType as DjangoClassificationTypeModel,
-)
 
 
 @fixture

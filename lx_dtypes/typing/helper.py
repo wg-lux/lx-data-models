@@ -64,47 +64,47 @@ KB_MODEL_NAMES_ORDERED: List[KB_MODEL_NAMES_LITERAL] = [
     "examination",
 ]
 
-# from lx_dtypes.contrib.lx_django.models.core.citation import (
+# from lx_dtypes.lx_django.models.core.citation import (
 #     Citation as CitationDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.classification import (
+# from lx_dtypes.lx_django.models.core.classification import (
 #     Classification as ClassificationDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.classification import (
+# from lx_dtypes.lx_django.models.core.classification import (
 #     ClassificationType as ClassificationTypeDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.classification_choice import (
+# from lx_dtypes.lx_django.models.core.classification_choice import (
 #     ClassificationChoice as ClassificationChoiceDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.classification_choice_descriptor import (
+# from lx_dtypes.lx_django.models.core.classification_choice_descriptor import (
 #     ClassificationChoiceDescriptor as ClassificationChoiceDescriptorDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.examination import (
+# from lx_dtypes.lx_django.models.core.examination import (
 #     Examination as ExaminationDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.examination import (
+# from lx_dtypes.lx_django.models.core.examination import (
 #     ExaminationType as ExaminationTypeDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.finding import (
+# from lx_dtypes.lx_django.models.core.finding import (
 #     Finding as FindingDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.finding import (
+# from lx_dtypes.lx_django.models.core.finding import (
 #     FindingType as FindingTypeDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.indication import (
+# from lx_dtypes.lx_django.models.core.indication import (
 #     Indication as IndicationDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.indication import (
+# from lx_dtypes.lx_django.models.core.indication import (
 #     IndicationType as IndicationTypeDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.intervention import (
+# from lx_dtypes.lx_django.models.core.intervention import (
 #     Intervention as InterventionDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.intervention import (
+# from lx_dtypes.lx_django.models.core.intervention import (
 #     InterventionType as InterventionTypeDjangoModel,
 # )
-# from lx_dtypes.contrib.lx_django.models.core.unit import Unit as UnitDjangoModel
-# from lx_dtypes.contrib.lx_django.models.core.unit import UnitType as UnitTypeDjangoModel
+# from lx_dtypes.lx_django.models.core.unit import Unit as UnitDjangoModel
+# from lx_dtypes.lx_django.models.core.unit import UnitType as UnitTypeDjangoModel
 # from lx_dtypes.models.core.citation_shallow import (
 #     CitationShallow,
 #     CitationShallowDataDict,

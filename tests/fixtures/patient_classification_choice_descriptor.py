@@ -1,11 +1,11 @@
-from pytest import fixture
-
-from lx_dtypes.contrib.lx_django.models.core.classification_choice_descriptor import (
+from lx_dtypes.lx_django.models.core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor as DjangoClassificationChoiceDescriptorModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.unit import (
+from lx_dtypes.lx_django.models.core.unit import (
     Unit as DjangoUnitModel,
 )
+from pytest import fixture
+
 from lx_dtypes.models.core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
 )

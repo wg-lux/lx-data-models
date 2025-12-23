@@ -1,8 +1,8 @@
-from pytest import fixture
-
-from lx_dtypes.contrib.lx_django.models.core.citation import (
+from lx_dtypes.lx_django.models.core.citation import (
     Citation as DjangoCitationModel,
 )
+from pytest import fixture
+
 from lx_dtypes.models.core.citation import Citation
 
 

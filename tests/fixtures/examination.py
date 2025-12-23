@@ -1,17 +1,17 @@
-from pytest import fixture
-
-from lx_dtypes.contrib.lx_django.models.core.examination import (
+from lx_dtypes.lx_django.models.core.examination import (
     Examination as DjangoExaminationModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.examination import (
+from lx_dtypes.lx_django.models.core.examination import (
     ExaminationType as DjangoExaminationTypeModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.finding import (
+from lx_dtypes.lx_django.models.core.finding import (
     Finding as DjangoFindingModel,
 )
-from lx_dtypes.contrib.lx_django.models.core.indication import (
+from lx_dtypes.lx_django.models.core.indication import (
     Indication as DjangoIndicationModel,
 )
+from pytest import fixture
+
 from lx_dtypes.models.core.examination import Examination, ExaminationType
 from lx_dtypes.models.core.finding import Finding
 from lx_dtypes.models.core.indication import Indication
