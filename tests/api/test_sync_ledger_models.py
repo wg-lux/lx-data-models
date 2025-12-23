@@ -19,7 +19,9 @@ from lx_dtypes.models.ledger.patient import Patient, PatientShallow
 
 @pytest.mark.django_db
 class TestLedgerModelSync:
-    def test_center_sync(self, sample_center_with_examiners: Center) -> None:
+    def test_center_with_examiner_sync(
+        self, sample_center_with_examiners: Center
+    ) -> None:
         ddict = sample_center_with_examiners.to_ddict()
         _django_center = DjangoCenterModel.sync_from_ddict(ddict)
         uuid = ddict.get("uuid")
@@ -58,17 +60,3 @@ class TestLedgerModelSync:
         # Convert the Django model instance back to a Pydantic model
         converted_patient = PatientShallow.model_validate(patient_dict)
         assert converted_patient.to_ddict_shallow() == sample_patient.to_ddict_shallow()
-
-    # def test_examiner_sync(self, sample_examiner: Examiner) -> None:
-    #     ddict = sample_examiner.to_ddict_shallow()
-    #     _django_examiner = DjangoExaminerModel.objects.create(**ddict)
-    #     uuid = ddict.get("uuid")
-    #     assert uuid is not None
-    #     retrieved_examiner = DjangoExaminerModel.objects.get(uuid=uuid)
-    #     assert str(retrieved_examiner.uuid) == sample_examiner.uuid
-    #     examiner_dict = retrieved_examiner.to_ddict_shallow()
-    #     # Convert the Django model instance back to a Pydantic model
-    #     converted_examiner = ExaminerShallow.model_validate(examiner_dict)
-    #     assert (
-    #         converted_examiner.to_ddict_shallow() == sample_examiner.to_ddict_shallow()
-    #     )

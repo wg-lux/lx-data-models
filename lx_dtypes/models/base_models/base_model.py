@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Self, TypedDict
+from typing import Any, Dict, Iterable, List, NotRequired, Optional, Self, TypedDict
 
 from pydantic import (
     AwareDatetime,
@@ -151,12 +151,20 @@ class AppBaseModelNamesUUIDTags(AppBaseModelUUIDTags):
         return self
 
 
-class KnowledgeBaseModelDataDict(AppBaseModelNamesUUIDTagsDataDict):
+class KnowledgebaseBaseModelDataDict(AppBaseModelNamesUUIDTagsDataDict):
     kb_module_name: str
 
 
-class KnowledgeBaseModel(AppBaseModelNamesUUIDTags):
+class KnowledgebaseBaseModel(AppBaseModelNamesUUIDTags):
     kb_module_name: str = Field(default_factory=str_unknown_factory)
+
+
+class LedgerBaseModelDataDict(AppBaseModelUUIDTagsDataDict):
+    external_ids: NotRequired[Dict[str, str]]
+
+
+class LedgerBaseModel(AppBaseModelUUIDTags):
+    external_ids: Dict[str, str] = Field(default_factory=dict)
 
 
 class PathMixin(AppBaseModel):

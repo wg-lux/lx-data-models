@@ -63,7 +63,7 @@ from lx_dtypes.models.core.unit_shallow import UnitShallow, UnitTypeShallow
 
 # TODO add transform utils based on those tests
 @pytest.mark.django_db
-class TestKnowledgeBaseModelSync:
+class TestKnowledgebaseBaseModelSync:
     def test_classification_choice_descriptor_sync(
         self,
         sample_classification_choice_descriptor_numeric: ClassificationChoiceDescriptor,

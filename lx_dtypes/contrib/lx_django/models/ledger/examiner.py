@@ -5,16 +5,14 @@ from django.db import models
 from lx_dtypes.models.ledger.examiner import ExaminerDataDict
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
+from ..base_model.base_model import LedgerBaseModel
 from ..base_model.person import PersonModel
-from ..typing import (
-    OptionalJSONFieldType,
-)
 
 if TYPE_CHECKING:
     from .center import Center
 
 
-class Examiner(PersonModel):
+class Examiner(LedgerBaseModel, PersonModel):
     center: models.ForeignKey["Center | None", "Center | None"] = models.ForeignKey(
         "Center",
         related_name="examiners",
@@ -23,15 +21,11 @@ class Examiner(PersonModel):
         on_delete=models.SET_NULL,
     )
 
-    external_ids: OptionalJSONFieldType = models.JSONField(
-        null=True, blank=True, default=dict
-    )
-
     @property
     def ddict(self) -> type[ExaminerDataDict]:
         return ExaminerDataDict
 
-    class Meta(PersonModel.Meta):
+    class Meta(LedgerBaseModel.Meta, PersonModel.Meta):
         pass
 
     @classmethod

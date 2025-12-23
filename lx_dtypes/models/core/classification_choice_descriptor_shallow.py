@@ -3,13 +3,13 @@ from typing import Dict, Literal, Optional, Union
 from pydantic import Field
 
 from lx_dtypes.models.base_models.base_model import (
-    KnowledgeBaseModel,
-    KnowledgeBaseModelDataDict,
+    KnowledgebaseBaseModel,
+    KnowledgebaseBaseModelDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
 
-class ClassificationChoiceDescriptorShallowDataDict(KnowledgeBaseModelDataDict):
+class ClassificationChoiceDescriptorShallowDataDict(KnowledgebaseBaseModelDataDict):
     descriptor_type: Literal["numeric", "text", "boolean", "selection"]
     unit_name: Optional[str]
     numeric_min: float
@@ -27,7 +27,7 @@ class ClassificationChoiceDescriptorShallowDataDict(KnowledgeBaseModelDataDict):
     selection_default_options: Dict[str, float]
 
 
-class ClassificationChoiceDescriptorShallow(KnowledgeBaseModel):
+class ClassificationChoiceDescriptorShallow(KnowledgebaseBaseModel):
     """
     Describes how a classification choice captures user input (type, defaults, bounds).
     Inherits from BaseModelMixin for common model functionality.

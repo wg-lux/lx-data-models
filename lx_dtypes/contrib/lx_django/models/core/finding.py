@@ -8,7 +8,7 @@ from lx_dtypes.models.core.finding_shallow import (
     FindingTypeShallowDataDict,
 )
 
-from ..base_model.base_model import KnowledgeBaseModel
+from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
     from .classification import Classification
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from .intervention import Intervention
 
 
-class FindingType(KnowledgeBaseModel):
+class FindingType(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
         findings: models.Manager["Finding"]
 
@@ -44,7 +44,7 @@ class FindingType(KnowledgeBaseModel):
         return obj
 
 
-class Finding(KnowledgeBaseModel):
+class Finding(KnowledgebaseBaseModel):
     classifications: models.ManyToManyField["Classification", "Classification"] = (
         models.ManyToManyField(
             "Classification",

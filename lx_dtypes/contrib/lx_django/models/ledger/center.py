@@ -6,14 +6,17 @@ from django.db import models
 from lx_dtypes.models.ledger.center import CenterDataDict
 from lx_dtypes.models.ledger.center_shallow import CenterShallowDataDict
 
-from ..base_model.base_model import AppBaseModelNamesUUIDTags
+from ..base_model.base_model import AppBaseModelNamesUUIDTags, LedgerBaseModel
 
 if TYPE_CHECKING:
     from .examiner import Examiner
     from .patient import Patient
 
 
-class Center(AppBaseModelNamesUUIDTags):
+class Center(AppBaseModelNamesUUIDTags, LedgerBaseModel):
+    class Meta(AppBaseModelNamesUUIDTags.Meta, LedgerBaseModel.Meta):
+        pass
+
     @property
     def ddict(self) -> type[CenterDataDict]:
         return CenterDataDict

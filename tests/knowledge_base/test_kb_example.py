@@ -5,7 +5,7 @@ from lx_dtypes.models.knowledge_base.knowledge_base import KnowledgeBase
 from lx_dtypes.utils.logging import Log
 
 
-class TestKnowledgeBaseModel:
+class TestKnowledgebaseBaseModel:
     def test_load_default_kb(
         self,
         lx_knowledge_base: KnowledgeBase,

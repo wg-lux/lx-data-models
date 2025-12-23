@@ -1,20 +1,24 @@
-from typing import Dict, Optional
+from typing import Dict
 
 from pydantic import Field
 
+from lx_dtypes.models.base_models.base_model import (
+    LedgerBaseModel,
+    LedgerBaseModelDataDict,
+)
 from lx_dtypes.models.base_models.person import Person, PersonDataDict
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
 
-class ExaminerShallowDataDict(PersonDataDict):
+class ExaminerShallowDataDict(LedgerBaseModelDataDict, PersonDataDict):  # type: ignore[misc]
     center_name: str
 
 
 class ExaminerDataDict(ExaminerShallowDataDict):
-    external_ids: Optional[Dict[str, str]]
+    pass
 
 
-class ExaminerShallow(Person):
+class ExaminerShallow(LedgerBaseModel, Person):
     center_name: str = Field(default_factory=str_unknown_factory)
 
     @property

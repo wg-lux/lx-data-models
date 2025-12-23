@@ -1,5 +1,6 @@
 from typing import List, Union
 
+from lx_dtypes.models.base_models.base_model import AppBaseModel
 from lx_dtypes.models.knowledge_base import KnowledgeBase
 from lx_dtypes.models.ledger.patient import Patient
 from lx_dtypes.models.ledger.patient_classification_choice_descriptor import (
@@ -11,7 +12,6 @@ from lx_dtypes.models.ledger.patient_finding_classification_choice import (
     PatientFindingClassificationChoice,
 )
 from lx_dtypes.models.ledger.patient_ledger import PatientLedger
-from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from .patient_interface_create import (
     create_examination_finding,
@@ -184,11 +184,13 @@ class PatientInterface(AppBaseModel):
                         raise ValueError(
                             f"Option '{option}' is not valid for descriptor '{descriptor_name}'. Valid options are: {valid_options}"
                         )
-
+        _examination_uuid = finding.patient_examination_uuid
+        assert _examination_uuid == examination_uuid
+        assert _examination_uuid is not None
         descriptor = PatientFindingClassificationChoiceDescriptor(
             descriptor_value=descriptor_value,
             patient_uuid=finding.patient_uuid,
-            patient_examination_uuid=finding.patient_examination_uuid,
+            patient_examination_uuid=_examination_uuid,
             patient_finding_uuid=finding.uuid,
             patient_finding_classifications_uuid=finding_classifications.uuid,
             patient_finding_classification_choice_uuid=choice.uuid,

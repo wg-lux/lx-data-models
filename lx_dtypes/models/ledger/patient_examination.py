@@ -1,21 +1,23 @@
 import datetime
-from typing import List, Optional, TypedDict
+from typing import List, Optional
 
 from pydantic import Field, field_serializer, field_validator
 
+from lx_dtypes.models.base_models.base_model import (
+    LedgerBaseModel,
+    LedgerBaseModelDataDict,
+)
 from lx_dtypes.utils.factories.field_defaults import (
     list_of_patient_finding_factory,
     list_of_patient_indication_factory,
     uuid_factory,
 )
-from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from .patient_finding import PatientFinding, PatientFindingDataDict
 from .patient_indication import PatientIndication, PatientIndicationDataDict
 
 
-class PatientExaminationShallowDataDict(TypedDict):
-    uuid: str
+class PatientExaminationShallowDataDict(LedgerBaseModelDataDict):
     patient_uuid: str
     examination_name: str
     examination_template: Optional[str]
@@ -24,20 +26,14 @@ class PatientExaminationShallowDataDict(TypedDict):
     indications_uuids: List[str]
 
 
-class PatientExaminationDataDict(TypedDict):
-    uuid: str
-    patient_uuid: str
-    examination_name: str
-    examination_template: Optional[str]
-    date: Optional[str]
+class PatientExaminationDataDict(PatientExaminationShallowDataDict):
     findings: List[PatientFindingDataDict]
     indications: List[PatientIndicationDataDict]
 
 
-class PatientExaminationShallow(AppBaseModel):
+class PatientExaminationShallow(LedgerBaseModel):
     """Shallow representation of a PatientExamination."""
 
-    uuid: str = Field(default_factory=uuid_factory)
     patient_uuid: str
     examination_name: str
     examination_template: Optional[str] = None
@@ -112,19 +108,19 @@ class PatientExamination(PatientExaminationShallow):
         data_dict = self.ddict(**self.model_dump())
         return data_dict
 
-    def to_ddict_shallow(self) -> PatientExaminationShallowDataDict:
-        findings_uuids = [finding.uuid for finding in self.findings]
-        indications_uuids = [indication.uuid for indication in self.indications]
-        data_dict = self.ddict_shallow(
-            uuid=self.uuid,
-            patient_uuid=self.patient_uuid,
-            examination_name=self.examination_name,
-            examination_template=self.examination_template,
-            date=self.serialize_date(self.date),
-            findings_uuids=findings_uuids,
-            indications_uuids=indications_uuids,
-        )
-        return data_dict
+    # def to_ddict_shallow(self) -> PatientExaminationShallowDataDict:
+    #     findings_uuids = [finding.uuid for finding in self.findings]
+    #     indications_uuids = [indication.uuid for indication in self.indications]
+    #     data_dict = self.ddict_shallow(
+    #         uuid=self.uuid,
+    #         patient_uuid=self.patient_uuid,
+    #         examination_name=self.examination_name,
+    #         examination_template=self.examination_template,
+    #         date=self.serialize_date(self.date),
+    #         findings_uuids=findings_uuids,
+    #         indications_uuids=indications_uuids,
+    #     )
+    #     return data_dict
 
     @classmethod
     def create(
@@ -156,6 +152,9 @@ class PatientExamination(PatientExaminationShallow):
             date=date_str,
             findings=[],
             indications=[],
+            findings_uuids=[],
+            indications_uuids=[],
+            tags=[],
         )
         instance = cls.model_validate(model_dict)
         return instance

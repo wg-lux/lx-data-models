@@ -1,12 +1,15 @@
-from typing import List, Optional, TypedDict
+from typing import List, Optional
 
 from pydantic import Field, field_serializer
 
+from lx_dtypes.models.base_models.base_model import (
+    LedgerBaseModel,
+    LedgerBaseModelDataDict,
+)
 from lx_dtypes.utils.factories.field_defaults import (
     list_of_patient_finding_classification_choice_factory,
     uuid_factory,
 )
-from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from .patient_finding_classification_choice import (
     PatientFindingClassificationChoice,
@@ -14,17 +17,7 @@ from .patient_finding_classification_choice import (
 )
 
 
-class PatientFindingClassificationsDataDict(TypedDict):
-    uuid: str
-    patient_uuid: str
-    patient_examination_uuid: Optional[str]
-    patient_finding_uuid: str
-    finding_name: str
-    choices: List[PatientFindingClassificationChoiceDataDict]
-
-
-class PatientFindingClassificationsShallowDataDict(TypedDict):
-    uuid: str
+class PatientFindingClassificationsShallowDataDict(LedgerBaseModelDataDict):
     patient_uuid: str
     patient_examination_uuid: Optional[str]
     patient_finding_uuid: str
@@ -32,7 +25,13 @@ class PatientFindingClassificationsShallowDataDict(TypedDict):
     choice_uuids: List[str]
 
 
-class PatientFindingClassificationsShallow(AppBaseModel):
+class PatientFindingClassificationsDataDict(
+    PatientFindingClassificationsShallowDataDict
+):
+    choices: List[PatientFindingClassificationChoiceDataDict]
+
+
+class PatientFindingClassificationsShallow(LedgerBaseModel):
     uuid: str = Field(default_factory=uuid_factory)
     patient_uuid: str
     patient_examination_uuid: Optional[str] = None
@@ -80,14 +79,14 @@ class PatientFindingClassifications(PatientFindingClassificationsShallow):
         data_dict = self.model_dump()
         return self.ddict(**data_dict)
 
-    def to_ddict_shallow(self) -> PatientFindingClassificationsShallowDataDict:
-        choice_uuids = [choice.uuid for choice in self.choices]
-        data_dict = PatientFindingClassificationsShallowDataDict(
-            uuid=self.uuid,
-            patient_uuid=self.patient_uuid,
-            patient_examination_uuid=self.patient_examination_uuid,
-            patient_finding_uuid=self.patient_finding_uuid,
-            finding_name=self.finding_name,
-            choice_uuids=choice_uuids,
-        )
-        return data_dict
+    # def to_ddict_shallow(self) -> PatientFindingClassificationsShallowDataDict:
+    #     choice_uuids = [choice.uuid for choice in self.choices]
+    #     data_dict = PatientFindingClassificationsShallowDataDict(
+    #         uuid=self.uuid,
+    #         patient_uuid=self.patient_uuid,
+    #         patient_examination_uuid=self.patient_examination_uuid,
+    #         patient_finding_uuid=self.patient_finding_uuid,
+    #         finding_name=self.finding_name,
+    #         choice_uuids=choice_uuids,
+    #     )
+    #     return data_dict

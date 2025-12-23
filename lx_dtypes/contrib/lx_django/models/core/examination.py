@@ -13,14 +13,14 @@ from lx_dtypes.models.core.examination_shallow import (
     ExaminationTypeShallowDataDict,
 )
 
-from ..base_model.base_model import KnowledgeBaseModel
+from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
     from .finding import Finding
     from .indication import Indication
 
 
-class ExaminationType(KnowledgeBaseModel):
+class ExaminationType(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
         examinations: models.Manager["Examination"]
 
@@ -53,7 +53,7 @@ class ExaminationType(KnowledgeBaseModel):
         return obj
 
 
-class Examination(KnowledgeBaseModel):
+class Examination(KnowledgebaseBaseModel):
     findings: models.ManyToManyField["Finding", "Finding"] = models.ManyToManyField(
         "Finding",
         related_name="examinations",

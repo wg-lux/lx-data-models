@@ -9,14 +9,14 @@ from lx_dtypes.models.core.classification_choice_shallow import (
     ClassificationChoiceShallowDataDict,
 )
 
-from ..base_model.base_model import KnowledgeBaseModel
+from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
     from .classification import Classification
     from .classification_choice_descriptor import ClassificationChoiceDescriptor
 
 
-class ClassificationChoice(KnowledgeBaseModel):
+class ClassificationChoice(KnowledgebaseBaseModel):
     classification_choice_descriptors: models.ManyToManyField[
         "ClassificationChoiceDescriptor", "ClassificationChoiceDescriptor"
     ] = models.ManyToManyField(

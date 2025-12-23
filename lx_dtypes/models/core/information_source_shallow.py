@@ -3,21 +3,21 @@ from typing import List
 from pydantic import Field
 
 from lx_dtypes.models.base_models.base_model import (
-    KnowledgeBaseModel,
-    KnowledgeBaseModelDataDict,
+    KnowledgebaseBaseModel,
+    KnowledgebaseBaseModelDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 
 
-class InformationSourceTypeShallowDataDict(KnowledgeBaseModelDataDict):
+class InformationSourceTypeShallowDataDict(KnowledgebaseBaseModelDataDict):
     pass
 
 
-class InformationSourceShallowDataDict(KnowledgeBaseModelDataDict):
+class InformationSourceShallowDataDict(KnowledgebaseBaseModelDataDict):
     type_names: List[str]
 
 
-class InformationSourceTypeShallow(KnowledgeBaseModel):
+class InformationSourceTypeShallow(KnowledgebaseBaseModel):
     """Simple container for information source type metadata."""
 
     @property
@@ -29,7 +29,7 @@ class InformationSourceTypeShallow(KnowledgeBaseModel):
         return data_dict
 
 
-class InformationSourceShallow(KnowledgeBaseModel):
+class InformationSourceShallow(KnowledgebaseBaseModel):
     """
     Shallow Model representing an information source.
 

@@ -11,13 +11,13 @@ from lx_dtypes.models.core.information_source_shallow import (
     InformationSourceTypeShallowDataDict,
 )
 
-from ..base_model.base_model import KnowledgeBaseModel
+from ..base_model.base_model import KnowledgebaseBaseModel
 from ..typing import (
     OptionalCharFieldType,
 )
 
 
-class InformationSourceType(KnowledgeBaseModel):
+class InformationSourceType(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
         information_sources: models.Manager["InformationSource"]
 
@@ -50,7 +50,7 @@ class InformationSourceType(KnowledgeBaseModel):
         return obj
 
 
-class InformationSource(KnowledgeBaseModel):
+class InformationSource(KnowledgebaseBaseModel):
     types: models.ManyToManyField["InformationSourceType", "InformationSourceType"] = (
         models.ManyToManyField(
             "InformationSourceType",

@@ -3,22 +3,22 @@ from typing import List
 from pydantic import Field
 
 from lx_dtypes.models.base_models.base_model import (
-    KnowledgeBaseModel,
-    KnowledgeBaseModelDataDict,
+    KnowledgebaseBaseModel,
+    KnowledgebaseBaseModelDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 
 
-class IndicationTypeShallowDataDict(KnowledgeBaseModelDataDict):
+class IndicationTypeShallowDataDict(KnowledgebaseBaseModelDataDict):
     pass
 
 
-class IndicationShallowDataDict(KnowledgeBaseModelDataDict):
+class IndicationShallowDataDict(KnowledgebaseBaseModelDataDict):
     type_names: List[str]
     expected_intervention_names: List[str]
 
 
-class IndicationTypeShallow(KnowledgeBaseModel):
+class IndicationTypeShallow(KnowledgebaseBaseModel):
     """Taggable metadata container for indication types."""
 
     @property
@@ -30,7 +30,7 @@ class IndicationTypeShallow(KnowledgeBaseModel):
         return data_dict
 
 
-class IndicationShallow(KnowledgeBaseModel):
+class IndicationShallow(KnowledgebaseBaseModel):
     """
     Shallow model representing a medical indication.
 

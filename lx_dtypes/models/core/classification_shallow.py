@@ -3,23 +3,23 @@ from typing import List
 from pydantic import Field
 
 from lx_dtypes.models.base_models.base_model import (
-    KnowledgeBaseModel,
-    KnowledgeBaseModelDataDict,
+    KnowledgebaseBaseModel,
+    KnowledgebaseBaseModelDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 
 
-class ClassificationTypeShallowDataDict(KnowledgeBaseModelDataDict):
+class ClassificationTypeShallowDataDict(KnowledgebaseBaseModelDataDict):
     pass
 
 
-class ClassificationShallowDataDict(KnowledgeBaseModelDataDict):
+class ClassificationShallowDataDict(KnowledgebaseBaseModelDataDict):
     pass
     choice_names: List[str]
     type_names: List[str]
 
 
-class ClassificationTypeShallow(KnowledgeBaseModel):
+class ClassificationTypeShallow(KnowledgebaseBaseModel):
     """Label metadata for a classification type without nested relations."""
 
     @property
@@ -31,7 +31,7 @@ class ClassificationTypeShallow(KnowledgeBaseModel):
         return data_dict
 
 
-class ClassificationShallow(KnowledgeBaseModel):
+class ClassificationShallow(KnowledgebaseBaseModel):
     """Classification stub that links to choice and type names only."""
 
     choice_names: List[str] = Field(default_factory=list_of_str_factory)

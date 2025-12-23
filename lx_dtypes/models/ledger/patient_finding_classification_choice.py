@@ -1,8 +1,11 @@
-from typing import Dict, List, NotRequired, Optional, TypedDict, Union
+from typing import Dict, List, NotRequired, Optional, Union
 
 from pydantic import Field, field_serializer
 
-from lx_dtypes.models.base_models.base_model import AppBaseModel
+from lx_dtypes.models.base_models.base_model import (
+    LedgerBaseModel,
+    LedgerBaseModelDataDict,
+)
 from lx_dtypes.utils.factories.field_defaults import (
     list_of_patient_finding_classification_choice_descriptor_factory,
     list_of_str_factory,
@@ -15,9 +18,7 @@ from .patient_classification_choice_descriptor import (
 )
 
 
-class PatientFindingClassificationChoiceShallowDataDict(TypedDict):
-    uuid: str
-    name: str
+class PatientFindingClassificationChoiceShallowDataDict(LedgerBaseModelDataDict):
     patient_uuid: str
     patient_examination_uuid: Optional[str]
     patient_finding_uuid: str
@@ -26,11 +27,13 @@ class PatientFindingClassificationChoiceShallowDataDict(TypedDict):
     descriptor_uuids: List[str]
 
 
-class PatientFindingClassificationChoiceDataDict(TypedDict):
+class PatientFindingClassificationChoiceDataDict(
+    PatientFindingClassificationChoiceShallowDataDict
+):
     descriptors: NotRequired[List[PatientFindingClassificationChoiceDescriptorDataDict]]
 
 
-class PatientFindingClassificationChoiceShallow(AppBaseModel):
+class PatientFindingClassificationChoiceShallow(LedgerBaseModel):
     uuid: str = Field(default_factory=uuid_factory)
     name: str
     patient_uuid: str
@@ -62,19 +65,19 @@ class PatientFindingClassificationChoice(PatientFindingClassificationChoiceShall
         data_dict = self.ddict(**self.model_dump())
         return data_dict
 
-    def to_ddict_shallow(self) -> PatientFindingClassificationChoiceShallowDataDict:
-        descriptor_uuids = [descriptor.uuid for descriptor in self.descriptors]
-        data_dict = self.ddict_shallow(
-            uuid=self.uuid,
-            name=self.name,
-            patient_uuid=self.patient_uuid,
-            patient_examination_uuid=self.patient_examination_uuid,
-            patient_finding_uuid=self.patient_finding_uuid,
-            patient_finding_classifications_uuid=self.patient_finding_classifications_uuid,
-            classification_name=self.classification_name,
-            descriptor_uuids=descriptor_uuids,
-        )
-        return data_dict
+    # def to_ddict_shallow(self) -> PatientFindingClassificationChoiceShallowDataDict:
+    #     descriptor_uuids = [descriptor.uuid for descriptor in self.descriptors]
+    #     data_dict = self.ddict_shallow(
+    #         uuid=self.uuid,
+    #         name=self.name,
+    #         patient_uuid=self.patient_uuid,
+    #         patient_examination_uuid=self.patient_examination_uuid,
+    #         patient_finding_uuid=self.patient_finding_uuid,
+    #         patient_finding_classifications_uuid=self.patient_finding_classifications_uuid,
+    #         classification_name=self.classification_name,
+    #         descriptor_uuids=descriptor_uuids,
+    #     )
+    #     return data_dict
 
     @field_serializer("descriptors")
     def serialize_descriptors(

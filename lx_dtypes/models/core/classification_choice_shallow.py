@@ -1,15 +1,15 @@
 from lx_dtypes.models.base_models.base_model import (
-    KnowledgeBaseModel,
-    KnowledgeBaseModelDataDict,
+    KnowledgebaseBaseModel,
+    KnowledgebaseBaseModelDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import list_of_str_factory
 
 
-class ClassificationChoiceShallowDataDict(KnowledgeBaseModelDataDict):
+class ClassificationChoiceShallowDataDict(KnowledgebaseBaseModelDataDict):
     classification_choice_descriptor_names: list[str]
 
 
-class ClassificationChoiceShallow(KnowledgeBaseModel):
+class ClassificationChoiceShallow(KnowledgebaseBaseModel):
     """
     Shallow reference to descriptors and types used by a classification choice.
     Inherits from BaseModelMixin for common model functionality.

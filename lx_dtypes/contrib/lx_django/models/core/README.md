@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:
     from .finding import Finding
 
-class Examination(KnowledgeBaseModel):
+class Examination(KnowledgebaseBaseModel):
     findings: models.ManyToManyField["Finding", "Finding"] = models.ManyToManyField(
         "Finding",
         related_name="examinations",
@@ -25,7 +25,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .examination import Examination
     
-class Finding(KnowledgeBaseModel):
+class Finding(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
         examinations: models.Manager["Examination"]
 

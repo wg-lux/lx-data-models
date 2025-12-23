@@ -1,44 +1,48 @@
-from typing import Dict, List, NotRequired, Optional, Self, TypedDict, Union
+from typing import Dict, List, NotRequired, Optional, Self, Union
 
 from pydantic import Field, field_serializer
 
+from lx_dtypes.models.base_models.base_model import (
+    LedgerBaseModel,
+    LedgerBaseModelDataDict,
+)
 from lx_dtypes.models.ledger.patient_finding_classification_choice import (
     PatientFindingClassificationChoice,
 )
 from lx_dtypes.utils.factories.field_defaults import (
     uuid_factory,
 )
-from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 from .patient_finding_classifications import (
     PatientFindingClassifications,
     PatientFindingClassificationsDataDict,
 )
+from .patient_finding_interventions import (
+    PatientFindingInterventions,
+    PatientFindingInterventionsDataDict,
+)
 
 
-class PatientFindingDataDict(TypedDict):
-    uuid: NotRequired[str]
+class PatientFindingShallowDataDict(LedgerBaseModelDataDict):
     patient_uuid: str
     patient_examination_uuid: Optional[str]
     finding_name: str
+    classifications_uuid: NotRequired[str]
+    interventions_uuid: NotRequired[str]
+
+
+class PatientFindingDataDict(PatientFindingShallowDataDict):
     classifications: NotRequired[PatientFindingClassificationsDataDict]
-    classifications_uuid: NotRequired[str]
+    interventions: NotRequired[PatientFindingInterventionsDataDict]
 
 
-class PatientFindingShallowDataDict(TypedDict):
-    uuid: NotRequired[str]
-    patient_uuid: str
-    patient_examination_uuid: Optional[str]
-    finding_name: str
-    classifications_uuid: NotRequired[str]
-
-
-class PatientFindingShallow(AppBaseModel):
+class PatientFindingShallow(LedgerBaseModel):
     uuid: str = Field(default_factory=uuid_factory)
     patient_uuid: str
     patient_examination_uuid: Optional[str] = None
     finding_name: str
     classifications_uuid: Optional[str] = None
+    interventions_uuid: Optional[str] = None
 
     @property
     def ddict_shallow(self) -> type[PatientFindingShallowDataDict]:
@@ -51,6 +55,7 @@ class PatientFindingShallow(AppBaseModel):
 
 class PatientFinding(PatientFindingShallow):
     classifications: Optional[PatientFindingClassifications] = None
+    interventions: Optional[PatientFindingInterventions] = None
 
     @property
     def ddict(self) -> type[PatientFindingDataDict]:
@@ -69,21 +74,23 @@ class PatientFinding(PatientFindingShallow):
         data_dict = self.ddict(**self.model_dump())
         return data_dict
 
-    def to_ddict_shallow(self) -> PatientFindingShallowDataDict:
-        classifications_uuid = (
-            self.classifications.uuid
-            if self.classifications
-            else self.classifications_uuid
-        )
-        assert classifications_uuid is not None, "classifications_uuid must be set"
-        data_dict = self.ddict_shallow(
-            uuid=self.uuid,
-            patient_uuid=self.patient_uuid,
-            patient_examination_uuid=self.patient_examination_uuid,
-            finding_name=self.finding_name,
-            classifications_uuid=classifications_uuid,
-        )
-        return data_dict
+    # def to_ddict_shallow(self) -> PatientFindingShallowDataDict:
+    #     classifications_uuid = (
+    #         self.classifications.uuid
+    #         if self.classifications
+    #         else self.classifications_uuid
+    #     )
+    #     assert classifications_uuid is not None, "classifications_uuid must be set"
+
+    #     data_dict = self.ddict_shallow(
+    #         uuid=self.uuid,
+    #         patient_uuid=self.patient_uuid,
+    #         patient_examination_uuid=self.patient_examination_uuid,
+    #         finding_name=self.finding_name,
+    #         classifications_uuid=classifications_uuid,
+    #         tags=[],
+    #     )
+    #     return data_dict
 
     @classmethod
     def create(

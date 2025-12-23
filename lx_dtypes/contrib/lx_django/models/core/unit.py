@@ -11,14 +11,14 @@ from lx_dtypes.models.core.unit_shallow import (
     UnitTypeShallowDataDict,
 )
 
-from ..base_model.base_model import KnowledgeBaseModel
+from ..base_model.base_model import KnowledgebaseBaseModel
 from ..typing import OptionalCharFieldType
 
 if TYPE_CHECKING:
     from .classification_choice_descriptor import ClassificationChoiceDescriptor
 
 
-class UnitType(KnowledgeBaseModel):
+class UnitType(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
         units: models.Manager["Unit"]
 
@@ -53,7 +53,7 @@ class UnitType(KnowledgeBaseModel):
         return ddict
 
 
-class Unit(KnowledgeBaseModel):
+class Unit(KnowledgebaseBaseModel):
     types: models.ManyToManyField["UnitType", "UnitType"] = models.ManyToManyField(
         "UnitType",
         related_name="units",

@@ -6,20 +6,13 @@ from lx_dtypes.models.ledger.patient import PatientDataDict
 from lx_dtypes.utils.factories.field_defaults import str_unknown_factory
 
 from ..base_model.person import PersonModel
-from ..typing import (
-    OptionalJSONFieldType,
-)
+from ..typing import JSONFieldType
 
 if TYPE_CHECKING:
     from .center import Center
 
 
 class Patient(PersonModel):
-    # center_name: OptionalCharFieldType = (
-    #     models.CharField(  # TODO make foreign key to center model
-    #         max_length=255, null=True, blank=True
-    #     )
-    # )
     center: models.ForeignKey[
         "Center | None",
         "Center | None",
@@ -30,8 +23,8 @@ class Patient(PersonModel):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    external_ids: OptionalJSONFieldType = models.JSONField(
-        null=True, blank=True, default=dict
+    external_ids: JSONFieldType = models.JSONField(
+        default=dict,
     )
 
     @property

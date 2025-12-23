@@ -11,7 +11,7 @@ from lx_dtypes.models.core.classification_shallow import (
     ClassificationTypeShallowDataDict,
 )
 
-from ..base_model.base_model import KnowledgeBaseModel
+from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
     from .classification_choice import ClassificationChoice
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from .finding import Finding
 
 
-class ClassificationType(KnowledgeBaseModel):
+class ClassificationType(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
         classifications: models.Manager["Classification"]
 
@@ -47,7 +47,7 @@ class ClassificationType(KnowledgeBaseModel):
         return obj
 
 
-class Classification(KnowledgeBaseModel):
+class Classification(KnowledgebaseBaseModel):
     choices: models.ManyToManyField["ClassificationChoice", "ClassificationChoice"] = (
         models.ManyToManyField(
             "ClassificationChoice",

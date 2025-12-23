@@ -6,8 +6,13 @@ from typing import Any, ClassVar, Dict, List, Self, Union
 from django.db import models
 from django_stubs_ext.db.models import TypedModelMeta
 
-
-from ..typing import CharFieldType, DateTimeField, OptionalCharFieldType, UUIDFieldType
+from ..typing import (
+    CharFieldType,
+    DateTimeField,
+    JSONFieldType,
+    OptionalCharFieldType,
+    UUIDFieldType,
+)
 
 GENDER_CHOICES = {
     "female": "Female",
@@ -20,6 +25,7 @@ GENDER_CHOICES = {
 class AppBaseModel(models.Model):
     """Abstract base model with common fields."""
 
+    objects: ClassVar[models.Manager[Self]]  # type: ignore[misc]
     created_at: ClassVar[DateTimeField] = models.DateTimeField(auto_now_add=True)
 
     class Meta(TypedModelMeta):
@@ -106,7 +112,7 @@ class AppBaseModelNamesUUIDTags(AppBaseModelUUIDTags):
         abstract = True
 
 
-class KnowledgeBaseModel(AppBaseModelNamesUUIDTags):
+class KnowledgebaseBaseModel(AppBaseModelNamesUUIDTags):
     """Abstract base model with UUID field."""
 
     objects: ClassVar[models.Manager[Self]]  # type: ignore[misc]
@@ -127,7 +133,7 @@ class KnowledgeBaseModel(AppBaseModelNamesUUIDTags):
             uuid (Union[str, uuid.UUID]): The UUID of the model instance.
 
         Returns:
-            KnowledgeBaseModel: The model instance with the given UUID.
+            KnowledgebaseBaseModel: The model instance with the given UUID.
         """
         if isinstance(uuid, str):
             uuid = uuid_module.UUID(uuid)
@@ -142,7 +148,7 @@ class KnowledgeBaseModel(AppBaseModelNamesUUIDTags):
             name (str): The name of the model instance.
 
         Returns:
-            KnowledgeBaseModel: The model instance with the given name.
+            KnowledgebaseBaseModel: The model instance with the given name.
         """
         instance = cls.objects.get(name=name)
         return instance
@@ -158,3 +164,15 @@ class KnowledgeBaseModel(AppBaseModelNamesUUIDTags):
     #     """
     #     instance = cls(**ddict)
     #     return instance
+
+
+class LedgerBaseModel(AppBaseModelUUIDTags):
+    """Abstract base model for ledger models."""
+
+    objects: ClassVar[models.Manager[Self]]  # type: ignore[misc]
+    external_ids: JSONFieldType = models.JSONField(
+        default=dict,
+    )
+
+    class Meta(AppBaseModelUUIDTags.Meta):
+        abstract = True

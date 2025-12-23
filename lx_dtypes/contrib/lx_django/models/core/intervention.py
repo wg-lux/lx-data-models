@@ -11,14 +11,14 @@ from lx_dtypes.models.core.intervention_shallow import (
     InterventionTypeShallowDataDict,
 )
 
-from ..base_model.base_model import KnowledgeBaseModel
+from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
     from .finding import Finding
     from .indication import Indication
 
 
-class InterventionType(KnowledgeBaseModel):
+class InterventionType(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
         interventions: models.Manager["Intervention"]
 
@@ -51,7 +51,7 @@ class InterventionType(KnowledgeBaseModel):
         return obj
 
 
-class Intervention(KnowledgeBaseModel):
+class Intervention(KnowledgebaseBaseModel):
     types: models.ManyToManyField["InterventionType", "InterventionType"] = (
         models.ManyToManyField(
             "InterventionType",

@@ -1,7 +1,11 @@
-from typing import List, NotRequired, Optional, TypedDict, Union
+from typing import List, Optional, Union
 
 from pydantic import Field, field_serializer
 
+from lx_dtypes.models.base_models.base_model import (
+    LedgerBaseModel,
+    LedgerBaseModelDataDict,
+)
 from lx_dtypes.models.core.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
     ClassificationChoiceDescriptorDataDict,
@@ -10,24 +14,13 @@ from lx_dtypes.models.core.classification_choice_descriptor_shallow import (
     ClassificationChoiceDescriptorShallowDataDict,
 )
 from lx_dtypes.utils.factories.field_defaults import uuid_factory
-from lx_dtypes.models.base_models.base_model import AppBaseModel
 
 
-class PatientFindingClassificationChoiceDescriptorDataDict(TypedDict):
-    uuid: NotRequired[str]
+class PatientFindingClassificationChoiceDescriptorShallowDataDict(
+    LedgerBaseModelDataDict
+):
     patient_uuid: str
-    patient_examination_uuid: Optional[str]
-    patient_finding_uuid: str
-    patient_finding_classifications_uuid: str
-    patient_finding_classification_choice_uuid: str
-    descriptor_value: Union[str, int, float, bool, List[str]]
-    descriptor: ClassificationChoiceDescriptorShallowDataDict
-
-
-class PatientFindingClassificationChoiceDescriptorShallowDataDict(TypedDict):
-    uuid: str
-    patient_uuid: str
-    patient_examination_uuid: Optional[str]
+    patient_examination_uuid: str
     patient_finding_uuid: str
     patient_finding_classifications_uuid: str
     patient_finding_classification_choice_uuid: str
@@ -35,11 +28,17 @@ class PatientFindingClassificationChoiceDescriptorShallowDataDict(TypedDict):
     descriptor_name: str
 
 
-class PatientFindingClassificationChoiceDescriptorShallow(AppBaseModel):
+class PatientFindingClassificationChoiceDescriptorDataDict(
+    PatientFindingClassificationChoiceDescriptorShallowDataDict
+):
+    descriptor: ClassificationChoiceDescriptorShallowDataDict
+
+
+class PatientFindingClassificationChoiceDescriptorShallow(LedgerBaseModel):
     uuid: str = Field(default_factory=uuid_factory)
     descriptor_value: Union[str, int, float, bool, List[str]]
     patient_uuid: str
-    patient_examination_uuid: Optional[str] = None
+    patient_examination_uuid: str
     patient_finding_uuid: str
     patient_finding_classifications_uuid: str
     patient_finding_classification_choice_uuid: str

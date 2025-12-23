@@ -11,14 +11,14 @@ from lx_dtypes.models.core.indication_shallow import (
     IndicationTypeShallowDataDict,
 )
 
-from ..base_model.base_model import KnowledgeBaseModel
+from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
     from .examination import Examination
     from .intervention import Intervention
 
 
-class IndicationType(KnowledgeBaseModel):
+class IndicationType(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
         indications: models.Manager["Indication"]
 
@@ -51,7 +51,7 @@ class IndicationType(KnowledgeBaseModel):
         return obj
 
 
-class Indication(KnowledgeBaseModel):
+class Indication(KnowledgebaseBaseModel):
     expected_interventions: models.ManyToManyField["Intervention", "Intervention"] = (
         models.ManyToManyField(
             "Intervention",
