@@ -1,6 +1,7 @@
 from typing import Tuple
 
 import pytest
+
 from lx_dtypes.lx_django.models import (
     Center as DjangoCenterModel,
 )
@@ -10,26 +11,32 @@ from lx_dtypes.lx_django.models import (
 from lx_dtypes.lx_django.models import (
     Patient as DjangoPatientModel,
 )
-
+from lx_dtypes.lx_django.models.ledger.patient_examination import (
+    PatientExamination as DjangoPatientExaminationModel,
+)
 from lx_dtypes.models.ledger.center import Center
 from lx_dtypes.models.ledger.center_shallow import CenterShallow
 from lx_dtypes.models.ledger.examiner import ExaminerShallow
 from lx_dtypes.models.ledger.patient import Patient, PatientShallow
+from lx_dtypes.models.ledger.patient_examination import PatientExamination
 
 
 @pytest.mark.django_db
 class TestLedgerModelSync:
-    def test_center_with_examiner_sync(
-        self, sample_center_with_examiners: Center
+    def test_patient_examination_sync(
+        self,
+        sample_patient_examination: PatientExamination,
+        sample_django_patient_examination: DjangoPatientExaminationModel,
     ) -> None:
-        ddict = sample_center_with_examiners.to_ddict()
-        _django_center = DjangoCenterModel.sync_from_ddict(ddict)
-        uuid = ddict.get("uuid")
-        assert uuid is not None
-        retrieved_center = DjangoCenterModel.objects.get(uuid=uuid)
-        assert str(retrieved_center.uuid) == sample_center_with_examiners.uuid
-        center_dict = retrieved_center.to_ddict_shallow()
-        # Convert the Django model instance back to a Pydantic model
+        pass
+
+    def test_center_with_examiner_sync(
+        self,
+        sample_center_with_examiners: Center,
+        sample_django_center_with_examiners: DjangoCenterModel,
+    ) -> None:
+        center_dict = sample_django_center_with_examiners.to_ddict_shallow()
+
         converted_center = CenterShallow.model_validate(center_dict)
         assert (
             converted_center.to_ddict_shallow()
@@ -44,19 +51,15 @@ class TestLedgerModelSync:
             assert converted_examiner.to_ddict_shallow() == examiner.to_ddict_shallow()
 
     def test_patient_sync(
-        self, sample_patient_with_center: Tuple[Patient, Center]
+        self,
+        sample_patient_with_center: Tuple[Patient, Center],
+        sample_django_patient_with_center: DjangoPatientModel,
     ) -> None:
         sample_patient, sample_center = sample_patient_with_center
 
-        DjangoCenterModel.sync_from_ddict(sample_center.to_ddict())
-
-        ddict = sample_patient.to_ddict()
-        _django_patient = DjangoPatientModel.sync_from_ddict(ddict)
-        uuid = ddict.get("uuid")
-        assert uuid is not None
-        retrieved_patient = DjangoPatientModel.objects.get(uuid=uuid)
+        retrieved_patient = sample_django_patient_with_center
         assert str(retrieved_patient.uuid) == sample_patient.uuid
         patient_dict = retrieved_patient.to_ddict_shallow()
-        # Convert the Django model instance back to a Pydantic model
+
         converted_patient = PatientShallow.model_validate(patient_dict)
         assert converted_patient.to_ddict_shallow() == sample_patient.to_ddict_shallow()

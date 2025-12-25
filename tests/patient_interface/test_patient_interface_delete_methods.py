@@ -19,7 +19,7 @@ class TestPatientInterfaceDeleteMethods:
         examination = patient_interface.get_patient_examination_by_uuid(examination_id)
         examination.delete_finding(patient_finding.uuid)
 
-        finding_uuids = [finding.uuid for finding in examination.findings]
+        finding_uuids = [finding.uuid for finding in examination.patient_findings]
         assert patient_finding.uuid not in finding_uuids
 
     def test_patient_interface_delete_patient(
@@ -76,7 +76,7 @@ class TestPatientInterfaceDeleteMethods:
 
         # Retrieve the indication UUID
         examination = patient_interface.get_patient_examination_by_uuid(examination_id)
-        indications = examination.indications
+        indications = examination.patient_indications
         indication_uuids = [
             indication.uuid
             for indication in indications
@@ -93,6 +93,6 @@ class TestPatientInterfaceDeleteMethods:
 
         # Verify the indication has been deleted
         examination = patient_interface.get_patient_examination_by_uuid(examination_id)
-        indications = examination.indications
+        indications = examination.patient_indications
         remaining_indication_uuids = [indication.uuid for indication in indications]
         assert indication_uuid not in remaining_indication_uuids

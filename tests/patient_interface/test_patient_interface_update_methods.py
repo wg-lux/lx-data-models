@@ -26,7 +26,7 @@ class TestPatientInterfaceUpdateMethods:
         examination = patient_interface.get_patient_examination_by_uuid(examination_id)
         finding = examination.get_finding_by_uuid(patient_finding.uuid)
         classifications = finding.get_or_create_classifications()
-        choice_names = [choice.name for choice in classifications.choices]
+        choice_names = [choice.choice_name for choice in classifications.choices]
         assert classification_choice_name_lesion_size_oval_mm in choice_names
 
     def test_patient_interface_add_invalid_classification_choice_to_finding_raises(
@@ -125,7 +125,7 @@ class TestPatientInterfaceUpdateMethods:
         examination = patient_interface.get_patient_examination_by_uuid(
             examination_uuid
         )
-        indications = examination.indications
+        indications = examination.patient_indications
         indication_names = [indication.indication_name for indication in indications]
 
         assert indication_name_screening_colonoscopy in indication_names

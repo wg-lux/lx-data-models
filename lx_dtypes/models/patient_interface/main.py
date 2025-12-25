@@ -128,12 +128,12 @@ class PatientInterface(AppBaseModel):
         )
         finding_classifications = finding.get_or_create_classifications()
         choice = finding_classifications.get_choice_by_uuid(choice_uuid)
-        kb_choice = self.knowledge_base.get_classification_choice(choice.name)
+        kb_choice = self.knowledge_base.get_classification_choice(choice.choice_name)
 
         valid_descriptors = kb_choice.classification_choice_descriptor_names
         if descriptor_name not in valid_descriptors:
             raise ValueError(
-                f"Descriptor '{descriptor_name}' is not valid for choice '{choice.name}'. Valid descriptors are: {valid_descriptors}"
+                f"Descriptor '{descriptor_name}' is not valid for choice '{choice.choice_name}'. Valid descriptors are: {valid_descriptors}"
             )
 
         kb_descriptor = self.knowledge_base.get_classification_choice_descriptor(

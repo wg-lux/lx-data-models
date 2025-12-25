@@ -16,6 +16,7 @@ from lx_dtypes.models.core.examination_shallow import (
 from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
+    from ..ledger.patient_examination import PatientExamination
     from .finding import Finding
     from .indication import Indication
 
@@ -23,6 +24,7 @@ if TYPE_CHECKING:
 class ExaminationType(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
         examinations: models.Manager["Examination"]
+        patient_examinations: models.QuerySet["PatientExamination"]
 
     @property
     def ddict_shallow(self) -> type[ExaminationTypeShallowDataDict]:

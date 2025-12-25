@@ -21,6 +21,10 @@ from ..typing import (
 )
 
 if TYPE_CHECKING:
+    from lx_dtypes.lx_django.models.ledger.patient_finding_classification_choice_descriptor import (
+        PatientFindingClassificationChoiceDescriptor,
+    )
+
     from .classification_choice import ClassificationChoice
     from .unit import Unit
 
@@ -93,6 +97,9 @@ class ClassificationChoiceDescriptor(KnowledgebaseBaseModel):
 
     if TYPE_CHECKING:
         classification_choices: models.Manager["ClassificationChoice"]
+        patient_finding_classification_choice_descriptors: models.QuerySet[
+            "PatientFindingClassificationChoiceDescriptor"
+        ]
 
     @property
     def ddict(self) -> type[ClassificationChoiceDescriptorDataDict]:

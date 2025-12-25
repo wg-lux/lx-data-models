@@ -10,6 +10,7 @@ from ..typing import JSONFieldType
 
 if TYPE_CHECKING:
     from .center import Center
+    from .patient_examination import PatientExamination
 
 
 class Patient(PersonModel):
@@ -26,6 +27,9 @@ class Patient(PersonModel):
     external_ids: JSONFieldType = models.JSONField(
         default=dict,
     )
+
+    if TYPE_CHECKING:  # pragma: no cover
+        examinations: models.QuerySet["PatientExamination"]
 
     @property
     def ddict(self) -> type[PatientDataDict]:

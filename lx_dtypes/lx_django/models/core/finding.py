@@ -11,6 +11,8 @@ from lx_dtypes.models.core.finding_shallow import (
 from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
+    from lx_dtypes.lx_django.models.ledger.patient_finding import PatientFinding
+
     from .classification import Classification
     from .examination import Examination
     from .intervention import Intervention
@@ -70,6 +72,7 @@ class Finding(KnowledgebaseBaseModel):
 
     if TYPE_CHECKING:
         examinations: models.Manager["Examination"]
+        patient_findings: models.Manager["PatientFinding"]
 
     @property
     def ddict_shallow(self) -> type[FindingShallowDataDict]:

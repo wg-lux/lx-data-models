@@ -13,6 +13,18 @@ from .core.unit import Unit, UnitType
 from .ledger.center import Center
 from .ledger.examiner import Examiner
 from .ledger.patient import Patient
+from .ledger.patient_examination import PatientExamination
+from .ledger.patient_finding import PatientFinding
+from .ledger.patient_finding_classification_choice import (
+    PatientFindingClassificationChoice,
+)
+from .ledger.patient_finding_classification_choice_descriptor import (
+    PatientFindingClassificationChoiceDescriptor,
+)
+from .ledger.patient_finding_classifications import PatientFindingClassifications
+from .ledger.patient_finding_intervention import PatientFindingIntervention
+from .ledger.patient_finding_interventions import PatientFindingInterventions
+from .ledger.patient_indication import PatientIndication
 
 __all__ = [
     "Patient",
@@ -35,4 +47,12 @@ __all__ = [
     "Citation",
     "InformationSource",
     "InformationSourceType",
+    "PatientExamination",
+    "PatientFinding",
+    "PatientFindingClassifications",
+    "PatientFindingClassificationChoice",
+    "PatientFindingClassificationChoiceDescriptor",
+    "PatientFindingInterventions",
+    "PatientFindingIntervention",
+    "PatientIndication",
 ]

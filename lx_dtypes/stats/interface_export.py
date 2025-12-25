@@ -72,7 +72,7 @@ def ledger2dataset(
     examinations = [e for _, e in ledger.examinations.items()]
     for exam in examinations:
         examination_dicts.append(exam.to_ddict_shallow())
-        for finding in exam.findings:
+        for finding in exam.patient_findings:
             finding_dicts.append(finding.to_ddict_shallow())
             if finding.classifications:
                 classifications_dicts.append(finding.classifications.to_ddict_shallow())

@@ -12,6 +12,10 @@ from lx_dtypes.models.core.classification_choice_shallow import (
 from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
+    from lx_dtypes.lx_django.models.ledger.patient_finding_classification_choice import (
+        PatientFindingClassificationChoice,
+    )
+
     from .classification import Classification
     from .classification_choice_descriptor import ClassificationChoiceDescriptor
 
@@ -24,12 +28,12 @@ class ClassificationChoice(KnowledgebaseBaseModel):
         related_name="classification_choices",
         blank=True,
     )
-    # classification_choice_descriptor_names: OptionalCharFieldType = models.CharField(
-    #     max_length=2000, null=True, blank=True
-    # )  # store as comma-separated UUIDs
 
     if TYPE_CHECKING:
-        classifications: models.Manager["Classification"]
+        classifications: models.QuerySet["Classification"]
+        patient_finding_classification_choices: models.QuerySet[
+            "PatientFindingClassificationChoice"
+        ]
 
     @property
     def ddict_shallow(self) -> type[ClassificationChoiceShallowDataDict]:

@@ -1,6 +1,10 @@
 from pytest import fixture
 
-from .fixtures.center import sample_center, sample_center_with_examiners
+from .fixtures.center import (
+    sample_center,
+    sample_center_with_examiners,
+    sample_django_center_with_examiners,
+)
 from .fixtures.citation import sample_citation, sample_django_citation
 from .fixtures.classification import (
     sample_classification,
@@ -54,7 +58,7 @@ from .fixtures.intervention import (
     sample_intervention,
     sample_intervention_type,
 )
-from .fixtures.knowledge_base import lx_knowledge_base
+from .fixtures.knowledge_base import django_lx_knowledge_base, lx_knowledge_base
 from .fixtures.logs import log_writer, logger
 from .fixtures.object_names import (
     classification_choice_name_lesion_size_oval_mm,
@@ -78,8 +82,13 @@ from .fixtures.paths import (
     sample_interventions_yaml_filepath,
     yaml_repo_dirs,
 )
-from .fixtures.patient import sample_patient, sample_patient_with_center
+from .fixtures.patient import (
+    sample_django_patient_with_center,
+    sample_patient,
+    sample_patient_with_center,
+)
 from .fixtures.patient_examination import (
+    sample_django_patient_examination,
     sample_patient_examination,
     sample_patient_finding_colon_polyp,
     sample_patient_finding_with_classification_choice,
@@ -180,4 +189,8 @@ __all__ = [
     "sample_django_information_source",
     "sample_center_with_examiners",
     "sample_patient_with_center",
+    "sample_django_center_with_examiners",
+    "sample_django_patient_with_center",
+    "sample_django_patient_examination",
+    "django_lx_knowledge_base",
 ]

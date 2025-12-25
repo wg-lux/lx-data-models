@@ -14,6 +14,7 @@ from lx_dtypes.models.core.indication_shallow import (
 from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
+    from ..ledger.patient_indication import PatientIndication
     from .examination import Examination
     from .intervention import Intervention
 
@@ -70,6 +71,7 @@ class Indication(KnowledgebaseBaseModel):
 
     if TYPE_CHECKING:
         examinations: models.Manager["Examination"]
+        patient_indications: models.Manager["PatientIndication"]
 
     @classmethod
     def sync_from_ddict_shallow(cls, ddict: IndicationShallowDataDict) -> Self:

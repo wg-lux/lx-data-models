@@ -1,4 +1,4 @@
-from typing import Dict, List, NotRequired, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from pydantic import Field, field_serializer
 
@@ -19,6 +19,7 @@ from .patient_classification_choice_descriptor import (
 
 
 class PatientFindingClassificationChoiceShallowDataDict(LedgerBaseModelDataDict):
+    choice_name: str
     patient_uuid: str
     patient_examination_uuid: Optional[str]
     patient_finding_uuid: str
@@ -30,12 +31,12 @@ class PatientFindingClassificationChoiceShallowDataDict(LedgerBaseModelDataDict)
 class PatientFindingClassificationChoiceDataDict(
     PatientFindingClassificationChoiceShallowDataDict
 ):
-    descriptors: NotRequired[List[PatientFindingClassificationChoiceDescriptorDataDict]]
+    descriptors: List[PatientFindingClassificationChoiceDescriptorDataDict]
 
 
 class PatientFindingClassificationChoiceShallow(LedgerBaseModel):
     uuid: str = Field(default_factory=uuid_factory)
-    name: str
+    choice_name: str
     patient_uuid: str
     patient_examination_uuid: Optional[str] = None
     patient_finding_uuid: str
@@ -113,7 +114,7 @@ class PatientFindingClassificationChoice(PatientFindingClassificationChoiceShall
                 str, Optional[str], List[PatientFindingClassificationChoiceDescriptor]
             ],
         ] = {
-            "name": choice_name,
+            "choice_name": choice_name,
             "patient_uuid": patient_uuid,
             "patient_examination_uuid": patient_examination_uuid,
             "patient_finding_uuid": patient_finding_uuid,

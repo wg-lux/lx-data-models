@@ -22,13 +22,13 @@ class PatientExaminationShallowDataDict(LedgerBaseModelDataDict):
     examination_name: str
     examination_template: Optional[str]
     date: Optional[str]
-    findings_uuids: List[str]
-    indications_uuids: List[str]
+    patient_findings_uuids: List[str]
+    patient_indications_uuids: List[str]
 
 
 class PatientExaminationDataDict(PatientExaminationShallowDataDict):
-    findings: List[PatientFindingDataDict]
-    indications: List[PatientIndicationDataDict]
+    patient_findings: List[PatientFindingDataDict]
+    patient_indications: List[PatientIndicationDataDict]
 
 
 class PatientExaminationShallow(LedgerBaseModel):
@@ -38,8 +38,8 @@ class PatientExaminationShallow(LedgerBaseModel):
     examination_name: str
     examination_template: Optional[str] = None
     date: Optional[datetime.datetime] = None
-    findings_uuids: List[str] = Field(default_factory=list)
-    indications_uuids: List[str] = Field(default_factory=list)
+    patient_findings_uuids: List[str] = Field(default_factory=list)
+    patient_indications_uuids: List[str] = Field(default_factory=list)
 
     @field_validator("date", mode="before")
     def validate_date(
@@ -80,11 +80,11 @@ class PatientExamination(PatientExaminationShallow):
         indications (list[PatientIndication]): List of indications associated with the examination.
     """
 
-    findings: List[PatientFinding] = Field(
+    patient_findings: List[PatientFinding] = Field(
         default_factory=list_of_patient_finding_factory
     )
 
-    indications: List[PatientIndication] = Field(
+    patient_indications: List[PatientIndication] = Field(
         default_factory=list_of_patient_indication_factory
     )
 
@@ -92,13 +92,13 @@ class PatientExamination(PatientExaminationShallow):
     def ddict(self) -> type[PatientExaminationDataDict]:
         return PatientExaminationDataDict
 
-    @field_serializer("findings")
+    @field_serializer("patient_findings")
     def serialize_findings(
         self, findings: List[PatientFinding]
     ) -> List[PatientFindingDataDict]:
         return [finding.to_ddict() for finding in findings]
 
-    @field_serializer("indications")
+    @field_serializer("patient_indications")
     def serialize_indications(
         self, indications: List[PatientIndication]
     ) -> List[PatientIndicationDataDict]:
@@ -150,10 +150,10 @@ class PatientExamination(PatientExaminationShallow):
             examination_name=examination_name,
             examination_template=examination_template,
             date=date_str,
-            findings=[],
-            indications=[],
-            findings_uuids=[],
-            indications_uuids=[],
+            patient_findings=[],
+            patient_indications=[],
+            patient_findings_uuids=[],
+            patient_indications_uuids=[],
             tags=[],
         )
         instance = cls.model_validate(model_dict)
@@ -165,11 +165,13 @@ class PatientExamination(PatientExaminationShallow):
             patient_examination_uuid=self.uuid,
             finding_name=finding_name,
         )
-        self.findings.append(finding)
+        self.patient_findings.append(finding)
         return finding
 
     def get_finding_by_uuid(self, finding_uuid: str) -> PatientFinding:
-        finding = next((f for f in self.findings if f.uuid == finding_uuid), None)
+        finding = next(
+            (f for f in self.patient_findings if f.uuid == finding_uuid), None
+        )
         if finding is None:
             raise ValueError(
                 f"Finding with UUID {finding_uuid} not found in examination {self.uuid}."
@@ -178,19 +180,19 @@ class PatientExamination(PatientExaminationShallow):
 
     def delete_finding(self, finding_uuid: str) -> None:
         finding = self.get_finding_by_uuid(finding_uuid)
-        self.findings.remove(finding)
+        self.patient_findings.remove(finding)
 
     def create_indication(self, indication_name: str) -> PatientIndication:
         indication = PatientIndication.create(
             patient_uuid=self.patient_uuid,
             indication_name=indication_name,
         )
-        self.indications.append(indication)
+        self.patient_indications.append(indication)
         return indication
 
     def get_indication_by_uuid(self, indication_uuid: str) -> PatientIndication:
         indication = next(
-            (i for i in self.indications if i.uuid == indication_uuid), None
+            (i for i in self.patient_indications if i.uuid == indication_uuid), None
         )
         if indication is None:
             raise ValueError(
@@ -200,4 +202,4 @@ class PatientExamination(PatientExaminationShallow):
 
     def delete_indication(self, indication_uuid: str) -> None:
         indication = self.get_indication_by_uuid(indication_uuid)
-        self.indications.remove(indication)
+        self.patient_indications.remove(indication)

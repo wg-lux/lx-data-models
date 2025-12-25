@@ -31,7 +31,7 @@ class TestPatientInterfaceCreateMethods:
             finding_name=finding_name_colon_polyp,
         )
         findings_names = [
-            finding.finding_name for finding in patient_examination.findings
+            finding.finding_name for finding in patient_examination.patient_findings
         ]
         assert finding_name_colon_polyp in findings_names
 

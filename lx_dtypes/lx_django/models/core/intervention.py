@@ -14,13 +14,18 @@ from lx_dtypes.models.core.intervention_shallow import (
 from ..base_model.base_model import KnowledgebaseBaseModel
 
 if TYPE_CHECKING:
+    from lx_dtypes.lx_django.models.ledger.patient_finding_intervention import (
+        PatientFindingIntervention,
+    )
+
     from .finding import Finding
     from .indication import Indication
 
 
 class InterventionType(KnowledgebaseBaseModel):
     if TYPE_CHECKING:
-        interventions: models.Manager["Intervention"]
+        interventions: models.QuerySet["Intervention"]
+        patient_finding_interventions: models.QuerySet["PatientFindingIntervention"]
 
     @property
     def ddict_shallow(self) -> type[InterventionTypeShallowDataDict]:

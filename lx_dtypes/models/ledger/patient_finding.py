@@ -32,8 +32,8 @@ class PatientFindingShallowDataDict(LedgerBaseModelDataDict):
 
 
 class PatientFindingDataDict(PatientFindingShallowDataDict):
-    classifications: NotRequired[PatientFindingClassificationsDataDict]
-    interventions: NotRequired[PatientFindingInterventionsDataDict]
+    classifications: PatientFindingClassificationsDataDict
+    interventions: PatientFindingInterventionsDataDict
 
 
 class PatientFindingShallow(LedgerBaseModel):
