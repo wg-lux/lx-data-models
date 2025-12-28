@@ -98,7 +98,7 @@ useLibraryCodeForTypes = true
 
 [tool.mypy]
 exclude = '^(\.venv|venv|env)/'
-mypy_path = "."
+# mypy_path = "."
 plugins = ["pandera.mypy", "mypy_django_plugin.main"]
 strict = true
 warn_unused_ignores = false
@@ -118,7 +118,7 @@ addopts = """
 markers = [
   "localfiles: depends on files present only on dev machines",
 ]
-testpaths = ["tests"]
+testpaths = ["tests", "lx_dtypes/**/tests"]
 
 [tool.ruff]
 line-length = 88

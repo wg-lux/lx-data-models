@@ -1,0 +1,25 @@
+from lx_dtypes.models.base.app_base_model.ddict import (
+    AppBaseModelDataDict,
+    AppBaseModelNamesUUIDTagsDataDict,
+    AppBaseModelUUIDTagsDataDict,
+)
+
+
+class TestAppBaseModelFixtures:
+    def test_app_base_model_data_dict_fixture(
+        self,
+        app_base_model_data_dict_fixture: AppBaseModelDataDict,
+    ) -> None:
+        assert app_base_model_data_dict_fixture == {}
+
+    def test_app_base_model_uuid_tags_data_dict_fixture(
+        self,
+        app_base_model_uuid_tags_data_dict_fixture: AppBaseModelUUIDTagsDataDict,
+    ) -> None:
+        assert app_base_model_uuid_tags_data_dict_fixture is not None
+
+    def test_app_base_model_names_uuid_tags_data_dict_fixture(
+        self,
+        app_base_model_names_uuid_tags_data_dict_fixture: AppBaseModelNamesUUIDTagsDataDict,
+    ) -> None:
+        assert app_base_model_names_uuid_tags_data_dict_fixture is not None
