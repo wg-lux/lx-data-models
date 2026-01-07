@@ -1,0 +1,9 @@
+uuid: str
+tags: List
+name: str
+name_de: str
+name_en: str
+description: str
+kb_module_name: str
+abbreviation: str
+unit_types: str

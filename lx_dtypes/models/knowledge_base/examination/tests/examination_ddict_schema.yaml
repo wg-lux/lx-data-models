@@ -1,0 +1,10 @@
+uuid: str
+tags: List
+name: str
+name_de: str
+name_en: str
+description: str
+kb_module_name: str
+findings: List
+examination_types: List
+indications: List

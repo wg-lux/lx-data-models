@@ -1,7 +1,12 @@
-from .app_base_model import AppBaseModelDDictEnum as app_base_model_ddicts
-from .files import FilesDDictEnum as files_ddicts
+from .app_base_model import AppBaseModelsLookupType, app_base_models_lookup
+from .file.ddict import FileModelsDDictsLookupType, file_models_ddicts_lookup
 
-__all__ = [
-    "app_base_model_ddicts",
-    "files_ddicts",
-]
+
+class BaseModelsLookupType(AppBaseModelsLookupType, FileModelsDDictsLookupType):
+    pass
+
+
+base_model_ddicts = BaseModelsLookupType(
+    **app_base_models_lookup,
+    **file_models_ddicts_lookup,
+)
