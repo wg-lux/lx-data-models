@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Set, Tuple
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.interface.main import (
+    from lx_dtypes.models.interface.KnowledgeBaseConfig import (
         KnowledgeBaseConfig,
     )
 

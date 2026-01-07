@@ -1,7 +1,9 @@
 import pytest
 
 from ..DbInterface import DbInterface
-from ..main import KnowledgeBase, KnowledgeBaseConfig, Ledger
+from ..KnowledgeBase import KnowledgeBase
+from ..KnowledgeBaseConfig import KnowledgeBaseConfig
+from ..Ledger import Ledger
 
 
 @pytest.fixture(scope="session")

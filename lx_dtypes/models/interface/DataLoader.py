@@ -4,13 +4,14 @@ from typing import TYPE_CHECKING, Dict, List, Set
 from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModel import AppBaseModel
+from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.utils.dataloader import (
     _default_dataloader_dirs_factory,
     resolve_kb_module_load_order,
 )
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.interface.main import KnowledgeBase, KnowledgeBaseConfig
+    from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
 
 class DataLoader(AppBaseModel):
@@ -26,7 +27,7 @@ class DataLoader(AppBaseModel):
         Returns:
             KnowledgeBase: The loaded knowledge base.
         """
-        from lx_dtypes.models.interface.main import KnowledgeBase
+        from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
         kb_config = self.get_initialized_config(module_name)
         kb = KnowledgeBase(config=kb_config)
