@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Self, TypedDict, Union, cast
+from typing import Dict, Self, Union, cast
 
 import yaml
 from pydantic import Field
@@ -12,10 +12,13 @@ from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelUUIDTags import (
 )
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.knowledge_base import (
+    KB_MODEL_NAMES_LITERAL,
     KB_MODEL_NAMES_ORDERED,
     KB_MODELS,
     knowledge_base_models_lookup,
 )
+from lx_dtypes.models.knowledge_base.citation.Citation import Citation
+from lx_dtypes.models.knowledge_base.citation.CitationDataDict import CitationDataDict
 from lx_dtypes.models.knowledge_base.classification.Classification import (
     Classification,
 )
@@ -93,6 +96,7 @@ from lx_dtypes.utils.parser import camel_to_snake, parse_shallow_object, snake_t
 
 class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
     config: KnowledgeBaseConfig
+    citation: Dict[str, CitationDataDict]
     classification: Dict[str, ClassificationDataDict]
     classification_type: Dict[str, ClassificationTypeDataDict]
     classification_choice: Dict[str, ClassificationChoiceDataDict]
@@ -116,6 +120,7 @@ YAML_IMPORT_SKIP_FIELDS = ["config", "uuid", "source_file", "created_at", "updat
 
 class KnowledgeBase(AppBaseModelUUIDTags):
     config: KnowledgeBaseConfig
+    citation: Dict[str, Citation] = Field(default_factory=dict)
     classification: Dict[str, Classification] = Field(default_factory=dict)
     classification_type: Dict[str, ClassificationType] = Field(default_factory=dict)
     classification_choice: Dict[str, ClassificationChoice] = Field(default_factory=dict)
@@ -248,9 +253,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 setattr(self, field_name, merged_tags)
                 continue
 
-            assert (
-                field_model_name in KB_MODEL_NAMES_ORDERED
-            ), f"Unknown model type: {field_model_name}"
+            assert field_model_name in KB_MODEL_NAMES_ORDERED, (
+                f"Unknown model type: {field_model_name}"
+            )
+            field_model_name = cast(KB_MODEL_NAMES_LITERAL, field_model_name)
             TargetModel: type[KB_MODELS] = knowledge_base_models_lookup[
                 field_model_name
             ]

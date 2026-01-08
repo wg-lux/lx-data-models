@@ -1,10 +1,10 @@
 from pathlib import Path
+from lx_dtypes.models.knowledge_base.main import KB_MODEL_NAMES_ORDERED
+from lx_dtypes.utils.parser import camel_to_snake
 
 from ..DbInterface import DbInterface
 
 TEST_INTERFACE_EXPORT_FILE = Path("./test_interface_export.yaml")
-from lx_dtypes.models.knowledge_base.main import KB_MODEL_NAMES_ORDERED
-from lx_dtypes.utils.parser import camel_to_snake
 
 
 class TestKnowledgeBaseDataLoader:
@@ -32,11 +32,11 @@ class TestDbInterfaceExport:
             new_value_1 = new_dict["knowledge_base"][field]
             new_value_2 = re_imported_dict["knowledge_base"][field]
 
-            assert (
-                original_value == new_value_1
-            ), f"Mismatch in field {field} after re-validation."
-            assert (
-                original_value == new_value_2
-            ), f"Mismatch in field {field} after YAML export/import."
+            assert original_value == new_value_1, (
+                f"Mismatch in field {field} after re-validation."
+            )
+            assert original_value == new_value_2, (
+                f"Mismatch in field {field} after YAML export/import."
+            )
 
         assert new_dict == expected_dict

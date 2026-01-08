@@ -31,6 +31,7 @@ FieldNames = Enum(
         "TAGS": "tags",
         "UUID": "uuid",
         "INDICATION_TYPES": "indication_types",
+        "CITATIONS": "citations",
         "CLASSIFICATION_CHOICE_DESCRIPTORS": "classification_choice_descriptors",
         "CLASSIFICATION_CHOICE_DESCRIPTOR_TYPE": "classification_choice_descriptor_type",
         "CLASSIFICATION_CHOICES": "classification_choices",
@@ -72,6 +73,7 @@ def mk_kbbm_list_type_fields(new_names: Optional[List[str]] = None) -> List[str]
     return new
 
 
+CITATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(["keywords", "authors"])
 CLASSIFICATION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields()
 CLASSIFICATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
     [

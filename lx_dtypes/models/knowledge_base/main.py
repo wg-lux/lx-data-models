@@ -1,5 +1,11 @@
 from typing import List, Literal, Union
 
+from .citation import (
+    KbCitationLookupType,
+    kb_citation_ddicts,
+    kb_citation_lookup,
+    kb_citation_models,
+)
 from .classification import (
     KbClassificationLookupType,
     kb_classification_ddicts,
@@ -61,6 +67,7 @@ class KnowledgeBaseModelsLookupType(
     KbInterventionLookupType,
     KbUnitLookupType,
     KbInformationSourceLookupType,
+    KbCitationLookupType,
 ):
     pass
 
@@ -75,6 +82,7 @@ knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
     **kb_intervention_lookup,
     **kb_unit_lookup,
     **kb_information_source_lookup,
+    **kb_citation_lookup,
 )
 
 KB_MODELS = Union[
@@ -87,6 +95,7 @@ KB_MODELS = Union[
     kb_intervention_models,
     kb_unit_models,
     kb_information_source_models,
+    kb_citation_models,
 ]
 
 KB_DDICTS = Union[
@@ -99,6 +108,7 @@ KB_DDICTS = Union[
     kb_intervention_ddicts,
     kb_unit_ddicts,
     kb_information_source_ddicts,
+    kb_citation_ddicts,
 ]
 
 KB_MODEL_NAMES_LITERAL = Literal[
@@ -108,6 +118,7 @@ KB_MODEL_NAMES_LITERAL = Literal[
     "ClassificationChoice",
     "ClassificationType",
     "Classification",
+    "Citation",
     "InterventionType",
     "Intervention",
     "FindingType",
@@ -123,6 +134,7 @@ KB_MODEL_NAMES_LITERAL = Literal[
 KB_MODEL_NAMES_ORDERED: List[KB_MODEL_NAMES_LITERAL] = [
     "InformationSourceType",
     "InformationSource",
+    "Citation",
     "UnitType",
     "Unit",
     "ClassificationChoiceDescriptor",

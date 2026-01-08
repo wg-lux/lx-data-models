@@ -16,7 +16,6 @@ class DbInterface(AppBaseModelUUIDTags):
 
     @classmethod
     def create_from_yaml(cls, yaml_path: Path) -> Self:
-
         with open(yaml_path, "r", encoding="utf-8") as f:
             data_dict = yaml.safe_load(f)
 
