@@ -10,6 +10,27 @@ from lx_dtypes.models.interface.test_fixtures import (
     db_interface_fixture,
     knowledge_base_fixture,
     ledger_fixture,
+    lx_knowledge_base,
+)
+from lx_dtypes.models.interface.test_fixtures.dataloader import (
+    empty_data_loader,
+    initialized_demo_kb_config,
+    uninitialized_demo_kb_config,
+    yaml_data_loader,
+)
+from lx_dtypes.models.interface.test_fixtures.names import demo_kb_config_name
+from lx_dtypes.models.interface.test_fixtures.paths import (
+    log_dir,
+    sample_citations_yaml_filepath,
+    sample_classification_choices_yaml_filepath,
+    sample_classifications_yaml_filepath,
+    sample_examination_types_yaml_filepath,
+    sample_examinations_yaml_filepath,
+    sample_findings_yaml_filepath,
+    sample_indications_yaml_filepath,
+    sample_information_source_yaml_filepath,
+    sample_interventions_yaml_filepath,
+    yaml_repo_dirs,
 )
 from lx_dtypes.models.knowledge_base.classification.test_fixtures import (
     classification_fixture,
@@ -74,4 +95,25 @@ __all__ = [
     "db_interface_fixture",
     "knowledge_base_fixture",
     "ledger_fixture",
+    # Path Fixtures
+    "yaml_repo_dirs",
+    "log_dir",
+    "sample_citations_yaml_filepath",
+    "sample_classifications_yaml_filepath",
+    "sample_classification_choices_yaml_filepath",
+    "sample_examinations_yaml_filepath",
+    "sample_examination_types_yaml_filepath",
+    "sample_findings_yaml_filepath",
+    "sample_indications_yaml_filepath",
+    "sample_interventions_yaml_filepath",
+    "sample_information_source_yaml_filepath",
+    # Names
+    "demo_kb_config_name",
+    # YAML Dataloader
+    "empty_data_loader",
+    "initialized_demo_kb_config",
+    "uninitialized_demo_kb_config",
+    "yaml_data_loader",
+    # lx Knowledge Base Fixtures
+    "lx_knowledge_base",
 ]

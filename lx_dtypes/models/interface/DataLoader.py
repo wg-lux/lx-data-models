@@ -32,13 +32,12 @@ class DataLoader(AppBaseModel):
         kb_config = self.get_initialized_config(module_name)
         kb = KnowledgeBase(config=kb_config)
 
-        # ordered_submodules = kb_config.modules
+        ordered_submodules = kb_config.modules
 
-        # TODO
-        # for sm_name in ordered_submodules:
-        #     sm_config = self.get_initialized_config(sm_name)
-        #     sm_kb = KnowledgeBase.create_from_config(sm_config)
-        #     kb.import_knowledge_base(sm_kb)
+        for sm_name in ordered_submodules:
+            sm_config = self.get_initialized_config(sm_name)
+            sm_kb = KnowledgeBase.create_from_config(sm_config)
+            kb.import_knowledge_base(sm_kb)
         return kb
 
     def fetch_config_yamls(self) -> List[Path]:

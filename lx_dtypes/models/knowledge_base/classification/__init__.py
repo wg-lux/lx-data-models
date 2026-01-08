@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import TypedDict, Union
 
 from .Classification import Classification
 from .ClassificationDataDict import ClassificationDataDict
@@ -20,6 +20,16 @@ kb_classification_lookup = KbClassificationLookupType(
     ClassificationTypeDataDict=ClassificationTypeDataDict,
 )
 
+kb_classification_models = Union[
+    Classification,
+    ClassificationType,
+]
+
+kb_classification_ddicts = Union[
+    ClassificationDataDict,
+    ClassificationTypeDataDict,
+]
+
 
 __all__ = [
     "Classification",
@@ -30,4 +40,6 @@ __all__ = [
     # "ClassificationTypesMixin",
     "kb_classification_lookup",
     "KbClassificationLookupType",
+    "kb_classification_models",
+    "kb_classification_ddicts",
 ]

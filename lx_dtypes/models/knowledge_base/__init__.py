@@ -1,10 +1,15 @@
-from .classification import KbClassificationLookupType, kb_classification_lookup
-
-
-class KnowledgeBaseModelsLookupType(KbClassificationLookupType):
-    pass
-
-
-knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
-    **kb_classification_lookup,
+from .main import (
+    KB_MODEL_NAMES_LITERAL,
+    KB_MODEL_NAMES_ORDERED,
+    KB_MODELS,
+    KnowledgeBaseModelsLookupType,
+    knowledge_base_models_lookup,
 )
+
+__all__ = [
+    "KnowledgeBaseModelsLookupType",
+    "knowledge_base_models_lookup",
+    "KB_MODELS",
+    "KB_MODEL_NAMES_LITERAL",
+    "KB_MODEL_NAMES_ORDERED",
+]

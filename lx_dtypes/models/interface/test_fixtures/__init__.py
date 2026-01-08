@@ -1,5 +1,6 @@
 import pytest
 
+from ..DataLoader import DataLoader
 from ..DbInterface import DbInterface
 from ..KnowledgeBase import KnowledgeBase
 from ..KnowledgeBaseConfig import KnowledgeBaseConfig
@@ -37,14 +38,22 @@ def knowledge_base_fixture() -> "KnowledgeBase":
 
 
 @pytest.fixture(scope="session")
+def lx_knowledge_base(
+    yaml_data_loader: DataLoader, demo_kb_config_name: str
+) -> KnowledgeBase:
+    kb = yaml_data_loader.load_knowledge_base(demo_kb_config_name)
+    return kb
+
+
+@pytest.fixture(scope="session")
 def db_interface_fixture(
-    knowledge_base_fixture: "KnowledgeBase",
+    lx_knowledge_base: "KnowledgeBase",
     ledger_fixture: "Ledger",
 ) -> "DbInterface":
     interface = DbInterface(
         uuid="123e4567-e89b-12d3-a456-426614174000",
         tags=["interface_tag1", "interface_tag2"],
-        knowledge_base=knowledge_base_fixture,
+        knowledge_base=lx_knowledge_base,
         ledger=ledger_fixture,
     )
     return interface
