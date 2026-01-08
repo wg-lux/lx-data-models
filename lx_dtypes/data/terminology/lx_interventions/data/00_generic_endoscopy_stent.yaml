@@ -2,7 +2,7 @@
   name: endoscopy_stent_generic
   description: Stent placement is a technique used to keep a narrowed area
     in the colon open.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
     - foreign_body

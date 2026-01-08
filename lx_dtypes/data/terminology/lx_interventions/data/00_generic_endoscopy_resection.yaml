@@ -5,7 +5,7 @@
     the colonoscope and used to remove the polyp by cutting it off at the base.
     The procedure is usually done without the need for sedation and is considered
     to be a safe and effective way to remove small polyps from the colon.
-  type_names:
+  intervention_types:
     - diagnostic
     - therapeutic
     - invasive
@@ -18,7 +18,7 @@
     the colonoscope and used to remove the polyp by cutting it off at the base.
     The procedure is usually done without the need for sedation and is considered
     to be a safe and effective way to remove small polyps from the colon.
-  type_names:
+  intervention_types:
     - diagnostic
     - therapeutic
     - invasive
@@ -31,7 +31,7 @@
     the colonoscope and removing a small piece of tissue from the lesion. The tissue
     sample is then sent to a laboratory for analysis to determine if the lesion
     is cancerous or benign.
-  type_names:
+  intervention_types:
     - diagnostic
     - therapeutic
     - invasive
@@ -46,7 +46,7 @@
     by cutting it off at the base. The procedure is usually done under sedation
     and is considered to be a safe and effective way to remove large polyps or early-stage
     cancers from the colon.
-  type_names:
+  intervention_types:
     - diagnostic
     - therapeutic
     - invasive
@@ -62,7 +62,7 @@
     by cutting it off at the base. The procedure is usually done under sedation
     and is considered to be a safe and effective way to remove large polyps or early-stage
     cancers from the colon.
-  type_names:
+  intervention_types:
     - therapeutic
     - diagnostic
     - invasive
@@ -72,7 +72,7 @@
   name: endoscopy_eftr_generic
   description: Endoscopic full-thickness resection (EFTR) is a technique used to
     remove lesions in the colon.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
     - diagnostic

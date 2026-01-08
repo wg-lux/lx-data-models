@@ -12,5 +12,5 @@
 
 - model: classification_choice
   name: "minutes_numeric_value"
-  classification_choice_descriptor_names:
+  classification_choice_descriptors:
     - minutes_numeric_value

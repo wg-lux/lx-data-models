@@ -36,6 +36,12 @@ from .indication import (
     kb_indication_lookup,
     kb_indication_models,
 )
+from .information_source import (
+    KbInformationSourceLookupType,
+    kb_information_source_ddicts,
+    kb_information_source_lookup,
+    kb_information_source_models,
+)
 from .intervention import (
     KbInterventionLookupType,
     kb_intervention_ddicts,
@@ -54,6 +60,7 @@ class KnowledgeBaseModelsLookupType(
     KbIndicationLookupType,
     KbInterventionLookupType,
     KbUnitLookupType,
+    KbInformationSourceLookupType,
 ):
     pass
 
@@ -67,6 +74,7 @@ knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
     **kb_indication_lookup,
     **kb_intervention_lookup,
     **kb_unit_lookup,
+    **kb_information_source_lookup,
 )
 
 KB_MODELS = Union[
@@ -78,6 +86,7 @@ KB_MODELS = Union[
     kb_indication_models,
     kb_intervention_models,
     kb_unit_models,
+    kb_information_source_models,
 ]
 
 KB_DDICTS = Union[
@@ -89,6 +98,7 @@ KB_DDICTS = Union[
     kb_indication_ddicts,
     kb_intervention_ddicts,
     kb_unit_ddicts,
+    kb_information_source_ddicts,
 ]
 
 KB_MODEL_NAMES_LITERAL = Literal[
@@ -106,9 +116,13 @@ KB_MODEL_NAMES_LITERAL = Literal[
     "Indication",
     "ExaminationType",
     "Examination",
+    "InformationSourceType",
+    "InformationSource",
 ]
 
 KB_MODEL_NAMES_ORDERED: List[KB_MODEL_NAMES_LITERAL] = [
+    "InformationSourceType",
+    "InformationSource",
     "UnitType",
     "Unit",
     "ClassificationChoiceDescriptor",

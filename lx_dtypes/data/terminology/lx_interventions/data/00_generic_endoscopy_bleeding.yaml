@@ -5,7 +5,7 @@
     that causes the blood vessels to constrict, reducing the flow of blood to the
     area. This can help to stop bleeding and make it easier to remove the lesion
     during the procedure.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
 
@@ -16,7 +16,7 @@
     after a polyp has been removed. It is performed by placing a small metal clip
     over the defect to seal it and prevent bleeding or perforation. The clip is
     left in place until the defect has healed, usually within a few days.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
     - foreign_body
@@ -24,7 +24,7 @@
 - model: intervention
   name: endoscopy_sclerotherapy_generic
   description: Sclerotherapy is a technique used to treat bleeding lesions.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
 
@@ -33,7 +33,7 @@
   description:
     Rubber band ligation is a technique used to treat bleeding lesions
     in the colon.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
     - foreign_body
@@ -43,7 +43,7 @@
   description:
     Over-the-scope clip (OTSC) is a clipping system used to close defects
     in the GI tract.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
     - foreign_body

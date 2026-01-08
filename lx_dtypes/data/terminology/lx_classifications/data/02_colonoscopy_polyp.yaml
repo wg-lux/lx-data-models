@@ -1,9 +1,9 @@
 - model: classification
   name: "colon_lesion_paris"
-  type_names: ["morphology"]
+  classification_types: ["morphology"]
   name_de: "Formklassifikation Kolonläsion"
   name_en: "Colon Lesion Shape Classification"
-  choice_names: [
+  classification_choices: [
       "colon_lesion_paris_Is", # maps to colon_lesion_planarity_sessile
       "colon_lesion_paris_Ip", # colon_lesion_planarity_pedunculated
       "colon_lesion_paris_IIa",
@@ -16,10 +16,10 @@
 
 - model: classification
   name: "colon_lesion_sano"
-  type_names: ["capillary_pattern", "morphology"]
+  classification_types: ["capillary_pattern", "morphology"]
   name_de: "Oberflächenklassifikation Kolonläsion"
   name_en: "Colon Lesion Surface Classification"
-  choice_names:
+  classification_choices:
     [
       "colon_lesion_sano_1",
       "colon_lesion_sano_2",
@@ -30,10 +30,10 @@
 - model: classification
 
   name: "colon_lesion_size_categorical"
-  type_names: ["size", "morphology"]
+  classification_types: ["size", "morphology"]
   name_de: "Größenklassifikation Kolonläsion (kategorisch)"
   name_en: "Colon Lesion Size Classification (categorical)"
-  choice_names: [
+  classification_choices: [
       "colon_lesion_size_categorical_diminutive", # 0 - 5 mm
       "colon_lesion_size_categorical_small", # 6 - 9 mm
       "colon_lesion_size_categorical_medium", # 10 - 20 mm
@@ -42,10 +42,10 @@
 
 - model: classification
   name: "colon_lesion_lst"
-  type_names: ["morphology"]
+  classification_types: ["morphology"]
   name_de: "Oberflächenklassifikation Kolonläsion"
   name_en: "Colon Lesion Surface Classification"
-  choice_names:
+  classification_choices:
     [
       "colon_lesion_lst_granular_homogeneous",
       "colon_lesion_lst_granular_nodular_mixed",
@@ -55,10 +55,10 @@
 
 - model: classification
   name: "colon_lesion_kudo"
-  type_names: ["colon_lesion_advanced_imaging", "morphology"]
+  classification_types: ["colon_lesion_advanced_imaging", "morphology"]
   name_de: "Oberflächenklassifikation Kolonläsion"
   name_en: "Colon Lesion Surface Classification"
-  choice_names:
+  classification_choices:
     [
       "colon_lesion_kudo_1",
       "colon_lesion_kudo_2",
@@ -73,8 +73,8 @@
   name: "colon_lesion_jnet"
   name_de: "Kolonläsion - JNET"
   name_en: "Colon lesion - JNET"
-  type_names: ["morphology", "colon_lesion_advanced_imaging"]
-  choice_names:
+  classification_types: ["morphology", "colon_lesion_advanced_imaging"]
+  classification_choices:
     [
       "colon_lesion_jnet_1",
       "colon_lesion_jnet_2a",
@@ -84,10 +84,10 @@
 
 - model: classification
   name: "colon_lesion_nice"
-  type_names: ["colon_lesion_advanced_imaging", "morphology"]
+  classification_types: ["colon_lesion_advanced_imaging", "morphology"]
   name_de: "Kolonläsion - NICE"
   name_en: "Colon lesion - NICE"
-  choice_names:
+  classification_choices:
     [
       "colon_lesion_NICE_type_1",
       "colon_lesion_NICE_type_2",

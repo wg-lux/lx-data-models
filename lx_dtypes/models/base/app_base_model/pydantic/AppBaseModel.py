@@ -9,9 +9,10 @@ from lx_dtypes.serialization import serialize_path
 
 
 class AppBaseModel(BaseModel):
-    source_file: Path | None = None
+    # Exclude from serialization everywhere (including nested models)
+    source_file: Path | None = Field(default=None, exclude=True)
     created_at: AwareDatetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(timezone.utc),
     )
     model_config = ConfigDict(
         # 1. Strips leading/trailing whitespace automatically ("  val  " -> "val")
@@ -53,7 +54,7 @@ class AppBaseModel(BaseModel):
         kwargs.setdefault("mode", "python")
         kwargs.setdefault("by_alias", True)
         kwargs.setdefault("exclude_none", False)
-        # kwargs.setdefault( #TODO revisit
+        # kwargs.setdefault(  # TODO revisit
         #     "exclude",
         #     {"source_file", "created_at"} | set(kwargs.get("exclude", [])),
         # )
@@ -61,14 +62,15 @@ class AppBaseModel(BaseModel):
         kwargs.setdefault("round_trip", True)
 
         dump = super().model_dump(*args, **kwargs)
-        dump.pop("source_file", None)
-        dump.pop("created_at", None)
+        # Defensive: ensure excluded fields are stripped even if config changes elsewhere
+        # dump.pop("source_file", None)
+        # dump.pop("created_at", None)
 
         return dump
 
     def to_yaml(self, path: Path) -> None:
         """Serialize the model instance to a YAML string."""
-        data = self.model_dump()
+        data = self.model_dump(mode="json")
         path = path.expanduser().resolve()
         with path.open("w", encoding="utf-8") as f:
             yaml.safe_dump(

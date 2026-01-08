@@ -2,7 +2,7 @@
   name: "complication_generic"
   name_de: "Komplikation (generisch)"
   name_en: "Complication (generic)"
-  type_names:
+  finding_types:
     - complication
-  classification_names:
+  classifications:
     - complication_generic_type

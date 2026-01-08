@@ -1,30 +1,30 @@
 - model: classification
   name: "visualized"
-  type_names:
+  classification_types:
     - inferrable
-  choice_names:
+  classification_choices:
     - "yes"
     - "no"
 
 - model: classification
   name: "examination_setting_generic_location"
-  type_names: []
-  choice_names:
+  classification_types: []
+  classification_choices:
     - examination_setting_generic_location_inpatient
     - examination_setting_generic_location_outpatient
 
 - model: classification
   name: "sedation_performed"
-  type_names: []
-  choice_names:
+  classification_types: []
+  classification_choices:
     - "yes"
     - "no"
     - "unknown"
 
 - model: classification
   name: "examination_setting_generic_sedation"
-  type_names: []
-  choice_names:
+  classification_types: []
+  classification_choices:
     - "sedation_propofol"
     - "sedation_midazolam"
     - "sedation_propofol_midazolam"
@@ -32,8 +32,8 @@
 
 - model: classification
   name: "complication_generic_type"
-  type_names: []
-  choice_names:
+  classification_types: []
+  classification_choices:
     - complication_generic_type_cardiorespiratory
     - complication_generic_type_bleeding
     - complication_generic_type_perforation
@@ -41,6 +41,6 @@
 
 - model: classification
   name: "time_minutes_generic"
-  type_names: []
-  choice_names:
+  classification_types: []
+  classification_choices:
     - minutes_numeric_value

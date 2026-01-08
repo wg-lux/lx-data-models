@@ -1,8 +1,8 @@
 - model: classification
   name: "colonoscopy_polyp_histology"
-  type_names:
+  classification_types:
     - histology
-  choice_names: [
+  classification_choices: [
       "histology_non_pathological",
       "histology_polyp_hyperplastic",
       "histology_polyp_adenoma_tubular",

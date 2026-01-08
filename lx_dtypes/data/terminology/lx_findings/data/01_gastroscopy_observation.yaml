@@ -2,97 +2,97 @@
 
   name: "gastroscopy_polyp"
   description: "Polyp"
-  type_names:
+  finding_types:
     - observation
-    #TODO add classification_names and intervention_names
+    #TODO add classifications and interventions
 
 - model: finding
   name: "gastroscopy_ulcer"
   description: "Ulcer"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_erythema"
   description: "Erythema"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_subepithelial_tumor"
   description: "Subepithelial Tumor"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_stenosis"
   description: "Stenosis"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_varices_esophageal"
   description: "Esophageal Varices"
-  type_names:
+  finding_types:
     - observation
     - persisting
 
 - model: finding
   name: "gastroscopy_varices_gastric"
   description: "Gastric Varices"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_varices_duodenal"
   description: "Duodenal Varices"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_scar"
   description: "Scar"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_bleeding"
   description: "Bleeding"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_stenosis"
   description: "Stenosis"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_ectopic_gastric_mucosa"
   description: "Ectopic Gastric Mucosa"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_diverticulum_esophagus"
   description: "Divertikel (Ösophagus)"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_diverticulum_duodenum"
   description: "Divertikel (Duodenum)"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_ectopic_pancreatic_tissue"
   description: "Ectopic Pancreatic Tissue"
-  type_names:
+  finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_obstruction_generic"
   description: "Generic Obstruction"
-  type_names:
+  finding_types:
     - observation

@@ -46,6 +46,8 @@ FieldNames = Enum(
         "INTERVENTION": "intervention",
         "INTERVENTIONS": "interventions",
         "INTERVENTION_TYPES": "intervention_types",
+        "INFORMATION_SOURCES": "information_sources",
+        "INFORMATION_SOURCE_TYPES": "information_source_types",
         "SELECTION_OPTIONS": "selection_options",
         "UNIT_TYPES": "unit_types",
         "UNIT": "unit",
@@ -128,6 +130,14 @@ INTERVENTION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
 )
 
 INTERVENTION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields()
+
+INFORMATION_SOURCE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
+    [
+        FieldNames.INFORMATION_SOURCE_TYPES.value,
+    ]
+)
+
+INFORMATION_SOURCE_TYPE_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields()
 
 UNIT_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields()
 UNIT_MODEL_LIST_TYPE_FIELDS = [

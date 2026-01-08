@@ -1,28 +1,28 @@
 - model: finding
   name: "examination_setting"
-  type_names:
+  finding_types:
     - baseline
   description: "Settings related to the examination environment and conditions."
-  classification_names:
+  classifications:
     - examination_setting_generic_location
 
 - model: finding
   name: "sedation_endoscopy"
   description: "Sedation during an examination"
-  type_names:
+  finding_types:
     - baseline
-  classification_names:
+  classifications:
     - sedation_performed
     - examination_setting_generic_sedation
 
 - model: finding
   name: "post_resection_wound"
   description: "Postresection Wound"
-  type_names:
+  finding_types:
     - observation
     - iatrogenic
-  intervention_names:
+  interventions:
     - endoscopy_injection_vasoactive
     - endoscopy_hemoclip_generic
     - endoscopy_over_the_scope_clip_generic
-  classification_names: [] #TODO active bleeding? macroscopically in sano?
+  classifications: [] #TODO active bleeding? macroscopically in sano?

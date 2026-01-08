@@ -2,7 +2,7 @@
   name: endoscopy_dilation_balloon
   description: Balloon dilation is a technique used to widen a narrowed area
     in the colon.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
 
@@ -10,6 +10,6 @@
   name: endoscopy_dilation_bougie
   description: Bougie dilation is a technique used to widen a narrowed area
     in the colon.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive

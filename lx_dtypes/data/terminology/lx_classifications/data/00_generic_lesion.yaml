@@ -1,24 +1,24 @@
 - model: classification
   name: "lesion_size_mm"
-  type_names: ["size"]
+  classification_types: ["size"]
   name_de: "Größe (mm)"
   name_en: "Size (mm)"
-  choice_names: ["lesion_size_oval_mm"]
+  classification_choices: ["lesion_size_oval_mm"]
 
 - model: classification
   name: "lesion_length_mm"
-  type_names: ["size"]
+  classification_types: ["size"]
   name_de: "Länge (mm)"
   name_en: "Length (mm)"
-  choice_names:
+  classification_choices:
     - lesion_length_mm #TODO
 
 - model: classification
   name: "lesion_planarity_default"
-  type_names: ["planarity", "morphology"]
+  classification_types: ["planarity", "morphology"]
   name_de: "Planaritätsklassifikation Kolonläsion"
   name_en: "Colon Lesion Planarity Classification"
-  choice_names:
+  classification_choices:
     - lesion_planarity_flat
     - lesion_planarity_flat_elevated
     - lesion_planarity_sessile
@@ -28,11 +28,11 @@
 
 - model: classification
   name: "lesion_surface_intact_default"
-  type_names:
+  classification_types:
     - morphology
   name_de: "Oberflächenklassifikation Kolonläsion"
   name_en: "Colon Lesion Surface Classification"
-  choice_names:
+  classification_choices:
     - lesion_surface_intact
     - lesion_surface_eroded
     - lesion_surface_ulcerated
@@ -41,7 +41,7 @@
   name: "lesion_circularity_default"
   name_de: "Zirkularität"
   name_en: "Circularity"
-  type_names: ["morphology"]
-  choice_names:
+  classification_types: ["morphology"]
+  classification_choices:
     - lesion_circularity_false
     - lesion_circularity_true
