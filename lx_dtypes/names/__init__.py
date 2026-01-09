@@ -1,5 +1,14 @@
 from enum import Enum
-from typing import List, Optional
+from typing import Dict, List, Literal, Optional
+
+GENDER_OPTIONS_LITERAL = Literal["female", "male", "other", "unknown"]
+GENDER_CHOICES: Dict[GENDER_OPTIONS_LITERAL, str] = {
+    "female": "Female",
+    "male": "Male",
+    "other": "Other",
+    "unknown": "Unknown",
+}
+
 
 # Prefix FN is for field names
 NumericDistributionChoices = Enum(

@@ -1,8 +1,11 @@
 from typing import List, Literal, Union
 
 from .citation import (
+    KbCitationDjangoLookupType,
     KbCitationLookupType,
     kb_citation_ddicts,
+    kb_citation_django,
+    kb_citation_django_lookup,
     kb_citation_lookup,
     kb_citation_models,
 )
@@ -72,6 +75,10 @@ class KnowledgeBaseModelsLookupType(
     pass
 
 
+class KnowledgeBaseModelsDjangoLookupType(KbCitationDjangoLookupType):
+    pass
+
+
 knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
     **kb_classification_lookup,
     **kb_classification_choice_lookup,
@@ -83,6 +90,10 @@ knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
     **kb_unit_lookup,
     **kb_information_source_lookup,
     **kb_citation_lookup,
+)
+
+knowledge_base_models_django_lookup = KnowledgeBaseModelsDjangoLookupType(
+    **kb_citation_django_lookup,
 )
 
 KB_MODELS = Union[
@@ -97,6 +108,8 @@ KB_MODELS = Union[
     kb_information_source_models,
     kb_citation_models,
 ]
+
+KB_MODELS_DJANGO = Union[kb_citation_django,]
 
 KB_DDICTS = Union[
     kb_classification_ddicts,

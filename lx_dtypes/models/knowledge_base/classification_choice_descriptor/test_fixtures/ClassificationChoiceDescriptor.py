@@ -17,4 +17,7 @@ def classification_choice_descriptor_fixture() -> ClassificationChoiceDescriptor
         numeric_distribution_params={"mean": 0.0, "stddev": 1.0},
         unit="centimeters",
     )
+
+    _ddict = pydantic_model.ddict
+
     return pydantic_model

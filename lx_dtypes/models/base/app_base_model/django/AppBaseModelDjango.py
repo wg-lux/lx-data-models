@@ -14,6 +14,7 @@ class AppBaseModelDjango(models.Model):
 
     class Meta(TypedModelMeta):
         abstract = True
+        app_label = "lx_dtypes_django"
 
     def _to_ddict(self) -> Dict[str, Any]:
         """Cleans the model instance data for dictionary representation.

@@ -20,6 +20,7 @@ django_stubs_ext.monkeypatch()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DJANGO_APP_MODULE = "lx_dtypes.django"
+DJANGO_APP_CONFIG = "lx_dtypes.django.apps.LxDtypesDjangoConfig"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    DJANGO_APP_MODULE,
+    DJANGO_APP_CONFIG,
 ]
 
 MIDDLEWARE = [

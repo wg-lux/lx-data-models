@@ -32,6 +32,10 @@ from lx_dtypes.models.interface.test_fixtures.paths import (
     sample_interventions_yaml_filepath,
     yaml_repo_dirs,
 )
+from lx_dtypes.models.knowledge_base.citation.test_fixtures import (
+    citation_fixture,
+    django_citation_fixture,
+)
 from lx_dtypes.models.knowledge_base.classification.test_fixtures import (
     classification_fixture,
 )
@@ -70,6 +74,9 @@ __all__ = [
     "app_base_model_pydantic_fixture",
     "app_base_model_uuid_tags_pydantic_fixture",
     "app_base_model_names_uuid_tags_pydantic_fixture",
+    # Citation Fixtures
+    "citation_fixture",
+    "django_citation_fixture",
     # Classification Fixtures
     "classification_fixture",
     # Classification Choice Fixtures
