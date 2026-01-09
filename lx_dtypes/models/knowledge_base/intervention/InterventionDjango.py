@@ -20,8 +20,15 @@ class InterventionDjango(KnowledgebaseBaseModelDjango[InterventionDataDict]):
     intervention_types: models.ManyToManyField[
         "InterventionTypeDjango", "InterventionTypeDjango"
     ] = models.ManyToManyField(
-        "InterventionTypeDjango", related_name=FieldNames.INTERVENTION_TYPES.value
+        "InterventionTypeDjango", related_name=FieldNames.INTERVENTIONS.value
     )
+
+    if TYPE_CHECKING:
+        from lx_dtypes.models.knowledge_base.indication.IndicationDjango import (
+            IndicationDjango,
+        )
+
+        indications: models.QuerySet["IndicationDjango"]
 
     @property
     def ddict_class(self) -> type[InterventionDataDict]:

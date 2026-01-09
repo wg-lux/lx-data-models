@@ -8,13 +8,28 @@ from lx_dtypes.models.base.app_base_model.django.AppBaseModelNamesUUIDTagsDjango
 )
 from lx_dtypes.names import mk_kbbm_list_type_fields
 from lx_dtypes.serialization import parse_str_list
-from lx_dtypes.utils.django_field_types import CharFieldType
+from lx_dtypes.utils.django_field_types import CharFieldType, UUIDFieldType
 
 DDictT = TypeVar("DDictT")
 
 
 class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDictT]):
     """Abstract base model with UUID field."""
+
+    # Override: keep uuid as unique, indexed, non-PK; use name as PK for KB models
+    uuid: UUIDFieldType = models.UUIDField(
+        default=uuid_module.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True,
+        primary_key=False,
+    )
+
+    name: CharFieldType = models.CharField(
+        max_length=255,
+        unique=True,
+        primary_key=True,
+    )
 
     objects: ClassVar[models.Manager[Self]]  # type: ignore[misc]
 

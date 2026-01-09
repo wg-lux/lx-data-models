@@ -12,8 +12,12 @@ from lx_dtypes.utils.django_field_types import CharFieldType, UUIDFieldType
 class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
     """Abstract base model with name and UUID fields."""
 
+    # Default: UUID is the primary key
     uuid: UUIDFieldType = models.UUIDField(
-        default=uuid_module.uuid4, editable=False, unique=True, primary_key=True
+        default=uuid_module.uuid4,
+        editable=False,
+        unique=True,
+        primary_key=True,
     )
     tags: CharFieldType = models.CharField(max_length=1024, blank=True)
 

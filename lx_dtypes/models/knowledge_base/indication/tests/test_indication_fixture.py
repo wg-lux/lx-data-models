@@ -1,8 +1,12 @@
 from pathlib import Path
 
+import pytest
+
 from lx_dtypes.utils.ddict_schema import dump_ddict_schema
+from lx_dtypes.utils.testing import validate_django_fixture
 
 from ..Indication import Indication
+from ..IndicationDjango import IndicationDjango
 from ..IndicationType import IndicationType
 
 TEST_EXPORT = Path(__file__).parent / "indication_fixture.yaml"
@@ -27,6 +31,14 @@ class TestIndicationFixture:
     def test_dump_indication_ddict(self, indication_fixture: Indication) -> None:
         ddict_type = indication_fixture.ddict_class
         dump_ddict_schema(ddict_type, TEST_EXPORT_DDICT_SCHEMA)
+
+
+@pytest.mark.django_db
+class TestDjangoIndicationFixture:
+    def test_django_indication_fixture(
+        self, django_indication_fixture: "IndicationDjango"
+    ) -> None:
+        validate_django_fixture(django_indication_fixture)
 
 
 class TestIndicationTypeFixture:

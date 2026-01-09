@@ -40,8 +40,11 @@ from .finding import (
     kb_finding_models,
 )
 from .indication import (
+    KbIndicationDjangoLookupType,
     KbIndicationLookupType,
     kb_indication_ddicts,
+    kb_indication_django_lookup,
+    kb_indication_django_models,
     kb_indication_lookup,
     kb_indication_models,
 )
@@ -78,12 +81,6 @@ class KnowledgeBaseModelsLookupType(
     pass
 
 
-class KnowledgeBaseModelsDjangoLookupType(
-    KbCitationDjangoLookupType, KbInterventionDjangoLookupType
-):
-    pass
-
-
 knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
     **kb_classification_lookup,
     **kb_classification_choice_lookup,
@@ -97,9 +94,19 @@ knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
     **kb_citation_lookup,
 )
 
+
+class KnowledgeBaseModelsDjangoLookupType(
+    KbCitationDjangoLookupType,
+    KbInterventionDjangoLookupType,
+    KbIndicationDjangoLookupType,
+):
+    pass
+
+
 knowledge_base_models_django_lookup = KnowledgeBaseModelsDjangoLookupType(
     **kb_citation_django_lookup,
     **kb_intervention_django_lookup,
+    **kb_indication_django_lookup,
 )
 
 KB_MODELS = Union[
@@ -118,6 +125,7 @@ KB_MODELS = Union[
 KB_MODELS_DJANGO = Union[
     kb_citation_django,
     kb_intervention_django_models,
+    kb_indication_django_models,
 ]
 
 KB_DDICTS = Union[

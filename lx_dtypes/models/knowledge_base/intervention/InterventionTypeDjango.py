@@ -5,9 +5,6 @@ from django.db import models
 from lx_dtypes.models.base.app_base_model.django.KnowledgebaseBaseModelDjango import (
     KnowledgebaseBaseModelDjango,
 )
-from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
-    InterventionDjango,
-)
 from lx_dtypes.models.knowledge_base.intervention.InterventionTypeDataDict import (
     InterventionTypeDataDict,
 )
@@ -16,6 +13,10 @@ from lx_dtypes.names import INTERVENTION_TYPE_MODEL_LIST_TYPE_FIELDS
 
 class InterventionTypeDjango(KnowledgebaseBaseModelDjango[InterventionTypeDataDict]):
     if TYPE_CHECKING:
+        from .InterventionDjango import (
+            InterventionDjango,
+        )
+
         interventions: models.QuerySet["InterventionDjango"]
         # patient_finding_interventions #TODO
 

@@ -2,8 +2,21 @@ from typing import TypedDict, Union
 
 from .Indication import Indication
 from .IndicationDataDict import IndicationDataDict
+from .IndicationDjango import IndicationDjango
 from .IndicationType import IndicationType
 from .IndicationTypeDataDict import IndicationTypeDataDict
+from .IndicationTypeDjango import IndicationTypeDjango
+
+
+class KbIndicationDjangoLookupType(TypedDict):
+    Indication: type[IndicationDjango]
+    IndicationType: type[IndicationTypeDjango]
+
+
+kb_indication_django_lookup = KbIndicationDjangoLookupType(
+    Indication=IndicationDjango,
+    IndicationType=IndicationTypeDjango,
+)
 
 
 class KbIndicationLookupType(TypedDict):
@@ -19,6 +32,11 @@ kb_indication_lookup = KbIndicationLookupType(
     IndicationType=IndicationType,
     IndicationTypeDataDict=IndicationTypeDataDict,
 )
+
+kb_indication_django_models = Union[
+    IndicationDjango,
+    IndicationTypeDjango,
+]
 
 kb_indication_models = Union[
     Indication,
