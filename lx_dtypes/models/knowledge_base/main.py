@@ -52,8 +52,11 @@ from .information_source import (
     kb_information_source_models,
 )
 from .intervention import (
+    KbInterventionDjangoLookupType,
     KbInterventionLookupType,
     kb_intervention_ddicts,
+    kb_intervention_django_lookup,
+    kb_intervention_django_models,
     kb_intervention_lookup,
     kb_intervention_models,
 )
@@ -75,7 +78,9 @@ class KnowledgeBaseModelsLookupType(
     pass
 
 
-class KnowledgeBaseModelsDjangoLookupType(KbCitationDjangoLookupType):
+class KnowledgeBaseModelsDjangoLookupType(
+    KbCitationDjangoLookupType, KbInterventionDjangoLookupType
+):
     pass
 
 
@@ -94,6 +99,7 @@ knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
 
 knowledge_base_models_django_lookup = KnowledgeBaseModelsDjangoLookupType(
     **kb_citation_django_lookup,
+    **kb_intervention_django_lookup,
 )
 
 KB_MODELS = Union[
@@ -109,7 +115,10 @@ KB_MODELS = Union[
     kb_citation_models,
 ]
 
-KB_MODELS_DJANGO = Union[kb_citation_django,]
+KB_MODELS_DJANGO = Union[
+    kb_citation_django,
+    kb_intervention_django_models,
+]
 
 KB_DDICTS = Union[
     kb_classification_ddicts,

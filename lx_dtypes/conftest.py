@@ -58,6 +58,8 @@ from lx_dtypes.models.knowledge_base.indication.test_fixtures import (
     indication_type_fixture,
 )
 from lx_dtypes.models.knowledge_base.intervention.test_fixtures import (
+    django_intervention_fixture,
+    django_intervention_type_fixture,
     intervention_fixture,
     intervention_type_fixture,
 )
@@ -95,6 +97,8 @@ __all__ = [
     # Intervention Fixtures
     "intervention_fixture",
     "intervention_type_fixture",
+    "django_intervention_fixture",
+    "django_intervention_type_fixture",
     # Unit Fixtures
     "unit_type_fixture",
     "unit_fixture",

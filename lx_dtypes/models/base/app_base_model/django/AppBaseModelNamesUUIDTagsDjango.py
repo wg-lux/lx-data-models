@@ -9,7 +9,9 @@ from lx_dtypes.utils.django_field_types import CharFieldType, OptionalCharFieldT
 class AppBaseModelNamesUUIDTagsDjango(AppBaseModelUUIDTagsDjango):
     """Abstract base model with name and UUID fields."""
 
-    name: CharFieldType = models.CharField(max_length=255, unique=True, db_index=True)
+    name: CharFieldType = models.CharField(
+        max_length=255, primary_key=True
+    )  # unique=True, db_index=True)
     name_de: OptionalCharFieldType = models.CharField(
         max_length=255, null=True, blank=True
     )
