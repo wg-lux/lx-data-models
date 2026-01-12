@@ -2,8 +2,21 @@ from typing import TypedDict, Union
 
 from .Finding import Finding
 from .FindingDataDict import FindingDataDict
+from .FindingDjango import FindingDjango
 from .FindingType import FindingType
 from .FindingTypeDataDict import FindingTypeDataDict
+from .FindingTypeDjango import FindingTypeDjango
+
+
+class KbFindingDjangoLookupType(TypedDict):
+    FindingDjango: type["FindingDjango"]
+    FindingTypeDjango: type["FindingTypeDjango"]
+
+
+kb_finding_django_lookup = KbFindingDjangoLookupType(
+    FindingDjango=FindingDjango,
+    FindingTypeDjango=FindingTypeDjango,
+)
 
 
 class KbFindingLookupType(TypedDict):
@@ -30,6 +43,11 @@ kb_finding_ddicts = Union[
     FindingTypeDataDict,
 ]
 
+kb_finding_django_models = Union[
+    FindingDjango,
+    FindingTypeDjango,
+]
+
 __all__ = [
     "Finding",
     "FindingDataDict",
@@ -39,4 +57,7 @@ __all__ = [
     "KbFindingLookupType",
     "kb_finding_models",
     "kb_finding_ddicts",
+    "kb_finding_django_lookup",
+    "KbFindingDjangoLookupType",
+    "kb_finding_django_models",
 ]
