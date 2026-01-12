@@ -53,6 +53,7 @@ FieldNames = Enum(
         "FINDING_TYPES": "finding_types",
         "INDICATIONS": "indications",
         "EXAMINATION": "examination",
+        "EXAMINATIONS": "examinations",
         "INTERVENTION": "intervention",
         "INTERVENTIONS": "interventions",
         "INTERVENTION_TYPES": "intervention_types",

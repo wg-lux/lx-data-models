@@ -2,8 +2,21 @@ from typing import TypedDict, Union
 
 from .Examination import Examination
 from .ExaminationDataDict import ExaminationDataDict
+from .ExaminationDjango import ExaminationDjango
 from .ExaminationType import ExaminationType
 from .ExaminationTypeDataDict import ExaminationTypeDataDict
+from .ExaminationTypeDjango import ExaminationTypeDjango
+
+
+class KbExaminationDjangoLookupType(TypedDict):
+    Examination: type[ExaminationDjango]
+    ExaminationType: type[ExaminationTypeDjango]
+
+
+kb_examination_django_lookup = KbExaminationDjangoLookupType(
+    Examination=ExaminationDjango,
+    ExaminationType=ExaminationTypeDjango,
+)
 
 
 class KbExaminationLookupType(TypedDict):
@@ -30,6 +43,11 @@ kb_examination_ddicts = Union[
     ExaminationTypeDataDict,
 ]
 
+kb_examination_django_models = Union[
+    ExaminationDjango,
+    ExaminationTypeDjango,
+]
+
 __all__ = [
     "Examination",
     "ExaminationDataDict",
@@ -39,4 +57,7 @@ __all__ = [
     "KbExaminationLookupType",
     "kb_examination_models",
     "kb_examination_ddicts",
+    "kb_examination_django_models",
+    "kb_examination_django_lookup",
+    "KbExaminationDjangoLookupType",
 ]

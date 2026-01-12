@@ -1,12 +1,24 @@
 from pathlib import Path
 
+import pytest
+
 from lx_dtypes.utils.ddict_schema import dump_ddict_schema
+from lx_dtypes.utils.testing import validate_django_fixture
 
 from ..Examination import Examination
+from ..ExaminationDjango import ExaminationDjango
 from ..ExaminationType import ExaminationType
 
 TEST_EXPORT = Path(__file__).parent / "examination_fixture.yaml"
 TEST_EXPORT_DDICT_SCHEMA = Path(__file__).parent / "examination_ddict_schema.yaml"
+
+
+@pytest.mark.django_db
+class TestDjangoExaminationFixture:
+    def test_django_examination_fixture(
+        self, django_examination_fixture: "ExaminationDjango"
+    ) -> None:
+        validate_django_fixture(django_examination_fixture)
 
 
 class TestExaminationTypeFixture:

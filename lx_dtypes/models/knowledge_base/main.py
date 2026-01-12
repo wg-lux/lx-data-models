@@ -37,8 +37,11 @@ from .classification_choice_descriptor import (
     kb_classification_choice_descriptor_models,
 )
 from .examination import (
+    KbExaminationDjangoLookupType,
     KbExaminationLookupType,
     kb_examination_ddicts,
+    kb_examination_django_lookup,
+    kb_examination_django_models,
     kb_examination_lookup,
     kb_examination_models,
 )
@@ -124,6 +127,7 @@ class KnowledgeBaseModelsDjangoLookupType(
     KbClassificationChoiceDjangoLookupType,
     KbClassificationDjangoLookupType,
     KbFindingDjangoLookupType,
+    KbExaminationDjangoLookupType,
 ):
     pass
 
@@ -137,6 +141,7 @@ knowledge_base_models_django_lookup = KnowledgeBaseModelsDjangoLookupType(
     **kb_classification_choice_django_lookup,
     **kb_classification_django_lookup,
     **kb_finding_django_lookup,
+    **kb_examination_django_lookup,
 )
 
 KB_MODELS = Union[
@@ -161,6 +166,7 @@ KB_MODELS_DJANGO = Union[
     kb_classification_choice_django_models,
     kb_classification_django_models,
     kb_finding_django_models,
+    kb_examination_django_models,
 ]
 
 KB_DDICTS = Union[

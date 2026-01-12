@@ -51,6 +51,8 @@ from lx_dtypes.models.knowledge_base.classification_choice_descriptor.test_fixtu
     django_classification_choice_descriptor_fixture,
 )
 from lx_dtypes.models.knowledge_base.examination.test_fixtures import (
+    django_examination_fixture,
+    django_examination_type_fixture,
     examination_fixture,
     examination_type_fixture,
 )
@@ -104,6 +106,8 @@ __all__ = [
     # Examination Fixtures
     "examination_fixture",
     "examination_type_fixture",
+    "django_examination_fixture",
+    "django_examination_type_fixture",
     # Finding Fixtures
     "finding_fixture",
     "finding_type_fixture",
