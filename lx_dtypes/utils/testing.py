@@ -1,7 +1,12 @@
+from typing import Union
+
 from lx_dtypes.models.knowledge_base import KB_MODELS_DJANGO
+from lx_dtypes.models.ledger import L_MODELS_DJANGO
 
 
-def validate_django_fixture(model_fixture: KB_MODELS_DJANGO) -> None:
+def validate_django_fixture(
+    model_fixture: Union[KB_MODELS_DJANGO, L_MODELS_DJANGO],
+) -> None:
     _ddict = model_fixture.ddict
     assert _ddict["uuid"] == model_fixture.uuid
 

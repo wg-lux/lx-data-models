@@ -25,7 +25,6 @@ class ClassificationChoiceDjango(
     ] = models.ManyToManyField(
         "ClassificationChoiceDescriptorDjango",
         related_name=FieldNames.CLASSIFICATION_CHOICES.value,
-        null=True,
         blank=True,
     )
 

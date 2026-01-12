@@ -1,5 +1,5 @@
 import uuid as uuid_module
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Self, Union
 
 from django.db import models
 
@@ -42,7 +42,7 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
 
     def _to_ddict(
         self,
-    ) -> Dict[str, Any]:  # TODO Change when we have proper ManyToMany field for tags
+    ) -> Dict[str, Any]:  # TODO DEPRECATED?
         data = super()._to_ddict()
         # replace "[" and "]" from tags string to convert it to list
         tags = data.get("tags", "")
@@ -58,3 +58,18 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
 
     class Meta(AppBaseModelDjango.Meta):
         abstract = True
+
+    @classmethod
+    def get_by_uuid(cls, uuid: Union[str, uuid_module.UUID]) -> Self:
+        """Get a model instance by its UUID.
+
+        Args:
+            uuid (Union[str, uuid.UUID]): The UUID of the model instance.
+
+        Returns:
+            KnowledgebaseBaseModel: The model instance with the given UUID.
+        """
+        if isinstance(uuid, str):
+            uuid = uuid_module.UUID(uuid)
+        instance = cls.objects.get(uuid=uuid)
+        return instance

@@ -1,3 +1,5 @@
+from typing import Self
+
 from django.db import models
 
 from lx_dtypes.models.base.app_base_model.django.AppBaseModelUUIDTagsDjango import (
@@ -27,3 +29,16 @@ class AppBaseModelNamesUUIDTagsDjango(AppBaseModelUUIDTagsDjango):
 
     class Meta(AppBaseModelUUIDTagsDjango.Meta):
         abstract = True
+
+    @classmethod
+    def get_by_name(cls, name: str) -> Self:
+        """Get a model instance by its name.
+
+        Args:
+            name (str): The name of the model instance.
+
+        Returns:
+            KnowledgebaseBaseModel: The model instance with the given name.
+        """
+        instance = cls.objects.get(name=name)
+        return instance

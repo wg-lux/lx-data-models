@@ -40,6 +40,8 @@ FieldNames = Enum(
         "TAGS": "tags",
         "UUID": "uuid",
         "INDICATION_TYPES": "indication_types",
+        "CENTER": "center",
+        "CENTERS": "centers",
         "CITATIONS": "citations",
         "CLASSIFICATION_CHOICE_DESCRIPTORS": "classification_choice_descriptors",
         "CLASSIFICATION_CHOICE_DESCRIPTOR_TYPE": "classification_choice_descriptor_type",
@@ -50,6 +52,8 @@ FieldNames = Enum(
         "FINDING": "finding",
         "FINDINGS": "findings",
         "EXAMINATION_TYPES": "examination_types",
+        "EXAMINER": "examiner",
+        "EXAMINERS": "examiners",
         "FINDING_TYPES": "finding_types",
         "INDICATIONS": "indications",
         "EXAMINATION": "examination",
@@ -73,6 +77,21 @@ ABM_UUID_TAGS_MODEL_LIST_TYPE_FIELDS: List[str] = [
 ]
 # KBBM = KnowledgeBaseBaseModel
 KBBM_LIST_TYPE_FIELDS: List[str] = ABM_UUID_TAGS_MODEL_LIST_TYPE_FIELDS + []
+LBM_LIST_TYPE_FIELDS: List[str] = ABM_UUID_TAGS_MODEL_LIST_TYPE_FIELDS + []
+
+
+def mk_lbm_list_type_fields(
+    new_names: Optional[List[str]] = None, m2m_fields: Optional[List[str]] = None
+) -> List[str]:
+    if not new_names:
+        new_names = []
+    base = LBM_LIST_TYPE_FIELDS.copy()
+    if m2m_fields:
+        new = list(set(base + m2m_fields + new_names))
+    else:
+        new = list(set(base + new_names))
+
+    return new
 
 
 def mk_kbbm_list_type_fields(
@@ -95,6 +114,19 @@ def rm_kbbm_list_type_fields(names: List[str]) -> List[str]:
     return [n for n in names if n not in drop_names]
 
 
+## LEDGER BASE MODELS LIST TYPE FIELDS
+CENTER_MODEL_M2M_FIELDS: List[str] = []
+CENTER_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=CENTER_MODEL_M2M_FIELDS
+)
+CENTER_MODEL_NESTED_FIELDS: List[str] = [FieldNames.EXAMINERS.value]
+
+EXAMINER_MODEL_M2M_FIELDS: List[str] = []
+EXAMINER_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=EXAMINER_MODEL_M2M_FIELDS
+)
+
+## KNOWLEDGE BASE MODELS LIST TYPE FIELDS
 CITATION_MODEL_M2M_FIELDS: List[str] = []
 CITATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
     ["keywords", "authors"], m2m_fields=CITATION_MODEL_M2M_FIELDS

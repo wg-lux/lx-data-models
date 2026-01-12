@@ -80,6 +80,10 @@ from lx_dtypes.models.knowledge_base.unit.test_fixtures import (
     unit_fixture,
     unit_type_fixture,
 )
+from lx_dtypes.models.ledger.center.test_fixtures import (
+    center_fixture,
+    django_center_fixture,
+)
 
 __all__ = [
     # App Base Model Fixtures
@@ -153,4 +157,7 @@ __all__ = [
     "yaml_data_loader",
     # lx Knowledge Base Fixtures
     "lx_knowledge_base",
+    ########### Ledger Fixtures ###########
+    "center_fixture",
+    "django_center_fixture",
 ]

@@ -6,6 +6,7 @@ junit.xml
 data/smartie
 knowledge_base.yaml
 .devenv.flake.nix
+**/models/**/tests/**.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -215,25 +216,4 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 test_interface_export.yaml
-lx_dtypes/models/knowledge_base/classification/tests/classification_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/classification/tests/classification_fixture.yaml
-lx_dtypes/models/knowledge_base/classification_choice/tests/classification_choice_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/classification_choice/tests/classification_choice_fixture.yaml
-lx_dtypes/models/knowledge_base/examination/tests/examination_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/examination/tests/examination_fixture.yaml
-lx_dtypes/models/knowledge_base/examination/tests/examination_type_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/examination/tests/examination_type_fixture.yaml
-lx_dtypes/models/knowledge_base/finding/tests/finding_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/finding/tests/finding_fixture.yaml
-lx_dtypes/models/knowledge_base/finding/tests/finding_type_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/finding/tests/finding_type_fixture.yaml
-lx_dtypes/models/knowledge_base/indication/tests/indication_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/indication/tests/indication_fixture.yaml
-lx_dtypes/models/knowledge_base/indication/tests/indication_type_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/indication/tests/indication_type_fixture.yaml
-lx_dtypes/models/knowledge_base/intervention/tests/intervention_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/intervention/tests/intervention_fixture.yaml
-lx_dtypes/models/knowledge_base/intervention/tests/intervention_type_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/intervention/tests/intervention_type_fixture.yaml
-lx_dtypes/models/knowledge_base/unit/tests/unit_ddict_schema.yaml
-lx_dtypes/models/knowledge_base/unit/tests/unit_fixture.yaml
+
