@@ -44,6 +44,7 @@ def django_intervention_type_fixture(
 @pytest.fixture()
 def django_intervention_fixture(
     intervention_fixture: Intervention,
+    django_intervention_type_fixture: InterventionTypeDjango,
 ) -> "InterventionDjango":
     intervention_django = InterventionDjango.sync_from_ddict(intervention_fixture.ddict)
 

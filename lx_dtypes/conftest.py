@@ -44,6 +44,7 @@ from lx_dtypes.models.knowledge_base.classification_choice.test_fixtures import 
 )
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.test_fixtures import (
     classification_choice_descriptor_fixture,
+    django_classification_choice_descriptor_fixture,
 )
 from lx_dtypes.models.knowledge_base.examination.test_fixtures import (
     examination_fixture,
@@ -66,6 +67,8 @@ from lx_dtypes.models.knowledge_base.intervention.test_fixtures import (
     intervention_type_fixture,
 )
 from lx_dtypes.models.knowledge_base.unit.test_fixtures import (
+    django_unit_fixture,
+    django_unit_type_fixture,
     unit_fixture,
     unit_type_fixture,
 )
@@ -87,6 +90,7 @@ __all__ = [
     "classification_choice_fixture",
     # Classification Choice Descriptor Fixtures
     "classification_choice_descriptor_fixture",
+    "django_classification_choice_descriptor_fixture",
     # Examination Fixtures
     "examination_fixture",
     "examination_type_fixture",
@@ -106,6 +110,8 @@ __all__ = [
     # Unit Fixtures
     "unit_type_fixture",
     "unit_fixture",
+    "django_unit_type_fixture",
+    "django_unit_fixture",
     # db Interface Fixtures
     "db_interface_fixture",
     "knowledge_base_fixture",

@@ -1,8 +1,12 @@
 from pathlib import Path
 
+import pytest
+
 from lx_dtypes.utils.ddict_schema import dump_ddict_schema
+from lx_dtypes.utils.testing import validate_django_fixture
 
 from ..Unit import Unit
+from ..UnitDjango import UnitDjango
 
 TEST_EXPORT = Path(__file__).parent / "unit_fixture.yaml"
 TEST_EXPORT_DDICT_SCHEMA = Path(__file__).parent / "unit_ddict_schema.yaml"
@@ -26,3 +30,9 @@ class TestUnitFixture:
     def test_dump_unit_ddict(self, unit_fixture: Unit) -> None:
         ddict_type = unit_fixture.ddict_class
         dump_ddict_schema(ddict_type, TEST_EXPORT_DDICT_SCHEMA)
+
+
+@pytest.mark.django_db
+class TestDjangoUnitFixture:
+    def test_django_unit_fixture(self, django_unit_fixture: "UnitDjango") -> None:
+        validate_django_fixture(django_unit_fixture)

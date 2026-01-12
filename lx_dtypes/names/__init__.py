@@ -61,6 +61,7 @@ FieldNames = Enum(
         "SELECTION_OPTIONS": "selection_options",
         "UNIT_TYPES": "unit_types",
         "UNIT": "unit",
+        "UNITS": "units",
     },
 )
 

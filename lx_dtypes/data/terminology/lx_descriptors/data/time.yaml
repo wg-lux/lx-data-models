@@ -2,4 +2,4 @@
   name: "minutes_numeric_value"
   description: "Numeric value representing minutes."
   unit: "minutes"
-  descriptor_type: "numeric"
+  classification_choice_descriptor_type: "numeric"

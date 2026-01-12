@@ -1,5 +1,5 @@
 import uuid as uuid_module
-from typing import ClassVar, Generic, List, Self, TypeVar, Union
+from typing import Any, ClassVar, Dict, Generic, List, Self, TypeVar, Union
 
 from django.db import models
 
@@ -11,6 +11,55 @@ from lx_dtypes.serialization import parse_str_list
 from lx_dtypes.utils.django_field_types import CharFieldType, UUIDFieldType
 
 DDictT = TypeVar("DDictT")
+
+
+def _parse_list_type_field(
+    list_type_fields: List[str],
+    m2m_field_names: set[str],
+    defaults_dict: Dict[str, Any],
+    instance: models.Model,
+) -> None:
+    for field_name in list_type_fields:
+        if field_name in m2m_field_names:
+            continue
+        if field_name in defaults_dict:
+            value = getattr(instance, field_name)
+            if isinstance(value, str):
+                value = [
+                    item.strip()
+                    for item in value.strip("[]").split(",")
+                    if item.strip()
+                ]
+            setattr(instance, field_name, value)
+
+
+def _sync_from_ddict_m2m_field(
+    m2m_values: Dict[str, object], instance: models.Model, cls: type[models.Model]
+) -> None:
+    for field_name, related_names in m2m_values.items():
+        if related_names is None:
+            continue
+
+        # Normalize to a list of identifiers
+        if isinstance(related_names, str):
+            related_iterable = [related_names]
+        elif isinstance(related_names, (list, tuple, set)):
+            related_iterable = list(related_names)
+        else:
+            related_iterable = [related_names]  # type: ignore
+
+        field = cls._meta.get_field(field_name)  # type: ignore
+        related_model = field.related_model  # type: ignore
+
+        related_instances = []
+        for related_name in related_iterable:
+            related_obj, _ = related_model.objects.get_or_create(  # type: ignore
+                name=related_name
+            )
+            related_instances.append(related_obj)
+
+        # Use the manager to set M2M relations; avoids direct assignment errors
+        getattr(instance, field_name).set(related_instances)
 
 
 class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDictT]):
@@ -53,11 +102,27 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
         defaults_dict = dict(defaults)  # type: ignore
         m2m_field_names = set(cls.m2m_fields())
         m2m_values: dict[str, object] = {}
+        fk_field_names = set(cls.fk_fields())
+        fk_values: dict[str, object] = {}
 
         # Ensure no m2m field stays in defaults passed to update_or_create
         for field in m2m_field_names:
             if field in defaults_dict:
                 m2m_values[field] = defaults_dict.pop(field)
+
+        # fk_fields in defaults contain related object names; extract them
+        # replace with actual related object in defaults_dict
+        for field in fk_field_names:
+            if field in defaults_dict:
+                related_name = defaults_dict.pop(field)
+                fk_values[field] = related_name
+                # get or create the related object
+                field_obj = cls._meta.get_field(field)  # type: ignore
+                related_model = field_obj.related_model  # type: ignore
+                related_obj = related_model.objects.get(  # type: ignore
+                    name=related_name
+                )
+                defaults_dict[field] = related_obj  # type: ignore
 
         instance, _created = cls.objects.update_or_create(
             name=defaults_dict["name"],  # type: ignore
@@ -66,45 +131,13 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
 
         # list type fields need special handling, as they are provided as comma separated strings
         # Skip many-to-many fields here; they are handled separately below via .set().
-        for field_name in cls.list_type_fields():
-            if field_name in m2m_field_names:
-                continue
-            if field_name in defaults_dict:
-                value = getattr(instance, field_name)
-                if isinstance(value, str):
-                    value = [
-                        item.strip()
-                        for item in value.strip("[]").split(",")
-                        if item.strip()
-                    ]
-                setattr(instance, field_name, value)
-
+        list_type_fields = cls.list_type_fields()
+        _parse_list_type_field(
+            list_type_fields, m2m_field_names, defaults_dict, instance
+        )
         # # Set many-to-many relations after creation/update.
         if m2m_values:
-            for field_name, related_names in m2m_values.items():
-                if related_names is None:
-                    continue
-
-                # Normalize to a list of identifiers
-                if isinstance(related_names, str):
-                    related_iterable = [related_names]
-                elif isinstance(related_names, (list, tuple, set)):
-                    related_iterable = list(related_names)
-                else:
-                    related_iterable = [related_names]  # type: ignore
-
-                field = cls._meta.get_field(field_name)  # type: ignore
-                related_model = field.related_model  # type: ignore
-
-                related_instances = []
-                for related_name in related_iterable:
-                    related_obj, _ = related_model.objects.get_or_create(  # type: ignore[attr-defined]
-                        name=related_name
-                    )
-                    related_instances.append(related_obj)
-
-                # Use the manager to set M2M relations; avoids direct assignment errors
-                getattr(instance, field_name).set(related_instances)
+            _sync_from_ddict_m2m_field(m2m_values, instance, cls)
 
         instance.refresh_from_db()
 
@@ -155,9 +188,18 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
 
     @classmethod
     def m2m_fields(cls) -> List[str]:
-        """Return a list of fields that are foreign keys in the DataDict."""
+        """Return a list of fields that are m2m relationships."""
 
         return [field.name for field in cls._meta.get_fields() if field.many_to_many]
+
+    @classmethod
+    def fk_fields(cls) -> List[str]:
+        """Return a list of fields that are foreign keys in the DataDict."""
+        relationships = [
+            field.name for field in cls._meta.get_fields() if field.is_relation
+        ]
+        m2m_fields = cls.m2m_fields()
+        return [field for field in relationships if field not in m2m_fields]
 
     @classmethod
     def get_by_uuid(cls, uuid: Union[str, uuid_module.UUID]) -> Self:
