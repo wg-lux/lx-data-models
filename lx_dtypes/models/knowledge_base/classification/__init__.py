@@ -62,6 +62,6 @@ __all__ = [
     "kb_classification_ddicts",
     "kb_classification_django_models",
     "kb_classification_django_lookup",
-    "ClassificationDjango",
-    "ClassificationTypeDjango",
+    # "ClassificationDjango",
+    # "ClassificationTypeDjango",
 ]

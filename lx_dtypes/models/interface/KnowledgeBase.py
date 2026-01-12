@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Self, Union, cast
+from typing import Dict, List, Self, Tuple, Union, cast
 
 import yaml
 from pydantic import Field
@@ -291,3 +291,31 @@ class KnowledgeBase(AppBaseModelUUIDTags):
 
         with open(export_path, "w", encoding="utf-8") as f:
             yaml.dump(dump, f)
+
+    def kb_entries_by_module_name(
+        self,
+    ) -> Dict[str, List[Tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]]]:
+        export_attrs = KB_MODEL_NAMES_ORDERED
+        cfg = self.config
+        module_names = cfg.modules
+        entries_by_module: Dict[
+            str, List[Tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]]
+        ] = {module_name: [] for module_name in module_names}
+
+        # entries_by_module[str_unknown_factory()] = []
+
+        for attr in export_attrs:
+            field_name = camel_to_snake(attr)
+            kb_dict: Dict[str, "KB_MODELS"] = getattr(self, field_name)
+            kb_entry_list: List["KB_MODELS"] = list(kb_dict.values())
+            assert isinstance(kb_entry_list, list)
+            for entry in kb_entry_list:
+                module_name = entry.kb_module_name
+
+                if module_name not in entries_by_module:
+                    raise KeyError(
+                        f"Module name '{module_name}' not found in knowledge base config."
+                    )
+                entries_by_module[module_name].append((attr, entry))
+
+        return entries_by_module

@@ -37,12 +37,12 @@ def _sync_from_ddict_m2m_field(
     m2m_values: Dict[str, object], instance: models.Model, cls: type[models.Model]
 ) -> None:
     for field_name, related_names in m2m_values.items():
-        if related_names is None:
+        if related_names is None or related_names == "":
             continue
 
         # Normalize to a list of identifiers
         if isinstance(related_names, str):
-            related_iterable = [related_names]
+            related_iterable = parse_str_list(related_names)
         elif isinstance(related_names, (list, tuple, set)):
             related_iterable = list(related_names)
         else:

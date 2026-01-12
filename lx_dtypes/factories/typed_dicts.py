@@ -10,4 +10,8 @@ from typing import Dict, Union
 
 
 def numeric_distribution_params_dict_factory() -> Dict[str, Union[str, float, int]]:
-    return {}
+    return dict()
+
+
+def selection_default_options_dict_factory() -> Dict[str, float]:
+    return dict()

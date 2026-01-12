@@ -2,6 +2,11 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 
+from lx_dtypes.factories.typed_dicts import (
+    # NumericDistributionParamsDict,
+    numeric_distribution_params_dict_factory,
+    selection_default_options_dict_factory,
+)
 from lx_dtypes.models.base.app_base_model.django.KnowledgebaseBaseModelDjango import (
     KnowledgebaseBaseModelDjango,
 )
@@ -51,14 +56,18 @@ class ClassificationChoiceDescriptorDjango(
         on_delete=models.CASCADE,
     )
 
-    numeric_min: FloatFieldType = models.FloatField()
-    numeric_max: FloatFieldType = models.FloatField()
-    numeric_distribution_params: JSONFieldType = models.JSONField()
+    numeric_min: FloatFieldType = models.FloatField(default=float("-inf"))
+    numeric_max: FloatFieldType = models.FloatField(default=float("inf"))
+    numeric_distribution_params: JSONFieldType = models.JSONField(
+        default=numeric_distribution_params_dict_factory
+    )
     text_max_length: IntegerFieldType = models.IntegerField()
     default_value_str: CharFieldType = models.CharField(max_length=255)
     default_value_num: FloatFieldType = models.FloatField()
     default_value_bool: BooleanFieldType = models.BooleanField()
-    selection_options: JSONFieldType = models.JSONField()
+    selection_options: JSONFieldType = models.JSONField(
+        default=selection_default_options_dict_factory
+    )
     selection_multiple: BooleanFieldType = models.BooleanField()
     selection_multiple_n_min: IntegerFieldType = models.IntegerField()
     selection_multiple_n_max: IntegerFieldType = models.IntegerField()

@@ -13,6 +13,20 @@ from lx_dtypes.models.knowledge_base.information_source.InformationSourceTypeDat
     InformationSourceTypeDataDict,
 )
 
+from .InformationSourceDjango import InformationSourceDjango
+from .InformationSourceTypeDjango import InformationSourceTypeDjango
+
+
+class KbInformationSourceDjangoLookupType(TypedDict):
+    InformationSource: type[InformationSourceDjango]
+    InformationSourceType: type[InformationSourceTypeDjango]
+
+
+kb_information_source_django_lookup = KbInformationSourceDjangoLookupType(
+    InformationSource=InformationSourceDjango,
+    InformationSourceType=InformationSourceTypeDjango,
+)
+
 
 class KbInformationSourceLookupType(TypedDict):
     InformationSource: type[InformationSource]
@@ -27,6 +41,9 @@ kb_information_source_models = Union[InformationSource, InformationSourceType]
 kb_information_source_ddicts = Union[
     InformationSourceDataDict, InformationSourceTypeDataDict
 ]
+kb_information_source_django_models = Union[
+    InformationSourceDjango, InformationSourceTypeDjango
+]
 
 __all__ = [
     "InformationSource",
@@ -37,4 +54,7 @@ __all__ = [
     "KbInformationSourceLookupType",
     "kb_information_source_models",
     "kb_information_source_ddicts",
+    "kb_information_source_django_lookup",
+    "KbInformationSourceDjangoLookupType",
+    "kb_information_source_django_models",
 ]

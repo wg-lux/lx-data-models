@@ -9,13 +9,13 @@ from .FindingTypeDjango import FindingTypeDjango
 
 
 class KbFindingDjangoLookupType(TypedDict):
-    FindingDjango: type["FindingDjango"]
-    FindingTypeDjango: type["FindingTypeDjango"]
+    Finding: type["FindingDjango"]
+    FindingType: type["FindingTypeDjango"]
 
 
 kb_finding_django_lookup = KbFindingDjangoLookupType(
-    FindingDjango=FindingDjango,
-    FindingTypeDjango=FindingTypeDjango,
+    Finding=FindingDjango,
+    FindingType=FindingTypeDjango,
 )
 
 

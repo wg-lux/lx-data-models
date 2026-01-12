@@ -64,8 +64,11 @@ from .indication import (
     kb_indication_models,
 )
 from .information_source import (
+    KbInformationSourceDjangoLookupType,
     KbInformationSourceLookupType,
     kb_information_source_ddicts,
+    kb_information_source_django_lookup,
+    kb_information_source_django_models,
     kb_information_source_lookup,
     kb_information_source_models,
 )
@@ -128,20 +131,24 @@ class KnowledgeBaseModelsDjangoLookupType(
     KbClassificationDjangoLookupType,
     KbFindingDjangoLookupType,
     KbExaminationDjangoLookupType,
+    KbInformationSourceDjangoLookupType,
 ):
     pass
 
 
-knowledge_base_models_django_lookup = KnowledgeBaseModelsDjangoLookupType(
-    **kb_citation_django_lookup,
-    **kb_intervention_django_lookup,
-    **kb_indication_django_lookup,
-    **kb_unit_django_lookup,
-    **kb_classification_choice_descriptor_django_lookup,
-    **kb_classification_choice_django_lookup,
-    **kb_classification_django_lookup,
-    **kb_finding_django_lookup,
-    **kb_examination_django_lookup,
+knowledge_base_models_django_lookup: KnowledgeBaseModelsDjangoLookupType = (
+    KnowledgeBaseModelsDjangoLookupType(
+        **kb_citation_django_lookup,
+        **kb_intervention_django_lookup,
+        **kb_indication_django_lookup,
+        **kb_unit_django_lookup,
+        **kb_classification_choice_descriptor_django_lookup,
+        **kb_classification_choice_django_lookup,
+        **kb_classification_django_lookup,
+        **kb_finding_django_lookup,
+        **kb_examination_django_lookup,
+        **kb_information_source_django_lookup,
+    )
 )
 
 KB_MODELS = Union[
@@ -167,6 +174,7 @@ KB_MODELS_DJANGO = Union[
     kb_classification_django_models,
     kb_finding_django_models,
     kb_examination_django_models,
+    kb_information_source_django_models,
 ]
 
 KB_DDICTS = Union[
