@@ -133,7 +133,10 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
         # Skip many-to-many fields here; they are handled separately below via .set().
         list_type_fields = cls.list_type_fields()
         _parse_list_type_field(
-            list_type_fields, m2m_field_names, defaults_dict, instance
+            list_type_fields,
+            m2m_field_names,
+            defaults_dict,
+            instance,  # type: ignore
         )
         # # Set many-to-many relations after creation/update.
         if m2m_values:

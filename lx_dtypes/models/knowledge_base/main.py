@@ -16,8 +16,11 @@ from .classification import (
     kb_classification_models,
 )
 from .classification_choice import (
+    KbClassificationChoiceDjangoLookupType,
     KbClassificationChoiceLookupType,
     kb_classification_choice_ddicts,
+    kb_classification_choice_django_lookup,
+    kb_classification_choice_django_models,
     kb_classification_choice_lookup,
     kb_classification_choice_models,
 )
@@ -112,6 +115,7 @@ class KnowledgeBaseModelsDjangoLookupType(
     KbIndicationDjangoLookupType,
     KbUnitDjangoLookupType,
     KbClassificationChoiceDescriptorDjangoLookupType,
+    KbClassificationChoiceDjangoLookupType,
 ):
     pass
 
@@ -122,6 +126,7 @@ knowledge_base_models_django_lookup = KnowledgeBaseModelsDjangoLookupType(
     **kb_indication_django_lookup,
     **kb_unit_django_lookup,
     **kb_classification_choice_descriptor_django_lookup,
+    **kb_classification_choice_django_lookup,
 )
 
 KB_MODELS = Union[
@@ -143,6 +148,7 @@ KB_MODELS_DJANGO = Union[
     kb_indication_django_models,
     kb_unit_django_models,
     kb_classification_choice_descriptor_django_models,
+    kb_classification_choice_django_models,
 ]
 
 KB_DDICTS = Union[

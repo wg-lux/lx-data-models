@@ -41,6 +41,7 @@ from lx_dtypes.models.knowledge_base.classification.test_fixtures import (
 )
 from lx_dtypes.models.knowledge_base.classification_choice.test_fixtures import (
     classification_choice_fixture,
+    django_classification_choice_fixture,
 )
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.test_fixtures import (
     classification_choice_descriptor_fixture,
@@ -88,6 +89,7 @@ __all__ = [
     "classification_fixture",
     # Classification Choice Fixtures
     "classification_choice_fixture",
+    "django_classification_choice_fixture",
     # Classification Choice Descriptor Fixtures
     "classification_choice_descriptor_fixture",
     "django_classification_choice_descriptor_fixture",

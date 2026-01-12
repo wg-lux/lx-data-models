@@ -1,6 +1,4 @@
 # Django Knowledge Base Models
-- ClassificationChoiceDescriptor
-- ClassificationChoice
 - Classification, ClassificationType
 - Finding, FindingType
 - Examination, ExaminationType

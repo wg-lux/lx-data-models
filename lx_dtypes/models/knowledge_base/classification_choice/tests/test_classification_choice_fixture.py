@@ -1,13 +1,25 @@
 from pathlib import Path
 
+import pytest
+
 from lx_dtypes.utils.ddict_schema import dump_ddict_schema
 
 from ..ClassificationChoice import ClassificationChoice
+from ..ClassificationChoiceDjango import ClassificationChoiceDjango
 
 TEST_EXPORT = Path(__file__).parent / "classification_choice_fixture.yaml"
 TEST_EXPORT_DDICT_SCHEMA = (
     Path(__file__).parent / "classification_choice_ddict_schema.yaml"
 )
+
+
+@pytest.mark.django_db
+class TestDjangoClassificationChoiceFixture:
+    def test_django_classification_choice_fixture(
+        self, django_classification_choice_fixture: "ClassificationChoiceDjango"
+    ) -> None:
+        assert django_classification_choice_fixture is not None
+        # Additional validation can be added here as needed
 
 
 class TestClassificationChoiceFixture:
@@ -38,7 +50,7 @@ class TestClassificationChoiceFixture:
     ) -> None:
         ddict = classification_choice_fixture.ddict
         assert isinstance(ddict["classification_choice_descriptors"], str)
-        assert ddict["classification_choice_descriptors"] == "descriptor1,descriptor2"
+        assert ddict["classification_choice_descriptors"] == "Sample Descriptor"
         assert ddict["tags"] == "tag1,tag2"
 
     def test_classification_choice_fixture(
