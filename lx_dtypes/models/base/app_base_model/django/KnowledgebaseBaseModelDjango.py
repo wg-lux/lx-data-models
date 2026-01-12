@@ -135,7 +135,7 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
         _parse_list_type_field(
             list_type_fields,
             m2m_field_names,
-            defaults_dict,
+            defaults_dict,  # type: ignore
             instance,  # type: ignore
         )
         # # Set many-to-many relations after creation/update.

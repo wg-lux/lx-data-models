@@ -38,6 +38,9 @@ from lx_dtypes.models.knowledge_base.citation.test_fixtures import (
 )
 from lx_dtypes.models.knowledge_base.classification.test_fixtures import (
     classification_fixture,
+    classification_type_fixture,
+    django_classification_fixture,
+    django_classification_type_fixture,
 )
 from lx_dtypes.models.knowledge_base.classification_choice.test_fixtures import (
     classification_choice_fixture,
@@ -87,6 +90,9 @@ __all__ = [
     "django_citation_fixture",
     # Classification Fixtures
     "classification_fixture",
+    "classification_type_fixture",
+    "django_classification_fixture",
+    "django_classification_type_fixture",
     # Classification Choice Fixtures
     "classification_choice_fixture",
     "django_classification_choice_fixture",
