@@ -1,7 +1,7 @@
 import pytest
 
-from lx_dtypes.models.knowledge_base.finding.Finding import Finding
-from lx_dtypes.models.knowledge_base.finding.FindingDjango import (
+from lx_dtypes.models.knowledge_base.finding._Finding import Finding
+from lx_dtypes.models.knowledge_base.finding._FindingDjango import (
     FindingDjango,
 )
 from lx_dtypes.models.knowledge_base.indication.Indication import Indication
@@ -61,5 +61,5 @@ def django_examination_fixture(
     django_indication_fixture: IndicationDjango,
 ) -> "ExaminationDjango":
     examination_django = ExaminationDjango.sync_from_ddict(examination_fixture.ddict)
-
+    examination_django.refresh_from_db()
     return examination_django

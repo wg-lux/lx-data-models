@@ -14,7 +14,7 @@ from .FindingTypeDataDict import (
 
 class FindingTypeDjango(KnowledgebaseBaseModelDjango[FindingTypeDataDict]):
     if TYPE_CHECKING:
-        from lx_dtypes.models.knowledge_base.finding.FindingDjango import (
+        from lx_dtypes.models.knowledge_base.finding._FindingDjango import (
             FindingDjango,
         )
 

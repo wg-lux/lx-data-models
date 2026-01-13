@@ -8,9 +8,9 @@ from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoiceD
 )
 
 from ..Classification import Classification
-from ..ClassificationDjango import ClassificationDjango
+from .._ClassificationDjango import ClassificationDjango
 from ..ClassificationType import ClassificationType
-from ..ClassificationTypeDjango import ClassificationTypeDjango
+from .._ClassificationTypeDjango import ClassificationTypeDjango
 
 
 @pytest.fixture(scope="session")

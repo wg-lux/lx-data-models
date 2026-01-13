@@ -1,11 +1,11 @@
 from typing import TypedDict, Union
 
+from ._ClassificationDjango import ClassificationDjango
+from ._ClassificationTypeDjango import ClassificationTypeDjango
 from .Classification import Classification
 from .ClassificationDataDict import ClassificationDataDict
-from .ClassificationDjango import ClassificationDjango
 from .ClassificationType import ClassificationType
 from .ClassificationTypeDataDict import ClassificationTypeDataDict
-from .ClassificationTypeDjango import ClassificationTypeDjango
 
 
 class KbClassificationDjangoLookupType(TypedDict):
@@ -62,6 +62,6 @@ __all__ = [
     "kb_classification_ddicts",
     "kb_classification_django_models",
     "kb_classification_django_lookup",
-    # "ClassificationDjango",
-    # "ClassificationTypeDjango",
+    "ClassificationDjango",
+    "ClassificationTypeDjango",
 ]

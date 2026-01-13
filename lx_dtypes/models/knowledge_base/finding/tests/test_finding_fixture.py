@@ -5,9 +5,9 @@ import pytest
 from lx_dtypes.utils.ddict_schema import dump_ddict_schema
 from lx_dtypes.utils.testing import validate_django_fixture
 
-from ..Finding import Finding
-from ..FindingDjango import FindingDjango
-from ..FindingType import FindingType
+from .._Finding import Finding
+from .._FindingDjango import FindingDjango
+from .._FindingType import FindingType
 
 TEST_EXPORT = Path(__file__).parent / "finding_fixture.yaml"
 TEST_EXPORT_DDICT_SCHEMA = Path(__file__).parent / "finding_ddict_schema.yaml"

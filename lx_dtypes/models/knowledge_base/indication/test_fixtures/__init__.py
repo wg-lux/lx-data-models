@@ -45,7 +45,9 @@ def django_indication_type_fixture(
 
 @pytest.fixture()
 def django_indication_fixture(
-    indication_fixture: Indication, django_intervention_fixture: InterventionDjango
+    indication_fixture: Indication,
+    django_intervention_fixture: InterventionDjango,
+    django_indication_type_fixture: IndicationTypeDjango,
 ) -> "IndicationDjango":
     indication_django = IndicationDjango.sync_from_ddict(indication_fixture.ddict)
 

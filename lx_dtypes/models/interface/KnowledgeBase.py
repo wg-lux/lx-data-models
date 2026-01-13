@@ -51,9 +51,9 @@ from lx_dtypes.models.knowledge_base.examination.ExaminationType import Examinat
 from lx_dtypes.models.knowledge_base.examination.ExaminationTypeDataDict import (
     ExaminationTypeDataDict,
 )
-from lx_dtypes.models.knowledge_base.finding.Finding import Finding
+from lx_dtypes.models.knowledge_base.finding._Finding import Finding
+from lx_dtypes.models.knowledge_base.finding._FindingType import FindingType
 from lx_dtypes.models.knowledge_base.finding.FindingDataDict import FindingDataDict
-from lx_dtypes.models.knowledge_base.finding.FindingType import FindingType
 from lx_dtypes.models.knowledge_base.finding.FindingTypeDataDict import (
     FindingTypeDataDict,
 )

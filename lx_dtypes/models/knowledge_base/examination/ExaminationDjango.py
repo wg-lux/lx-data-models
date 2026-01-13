@@ -12,7 +12,7 @@ from .ExaminationDataDict import (
 )
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.knowledge_base.finding.FindingDjango import (
+    from lx_dtypes.models.knowledge_base.finding._FindingDjango import (
         FindingDjango,
     )
     from lx_dtypes.models.knowledge_base.indication.IndicationDjango import (

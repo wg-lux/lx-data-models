@@ -84,6 +84,10 @@ from lx_dtypes.models.ledger.center.test_fixtures import (
     center_fixture,
     django_center_fixture,
 )
+from lx_dtypes.models.ledger.p_examination.test_fixtures import (
+    django_p_examination_fixture,
+    p_examination_fixture,
+)
 
 __all__ = [
     # App Base Model Fixtures
@@ -160,4 +164,7 @@ __all__ = [
     ########### Ledger Fixtures ###########
     "center_fixture",
     "django_center_fixture",
+    # Patient Examination Fixtures
+    "p_examination_fixture",
+    "django_p_examination_fixture",
 ]

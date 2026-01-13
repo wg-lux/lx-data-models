@@ -1,5 +1,5 @@
 import uuid as uuid_module
-from typing import ClassVar, Generic, List, Self, TypeVar
+from typing import ClassVar, Generic, List, Literal, Self, TypeVar
 
 from django.db import models
 
@@ -43,7 +43,7 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
         abstract = True
 
     @classmethod
-    def ddict_pk_field_name(cls) -> str:
+    def ddict_pk_field_name(cls) -> Literal["name"]:
         """Return the name of the primary key field in the DataDict."""
         return "name"
 

@@ -54,9 +54,7 @@ def sync_from_ddict_m2m_field(
 
         related_instances = []
         for related_name in related_iterable:
-            related_obj, _ = related_model.objects.get_or_create(  # type: ignore
-                name=related_name
-            )
+            related_obj = related_model.objects.get(pk=related_name)  # type: ignore
             related_instances.append(related_obj)
 
         # Use the manager to set M2M relations; avoids direct assignment errors

@@ -16,7 +16,7 @@ class ClassificationTypeDjango(
     KnowledgebaseBaseModelDjango[ClassificationTypeDataDict]
 ):
     if TYPE_CHECKING:
-        from .ClassificationDjango import ClassificationDjango
+        from ._ClassificationDjango import ClassificationDjango
 
         classifications: models.QuerySet["ClassificationDjango"]
 

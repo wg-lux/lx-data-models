@@ -12,14 +12,14 @@ from .FindingDataDict import (
 )
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.knowledge_base.classification.ClassificationDjango import (
+    from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import (
         ClassificationDjango,
     )
     from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
         InterventionDjango,
     )
 
-    from .FindingTypeDjango import (
+    from ._FindingTypeDjango import (
         FindingTypeDjango,
     )
 

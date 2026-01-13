@@ -67,6 +67,10 @@ FieldNames = Enum(
         "UNIT_TYPES": "unit_types",
         "UNIT": "unit",
         "UNITS": "units",
+        #
+        "PATIENT_FINDINGS": "patient_findings",
+        "PATIENT_INDICATIONS": "patient_indications",
+        "PATIENT_EXAMINATIONS": "patient_examinations",
     },
 )
 
@@ -121,10 +125,20 @@ CENTER_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
 )
 CENTER_MODEL_NESTED_FIELDS: List[str] = [FieldNames.EXAMINERS.value]
 
-EXAMINER_MODEL_M2M_FIELDS: List[str] = []
+EXAMINER_MODEL_M2M_FIELDS: List[str] = [FieldNames.EXAMINERS.value]
 EXAMINER_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
     m2m_fields=EXAMINER_MODEL_M2M_FIELDS
 )
+
+P_EXAMINATION_MODEL_M2M_FIELDS: List[str] = []
+P_EXAMINATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=P_EXAMINATION_MODEL_M2M_FIELDS
+)
+P_EXAMINATION_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_FINDINGS.value,
+    FieldNames.PATIENT_INDICATIONS.value,
+]
+
 
 ## KNOWLEDGE BASE MODELS LIST TYPE FIELDS
 CITATION_MODEL_M2M_FIELDS: List[str] = []

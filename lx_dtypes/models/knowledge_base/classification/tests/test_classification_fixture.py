@@ -6,7 +6,7 @@ from lx_dtypes.utils.ddict_schema import dump_ddict_schema
 from lx_dtypes.utils.testing import validate_django_fixture
 
 from ..Classification import Classification
-from ..ClassificationDjango import ClassificationDjango
+from .._ClassificationDjango import ClassificationDjango
 
 TEST_EXPORT = Path(__file__).parent / "classification_fixture.yaml"
 TEST_EXPORT_DDICT_SCHEMA = Path(__file__).parent / "classification_ddict_schema.yaml"

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
         ClassificationChoiceDjango,
     )
 
-    from .ClassificationTypeDjango import ClassificationTypeDjango
+    from ._ClassificationTypeDjango import ClassificationTypeDjango
 
 
 class ClassificationDjango(KnowledgebaseBaseModelDjango[ClassificationDataDict]):

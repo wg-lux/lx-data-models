@@ -1,18 +1,18 @@
 import pytest
 
-from lx_dtypes.models.knowledge_base.classification.Classification import Classification
-from lx_dtypes.models.knowledge_base.classification.ClassificationDjango import (
+from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import (
     ClassificationDjango,
 )
+from lx_dtypes.models.knowledge_base.classification.Classification import Classification
 from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
 from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
     InterventionDjango,
 )
 
-from ..Finding import Finding
-from ..FindingDjango import FindingDjango
-from ..FindingType import FindingType
-from ..FindingTypeDjango import FindingTypeDjango
+from .._Finding import Finding
+from .._FindingDjango import FindingDjango
+from .._FindingType import FindingType
+from .._FindingTypeDjango import FindingTypeDjango
 
 
 @pytest.fixture(scope="session")

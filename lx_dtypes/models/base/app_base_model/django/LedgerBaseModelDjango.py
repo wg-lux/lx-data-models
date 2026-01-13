@@ -1,5 +1,5 @@
 import uuid as uuid_module
-from typing import ClassVar, Generic, List, Self, TypeVar
+from typing import ClassVar, Generic, List, Literal, Self, TypeVar
 
 from django.db import models
 
@@ -8,7 +8,7 @@ from lx_dtypes.models.base.app_base_model.django.AppBaseModelUUIDTagsDjango impo
 )
 from lx_dtypes.names import mk_lbm_list_type_fields
 from lx_dtypes.serialization import parse_str_list
-from lx_dtypes.utils.django_field_types import UUIDFieldType
+from lx_dtypes.utils.django_field_types import JSONFieldType, UUIDFieldType
 from lx_dtypes.utils.django_sync import parse_list_type_field, sync_from_ddict_m2m_field
 
 DDictT = TypeVar("DDictT")
@@ -27,6 +27,7 @@ class LedgerBaseModelDjango(
         db_index=True,
         primary_key=True,
     )
+    external_ids: JSONFieldType = models.JSONField(default=dict)
 
     objects: ClassVar[models.Manager[Self]]  # type: ignore[misc]
 
@@ -47,7 +48,7 @@ class LedgerBaseModelDjango(
         return default_nested_fields
 
     @classmethod
-    def ddict_pk_field_name(cls) -> str:
+    def ddict_pk_field_name(cls) -> Literal["uuid"]:
         """Return the name of the primary key field in the DataDict."""
         return "uuid"
 
@@ -65,6 +66,7 @@ class LedgerBaseModelDjango(
     @property
     def ddict(self) -> DDictT:
         """Materialize the DataDict using the model contents."""
+
         fields = tuple(self.ddict_class.__annotations__.keys())  # type: ignore
         data: dict = {}  # type: ignore
         m2m_field_names = set(self.m2m_fields())
@@ -121,7 +123,7 @@ class LedgerBaseModelDjango(
             if field in defaults_dict:
                 m2m_values[field] = defaults_dict.pop(field)
 
-        # fk_fields in defaults contain related object names; extract them
+        # fk_fields in defaults contain related object names or uuids; extract them
         # replace with actual related object in defaults_dict
         for field in fk_field_names:
             if field in defaults_dict:
@@ -130,13 +132,12 @@ class LedgerBaseModelDjango(
                 # get or create the related object
                 field_obj = cls._meta.get_field(field)  # type: ignore
                 related_model = field_obj.related_model  # type: ignore
-                related_obj = related_model.objects.get(  # type: ignore
-                    name=related_name
-                )
+                related_obj = related_model.objects.get(pk=related_name)  # type: ignore
+
                 defaults_dict[field] = related_obj  # type: ignore
 
         instance, _created = cls.objects.update_or_create(
-            name=defaults_dict[pk_field_name],  # type: ignore
+            pk=defaults_dict[pk_field_name],  # type: ignore
             defaults=defaults_dict,  # type: ignore
         )
 

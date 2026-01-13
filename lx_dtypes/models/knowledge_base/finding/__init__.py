@@ -1,11 +1,11 @@
 from typing import TypedDict, Union
 
-from .Finding import Finding
+from ._Finding import Finding
+from ._FindingDjango import FindingDjango
+from ._FindingType import FindingType
+from ._FindingTypeDjango import FindingTypeDjango
 from .FindingDataDict import FindingDataDict
-from .FindingDjango import FindingDjango
-from .FindingType import FindingType
 from .FindingTypeDataDict import FindingTypeDataDict
-from .FindingTypeDjango import FindingTypeDjango
 
 
 class KbFindingDjangoLookupType(TypedDict):
