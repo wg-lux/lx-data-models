@@ -132,8 +132,8 @@ class LedgerBaseModelDjango(
                 # get or create the related object
                 field_obj = cls._meta.get_field(field)  # type: ignore
                 related_model = field_obj.related_model  # type: ignore
-                related_obj = related_model.objects.get(pk=related_name)  # type: ignore
 
+                related_obj = related_model.objects.get(pk=related_name)  # type: ignore
                 defaults_dict[field] = related_obj  # type: ignore
 
         instance, _created = cls.objects.update_or_create(

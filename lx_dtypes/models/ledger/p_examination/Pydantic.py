@@ -7,6 +7,7 @@ from lx_dtypes.factories.typed_lists import list_of_str_factory
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
 )
+from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
 from lx_dtypes.names import (
     P_EXAMINATION_MODEL_LIST_TYPE_FIELDS,
     P_EXAMINATION_MODEL_NESTED_FIELDS,
@@ -22,7 +23,7 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
     date: Optional[datetime.date] = None
     examination: str
     # TODO: Full implementation with nested models
-    # patient_findings: List[PFinding] = Field(default_factory=list)
+    patient_findings: List[PFinding] = Field(default_factory=list)
     # patient_indications: List[PIndication] = Field(default_factory=list)
 
     @classmethod

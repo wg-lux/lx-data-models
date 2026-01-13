@@ -71,6 +71,7 @@ FieldNames = Enum(
         "PATIENT_FINDINGS": "patient_findings",
         "PATIENT_INDICATIONS": "patient_indications",
         "PATIENT_EXAMINATIONS": "patient_examinations",
+        "PATIENT_FINDING_CLASSIFICATIONS": "patient_finding_classifications",
     },
 )
 
@@ -137,6 +138,15 @@ P_EXAMINATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
 P_EXAMINATION_MODEL_NESTED_FIELDS: List[str] = [
     FieldNames.PATIENT_FINDINGS.value,
     FieldNames.PATIENT_INDICATIONS.value,
+]
+
+P_FINDING_MODEL_M2M_FIELDS: List[str] = []
+P_FINDING_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=P_FINDING_MODEL_M2M_FIELDS
+)
+
+P_FINDING_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_FINDING_CLASSIFICATIONS.value,
 ]
 
 

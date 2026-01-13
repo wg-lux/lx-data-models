@@ -1,6 +1,4 @@
 # Ledger Models
-- examination
-- finding
 - finding_classifications
 - finding_classification_choice
 - finding_classifications_choice_descriptor

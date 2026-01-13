@@ -61,5 +61,5 @@ def django_finding_fixture(
     django_finding_type_fixture: FindingTypeDjango,
 ) -> "FindingDjango":
     finding_django = FindingDjango.sync_from_ddict(finding_fixture.ddict)
-
+    finding_django.refresh_from_db()
     return finding_django

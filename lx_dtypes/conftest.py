@@ -88,6 +88,10 @@ from lx_dtypes.models.ledger.p_examination.test_fixtures import (
     django_p_examination_fixture,
     p_examination_fixture,
 )
+from lx_dtypes.models.ledger.p_finding.test_fixtures import (
+    django_p_finding_fixture,
+    p_finding_fixture,
+)
 
 __all__ = [
     # App Base Model Fixtures
@@ -167,4 +171,7 @@ __all__ = [
     # Patient Examination Fixtures
     "p_examination_fixture",
     "django_p_examination_fixture",
+    # Patient Finding Fixtures
+    "p_finding_fixture",
+    "django_p_finding_fixture",
 ]

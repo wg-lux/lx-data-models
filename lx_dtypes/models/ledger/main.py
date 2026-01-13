@@ -27,12 +27,22 @@ from .p_examination import (
     l_p_examination_lookup,
     l_p_examination_models,
 )
+from .p_finding import (
+    LPFindingDjangoLookupType,
+    LPFindingLookupType,
+    l_p_finding_ddicts,
+    l_p_finding_django_lookup,
+    l_p_finding_django_models,
+    l_p_finding_lookup,
+    l_p_finding_models,
+)
 
 
 class LedgerModelsLookupType(
     LCenterLookupType,
     LPExaminationLookupType,
     LExaminerLookupType,
+    LPFindingLookupType,
 ):
     pass
 
@@ -41,11 +51,15 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_center_lookup,
     **l_p_examination_lookup,
     **l_examiner_lookup,
+    **l_p_finding_lookup,
 )
 
 
 class LedgerModelsDjangoLookupType(
-    LCenterDjangoLookupType, LPExaminationDjangoLookupType, LExaminerDjangoLookupType
+    LCenterDjangoLookupType,
+    LPExaminationDjangoLookupType,
+    LExaminerDjangoLookupType,
+    LPFindingDjangoLookupType,
 ):
     pass
 
@@ -55,22 +69,31 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
         **l_center_django_lookup,
         **l_p_examination_django_lookup,
         **l_examiner_django_lookup,
+        **l_p_finding_django_lookup,
     )
 )
 
-L_MODELS = Union[l_center_models, l_p_examination_models, l_examiner_models]
-
-L_MODELS_DJANGO = Union[
-    l_center_django_models, l_p_examination_django_models, l_examiner_django_models
+L_MODELS = Union[
+    l_center_models, l_p_examination_models, l_examiner_models, l_p_finding_models
 ]
 
-L_DDICTS = Union[l_center_ddicts, l_p_examination_ddicts, l_examiner_ddicts]
-L_MODEL_NAMES_LITERAL = Literal["Center", "Examiner", "PExamination"]
+L_MODELS_DJANGO = Union[
+    l_center_django_models,
+    l_p_examination_django_models,
+    l_examiner_django_models,
+    l_p_finding_django_models,
+]
+
+L_DDICTS = Union[
+    l_center_ddicts, l_p_examination_ddicts, l_examiner_ddicts, l_p_finding_ddicts
+]
+L_MODEL_NAMES_LITERAL = Literal["Center", "Examiner", "PExamination", "PFinding"]
 
 L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "Center",
     "Examiner",
     "PExamination",
+    "PFinding",
 ]
 
 __all__ = [
