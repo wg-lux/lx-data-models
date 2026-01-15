@@ -112,6 +112,15 @@ from lx_dtypes.models.ledger.p_indication.test_fixtures import (
     django_p_indication_fixture,
     p_indication_fixture,
 )
+from lx_dtypes.models.ledger.p_intervention.test_fixtures import (
+    django_p_finding_intervention_fixture,
+    p_finding_intervention_fixture,
+)
+from lx_dtypes.models.ledger.p_interventions.test_fixtures import (
+    django_p_finding_interventions_fixture,
+    django_populated_p_finding_interventions_fixture,
+    p_finding_interventions_fixture,
+)
 
 __all__ = [
     # App Base Model Fixtures
@@ -199,6 +208,13 @@ __all__ = [
     # Patient Indication Fixtures
     "p_indication_fixture",
     "django_p_indication_fixture",
+    # Patient Interventions fixtures
+    "p_finding_interventions_fixture",
+    "django_p_finding_interventions_fixture",
+    "django_populated_p_finding_interventions_fixture",
+    # Patient Finding Intervention Fixtures
+    "p_finding_intervention_fixture",
+    "django_p_finding_intervention_fixture",
     # Patient Finding Classifications Fixtures
     "p_finding_classifications_fixture",
     "django_p_finding_classifications_fixture",

@@ -72,6 +72,24 @@ from .p_indication import (
     l_p_indication_lookup,
     l_p_indication_models,
 )
+from .p_intervention import (
+    LPFindingInterventionDjangoLookupType,
+    LPFindingInterventionLookupType,
+    l_p_finding_intervention_ddicts,
+    l_p_finding_intervention_django_lookup,
+    l_p_finding_intervention_django_models,
+    l_p_finding_intervention_lookup,
+    l_p_finding_intervention_models,
+)
+from .p_interventions import (
+    LPFindingInterventionsDjangoLookupType,
+    LPFindingInterventionsLookupType,
+    l_p_finding_interventions_ddicts,
+    l_p_finding_interventions_django_lookup,
+    l_p_finding_interventions_django_models,
+    l_p_finding_interventions_lookup,
+    l_p_finding_interventions_models,
+)
 
 
 class LedgerModelsLookupType(
@@ -83,6 +101,8 @@ class LedgerModelsLookupType(
     LPFindingClassificationsLookupType,
     LPFindingClassificationChoiceLookupType,
     LPFindingClassificationChoiceDescriptorLookupType,
+    LPFindingInterventionsLookupType,
+    LPFindingInterventionLookupType,
 ):
     pass
 
@@ -96,6 +116,8 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_p_finding_classifications_lookup,
     **l_p_finding_classification_choice_lookup,
     **l_p_finding_classification_choice_descriptor_lookup,
+    **l_p_finding_interventions_lookup,
+    **l_p_finding_intervention_lookup,
 )
 
 
@@ -108,6 +130,8 @@ class LedgerModelsDjangoLookupType(
     LPFindingClassificationsDjangoLookupType,
     LPFindingClassificationChoiceDjangoLookupType,
     LPFindingClassificationChoiceDescriptorDjangoLookupType,
+    LPFindingInterventionsDjangoLookupType,
+    LPFindingInterventionDjangoLookupType,
 ):
     pass
 
@@ -122,6 +146,8 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
         **l_p_finding_classifications_django_lookup,
         **l_p_finding_classification_choice_django_lookup,
         **l_p_finding_classification_choice_descriptor_django_lookup,
+        **l_p_finding_interventions_django_lookup,
+        **l_p_finding_intervention_django_lookup,
     )
 )
 
@@ -134,6 +160,8 @@ L_MODELS = Union[
     l_p_finding_classifications_models,
     l_p_finding_classification_choice_models,
     l_p_finding_classification_choice_descriptor_models,
+    l_p_finding_interventions_models,
+    l_p_finding_intervention_models,
 ]
 
 L_MODELS_DJANGO = Union[
@@ -145,6 +173,8 @@ L_MODELS_DJANGO = Union[
     l_p_finding_classifications_django_models,
     l_p_finding_classification_choice_django_models,
     l_p_finding_classification_choice_descriptor_django_models,
+    l_p_finding_interventions_django_models,
+    l_p_finding_intervention_django_models,
 ]
 
 L_DDICTS = Union[
@@ -156,6 +186,8 @@ L_DDICTS = Union[
     l_p_finding_classifications_ddicts,
     l_p_finding_classification_choice_ddicts,
     l_p_finding_classification_choice_descriptor_ddicts,
+    l_p_finding_interventions_ddicts,
+    l_p_finding_intervention_ddicts,
 ]
 L_MODEL_NAMES_LITERAL = Literal[
     "Center",
@@ -165,6 +197,7 @@ L_MODEL_NAMES_LITERAL = Literal[
     "PIndication",
     "PFindingClassifications",
     "PFindingClassificationChoice",
+    "PFindingInterventions",
 ]
 
 L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
@@ -175,6 +208,7 @@ L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "PIndication",
     "PFindingClassifications",
     "PFindingClassificationChoice",
+    "PFindingInterventions",
 ]
 
 __all__ = [

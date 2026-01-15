@@ -23,7 +23,6 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
     examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
     date: Optional[datetime.date] = None
     examination: str
-    # TODO: Full implementation with nested models
     patient_findings: List[PFinding] = Field(default_factory=list)
     patient_indications: List[PIndication] = Field(default_factory=list)
 

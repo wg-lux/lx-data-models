@@ -25,6 +25,9 @@ if TYPE_CHECKING:
     from lx_dtypes.models.ledger.p_finding_classifications.Django import (
         PFindingClassificationsDjango,
     )
+    from lx_dtypes.models.ledger.p_interventions.Django import (
+        PFindingInterventionsDjango,
+    )
 
 
 class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
@@ -43,6 +46,7 @@ class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
 
     if TYPE_CHECKING:
         patient_finding_classifications: models.Manager["PFindingClassificationsDjango"]
+        patient_finding_interventions: models.Manager["PFindingInterventionsDjango"]
 
     @property
     def ddict_class(self) -> type[PFindingDataDict]:
