@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -7,6 +7,7 @@ from lx_dtypes.models.knowledge_base.examination.ExaminationDjango import (
 )
 from lx_dtypes.models.ledger.p_finding.Django import PFindingDjango
 from lx_dtypes.models.ledger.p_indication.Django import PIndicationDjango
+from lx_dtypes.models.ledger.patient.Django import PatientDjango
 
 from ..Django import PExaminationDjango
 from ..Pydantic import PExamination
@@ -15,10 +16,12 @@ from ..Pydantic import PExamination
 @pytest.fixture()
 def p_examination_fixture(
     django_examination_fixture: ExaminationDjango,
+    django_patient_fixture: PatientDjango,
 ) -> PExamination:
     instance = PExamination(
+        patient=str(django_patient_fixture.pk),
         examination=django_examination_fixture.name,
-        date=datetime(2024, 1, 1, 10, 0, 0),
+        date=datetime(2024, 1, 1, 10, 0, 0, tzinfo=timezone.utc),
     )
     return instance
 

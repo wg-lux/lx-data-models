@@ -90,6 +90,15 @@ from .p_interventions import (
     l_p_finding_interventions_lookup,
     l_p_finding_interventions_models,
 )
+from .patient import (
+    LPatientDjangoLookupType,
+    LPatientLookupType,
+    l_patient_ddicts,
+    l_patient_django_lookup,
+    l_patient_django_models,
+    l_patient_lookup,
+    l_patient_models,
+)
 
 
 class LedgerModelsLookupType(
@@ -103,6 +112,7 @@ class LedgerModelsLookupType(
     LPFindingClassificationChoiceDescriptorLookupType,
     LPFindingInterventionsLookupType,
     LPFindingInterventionLookupType,
+    LPatientLookupType,
 ):
     pass
 
@@ -118,6 +128,7 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_p_finding_classification_choice_descriptor_lookup,
     **l_p_finding_interventions_lookup,
     **l_p_finding_intervention_lookup,
+    **l_patient_lookup,
 )
 
 
@@ -132,6 +143,7 @@ class LedgerModelsDjangoLookupType(
     LPFindingClassificationChoiceDescriptorDjangoLookupType,
     LPFindingInterventionsDjangoLookupType,
     LPFindingInterventionDjangoLookupType,
+    LPatientDjangoLookupType,
 ):
     pass
 
@@ -148,6 +160,7 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
         **l_p_finding_classification_choice_descriptor_django_lookup,
         **l_p_finding_interventions_django_lookup,
         **l_p_finding_intervention_django_lookup,
+        **l_patient_django_lookup,
     )
 )
 
@@ -162,6 +175,7 @@ L_MODELS = Union[
     l_p_finding_classification_choice_descriptor_models,
     l_p_finding_interventions_models,
     l_p_finding_intervention_models,
+    l_patient_models,
 ]
 
 L_MODELS_DJANGO = Union[
@@ -175,6 +189,7 @@ L_MODELS_DJANGO = Union[
     l_p_finding_classification_choice_descriptor_django_models,
     l_p_finding_interventions_django_models,
     l_p_finding_intervention_django_models,
+    l_patient_django_models,
 ]
 
 L_DDICTS = Union[
@@ -188,6 +203,7 @@ L_DDICTS = Union[
     l_p_finding_classification_choice_descriptor_ddicts,
     l_p_finding_interventions_ddicts,
     l_p_finding_intervention_ddicts,
+    l_patient_ddicts,
 ]
 L_MODEL_NAMES_LITERAL = Literal[
     "Center",
@@ -198,6 +214,7 @@ L_MODEL_NAMES_LITERAL = Literal[
     "PFindingClassifications",
     "PFindingClassificationChoice",
     "PFindingInterventions",
+    "PFindingIntervention",
 ]
 
 L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
@@ -209,6 +226,7 @@ L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "PFindingClassifications",
     "PFindingClassificationChoice",
     "PFindingInterventions",
+    "PFindingIntervention",
 ]
 
 __all__ = [

@@ -15,3 +15,4 @@ class PExaminationDataDict(LedgerBaseModelDataDict):
     date: Optional[str]
     patient_findings: List["PFindingDataDict"]
     patient_indications: List["PIndicationDataDict"]
+    patient: str

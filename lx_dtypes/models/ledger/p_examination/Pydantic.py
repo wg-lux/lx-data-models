@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Optional, Union
 
-from pydantic import Field, field_validator
+from pydantic import AwareDatetime, Field, field_validator
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
@@ -20,8 +20,9 @@ from .DataDict import (
 
 
 class PExamination(LedgerBaseModel[PExaminationDataDict]):
+    patient: str
     examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
-    date: Optional[datetime.date] = None
+    date: Optional[AwareDatetime] = None
     examination: str
     patient_findings: List[PFinding] = Field(default_factory=list)
     patient_indications: List[PIndication] = Field(default_factory=list)
@@ -41,12 +42,16 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
     @field_validator("date", mode="before")
     def validate_date(
         cls, v: Optional[Union[str, datetime.date, datetime.datetime]]
-    ) -> Optional[datetime.date]:
+    ) -> Optional[AwareDatetime]:
         if isinstance(v, str):
             try:
-                return datetime.date.fromisoformat(v)
+                return datetime.datetime.fromisoformat(v)
             except ValueError:
                 return None
         if isinstance(v, datetime.datetime):
-            return v.date()
+            return v
+        if isinstance(v, datetime.date):
+            return datetime.datetime(
+                year=v.year, month=v.month, day=v.day, tzinfo=datetime.timezone.utc
+            )
         return v

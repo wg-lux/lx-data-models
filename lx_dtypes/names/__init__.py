@@ -76,6 +76,7 @@ FieldNames = Enum(
         "PATIENT_FINDING_CLASSIFICATION_CHOICE_DESCRIPTORS": "patient_finding_classification_choice_descriptors",
         "PATIENT_FINDING_INTERVENTIONS": "patient_finding_interventions",
         "PATIENT_FINDING_INTERVENTION": "patient_finding_intervention",
+        "PATIENTS": "patients",
     },
 )
 
@@ -128,9 +129,11 @@ CENTER_MODEL_M2M_FIELDS: List[str] = []
 CENTER_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
     m2m_fields=CENTER_MODEL_M2M_FIELDS
 )
-CENTER_MODEL_NESTED_FIELDS: List[str] = [FieldNames.EXAMINERS.value]
+CENTER_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.EXAMINERS.value,
+]
 
-EXAMINER_MODEL_M2M_FIELDS: List[str] = [FieldNames.EXAMINERS.value]
+EXAMINER_MODEL_M2M_FIELDS: List[str] = []
 EXAMINER_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
     m2m_fields=EXAMINER_MODEL_M2M_FIELDS
 )
@@ -198,7 +201,11 @@ P_INTERVENTION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
     m2m_fields=P_INTERVENTION_MODEL_M2M_FIELDS
 )
 P_INTERVENTION_MODEL_NESTED_FIELDS: List[str] = []
-
+PATIENT_MODEL_M2M_FIELDS: List[str] = []
+PATIENT_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=PATIENT_MODEL_M2M_FIELDS
+)
+PATIENT_MODEL_NESTED_FIELDS: List[str] = []
 ## KNOWLEDGE BASE MODELS LIST TYPE FIELDS
 CITATION_MODEL_M2M_FIELDS: List[str] = []
 CITATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(

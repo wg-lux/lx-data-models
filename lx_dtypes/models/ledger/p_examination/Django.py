@@ -29,9 +29,17 @@ if TYPE_CHECKING:
     from lx_dtypes.models.ledger.p_indication.Django import (
         PIndicationDjango,
     )
+    from lx_dtypes.models.ledger.patient.Django import (
+        PatientDjango,
+    )
 
 
 class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
+    patient: models.ForeignKey["PatientDjango", "PatientDjango"] = models.ForeignKey(
+        "PatientDjango",
+        related_name=FieldNames.PATIENT_EXAMINATIONS.value,
+        on_delete=models.CASCADE,
+    )
     examiners: models.ManyToManyField["ExaminerDjango", "ExaminerDjango"] = (
         models.ManyToManyField(
             "ExaminerDjango",

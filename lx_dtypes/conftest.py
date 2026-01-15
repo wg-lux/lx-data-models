@@ -121,6 +121,10 @@ from lx_dtypes.models.ledger.p_interventions.test_fixtures import (
     django_populated_p_finding_interventions_fixture,
     p_finding_interventions_fixture,
 )
+from lx_dtypes.models.ledger.patient.test_fixtures import (
+    django_patient_fixture,
+    patient_fixture,
+)
 
 __all__ = [
     # App Base Model Fixtures
@@ -226,4 +230,7 @@ __all__ = [
     # Patient Finding Classification Choice Descriptor Fixtures
     "p_finding_classification_choice_descriptor_fixture",
     "django_p_finding_classification_choice_descriptor_fixture",
+    # Patient Fixtures
+    "patient_fixture",
+    "django_patient_fixture",
 ]

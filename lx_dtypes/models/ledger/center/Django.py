@@ -20,6 +20,9 @@ if TYPE_CHECKING:
     from lx_dtypes.models.ledger.examiner.Django import (
         ExaminerDjango,
     )
+    from lx_dtypes.models.ledger.patient.Django import (
+        PatientDjango,
+    )
 
 
 class CenterDjango(LedgerBaseModelDjango[CenterDataDict]):
@@ -28,6 +31,7 @@ class CenterDjango(LedgerBaseModelDjango[CenterDataDict]):
 
     if TYPE_CHECKING:
         examiners: models.QuerySet["ExaminerDjango"]
+        patients: models.QuerySet["PatientDjango"]
 
     @property
     def ddict_class(self) -> type[CenterDataDict]:
