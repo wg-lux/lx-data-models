@@ -23,6 +23,12 @@ if TYPE_CHECKING:
     from lx_dtypes.models.ledger.examiner.Django import (
         ExaminerDjango,
     )
+    from lx_dtypes.models.ledger.p_finding.Django import (
+        PFindingDjango,
+    )
+    from lx_dtypes.models.ledger.p_indication.Django import (
+        PIndicationDjango,
+    )
 
 
 class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
@@ -41,6 +47,10 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
         )
     )
     date: OptionalDateTimeField = models.DateTimeField(null=True, blank=True)
+
+    if TYPE_CHECKING:
+        patient_findings: models.Manager["PFindingDjango"]
+        patient_indications: models.Manager["PIndicationDjango"]
 
     @property
     def ddict_class(self) -> type[PExaminationDataDict]:

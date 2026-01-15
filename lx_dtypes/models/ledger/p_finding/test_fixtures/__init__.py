@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import pytest
 
 from lx_dtypes.models.knowledge_base.finding._FindingDjango import (

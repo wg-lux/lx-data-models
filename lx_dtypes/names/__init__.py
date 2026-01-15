@@ -140,6 +140,12 @@ P_EXAMINATION_MODEL_NESTED_FIELDS: List[str] = [
     FieldNames.PATIENT_INDICATIONS.value,
 ]
 
+P_INDICATION_MODEL_M2M_FIELDS: List[str] = []
+P_INDICATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=P_INDICATION_MODEL_M2M_FIELDS
+)
+P_INDICATION_MODEL_NESTED_FIELDS: List[str] = []
+
 P_FINDING_MODEL_M2M_FIELDS: List[str] = []
 P_FINDING_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
     m2m_fields=P_FINDING_MODEL_M2M_FIELDS

@@ -36,6 +36,15 @@ from .p_finding import (
     l_p_finding_lookup,
     l_p_finding_models,
 )
+from .p_indication import (
+    LPIndicationDjangoLookupType,
+    LPIndicationLookupType,
+    l_p_indication_ddicts,
+    l_p_indication_django_lookup,
+    l_p_indication_django_models,
+    l_p_indication_lookup,
+    l_p_indication_models,
+)
 
 
 class LedgerModelsLookupType(
@@ -43,6 +52,7 @@ class LedgerModelsLookupType(
     LPExaminationLookupType,
     LExaminerLookupType,
     LPFindingLookupType,
+    LPIndicationLookupType,
 ):
     pass
 
@@ -52,6 +62,7 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_p_examination_lookup,
     **l_examiner_lookup,
     **l_p_finding_lookup,
+    **l_p_indication_lookup,
 )
 
 
@@ -60,6 +71,7 @@ class LedgerModelsDjangoLookupType(
     LPExaminationDjangoLookupType,
     LExaminerDjangoLookupType,
     LPFindingDjangoLookupType,
+    LPIndicationDjangoLookupType,
 ):
     pass
 
@@ -70,11 +82,16 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
         **l_p_examination_django_lookup,
         **l_examiner_django_lookup,
         **l_p_finding_django_lookup,
+        **l_p_indication_django_lookup,
     )
 )
 
 L_MODELS = Union[
-    l_center_models, l_p_examination_models, l_examiner_models, l_p_finding_models
+    l_center_models,
+    l_p_examination_models,
+    l_examiner_models,
+    l_p_finding_models,
+    l_p_indication_models,
 ]
 
 L_MODELS_DJANGO = Union[
@@ -82,18 +99,26 @@ L_MODELS_DJANGO = Union[
     l_p_examination_django_models,
     l_examiner_django_models,
     l_p_finding_django_models,
+    l_p_indication_django_models,
 ]
 
 L_DDICTS = Union[
-    l_center_ddicts, l_p_examination_ddicts, l_examiner_ddicts, l_p_finding_ddicts
+    l_center_ddicts,
+    l_p_examination_ddicts,
+    l_examiner_ddicts,
+    l_p_finding_ddicts,
+    l_p_indication_ddicts,
 ]
-L_MODEL_NAMES_LITERAL = Literal["Center", "Examiner", "PExamination", "PFinding"]
+L_MODEL_NAMES_LITERAL = Literal[
+    "Center", "Examiner", "PExamination", "PFinding", "PIndication"
+]
 
 L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "Center",
     "Examiner",
     "PExamination",
     "PFinding",
+    "PIndication",
 ]
 
 __all__ = [

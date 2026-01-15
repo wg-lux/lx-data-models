@@ -42,6 +42,13 @@ class LedgerBaseModelDjango(
         return [field for field in m2m_fields if field not in nested_fields]
 
     @classmethod
+    def fk_fields(cls) -> List[str]:
+        """Return a list of fields that are foreign keys in the DataDict."""
+        fk_fields = super().fk_fields()
+        nested_fields = cls.nested_fields()
+        return [field for field in fk_fields if field not in nested_fields]
+
+    @classmethod
     def nested_fields(cls) -> List[str]:
         """Return a list of fields that are nested DataDicts in the DataDict."""
         default_nested_fields: List[str] = []
@@ -73,15 +80,33 @@ class LedgerBaseModelDjango(
         list_fields = set(self.list_type_fields())
         nested_fields = set(self.nested_fields())
         pk_field_name = self.ddict_pk_field_name()
+        fk_fields = set(self.fk_fields())
         for field in fields:
             if field in nested_fields:
+                print(f"Processing nested field: {field}")
                 # Nested objects are handled separately; skip here to avoid missing reverse attrs
-                continue
-            if field in m2m_field_names:
+                value = getattr(self, field)
+
+                if hasattr(value, "all"):
+                    value = [_.ddict for _ in value.all()]  # type: ignore
+                else:
+                    value = value.ddict  # type: ignore
+
+            elif field in m2m_field_names:
                 related_names = list(
                     getattr(self, field).values_list(pk_field_name, flat=True)
                 )
                 value = related_names
+
+            elif field in fk_fields:
+                related_obj = getattr(self, field)
+                related_model = type(related_obj)
+                related_pk_field_name = related_model.ddict_pk_field_name()  # type: ignore
+                if related_obj is not None:
+                    value = getattr(related_obj, related_pk_field_name)
+                    value = str(value)
+                else:
+                    value = None
 
             elif field in list_fields:
                 raw_value = getattr(self, field)
@@ -132,8 +157,10 @@ class LedgerBaseModelDjango(
                 # get or create the related object
                 field_obj = cls._meta.get_field(field)  # type: ignore
                 related_model = field_obj.related_model  # type: ignore
-
-                related_obj = related_model.objects.get(pk=related_name)  # type: ignore
+                target_pk_field = related_model.ddict_pk_field_name()  # type: ignore
+                related_obj = related_model.objects.get(  # type: ignore
+                    **{target_pk_field: related_name}
+                )  # type: ignore
                 defaults_dict[field] = related_obj  # type: ignore
 
         instance, _created = cls.objects.update_or_create(

@@ -8,6 +8,7 @@ from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
 )
 from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
+from lx_dtypes.models.ledger.p_indication.Pydantic import PIndication
 from lx_dtypes.names import (
     P_EXAMINATION_MODEL_LIST_TYPE_FIELDS,
     P_EXAMINATION_MODEL_NESTED_FIELDS,
@@ -24,7 +25,7 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
     examination: str
     # TODO: Full implementation with nested models
     patient_findings: List[PFinding] = Field(default_factory=list)
-    # patient_indications: List[PIndication] = Field(default_factory=list)
+    patient_indications: List[PIndication] = Field(default_factory=list)
 
     @classmethod
     def list_type_fields(cls) -> List[str]:

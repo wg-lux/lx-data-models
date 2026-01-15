@@ -86,11 +86,16 @@ from lx_dtypes.models.ledger.center.test_fixtures import (
 )
 from lx_dtypes.models.ledger.p_examination.test_fixtures import (
     django_p_examination_fixture,
+    django_populated_p_examination_fixture,
     p_examination_fixture,
 )
 from lx_dtypes.models.ledger.p_finding.test_fixtures import (
     django_p_finding_fixture,
     p_finding_fixture,
+)
+from lx_dtypes.models.ledger.p_indication.test_fixtures import (
+    django_p_indication_fixture,
+    p_indication_fixture,
 )
 
 __all__ = [
@@ -171,7 +176,11 @@ __all__ = [
     # Patient Examination Fixtures
     "p_examination_fixture",
     "django_p_examination_fixture",
+    "django_populated_p_examination_fixture",
     # Patient Finding Fixtures
     "p_finding_fixture",
     "django_p_finding_fixture",
+    # Patient Indication Fixtures
+    "p_indication_fixture",
+    "django_p_indication_fixture",
 ]
