@@ -22,6 +22,9 @@ if TYPE_CHECKING:
     from lx_dtypes.models.ledger.p_examination.Django import (
         PExaminationDjango,
     )
+    from lx_dtypes.models.ledger.p_finding_classifications.Django import (
+        PFindingClassificationsDjango,
+    )
 
 
 class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
@@ -37,6 +40,9 @@ class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
         related_name=FieldNames.PATIENT_FINDINGS.value,
         on_delete=models.CASCADE,
     )
+
+    if TYPE_CHECKING:
+        patient_finding_classifications: models.Manager["PFindingClassificationsDjango"]
 
     @property
     def ddict_class(self) -> type[PFindingDataDict]:

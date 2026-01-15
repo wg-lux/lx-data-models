@@ -1,7 +1,12 @@
 from typing import List
 
+from pydantic import Field
+
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
+)
+from lx_dtypes.models.ledger.p_finding_classifications.Pydantic import (
+    PFindingClassifications,
 )
 from lx_dtypes.names import (
     P_FINDING_MODEL_LIST_TYPE_FIELDS,
@@ -16,6 +21,9 @@ from .DataDict import (
 class PFinding(LedgerBaseModel[PFindingDataDict]):
     finding: str
     patient_examination: str
+    patient_finding_classifications: List[PFindingClassifications] = Field(
+        default_factory=list
+    )
 
     @classmethod
     def list_type_fields(cls) -> List[str]:

@@ -36,6 +36,33 @@ from .p_finding import (
     l_p_finding_lookup,
     l_p_finding_models,
 )
+from .p_finding_classification_choice import (
+    LPFindingClassificationChoiceDjangoLookupType,
+    LPFindingClassificationChoiceLookupType,
+    l_p_finding_classification_choice_ddicts,
+    l_p_finding_classification_choice_django_lookup,
+    l_p_finding_classification_choice_django_models,
+    l_p_finding_classification_choice_lookup,
+    l_p_finding_classification_choice_models,
+)
+from .p_finding_classification_choice_descriptor import (
+    LPFindingClassificationChoiceDescriptorDjangoLookupType,
+    LPFindingClassificationChoiceDescriptorLookupType,
+    l_p_finding_classification_choice_descriptor_ddicts,
+    l_p_finding_classification_choice_descriptor_django_lookup,
+    l_p_finding_classification_choice_descriptor_django_models,
+    l_p_finding_classification_choice_descriptor_lookup,
+    l_p_finding_classification_choice_descriptor_models,
+)
+from .p_finding_classifications import (
+    LPFindingClassificationsDjangoLookupType,
+    LPFindingClassificationsLookupType,
+    l_p_finding_classifications_ddicts,
+    l_p_finding_classifications_django_lookup,
+    l_p_finding_classifications_django_models,
+    l_p_finding_classifications_lookup,
+    l_p_finding_classifications_models,
+)
 from .p_indication import (
     LPIndicationDjangoLookupType,
     LPIndicationLookupType,
@@ -53,6 +80,9 @@ class LedgerModelsLookupType(
     LExaminerLookupType,
     LPFindingLookupType,
     LPIndicationLookupType,
+    LPFindingClassificationsLookupType,
+    LPFindingClassificationChoiceLookupType,
+    LPFindingClassificationChoiceDescriptorLookupType,
 ):
     pass
 
@@ -63,6 +93,9 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_examiner_lookup,
     **l_p_finding_lookup,
     **l_p_indication_lookup,
+    **l_p_finding_classifications_lookup,
+    **l_p_finding_classification_choice_lookup,
+    **l_p_finding_classification_choice_descriptor_lookup,
 )
 
 
@@ -72,6 +105,9 @@ class LedgerModelsDjangoLookupType(
     LExaminerDjangoLookupType,
     LPFindingDjangoLookupType,
     LPIndicationDjangoLookupType,
+    LPFindingClassificationsDjangoLookupType,
+    LPFindingClassificationChoiceDjangoLookupType,
+    LPFindingClassificationChoiceDescriptorDjangoLookupType,
 ):
     pass
 
@@ -83,6 +119,9 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
         **l_examiner_django_lookup,
         **l_p_finding_django_lookup,
         **l_p_indication_django_lookup,
+        **l_p_finding_classifications_django_lookup,
+        **l_p_finding_classification_choice_django_lookup,
+        **l_p_finding_classification_choice_descriptor_django_lookup,
     )
 )
 
@@ -92,6 +131,9 @@ L_MODELS = Union[
     l_examiner_models,
     l_p_finding_models,
     l_p_indication_models,
+    l_p_finding_classifications_models,
+    l_p_finding_classification_choice_models,
+    l_p_finding_classification_choice_descriptor_models,
 ]
 
 L_MODELS_DJANGO = Union[
@@ -100,6 +142,9 @@ L_MODELS_DJANGO = Union[
     l_examiner_django_models,
     l_p_finding_django_models,
     l_p_indication_django_models,
+    l_p_finding_classifications_django_models,
+    l_p_finding_classification_choice_django_models,
+    l_p_finding_classification_choice_descriptor_django_models,
 ]
 
 L_DDICTS = Union[
@@ -108,9 +153,18 @@ L_DDICTS = Union[
     l_examiner_ddicts,
     l_p_finding_ddicts,
     l_p_indication_ddicts,
+    l_p_finding_classifications_ddicts,
+    l_p_finding_classification_choice_ddicts,
+    l_p_finding_classification_choice_descriptor_ddicts,
 ]
 L_MODEL_NAMES_LITERAL = Literal[
-    "Center", "Examiner", "PExamination", "PFinding", "PIndication"
+    "Center",
+    "Examiner",
+    "PExamination",
+    "PFinding",
+    "PIndication",
+    "PFindingClassifications",
+    "PFindingClassificationChoice",
 ]
 
 L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
@@ -119,6 +173,8 @@ L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "PExamination",
     "PFinding",
     "PIndication",
+    "PFindingClassifications",
+    "PFindingClassificationChoice",
 ]
 
 __all__ = [

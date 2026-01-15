@@ -91,7 +91,22 @@ from lx_dtypes.models.ledger.p_examination.test_fixtures import (
 )
 from lx_dtypes.models.ledger.p_finding.test_fixtures import (
     django_p_finding_fixture,
+    django_populated_p_finding_fixture,
     p_finding_fixture,
+)
+from lx_dtypes.models.ledger.p_finding_classification_choice.test_fixtures import (
+    django_p_finding_classification_choice_fixture,
+    django_populated_p_finding_classification_choice_fixture,
+    p_finding_classification_choice_fixture,
+)
+from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.test_fixtures import (
+    django_p_finding_classification_choice_descriptor_fixture,
+    p_finding_classification_choice_descriptor_fixture,
+)
+from lx_dtypes.models.ledger.p_finding_classifications.test_fixtures import (
+    django_p_finding_classifications_fixture,
+    django_populated_p_finding_classifications_fixture,
+    p_finding_classifications_fixture,
 )
 from lx_dtypes.models.ledger.p_indication.test_fixtures import (
     django_p_indication_fixture,
@@ -180,7 +195,19 @@ __all__ = [
     # Patient Finding Fixtures
     "p_finding_fixture",
     "django_p_finding_fixture",
+    "django_populated_p_finding_fixture",
     # Patient Indication Fixtures
     "p_indication_fixture",
     "django_p_indication_fixture",
+    # Patient Finding Classifications Fixtures
+    "p_finding_classifications_fixture",
+    "django_p_finding_classifications_fixture",
+    "django_populated_p_finding_classifications_fixture",
+    # Patient Finding Classification Choice Fixtures
+    "p_finding_classification_choice_fixture",
+    "django_p_finding_classification_choice_fixture",
+    "django_populated_p_finding_classification_choice_fixture",
+    # Patient Finding Classification Choice Descriptor Fixtures
+    "p_finding_classification_choice_descriptor_fixture",
+    "django_p_finding_classification_choice_descriptor_fixture",
 ]

@@ -41,7 +41,7 @@ class TestDjangoPExaminationFixture:
     def test_populated_django_p_examination_fixture(
         self,
         django_populated_p_examination_fixture: PExaminationDjango,
-        django_p_finding_fixture: PFindingDjango,
+        django_populated_p_finding_fixture: PFindingDjango,
         django_p_indication_fixture: PIndicationDjango,
     ) -> None:
         assert django_populated_p_examination_fixture is not None
