@@ -7,6 +7,8 @@ data/smartie
 knowledge_base.yaml
 .devenv.flake.nix
 **/models/**/tests/**.yaml
+./star_upper_gi_interface_export_test.yaml
+./star_upper_gi_kb_export_test.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -30,7 +30,9 @@ class DataLoader(AppBaseModel):
         from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
         kb_config = self.get_initialized_config(module_name)
-        kb = KnowledgeBase(config=kb_config)
+        # Load root module data from YAML so the base KB is populated even when
+        # there are no submodules.
+        kb = KnowledgeBase.create_from_config(kb_config)
 
         ordered_submodules = kb_config.modules
 

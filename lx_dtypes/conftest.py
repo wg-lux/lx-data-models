@@ -32,6 +32,11 @@ from lx_dtypes.models.interface.test_fixtures.paths import (
     sample_interventions_yaml_filepath,
     yaml_repo_dirs,
 )
+from lx_dtypes.models.interface.test_fixtures.star_upper_gi.dataloader import (
+    star_ugi_initialized_kb_config,
+    star_ugi_knowledge_base,
+    star_ugi_yaml_data_loader,
+)
 from lx_dtypes.models.knowledge_base.citation.test_fixtures import (
     citation_fixture,
     django_citation_fixture,
@@ -233,4 +238,8 @@ __all__ = [
     # Patient Fixtures
     "patient_fixture",
     "django_patient_fixture",
+    # STAR UGI
+    "star_ugi_yaml_data_loader",
+    "star_ugi_initialized_kb_config",
+    "star_ugi_knowledge_base",
 ]

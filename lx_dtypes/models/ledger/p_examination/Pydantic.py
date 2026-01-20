@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional, Union
+from typing import List, NamedTuple, Optional, Union
 
 from pydantic import AwareDatetime, Field, field_validator
 
@@ -8,6 +8,9 @@ from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
 )
 from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
+from lx_dtypes.models.ledger.p_finding_classification_choice.Pydantic import (
+    PFindingClassificationChoice,
+)
 from lx_dtypes.models.ledger.p_indication.Pydantic import PIndication
 from lx_dtypes.names import (
     P_EXAMINATION_MODEL_LIST_TYPE_FIELDS,
@@ -16,6 +19,16 @@ from lx_dtypes.names import (
 
 from .DataDict import (
     PExaminationDataDict,
+)
+
+PFindingClassificationChoiceLookupTuple = NamedTuple(
+    "PFindingClassificationChoiceLookupTuple",
+    [
+        ("p_examination_uuid", str),
+        ("p_finding_uuid", str),
+        ("p_finding_classifications_uuid", str),
+        ("p_finding_classification_choice", PFindingClassificationChoice),
+    ],
 )
 
 
@@ -55,3 +68,38 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
                 year=v.year, month=v.month, day=v.day, tzinfo=datetime.timezone.utc
             )
         return v
+
+    def get_finding_by_uuid(self, finding_uuid: str) -> PFinding:
+        for finding in self.patient_findings:
+            if str(finding.uuid) == finding_uuid:
+                return finding
+        raise KeyError(
+            f"Finding with UUID {finding_uuid} not found in this examination."
+        )
+
+    def get_finding_classification_choice_by_uuid(
+        self, finding_classification_choice_uuid: str
+    ) -> PFindingClassificationChoiceLookupTuple:
+        lookup_tuple: Optional[PFindingClassificationChoiceLookupTuple] = None
+        for finding in self.patient_findings:
+            for classifications_list in finding.patient_finding_classifications:
+                for (
+                    classification_choice
+                ) in classifications_list.patient_finding_classification_choices:
+                    if (
+                        str(classification_choice.uuid)
+                        == finding_classification_choice_uuid
+                    ):
+                        lookup_tuple = PFindingClassificationChoiceLookupTuple(
+                            p_examination_uuid=str(self.uuid),
+                            p_finding_uuid=str(finding.uuid),
+                            p_finding_classifications_uuid=str(
+                                classifications_list.uuid
+                            ),
+                            p_finding_classification_choice=classification_choice,
+                        )
+        if lookup_tuple is None:
+            raise KeyError(
+                f"Finding Classification Choice with UUID {finding_classification_choice_uuid} not found in this examination."
+            )
+        return lookup_tuple

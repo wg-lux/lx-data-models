@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Self, Tuple, Union, cast
+from typing import Dict, List, Self, Tuple, TypedDict, Union, cast
 
 import yaml
 from pydantic import Field
@@ -116,6 +116,26 @@ class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
 
 
 YAML_IMPORT_SKIP_FIELDS = ["config", "uuid", "source_file", "created_at", "updated_at"]
+
+
+class KnowledgeBaseRecordList(TypedDict):
+    citations: List[CitationDataDict]
+    classifications: List[ClassificationDataDict]
+    classification_types: List[ClassificationTypeDataDict]
+    classification_choices: List[ClassificationChoiceDataDict]
+    classification_choice_descriptors: List[ClassificationChoiceDescriptorDataDict]
+    examinations: List[ExaminationDataDict]
+    examination_types: List[ExaminationTypeDataDict]
+    findings: List[FindingDataDict]
+    finding_types: List[FindingTypeDataDict]
+    indications: List[IndicationDataDict]
+    indication_types: List[IndicationTypeDataDict]
+    interventions: List[InterventionDataDict]
+    intervention_types: List[InterventionTypeDataDict]
+    units: List[UnitDataDict]
+    unit_types: List[UnitTypeDataDict]
+    information_sources: List[InformationSourceDataDict]
+    information_source_types: List[InformationSourceTypeDataDict]
 
 
 class KnowledgeBase(AppBaseModelUUIDTags):
@@ -253,9 +273,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 setattr(self, field_name, merged_tags)
                 continue
 
-            assert field_model_name in KB_MODEL_NAMES_ORDERED, (
-                f"Unknown model type: {field_model_name}"
-            )
+            assert (
+                field_model_name in KB_MODEL_NAMES_ORDERED
+            ), f"Unknown model type: {field_model_name}"
             field_model_name = cast(KB_MODEL_NAMES_LITERAL, field_model_name)
             TargetModel: type[KB_MODELS] = knowledge_base_models_lookup[
                 field_model_name
@@ -319,3 +339,52 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 entries_by_module[module_name].append((attr, entry))
 
         return entries_by_module
+
+    def export_record_lists(self) -> KnowledgeBaseRecordList:
+        citation_records = [r.ddict for r in self.citation.values()]
+        classification_records = [r.ddict for r in self.classification.values()]
+        classification_type_records = [
+            r.ddict for r in self.classification_type.values()
+        ]
+        classification_choice_records = [
+            r.ddict for r in self.classification_choice.values()
+        ]
+        classification_choice_descriptor_records = [
+            r.ddict for r in self.classification_choice_descriptor.values()
+        ]
+        examination_records = [r.ddict for r in self.examination.values()]
+        examination_type_records = [r.ddict for r in self.examination_type.values()]
+        finding_records = [r.ddict for r in self.finding.values()]
+        finding_type_records = [r.ddict for r in self.finding_type.values()]
+        indication_records = [r.ddict for r in self.indication.values()]
+        indication_type_records = [r.ddict for r in self.indication_type.values()]
+        intervention_records = [r.ddict for r in self.intervention.values()]
+        intervention_type_records = [r.ddict for r in self.intervention_type.values()]
+        unit_records = [r.ddict for r in self.unit.values()]
+        unit_type_records = [r.ddict for r in self.unit_type.values()]
+        information_source_records = [r.ddict for r in self.information_source.values()]
+        information_source_type_records = [
+            r.ddict for r in self.information_source_type.values()
+        ]
+
+        record_lists = KnowledgeBaseRecordList(
+            citations=citation_records,
+            classifications=classification_records,
+            classification_types=classification_type_records,
+            classification_choices=classification_choice_records,
+            classification_choice_descriptors=classification_choice_descriptor_records,
+            examinations=examination_records,
+            examination_types=examination_type_records,
+            findings=finding_records,
+            finding_types=finding_type_records,
+            indications=indication_records,
+            indication_types=indication_type_records,
+            interventions=intervention_records,
+            intervention_types=intervention_type_records,
+            units=unit_records,
+            unit_types=unit_type_records,
+            information_sources=information_source_records,
+            information_source_types=information_source_type_records,
+        )
+
+        return record_lists

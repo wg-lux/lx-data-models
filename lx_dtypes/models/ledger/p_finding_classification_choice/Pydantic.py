@@ -5,6 +5,9 @@ from pydantic import Field
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
 )
+from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
+    ClassificationChoiceDescriptor,
+)
 from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.Pydantic import (
     PFindingClassificationChoiceDescriptor,
 )
@@ -39,3 +42,31 @@ class PFindingClassificationChoice(
     @classmethod
     def nested_fields(cls) -> List[str]:
         return P_FINDING_CLASSIFICATION_CHOICE_MODEL_NESTED_FIELDS
+
+    def create_descriptor(
+        self,
+        descriptor: "ClassificationChoiceDescriptor",
+        descriptor_value: str | int | float | bool | List[str],
+    ):
+
+        if descriptor.is_numeric:
+            descriptor_value = float(descriptor_value)  # type: ignore
+        elif descriptor.is_boolean:
+            descriptor_value = bool(descriptor_value)  # type: ignore
+        elif descriptor.is_selection:
+            descriptor_value = list(descriptor_value)  # type: ignore
+        elif descriptor.is_text:
+            descriptor_value = str(descriptor_value)  # type: ignore
+        else:
+            raise ValueError(
+                f"Unsupported descriptor type for descriptor {descriptor.name}"
+            )
+
+        p_descriptor = PFindingClassificationChoiceDescriptor(
+            classification_choice_descriptor=descriptor.name,
+            descriptor_value=descriptor_value,
+            patient_finding_classification_choice=str(self.uuid),
+        )
+
+        self.patient_finding_classification_choice_descriptors.append(p_descriptor)
+        return p_descriptor

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -14,6 +15,18 @@ class TestKnowledgeBaseDataLoader:
     def test_knowledge_base_data_loader(self) -> None:
         # TODO
         return None
+
+    def test_db_interface_schema(self) -> None:
+        db_interface = DbInterface.create_empty(name="TestDBInterface", version="1.0.0")
+
+        # Dump schema
+        schema = DbInterface.model_json_schema()
+        schema_path = Path("./db_interface_schema.json")
+        schema_path.write_text(json.dumps(schema, indent=2), encoding="utf-8")
+
+        assert schema_path.exists()
+        assert "knowledge_base" in schema.get("properties", {})
+        assert "ledger" in schema.get("properties", {})
 
 
 class TestDbInterfaceExport:
@@ -35,12 +48,12 @@ class TestDbInterfaceExport:
             new_value_1 = new_dict["knowledge_base"][field]
             new_value_2 = re_imported_dict["knowledge_base"][field]
 
-            assert original_value == new_value_1, (
-                f"Mismatch in field {field} after re-validation."
-            )
-            assert original_value == new_value_2, (
-                f"Mismatch in field {field} after YAML export/import."
-            )
+            assert (
+                original_value == new_value_1
+            ), f"Mismatch in field {field} after re-validation."
+            assert (
+                original_value == new_value_2
+            ), f"Mismatch in field {field} after YAML export/import."
 
         assert new_dict == expected_dict
 

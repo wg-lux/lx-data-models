@@ -1,0 +1,2 @@
+created_at,first_name,last_name,dob,email,gender,phone,street,city,state,zip_code,country,uuid,tags,external_ids,center
+2026-01-20 12:47:52.270129+00:00,John,Doe,1980-01-01,,unknown,,,,,,,b9877028-dc56-403a-b65d-10797b1dfe2f,,{},

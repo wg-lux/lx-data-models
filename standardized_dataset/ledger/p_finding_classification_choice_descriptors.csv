@@ -1,0 +1,9 @@
+created_at,uuid,tags,external_ids,descriptor_value,classification_choice_descriptor,patient_finding_classification_choice
+2026-01-20 12:47:52.270926+00:00,22b130f0-68c1-44ce-99e5-a7d9143ec612,,{},21.0,length_cm_descriptor,f9f91f08-e605-4f65-ae24-37573a9bed6e
+2026-01-20 12:47:52.270998+00:00,71e1b581-c2e3-439e-b380-2775f3b038d6,,{},21.0,length_cm_descriptor,d2e579bb-5eb4-4770-8f36-6b62ec417101
+2026-01-20 12:47:52.271062+00:00,5b9c13fc-2918-4e88-b5f7-1159c4643ba0,,{},20.0,length_cm_descriptor,88f3a7b1-6e2a-4469-8a3a-adb1fed26935
+2026-01-20 12:47:52.271665+00:00,19752d99-71c8-4838-8db9-a23e7fa93bf7,,{},-2.0,length_cm_descriptor,056b4ebe-6a22-4c27-bd10-d162e0cf7104
+2026-01-20 12:47:52.271702+00:00,885a39b9-0725-447d-b29d-37048523781c,,{},8.0,length_mm_descriptor,0b4f77c0-06cd-4422-af81-b50aa9503280
+2026-01-20 12:47:52.271792+00:00,08cf6f26-d54e-4839-b6f0-907b2ca394ab,,{},Other Information not yet reflected in structured manner can be added here.,additional_text_info,5af77702-7aab-418d-8ec5-1d15fc94b2c9
+2026-01-20 12:47:52.272000+00:00,7e09e2a2-e07c-43ff-aeb1-23b4c1ad73e8,,{},12.0,length_cm_descriptor,77c31cbc-0d3e-4459-881f-b53cf4bf5c78
+2026-01-20 12:47:52.272037+00:00,5520d90d-4f45-4310-b23d-b1aaf7c46329,,{},5.0,length_mm_descriptor,a7ac0950-14b4-46a3-9bad-0aa883fdf830

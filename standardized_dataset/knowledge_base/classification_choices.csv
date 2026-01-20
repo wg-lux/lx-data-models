@@ -1,0 +1,38 @@
+created_at,uuid,tags,name,name_de,name_en,description,kb_module_name,classification_choice_descriptors
+2026-01-20 12:47:52.107446+00:00,74b084b6-52fc-4659-96d3-570d9a5fa71e,,star_upper_gi_forrest_Ia,unknown,unknown,Active spurting bleeding (Forrest Ia).,star_upper_gi,
+2026-01-20 12:47:52.107482+00:00,d1091821-2428-4ea3-a35c-a3d74cfa0706,,star_upper_gi_forrest_Ib,unknown,unknown,Active oozing bleeding (Forrest Ib).,star_upper_gi,
+2026-01-20 12:47:52.107504+00:00,bad95838-93a8-4fc3-9375-fc04d2d2deb8,,star_upper_gi_forrest_IIa,unknown,unknown,"Visible vessel, non-bleeding (Forrest IIa).",star_upper_gi,
+2026-01-20 12:47:52.107523+00:00,32573971-a5c8-4945-b60e-1b9e3d39702c,,star_upper_gi_forrest_IIb,unknown,unknown,Adherent clot (Forrest IIb).,star_upper_gi,
+2026-01-20 12:47:52.107541+00:00,fde8375c-1a6f-42e5-9a55-d04eaa96b804,,star_upper_gi_forrest_IIc,unknown,unknown,Hematin-covered lesion (Forrest IIc).,star_upper_gi,
+2026-01-20 12:47:52.107560+00:00,04067e48-9bf2-4287-8b4f-ace67ee0913b,,star_upper_gi_forrest_III,unknown,unknown,Lesion without bleeding; flat spot / Clean base (Forrest III).,star_upper_gi,
+2026-01-20 12:47:52.108220+00:00,cd19b5b8-4783-44a1-a835-55458fd22611,,additional_text_info,unknown,unknown,unknown,star_upper_gi,additional_text_info
+2026-01-20 12:47:52.109512+00:00,3224b769-6b4b-4122-b13f-ab5d16d59f01,,star_upper_gi_imaging_modality_white_light,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.109539+00:00,1156e699-7a15-4e88-b591-1875679f11f8,,star_upper_gi_imaging_modality_narrow_band_imaging,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.109560+00:00,d17f34de-9e89-45a1-bdcc-4e7fb25eda5b,,star_upper_gi_imaging_modality_chromoendoscopy,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.109580+00:00,77a7471f-444d-45a9-91fd-65a316e49964,,star_upper_gi_imaging_modality_acidic_staining,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.118099+00:00,35b5daa4-f536-4ecb-86a6-ae4208d8ada1,,distance_cm,unknown,unknown,unknown,star_upper_gi,length_cm_descriptor
+2026-01-20 12:47:52.118128+00:00,7306dc0b-9958-4bdd-8442-3a8bb7aa6287,,size_mm,unknown,unknown,unknown,star_upper_gi,length_mm_descriptor
+2026-01-20 12:47:52.120409+00:00,088ddbb1-6250-44a7-93aa-52a54571a973,,star_upper_gi_paris_Is,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.120437+00:00,37957ce2-2004-4dfb-b8cb-d3518c744933,,star_upper_gi_paris_Ip,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.120458+00:00,fc498a90-cbdf-45c0-8250-e9f1efb4ed09,,star_upper_gi_paris_IIa,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.120477+00:00,8e36c392-2852-4d63-8b88-cdc5e3bac200,,star_upper_gi_paris_IIb,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.120496+00:00,8f2a1943-220a-4d80-963f-0c3356716123,,star_upper_gi_paris_IIc,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.120514+00:00,0445caae-8231-4616-874e-6b0526861d99,,star_upper_gi_paris_III,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.120533+00:00,4171a04f-778c-4059-9620-8c716849d99e,,star_upper_gi_paris_IIa_IIc,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.120552+00:00,5400021c-d885-4b9f-ab0b-1e6655e8270b,,star_upper_gi_paris_IIb_IIc,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.127944+00:00,a78524eb-53d1-4c92-96cf-4ebc07d8ede9,,star_upper_gi_location_esophagus_proximal,Ösophagus (proximal),Esophagus (proximal),unknown,star_upper_gi,
+2026-01-20 12:47:52.127979+00:00,da66a660-8c12-4aa2-85b9-edbf8161133f,,star_upper_gi_location_esophagus_distal,Ösophagus (distal),Esophagus (distal),unknown,star_upper_gi,
+2026-01-20 12:47:52.128004+00:00,fc0043d6-c467-4031-a921-8425d6aa7012,,star_upper_gi_location_z_line,Z-Linie,Z-line,unknown,star_upper_gi,distance_cm
+2026-01-20 12:47:52.128025+00:00,b5661177-c820-4b6c-9a93-c20ae2fdc7ab,,star_upper_gi_location_gastroesophageal_junction,Gastroösophagealer Übergang,Gastroesophageal junction,unknown,star_upper_gi,distance_cm
+2026-01-20 12:47:52.128046+00:00,7ee5472b-5d59-48f1-b025-881362b53ff4,,star_upper_gi_location_stomach_fundus,Magen (Fundus),Stomach (Fundus),unknown,star_upper_gi,
+2026-01-20 12:47:52.128064+00:00,518e7f2e-b871-4ca4-9635-16ddf85fd43c,,star_upper_gi_location_stomach_corpus,Magen (Corpus),Stomach (Corpus),unknown,star_upper_gi,
+2026-01-20 12:47:52.128082+00:00,bee9d755-c80e-4027-8b96-e81796e2e8e0,,star_upper_gi_location_stomach_antrum,Magen (Antrum),Stomach (Antrum),unknown,star_upper_gi,
+2026-01-20 12:47:52.128100+00:00,0aaccde3-9604-4a8d-b6b7-6c2be4dd5909,,star_upper_gi_location_stomach_cardia,Magen (Kardia),Stomach (Cardia),unknown,star_upper_gi,
+2026-01-20 12:47:52.128118+00:00,f2e62e8e-5bfe-4a5d-89ee-7022246c0e70,,star_upper_gi_location_stomach_pylorus,Magen (Pylorus),Stomach (Pylorus),unknown,star_upper_gi,
+2026-01-20 12:47:52.128135+00:00,3ad979b8-2013-4a5b-8cd0-61f35f93a30c,,star_upper_gi_location_duodenum_bulbus,Duodenum (Bulbus),Duodenum (Bulbus),unknown,star_upper_gi,
+2026-01-20 12:47:52.128154+00:00,bed9afa8-3b11-47e1-b693-95e46f9b585f,,star_upper_gi_location_duodenum_descending_part,Duodenum (Pars descendens),Duodenum (Descending part),unknown,star_upper_gi,
+2026-01-20 12:47:52.128171+00:00,98b2e463-5f54-4eb7-b159-8022505f5514,,star_upper_gi_location_papilla_major,Papilla duodeni major,Major duodenal papilla,unknown,star_upper_gi,
+2026-01-20 12:47:52.128189+00:00,11596ae2-2d04-45dc-8af3-19ffa6285545,,star_upper_gi_location_papilla_minor,Papilla duodeni minor,Minor duodenal papilla,unknown,star_upper_gi,
+2026-01-20 12:47:52.131052+00:00,ae07ec90-d5c7-416a-9c36-82ddf9201221,,yes,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.131081+00:00,70f429cd-f44f-43c6-8891-67e37e60b8af,,no,unknown,unknown,unknown,star_upper_gi,
+2026-01-20 12:47:52.131102+00:00,0473e0a3-0b88-4296-b1d1-64005dda9f20,,unknown,unknown,unknown,unknown,star_upper_gi,
