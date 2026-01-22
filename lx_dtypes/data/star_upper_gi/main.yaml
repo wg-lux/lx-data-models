@@ -13,7 +13,6 @@
     - star_upper_gi_vili_duodenum_atrophic
     - star_upper_gi_papilla_major_visualized
     - star_upper_gi_papilla_minor_visualized
-    # Abnormal Findings
     - star_upper_gi_polyp
     - star_upper_gi_ulcer
     - star_upper_gi_esophagus_ectopic_mucosa

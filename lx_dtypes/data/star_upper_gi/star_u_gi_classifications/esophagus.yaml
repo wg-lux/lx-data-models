@@ -62,9 +62,9 @@
   name: star_upper_gi_erefs_exudates
   description: "Classification of exudates in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
-- star_upper_gi_erefs_exudates_none
-- star_upper_gi_erefs_exudates_mild
-- star_upper_gi_erefs_exudates_severe
+    - star_upper_gi_erefs_exudates_none
+    - star_upper_gi_erefs_exudates_mild
+    - star_upper_gi_erefs_exudates_severe
 
 - model: classification
   name: star_upper_gi_erefs_furrows
