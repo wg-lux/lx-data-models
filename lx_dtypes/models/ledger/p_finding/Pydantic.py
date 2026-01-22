@@ -18,6 +18,7 @@ from lx_dtypes.names import (
 
 from .DataDict import (
     PFindingDataDict,
+    SerializedPFindingDataDict,
 )
 
 
@@ -57,6 +58,14 @@ class PFinding(LedgerBaseModel[PFindingDataDict]):
     def nested_fields(cls) -> List[str]:
         return P_FINDING_MODEL_NESTED_FIELDS
 
+    @property
+    def serialized_ddict_class(self) -> type[SerializedPFindingDataDict]:
+        return SerializedPFindingDataDict
+
+    @classmethod
+    def serialized_model_class(cls) -> type["SerializedPFinding"]:
+        return SerializedPFinding
+
     def get_p_classifications_by_uuid(
         self, classifications_uuid: str
     ) -> PFindingClassifications:
@@ -66,3 +75,22 @@ class PFinding(LedgerBaseModel[PFindingDataDict]):
         raise KeyError(
             f"Finding Classifications with UUID {classifications_uuid} not found in this finding."
         )
+
+
+class SerializedPFinding(LedgerBaseModel[SerializedPFindingDataDict]):
+    finding: str
+    patient_examination: str
+    patient_finding_classifications: str = ""
+    patient_finding_interventions: str = ""
+
+    @classmethod
+    def list_type_fields(cls) -> List[str]:
+        return P_FINDING_MODEL_LIST_TYPE_FIELDS
+
+    @property
+    def ddict_class(self) -> type[SerializedPFindingDataDict]:
+        return SerializedPFindingDataDict
+
+    @classmethod
+    def nested_fields(cls) -> List[str]:
+        return []

@@ -44,7 +44,7 @@ def parse_str_list(value: Sequence[str] | str | None) -> list[str]:
     return items
 
 
-def serialize_str_list(values: Sequence[str] | None) -> str:
+def serialize_str_list(values: Sequence[str] | None, sep: str = ",") -> str:
     """Serialize a list of strings into a comma-separated string.
 
     Args:
@@ -66,4 +66,4 @@ def serialize_str_list(values: Sequence[str] | None) -> str:
         if stripped != _WHITESPACE_ONLY:
             normalized.append(stripped)
 
-    return ",".join(normalized)
+    return sep.join(normalized)

@@ -16,3 +16,12 @@ class PExaminationDataDict(LedgerBaseModelDataDict):
     patient_findings: List["PFindingDataDict"]
     patient_indications: List["PIndicationDataDict"]
     patient: str
+
+
+class SerializedPExaminationDataDict(LedgerBaseModelDataDict):
+    examiners: List[str]
+    examination: str
+    date: Optional[str]
+    patient_findings: str
+    patient_indications: str
+    patient: str

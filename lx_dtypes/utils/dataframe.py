@@ -1,4 +1,4 @@
-from typing import Any, List, Union, cast
+from typing import Any, List, cast
 
 import pandas as pd
 from pandera.api.pandas.model import DataFrameModel
@@ -46,7 +46,7 @@ from lx_dtypes.stats.schemas.ledger import (
 )
 
 
-def _validate_or_empty(schema: type[DataFrameModel], records: List[Any]) -> DataFrame:
+def _validate_or_empty(schema: type[DataFrameModel], records: List[Any]) -> DataFrame:  # type: ignore # TODO mypy pandera typing issue
     """Validate records against schema; return empty typed frame when none."""
 
     schema_obj = schema.to_schema()
@@ -60,7 +60,7 @@ def _validate_or_empty(schema: type[DataFrameModel], records: List[Any]) -> Data
         df = pd.DataFrame.from_records(records)
         validated_df = schema_obj.validate(df)
 
-    validated_df = cast(DataFrame, validated_df)
+    validated_df = cast(DataFrame, validated_df)  # type: ignore # TODO mypy pandera typing issue
 
     return validated_df
 
@@ -181,7 +181,6 @@ def ledger2dataset(ledger: Ledger) -> LedgerDataset:
 def interface2dataset(
     patient_interface: DbInterface,
 ) -> InterfaceExportDataset:
-
     ledger_dataset = ledger2dataset(ledger=patient_interface.ledger)
     kb_dataset = kb2dataset(kb=patient_interface.knowledge_base)
 

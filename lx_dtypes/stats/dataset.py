@@ -81,13 +81,14 @@ class LedgerDataset(DatasetBaseModel):
         Args:
             file_path (Path): The path to the Excel file where data will be saved.
         """
+
         def _strip_tz(df: pd.DataFrame) -> pd.DataFrame:
             tz_cols = df.select_dtypes(include=["datetimetz"]).columns
             if not len(tz_cols):
                 return df
             df = df.copy()
             for col in tz_cols:
-                df[col] = df[col].dt.tz_convert("UTC").dt.tz_localize(None)
+                df[col] = df[col].dt.tz_convert("UTC").dt.tz_localize(None)  # type: ignore
             return df
 
         with pd.ExcelWriter(file_path) as writer:
@@ -145,13 +146,14 @@ class KnowledgeBaseDataset(DatasetBaseModel):
         Args:
             file_path (Path): The path to the Excel file where data will be saved.
         """
+
         def _strip_tz(df: pd.DataFrame) -> pd.DataFrame:
             tz_cols = df.select_dtypes(include=["datetimetz"]).columns
             if not len(tz_cols):
                 return df
             df = df.copy()
             for col in tz_cols:
-                df[col] = df[col].dt.tz_convert("UTC").dt.tz_localize(None)
+                df[col] = df[col].dt.tz_convert("UTC").dt.tz_localize(None)  # type: ignore
             return df
 
         with pd.ExcelWriter(file_path) as writer:
@@ -193,33 +195,37 @@ class InterfaceExportDataset(DatasetBaseModel):
         elif file_path.exists() and overwrite:
             file_path.unlink()
         with pd.ExcelWriter(file_path) as writer:
-            # Export knowledge base dataframes
-            kb_model_fields = self.knowledge_base.model_fields_set
-            for field_name in kb_model_fields:
-                df = getattr(self.knowledge_base, field_name, None)
-                if not isinstance(df, pd.DataFrame):
-                    continue
-                sheet_name = f"kb_{field_name}"
-                # Excel cannot handle tz-aware datetimes; drop tz only for export.
-                tz_cols = df.select_dtypes(include=["datetimetz"]).columns
-                export_df = df
-                if len(tz_cols):
-                    export_df = df.copy()
-                    for col in tz_cols:
-                        export_df[col] = export_df[col].dt.tz_convert("UTC").dt.tz_localize(None)
-                export_df.to_excel(writer, sheet_name=sheet_name, index=False)
-
             # Export ledger dataframes
             ledger_model_fields = self.ledger.model_fields_set
             for field_name in ledger_model_fields:
                 df = getattr(self.ledger, field_name, None)
                 if not isinstance(df, pd.DataFrame):
                     continue
-                sheet_name = f"ledger_{field_name}"
+                sheet_name = f"l_{field_name}"[:31]  # Excel sheet name max length is 31
                 tz_cols = df.select_dtypes(include=["datetimetz"]).columns
                 export_df = df
                 if len(tz_cols):
                     export_df = df.copy()
                     for col in tz_cols:
-                        export_df[col] = export_df[col].dt.tz_convert("UTC").dt.tz_localize(None)
+                        export_df[col] = (
+                            export_df[col].dt.tz_convert("UTC").dt.tz_localize(None)  # type: ignore
+                        )
+                export_df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+            # Export knowledge base dataframes
+            kb_model_fields = self.knowledge_base.model_fields_set
+            for field_name in kb_model_fields:
+                df = getattr(self.knowledge_base, field_name, None)
+                if not isinstance(df, pd.DataFrame):
+                    continue
+                sheet_name = f"k_{field_name}"[:31]
+                # Excel cannot handle tz-aware datetimes; drop tz only for export.
+                tz_cols = df.select_dtypes(include=["datetimetz"]).columns
+                export_df = df
+                if len(tz_cols):
+                    export_df = df.copy()
+                    for col in tz_cols:
+                        export_df[col] = (
+                            export_df[col].dt.tz_convert("UTC").dt.tz_localize(None)  # type: ignore
+                        )
                 export_df.to_excel(writer, sheet_name=sheet_name, index=False)

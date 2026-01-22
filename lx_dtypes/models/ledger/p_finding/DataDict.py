@@ -14,3 +14,10 @@ class PFindingDataDict(LedgerBaseModelDataDict):
     patient_examination: str
     patient_finding_classifications: list[PFindingClassificationsDataDict]
     patient_finding_interventions: list[PFindingInterventionsDataDict]
+
+
+class SerializedPFindingDataDict(LedgerBaseModelDataDict):
+    finding: str
+    patient_examination: str
+    patient_finding_classifications: str
+    patient_finding_interventions: str

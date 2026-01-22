@@ -1,6 +1,6 @@
 from datetime import date
 from pathlib import Path
-from typing import Dict, Optional, Self
+from typing import Any, Dict, Optional, Self
 
 import yaml
 
@@ -32,9 +32,6 @@ from lx_dtypes.models.ledger.p_finding_classifications.Pydantic import (
     PFindingClassifications,
 )
 from lx_dtypes.models.ledger.patient.Pydantic import Patient
-from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.Pydantic import (
-    PFindingClassificationChoiceDescriptor,
-)
 
 
 class DbInterfaceDataDict(
@@ -63,9 +60,11 @@ class DbInterface(AppBaseModelUUIDTags):
         )
 
         kb_cfg = KnowledgeBaseConfig(name=name, version=version)
-        db_interface = cls(
-            knowledge_base=KnowledgeBase.create_from_config(kb_cfg),
-            ledger=Ledger(),
+        db_interface = cls.model_validate(
+            {
+                "knowledge_base": KnowledgeBase.create_from_config(kb_cfg),
+                "ledger": Ledger(),
+            }
         )
         return db_interface
 
@@ -81,9 +80,12 @@ class DbInterface(AppBaseModelUUIDTags):
         if last_name is not None:
             kwargs["last_name"] = last_name
         if dob is not None:
+            if isinstance(dob, date):
+                # tp str
+                dob = dob.isoformat()
             kwargs["dob"] = dob
 
-        patient = Patient(**kwargs)
+        patient = Patient(**kwargs)  # type: ignore # TODO mypy issue with dynamic kwargs
         self.ledger.patients[str(patient.uuid)] = patient
         return patient
 
@@ -145,9 +147,9 @@ class DbInterface(AppBaseModelUUIDTags):
 
         examination_obj = self.knowledge_base.get_examination(p_examination.examination)
 
-        assert (
-            finding_name in examination_obj.findings
-        ), f"Finding '{finding_name}' is not linked to Examination '{examination_obj.name}'."
+        assert finding_name in examination_obj.findings, (
+            f"Finding '{finding_name}' is not linked to Examination '{examination_obj.name}'."
+        )
 
         p_examination = self.ledger.patient_examinations[p_examination_uuid]
 
@@ -218,9 +220,9 @@ class DbInterface(AppBaseModelUUIDTags):
             classification_name = classification
         # Make sure classification is linked to finding
         finding_obj = self.knowledge_base.get_finding(p_finding.finding)
-        assert (
-            classification_name in finding_obj.classifications
-        ), f"Classification '{classification_name}' is not linked to Finding '{finding_obj.name}'."
+        assert classification_name in finding_obj.classifications, (
+            f"Classification '{classification_name}' is not linked to Finding '{finding_obj.name}'."
+        )
 
         try:
             classification_obj = self.knowledge_base.get_classification(
@@ -249,7 +251,9 @@ class DbInterface(AppBaseModelUUIDTags):
         # Make sure that the classification choice belongs to the classification
         assert (
             classification_choice_name in classification_obj.classification_choices
-        ), f"Classification Choice '{classification_choice_name}' does not belong to Classification '{classification_name}'."
+        ), (
+            f"Classification Choice '{classification_choice_name}' does not belong to Classification '{classification_name}'."
+        )
 
         # create PFindingClassificationChoice
         p_finding_classification_choice = PFindingClassificationChoice(
@@ -269,8 +273,8 @@ class DbInterface(AppBaseModelUUIDTags):
         patient_examination: PExamination | str,
         patient_finding_classification_choice: PFindingClassificationChoice | str,
         classification_choice_descriptor: ClassificationChoiceDescriptor | str,
-        descriptor_data: Dict,
-    ):
+        descriptor_data: Dict[str, Any],  # TODO
+    ) -> None:
         if isinstance(patient_examination, PExamination):
             p_examination_uuid = str(patient_examination.uuid)
         else:
@@ -294,7 +298,7 @@ class DbInterface(AppBaseModelUUIDTags):
         else:
             classification_choice_descriptor_name = classification_choice_descriptor
 
-        classification_choice_descriptor_obj = (
+        _classification_choice_descriptor_obj = (
             self.knowledge_base.get_classification_choice_descriptor(
                 classification_choice_descriptor_name
             )
@@ -306,8 +310,9 @@ class DbInterface(AppBaseModelUUIDTags):
             )
         )
 
-        p_finding_classification_choice = (
+        _p_finding_classification_choice = (
             p_finding_classification_choice_lookup_tuple.p_finding_classification_choice
         )
 
-        #
+        # TODO Finish implementation of descriptor creation
+        raise NotImplementedError("Descriptor creation not yet implemented.")

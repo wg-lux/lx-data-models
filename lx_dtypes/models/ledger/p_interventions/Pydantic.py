@@ -15,6 +15,7 @@ from lx_dtypes.names import (
 
 from .DataDict import (
     PFindingInterventionsDataDict,
+    SerializedPFindingInterventionsDataDict,
 )
 
 
@@ -36,3 +37,30 @@ class PFindingInterventions(LedgerBaseModel[PFindingInterventionsDataDict]):
     @classmethod
     def nested_fields(cls) -> List[str]:
         return P_INTERVENTIONS_MODEL_NESTED_FIELDS
+
+    @property
+    def serialized_ddict_class(self) -> type[SerializedPFindingInterventionsDataDict]:
+        return SerializedPFindingInterventionsDataDict
+
+    @classmethod
+    def serialized_model_class(cls) -> type["SerializedPFindingInterventions"]:
+        return SerializedPFindingInterventions
+
+
+class SerializedPFindingInterventions(
+    LedgerBaseModel[SerializedPFindingInterventionsDataDict]
+):
+    patient_finding: str
+    patient_finding_interventions: str = ""
+
+    @classmethod
+    def list_type_fields(cls) -> List[str]:
+        return P_INTERVENTIONS_MODEL_LIST_TYPE_FIELDS
+
+    @property
+    def ddict_class(self) -> type[SerializedPFindingInterventionsDataDict]:
+        return SerializedPFindingInterventionsDataDict
+
+    @classmethod
+    def nested_fields(cls) -> List[str]:
+        return []

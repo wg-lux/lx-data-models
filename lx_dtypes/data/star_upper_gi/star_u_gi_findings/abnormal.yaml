@@ -51,7 +51,11 @@
 - model: finding
   name: star_upper_gi_esophagitis_eosinophilic
   classifications:
-    - star_upper_gi_erefs
+    - star_upper_gi_erefs_edema
+    - star_upper_gi_erefs_rings
+    - star_upper_gi_erefs_exudates
+    - star_upper_gi_erefs_furrows
+    - star_upper_gi_erefs_strictures
     - additional_text_info
 
 - model: finding

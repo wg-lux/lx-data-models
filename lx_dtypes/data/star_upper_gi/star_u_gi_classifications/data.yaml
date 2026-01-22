@@ -4,14 +4,6 @@
     - distance_cm
 
 - model: classification
-  name: "star_upper_gi_location_esophagus_distance_z_line"
-  description: |
-    Classification of distance from Z-line in the esophagus during upper GI endoscopy.
-    Distances proximal to the Z-line are negative, distances distal to the Z-line are positive.
-  classification_choices:
-    - distance_cm
-
-- model: classification
   name: "size_oval_mm"
   description: "Classification of size in millimeters."
   classification_choices:
@@ -21,15 +13,6 @@
   name: "additional_text_info"
   classification_choices:
     - additional_text_info
-
-- model: classification
-  name: "upper_gi_esophagus_imaging_modality_classification"
-  description: "Classification of imaging modalities used for esophagus during upper GI endoscopy."
-  classification_choices:
-    - star_upper_gi_imaging_modality_white_light
-    - star_upper_gi_imaging_modality_narrow_band_imaging
-    - star_upper_gi_imaging_modality_chromoendoscopy
-    - star_upper_gi_imaging_modality_acidic_staining
 
 - model: classification
   name: "star_upper_gi_location_classification"

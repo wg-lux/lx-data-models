@@ -1,0 +1,3299 @@
+{
+  "$defs": {
+    "Center": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "examiners": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Examiners"
+        }
+      },
+      "title": "Center",
+      "type": "object"
+    },
+    "Citation": {
+      "additionalProperties": false,
+      "description": "Model for citations in a knowledge base.",
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "citation_key": {
+          "title": "Citation Key",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "abstract": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Abstract"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Authors",
+          "type": "array"
+        },
+        "publication_year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publication Year"
+        },
+        "publication_month": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publication Month"
+        },
+        "journal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Journal"
+        },
+        "publisher": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publisher"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Volume"
+        },
+        "issue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Issue"
+        },
+        "pages": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pages"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "entry_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entry Type"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "keywords": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Keywords",
+          "type": "array"
+        },
+        "identifiers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Identifiers",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "citation_key",
+        "title"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "Classification": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "classification_choices": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Classification Choices"
+        },
+        "classification_types": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Classification Types"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Classification",
+      "type": "object"
+    },
+    "ClassificationChoice": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "classification_choice_descriptors": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Classification Choice Descriptors"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ClassificationChoice",
+      "type": "object"
+    },
+    "ClassificationChoiceDescriptor": {
+      "additionalProperties": false,
+      "description": "Model for classification choice descriptors in a knowledge base.",
+      "properties": {
+        "text_max_length": {
+          "title": "Text Max Length",
+          "type": "integer"
+        },
+        "default_value_str": {
+          "title": "Default Value Str",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "classification_choice_descriptor_type": {
+          "$ref": "#/$defs/ClassificationChoiceDescriptorTypes"
+        },
+        "default_value_bool": {
+          "default": false,
+          "title": "Default Value Bool",
+          "type": "boolean"
+        },
+        "selection_options": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Selection Options",
+          "type": "array"
+        },
+        "selection_multiple": {
+          "default": false,
+          "title": "Selection Multiple",
+          "type": "boolean"
+        },
+        "selection_multiple_n_min": {
+          "title": "Selection Multiple N Min",
+          "type": "integer"
+        },
+        "selection_multiple_n_max": {
+          "title": "Selection Multiple N Max",
+          "type": "integer"
+        },
+        "selection_default_options": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Selection Default Options",
+          "type": "object"
+        },
+        "numeric_min": {
+          "title": "Numeric Min",
+          "type": "number"
+        },
+        "numeric_max": {
+          "title": "Numeric Max",
+          "type": "number"
+        },
+        "numeric_distribution": {
+          "$ref": "#/$defs/NumericDistributionChoices"
+        },
+        "numeric_distribution_params": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "title": "Numeric Distribution Params",
+          "type": "object"
+        },
+        "default_value_num": {
+          "title": "Default Value Num",
+          "type": "number"
+        },
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ClassificationChoiceDescriptor",
+      "type": "object"
+    },
+    "ClassificationChoiceDescriptorTypes": {
+      "enum": [
+        "numeric",
+        "text",
+        "boolean",
+        "selection"
+      ],
+      "title": "ClassificationChoiceDescriptorTypes",
+      "type": "string"
+    },
+    "ClassificationType": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ClassificationType",
+      "type": "object"
+    },
+    "Examination": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "findings": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Findings"
+        },
+        "examination_types": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Examination Types"
+        },
+        "indications": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Indications"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Examination",
+      "type": "object"
+    },
+    "ExaminationType": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ExaminationType",
+      "type": "object"
+    },
+    "Examiner": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "first_name": {
+          "title": "First Name",
+          "type": "string"
+        },
+        "last_name": {
+          "title": "Last Name",
+          "type": "string"
+        },
+        "dob": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dob"
+        },
+        "email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Email"
+        },
+        "gender": {
+          "enum": [
+            "female",
+            "male",
+            "other",
+            "unknown"
+          ],
+          "title": "Gender",
+          "type": "string"
+        },
+        "phone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Phone"
+        },
+        "street": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Street"
+        },
+        "city": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "City"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "State"
+        },
+        "zip_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Zip Code"
+        },
+        "country": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Country"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "center": {
+          "title": "Center",
+          "type": "string"
+        }
+      },
+      "title": "Examiner",
+      "type": "object"
+    },
+    "FilesAndDirsModel": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "File"
+        },
+        "dir": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dir"
+        },
+        "files": {
+          "items": {
+            "format": "path",
+            "type": "string"
+          },
+          "title": "Files",
+          "type": "array"
+        },
+        "dirs": {
+          "items": {
+            "format": "path",
+            "type": "string"
+          },
+          "title": "Dirs",
+          "type": "array"
+        }
+      },
+      "title": "FilesAndDirsModel",
+      "type": "object"
+    },
+    "Finding": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "finding_types": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Finding Types"
+        },
+        "classifications": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Classifications"
+        },
+        "interventions": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Interventions"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "FindingType": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "FindingType",
+      "type": "object"
+    },
+    "Indication": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "indication_types": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Indication Types"
+        },
+        "interventions": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Interventions"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Indication",
+      "type": "object"
+    },
+    "IndicationType": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "IndicationType",
+      "type": "object"
+    },
+    "InformationSource": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "information_source_types": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Information Source Types"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "InformationSource",
+      "type": "object"
+    },
+    "InformationSourceType": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "InformationSourceType",
+      "type": "object"
+    },
+    "Intervention": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "intervention_types": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Intervention Types"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Intervention",
+      "type": "object"
+    },
+    "InterventionType": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "InterventionType",
+      "type": "object"
+    },
+    "KnowledgeBase": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "config": {
+          "$ref": "#/$defs/KnowledgeBaseConfig"
+        },
+        "citation": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Citation"
+          },
+          "title": "Citation",
+          "type": "object"
+        },
+        "classification": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Classification"
+          },
+          "title": "Classification",
+          "type": "object"
+        },
+        "classification_type": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ClassificationType"
+          },
+          "title": "Classification Type",
+          "type": "object"
+        },
+        "classification_choice": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ClassificationChoice"
+          },
+          "title": "Classification Choice",
+          "type": "object"
+        },
+        "classification_choice_descriptor": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ClassificationChoiceDescriptor"
+          },
+          "title": "Classification Choice Descriptor",
+          "type": "object"
+        },
+        "examination": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Examination"
+          },
+          "title": "Examination",
+          "type": "object"
+        },
+        "examination_type": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ExaminationType"
+          },
+          "title": "Examination Type",
+          "type": "object"
+        },
+        "finding": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Finding"
+          },
+          "title": "Finding",
+          "type": "object"
+        },
+        "finding_type": {
+          "additionalProperties": {
+            "$ref": "#/$defs/FindingType"
+          },
+          "title": "Finding Type",
+          "type": "object"
+        },
+        "indication": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Indication"
+          },
+          "title": "Indication",
+          "type": "object"
+        },
+        "indication_type": {
+          "additionalProperties": {
+            "$ref": "#/$defs/IndicationType"
+          },
+          "title": "Indication Type",
+          "type": "object"
+        },
+        "intervention": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Intervention"
+          },
+          "title": "Intervention",
+          "type": "object"
+        },
+        "intervention_type": {
+          "additionalProperties": {
+            "$ref": "#/$defs/InterventionType"
+          },
+          "title": "Intervention Type",
+          "type": "object"
+        },
+        "unit_type": {
+          "additionalProperties": {
+            "$ref": "#/$defs/UnitType"
+          },
+          "title": "Unit Type",
+          "type": "object"
+        },
+        "unit": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Unit"
+          },
+          "title": "Unit",
+          "type": "object"
+        },
+        "information_source": {
+          "additionalProperties": {
+            "$ref": "#/$defs/InformationSource"
+          },
+          "title": "Information Source",
+          "type": "object"
+        },
+        "information_source_type": {
+          "additionalProperties": {
+            "$ref": "#/$defs/InformationSourceType"
+          },
+          "title": "Information Source Type",
+          "type": "object"
+        }
+      },
+      "required": [
+        "config"
+      ],
+      "title": "KnowledgeBase",
+      "type": "object"
+    },
+    "KnowledgeBaseConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "depends_on": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Depends On",
+          "type": "array"
+        },
+        "modules": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Modules",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/FilesAndDirsModel"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "KnowledgeBaseConfig",
+      "type": "object"
+    },
+    "Ledger": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "patient_examinations": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PExamination"
+          },
+          "title": "Patient Examinations",
+          "type": "object"
+        },
+        "patients": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Patient"
+          },
+          "title": "Patients",
+          "type": "object"
+        },
+        "centers": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Center"
+          },
+          "title": "Centers",
+          "type": "object"
+        },
+        "examiners": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Examiner"
+          },
+          "title": "Examiners",
+          "type": "object"
+        }
+      },
+      "title": "Ledger",
+      "type": "object"
+    },
+    "NumericDistributionChoices": {
+      "enum": [
+        "normal",
+        "log_normal",
+        "uniform",
+        "exponential",
+        "unknown"
+      ],
+      "title": "NumericDistributionChoices",
+      "type": "string"
+    },
+    "PExamination": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "patient": {
+          "title": "Patient",
+          "type": "string"
+        },
+        "examiners": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Examiners"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Date"
+        },
+        "examination": {
+          "title": "Examination",
+          "type": "string"
+        },
+        "patient_findings": {
+          "items": {
+            "$ref": "#/$defs/PFinding"
+          },
+          "title": "Patient Findings",
+          "type": "array"
+        },
+        "patient_indications": {
+          "items": {
+            "$ref": "#/$defs/PIndication"
+          },
+          "title": "Patient Indications",
+          "type": "array"
+        }
+      },
+      "required": [
+        "patient",
+        "examination"
+      ],
+      "title": "PExamination",
+      "type": "object"
+    },
+    "PFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "finding": {
+          "title": "Finding",
+          "type": "string"
+        },
+        "patient_examination": {
+          "title": "Patient Examination",
+          "type": "string"
+        },
+        "patient_finding_classifications": {
+          "items": {
+            "$ref": "#/$defs/PFindingClassifications"
+          },
+          "title": "Patient Finding Classifications",
+          "type": "array"
+        },
+        "patient_finding_interventions": {
+          "items": {
+            "$ref": "#/$defs/PFindingInterventions"
+          },
+          "title": "Patient Finding Interventions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "finding",
+        "patient_examination"
+      ],
+      "title": "PFinding",
+      "type": "object"
+    },
+    "PFindingClassificationChoice": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "classification": {
+          "title": "Classification",
+          "type": "string"
+        },
+        "classification_choice": {
+          "title": "Classification Choice",
+          "type": "string"
+        },
+        "patient_finding_classifications": {
+          "title": "Patient Finding Classifications",
+          "type": "string"
+        },
+        "patient_finding_classification_choice_descriptors": {
+          "items": {
+            "$ref": "#/$defs/PFindingClassificationChoiceDescriptor"
+          },
+          "title": "Patient Finding Classification Choice Descriptors",
+          "type": "array"
+        }
+      },
+      "required": [
+        "classification",
+        "classification_choice",
+        "patient_finding_classifications"
+      ],
+      "title": "PFindingClassificationChoice",
+      "type": "object"
+    },
+    "PFindingClassificationChoiceDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "descriptor_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Descriptor Value"
+        },
+        "classification_choice_descriptor": {
+          "title": "Classification Choice Descriptor",
+          "type": "string"
+        },
+        "patient_finding_classification_choice": {
+          "title": "Patient Finding Classification Choice",
+          "type": "string"
+        }
+      },
+      "required": [
+        "descriptor_value",
+        "classification_choice_descriptor",
+        "patient_finding_classification_choice"
+      ],
+      "title": "PFindingClassificationChoiceDescriptor",
+      "type": "object"
+    },
+    "PFindingClassifications": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "patient_finding": {
+          "title": "Patient Finding",
+          "type": "string"
+        },
+        "patient_finding_classification_choices": {
+          "items": {
+            "$ref": "#/$defs/PFindingClassificationChoice"
+          },
+          "title": "Patient Finding Classification Choices",
+          "type": "array"
+        }
+      },
+      "required": [
+        "patient_finding"
+      ],
+      "title": "PFindingClassifications",
+      "type": "object"
+    },
+    "PFindingIntervention": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "patient_finding_interventions": {
+          "title": "Patient Finding Interventions",
+          "type": "string"
+        },
+        "intervention": {
+          "title": "Intervention",
+          "type": "string"
+        }
+      },
+      "required": [
+        "patient_finding_interventions",
+        "intervention"
+      ],
+      "title": "PFindingIntervention",
+      "type": "object"
+    },
+    "PFindingInterventions": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "patient_finding": {
+          "title": "Patient Finding",
+          "type": "string"
+        },
+        "patient_finding_interventions": {
+          "items": {
+            "$ref": "#/$defs/PFindingIntervention"
+          },
+          "title": "Patient Finding Interventions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "patient_finding"
+      ],
+      "title": "PFindingInterventions",
+      "type": "object"
+    },
+    "PIndication": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "indication": {
+          "title": "Indication",
+          "type": "string"
+        },
+        "patient_examination": {
+          "title": "Patient Examination",
+          "type": "string"
+        }
+      },
+      "required": [
+        "indication",
+        "patient_examination"
+      ],
+      "title": "PIndication",
+      "type": "object"
+    },
+    "Patient": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "first_name": {
+          "title": "First Name",
+          "type": "string"
+        },
+        "last_name": {
+          "title": "Last Name",
+          "type": "string"
+        },
+        "dob": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dob"
+        },
+        "email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Email"
+        },
+        "gender": {
+          "enum": [
+            "female",
+            "male",
+            "other",
+            "unknown"
+          ],
+          "title": "Gender",
+          "type": "string"
+        },
+        "phone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Phone"
+        },
+        "street": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Street"
+        },
+        "city": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "City"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "State"
+        },
+        "zip_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Zip Code"
+        },
+        "country": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Country"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "center": {
+          "title": "Center",
+          "type": "string"
+        }
+      },
+      "title": "Patient",
+      "type": "object"
+    },
+    "Unit": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "abbreviation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Abbreviation"
+        },
+        "unit_types": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unit Types",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "unit_types"
+      ],
+      "title": "Unit",
+      "type": "object"
+    },
+    "UnitType": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "UnitType",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "source_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source File"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "uuid": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "format": "uuid",
+          "type": "string"
+        }
+      ],
+      "title": "Uuid"
+    },
+    "tags": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ],
+      "title": "Tags"
+    },
+    "knowledge_base": {
+      "$ref": "#/$defs/KnowledgeBase"
+    },
+    "ledger": {
+      "$ref": "#/$defs/Ledger"
+    }
+  },
+  "required": [
+    "knowledge_base",
+    "ledger"
+  ],
+  "title": "DbInterface",
+  "type": "object"
+}

@@ -1,10 +1,7 @@
-from datetime import date
 from pathlib import Path
 
-from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.DbInterface import DbInterface
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
-from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.interface.Ledger import Ledger
 from lx_dtypes.utils.dataframe import interface2dataset
 
@@ -177,6 +174,7 @@ FINDINGS_ABNORMAL_W_DESCRIPTORS = [
             ),
         ],
     ),
+    # Ulcer Duodenum
     (
         "star_upper_gi_ulcer",
         [
@@ -189,6 +187,7 @@ FINDINGS_ABNORMAL_W_DESCRIPTORS = [
             ),
         ],
     ),
+    # Ulcer Stomach
     (
         "star_upper_gi_ulcer",
         [
@@ -201,11 +200,156 @@ FINDINGS_ABNORMAL_W_DESCRIPTORS = [
             ),
         ],
     ),
+    # Ectopic Mucosa Esophagus
     (
         "star_upper_gi_esophagus_ectopic_mucosa",
         [
             ("distance_cm", "distance_cm", "length_cm_descriptor", "12.0"),
             ("size_oval_mm", "size_mm", "length_mm_descriptor", "5"),
+        ],
+    ),
+    # Barrett's Esophagus
+    (
+        "star_upper_gi_esophagus_barretts",
+        [
+            (
+                "star_upper_gi_barrett_praque_classification",
+                "star_upper_gi_barrett_praque_c_value",
+                "length_cm_descriptor",
+                "3.0",
+            ),
+            (
+                "star_upper_gi_barrett_praque_classification",
+                "star_upper_gi_barrett_praque_m_value",
+                "length_cm_descriptor",
+                "4.0",
+            ),
+        ],
+    ),
+    # Varices Esophagus
+    (
+        "star_upper_gi_esophagus_varices",
+        [
+            (
+                "star_upper_gi_esophagus_varices_baveno",
+                "star_upper_gi_esophagus_varices_baveno_small",
+                None,
+                None,
+            ),
+            (
+                "additional_text_info",
+                "additional_text_info",
+                "additional_text_info",
+                "1 varices noted, no red wale markings.",
+            ),
+        ],
+    ),
+    # Esophagus diverticulum
+    (
+        "star_upper_gi_esophagus_diverticulum",
+        [
+            ("distance_cm", "distance_cm", "length_cm_descriptor", "8.0"),
+            ("size_oval_mm", "size_mm", "length_mm_descriptor", "6"),
+        ],
+    ),
+    # Esophagitis LA Grade
+    (
+        "star_upper_gi_esophagitis",
+        [
+            (
+                "star_upper_gi_los_angeles_classification",
+                "star_upper_gi_los_angeles_classification_a",
+                None,
+                None,
+            ),
+        ],
+    ),
+    # Esosinophilic Esophagitis
+    (
+        "star_upper_gi_esophagitis_eosinophilic",
+        [
+            # edema
+            (
+                "star_upper_gi_erefs_edema",
+                "star_upper_gi_erefs_edema_present",
+                None,
+                None,
+            ),
+            # rings
+            (
+                "star_upper_gi_erefs_rings",
+                "star_upper_gi_erefs_rings_moderate",
+                None,
+                None,
+            ),
+            # exudates
+            (
+                "star_upper_gi_erefs_exudates",
+                "star_upper_gi_erefs_exudates_mild",
+                None,
+                None,
+            ),
+            # furrows
+            (
+                "star_upper_gi_erefs_furrows",
+                "star_upper_gi_erefs_furrows_present",
+                None,
+                None,
+            ),
+            # strictures
+            (
+                "star_upper_gi_erefs_strictures",
+                "star_upper_gi_erefs_strictures_none",
+                None,
+                None,
+            ),
+        ],
+    ),
+    # Caustic Esophagitis
+    (
+        "star_upper_gi_esophagitis_caustic",
+        [
+            (
+                "star_upper_gi_zargar",
+                "star_upper_gi_zargar_grade_2a",
+                None,
+                None,
+            ),
+        ],
+    ),
+    # star_upper_gi_stomach_varices
+    (
+        "star_upper_gi_stomach_varices",
+        [
+            (
+                "star_upper_gi_stomach_varices_sarin",
+                "star_upper_gi_stomach_varices_sarin_gov1",
+                None,
+                None,
+            ),
+        ],
+    ),
+    (
+        "star_upper_gi_stomach_varices",
+        [
+            (
+                "star_upper_gi_stomach_varices_sarin",
+                "star_upper_gi_stomach_varices_sarin_igv2",
+                None,
+                None,
+            ),
+        ],
+    ),
+    (
+        "star_upper_gi_duodenum_diverticulum",
+        [
+            (
+                "star_upper_gi_location_duodenum",
+                "star_upper_gi_location_duodenum_descending_part",
+                None,
+                None,
+            ),
+            ("size_oval_mm", "size_mm", "length_mm_descriptor", "4"),
         ],
     ),
 ]
@@ -252,12 +396,12 @@ class TestStarUpperGIData:
                     classification_choice=classification_choice_name,
                 )
 
-        for finding_name, classification_choice_tuples in FINDINGS_NORMAL_W_DESCRIPTORS:
+        for finding_name, classification_choice_tuples in FINDINGS_NORMAL_W_DESCRIPTORS:  # type: ignore # TODO fix typing
             p_finding = db_interface.create_examination_finding(
                 patient_examination=p_examination,
                 finding=finding_name,
             )
-            for (
+            for (  # type: ignore # TODO fix typing
                 classification_name,
                 classification_choice_name,
                 descriptor_name,
@@ -305,7 +449,7 @@ class TestStarUpperGIData:
                     classification_choice=classification_choice_name,
                 )
 
-        for (
+        for (  # type: ignore # TODO fix typing
             finding_name,
             classification_choice_tuples,
         ) in FINDINGS_ABNORMAL_W_DESCRIPTORS:
@@ -313,7 +457,7 @@ class TestStarUpperGIData:
                 patient_examination=p_examination_abnormal,
                 finding=finding_name,
             )
-            for (
+            for (  # type: ignore # TODO fix typing
                 classification_name,
                 classification_choice_name,
                 descriptor_name,

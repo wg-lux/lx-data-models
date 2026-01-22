@@ -17,5 +17,13 @@
     - star_upper_gi_polyp
     - star_upper_gi_ulcer
     - star_upper_gi_esophagus_ectopic_mucosa
-    # - star_upper_gi_esophagus_barretts # TODO
+    - star_upper_gi_esophagus_barretts
+    - star_upper_gi_esophagus_diverticulum
+    - star_upper_gi_esophagus_varices
+    - star_upper_gi_esophagitis
+    - star_upper_gi_esophagitis_eosinophilic
+    - star_upper_gi_esophagitis_caustic
+    - star_upper_gi_stomach_varices
+    - star_upper_gi_duodenum_diverticulum
+
   indications: []

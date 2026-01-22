@@ -11,3 +11,8 @@ from lx_dtypes.models.ledger.p_intervention.DataDict import (
 class PFindingInterventionsDataDict(LedgerBaseModelDataDict):
     patient_finding: str
     patient_finding_interventions: List[PFindingInterventionDataDict]
+
+
+class SerializedPFindingInterventionsDataDict(LedgerBaseModelDataDict):
+    patient_finding: str
+    patient_finding_interventions: str

@@ -273,9 +273,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 setattr(self, field_name, merged_tags)
                 continue
 
-            assert (
-                field_model_name in KB_MODEL_NAMES_ORDERED
-            ), f"Unknown model type: {field_model_name}"
+            assert field_model_name in KB_MODEL_NAMES_ORDERED, (
+                f"Unknown model type: {field_model_name}"
+            )
             field_model_name = cast(KB_MODEL_NAMES_LITERAL, field_model_name)
             TargetModel: type[KB_MODELS] = knowledge_base_models_lookup[
                 field_model_name

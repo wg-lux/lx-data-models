@@ -18,6 +18,7 @@ from lx_dtypes.names import (
 
 from .DataDict import (
     PFindingClassificationChoiceDataDict,
+    SerializedPFindingClassificationChoiceDataDict,
 )
 
 
@@ -47,8 +48,7 @@ class PFindingClassificationChoice(
         self,
         descriptor: "ClassificationChoiceDescriptor",
         descriptor_value: str | int | float | bool | List[str],
-    ):
-
+    ) -> PFindingClassificationChoiceDescriptor:
         if descriptor.is_numeric:
             descriptor_value = float(descriptor_value)  # type: ignore
         elif descriptor.is_boolean:
@@ -70,3 +70,34 @@ class PFindingClassificationChoice(
 
         self.patient_finding_classification_choice_descriptors.append(p_descriptor)
         return p_descriptor
+
+    @property
+    def serialized_ddict_class(
+        self,
+    ) -> type[SerializedPFindingClassificationChoiceDataDict]:
+        return SerializedPFindingClassificationChoiceDataDict
+
+    @classmethod
+    def serialized_model_class(cls) -> type["SerializedPFindingClassificationChoice"]:
+        return SerializedPFindingClassificationChoice
+
+
+class SerializedPFindingClassificationChoice(
+    LedgerBaseModel[SerializedPFindingClassificationChoiceDataDict]
+):
+    classification: str
+    classification_choice: str
+    patient_finding_classifications: str
+    patient_finding_classification_choice_descriptors: str = ""
+
+    @classmethod
+    def list_type_fields(cls) -> List[str]:
+        return P_FINDING_CLASSIFICATION_CHOICE_MODEL_LIST_TYPE_FIELDS
+
+    @property
+    def ddict_class(self) -> type[SerializedPFindingClassificationChoiceDataDict]:
+        return SerializedPFindingClassificationChoiceDataDict
+
+    @classmethod
+    def nested_fields(cls) -> List[str]:
+        return []

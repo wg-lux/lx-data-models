@@ -13,37 +13,44 @@ from lx_dtypes.models.ledger.center import Center, CenterDataDict
 from lx_dtypes.models.ledger.examiner.DataDict import ExaminerDataDict
 from lx_dtypes.models.ledger.examiner.Pydantic import Examiner
 from lx_dtypes.models.ledger.p_examination import PExamination, PExaminationDataDict
-from lx_dtypes.models.ledger.p_finding.DataDict import PFindingDataDict
+from lx_dtypes.models.ledger.p_examination.DataDict import (
+    SerializedPExaminationDataDict,
+)
+from lx_dtypes.models.ledger.p_finding.DataDict import (
+    SerializedPFindingDataDict,
+)
 from lx_dtypes.models.ledger.p_finding_classification_choice.DataDict import (
-    PFindingClassificationChoiceDataDict,
+    SerializedPFindingClassificationChoiceDataDict,
 )
 from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.DataDict import (
     PFindingClassificationChoiceDescriptorDataDict,
 )
 from lx_dtypes.models.ledger.p_finding_classifications.DataDict import (
-    PFindingClassificationsDataDict,
+    SerializedPFindingClassificationsDataDict,
 )
 from lx_dtypes.models.ledger.p_indication.DataDict import PIndicationDataDict
 from lx_dtypes.models.ledger.p_intervention.DataDict import PFindingInterventionDataDict
 from lx_dtypes.models.ledger.p_interventions.DataDict import (
-    PFindingInterventionsDataDict,
+    SerializedPFindingInterventionsDataDict,
 )
 from lx_dtypes.models.ledger.patient import Patient, PatientDataDict
 
 
 class LedgerRecordList(TypedDict):
     patients: List[PatientDataDict]
-    p_examinations: List[PExaminationDataDict]
+    p_examinations: List[SerializedPExaminationDataDict]
     centers: List[CenterDataDict]
     examiners: List[ExaminerDataDict]
-    p_findings: List[PFindingDataDict]
+    p_findings: List[SerializedPFindingDataDict]
     p_indications: List[PIndicationDataDict]
-    p_finding_classifications: List[PFindingClassificationsDataDict]
-    p_finding_classification_choices: List[PFindingClassificationChoiceDataDict]
+    p_finding_classifications: List[SerializedPFindingClassificationsDataDict]
+    p_finding_classification_choices: List[
+        SerializedPFindingClassificationChoiceDataDict
+    ]
     p_finding_classification_choice_descriptors: List[
         PFindingClassificationChoiceDescriptorDataDict
     ]
-    p_finding_interventions: List[PFindingInterventionsDataDict]
+    p_finding_interventions: List[SerializedPFindingInterventionsDataDict]
     p_finding_intervention: List[PFindingInterventionDataDict]
 
 
@@ -65,78 +72,80 @@ class Ledger(AppBaseModelUUIDTags):
     def p_examination_exists(self, examination_uuid: str) -> bool:
         return examination_uuid in self.patient_examinations
 
-    def export_patient_examination_record_list(self) -> Tuple[
-        List[PExaminationDataDict],
-        List[PFindingDataDict],
+    def export_patient_examination_record_list(
+        self,
+    ) -> Tuple[
+        List[SerializedPExaminationDataDict],
+        List[SerializedPFindingDataDict],
         List[PIndicationDataDict],
-        List[PFindingClassificationsDataDict],
-        List[PFindingClassificationChoiceDataDict],
+        List[SerializedPFindingClassificationsDataDict],
+        List[SerializedPFindingClassificationChoiceDataDict],
         List[PFindingClassificationChoiceDescriptorDataDict],
-        List[PFindingInterventionsDataDict],
+        List[SerializedPFindingInterventionsDataDict],
         List[PFindingInterventionDataDict],
     ]:
-        p_examination_dicts: List[PExaminationDataDict] = []
-        p_finding_dicts: List[PFindingDataDict] = []
+        p_examination_dicts: List[SerializedPExaminationDataDict] = []
+        p_finding_dicts: List[SerializedPFindingDataDict] = []
         p_indication_dicts: List[PIndicationDataDict] = []
-        p_finding_classifications_dicts: List[PFindingClassificationsDataDict] = []
+        p_finding_classifications_dicts: List[
+            SerializedPFindingClassificationsDataDict
+        ] = []
         p_finding_classification_choice_dicts: List[
-            PFindingClassificationChoiceDataDict
+            SerializedPFindingClassificationChoiceDataDict
         ] = []
         p_finding_classification_choice_descriptor_dicts: List[
             PFindingClassificationChoiceDescriptorDataDict
         ] = []
-        p_finding_interventions_dicts: List[PFindingInterventionsDataDict] = []
+        p_finding_interventions_dicts: List[
+            SerializedPFindingInterventionsDataDict
+        ] = []
         p_finding_intervention_dicts: List[PFindingInterventionDataDict] = []
 
         for p_examination in self.patient_examinations.values():
             # 1. Export PExamination
-            p_examination_dicts.append(p_examination.ddict)
+            p_examination_dicts.append(p_examination.serialized_ddict)
 
             # 2. Export PIndication
             for p_indication in p_examination.patient_indications:
-                p_indication_dicts.append(p_indication.ddict)
+                p_indication_dicts.append(p_indication.serialized_ddict)
 
             # 3. Export PFinding and nested classifications
             for p_finding in p_examination.patient_findings:
-                p_finding_dicts.append(p_finding.ddict)
+                p_finding_dicts.append(p_finding.serialized_ddict)
 
                 # 4. Export PFindingClassifications and nested choices
                 for (
                     p_finding_classifications
                 ) in p_finding.patient_finding_classifications:
                     p_finding_classifications_dicts.append(
-                        p_finding_classifications.ddict
+                        p_finding_classifications.serialized_ddict
                     )
 
                     # 5. Export PFindingClassificationChoice and nested descriptors
-                    for (
-                        p_finding_classification_choice
-                    ) in (
+                    for p_finding_classification_choice in (
                         p_finding_classifications.patient_finding_classification_choices
                     ):
                         p_finding_classification_choice_dicts.append(
-                            p_finding_classification_choice.ddict
+                            p_finding_classification_choice.serialized_ddict
                         )
 
                         # 6. Export PFindingClassificationChoiceDescriptor
-                        for (
-                            p_finding_classification_choice_descriptor
-                        ) in (
-                            p_finding_classification_choice.patient_finding_classification_choice_descriptors
-                        ):
+                        for p_finding_classification_choice_descriptor in p_finding_classification_choice.patient_finding_classification_choice_descriptors:
                             p_finding_classification_choice_descriptor_dicts.append(
                                 p_finding_classification_choice_descriptor.ddict
                             )
                 # 7. Export PFindingInterventions and nested PFindingIntervention
                 for p_finding_interventions in p_finding.patient_finding_interventions:
-                    p_finding_interventions_dicts.append(p_finding_interventions.ddict)
+                    p_finding_interventions_dicts.append(
+                        p_finding_interventions.serialized_ddict
+                    )
 
                     # 8. Export PFindingIntervention
                     for (
                         p_finding_intervention
                     ) in p_finding_interventions.patient_finding_interventions:
                         p_finding_intervention_dicts.append(
-                            p_finding_intervention.ddict
+                            p_finding_intervention.serialized_ddict
                         )
 
         return (
@@ -151,11 +160,15 @@ class Ledger(AppBaseModelUUIDTags):
         )
 
     def export_record_lists(self) -> LedgerRecordList:
-        patient_dicts: List[PatientDataDict] = [r.ddict for r in self.patients.values()]
-        examiner_dicts: List[ExaminerDataDict] = [
-            r.ddict for r in self.examiners.values()
+        patient_dicts: List[PatientDataDict] = [
+            r.serialized_ddict for r in self.patients.values()
         ]
-        center_dicts: List[CenterDataDict] = [r.ddict for r in self.centers.values()]
+        examiner_dicts: List[ExaminerDataDict] = [
+            r.serialized_ddict for r in self.examiners.values()
+        ]
+        center_dicts: List[CenterDataDict] = [
+            r.serialized_ddict for r in self.centers.values()
+        ]
 
         (
             p_examination_dicts,

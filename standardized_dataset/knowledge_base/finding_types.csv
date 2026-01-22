@@ -1,7 +1,0 @@
-created_at,uuid,tags,name,name_de,name_en,description,kb_module_name
-2026-01-20 12:47:52.129952+00:00,5984ed72-8787-46ee-aca6-647896f5a7a5,,preprocedure,unknown,unknown,unknown,star_upper_gi
-2026-01-20 12:47:52.129984+00:00,15878e18-196a-4609-9e94-6455bdc4bfef,,periprocedure,unknown,unknown,unknown,star_upper_gi
-2026-01-20 12:47:52.130004+00:00,69d5636d-e061-4d5f-a2fe-dbaaa1c40431,,postprocedure,unknown,unknown,unknown,star_upper_gi
-2026-01-20 12:47:52.130024+00:00,bec967de-d31c-467e-b7d9-9dda3a162a27,,mandatory,unknown,unknown,unknown,star_upper_gi
-2026-01-20 12:47:52.130042+00:00,4cb1bdcf-b913-430d-a2de-4c654db0e980,,optional,unknown,unknown,unknown,star_upper_gi
-2026-01-20 12:47:52.130060+00:00,a0dadb5f-160d-4966-93ac-c2dfbb5dd039,,conditonal,unknown,unknown,unknown,star_upper_gi

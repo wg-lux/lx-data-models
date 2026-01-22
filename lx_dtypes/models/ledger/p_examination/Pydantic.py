@@ -19,6 +19,7 @@ from lx_dtypes.names import (
 
 from .DataDict import (
     PExaminationDataDict,
+    SerializedPExaminationDataDict,
 )
 
 PFindingClassificationChoiceLookupTuple = NamedTuple(
@@ -77,6 +78,14 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
             f"Finding with UUID {finding_uuid} not found in this examination."
         )
 
+    @property
+    def serialized_ddict_class(self) -> type[SerializedPExaminationDataDict]:
+        return SerializedPExaminationDataDict
+
+    @classmethod
+    def serialized_model_class(cls) -> type["SerializedPExamination"]:
+        return SerializedPExamination
+
     def get_finding_classification_choice_by_uuid(
         self, finding_classification_choice_uuid: str
     ) -> PFindingClassificationChoiceLookupTuple:
@@ -103,3 +112,24 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
                 f"Finding Classification Choice with UUID {finding_classification_choice_uuid} not found in this examination."
             )
         return lookup_tuple
+
+
+class SerializedPExamination(LedgerBaseModel[SerializedPExaminationDataDict]):
+    patient: str
+    examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
+    date: Optional[AwareDatetime] = None
+    examination: str
+    patient_findings: str = ""
+    patient_indications: str = ""
+
+    @classmethod
+    def list_type_fields(cls) -> List[str]:
+        return P_EXAMINATION_MODEL_LIST_TYPE_FIELDS
+
+    @property
+    def ddict_class(self) -> type[SerializedPExaminationDataDict]:
+        return SerializedPExaminationDataDict
+
+    @classmethod
+    def nested_fields(cls) -> List[str]:
+        return []

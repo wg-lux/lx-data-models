@@ -4,20 +4,22 @@ import pandera.pandas as pa
 
 from lx_dtypes.models.ledger.center.Pydantic import Center
 from lx_dtypes.models.ledger.examiner.Pydantic import Examiner
-from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
-from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
+from lx_dtypes.models.ledger.p_examination.Pydantic import SerializedPExamination
+from lx_dtypes.models.ledger.p_finding.Pydantic import SerializedPFinding
 from lx_dtypes.models.ledger.p_finding_classification_choice.Pydantic import (
-    PFindingClassificationChoice,
+    SerializedPFindingClassificationChoice,
 )
 from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.Pydantic import (
     PFindingClassificationChoiceDescriptor,
 )
 from lx_dtypes.models.ledger.p_finding_classifications.Pydantic import (
-    PFindingClassifications,
+    SerializedPFindingClassifications,
 )
 from lx_dtypes.models.ledger.p_indication.Pydantic import PIndication
 from lx_dtypes.models.ledger.p_intervention.Pydantic import PFindingIntervention
-from lx_dtypes.models.ledger.p_interventions.Pydantic import PFindingInterventions
+from lx_dtypes.models.ledger.p_interventions.Pydantic import (
+    SerializedPFindingInterventions,
+)
 from lx_dtypes.models.ledger.patient.Pydantic import Patient
 
 from .common import COERCE, PANDERA_PYDANTIC_MODEL
@@ -44,13 +46,13 @@ class ExaminerDfSchema(pa.DataFrameModel):
 class PExaminationDfSchema(pa.DataFrameModel):
     class Config:  # type: ignore
         coerce = COERCE
-        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(PExamination)
+        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(SerializedPExamination)
 
 
 class PFindingDfSchema(pa.DataFrameModel):
     class Config:  # type: ignore
         coerce = COERCE
-        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(PFinding)
+        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(SerializedPFinding)
 
 
 class PIndicationDfSchema(pa.DataFrameModel):
@@ -62,13 +64,15 @@ class PIndicationDfSchema(pa.DataFrameModel):
 class PFindingClassificationsDfSchema(pa.DataFrameModel):
     class Config:  # type: ignore
         coerce = COERCE
-        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(PFindingClassifications)
+        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(SerializedPFindingClassifications)
 
 
 class PFindingClassificationChoiceDfSchema(pa.DataFrameModel):
     class Config:  # type: ignore
         coerce = COERCE
-        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(PFindingClassificationChoice)
+        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(
+            SerializedPFindingClassificationChoice
+        )
 
 
 class PFindingClassificationChoiceDescriptorDfSchema(pa.DataFrameModel):
@@ -82,7 +86,7 @@ class PFindingClassificationChoiceDescriptorDfSchema(pa.DataFrameModel):
 class PFindingInterventionsDfSchema(pa.DataFrameModel):
     class Config:  # type: ignore
         coerce = COERCE
-        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(PFindingInterventions)
+        dtype: ClassVar[Any] = PANDERA_PYDANTIC_MODEL(SerializedPFindingInterventions)
 
 
 class PFindingInterventionDfSchema(pa.DataFrameModel):
