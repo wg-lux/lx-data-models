@@ -1,14 +1,16 @@
+# Pydantic V2 Cheat Sheet
+
 Here is a comprehensive Pydantic V2 Cheat Sheet. It consolidates our previous discussions on strict typing, date handling, and validation into reusable patterns.
 
 -----
 
-### The Pydantic V2 Lifecycle
+## The Pydantic V2 Lifecycle
 
 Understanding *when* things happen is key to using the tools below.
 
 -----
 
-### 1. The "Golden Standard" Base Model
+## 1. The "Golden Standard" Base Model
 
 Start every project with this. It handles string hygiene and configuration globally, so you don't have to repeat it.
 
@@ -30,7 +32,7 @@ class AppBaseModel(BaseModel):
 
 -----
 
-### 2. DateTime & Timezones (Strict Mode)
+## 2. DateTime & Timezones (Strict Mode)
 
 Never use naive datetimes. Always use `AwareDatetime` and `default_factory`.
 
@@ -54,7 +56,7 @@ class TimestampModel(AppBaseModel):
 
 -----
 
-### 3. Reusable Fields (Mixins)
+## 3. Reusable Fields (Mixins)
 
 Use Mixins for fields that appear across multiple models (like your `name_de`/`name_en` requirement).
 
@@ -84,9 +86,9 @@ class Product(LocalizedNameMixin, AppBaseModel):
 
 -----
 
-### 4. Advanced Validation Patterns
+## 4. Advanced Validation Patterns
 
-#### A. Sorting & Uniqueness (Lists)
+### A. Sorting & Uniqueness (Lists)
 
 Enforce that a list is unique and sorted upon creation.
 
@@ -106,7 +108,7 @@ class TaggedItem(AppBaseModel):
         return sorted(list(set(v)))
 ```
 
-#### B. The "Best of Both Worlds" (Dict vs List)
+### B. The "Best of Both Worlds" (Dict vs List)
 
 Store data as a **Dict** (for O(1) performance), but accept and return **Lists** (for API standards).
 
@@ -135,7 +137,7 @@ class Inventory(BaseModel):
 
 -----
 
-### 5. Computed Fields (Derived Data)
+## 5. Computed Fields (Derived Data)
 
 Use this for fields that shouldn't be saved to the DB, but should appear in the API response.
 
@@ -155,7 +157,7 @@ class Rectangle(AppBaseModel):
 
 -----
 
-### 6. Managing Aliases (Frontend vs Backend)
+## 6. Managing Aliases (Frontend vs Backend)
 
 Handle `camelCase` (JS frontend) vs `snake_case` (Python backend).
 
@@ -173,7 +175,7 @@ class User(AppBaseModel):
 
 -----
 
-### 7. Path Objects & Filesystems
+## 7. Path Objects & Filesystems
 
 Prefer `pathlib` types over raw strings whenever a model touches the filesystem. This preserves cross-platform semantics and lets Pydantic validate early.
 
@@ -216,7 +218,7 @@ Best practices:
 
 -----
 
-### 8. YAML Fixtures & Sample Data
+## 8. YAML Fixtures & Sample Data
 
 Treat YAML fixtures like immutable contracts: load them through your models so drift is caught immediately.
 
@@ -246,7 +248,7 @@ Best practices:
 
 -----
 
-### Summary Table: Validator Modes
+## Summary Table: Validator Modes
 
 | Decorator | Mode | Use Case |
 | --- | --- | --- |
@@ -255,6 +257,6 @@ Best practices:
 | `@model_validator` | `after` | Multi-field logic (e.g., "start_date must be before end_date"). |
 | `@model_validator` | `before` | Reshaping the entire incoming JSON structure before Pydantic touches it. |
 
-### Next Step
+## Next Step
 
 Would you like me to show you how to generate **Environment Configuration** (loading `.env` files) using `pydantic-settings`, which is the standard way to handle secrets like database URLs alongside these models?

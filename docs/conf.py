@@ -3,9 +3,19 @@
 from __future__ import annotations
 
 import datetime
+import os
 import sys
 from importlib import metadata
 from pathlib import Path
+
+import django
+
+DJANGO_SETTINGS_MODULE = "lx_dtypes.django_settings"
+# setenv DJANGO_SETTINGS_MODULE lx_dtypes.django_settings
+os.environ["DJANGO_SETTINGS_MODULE"] = DJANGO_SETTINGS_MODULE
+
+# initialize django
+django.setup()
 
 DOCS_PATH = Path(__file__).resolve().parent
 REPO_ROOT = DOCS_PATH.parent
@@ -57,7 +67,14 @@ autodoc_default_options = {
 }
 
 templates_path = ["_templates"]
-exclude_patterns: list[str] = ["_build", "Thumbs.db", ".DS_Store"]
+# exclude_patterns: list[str] = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns: list[str] = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "**/tests/**",
+    "**/test_*",
+]
 
 html_theme = "furo"
 html_static_path = ["_static"]
@@ -65,4 +82,5 @@ html_title = "lx-dtypes Documentation"
 
 myst_heading_anchors = 3
 todo_include_todos = True
-python_use_unqualified_type_names = True
+python_use_unqualified_type_names = False
+# nitpick_ignore = True

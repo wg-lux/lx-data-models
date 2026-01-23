@@ -9,6 +9,7 @@ knowledge_base.yaml
 **/models/**/tests/**.yaml
 star_upper_gi_interface_export_test.yaml
 star_upper_gi_kb_export_test.yaml
+docs_build.tar.gz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
