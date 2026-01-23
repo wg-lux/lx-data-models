@@ -57,4 +57,5 @@ __all__ = [
     "KbIndicationLookupType",
     "kb_indication_models",
     "kb_indication_ddicts",
+    "kb_indication_django_lookup",
 ]

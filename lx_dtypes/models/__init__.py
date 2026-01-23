@@ -67,6 +67,7 @@ def get_model_pk_field(model_name: MODEL_NAMES_LITERAL) -> Literal["name", "uuid
 
 
 __all__ = [
+    "MODEL_NAMES",
     "ModelsDjangoLookupType",
     "ModelsLookupType",
     "models_django_lookup",

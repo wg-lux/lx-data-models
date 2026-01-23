@@ -17,9 +17,7 @@ class TestKnowledgeBaseDataLoader:
         return None
 
     def test_db_interface_schema(self) -> None:
-        _db_interface = DbInterface.create_empty(
-            name="TestDBInterface", version="1.0.0"
-        )
+        DbInterface.create_empty(name="TestDBInterface", version="1.0.0")
 
         # Dump schema
         schema = DbInterface.model_json_schema()
@@ -50,12 +48,12 @@ class TestDbInterfaceExport:
             new_value_1 = new_dict["knowledge_base"][field]
             new_value_2 = re_imported_dict["knowledge_base"][field]
 
-            assert original_value == new_value_1, (
-                f"Mismatch in field {field} after re-validation."
-            )
-            assert original_value == new_value_2, (
-                f"Mismatch in field {field} after YAML export/import."
-            )
+            assert (
+                original_value == new_value_1
+            ), f"Mismatch in field {field} after re-validation."
+            assert (
+                original_value == new_value_2
+            ), f"Mismatch in field {field} after YAML export/import."
 
         assert new_dict == expected_dict
 
