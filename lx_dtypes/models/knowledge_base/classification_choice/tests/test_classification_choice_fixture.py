@@ -18,12 +18,23 @@ class TestDjangoClassificationChoiceFixture:
     def test_django_classification_choice_fixture(
         self, django_classification_choice_fixture: "ClassificationChoiceDjango"
     ) -> None:
+        """
+        Verify that the Django-backed ClassificationChoice fixture is available.
+        
+        Parameters:
+            django_classification_choice_fixture (ClassificationChoiceDjango): A pytest fixture providing a Django-backed ClassificationChoice instance used by the test.
+        """
         assert django_classification_choice_fixture is not None
         # Additional validation can be added here as needed
 
 
 class TestClassificationChoiceFixture:
     def test_invalid_dict_raises(self) -> None:
+        """
+        Verifies that validate_ddict raises a ValueError for dictionaries containing unexpected fields.
+        
+        Asserts the raised exception's message contains "Invalid DataDict".
+        """
         invalid_dict = {
             "classification_choice_descriptors": "valid_string",
             "invalid_field": 123,
@@ -48,6 +59,12 @@ class TestClassificationChoiceFixture:
     def test_serialize_str_fields(
         self, classification_choice_fixture: ClassificationChoice
     ) -> None:
+        """
+        Verify the fixture's ddict serializes specific fields with expected values.
+        
+        Parameters:
+            classification_choice_fixture (ClassificationChoice): Fixture providing a ClassificationChoice whose `ddict` must contain `classification_choice_descriptors` equal to "Sample Descriptor" and `tags` equal to "tag1,tag2".
+        """
         ddict = classification_choice_fixture.ddict
         assert isinstance(ddict["classification_choice_descriptors"], str)
         assert ddict["classification_choice_descriptors"] == "Sample Descriptor"
@@ -71,5 +88,11 @@ class TestClassificationChoiceFixture:
     def test_dump_classification_choice_ddict(
         self, classification_choice_fixture: ClassificationChoice
     ) -> None:
+        """
+        Emit the data dictionary (DDict) schema for the fixture's classification choice.
+        
+        Parameters:
+            classification_choice_fixture (ClassificationChoice): Fixture instance whose `ddict_class` will be exported as a DDict schema to the TEST_EXPORT_DDICT_SCHEMA path.
+        """
         ddict_type = classification_choice_fixture.ddict_class
         dump_ddict_schema(ddict_type, TEST_EXPORT_DDICT_SCHEMA)

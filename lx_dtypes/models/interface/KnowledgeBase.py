@@ -163,59 +163,212 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     )
 
     def get_classification(self, name: str) -> Classification:
+        """
+        Retrieve a Classification by its name from this knowledge base.
+        
+        Parameters:
+            name (str): The classification's unique name/key.
+        
+        Returns:
+            Classification: The Classification instance identified by `name`.
+        """
         return self.classification[name]
 
     def get_classification_type(self, name: str) -> ClassificationType:
+        """
+        Retrieve a ClassificationType by its name.
+        
+        Returns:
+            The ClassificationType with the given name.
+        """
         return self.classification_type[name]
 
     def get_classification_choice(self, name: str) -> ClassificationChoice:
+        """
+        Retrieve a ClassificationChoice by its registered name.
+        
+        Parameters:
+            name (str): The unique name/key of the classification choice to retrieve.
+        
+        Returns:
+            ClassificationChoice: The classification choice instance associated with `name`.
+        """
         return self.classification_choice[name]
 
     def get_classification_choice_descriptor(
         self, name: str
     ) -> ClassificationChoiceDescriptor:
+        """
+        Retrieve a ClassificationChoiceDescriptor by its name.
+        
+        Parameters:
+            name (str): The name of the classification choice descriptor to retrieve.
+        
+        Returns:
+            ClassificationChoiceDescriptor: The descriptor matching `name`.
+        """
         return self.classification_choice_descriptor[name]
 
     def get_examination(self, name: str) -> Examination:
+        """
+        Retrieve an Examination by its name.
+        
+        Returns:
+            Examination: The Examination instance associated with the given name.
+        """
         return self.examination[name]
 
     def get_examination_type(self, name: str) -> ExaminationType:
+        """
+        Retrieve an examination type by its name.
+        
+        Parameters:
+            name (str): The lookup key of the examination type.
+        
+        Returns:
+            ExaminationType: The ExaminationType with the given name.
+        
+        Raises:
+            KeyError: If no examination type with the specified name exists.
+        """
         return self.examination_type[name]
 
     def get_finding(self, name: str) -> Finding:
+        """
+        Retrieve a Finding by its name.
+        
+        Parameters:
+            name (str): The name (key) of the finding to retrieve.
+        
+        Returns:
+            Finding: The Finding instance corresponding to `name`.
+        
+        Raises:
+            KeyError: If no finding with the given `name` exists.
+        """
         return self.finding[name]
 
     def get_finding_type(self, name: str) -> FindingType:
+        """
+        Retrieve a FindingType by its name.
+        
+        Parameters:
+            name (str): The finding type's name (key) to look up.
+        
+        Returns:
+            FindingType: The FindingType instance matching `name`.
+        
+        Raises:
+            KeyError: If no FindingType with `name` exists in the knowledge base.
+        """
         return self.finding_type[name]
 
     def get_indication(self, name: str) -> Indication:
+        """
+        Retrieve an Indication by its name.
+        
+        Parameters:
+            name (str): The unique name/key of the indication to retrieve.
+        
+        Returns:
+            Indication: The Indication instance matching the provided name.
+        """
         return self.indication[name]
 
     def get_indication_type(self, name: str) -> IndicationType:
+        """
+        Retrieve an IndicationType by its name.
+        
+        Returns:
+            The IndicationType with the given name.
+        """
         return self.indication_type[name]
 
     def get_intervention(self, name: str) -> Intervention:
+        """
+        Retrieve an Intervention by its name from the knowledge base.
+        
+        Parameters:
+            name (str): The intervention's name (dictionary key) to look up.
+        
+        Returns:
+            Intervention: The Intervention instance with the given name.
+        """
         return self.intervention[name]
 
     def get_intervention_type(self, name: str) -> InterventionType:
+        """
+        Retrieve an InterventionType by its name.
+        
+        Parameters:
+            name (str): The intervention type's name to look up.
+        
+        Returns:
+            InterventionType: The InterventionType instance matching `name`.
+        
+        Raises:
+            KeyError: If no intervention type with the given name exists.
+        """
         return self.intervention_type[name]
 
     def get_unit_type(self, name: str) -> UnitType:
+        """
+        Retrieve a UnitType from the knowledge base by its name.
+        
+        Parameters:
+            name (str): The name of the unit type to retrieve.
+        
+        Returns:
+            UnitType: The unit type with the given name.
+        """
         return self.unit_type[name]
 
     def get_unit(self, name: str) -> Unit:
+        """
+        Retrieve the Unit with the given name from the knowledge base.
+        
+        Parameters:
+            name (str): The unit's identifier as stored in the knowledge base.
+        
+        Returns:
+            Unit: The Unit instance corresponding to the provided name.
+        """
         return self.unit[name]
 
     @property
     def ddict_class(self) -> type[KnowledgeBaseDDict]:
+        """
+        Return the DataDict class used to build serialized dictionary representations of this KnowledgeBase.
+        
+        Returns:
+            The `KnowledgeBaseDDict` class used for ddict construction.
+        """
         return KnowledgeBaseDDict
 
     @property
     def ddict(self) -> KnowledgeBaseDDict:
+        """
+        Create a data-dictionary representation of the knowledge base.
+        
+        Returns:
+            KnowledgeBaseDDict: A data-dictionary (plain-Python) representation of the model suitable for serialization and export.
+        """
         return self.ddict_class(**self.model_dump())
 
     @classmethod
     def create_from_config(cls, config: "KnowledgeBaseConfig") -> "KnowledgeBase":
+        """
+        Create a KnowledgeBase instance from a KnowledgeBaseConfig and populate its module entries from YAML files referenced by the config.
+        
+        Parameters:
+            config (KnowledgeBaseConfig): Configuration describing the knowledge base and the data source(s). The config's data provider is used to locate and parse submodule YAML files.
+        
+        Returns:
+            KnowledgeBase: A KnowledgeBase validated from the provided config and populated with parsed model objects from the config's YAML submodules.
+        
+        Raises:
+            ValueError: If a parsed object corresponds to a model name that does not exist on the KnowledgeBase class.
+        """
         name = config.name
         # source_file = config.source_file
         # assert source_file is not None, "Config must have source_file set." # Can be removed?
@@ -244,10 +397,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
 
     @classmethod
     def create_from_yaml(cls, yaml_path: Path) -> Self:
-        """Load a knowledge base from a YAML dump.
-
-        Args:
-            yaml_path (Path): The path to the YAML file.
+        """
+        Create a KnowledgeBase instance from a YAML file.
+        
+        Loads the YAML file at yaml_path and validates its contents into a KnowledgeBase.
+        
+        Returns:
+            KnowledgeBase: The validated KnowledgeBase instance constructed from the YAML file.
         """
         with open(yaml_path, "r", encoding="utf-8") as f:
             data_dict = yaml.safe_load(f)
@@ -256,10 +412,16 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         return kb
 
     def import_knowledge_base(self, other: "KnowledgeBase") -> None:
-        """Merge another KnowledgeBase into this one.
-
-        Args:
-            other (KnowledgeBase): The other KnowledgeBase to merge.
+        """
+        Merge records from another KnowledgeBase into this instance.
+        
+        Merges each model collection from `other` into `self` by adding entries from `other` and replacing any existing entries with the same key. The `tags` list is merged as the union of both instances' tags. Fields listed in YAML_IMPORT_SKIP_FIELDS are ignored. Values from `other` will be validated or converted into the target model type when necessary.
+        
+        Parameters:
+            other (KnowledgeBase): KnowledgeBase whose records will be merged into this one.
+        
+        Raises:
+            AssertionError: If a model field name is not recognised or if the expected model collections are not dicts.
         """
         for field_name in KnowledgeBase.model_fields:
             field_model_name = snake_to_camel(field_name)
@@ -300,11 +462,12 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def export_knowledge_base(
         self, export_dir: Path, filename: str = "knowledge_base"
     ) -> None:
-        """Export the knowledge base to the specified directory in YAML format.
-
-        Args:
-            kb (KnowledgeBase): The knowledge base to export.
-            export_dir (Path): The directory to export the knowledge base to.
+        """
+        Write the knowledge base's ddict representation to a YAML file named "{filename}.yaml" in the given directory.
+        
+        Parameters:
+            export_dir (Path): Destination directory for the exported YAML file.
+            filename (str): Base filename (without extension) to use for the YAML file; defaults to "knowledge_base".
         """
         dump = self.ddict
         export_path = export_dir / f"{filename}.yaml"
@@ -315,6 +478,17 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def kb_entries_by_module_name(
         self,
     ) -> Dict[str, List[Tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]]]:
+        """
+        Group knowledge-base entries by their declaring module name.
+        
+        Iterates over the canonical model export order and collects each model instance under the module name found on the instance (`kb_module_name`). Each list contains tuples of the model name (one of `KB_MODEL_NAMES_LITERAL`) and the model instance, preserving the order of models visited.
+        
+        Returns:
+            Dict[str, List[Tuple[KB_MODEL_NAMES_LITERAL, KB_MODELS]]]: Mapping from module name to a list of (model-name, model-instance) tuples.
+        
+        Raises:
+            KeyError: If an entry references a module name not present in the knowledge base config.
+        """
         export_attrs = KB_MODEL_NAMES_ORDERED
         cfg = self.config
         module_names = cfg.modules
@@ -341,6 +515,29 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         return entries_by_module
 
     def export_record_lists(self) -> KnowledgeBaseRecordList:
+        """
+        Collects each knowledge-base model into lists of their ddict (data-dictionary) representations and returns them grouped in a KnowledgeBaseRecordList.
+        
+        Returns:
+            KnowledgeBaseRecordList: A TypedDict containing lists of data-dictionary records for each KB category with keys:
+                - citations
+                - classifications
+                - classification_types
+                - classification_choices
+                - classification_choice_descriptors
+                - examinations
+                - examination_types
+                - findings
+                - finding_types
+                - indications
+                - indication_types
+                - interventions
+                - intervention_types
+                - units
+                - unit_types
+                - information_sources
+                - information_source_types
+        """
         citation_records = [r.ddict for r in self.citation.values()]
         classification_records = [r.ddict for r in self.classification.values()]
         classification_type_records = [

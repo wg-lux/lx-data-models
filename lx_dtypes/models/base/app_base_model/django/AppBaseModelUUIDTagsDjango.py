@@ -23,6 +23,18 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
 
     @classmethod
     def str_list_to_list(cls, value: Union[str, List[str], None]) -> List[str]:
+        """
+        Normalize an input that may be None, a list, or a delimited string into a list of cleaned tag strings.
+        
+        Parameters:
+            value (Union[str, List[str], None]): The input to normalize. May be:
+                - None, which yields an empty list.
+                - A list of values, whose items will be converted to strings and trimmed.
+                - A string containing comma-separated tokens and/or surrounding brackets/quotes (e.g. "a,b", "['a','b']"), which will be split on commas and trimmed.
+        
+        Returns:
+            List[str]: A list of non-empty strings with surrounding whitespace and surrounding single/double quotes removed.
+        """
         if value is None:
             return []
         if isinstance(value, list):
@@ -43,6 +55,13 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
     def _to_ddict(
         self,
     ) -> Dict[str, Any]:  # TODO DEPRECATED?
+        """
+        Produce a serializable representation of the instance with normalized tags and a stringified uuid.
+        
+        Returns:
+            data (Dict[str, Any]): Mapping of the instance fields where `tags` is a list of tag strings
+            (empty list if no tags) and `uuid` is converted to its string form.
+        """
         data = super()._to_ddict()
         # replace "[" and "]" from tags string to convert it to list
         tags = data.get("tags", "")
@@ -61,13 +80,14 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
 
     @classmethod
     def get_by_uuid(cls, uuid: Union[str, uuid_module.UUID]) -> Self:
-        """Get a model instance by its UUID.
-
-        Args:
-            uuid (Union[str, uuid.UUID]): The UUID of the model instance.
-
+        """
+        Retrieve the model instance identified by the given UUID.
+        
+        Parameters:
+            uuid (str | uuid.UUID): UUID value identifying the instance; string UUIDs will be converted to `uuid.UUID`.
+        
         Returns:
-            KnowledgebaseBaseModel: The model instance with the given UUID.
+            Self: The model instance with the given UUID.
         """
         if isinstance(uuid, str):
             uuid = uuid_module.UUID(uuid)

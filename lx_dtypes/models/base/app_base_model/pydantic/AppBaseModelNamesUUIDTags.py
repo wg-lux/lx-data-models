@@ -15,7 +15,14 @@ class AppBaseModelNamesUUIDTags(AppBaseModelUUIDTags):
 
     @model_validator(mode="after")
     def fallback_translations(self) -> Self:
-        """Autofill missing translations with the primary name."""
+        """
+        Fill missing or empty translation fields with the primary `name`.
+        
+        If `name_en` or `name_de` are missing or empty, they are set to the value of `name`.
+        
+        Returns:
+            Self: The model instance with translations populated.
+        """
         if not self.name_en:
             self.name_en = self.name
         if not self.name_de:

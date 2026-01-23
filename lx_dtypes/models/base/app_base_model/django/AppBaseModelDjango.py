@@ -17,10 +17,11 @@ class AppBaseModelDjango(models.Model):
         app_label = "lx_dtypes_django"
 
     def _to_ddict(self) -> Dict[str, Any]:
-        """Cleans the model instance data for dictionary representation.
-
+        """
+        Produce a dictionary of the model instance's non-None field values, excluding the "id" key.
+        
         Returns:
-            dict: Cleaned data dictionary.
+            Dict[str, Any]: Mapping of field names to their values for all fields whose value is not None, with "id" removed if present.
         """
         data: Dict[str, Any] = {}
         for field in self._meta.fields:
@@ -33,13 +34,23 @@ class AppBaseModelDjango(models.Model):
 
     @classmethod
     def m2m_fields(cls) -> List[str]:
-        """Return a list of fields that are m2m relationships."""
+        """
+        Return the names of all many-to-many relationship fields declared on the model.
+        
+        Returns:
+            List[str]: Field names for all many-to-many relationships defined on the model class.
+        """
 
         return [field.name for field in cls._meta.get_fields() if field.many_to_many]
 
     @classmethod
     def fk_fields(cls) -> List[str]:
-        """Return a list of fields that are foreign keys in the DataDict."""
+        """
+        Return the names of the model's non-many-to-many relational fields (foreign keys).
+        
+        Returns:
+            fk_field_names (List[str]): List of field names for relational fields excluding many-to-many relationships.
+        """
         relationships = [
             field.name for field in cls._meta.get_fields() if field.is_relation
         ]

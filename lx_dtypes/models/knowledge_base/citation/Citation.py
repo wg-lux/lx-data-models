@@ -35,8 +35,20 @@ class Citation(
 
     @classmethod
     def list_type_fields(cls) -> List[str]:
+        """
+        Provide the names of the model's fields that hold list values.
+        
+        Returns:
+            list_type_fields (List[str]): A list of field names that are list-typed in this model.
+        """
         return CITATION_MODEL_LIST_TYPE_FIELDS
 
     @property
     def ddict_class(self) -> type[CitationDataDict]:
+        """
+        Expose the data-dictionary class associated with this model.
+        
+        Returns:
+            type[CitationDataDict]: The CitationDataDict class used to represent this model's underlying data dictionary.
+        """
         return CitationDataDict

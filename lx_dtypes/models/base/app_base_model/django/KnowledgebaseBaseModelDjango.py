@@ -44,15 +44,26 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
 
     @classmethod
     def ddict_pk_field_name(cls) -> Literal["name"]:
-        """Return the name of the primary key field in the DataDict."""
+        """
+        Primary key field name used in the DataDict representation.
+        
+        Returns:
+            str: The literal string "name", indicating which model field is used as the DataDict primary key.
+        """
         return "name"
 
     @classmethod
     def sync_from_ddict(cls, defaults: DDictT) -> Self:
-        """Sync the model instance from a DataDict.
-
-        Args:
-            defaults (DDictT): The DataDict to sync from.
+        """
+        Create or update a model instance from a DataDict and synchronize its related fields.
+        
+        This method uses the DataDict's `name` field as the primary key to create or update the instance, resolves foreign-key fields by related object name, applies list-type field conversions, and sets many-to-many relations after the instance is saved. The instance is refreshed from the database before being returned.
+        
+        Parameters:
+            defaults (DDictT): DataDict containing the fields to apply to the model. FK fields should contain related object names; m2m fields should contain iterables of related identifiers.
+        
+        Returns:
+            Self: The created or updated model instance.
         """
 
         # Split m2m values out so they can be set after the instance is saved.
@@ -106,12 +117,27 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
 
     @property
     def ddict_class(self) -> type[DDictT]:
-        """Return the DataDict type associated with this model."""
+        """
+        Provide the DataDict class associated with this model.
+        
+        Returns:
+            type[DDictT]: The DataDict class used to materialize instances of this model.
+        
+        Raises:
+            NotImplementedError: If a subclass does not override this method.
+        """
         raise NotImplementedError("Subclasses must implement ddict_class")
 
     @property
     def ddict(self) -> DDictT:
-        """Materialize the DataDict using the model contents."""
+        """
+        Constructs a DataDict instance populated from this model's fields.
+        
+        Many-to-many fields are serialized as lists of related objects' primary-key values (using the DataDict PK field name). Fields declared as list-type are parsed from their stored string representation. Fields with value `None` are omitted; if present, `created_at` is included and `id` is removed.
+        
+        Returns:
+            An instance of the model's `ddict_class` populated with the collected field values.
+        """
         fields = tuple(self.ddict_class.__annotations__.keys())  # type: ignore
         data: dict = {}  # type: ignore
         m2m_field_names = set(self.m2m_fields())
@@ -140,6 +166,11 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
 
     @classmethod
     def list_type_fields(cls) -> List[str]:
-        """Return a list of fields that are lists in the DataDict."""
+        """
+        List field names that should be treated as list-types in the DataDict.
+        
+        Returns:
+            list_type_fields (List[str]): Field names that represent lists in the DataDict.
+        """
         default_list_type_fields = mk_kbbm_list_type_fields()
         return default_list_type_fields

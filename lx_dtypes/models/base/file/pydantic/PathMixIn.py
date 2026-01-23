@@ -14,6 +14,18 @@ class PathMixin(AppBaseModel):
 
     @staticmethod
     def _ensure_path(value: Path | str) -> Path:
+        """
+        Normalize an input value into a pathlib.Path.
+        
+        Parameters:
+            value (Path | str): A Path object or a string representing a filesystem path.
+        
+        Returns:
+            Path: The corresponding pathlib.Path instance.
+        
+        Raises:
+            AssertionError: If `value` is neither a Path nor a str.
+        """
         if isinstance(value, Path):
             return value
         assert isinstance(value, str)

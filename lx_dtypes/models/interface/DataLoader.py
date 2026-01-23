@@ -19,13 +19,11 @@ class DataLoader(AppBaseModel):
     module_configs: Dict[str, "KnowledgeBaseConfig"] = Field(default_factory=dict)
 
     def load_knowledge_base(self, module_name: str) -> "KnowledgeBase":
-        """Load a knowledge base by module name.
-
-        Args:
-            module_name (str): The name of the knowledge base module to load.
-
+        """
+        Assemble a KnowledgeBase for the given module name including its declared submodules.
+        
         Returns:
-            KnowledgeBase: The loaded knowledge base.
+            KnowledgeBase: The assembled knowledge base configured for the requested module with its ordered submodules imported.
         """
         from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
@@ -61,10 +59,10 @@ class DataLoader(AppBaseModel):
         return config_files
 
     def load_module_configs(self) -> None:
-        """Resolve the load order of modules based on dependencies.
-
-        Returns:
-            List[str]: Ordered list of module names to load.
+        """
+        Load KnowledgeBaseConfig objects from discovered config YAMLs into the loader's module_configs.
+        
+        Discovers all "config.yaml" files under the DataLoader's input_dirs, loads each file into a KnowledgeBaseConfig, sets the config's data.source_file to the file path, normalizes data paths relative to that file, and stores the config in self.module_configs keyed by the config's name.
         """
 
         config_files = self.fetch_config_yamls()
