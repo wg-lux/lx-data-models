@@ -146,10 +146,10 @@ class DbInterface(AppBaseModelUUIDTags):
         assert _finding_obj is not None
         examination_obj = self.knowledge_base.get_examination(p_examination.examination)
 
-        assert (
-            finding_name in examination_obj.findings
-        ), f"Finding '{finding_name}' is not linked to Examination '{examination_obj.name}'."
-
+        if finding_name not in examination_obj.findings:
+            raise ValueError(
+                f"Finding '{finding_name}' is not linked to Examination '{examination_obj.name}'."
+            )
         p_examination = self.ledger.patient_examinations[p_examination_uuid]
 
         p_finding = PFinding(
@@ -219,9 +219,9 @@ class DbInterface(AppBaseModelUUIDTags):
             classification_name = classification
         # Make sure classification is linked to finding
         finding_obj = self.knowledge_base.get_finding(p_finding.finding)
-        assert (
-            classification_name in finding_obj.classifications
-        ), f"Classification '{classification_name}' is not linked to Finding '{finding_obj.name}'."
+        assert classification_name in finding_obj.classifications, (
+            f"Classification '{classification_name}' is not linked to Finding '{finding_obj.name}'."
+        )
 
         try:
             classification_obj = self.knowledge_base.get_classification(
@@ -250,7 +250,9 @@ class DbInterface(AppBaseModelUUIDTags):
         # Make sure that the classification choice belongs to the classification
         assert (
             classification_choice_name in classification_obj.classification_choices
-        ), f"Classification Choice '{classification_choice_name}' does not belong to Classification '{classification_name}'."
+        ), (
+            f"Classification Choice '{classification_choice_name}' does not belong to Classification '{classification_name}'."
+        )
 
         # create PFindingClassificationChoice
         p_finding_classification_choice = PFindingClassificationChoice(
