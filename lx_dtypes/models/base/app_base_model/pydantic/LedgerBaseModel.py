@@ -61,6 +61,7 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
         return self.serialized_ddict_class(**serialized_model.model_dump())
 
     @model_validator(mode="before")
+    @classmethod
     def _coerce_list_fields(cls, data: Any) -> Any:
         data = dict(data)
         for field in cls.list_type_fields():

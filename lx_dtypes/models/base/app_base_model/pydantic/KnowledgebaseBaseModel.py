@@ -32,6 +32,7 @@ class KnowledgebaseBaseModel(AppBaseModelNamesUUIDTags, ABC, Generic[DDictT]):
         return self.ddict_class(**self.model_dump())
 
     @model_validator(mode="before")
+    @classmethod
     def _coerce_list_fields(cls, data: Any) -> Any:
         data = dict(data)
         for field in cls.list_type_fields():
