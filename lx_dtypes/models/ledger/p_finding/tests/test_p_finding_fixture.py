@@ -46,8 +46,7 @@ class TestDjangoPFindingFixture:
         assert django_populated_p_finding_fixture is not None
 
         _ddict = django_populated_p_finding_fixture.ddict
-        for key, value in _ddict.items():
-            print(f"{key}: {value}")
+
         pydantic_instance = PFinding.model_validate(_ddict)
 
         pydantic_instance.to_yaml(

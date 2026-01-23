@@ -63,6 +63,8 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
             except ValueError:
                 return None
         if isinstance(v, datetime.datetime):
+            if v.tzinfo is None:
+                return v.replace(tzinfo=datetime.timezone.utc)
             return v
         if isinstance(v, datetime.date):
             return datetime.datetime(

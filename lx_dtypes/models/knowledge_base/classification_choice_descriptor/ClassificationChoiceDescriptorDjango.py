@@ -73,13 +73,6 @@ class ClassificationChoiceDescriptorDjango(
     selection_multiple_n_max: IntegerFieldType = models.IntegerField()
     selection_default_options: JSONFieldType = models.JSONField()
 
-    # if TYPE_CHECKING:
-    #     from .ClassificationChoiceDjango import (
-    #         ClassificationChoiceDjango,
-    #     )
-
-    #     classification_choices: models.QuerySet["ClassificationChoiceDjango"]
-
     @property
     def ddict_class(self) -> type[ClassificationChoiceDescriptorDataDict]:
         return ClassificationChoiceDescriptorDataDict

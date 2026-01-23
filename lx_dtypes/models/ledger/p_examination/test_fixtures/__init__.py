@@ -46,7 +46,6 @@ def django_populated_p_examination_fixture(
 
     # assert that finding is linked
     all_findings = django_p_examination_fixture.patient_findings.all()
-    print(f"Linked findings: {all_findings}")
     # check if django_finding_fixture is in all_findings
     if django_p_finding_fixture not in all_findings:
         raise ValueError(
@@ -55,7 +54,6 @@ def django_populated_p_examination_fixture(
 
     all_indications = django_p_examination_fixture.patient_indications.all()
 
-    print(f"Linked indications: {all_indications}")
     # check if django_indication_fixture is in all_indications
     if django_p_indication_fixture not in all_indications:
         raise ValueError(

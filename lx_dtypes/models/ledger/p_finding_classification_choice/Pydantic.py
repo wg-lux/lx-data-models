@@ -15,6 +15,7 @@ from lx_dtypes.names import (
     P_FINDING_CLASSIFICATION_CHOICE_MODEL_LIST_TYPE_FIELDS,
     P_FINDING_CLASSIFICATION_CHOICE_MODEL_NESTED_FIELDS,
 )
+from lx_dtypes.serialization import parse_str_list
 
 from .DataDict import (
     PFindingClassificationChoiceDataDict,
@@ -52,9 +53,30 @@ class PFindingClassificationChoice(
         if descriptor.is_numeric:
             descriptor_value = float(descriptor_value)  # type: ignore
         elif descriptor.is_boolean:
-            descriptor_value = bool(descriptor_value)  # type: ignore
+            # Explicit parsing to avoid bool("false") == True
+            if isinstance(descriptor_value, str):
+                normalized = descriptor_value.strip().lower()
+                if normalized in {"true", "1", "yes", "y", "on"}:
+                    descriptor_value = True  # type: ignore[assignment]
+                elif normalized in {"false", "0", "no", "n", "off"}:
+                    descriptor_value = False  # type: ignore[assignment]
+                else:
+                    raise ValueError(
+                        f"Unsupported boolean string value '{descriptor_value}' "
+                        f"for descriptor {descriptor.name}"
+                    )
+            else:
+                descriptor_value = bool(descriptor_value)  # type: ignore
         elif descriptor.is_selection:
-            descriptor_value = list(descriptor_value)  # type: ignore
+            # Ensure descriptor_value is a list of strings; avoid list() on raw strings
+            if isinstance(descriptor_value, list):
+                # Assume already a list of strings
+                pass
+            elif isinstance(descriptor_value, str):
+                descriptor_value = parse_str_list(descriptor_value)  # type: ignore[assignment]
+            else:
+                # Wrap other scalar values as a single string element
+                descriptor_value = [str(descriptor_value)]  # type: ignore[assignment]
         elif descriptor.is_text:
             descriptor_value = str(descriptor_value)  # type: ignore
         else:

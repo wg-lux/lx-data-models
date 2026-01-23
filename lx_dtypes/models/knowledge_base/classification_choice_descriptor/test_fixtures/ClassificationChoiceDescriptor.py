@@ -25,8 +25,6 @@ def classification_choice_descriptor_fixture(
         unit=unit_fixture.name,
     )
 
-    _ddict = pydantic_model.ddict
-
     return pydantic_model
 
 

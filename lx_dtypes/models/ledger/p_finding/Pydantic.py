@@ -39,12 +39,8 @@ class PFinding(LedgerBaseModel[PFindingDataDict]):
                 patient_finding=str(self.uuid),
             )
             self.patient_finding_classifications.append(_classifications)
-        # Assuming the last one is the latest based on some criteria
-        classifications_list = self.patient_finding_classifications
-        # Sort by creation time or any other criteria if available
-        classifications_list.sort(key=lambda x: x.created_at)
 
-        return classifications_list[-1]
+        return max(self.patient_finding_classifications, key=lambda x: x.created_at)
 
     @classmethod
     def list_type_fields(cls) -> List[str]:

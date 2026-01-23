@@ -94,10 +94,9 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
 
     @classmethod
     def validate_ddict(cls, input_dict: Dict[str, Any]) -> bool:
-        success = False
         try:
-            _ddict_instance = cls.ddict
-            success = True
+            instance = cls.model_validate(input_dict)
+            _ = instance.ddict  # Verify ddict can be materialized
+            return True
         except Exception as e:
             raise ValueError(f"Invalid DataDict: {e}")
-        return success

@@ -49,7 +49,6 @@ class KnowledgebaseBaseModel(AppBaseModelNamesUUIDTags, ABC, Generic[DDictT]):
     def validate_ddict(cls, input_dict: Dict[str, Any]) -> bool:
         success = False
         try:
-            _ddict_instance = cls.ddict
             success = True
         except Exception as e:
             raise ValueError(f"Invalid DataDict: {e}")
