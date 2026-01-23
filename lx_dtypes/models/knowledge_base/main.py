@@ -4,8 +4,8 @@ from .citation import (
     KbCitationDjangoLookupType,
     KbCitationLookupType,
     kb_citation_ddicts,
-    kb_citation_django,
     kb_citation_django_lookup,
+    kb_citation_django_models,
     kb_citation_lookup,
     kb_citation_models,
 )
@@ -165,7 +165,7 @@ KB_MODELS = Union[
 ]
 
 KB_MODELS_DJANGO = Union[
-    kb_citation_django,
+    kb_citation_django_models,
     kb_intervention_django_models,
     kb_indication_django_models,
     kb_unit_django_models,

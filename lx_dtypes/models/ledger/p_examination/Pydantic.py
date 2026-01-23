@@ -54,6 +54,7 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
         return P_EXAMINATION_MODEL_NESTED_FIELDS
 
     @field_validator("date", mode="before")
+    @classmethod
     def validate_date(
         cls, v: Optional[Union[str, datetime.date, datetime.datetime]]
     ) -> Optional[AwareDatetime]:

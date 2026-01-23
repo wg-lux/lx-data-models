@@ -26,7 +26,7 @@ kb_citation_models = Union[Citation,]
 
 kb_citation_ddicts = Union[CitationDataDict,]
 
-kb_citation_django = Union[CitationDjango,]
+kb_citation_django_models = Union[CitationDjango,]
 
 __all__ = [
     "Citation",
@@ -34,7 +34,7 @@ __all__ = [
     "kb_citation_lookup",
     "kb_citation_models",
     "kb_citation_ddicts",
-    "kb_citation_django",
+    "kb_citation_django_models",
     "CitationDjango",
     "kb_citation_django_lookup",
     "KbCitationDjangoLookupType",
