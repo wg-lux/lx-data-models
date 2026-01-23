@@ -11,9 +11,9 @@ class FilesAndDirsModel(PathMixin, AppBaseModel):
     def resolve_paths(self, base_dir: Path) -> None:
         """
         Normalize and replace the model's path attributes with absolute Path objects resolved relative to base_dir.
-        
+
         Transforms the attributes `file`, `dir`, each entry of `files`, and each entry of `dirs` (when present) into absolute, resolved Path instances based on the provided base_dir, updating the attributes in place.
-        
+
         Parameters:
             base_dir (Path): Base directory used to resolve any relative paths.
         """
@@ -32,10 +32,10 @@ class FilesAndDirsModel(PathMixin, AppBaseModel):
     def get_files_with_suffix(self, suffix: Optional[str]) -> List[Path]:
         """
         Collects files stored on the model and returns those whose suffix exactly matches the provided value.
-        
+
         Parameters:
             suffix (Optional[str]): Suffix to match (including the leading dot, e.g. ".py"); only files whose `Path.suffix` equals this value are kept.
-        
+
         Returns:
             List[Path]: Paths of matching files sorted by filename in alphabetical order.
         """

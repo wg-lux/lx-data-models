@@ -34,7 +34,7 @@ class TestCenterFixture:
     def test_dump_center_ddict(self, center_fixture: Center) -> None:
         """
         Dump the Center ddict schema to a YAML file adjacent to this test.
-        
+
         Parameters:
             center_fixture (Center): A Center fixture whose `ddict_class` schema will be exported to `center_ddict_schema.yaml` in the same directory as this test.
         """

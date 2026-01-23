@@ -18,12 +18,12 @@ from ..IndicationTypeDjango import IndicationTypeDjango
 def indication_type_fixture() -> IndicationType:
     """
     Provide a reusable sample IndicationType instance for tests.
-    
+
     The returned instance has:
     - name: "sample_indication_type"
     - description: "This is a sample indication type for testing purposes."
     - tags: ["tagA", "tagB"]
-    
+
     Returns:
         IndicationType: A preconfigured IndicationType object suitable for use in test fixtures.
     """
@@ -38,10 +38,10 @@ def indication_type_fixture() -> IndicationType:
 def indication_fixture(indication_type_fixture: IndicationType) -> Indication:
     """
     Create a test Indication domain object linked to the provided IndicationType.
-    
+
     Parameters:
         indication_type_fixture (IndicationType): The IndicationType whose `name` will be included in the returned Indication's `indication_types` list.
-    
+
     Returns:
         Indication: An Indication with name "sample_indication", `indication_types` set to [indication_type_fixture.name], and tags ["tag1", "tag2"].
     """
@@ -58,10 +58,10 @@ def django_indication_type_fixture(
 ) -> "IndicationTypeDjango":
     """
     Create an IndicationTypeDjango instance from a domain IndicationType for tests.
-    
+
     Parameters:
         indication_type_fixture (IndicationType): Domain IndicationType to convert.
-    
+
     Returns:
         IndicationTypeDjango: Django-adapted IndicationType synchronized from the provided domain object.
     """
@@ -80,12 +80,12 @@ def django_indication_fixture(
 ) -> "IndicationDjango":
     """
     Create and return an IndicationDjango populated from the provided domain Indication's ddict.
-    
+
     Parameters:
         indication_fixture (Indication): Domain Indication whose ddict is used to populate the Django model.
         django_intervention_fixture (InterventionDjango): Fixture providing an InterventionDjango required by tests (not directly used here).
         django_indication_type_fixture (IndicationTypeDjango): Fixture providing an IndicationTypeDjango required by tests (not directly used here).
-    
+
     Returns:
         IndicationDjango: A Django-model instance synchronized from the domain indication's ddict.
     """

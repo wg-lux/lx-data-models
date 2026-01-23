@@ -19,7 +19,7 @@ from .._FindingTypeDjango import FindingTypeDjango
 def finding_type_fixture() -> FindingType:
     """
     Create a sample FindingType for tests.
-    
+
     Returns:
         A FindingType with name "sample_finding_type", description "This is a sample finding type for testing purposes.", and tags ["tagX", "tagY"].
     """
@@ -38,14 +38,14 @@ def finding_fixture(
 ) -> Finding:
     """
     Create a sample Finding instance for tests.
-    
+
     The returned Finding has name "sample_finding", a test description, tags ["tag1", "tag2"], and its classifications, interventions, and finding_types lists populated with the .name values of the provided fixtures.
-    
+
     Parameters:
         finding_type_fixture (FindingType): FindingType whose `name` is added to `finding_types`.
         classification_fixture (Classification): Classification whose `name` is added to `classifications`.
         intervention_fixture (Intervention): Intervention whose `name` is added to `interventions`.
-    
+
     Returns:
         Finding: A preconfigured Finding instance for use in tests.
     """
@@ -69,10 +69,10 @@ def django_finding_type_fixture(
 ) -> "FindingTypeDjango":
     """
     Create a FindingTypeDjango instance synchronized from the given FindingType domain object.
-    
+
     Parameters:
         finding_type_fixture (FindingType): Domain FindingType whose data will be used to create or update the Django model.
-    
+
     Returns:
         FindingTypeDjango: The Django model instance representing the provided FindingType.
     """
@@ -90,7 +90,7 @@ def django_finding_fixture(
 ) -> "FindingDjango":
     """
     Create a Django-synced Finding model instance for use in tests.
-    
+
     Returns:
         FindingDjango: A FindingDjango instance created from the provided Finding's ddict and refreshed from the database.
     """

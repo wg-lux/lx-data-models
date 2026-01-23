@@ -21,7 +21,7 @@ class DataLoader(AppBaseModel):
     def load_knowledge_base(self, module_name: str) -> "KnowledgeBase":
         """
         Assemble a KnowledgeBase for the given module name including its declared submodules.
-        
+
         Returns:
             KnowledgeBase: The assembled knowledge base configured for the requested module with its ordered submodules imported.
         """
@@ -61,7 +61,7 @@ class DataLoader(AppBaseModel):
     def load_module_configs(self) -> None:
         """
         Load KnowledgeBaseConfig objects from discovered config YAMLs into the loader's module_configs.
-        
+
         Discovers all "config.yaml" files under the DataLoader's input_dirs, loads each file into a KnowledgeBaseConfig, sets the config's data.source_file to the file path, normalizes data paths relative to that file, and stores the config in self.module_configs keyed by the config's name.
         """
 

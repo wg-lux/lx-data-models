@@ -31,7 +31,7 @@ class ExaminerDjango(PersonDjango, LedgerBaseModelDjango[ExaminerDataDict]):
     def ddict_class(self) -> type[ExaminerDataDict]:
         """
         Return the data-dictionary class associated with this model.
-        
+
         Returns:
             type[ExaminerDataDict]: The ExaminerDataDict class used for this model's data dictionaries.
         """
@@ -41,7 +41,7 @@ class ExaminerDjango(PersonDjango, LedgerBaseModelDjango[ExaminerDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Return the model field names that should be treated as list-typed for the Examiner model.
-        
+
         Returns:
             list[str]: Field name strings that represent list-typed attributes for ExaminerDjango.
         """

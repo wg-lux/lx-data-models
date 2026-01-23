@@ -32,7 +32,7 @@ class ClassificationChoiceDjango(
     def ddict_class(self) -> type[ClassificationChoiceDataDict]:
         """
         Provide the data-dictionary class associated with this model.
-        
+
         Returns:
             type[ClassificationChoiceDataDict]: The `ClassificationChoiceDataDict` class used to represent this model's data dictionary.
         """
@@ -42,7 +42,7 @@ class ClassificationChoiceDjango(
     def list_type_fields(cls) -> list[str]:
         """
         Get the configured list-type field names for ClassificationChoice models.
-        
+
         Returns:
             list[str]: Field names that are treated as list-type for this model.
         """

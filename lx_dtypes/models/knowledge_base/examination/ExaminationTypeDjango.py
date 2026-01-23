@@ -24,7 +24,7 @@ class ExaminationTypeDjango(KnowledgebaseBaseModelDjango[ExaminationTypeDataDict
     def ddict_class(self) -> type[ExaminationTypeDataDict]:
         """
         Provide the data-dictionary class associated with this Django model.
-        
+
         Returns:
             ddict_cls (type[ExaminationTypeDataDict]): The ExaminationTypeDataDict class used to represent this model's structured data.
         """
@@ -34,7 +34,7 @@ class ExaminationTypeDjango(KnowledgebaseBaseModelDjango[ExaminationTypeDataDict
     def list_type_fields(cls) -> list[str]:
         """
         Return the names of model fields that represent list-typed values.
-        
+
         Returns:
             list[str]: A list of field names that should be treated as lists when converting or serializing the model.
         """

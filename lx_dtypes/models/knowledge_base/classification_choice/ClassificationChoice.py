@@ -23,7 +23,7 @@ class ClassificationChoice(KnowledgebaseBaseModel[ClassificationChoiceDataDict])
     def list_type_fields(cls) -> List[str]:
         """
         Return the list-type field names for the ClassificationChoice model.
-        
+
         Returns:
             List[str]: Field names that must be treated as list types for this model.
         """
@@ -33,7 +33,7 @@ class ClassificationChoice(KnowledgebaseBaseModel[ClassificationChoiceDataDict])
     def ddict_class(self) -> type[ClassificationChoiceDataDict]:
         """
         Return the associated data-dictionary class for this model.
-        
+
         Returns:
             type[ClassificationChoiceDataDict]: The ClassificationChoiceDataDict class used as the model's data-dictionary type.
         """

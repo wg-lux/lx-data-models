@@ -59,13 +59,13 @@ MODEL_NAMES: List[MODEL_NAMES_LITERAL] = KB_MODEL_NAMES_ORDERED + L_MODEL_NAMES_
 def get_model_pk_field(model_name: MODEL_NAMES_LITERAL) -> Literal["name", "uuid"]:
     """
     Get the primary-key field name used by the specified model ('name' or 'uuid').
-    
+
     Parameters:
         model_name (MODEL_NAMES_LITERAL): The model identifier to look up.
-    
+
     Returns:
         pk (Literal['name', 'uuid']): `'name'` if the model's primary key field is name, `'uuid'` if it is uuid.
-    
+
     Raises:
         ValueError: If `model_name` is not present in the models lookup.
     """

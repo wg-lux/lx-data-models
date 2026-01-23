@@ -21,7 +21,7 @@ from ..ExaminationTypeDjango import (
 def examination_type_fixture() -> ExaminationType:
     """
     Create a sample ExaminationType used by tests.
-    
+
     Returns:
         ExaminationType: An instance with name "sample_examination_type", description "This is a sample examination type for testing purposes.", and tags ["tagA", "tagB"].
     """
@@ -40,12 +40,12 @@ def examination_fixture(
 ) -> Examination:
     """
     Create a sample Examination instance that references the provided fixtures by name.
-    
+
     Parameters:
         examination_type_fixture (ExaminationType): Fixture whose `name` will be placed into the examination's `examination_types`.
         finding_fixture (Finding): Fixture whose `name` will be placed into the examination's `findings`.
         indication_fixture (Indication): Fixture whose `name` will be placed into the examination's `indications`.
-    
+
     Returns:
         examination (Examination): An Examination populated with sample name, description, tags, and associations to the provided fixtures' names.
     """
@@ -65,10 +65,10 @@ def django_examination_type_fixture(
 ) -> "ExaminationTypeDjango":
     """
     Create and return a Django ExaminationType model synchronized from the provided domain fixture.
-    
+
     Parameters:
         examination_type_fixture (ExaminationType): Domain model fixture whose ddict representation will be used to create or update the ExaminationTypeDjango.
-    
+
     Returns:
         ExaminationTypeDjango: The synchronized Django ExaminationType instance.
     """
@@ -88,13 +88,13 @@ def django_examination_fixture(
 ) -> "ExaminationDjango":
     """
     Create an ExaminationDjango instance synchronized from the supplied examination fixture.
-    
+
     Parameters:
         examination_fixture (Examination): Domain object whose ddict is used to create the Django instance.
         django_examination_type_fixture (ExaminationTypeDjango): Ensures the related ExaminationType Django record exists.
         django_finding_fixture (FindingDjango): Ensures related Finding Django records exist.
         django_indication_fixture (IndicationDjango): Ensures related Indication Django records exist.
-    
+
     Returns:
         ExaminationDjango: The ExaminationDjango instance created from the fixture and refreshed from the database.
     """

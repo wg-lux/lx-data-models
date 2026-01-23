@@ -44,7 +44,7 @@ class ClassificationChoiceDescriptor(
     def list_type_fields(cls) -> List[str]:
         """
         Get the model's list-type field names.
-        
+
         Returns:
             A list of field names that are treated as list-type fields for this classification choice descriptor.
         """
@@ -54,7 +54,7 @@ class ClassificationChoiceDescriptor(
     def ddict_class(self) -> type[ClassificationChoiceDescriptorDataDict]:
         """
         Return the data-dictionary class associated with this descriptor.
-        
+
         Returns:
             ddict_class (type[ClassificationChoiceDescriptorDataDict]): The class used to represent this descriptor's data dictionary.
         """

@@ -69,7 +69,7 @@ class Ledger(AppBaseModelUUIDTags):
     def patient_exists(self, patient_uuid: str) -> bool:
         """
         Check whether a patient with the given UUID exists in the ledger.
-        
+
         Returns:
             `true` if a patient with the given UUID exists, `false` otherwise.
         """
@@ -78,7 +78,7 @@ class Ledger(AppBaseModelUUIDTags):
     def p_examination_exists(self, examination_uuid: str) -> bool:
         """
         Check whether a patient examination with the given UUID exists in the ledger.
-        
+
         Returns:
             `True` if an examination with the given UUID is present in `self.patient_examinations`, `False` otherwise.
         """
@@ -98,7 +98,7 @@ class Ledger(AppBaseModelUUIDTags):
     ]:
         """
         Collects and serializes all patient-examination-related records into eight separate lists.
-        
+
         Returns:
             Tuple containing, in order:
             - p_examination_dicts (List[SerializedPExaminationDataDict]): Serialized patient examination records.
@@ -188,9 +188,9 @@ class Ledger(AppBaseModelUUIDTags):
     def export_record_lists(self) -> LedgerRecordList:
         """
         Collects serialized representations of all ledger entities and returns them as a LedgerRecordList suitable for export.
-        
+
         The returned record list contains flattened lists for patients, patient examinations, centers, examiners, findings, indications, finding classifications, classification choices, classification choice descriptors, finding interventions, and individual finding intervention records.
-        
+
         Returns:
             LedgerRecordList: A TypedDict with these keys populated:
                 - patients: List of patient data dicts.

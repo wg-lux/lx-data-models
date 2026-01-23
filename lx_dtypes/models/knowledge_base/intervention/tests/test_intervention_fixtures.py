@@ -31,7 +31,7 @@ class TestInterventionFixture:
     def test_dump_intervention_ddict(self, intervention_fixture: Intervention) -> None:
         """
         Dump the DDict schema for the provided Intervention fixture's ddict class to TEST_EXPORT_DDICT_SCHEMA.
-        
+
         Parameters:
             intervention_fixture (Intervention): Fixture instance whose `ddict_class` will be used to generate and write the DDict schema.
         """
@@ -46,7 +46,7 @@ class TestDjangoInterventionFixture:
     ) -> None:
         """
         Validate that the provided Django-backed Intervention fixture is a well-formed and usable fixture.
-        
+
         Parameters:
             django_intervention_fixture (InterventionDjango): A Django model-backed Intervention fixture instance to validate.
         """
@@ -77,7 +77,7 @@ class TestInterventionTypeFixture:
     ) -> None:
         """
         Dumps the DDict schema of the provided InterventionType fixture to a YAML file next to this test.
-        
+
         Parameters:
             intervention_type_fixture (InterventionType): Fixture whose `ddict_class` will be serialized into a DDict schema and written to `intervention_type_ddict_schema.yaml`.
         """

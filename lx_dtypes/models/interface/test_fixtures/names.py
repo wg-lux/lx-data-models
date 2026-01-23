@@ -7,7 +7,7 @@ SAMPLE_KNOWLEDGE_BASE_NAME = "lx_knowledge_base"
 def demo_kb_config_name() -> str:
     """
     Provide the sample knowledge base name used by tests.
-    
+
     Returns:
         str: The sample knowledge base name "lx_knowledge_base".
     """

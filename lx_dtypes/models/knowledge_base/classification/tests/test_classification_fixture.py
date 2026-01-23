@@ -27,9 +27,9 @@ class TestClassificationFixture:
     ) -> None:
         """
         Validate a Classification fixture for ddict round-trip consistency and YAML export.
-        
+
         Asserts the provided fixture is present, that constructing a new Classification from its ddict and dumping the model produces an equivalent ddict, and that the ddict passes Classification.validate_ddict. Finally, exports the fixture to the TEST_EXPORT YAML file.
-        
+
         Parameters:
             classification_fixture (Classification): Fixture instance to validate and export.
         """
@@ -51,7 +51,7 @@ class TestClassificationFixture:
     ) -> None:
         """
         Dump the ddict schema for the provided Classification fixture to the test export path.
-        
+
         Parameters:
             classification_fixture (Classification): Fixture whose `ddict_class` will be exported to the file path defined by TEST_EXPORT_DDICT_SCHEMA.
         """

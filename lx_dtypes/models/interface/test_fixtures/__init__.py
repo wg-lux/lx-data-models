@@ -11,7 +11,7 @@ from ..Ledger import Ledger
 def ledger_fixture() -> "Ledger":
     """
     Create a session-scoped Ledger used by tests.
-    
+
     Returns:
         ledger (Ledger): Ledger instance with UUID "423e4567-e89b-12d3-a456-426614174003" and tags ["ledger_tag1", "ledger_tag2"].
     """
@@ -26,9 +26,9 @@ def ledger_fixture() -> "Ledger":
 def knowledge_base_fixture() -> "KnowledgeBase":
     """
     Create a KnowledgeBase instance preconfigured for tests.
-    
+
     The returned KnowledgeBase has a predefined UUID and tags and is populated with a KnowledgeBaseConfig that includes name, localized names (de/en), description, UUID, tags, dependencies, modules, and version.
-    
+
     Returns:
         KnowledgeBase: The configured KnowledgeBase instance.
     """
@@ -57,11 +57,11 @@ def lx_knowledge_base(
 ) -> KnowledgeBase:
     """
     Load a KnowledgeBase from YAML using the provided data loader and configuration name.
-    
+
     Parameters:
         yaml_data_loader (DataLoader): DataLoader instance used to load the knowledge base from YAML.
         demo_kb_config_name (str): Name or identifier of the knowledge-base configuration to load.
-    
+
     Returns:
         KnowledgeBase: The loaded KnowledgeBase instance corresponding to the given configuration name.
     """
@@ -76,11 +76,11 @@ def db_interface_fixture(
 ) -> "DbInterface":
     """
     Create a DbInterface instance linking a knowledge base and a ledger for tests.
-    
+
     Parameters:
         lx_knowledge_base (KnowledgeBase): The knowledge base to attach to the interface.
         ledger_fixture (Ledger): The ledger to attach to the interface.
-    
+
     Returns:
         DbInterface: A DbInterface configured with the provided knowledge base and ledger, and preset UUID and tags for test use.
     """

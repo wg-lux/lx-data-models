@@ -36,7 +36,7 @@ class IndicationDjango(KnowledgebaseBaseModelDjango[IndicationDataDict]):
     def ddict_class(self) -> type[IndicationDataDict]:
         """
         Return the data-dictionary class associated with this model.
-        
+
         Returns:
             ddict_class (type[IndicationDataDict]): The IndicationDataDict class used to represent this model's structured data.
         """
@@ -46,7 +46,7 @@ class IndicationDjango(KnowledgebaseBaseModelDjango[IndicationDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         List field names that should be treated as list types for the Indication model.
-        
+
         Returns:
             list[str]: Field name strings that represent list-typed fields on the model.
         """

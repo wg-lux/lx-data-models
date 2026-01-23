@@ -22,7 +22,7 @@ class Center(LedgerBaseModel[CenterDataDict]):
     def list_type_fields(cls) -> List[str]:
         """
         Identify model fields that should be treated as list types.
-        
+
         Returns:
             List[str]: Field names corresponding to attributes that are list-typed for this model.
         """
@@ -32,7 +32,7 @@ class Center(LedgerBaseModel[CenterDataDict]):
     def ddict_class(self) -> type[CenterDataDict]:
         """
         Associated data dictionary class for the model.
-        
+
         Returns:
             type[CenterDataDict]: The CenterDataDict class used to represent this model's data dictionary.
         """
@@ -42,7 +42,7 @@ class Center(LedgerBaseModel[CenterDataDict]):
     def nested_fields(cls) -> List[str]:
         """
         Provide the model's nested field names.
-        
+
         Returns:
             List[str]: Field names that represent nested sub-models.
         """

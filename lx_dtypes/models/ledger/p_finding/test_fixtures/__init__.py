@@ -24,11 +24,11 @@ def p_finding_fixture(
 ) -> PFinding:
     """
     Create a PFinding Pydantic instance initialized from the provided Django fixtures.
-    
+
     Parameters:
         django_p_examination_fixture (PExaminationDjango): Django patient examination instance whose primary key is used as the PFinding.patient_examination (converted to string).
         django_finding_fixture (FindingDjango): Django finding instance whose name is used as the PFinding.finding.
-    
+
     Returns:
         PFinding: A PFinding instance with `finding` set to the finding name and `patient_examination` set to the examination primary key as a string.
     """
@@ -45,10 +45,10 @@ def django_p_finding_fixture(
 ) -> PFindingDjango:
     """
     Create a PFindingDjango ORM instance from a PFinding pydantic fixture and refresh it from the database.
-    
+
     Parameters:
         p_finding_fixture (PFinding): Pydantic PFinding instance whose `ddict` is used to construct the ORM object.
-    
+
     Returns:
         PFindingDjango: A PFindingDjango instance refreshed from the database.
     """
@@ -65,15 +65,15 @@ def django_populated_p_finding_fixture(
 ) -> PFindingDjango:
     """
     Verify that the given PFindingDjango instance is refreshed from the database and has the provided classifications and interventions linked, then return the refreshed instance.
-    
+
     Parameters:
         django_p_finding_fixture (PFindingDjango): The PFindingDjango instance to refresh and verify.
         django_populated_p_finding_classifications_fixture (PFindingClassificationsDjango): The expected classifications ORM instance that must be related to the finding.
         django_populated_p_finding_interventions_fixture (PFindingInterventionsDjango): The expected interventions ORM instance that must be related to the finding.
-    
+
     Returns:
         PFindingDjango: The refreshed PFindingDjango instance.
-    
+
     Raises:
         ValueError: If the provided classifications or interventions fixture is not linked to the finding.
     """

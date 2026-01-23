@@ -10,7 +10,7 @@ class UnitType(KnowledgebaseBaseModel[UnitTypeDataDict]):
     def ddict_class(self) -> type[UnitTypeDataDict]:
         """
         Return the data-dictionary class associated with this model.
-        
+
         Returns:
             type[UnitTypeDataDict]: The UnitTypeDataDict class used as the model's underlying data dictionary type.
         """
@@ -20,7 +20,7 @@ class UnitType(KnowledgebaseBaseModel[UnitTypeDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Get the field names used when producing lists of UnitType models.
-        
+
         Returns:
             list[str]: Field names included when listing UnitType models.
         """

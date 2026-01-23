@@ -14,7 +14,7 @@ class InterventionType(KnowledgebaseBaseModel[InterventionTypeDataDict]):
     def list_type_fields(cls) -> List[str]:
         """
         Provide the field names that should be treated as list-type fields for InterventionType.
-        
+
         Returns:
             List[str]: Field names used when representing an InterventionType as a list.
         """
@@ -24,7 +24,7 @@ class InterventionType(KnowledgebaseBaseModel[InterventionTypeDataDict]):
     def ddict_class(self) -> type[InterventionTypeDataDict]:
         """
         The data dictionary class associated with this model.
-        
+
         Returns:
             type[InterventionTypeDataDict]: The InterventionTypeDataDict class.
         """

@@ -13,7 +13,7 @@ class ClassificationType(KnowledgebaseBaseModel[ClassificationTypeDataDict]):
     def list_type_fields(cls) -> List[str]:
         """
         Return the list of field names that identify classification types.
-        
+
         Returns:
             List[str]: Field names used by the ClassificationType model to represent type identifiers.
         """
@@ -23,7 +23,7 @@ class ClassificationType(KnowledgebaseBaseModel[ClassificationTypeDataDict]):
     def ddict_class(self) -> type[ClassificationTypeDataDict]:
         """
         Return the data-dict class associated with this model.
-        
+
         Returns:
             type[ClassificationTypeDataDict]: The ClassificationTypeDataDict class used as the model's data dictionary type.
         """

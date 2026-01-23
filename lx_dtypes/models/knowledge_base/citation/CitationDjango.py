@@ -71,7 +71,7 @@ class CitationDjango(KnowledgebaseBaseModelDjango[CitationDataDict]):
     def ddict_class(self) -> type[CitationDataDict]:
         """
         Data dictionary class used by this model.
-        
+
         Returns:
             The `CitationDataDict` class.
         """
@@ -81,7 +81,7 @@ class CitationDjango(KnowledgebaseBaseModelDjango[CitationDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Identify model fields that represent list-valued data.
-        
+
         Returns:
             list[str]: Field names in the model that should be treated as list-valued (e.g., comma-separated or JSON arrays).
         """

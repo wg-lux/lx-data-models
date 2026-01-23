@@ -37,7 +37,7 @@ class UnitDjango(KnowledgebaseBaseModelDjango[UnitDataDict]):
     def ddict_class(self) -> type[UnitDataDict]:
         """
         Provide the data-dictionary class used by this model.
-        
+
         Returns:
             type[UnitDataDict]: The UnitDataDict class representing this model's data dictionary.
         """
@@ -47,7 +47,7 @@ class UnitDjango(KnowledgebaseBaseModelDjango[UnitDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Provide the names of this model's fields that represent list/collection types.
-        
+
         Returns:
             list[str]: Field name strings that should be treated as list-type fields.
         """

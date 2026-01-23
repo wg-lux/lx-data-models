@@ -19,7 +19,7 @@ class AppBaseModelDjango(models.Model):
     def _to_ddict(self) -> Dict[str, Any]:
         """
         Produce a dictionary of the model instance's non-None field values, excluding the "id" key.
-        
+
         Returns:
             Dict[str, Any]: Mapping of field names to their values for all fields whose value is not None, with "id" removed if present.
         """
@@ -36,7 +36,7 @@ class AppBaseModelDjango(models.Model):
     def m2m_fields(cls) -> List[str]:
         """
         Return the names of all many-to-many relationship fields declared on the model.
-        
+
         Returns:
             List[str]: Field names for all many-to-many relationships defined on the model class.
         """
@@ -47,7 +47,7 @@ class AppBaseModelDjango(models.Model):
     def fk_fields(cls) -> List[str]:
         """
         Return the names of the model's non-many-to-many relational fields (foreign keys).
-        
+
         Returns:
             fk_field_names (List[str]): List of field names for relational fields excluding many-to-many relationships.
         """

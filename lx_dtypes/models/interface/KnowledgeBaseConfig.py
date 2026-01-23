@@ -19,11 +19,11 @@ class KnowledgeBaseConfig(AppBaseModelNamesUUIDTags):
     def normalize_data_paths(self, config_file: Optional[Path]) -> None:
         """
         Normalize data paths to absolute paths relative to the knowledge base module.
-        
+
         Parameters:
             config_file (Optional[Path]): Path to the knowledge base config file used to determine
                 the module base directory. If `None`, `self.source_file` is used.
-        
+
         Raises:
             ValueError: If `config_file` is `None` and `self.source_file` is not set.
         """

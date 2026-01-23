@@ -34,10 +34,10 @@ class AppBaseModelNamesUUIDTagsDjango(AppBaseModelUUIDTagsDjango):
     def get_by_name(cls, name: str) -> Self:
         """
         Retrieve a model instance with the given name.
-        
+
         Parameters:
             name (str): The exact name to look up.
-        
+
         Returns:
             Self: The model instance matching the provided name.
         """

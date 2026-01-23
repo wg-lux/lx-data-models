@@ -24,7 +24,7 @@ class FindingTypeDjango(KnowledgebaseBaseModelDjango[FindingTypeDataDict]):
     def ddict_class(self) -> type[FindingTypeDataDict]:
         """
         Return the data-dict class associated with this model.
-        
+
         Returns:
             type[FindingTypeDataDict]: The class used to create the model's data-dictionary instances.
         """
@@ -34,7 +34,7 @@ class FindingTypeDjango(KnowledgebaseBaseModelDjango[FindingTypeDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Provide the list of model field names used when listing finding type information.
-        
+
         Returns:
             list[str]: Field names from FINDING_TYPE_MODEL_LIST_TYPE_FIELDS.
         """

@@ -21,7 +21,7 @@ class TestAppBaseModelFixtures:
     ) -> None:
         """
         Verify that the AppBaseModel UUID-tags data-dict fixture is provided.
-        
+
         Parameters:
             app_base_model_uuid_tags_data_dict_fixture (AppBaseModelUUIDTagsDataDict): Fixture supplying a data dictionary for an AppBaseModel that includes UUID tags; must not be None.
         """
@@ -51,7 +51,7 @@ class TestAppBaseModelFixtures:
     ) -> None:
         """
         Asserts that the provided names+UUID tags pydantic fixture is an AppBaseModel instance.
-        
+
         Parameters:
             app_base_model_names_uuid_tags_pydantic_fixture (AppBaseModel): Pytest fixture supplying an AppBaseModel populated with name and UUID tag fields.
         """

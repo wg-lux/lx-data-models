@@ -24,7 +24,7 @@ class ClassificationTypeDjango(
     def ddict_class(self) -> type[ClassificationTypeDataDict]:
         """
         The data-dictionary class associated with this model.
-        
+
         Returns:
             type[ClassificationTypeDataDict]: The ClassificationTypeDataDict class used to represent this model's data.
         """
@@ -34,7 +34,7 @@ class ClassificationTypeDjango(
     def list_type_fields(cls) -> list[str]:
         """
         Provide the names of model fields that are treated as list-type for classification-type models.
-        
+
         Returns:
             list[str]: Field names that should be handled as lists for this model.
         """

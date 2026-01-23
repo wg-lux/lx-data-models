@@ -22,7 +22,7 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def ddict_class(self) -> type[DDictT]:
         """
         The DataDict class associated with this model.
-        
+
         Returns:
             type[DDictT]: The DataDict type used to construct materialized ddict instances.
         """
@@ -31,9 +31,9 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def serialized_ddict_class(self) -> type[Any]:
         """
         The DataDict class used for serialized export.
-        
+
         If the class sets `serialized_ddict_cls`, that class is returned; otherwise `ddict_class` is returned.
-        
+
         Returns:
             type[Any]: The DataDict class to use for serialized exports.
         """
@@ -45,7 +45,7 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def list_type_fields(cls) -> List[str]:
         """
         Identify the DataDict field names whose values are lists.
-        
+
         Returns:
             List[str]: Field names in the associated DataDict that should be treated as lists.
         """
@@ -55,7 +55,7 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def nested_fields(cls) -> List[str]:
         """
         Return the names of DataDict fields whose values are nested DataDicts.
-        
+
         Returns:
             list[str]: Field names in the associated DataDict that contain nested DataDict values.
         """
@@ -64,7 +64,7 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def serialized_model_class(cls) -> "type[LedgerBaseModel[Any]]":
         """
         Get the model class used for serialized export.
-        
+
         Returns:
             model_cls (type[LedgerBaseModel[Any]]): The class to use when producing serialized representations; `serialized_model_cls` if set on the class, otherwise the class itself.
         """
@@ -75,7 +75,7 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def ddict(self) -> DDictT:
         """
         Materializes the DataDict associated with this model from the model's data.
-        
+
         Returns:
             ddict (DDictT): An instance of the model's DataDict class constructed from the model's dumped data.
         """
@@ -85,7 +85,7 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def serialized_ddict(self) -> Any:
         """
         Produce a serialized DataDict with nested ledger models replaced by UUID strings.
-        
+
         Returns:
             An instance of the serialized DataDict class (`serialized_ddict_class`) containing the model's data with nested ledger items flattened to UUID strings.
         """
@@ -102,10 +102,10 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def _coerce_list_fields(cls, data: Any) -> Any:
         """
         Coerce fields declared as list-type into Python lists within a shallow copy of the input mapping.
-        
+
         Parameters:
             data (Any): A mapping-like input (will be converted to a dict) whose keys may include fields returned by list_type_fields().
-        
+
         Returns:
             dict: A shallow copy of the input with each field named in list_type_fields() replaced by the result of parse_str_list(data.get(field)).
         """
@@ -117,9 +117,9 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         """
         Return the model's data with any list-typed fields converted to their serialized string form.
-        
+
         The returned dictionary is the same as the standard model dump except each field named in list_type_fields() is replaced by the value produced by serialize_str_list for that field.
-        
+
         Returns:
             dict: Model data with list-type fields serialized to comma-separated string representations.
         """
@@ -131,10 +131,10 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def _flatten_nested(self, value: Any) -> Any:
         """
         Recursively flatten nested LedgerBaseModel instances, lists, and dicts into UUID strings or serialized collections.
-        
+
         Parameters:
             value (Any): Any value that may contain nested LedgerBaseModel instances, lists, or dicts.
-        
+
         Returns:
             Any: The flattened value:
               - If `value` is a LedgerBaseModel, its `uuid` as a string.
@@ -162,13 +162,13 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
     def validate_ddict(cls, input_dict: Dict[str, Any]) -> bool:
         """
         Validate that an input mapping can be converted into this model and materialized as its DataDict.
-        
+
         Parameters:
             input_dict (Dict[str, Any]): Mapping representing the DataDict to validate.
-        
+
         Returns:
             bool: `True` if validation and materialization succeed.
-        
+
         Raises:
             ValueError: If validation or materialization fails; the exception message describes the problem.
         """

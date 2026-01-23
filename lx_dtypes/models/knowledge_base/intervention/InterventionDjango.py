@@ -34,7 +34,7 @@ class InterventionDjango(KnowledgebaseBaseModelDjango[InterventionDataDict]):
     def ddict_class(self) -> type[InterventionDataDict]:
         """
         Provide the data-dictionary class associated with this model.
-        
+
         Returns:
             The `InterventionDataDict` class used to represent this model's data as a dictionary.
         """
@@ -44,7 +44,7 @@ class InterventionDjango(KnowledgebaseBaseModelDjango[InterventionDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Return the names of model fields that represent list-typed relationships for the Intervention model.
-        
+
         Returns:
             list[str]: Field name strings that should be treated as list-typed (e.g., many-to-many or related lists).
         """

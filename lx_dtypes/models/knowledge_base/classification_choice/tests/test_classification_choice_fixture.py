@@ -20,7 +20,7 @@ class TestDjangoClassificationChoiceFixture:
     ) -> None:
         """
         Verify that the Django-backed ClassificationChoice fixture is available.
-        
+
         Parameters:
             django_classification_choice_fixture (ClassificationChoiceDjango): A pytest fixture providing a Django-backed ClassificationChoice instance used by the test.
         """
@@ -32,7 +32,7 @@ class TestClassificationChoiceFixture:
     def test_invalid_dict_raises(self) -> None:
         """
         Verifies that validate_ddict raises a ValueError for dictionaries containing unexpected fields.
-        
+
         Asserts the raised exception's message contains "Invalid DataDict".
         """
         invalid_dict = {
@@ -61,7 +61,7 @@ class TestClassificationChoiceFixture:
     ) -> None:
         """
         Verify the fixture's ddict serializes specific fields with expected values.
-        
+
         Parameters:
             classification_choice_fixture (ClassificationChoice): Fixture providing a ClassificationChoice whose `ddict` must contain `classification_choice_descriptors` equal to "Sample Descriptor" and `tags` equal to "tag1,tag2".
         """
@@ -90,7 +90,7 @@ class TestClassificationChoiceFixture:
     ) -> None:
         """
         Emit the data dictionary (DDict) schema for the fixture's classification choice.
-        
+
         Parameters:
             classification_choice_fixture (ClassificationChoice): Fixture instance whose `ddict_class` will be exported as a DDict schema to the TEST_EXPORT_DDICT_SCHEMA path.
         """

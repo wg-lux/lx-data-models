@@ -52,7 +52,7 @@ class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
     def ddict_class(self) -> type[PFindingDataDict]:
         """
         Return the data-dictionary class associated with this model.
-        
+
         Returns:
             ddict_class (type[PFindingDataDict]): The PFindingDataDict class for this model.
         """
@@ -62,7 +62,7 @@ class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Provide the model field names that represent list-valued relationships.
-        
+
         Returns:
             list[str]: Field name strings corresponding to fields that contain list values.
         """
@@ -72,7 +72,7 @@ class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
     def nested_fields(cls) -> list[str]:
         """
         List the nested field names for the PFinding model.
-        
+
         Returns:
             list[str]: Field names that represent nested (expanded) relationships for this model.
         """

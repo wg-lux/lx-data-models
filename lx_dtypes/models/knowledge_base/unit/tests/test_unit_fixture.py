@@ -37,7 +37,7 @@ class TestDjangoUnitFixture:
     def test_django_unit_fixture(self, django_unit_fixture: "UnitDjango") -> None:
         """
         Validate that the provided Django Unit fixture meets the test suite's expected fixture requirements.
-        
+
         Parameters:
             django_unit_fixture (UnitDjango): A Django Unit model instance supplied by the test fixture, which will be validated for correctness and completeness.
         """

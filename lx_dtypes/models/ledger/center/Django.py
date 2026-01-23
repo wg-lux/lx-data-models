@@ -37,7 +37,7 @@ class CenterDjango(LedgerBaseModelDjango[CenterDataDict]):
     def ddict_class(self) -> type[CenterDataDict]:
         """
         DataDict class that represents this model's data structure.
-        
+
         Returns:
             type[CenterDataDict]: The CenterDataDict class used to represent and validate the model's data.
         """
@@ -47,7 +47,7 @@ class CenterDjango(LedgerBaseModelDjango[CenterDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Return the field names that should be treated as list types for the Center model.
-        
+
         Returns:
             list[str]: Names of fields on the Center model that are list-typed.
         """
@@ -57,7 +57,7 @@ class CenterDjango(LedgerBaseModelDjango[CenterDataDict]):
     def nested_fields(cls) -> list[str]:
         """
         Provide the list of field names treated as nested objects for Center models.
-        
+
         Returns:
             A list of field names (strings) that represent nested object relationships for the model.
         """

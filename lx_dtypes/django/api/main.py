@@ -11,7 +11,7 @@ api = NinjaAPI()
 def hello(request: BaseRequest) -> Literal["Hello world"]:
     """
     Return the fixed greeting used as the /hello endpoint response.
-    
+
     Returns:
         The exact string "Hello world" returned to clients.
     """

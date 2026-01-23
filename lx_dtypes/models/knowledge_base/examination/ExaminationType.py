@@ -14,7 +14,7 @@ class ExaminationType(KnowledgebaseBaseModel[ExaminationTypeDataDict]):
     def list_type_fields(cls) -> List[str]:
         """
         Provide the names of fields that should be treated as list-typed for the ExaminationType model.
-        
+
         Returns:
             List[str]: Names of attributes that are represented as lists in the model.
         """
@@ -24,7 +24,7 @@ class ExaminationType(KnowledgebaseBaseModel[ExaminationTypeDataDict]):
     def ddict_class(self) -> type[ExaminationTypeDataDict]:
         """
         The data-dictionary class associated with this model.
-        
+
         Returns:
             type[ExaminationTypeDataDict]: The ExaminationTypeDataDict type used to represent this model's data dictionary.
         """

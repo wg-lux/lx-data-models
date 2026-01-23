@@ -38,9 +38,9 @@ class LedgerBaseModelDjango(
     def m2m_fields(cls) -> List[str]:
         """
         Return many-to-many field names excluding nested data-dictionary fields.
-        
+
         Filters the list of m2m fields inherited from the superclass by removing any fields listed in this class's nested_fields().
-        
+
         Returns:
             List[str]: Many-to-many field names that are not nested.
         """
@@ -52,7 +52,7 @@ class LedgerBaseModelDjango(
     def fk_fields(cls) -> List[str]:
         """
         List foreign-key field names excluding any fields declared as nested DataDict fields.
-        
+
         Returns:
             List[str]: Foreign-key field names from the superclass with nested fields removed.
         """
@@ -64,7 +64,7 @@ class LedgerBaseModelDjango(
     def nested_fields(cls) -> List[str]:
         """
         List nested DataDict field names for the model.
-        
+
         Returns:
             List[str]: Field names that should be treated as nested DataDicts (empty by default).
         """
@@ -75,7 +75,7 @@ class LedgerBaseModelDjango(
     def ddict_pk_field_name(cls) -> Literal["uuid"]:
         """
         Primary key field name used in the DataDict.
-        
+
         Returns:
             The string "uuid", the primary key field name used in the DataDict.
         """
@@ -85,7 +85,7 @@ class LedgerBaseModelDjango(
     def list_type_fields(cls) -> List[str]:
         """
         Identify the model field names that should be treated as lists in the DataDict.
-        
+
         Returns:
             List[str]: Field names that represent list-type values in the DataDict.
         """
@@ -96,7 +96,7 @@ class LedgerBaseModelDjango(
     def ddict_class(self) -> type[DDictT]:
         """
         The DataDict class associated with this model. Subclasses must implement this property.
-        
+
         Returns:
             type[DDictT]: The DataDict type used to construct ddict instances for this model.
         """
@@ -106,9 +106,9 @@ class LedgerBaseModelDjango(
     def ddict(self) -> DDictT:
         """
         Create a DataDict instance representing the model's current data.
-        
+
         Builds a mapping from the model to the DataDict by expanding nested relations into nested ddict structures, representing many-to-many fields as lists of related primary keys, resolving foreign keys to the related object's primary-key string or `None`, parsing list-type fields, and omitting fields with `None` values. Ensures `created_at` is present if the model has it and removes an `id` key if present.
-        
+
         Returns:
             DDictT: An instance of the model's associated DataDict class populated from the model.
         """
@@ -165,12 +165,12 @@ class LedgerBaseModelDjango(
     def sync_from_ddict(cls, defaults: DDictT) -> Self:
         """
         Create or update a model instance from a DataDict and synchronize related fields.
-        
+
         This classmethod applies values from `defaults` to the model: it ignores nested-data fields, resolves and assigns foreign-key relations based on the related objects' pk, parses list-type fields, and sets many-to-many relations after the instance is created or updated. The resulting instance is refreshed from the database before being returned.
-        
+
         Parameters:
             defaults (DDictT): DataDict containing field values to apply; may include fk identifiers and m2m lists.
-        
+
         Returns:
             Self: The created or updated model instance with relations synchronized.
         """

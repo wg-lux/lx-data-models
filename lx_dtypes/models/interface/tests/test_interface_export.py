@@ -19,7 +19,7 @@ class TestKnowledgeBaseDataLoader:
     def test_db_interface_schema(self) -> None:
         """
         Create an empty DbInterface, export its JSON schema to ./db_interface_schema.json, and verify required properties.
-        
+
         Verifies that the schema file is created and that the schema's top-level properties include "knowledge_base" and "ledger".
         """
         DbInterface.create_empty(name="TestDBInterface", version="1.0.0")
@@ -38,14 +38,14 @@ class TestDbInterfaceExport:
     def test_db_interface_export(self, db_interface_fixture: "DbInterface") -> None:
         """
         Validate that a DbInterface instance round-trips through model validation and YAML export/import without loss.
-        
+
         This test:
         - Dumps the provided DbInterface fixture to a dict.
         - Re-validates that dict via DbInterface.model_validate() and re-dumps it.
         - Exports the re-validated instance to YAML and re-imports it from that file.
         - Compares each knowledge_base field (mapped from KB_MODEL_NAMES_ORDERED to snake_case) between the original, the re-validated, and the YAML re-imported representations and asserts equality.
         - Asserts the full re-validated dict equals the original dumped dict.
-        
+
         Parameters:
             db_interface_fixture (DbInterface): A pre-built DbInterface instance used as the source for validation and export/import checks.
         """
@@ -83,7 +83,7 @@ class TestDbInterfaceDjangoExport:
     ) -> None:
         """
         Sync the provided DbInterface into the Django database and verify key knowledge-base entities exist.
-        
+
         This test synchronizes the given DbInterface to the Django ORM and asserts that a colonoscopy examination and its related
         knowledge-base objects are present and correctly linked: the "colonoscopy" examination, the "colon_polyp" finding,
         the "endoscopy_biopsy_grasper_generic" intervention, the "lesion_size_mm" classification, and the "lesion_size_oval_mm"

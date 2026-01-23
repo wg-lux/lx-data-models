@@ -17,7 +17,7 @@ class Unit(KnowledgebaseBaseModel[UnitDataDict]):
     def ddict_class(self) -> type[UnitDataDict]:
         """
         Return the UnitDataDict class associated with this model.
-        
+
         Returns:
             type[UnitDataDict]: The UnitDataDict class used by this Unit model.
         """
@@ -27,7 +27,7 @@ class Unit(KnowledgebaseBaseModel[UnitDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Return the model field names that should be treated as list-type fields.
-        
+
         Returns:
             list[str]: Field name strings that the model treats as list-type fields.
         """
@@ -37,7 +37,7 @@ class Unit(KnowledgebaseBaseModel[UnitDataDict]):
     def fallback_abbreviation(self) -> Self:
         """
         Fill the missing abbreviation from the model's name, truncating it to 10 characters if necessary.
-        
+
         Returns:
             Self: the instance, with `abbreviation` set to the primary `name` (truncated to 10 characters) if it was previously missing.
         """

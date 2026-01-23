@@ -23,7 +23,7 @@ class Classification(
     def list_type_fields(cls) -> List[str]:
         """
         Provide the names of model fields that should be treated as list types.
-        
+
         Returns:
             A list of field names that are considered list-typed for this model.
         """
@@ -33,7 +33,7 @@ class Classification(
     def ddict_class(self) -> type[ClassificationDataDict]:
         """
         The data-dictionary class associated with this model.
-        
+
         Returns:
             ddict_class_type (type[ClassificationDataDict]): The ClassificationDataDict type used by this model.
         """

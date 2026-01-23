@@ -25,7 +25,7 @@ class Examination(KnowledgebaseBaseModel[ExaminationDataDict]):
     def list_type_fields(cls) -> List[str]:
         """
         Identify the model attributes that should be treated as list-type fields.
-        
+
         Returns:
             list_type_fields (List[str]): Names of attributes in this model that are considered list-type (i.e., accept a string or list of strings).
         """
@@ -35,7 +35,7 @@ class Examination(KnowledgebaseBaseModel[ExaminationDataDict]):
     def ddict_class(self) -> type[ExaminationDataDict]:
         """
         Provide the ExaminationDataDict type associated with this model.
-        
+
         Returns:
             type[ExaminationDataDict]: The data-dictionary type used to represent Examination instances.
         """

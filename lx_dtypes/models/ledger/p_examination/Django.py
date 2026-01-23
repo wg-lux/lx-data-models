@@ -64,7 +64,7 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
     def ddict_class(self) -> type[PExaminationDataDict]:
         """
         Return the data-dict class associated with this model.
-        
+
         Returns:
             type[PExaminationDataDict]: The PExaminationDataDict class used for this model's data dictionary representation.
         """
@@ -74,7 +74,7 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
     def list_type_fields(cls) -> list[str]:
         """
         Return the field names on this model that are treated as list-typed.
-        
+
         Returns:
             list[str]: Field names that represent list-valued relationships or collections for this model.
         """
@@ -84,7 +84,7 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
     def nested_fields(cls) -> list[str]:
         """
         Return the names of fields that should be treated as nested for this model.
-        
+
         Returns:
             list[str]: Field names considered nested (to be serialized/deserialized as nested objects).
         """

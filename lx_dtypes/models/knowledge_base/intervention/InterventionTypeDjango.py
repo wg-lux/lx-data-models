@@ -24,7 +24,7 @@ class InterventionTypeDjango(KnowledgebaseBaseModelDjango[InterventionTypeDataDi
     def ddict_class(self) -> type[InterventionTypeDataDict]:
         """
         Return the data-dictionary class associated with this model.
-        
+
         Returns:
             type[InterventionTypeDataDict]: The InterventionTypeDataDict class used to represent this model's structured data.
         """
@@ -34,7 +34,7 @@ class InterventionTypeDjango(KnowledgebaseBaseModelDjango[InterventionTypeDataDi
     def list_type_fields(cls) -> list[str]:
         """
         Provide the list-type field names used by the InterventionType model.
-        
+
         Returns:
             list[str]: Field names in the model that should be treated as lists.
         """

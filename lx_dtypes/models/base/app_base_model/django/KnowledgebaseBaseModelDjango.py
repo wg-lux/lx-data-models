@@ -46,7 +46,7 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
     def ddict_pk_field_name(cls) -> Literal["name"]:
         """
         Primary key field name used in the DataDict representation.
-        
+
         Returns:
             str: The literal string "name", indicating which model field is used as the DataDict primary key.
         """
@@ -56,12 +56,12 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
     def sync_from_ddict(cls, defaults: DDictT) -> Self:
         """
         Create or update a model instance from a DataDict and synchronize its related fields.
-        
+
         This method uses the DataDict's `name` field as the primary key to create or update the instance, resolves foreign-key fields by related object name, applies list-type field conversions, and sets many-to-many relations after the instance is saved. The instance is refreshed from the database before being returned.
-        
+
         Parameters:
             defaults (DDictT): DataDict containing the fields to apply to the model. FK fields should contain related object names; m2m fields should contain iterables of related identifiers.
-        
+
         Returns:
             Self: The created or updated model instance.
         """
@@ -119,10 +119,10 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
     def ddict_class(self) -> type[DDictT]:
         """
         Provide the DataDict class associated with this model.
-        
+
         Returns:
             type[DDictT]: The DataDict class used to materialize instances of this model.
-        
+
         Raises:
             NotImplementedError: If a subclass does not override this method.
         """
@@ -132,9 +132,9 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
     def ddict(self) -> DDictT:
         """
         Constructs a DataDict instance populated from this model's fields.
-        
+
         Many-to-many fields are serialized as lists of related objects' primary-key values (using the DataDict PK field name). Fields declared as list-type are parsed from their stored string representation. Fields with value `None` are omitted; if present, `created_at` is included and `id` is removed.
-        
+
         Returns:
             An instance of the model's `ddict_class` populated with the collected field values.
         """
@@ -168,7 +168,7 @@ class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDic
     def list_type_fields(cls) -> List[str]:
         """
         List field names that should be treated as list-types in the DataDict.
-        
+
         Returns:
             list_type_fields (List[str]): Field names that represent lists in the DataDict.
         """

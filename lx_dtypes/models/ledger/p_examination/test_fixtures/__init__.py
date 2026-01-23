@@ -20,11 +20,11 @@ def p_examination_fixture(
 ) -> PExamination:
     """
     Create a PExamination test instance using the provided Django fixtures and a fixed UTC datetime.
-    
+
     Parameters:
         django_examination_fixture (ExaminationDjango): Django Examination whose `name` is used for the `examination` field.
         django_patient_fixture (PatientDjango): Django Patient whose primary key is used (as a string) for the `patient` field.
-    
+
     Returns:
         PExamination: Instance with `patient` set to the patient's PK string, `examination` set to the examination name, and `date` set to 2024-01-01T10:00:00Z.
     """
@@ -43,11 +43,11 @@ def django_p_examination_fixture(
 ) -> PExaminationDjango:
     """
     Create a PExaminationDjango instance from a PExamination fixture and return it with database state refreshed.
-    
+
     Parameters:
         p_examination_fixture (PExamination): Pydantic representation used to create or update the Django instance.
         django_examination_fixture (ExaminationDjango): Provided to ensure the Examination Django fixture is available for test dependency wiring.
-    
+
     Returns:
         PExaminationDjango: The Django model instance corresponding to `p_examination_fixture`, refreshed from the database.
     """
@@ -64,15 +64,15 @@ def django_populated_p_examination_fixture(
 ) -> PExaminationDjango:
     """
     Validate that a PExaminationDjango has the expected related finding and indication, then return it.
-    
+
     Parameters:
         django_p_examination_fixture (PExaminationDjango): The examination Django instance to refresh and validate.
         django_p_finding_fixture (PFindingDjango): The expected finding instance that should be linked to the examination.
         django_p_indication_fixture (PIndicationDjango): The expected indication instance that should be linked to the examination.
-    
+
     Returns:
         PExaminationDjango: The same `django_p_examination_fixture` after validation.
-    
+
     Raises:
         ValueError: If `django_p_finding_fixture` is not present in the examination's `patient_findings` or
                     if `django_p_indication_fixture` is not present in the examination's `patient_indications`.

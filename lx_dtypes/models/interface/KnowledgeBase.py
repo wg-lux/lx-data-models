@@ -165,10 +165,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_classification(self, name: str) -> Classification:
         """
         Retrieve a Classification by its name from this knowledge base.
-        
+
         Parameters:
             name (str): The classification's unique name/key.
-        
+
         Returns:
             Classification: The Classification instance identified by `name`.
         """
@@ -177,7 +177,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_classification_type(self, name: str) -> ClassificationType:
         """
         Retrieve a ClassificationType by its name.
-        
+
         Returns:
             The ClassificationType with the given name.
         """
@@ -186,10 +186,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_classification_choice(self, name: str) -> ClassificationChoice:
         """
         Retrieve a ClassificationChoice by its registered name.
-        
+
         Parameters:
             name (str): The unique name/key of the classification choice to retrieve.
-        
+
         Returns:
             ClassificationChoice: The classification choice instance associated with `name`.
         """
@@ -200,10 +200,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     ) -> ClassificationChoiceDescriptor:
         """
         Retrieve a ClassificationChoiceDescriptor by its name.
-        
+
         Parameters:
             name (str): The name of the classification choice descriptor to retrieve.
-        
+
         Returns:
             ClassificationChoiceDescriptor: The descriptor matching `name`.
         """
@@ -212,7 +212,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_examination(self, name: str) -> Examination:
         """
         Retrieve an Examination by its name.
-        
+
         Returns:
             Examination: The Examination instance associated with the given name.
         """
@@ -221,13 +221,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_examination_type(self, name: str) -> ExaminationType:
         """
         Retrieve an examination type by its name.
-        
+
         Parameters:
             name (str): The lookup key of the examination type.
-        
+
         Returns:
             ExaminationType: The ExaminationType with the given name.
-        
+
         Raises:
             KeyError: If no examination type with the specified name exists.
         """
@@ -236,13 +236,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_finding(self, name: str) -> Finding:
         """
         Retrieve a Finding by its name.
-        
+
         Parameters:
             name (str): The name (key) of the finding to retrieve.
-        
+
         Returns:
             Finding: The Finding instance corresponding to `name`.
-        
+
         Raises:
             KeyError: If no finding with the given `name` exists.
         """
@@ -251,13 +251,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_finding_type(self, name: str) -> FindingType:
         """
         Retrieve a FindingType by its name.
-        
+
         Parameters:
             name (str): The finding type's name (key) to look up.
-        
+
         Returns:
             FindingType: The FindingType instance matching `name`.
-        
+
         Raises:
             KeyError: If no FindingType with `name` exists in the knowledge base.
         """
@@ -266,10 +266,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_indication(self, name: str) -> Indication:
         """
         Retrieve an Indication by its name.
-        
+
         Parameters:
             name (str): The unique name/key of the indication to retrieve.
-        
+
         Returns:
             Indication: The Indication instance matching the provided name.
         """
@@ -278,7 +278,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_indication_type(self, name: str) -> IndicationType:
         """
         Retrieve an IndicationType by its name.
-        
+
         Returns:
             The IndicationType with the given name.
         """
@@ -287,10 +287,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_intervention(self, name: str) -> Intervention:
         """
         Retrieve an Intervention by its name from the knowledge base.
-        
+
         Parameters:
             name (str): The intervention's name (dictionary key) to look up.
-        
+
         Returns:
             Intervention: The Intervention instance with the given name.
         """
@@ -299,13 +299,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_intervention_type(self, name: str) -> InterventionType:
         """
         Retrieve an InterventionType by its name.
-        
+
         Parameters:
             name (str): The intervention type's name to look up.
-        
+
         Returns:
             InterventionType: The InterventionType instance matching `name`.
-        
+
         Raises:
             KeyError: If no intervention type with the given name exists.
         """
@@ -314,10 +314,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_unit_type(self, name: str) -> UnitType:
         """
         Retrieve a UnitType from the knowledge base by its name.
-        
+
         Parameters:
             name (str): The name of the unit type to retrieve.
-        
+
         Returns:
             UnitType: The unit type with the given name.
         """
@@ -326,10 +326,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def get_unit(self, name: str) -> Unit:
         """
         Retrieve the Unit with the given name from the knowledge base.
-        
+
         Parameters:
             name (str): The unit's identifier as stored in the knowledge base.
-        
+
         Returns:
             Unit: The Unit instance corresponding to the provided name.
         """
@@ -339,7 +339,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def ddict_class(self) -> type[KnowledgeBaseDDict]:
         """
         Return the DataDict class used to build serialized dictionary representations of this KnowledgeBase.
-        
+
         Returns:
             The `KnowledgeBaseDDict` class used for ddict construction.
         """
@@ -349,7 +349,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def ddict(self) -> KnowledgeBaseDDict:
         """
         Create a data-dictionary representation of the knowledge base.
-        
+
         Returns:
             KnowledgeBaseDDict: A data-dictionary (plain-Python) representation of the model suitable for serialization and export.
         """
@@ -359,13 +359,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def create_from_config(cls, config: "KnowledgeBaseConfig") -> "KnowledgeBase":
         """
         Create a KnowledgeBase instance from a KnowledgeBaseConfig and populate its module entries from YAML files referenced by the config.
-        
+
         Parameters:
             config (KnowledgeBaseConfig): Configuration describing the knowledge base and the data source(s). The config's data provider is used to locate and parse submodule YAML files.
-        
+
         Returns:
             KnowledgeBase: A KnowledgeBase validated from the provided config and populated with parsed model objects from the config's YAML submodules.
-        
+
         Raises:
             ValueError: If a parsed object corresponds to a model name that does not exist on the KnowledgeBase class.
         """
@@ -399,9 +399,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def create_from_yaml(cls, yaml_path: Path) -> Self:
         """
         Create a KnowledgeBase instance from a YAML file.
-        
+
         Loads the YAML file at yaml_path and validates its contents into a KnowledgeBase.
-        
+
         Returns:
             KnowledgeBase: The validated KnowledgeBase instance constructed from the YAML file.
         """
@@ -414,12 +414,12 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def import_knowledge_base(self, other: "KnowledgeBase") -> None:
         """
         Merge records from another KnowledgeBase into this instance.
-        
+
         Merges each model collection from `other` into `self` by adding entries from `other` and replacing any existing entries with the same key. The `tags` list is merged as the union of both instances' tags. Fields listed in YAML_IMPORT_SKIP_FIELDS are ignored. Values from `other` will be validated or converted into the target model type when necessary.
-        
+
         Parameters:
             other (KnowledgeBase): KnowledgeBase whose records will be merged into this one.
-        
+
         Raises:
             AssertionError: If a model field name is not recognised or if the expected model collections are not dicts.
         """
@@ -464,7 +464,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     ) -> None:
         """
         Write the knowledge base's ddict representation to a YAML file named "{filename}.yaml" in the given directory.
-        
+
         Parameters:
             export_dir (Path): Destination directory for the exported YAML file.
             filename (str): Base filename (without extension) to use for the YAML file; defaults to "knowledge_base".
@@ -480,12 +480,12 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     ) -> Dict[str, List[Tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]]]:
         """
         Group knowledge-base entries by their declaring module name.
-        
+
         Iterates over the canonical model export order and collects each model instance under the module name found on the instance (`kb_module_name`). Each list contains tuples of the model name (one of `KB_MODEL_NAMES_LITERAL`) and the model instance, preserving the order of models visited.
-        
+
         Returns:
             Dict[str, List[Tuple[KB_MODEL_NAMES_LITERAL, KB_MODELS]]]: Mapping from module name to a list of (model-name, model-instance) tuples.
-        
+
         Raises:
             KeyError: If an entry references a module name not present in the knowledge base config.
         """
@@ -517,7 +517,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def export_record_lists(self) -> KnowledgeBaseRecordList:
         """
         Collects each knowledge-base model into lists of their ddict (data-dictionary) representations and returns them grouped in a KnowledgeBaseRecordList.
-        
+
         Returns:
             KnowledgeBaseRecordList: A TypedDict containing lists of data-dictionary records for each KB category with keys:
                 - citations

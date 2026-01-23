@@ -49,10 +49,10 @@ class DbInterface(AppBaseModelUUIDTags):
     def create_from_yaml(cls, yaml_path: Path) -> Self:
         """
         Create a DbInterface from YAML at the given filesystem path.
-        
+
         Parameters:
             yaml_path (Path): Path to a YAML file containing DbInterface data.
-        
+
         Returns:
             DbInterface: Instance populated and validated from the YAML file.
         """
@@ -66,11 +66,11 @@ class DbInterface(AppBaseModelUUIDTags):
     def create_empty(cls, name: str, version: str) -> Self:
         """
         Create a DbInterface populated with a KnowledgeBase built from the provided name and version and an empty Ledger.
-        
+
         Parameters:
             name (str): Human-readable name for the knowledge base.
             version (str): Version identifier for the knowledge base.
-        
+
         Returns:
             db_interface (DbInterface): A validated DbInterface instance containing the constructed KnowledgeBase and an empty Ledger.
         """
@@ -95,12 +95,12 @@ class DbInterface(AppBaseModelUUIDTags):
     ) -> Patient:
         """
         Create a new Patient and store it in the in-memory ledger.
-        
+
         Parameters:
             first_name (Optional[str]): Patient's first name.
             last_name (Optional[str]): Patient's last name.
             dob (Optional[str | date]): Date of birth as an ISO-8601 string or a date object; if a date is provided it is converted to an ISO-8601 string.
-        
+
         Returns:
             Patient: The created Patient instance (also persisted to this DbInterface's ledger).
         """
@@ -124,14 +124,14 @@ class DbInterface(AppBaseModelUUIDTags):
     ) -> PExamination:
         """
         Create and persist a patient-specific examination linking a patient to an examination defined in the knowledge base.
-        
+
         Parameters:
             patient (Patient | str): Patient instance or patient UUID string. If a Patient is provided, its UUID is used.
             examination (Examination | str): Examination instance or examination name string. If an Examination is provided, its name is used.
-        
+
         Returns:
             PExamination: The newly created patient examination object.
-        
+
         Raises:
             ValueError: If the patient UUID is not present in the ledger.
             ValueError: If the examination name does not exist in the knowledge base.
@@ -167,16 +167,16 @@ class DbInterface(AppBaseModelUUIDTags):
     ) -> PFinding:
         """
         Create and attach a PFinding to an existing patient examination.
-        
+
         Validates that the target patient examination exists in the ledger and that the specified finding exists in the knowledge base and is linked to the examination; creates a PFinding with an associated PFindingClassifications entry, appends it to the patient examination, updates the ledger, and returns the created PFinding.
-        
+
         Parameters:
             patient_examination (PExamination | str): A PExamination instance or its UUID string; must refer to a patient examination present in the ledger.
             finding (Finding | str): A Finding instance or the finding's name; must exist in the knowledge base and be linked to the exam referenced by the patient examination.
-        
+
         Returns:
             PFinding: The newly created patient finding, already associated with its PFindingClassifications and appended to the patient examination.
-        
+
         Raises:
             ValueError: If the patient examination does not exist in the ledger, if the finding does not exist in the knowledge base, or if the finding is not linked to the referenced examination.
         """
@@ -237,19 +237,19 @@ class DbInterface(AppBaseModelUUIDTags):
         # Patient Examination existence check
         """
         Create and attach a PFindingClassificationChoice to a patient's finding classifications.
-        
+
         Validates that the patient examination and patient finding exist in the ledger, resolves or selects the target PFindingClassifications object, verifies that the specified Classification and ClassificationChoice exist in the knowledge base and are linked correctly to the finding, then creates and appends a PFindingClassificationChoice to the PFindingClassifications and returns it.
-        
+
         Parameters:
             patient_examination (PExamination | str): Patient examination instance or its UUID.
             patient_finding (PFinding | str): Patient finding instance or its UUID (must belong to the given patient examination).
             classification (Classification | str): Classification instance or its name; must be linked to the finding.
             classification_choice (ClassificationChoice | str): ClassificationChoice instance or its name; must belong to the specified classification.
             patient_finding_classifications (Optional[PFindingClassifications | str]): Specific PFindingClassifications instance or UUID to attach the choice to. If None, the finding's latest classifications object is used.
-        
+
         Returns:
             PFindingClassificationChoice: The newly created PFindingClassificationChoice appended to the target PFindingClassifications.
-        
+
         Raises:
             ValueError: If the patient examination, classification, or classification choice is not found in the ledger or knowledge base.
             AssertionError: If the classification is not linked to the finding or the classification choice does not belong to the classification.
@@ -354,13 +354,13 @@ class DbInterface(AppBaseModelUUIDTags):
     ) -> None:
         """
         Create a descriptor for a classification choice on a patient finding classification choice.
-        
+
         Resolves the provided identifiers or objects to their canonical forms, looks up the referenced
         ClassificationChoiceDescriptor in the knowledge base and the PFindingClassificationChoice within
         the given patient examination, and performs validation checks required before creating a descriptor.
         The actual creation and storage of the descriptor is not implemented and this method currently raises
         NotImplementedError.
-        
+
         Parameters:
             patient_examination (PExamination | str): Patient examination instance or its UUID.
             patient_finding_classification_choice (PFindingClassificationChoice | str):
@@ -368,7 +368,7 @@ class DbInterface(AppBaseModelUUIDTags):
             classification_choice_descriptor (ClassificationChoiceDescriptor | str):
                 ClassificationChoiceDescriptor instance or its name as defined in the knowledge base.
             descriptor_data (Dict[str, Any]): Arbitrary data for the descriptor (implementation-specific).
-        
+
         Raises:
             AssertionError: If required referenced objects (examination lookup result or descriptor) are missing.
             NotImplementedError: Always raised because descriptor creation is not yet implemented.

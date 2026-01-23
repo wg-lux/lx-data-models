@@ -15,14 +15,14 @@ def uninitialized_demo_kb_config(
 ) -> "KnowledgeBaseConfig":
     """
     Retrieve an uninitialized knowledge-base configuration by name from the given YAML data loader.
-    
+
     Parameters:
         yaml_data_loader (DataLoader): Data loader containing loaded module configurations.
         demo_kb_config_name (str): Key name of the demo knowledge-base configuration to retrieve.
-    
+
     Returns:
         KnowledgeBaseConfig: The requested knowledge-base configuration object.
-    
+
     Raises:
         AssertionError: If no configuration with the given name exists in the data loader.
     """
@@ -37,11 +37,11 @@ def initialized_demo_kb_config(
 ) -> "KnowledgeBaseConfig":
     """
     Return an initialized knowledge base configuration by name.
-    
+
     Parameters:
         yaml_data_loader (DataLoader): DataLoader instance used to load and initialize configurations.
         demo_kb_config_name (str): Name of the knowledge base configuration to initialize and return.
-    
+
     Returns:
         kb_config (KnowledgeBaseConfig): The initialized knowledge base configuration corresponding to the given name.
     """

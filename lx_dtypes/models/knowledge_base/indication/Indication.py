@@ -20,7 +20,7 @@ class Indication(KnowledgebaseBaseModel[IndicationDataDict]):
     def list_type_fields(cls) -> List[str]:
         """
         List the field names treated as list types for the Indication model.
-        
+
         Returns:
             list[str]: Field names that should be interpreted as lists (from INDICATION_MODEL_LIST_TYPE_FIELDS).
         """
@@ -30,7 +30,7 @@ class Indication(KnowledgebaseBaseModel[IndicationDataDict]):
     def ddict_class(self) -> type[IndicationDataDict]:
         """
         Return the data-dictionary class used by this model.
-        
+
         Returns:
             type[IndicationDataDict]: The IndicationDataDict class.
         """

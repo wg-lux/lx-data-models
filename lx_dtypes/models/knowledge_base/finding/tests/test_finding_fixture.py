@@ -20,9 +20,9 @@ class TestDjangoFindingFixture:
     ) -> None:
         """
         Validate the provided Django Finding fixture.
-        
+
         Runs validation against the given Django fixture to ensure its serialized representation and the database-backed object are consistent.
-        
+
         Parameters:
             django_finding_fixture (FindingDjango): Pytest fixture providing a Django model instance (and its serialized data) representing a Finding.
         """
@@ -33,9 +33,9 @@ class TestFindingFixture:
     def test_finding_fixture(self, finding_fixture: Finding) -> None:
         """
         Verify a Finding fixture round-trips through model validation, preserves its ddict, and can be exported to YAML.
-        
+
         This test constructs a new Finding from the fixture's ddict, ensures the reconstructed object's ddict equals the original, validates the reconstructed model's dumped data with Finding.validate_ddict, and writes the fixture to TEST_EXPORT.
-        
+
         Parameters:
             finding_fixture (Finding): The Finding test fixture to validate and export.
         """
@@ -55,7 +55,7 @@ class TestFindingFixture:
     def test_dump_finding_ddict(self, finding_fixture: Finding) -> None:
         """
         Write the DDIC schema for the Finding fixture's ddict type to TEST_EXPORT_DDICT_SCHEMA.
-        
+
         Parameters:
             finding_fixture (Finding): Test fixture whose `ddict_class` is used as the schema source.
         """
@@ -67,12 +67,12 @@ class TestFindingTypeFixture:
     def test_finding_type_fixture(self, finding_type_fixture: "FindingType") -> None:
         """
         Verify a FindingType fixture round-trips through validation and can be exported to YAML.
-        
+
         Validates that a FindingType fixture:
         - can be used to construct a new instance from its ddict and produce an identical ddict,
         - passes the class-level ddict validation on the dumped model,
         - and can be exported to a YAML file named `finding_type_fixture.yaml` next to this test file.
-        
+
         Parameters:
             finding_type_fixture (FindingType): Pytest fixture providing a populated FindingType instance.
         """

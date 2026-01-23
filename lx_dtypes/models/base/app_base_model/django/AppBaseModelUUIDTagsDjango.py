@@ -25,13 +25,13 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
     def str_list_to_list(cls, value: Union[str, List[str], None]) -> List[str]:
         """
         Normalize an input that may be None, a list, or a delimited string into a list of cleaned tag strings.
-        
+
         Parameters:
             value (Union[str, List[str], None]): The input to normalize. May be:
                 - None, which yields an empty list.
                 - A list of values, whose items will be converted to strings and trimmed.
                 - A string containing comma-separated tokens and/or surrounding brackets/quotes (e.g. "a,b", "['a','b']"), which will be split on commas and trimmed.
-        
+
         Returns:
             List[str]: A list of non-empty strings with surrounding whitespace and surrounding single/double quotes removed.
         """
@@ -57,7 +57,7 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
     ) -> Dict[str, Any]:  # TODO DEPRECATED?
         """
         Produce a serializable representation of the instance with normalized tags and a stringified uuid.
-        
+
         Returns:
             data (Dict[str, Any]): Mapping of the instance fields where `tags` is a list of tag strings
             (empty list if no tags) and `uuid` is converted to its string form.
@@ -82,10 +82,10 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
     def get_by_uuid(cls, uuid: Union[str, uuid_module.UUID]) -> Self:
         """
         Retrieve the model instance identified by the given UUID.
-        
+
         Parameters:
             uuid (str | uuid.UUID): UUID value identifying the instance; string UUIDs will be converted to `uuid.UUID`.
-        
+
         Returns:
             Self: The model instance with the given UUID.
         """

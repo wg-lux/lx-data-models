@@ -32,7 +32,7 @@ class InformationSourceDjango(
     def ddict_class(self) -> type["InformationSourceDataDict"]:
         """
         Expose the data-dictionary class associated with this model.
-        
+
         Returns:
             InformationSourceDataDict: The class used as the model's data dictionary.
         """
@@ -42,7 +42,7 @@ class InformationSourceDjango(
     def list_type_fields(cls) -> list[str]:
         """
         Provide the names of model fields that should be treated as list (array) types.
-        
+
         Returns:
             list[str]: Field names that are configured as list-type fields for this model.
         """

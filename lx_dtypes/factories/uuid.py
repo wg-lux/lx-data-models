@@ -4,7 +4,7 @@ import uuid
 def uuid_factory() -> uuid.UUID:
     """
     Generate a new random UUID.
-    
+
     Returns:
         uuid.UUID: The generated UUID.
     """
@@ -15,7 +15,7 @@ def uuid_factory() -> uuid.UUID:
 def str_uuid_factory() -> str:
     """
     Generates a new UUID and returns its canonical string representation.
-    
+
     Returns:
         uuid_str (str): UUID in standard 36-character canonical form (hexadecimal, 8-4-4-4-12).
     """

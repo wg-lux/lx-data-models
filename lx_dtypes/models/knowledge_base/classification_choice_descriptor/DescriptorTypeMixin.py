@@ -12,7 +12,7 @@ class DescriptorTypeMixin(BaseModel):
     def is_numeric(self) -> bool:
         """
         Indicates whether the classification_choice_descriptor_type is numeric.
-        
+
         Returns:
             True if the descriptor type equals ClassificationChoiceDescriptorTypes.NUMERIC, False otherwise.
         """
@@ -25,7 +25,7 @@ class DescriptorTypeMixin(BaseModel):
     def is_selection(self) -> bool:
         """
         Determine whether the descriptor's classification type is selection.
-        
+
         Returns:
             `true` if `classification_choice_descriptor_type` equals `ClassificationChoiceDescriptorTypes.SELECTION`, `false` otherwise.
         """
@@ -38,7 +38,7 @@ class DescriptorTypeMixin(BaseModel):
     def is_boolean(self) -> bool:
         """
         Return whether the descriptor's classification choice type is boolean.
-        
+
         Returns:
             True if the descriptor's `classification_choice_descriptor_type` equals ClassificationChoiceDescriptorTypes.BOOLEAN, False otherwise.
         """
@@ -51,7 +51,7 @@ class DescriptorTypeMixin(BaseModel):
     def is_text(self) -> bool:
         """
         Indicates whether the descriptor type is text.
-        
+
         Returns:
             `True` if `classification_choice_descriptor_type` equals `ClassificationChoiceDescriptorTypes.TEXT`, `False` otherwise.
         """

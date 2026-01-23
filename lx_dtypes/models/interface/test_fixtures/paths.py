@@ -24,7 +24,7 @@ def log_dir() -> Path:
 def sample_information_source_yaml_filepath() -> Path:
     """
     Provide the filesystem path to the sample information source YAML file.
-    
+
     Returns:
         Path: Path to "./lx_dtypes/data/information_source_data/data/unknown.yaml".
     """
@@ -35,7 +35,7 @@ def sample_information_source_yaml_filepath() -> Path:
 def sample_citations_yaml_filepath() -> Path:
     """
     Provide the filesystem path to the sample citations YAML file used by tests.
-    
+
     Returns:
         Path: Path pointing to "./lx_dtypes/data/citations/data/sample_references.yaml"
     """
@@ -46,7 +46,7 @@ def sample_citations_yaml_filepath() -> Path:
 def sample_examinations_yaml_filepath() -> Path:
     """
     Provide the Path to the sample examinations YAML file for colonoscopy.
-    
+
     Returns:
         Path to the colonoscopy sample examinations YAML file.
     """
@@ -57,7 +57,7 @@ def sample_examinations_yaml_filepath() -> Path:
 def sample_examination_types_yaml_filepath() -> Path:
     """
     Provide the filesystem path to the sample examination types YAML file.
-    
+
     Returns:
         Path: Path to the sample examination types YAML file at
         "./lx_dtypes/data/terminology/lx_examinations/data/examination_types.yaml".
@@ -71,7 +71,7 @@ def sample_examination_types_yaml_filepath() -> Path:
 def sample_indications_yaml_filepath() -> Path:
     """
     Path to the sample colonoscopy indications YAML file.
-    
+
     Returns:
         Path: Filesystem path to "lx_dtypes/data/terminology/lx_indications/data/colonoscopy_indications.yaml".
     """
@@ -84,7 +84,7 @@ def sample_indications_yaml_filepath() -> Path:
 def sample_interventions_yaml_filepath() -> Path:
     """
     Provide the filesystem path to the sample interventions YAML used by tests.
-    
+
     Returns:
         Path: Path to the sample interventions YAML file at "./lx_dtypes/data/terminology/lx_interventions/data/00_generic_endoscopy_ablation.yaml"
     """
@@ -97,7 +97,7 @@ def sample_interventions_yaml_filepath() -> Path:
 def sample_findings_yaml_filepath() -> Path:
     """
     Path to the sample findings YAML file for colonoscopy observations.
-    
+
     Returns:
         Path: Path to "./lx_dtypes/data/terminology/lx_findings/data/02_colonoscopy_observation.yaml".
     """
@@ -110,7 +110,7 @@ def sample_findings_yaml_filepath() -> Path:
 def sample_classifications_yaml_filepath() -> Path:
     """
     Provide the Path to the sample classifications YAML file for colonoscopy polyp data.
-    
+
     Returns:
         filepath (Path): Path to "./lx_dtypes/data/terminology/lx_classifications/data/02_colonoscopy_polyp.yaml".
     """
@@ -123,7 +123,7 @@ def sample_classifications_yaml_filepath() -> Path:
 def sample_classification_choices_yaml_filepath() -> Path:
     """
     Return the Path to the sample classification choices YAML file for colonoscopy polyp morphology.
-    
+
     Returns:
         path (Path): Path pointing to "./lx_dtypes/data/terminology/lx_classification_choices/data/02_colonoscopy_polyp_morphology.yaml".
     """

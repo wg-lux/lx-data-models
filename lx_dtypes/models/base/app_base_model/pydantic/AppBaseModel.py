@@ -41,12 +41,12 @@ class AppBaseModel(BaseModel):
     def from_yaml_file(cls, path: Path) -> Self:
         """
         Create a model instance from a YAML file.
-        
+
         Reads the YAML content at `path` (tilde expanded and resolved), sets the instance's `source_file` to the resolved path, validates the data against the model, and returns the constructed instance.
-        
+
         Parameters:
             path (Path): Path to the YAML file to load.
-        
+
         Returns:
             Self: A validated model instance populated from the YAML content.
         """
@@ -61,9 +61,9 @@ class AppBaseModel(BaseModel):
     def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         """
         Serialize the model to a dictionary using the file-oriented default dump options.
-        
+
         This method applies default serialization settings when none are provided: mode='python', by_alias=True, exclude_none=False, exclude_defaults=False, and round_trip=True. Any options passed via kwargs override these defaults.
-        
+
         Returns:
             dict: Dictionary representation of the model using the effective dump options.
         """
@@ -88,13 +88,13 @@ class AppBaseModel(BaseModel):
     def to_yaml(self, path: Path) -> None:
         """
         Write the model instance to a YAML file at the given path.
-        
+
         The instance is converted to a JSON-compatible mapping and written to the destination
         using UTF-8 encoding, 2-space indentation, preserved key order, and Unicode characters allowed.
-        
+
         Parameters:
             path (Path): Destination file path; user tilde will be expanded and the path resolved.
-        
+
         """
         data = self.model_dump(mode="json")
         path = path.expanduser().resolve()

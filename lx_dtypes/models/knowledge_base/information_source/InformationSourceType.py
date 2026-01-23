@@ -14,7 +14,7 @@ class InformationSourceType(KnowledgebaseBaseModel[InformationSourceTypeDataDict
     def list_type_fields(cls) -> List[str]:
         """
         Identify which model fields should be treated as list-type fields.
-        
+
         Returns:
             list_type_fields (List[str]): List of field names that are considered list-typed for this model.
         """
@@ -24,7 +24,7 @@ class InformationSourceType(KnowledgebaseBaseModel[InformationSourceTypeDataDict
     def ddict_class(self) -> type[InformationSourceTypeDataDict]:
         """
         The data-dict class associated with this model.
-        
+
         Returns:
             type[InformationSourceTypeDataDict]: The InformationSourceTypeDataDict class used for this model's data representation.
         """
