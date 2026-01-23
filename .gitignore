@@ -3,6 +3,13 @@
 .direnv/
 *log.yaml
 junit.xml
+data/smartie
+knowledge_base.yaml
+.devenv.flake.nix
+**/models/**/tests/**.yaml
+star_upper_gi_interface_export_test.yaml
+star_upper_gi_kb_export_test.yaml
+docs_build.tar.gz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -142,7 +149,7 @@ celerybeat.pid
 
 # Environments
 .env
-.envrc
+# .envrc
 .venv
 env/
 venv/
@@ -211,3 +218,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+test_interface_export.yaml
+
+standardized_dataset/**

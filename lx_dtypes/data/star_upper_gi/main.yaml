@@ -1,0 +1,28 @@
+- model: examination
+  name: "star_upper_gi_endoscopy"
+  findings:
+    # Default Findings
+    - star_upper_gi_mucosa_esophagus_abnormal
+    - star_upper_gi_location_esophagogastric_junction
+    - star_upper_gi_location_hiatus
+    - star_upper_gi_location_squamocolumnar_junction
+    - star_upper_gi_imaging_modality_esophagus
+    - star_upper_gi_mucosa_stomach_abnormal
+    - star_upper_gi_chromoendoscopy_stomach
+    - star_upper_gi_mucosa_duodenum_abnormal
+    - star_upper_gi_vili_duodenum_atrophic
+    - star_upper_gi_papilla_major_visualized
+    - star_upper_gi_papilla_minor_visualized
+    - star_upper_gi_polyp
+    - star_upper_gi_ulcer
+    - star_upper_gi_esophagus_ectopic_mucosa
+    - star_upper_gi_esophagus_barretts
+    - star_upper_gi_esophagus_diverticulum
+    - star_upper_gi_esophagus_varices
+    - star_upper_gi_esophagitis
+    - star_upper_gi_esophagitis_eosinophilic
+    - star_upper_gi_esophagitis_caustic
+    - star_upper_gi_stomach_varices
+    - star_upper_gi_duodenum_diverticulum
+
+  indications: []

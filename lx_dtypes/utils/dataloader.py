@@ -1,10 +1,15 @@
 from heapq import heappop, heappush
+from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Set, Tuple
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.knowledge_base.knowledge_base_config import (
+    from lx_dtypes.models.interface.KnowledgeBaseConfig import (
         KnowledgeBaseConfig,
     )
+
+
+def _default_dataloader_dirs_factory() -> List[Path]:
+    return [Path("./data/")]
 
 
 def resolve_kb_module_load_order(

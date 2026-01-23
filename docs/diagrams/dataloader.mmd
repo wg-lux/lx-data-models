@@ -1,0 +1,41 @@
+---
+id: f47a01a2-f0aa-4366-b506-30129c65172a
+---
+sequenceDiagram
+    participant User
+    participant DataLoader
+    participant KnowledgeBase
+    participant DbInterface
+    participant Ledger
+    participant Django as Django ORM
+
+    User->>DataLoader: create_from_yaml(yaml_path)
+    DataLoader->>DataLoader: load module configs
+    DataLoader->>KnowledgeBase: create_from_config(config)
+    KnowledgeBase->>KnowledgeBase: parse YAML submodules<br/>(citations, findings, classifications)
+    KnowledgeBase-->>DataLoader: ✓ KnowledgeBase instance
+    
+    User->>DbInterface: create_from_yaml(yaml_path)
+    DbInterface->>DataLoader: initialize DataLoader
+    DbInterface->>KnowledgeBase: load via DataLoader
+    DbInterface->>Ledger: initialize empty Ledger
+    DbInterface-->>User: ✓ DbInterface ready
+
+    User->>DbInterface: create_patient(first_name, last_name)
+    DbInterface->>Ledger: store Patient
+    Ledger-->>DbInterface: ✓ Patient UUID
+    
+    User->>DbInterface: create_patient_examination(patient, examination)
+    DbInterface->>Ledger: validate & store PExamination
+    DbInterface->>KnowledgeBase: resolve examination reference
+    Ledger-->>DbInterface: ✓ PExamination UUID
+    
+    User->>DbInterface: create_examination_finding(p_exam, finding)
+    DbInterface->>Ledger: create PFinding<br/>with classifications
+    Ledger-->>DbInterface: ✓ PFinding UUID
+    
+    User->>DbInterface: export to Django
+    DbInterface->>Django: sync PExamination.ddict
+    DbInterface->>Django: sync PFinding with relations
+    DbInterface->>Django: sync Classifications & Choices
+    Django-->>DbInterface: ✓ persiste

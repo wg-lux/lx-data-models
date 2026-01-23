@@ -104,6 +104,12 @@ local run guarantees that CI will agree.
    uploads to TestPyPI, then PyPI for tagged releases—no API tokens required.
 6. Announce in the relevant channels and update documentation badges.
 
+## Specific Guides
+### Importer
+Based on the example in `lx_dtypes/importer/smartie`, you can create import modules for your own datasets. When requesting a pull request to add a new importer, please ensure that:
+- mock data or data samples are included for testing purposes under `tests/data/your_importer_name/`
+- appropriate tests are added under `tests/importer/test_your_importer_name.py`
+
 ## Need Help?
 
 Open a discussion or issue on GitHub, or reach out to the maintainers listed in

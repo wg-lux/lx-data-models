@@ -1,2 +1,17 @@
 - model: intervention_type
   name: "default_intervention_type"
+
+- model: intervention_type
+  name: "therapeutic"
+
+- model: intervention_type
+  name: "diagnostic"
+
+- model: intervention_type
+  name: "invasive"
+
+- model: intervention_type
+  name: "foreign_body"
+
+- model: intervention_type
+  name: "histology_sampling"

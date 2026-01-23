@@ -5,7 +5,7 @@
     cushion of fluid that lifts the lesion away from the colon wall. This allows
     the lesion to be removed more easily and reduces the risk of complications during
     the procedure.
-  type_names:
+  intervention_types:
     - diagnostic
     - invasive
 
@@ -14,7 +14,7 @@
   description:
     Foreign body removal is a technique used to remove objects that have
     been accidentally swallowed and are stuck in the colon.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
 
@@ -23,7 +23,7 @@
   description:
     Foreign body removal with grasper is a technique used to remove objects
     that have been accidentally swallowed and are stuck in the colon using a grasper tool.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
 
@@ -32,7 +32,7 @@
   description:
     Foreign body removal with net is a technique used to remove objects
     that have been accidentally swallowed and are stuck in the colon using a net tool.
-  type_names:
+  intervention_types:
     - therapeutic
     - invasive
 
@@ -46,6 +46,6 @@
     the colonoscope and removing a small piece of tissue from the lesion. The tissue
     sample is then sent to a laboratory for analysis to determine if the lesion
     is cancerous or benign.
-  type_names:
+  intervention_types:
     - diagnostic
     - invasive

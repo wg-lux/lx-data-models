@@ -1,0 +1,81 @@
+# Generic
+- model: finding
+  name: star_upper_gi_polyp
+  classifications:
+    - star_upper_gi_location_classification
+    - star_upper_gi_location_esophagus_distance_z_line
+    - star_upper_gi_lesion_paris
+    - size_oval_mm
+    - additional_text_info
+
+- model: finding
+  name: star_upper_gi_ulcer
+  classifications:
+    - star_upper_gi_forrest
+    - star_upper_gi_location_classification
+    - additional_text_info
+
+# Esophagus
+- model: finding
+  name: star_upper_gi_esophagus_ectopic_mucosa
+  classifications:
+    - distance_cm
+    - size_oval_mm
+    - additional_text_info
+
+- model: finding
+  name: star_upper_gi_esophagus_diverticulum
+  classifications:
+    - distance_cm
+    - size_oval_mm
+    - additional_text_info
+
+- model: finding
+  name: star_upper_gi_esophagus_barretts
+  classifications:
+    - star_upper_gi_barrett_praque_classification
+    - additional_text_info
+
+- model: finding
+  name: star_upper_gi_esophagus_varices
+  classifications:
+    - star_upper_gi_esophagus_varices_baveno
+    - additional_text_info
+
+- model: finding
+  name: star_upper_gi_esophagitis
+  classifications:
+    - star_upper_gi_los_angeles_classification
+    - additional_text_info
+
+- model: finding
+  name: star_upper_gi_esophagitis_eosinophilic
+  classifications:
+    - star_upper_gi_erefs_edema
+    - star_upper_gi_erefs_rings
+    - star_upper_gi_erefs_exudates
+    - star_upper_gi_erefs_furrows
+    - star_upper_gi_erefs_strictures
+    - additional_text_info
+
+- model: finding
+  name: star_upper_gi_esophagitis_caustic
+  classifications:
+    - star_upper_gi_zargar
+    - additional_text_info
+
+# Stomach
+
+- model: finding
+  name: star_upper_gi_stomach_varices
+  classifications:
+    - star_upper_gi_stomach_varices_sarin
+    - additional_text_info
+
+# Duodenum
+- model: finding
+  name: star_upper_gi_duodenum_diverticulum
+  classifications:
+    - size_oval_mm
+    - star_upper_gi_location_duodenum
+    - additional_text_info

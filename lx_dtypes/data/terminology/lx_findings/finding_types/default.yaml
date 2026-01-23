@@ -1,2 +1,23 @@
 - model: finding_type
   name: "default_finding_type"
+
+- model: finding_type
+  name: "complication"
+
+- model: finding_type
+  name: "baseline"
+
+- model: finding_type
+  name: "observation"
+
+- model: finding_type
+  name: "iatrogenic"
+
+- model: finding_type
+  name: "persisting"
+
+- model: finding_type
+  name: "anatomy"
+
+- model: finding_type
+  name: "hidden"

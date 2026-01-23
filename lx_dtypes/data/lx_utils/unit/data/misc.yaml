@@ -1,0 +1,20 @@
+- model: unit
+
+  name: "percent"
+  abbreviation: "%"
+  name_de: "Prozent"
+  name_en: "percent"
+
+- model: unit
+
+  name: "ratio"
+  abbreviation: ""
+  name_de: "Ratio"
+  name_en: "ratio"
+
+- model: unit
+
+  name: "dose"
+  name_de: "Dosierung(en)"
+  name_en: "dose(s)"
+  abbreviation: ""

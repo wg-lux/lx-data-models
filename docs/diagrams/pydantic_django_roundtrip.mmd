@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant Pydantic as Pydantic Model
+    participant DataDict
+    participant Django as Django Model
+    participant DB as Database
+
+    Pydantic->>DataDict: ddict_class returns type
+    Pydantic->>Pydantic: model_dump() → dict
+    Pydantic->>DataDict: validate(dumped_dict)
+    DataDict-->>Pydantic: ✓ DataDict instance
+    
+    DataDict->>Django: sync_from_ddict(ddict)
+    Django->>Django: parse nested fields
+    Django->>Django: resolve FK by name
+    Django->>Django: update_or_create(pk=uuid)
+    Django->>DB: INSERT/UPDATE
+    DB-->>Django: ✓ persisted
+    Django-->>Django: refresh_from_db()
+    
+    Django->>Pydantic: model_validate(Django.ddict)
+    Pydantic->>Pydantic: deserialize to Pydantic
+    Pydantic-->>Django: ✓ round-trip complete

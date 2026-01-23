@@ -1,0 +1,16 @@
+- model: classification_choice
+  name: "star_upper_gi_paris_Is"
+- model: classification_choice
+  name: "star_upper_gi_paris_Ip"
+- model: classification_choice
+  name: "star_upper_gi_paris_IIa"
+- model: classification_choice
+  name: "star_upper_gi_paris_IIb"
+- model: classification_choice
+  name: "star_upper_gi_paris_IIc"
+- model: classification_choice
+  name: "star_upper_gi_paris_III"
+- model: classification_choice
+  name: "star_upper_gi_paris_IIa_IIc"
+- model: classification_choice
+  name: "star_upper_gi_paris_IIb_IIc"

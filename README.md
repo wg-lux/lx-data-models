@@ -62,6 +62,48 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
+## Migrations
+
+The following command shortcuts are available for managing migratons, see line below for what they do:
+
+mkmigrations
+	
+ "uv run python manage.py makemigrations ${DJANGO_APP_NAME}";
+
+migrate
+
+ "uv run python manage.py migrate";
+
+runserver 
+
+ "uv run python manage.py runserver";
+
+resetdb
+
+ "rm -f db.sqlite3";
+
+resetmigrations
+
+	rm -rf ${DJANGO_APP_DIR}/migrations/;
+	uv run python manage.py makemigrations ${DJANGO_APP_NAME};
+
+
+### Initialized Models
+Some pydantic models with ForwardRefs require initialization before use.
+Import initialized models from `lx_dtypes.utils.initialized_models`
+
+If you encounter this error when using a model, you may add it there.
+
+Example for the PatientLedger model which references Examiner. This would cause a circular import, therefore we just use the Examiner model during TYPE_CHECKING in the PatientLedger model file and rebuild the model here.
+```python
+from lx_dtypes.models.examiner import (
+    Examiner,  # for model rebuild # type: ignore # noqa: F401
+)
+
+PatientLedger.model_rebuild()
+
+```
+
 ### Test & Lint
 
 ```bash
@@ -82,6 +124,8 @@ make -C docs html
 
 Use `make -C docs linkcheck` to verify outbound references before publishing to
 Read the Docs or GitHub Pages.
+
+
 
 ## Release Process
 1. Update `CHANGELOG.md` and bump the version in `pyproject.toml`.

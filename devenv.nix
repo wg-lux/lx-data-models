@@ -37,6 +37,9 @@ let
   _module.args.buildInputs = baseBuildInputs;
 
   SYNC_CMD = "uv sync --extra dev --extra docs";
+  DJANGO_APP_NAME = "lx_dtypes.django";
+  DJANGO_APP_LABEL = "lx_dtypes_django";
+  DJANGO_APP_DIR = "./lx_dtypes/contrib/${DJANGO_APP_NAME}";
 
 in
 {
@@ -83,10 +86,23 @@ in
     hello.package = pkgs.zsh;
     hello.exec = "uv run python hello.py";
     pyshell.exec = "uv run python manage.py shell";
+    mkmigrations.exec = "uv run python manage.py makemigrations ${DJANGO_APP_LABEL}";
+    migrate.exec = "uv run python manage.py migrate";
+    runserver.exec = "uv run python manage.py runserver";
+    resetdb.exec = "rm -f db.sqlite3";
+    resetmigrations.exec = ''
+      rm -rf ${DJANGO_APP_DIR}/migrations/
+      uv run python manage.py makemigrations ${DJANGO_APP_LABEL}
+    '';
+
+    mp.exec = "uv run python -m mypy lx_dtypes";
+    pc.exec = "pre-commit run --all-files";
 
     mkdocs.exec = ''
+      uv run make -C docs clean
       uv run make -C docs html
       uv run make -C docs linkcheck
+      tar -czf docs_build.tar.gz -C docs _build/html
     '';
     uvsnc.exec = ''
       ${SYNC_CMD}

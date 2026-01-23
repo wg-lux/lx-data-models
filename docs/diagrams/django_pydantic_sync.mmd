@@ -1,0 +1,31 @@
+---
+id: a1cfdf80-789f-4341-aa87-a706e62d15b1
+---
+sequenceDiagram
+    participant Base as AppBaseModel
+    participant KB as KnowledgebaseBaseModel
+    participant Ledger as LedgerBaseModel
+    participant DDictType as DataDict
+    participant Django as DjangoModel
+    participant Sync as sync_from_ddict
+
+    Base->>Base: create instance with uuid, tags
+    Base->>Base: _to_ddict() → Dict
+    
+    KB->>KB: inherit from Base
+    KB->>DDictType: ddict_class property
+    KB->>KB: _coerce_list_fields (model_validator)
+    KB->>KB: model_dump with serialize_str_list
+    
+    Ledger->>Ledger: inherit from Base
+    Ledger->>Ledger: external_ids: JSONField
+    Ledger->>Ledger: nested_fields(), list_type_fields()
+    Ledger->>DDictType: ddict property
+    
+    DDictType->>Django: provides type schema
+    Django->>Django: ForeignKey, ManyToMany relations
+    Django->>Sync: call sync_from_ddict(ddict)
+    Sync->>Django: resolve FK by name
+    Sync->>Django: apply M2M relations
+    Sync->>Django: update_or_create(pk)
+    Django-->>Sync: ✓ instance with refresh_from_db
