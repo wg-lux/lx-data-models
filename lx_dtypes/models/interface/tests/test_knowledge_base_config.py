@@ -30,6 +30,14 @@ class TestKnowledgeBaseConfig:
         self,
         uninitialized_demo_kb_config: KnowledgeBaseConfig,
     ) -> None:
+        """
+        Verify that calling `normalize_data_paths` with `config_file=None` raises a ValueError when no source file is set.
+        
+        This test sets both `kb_config.source_file` and `kb_config.data.source_file` to None and asserts that `normalize_data_paths(config_file=None)` raises a ValueError with the message "source_file must be set to normalize data paths".
+        
+        Parameters:
+            uninitialized_demo_kb_config (KnowledgeBaseConfig): Fixture providing a base KnowledgeBaseConfig instance to copy and modify for the test.
+        """
         kb_config = uninitialized_demo_kb_config.model_copy(deep=True)
         kb_config.source_file = None
         kb_config.data.source_file = None

@@ -39,7 +39,17 @@ class AppBaseModel(BaseModel):
 
     @classmethod
     def from_yaml_file(cls, path: Path) -> Self:
-        """Load model instance from a YAML file."""
+        """
+        Create a model instance from a YAML file.
+        
+        Reads the YAML content at `path` (tilde expanded and resolved), sets the instance's `source_file` to the resolved path, validates the data against the model, and returns the constructed instance.
+        
+        Parameters:
+            path (Path): Path to the YAML file to load.
+        
+        Returns:
+            Self: A validated model instance populated from the YAML content.
+        """
         path = path.expanduser().resolve()
         with path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
@@ -49,7 +59,14 @@ class AppBaseModel(BaseModel):
         return instance
 
     def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
-        """Override the default model_dump to exclude certain fields and set defaults."""
+        """
+        Serialize the model to a dictionary using the file-oriented default dump options.
+        
+        This method applies default serialization settings when none are provided: mode='python', by_alias=True, exclude_none=False, exclude_defaults=False, and round_trip=True. Any options passed via kwargs override these defaults.
+        
+        Returns:
+            dict: Dictionary representation of the model using the effective dump options.
+        """
 
         kwargs.setdefault("mode", "python")
         kwargs.setdefault("by_alias", True)
@@ -69,7 +86,16 @@ class AppBaseModel(BaseModel):
         return dump
 
     def to_yaml(self, path: Path) -> None:
-        """Serialize the model instance to a YAML string."""
+        """
+        Write the model instance to a YAML file at the given path.
+        
+        The instance is converted to a JSON-compatible mapping and written to the destination
+        using UTF-8 encoding, 2-space indentation, preserved key order, and Unicode characters allowed.
+        
+        Parameters:
+            path (Path): Destination file path; user tilde will be expanded and the path resolved.
+        
+        """
         data = self.model_dump(mode="json")
         path = path.expanduser().resolve()
         with path.open("w", encoding="utf-8") as f:

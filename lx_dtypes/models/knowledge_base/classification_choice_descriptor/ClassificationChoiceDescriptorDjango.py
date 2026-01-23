@@ -75,8 +75,20 @@ class ClassificationChoiceDescriptorDjango(
 
     @property
     def ddict_class(self) -> type[ClassificationChoiceDescriptorDataDict]:
+        """
+        The data-dictionary class used to serialize and deserialize this model.
+        
+        Returns:
+            type[ClassificationChoiceDescriptorDataDict]: The associated ClassificationChoiceDescriptorDataDict class.
+        """
         return ClassificationChoiceDescriptorDataDict
 
     @classmethod
     def list_type_fields(cls) -> list[str]:
+        """
+        List the model's field names that contain list values.
+        
+        Returns:
+            list[str]: Field names on the model that should be treated as list/array fields.
+        """
         return CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS

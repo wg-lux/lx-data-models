@@ -32,13 +32,14 @@ class AppBaseModelNamesUUIDTagsDjango(AppBaseModelUUIDTagsDjango):
 
     @classmethod
     def get_by_name(cls, name: str) -> Self:
-        """Get a model instance by its name.
-
-        Args:
-            name (str): The name of the model instance.
-
+        """
+        Retrieve a model instance with the given name.
+        
+        Parameters:
+            name (str): The exact name to look up.
+        
         Returns:
-            KnowledgebaseBaseModel: The model instance with the given name.
+            Self: The model instance matching the provided name.
         """
         instance = cls.objects.get(name=name)
         return instance

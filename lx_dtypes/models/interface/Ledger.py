@@ -67,9 +67,21 @@ class Ledger(AppBaseModelUUIDTags):
     examiners: Dict[str, Examiner] = Field(default_factory=dict)
 
     def patient_exists(self, patient_uuid: str) -> bool:
+        """
+        Check whether a patient with the given UUID exists in the ledger.
+        
+        Returns:
+            `true` if a patient with the given UUID exists, `false` otherwise.
+        """
         return patient_uuid in self.patients
 
     def p_examination_exists(self, examination_uuid: str) -> bool:
+        """
+        Check whether a patient examination with the given UUID exists in the ledger.
+        
+        Returns:
+            `True` if an examination with the given UUID is present in `self.patient_examinations`, `False` otherwise.
+        """
         return examination_uuid in self.patient_examinations
 
     def export_patient_examination_record_list(
@@ -84,6 +96,20 @@ class Ledger(AppBaseModelUUIDTags):
         List[SerializedPFindingInterventionsDataDict],
         List[PFindingInterventionDataDict],
     ]:
+        """
+        Collects and serializes all patient-examination-related records into eight separate lists.
+        
+        Returns:
+            Tuple containing, in order:
+            - p_examination_dicts (List[SerializedPExaminationDataDict]): Serialized patient examination records.
+            - p_finding_dicts (List[SerializedPFindingDataDict]): Serialized findings associated with examinations.
+            - p_indication_dicts (List[PIndicationDataDict]): Serialized indications associated with examinations.
+            - p_finding_classifications_dicts (List[SerializedPFindingClassificationsDataDict]): Serialized finding-classification records.
+            - p_finding_classification_choice_dicts (List[SerializedPFindingClassificationChoiceDataDict]): Serialized classification choice records.
+            - p_finding_classification_choice_descriptor_dicts (List[PFindingClassificationChoiceDescriptorDataDict]): Descriptor dictionaries for classification choices.
+            - p_finding_interventions_dicts (List[SerializedPFindingInterventionsDataDict]): Serialized intervention-group records for findings.
+            - p_finding_intervention_dicts (List[PFindingInterventionDataDict]): Serialized individual intervention records.
+        """
         p_examination_dicts: List[SerializedPExaminationDataDict] = []
         p_finding_dicts: List[SerializedPFindingDataDict] = []
         p_indication_dicts: List[PIndicationDataDict] = []
@@ -160,6 +186,25 @@ class Ledger(AppBaseModelUUIDTags):
         )
 
     def export_record_lists(self) -> LedgerRecordList:
+        """
+        Collects serialized representations of all ledger entities and returns them as a LedgerRecordList suitable for export.
+        
+        The returned record list contains flattened lists for patients, patient examinations, centers, examiners, findings, indications, finding classifications, classification choices, classification choice descriptors, finding interventions, and individual finding intervention records.
+        
+        Returns:
+            LedgerRecordList: A TypedDict with these keys populated:
+                - patients: List of patient data dicts.
+                - p_examinations: List of serialized patient examination data dicts.
+                - centers: List of center data dicts.
+                - examiners: List of examiner data dicts.
+                - p_findings: List of serialized finding data dicts.
+                - p_indications: List of indication data dicts.
+                - p_finding_classifications: List of serialized finding classifications data dicts.
+                - p_finding_classification_choices: List of serialized classification choice data dicts.
+                - p_finding_classification_choice_descriptors: List of classification choice descriptor data dicts.
+                - p_finding_interventions: List of serialized finding interventions data dicts.
+                - p_finding_intervention: List of individual finding intervention data dicts.
+        """
         patient_dicts: List[PatientDataDict] = [
             r.serialized_ddict for r in self.patients.values()
         ]

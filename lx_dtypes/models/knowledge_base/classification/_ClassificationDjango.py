@@ -34,8 +34,20 @@ class ClassificationDjango(KnowledgebaseBaseModelDjango[ClassificationDataDict])
 
     @property
     def ddict_class(self) -> type[ClassificationDataDict]:
+        """
+        Provide the data-dictionary class associated with this model.
+        
+        Returns:
+            The `ClassificationDataDict` class.
+        """
         return ClassificationDataDict
 
     @classmethod
     def list_type_fields(cls) -> list[str]:
+        """
+        List model field names that are treated as list-type fields.
+        
+        Returns:
+            list[str]: Field name strings that should be treated as list-type fields.
+        """
         return CLASSIFICATION_MODEL_LIST_TYPE_FIELDS

@@ -9,7 +9,14 @@ from .PathMixIn import PathMixin
 
 class FilesAndDirsModel(PathMixin, AppBaseModel):
     def resolve_paths(self, base_dir: Path) -> None:
-        """Resolve all paths to their absolute forms."""
+        """
+        Normalize and replace the model's path attributes with absolute Path objects resolved relative to base_dir.
+        
+        Transforms the attributes `file`, `dir`, each entry of `files`, and each entry of `dirs` (when present) into absolute, resolved Path instances based on the provided base_dir, updating the attributes in place.
+        
+        Parameters:
+            base_dir (Path): Base directory used to resolve any relative paths.
+        """
 
         if self.file:
             self.file = (base_dir / self.file).expanduser().resolve()
@@ -23,16 +30,14 @@ class FilesAndDirsModel(PathMixin, AppBaseModel):
             self.dirs[i] = (base_dir / dir_path).expanduser().resolve()
 
     def get_files_with_suffix(self, suffix: Optional[str]) -> List[Path]:
-        """Get all files with the specified suffix.
-        First, all specified files are gathered, then files are ordered by
-        filename (alphabetically). It is encouraged to keep import order in mind when
-        naming files (e.g., prefixing with numbers).
-
-        Args:
-            suffix (str): The suffix to filter files by.
-
+        """
+        Collects files stored on the model and returns those whose suffix exactly matches the provided value.
+        
+        Parameters:
+            suffix (Optional[str]): Suffix to match (including the leading dot, e.g. ".py"); only files whose `Path.suffix` equals this value are kept.
+        
         Returns:
-            list[Path]: A list of files with the specified suffix.
+            List[Path]: Paths of matching files sorted by filename in alphabetical order.
         """
         all_files = [self.file] if self.file else []
         all_files += [file for file in self.files]

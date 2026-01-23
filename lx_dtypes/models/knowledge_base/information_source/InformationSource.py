@@ -16,8 +16,20 @@ class InformationSource(KnowledgebaseBaseModel[InformationSourceDataDict]):
 
     @property
     def ddict_class(self) -> type[InformationSourceDataDict]:
+        """
+        Return the data-dictionary class associated with this model.
+        
+        Returns:
+            type[InformationSourceDataDict]: The InformationSourceDataDict class used by this model.
+        """
         return InformationSourceDataDict
 
     @classmethod
     def list_type_fields(cls) -> List[str]:
+        """
+        Provide the names of model fields that are treated as list types for this class.
+        
+        Returns:
+            List[str]: Field names in the InformationSource model that should be interpreted as lists.
+        """
         return INFORMATION_SOURCE_MODEL_LIST_TYPE_FIELDS

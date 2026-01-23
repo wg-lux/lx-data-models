@@ -36,43 +36,82 @@ class LedgerBaseModelDjango(
 
     @classmethod
     def m2m_fields(cls) -> List[str]:
-        """Return a list of fields that are m2m relationships."""
+        """
+        Return many-to-many field names excluding nested data-dictionary fields.
+        
+        Filters the list of m2m fields inherited from the superclass by removing any fields listed in this class's nested_fields().
+        
+        Returns:
+            List[str]: Many-to-many field names that are not nested.
+        """
         m2m_fields = super().m2m_fields()
         nested_fields = cls.nested_fields()
         return [field for field in m2m_fields if field not in nested_fields]
 
     @classmethod
     def fk_fields(cls) -> List[str]:
-        """Return a list of fields that are foreign keys in the DataDict."""
+        """
+        List foreign-key field names excluding any fields declared as nested DataDict fields.
+        
+        Returns:
+            List[str]: Foreign-key field names from the superclass with nested fields removed.
+        """
         fk_fields = super().fk_fields()
         nested_fields = cls.nested_fields()
         return [field for field in fk_fields if field not in nested_fields]
 
     @classmethod
     def nested_fields(cls) -> List[str]:
-        """Return a list of fields that are nested DataDicts in the DataDict."""
+        """
+        List nested DataDict field names for the model.
+        
+        Returns:
+            List[str]: Field names that should be treated as nested DataDicts (empty by default).
+        """
         default_nested_fields: List[str] = []
         return default_nested_fields
 
     @classmethod
     def ddict_pk_field_name(cls) -> Literal["uuid"]:
-        """Return the name of the primary key field in the DataDict."""
+        """
+        Primary key field name used in the DataDict.
+        
+        Returns:
+            The string "uuid", the primary key field name used in the DataDict.
+        """
         return "uuid"
 
     @classmethod
     def list_type_fields(cls) -> List[str]:
-        """Return a list of fields that are lists in the DataDict."""
+        """
+        Identify the model field names that should be treated as lists in the DataDict.
+        
+        Returns:
+            List[str]: Field names that represent list-type values in the DataDict.
+        """
         default_list_type_fields = mk_lbm_list_type_fields()
         return default_list_type_fields
 
     @property
     def ddict_class(self) -> type[DDictT]:
-        """Return the DataDict type associated with this model."""
+        """
+        The DataDict class associated with this model. Subclasses must implement this property.
+        
+        Returns:
+            type[DDictT]: The DataDict type used to construct ddict instances for this model.
+        """
         raise NotImplementedError("Subclasses must implement ddict_class")
 
     @property
     def ddict(self) -> DDictT:
-        """Materialize the DataDict using the model contents."""
+        """
+        Create a DataDict instance representing the model's current data.
+        
+        Builds a mapping from the model to the DataDict by expanding nested relations into nested ddict structures, representing many-to-many fields as lists of related primary keys, resolving foreign keys to the related object's primary-key string or `None`, parsing list-type fields, and omitting fields with `None` values. Ensures `created_at` is present if the model has it and removes an `id` key if present.
+        
+        Returns:
+            DDictT: An instance of the model's associated DataDict class populated from the model.
+        """
 
         fields = tuple(self.ddict_class.__annotations__.keys())  # type: ignore
         data: dict = {}  # type: ignore
@@ -124,10 +163,16 @@ class LedgerBaseModelDjango(
 
     @classmethod
     def sync_from_ddict(cls, defaults: DDictT) -> Self:
-        """Sync the model instance from a DataDict.
-
-        Args:
-            defaults (DDictT): The DataDict to sync from.
+        """
+        Create or update a model instance from a DataDict and synchronize related fields.
+        
+        This classmethod applies values from `defaults` to the model: it ignores nested-data fields, resolves and assigns foreign-key relations based on the related objects' pk, parses list-type fields, and sets many-to-many relations after the instance is created or updated. The resulting instance is refreshed from the database before being returned.
+        
+        Parameters:
+            defaults (DDictT): DataDict containing field values to apply; may include fk identifiers and m2m lists.
+        
+        Returns:
+            Self: The created or updated model instance with relations synchronized.
         """
 
         nested_fields = cls.nested_fields()

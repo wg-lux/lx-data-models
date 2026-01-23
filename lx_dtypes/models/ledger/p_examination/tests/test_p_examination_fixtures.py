@@ -44,6 +44,14 @@ class TestDjangoPExaminationFixture:
         django_populated_p_finding_fixture: PFindingDjango,
         django_p_indication_fixture: PIndicationDjango,
     ) -> None:
+        """
+        Validate a populated Django-backed PExamination fixture, export its Pydantic representation to YAML, and run Django fixture validation.
+        
+        Parameters:
+            django_populated_p_examination_fixture (PExaminationDjango): A Django fixture for a populated PExamination.
+            django_populated_p_finding_fixture (PFindingDjango): A related populated PFinding Django fixture used to ensure cross-fixture relationships exist.
+            django_p_indication_fixture (PIndicationDjango): A related PIndication Django fixture used to ensure cross-fixture relationships exist.
+        """
         assert django_populated_p_examination_fixture is not None
 
         _ddict = django_populated_p_examination_fixture.ddict
