@@ -122,9 +122,9 @@ class Ledger(AppBaseModelUUIDTags):
         p_finding_classification_choice_descriptor_dicts: List[
             PFindingClassificationChoiceDescriptorDataDict
         ] = []
-        p_finding_interventions_dicts: List[
-            SerializedPFindingInterventionsDataDict
-        ] = []
+        p_finding_interventions_dicts: List[SerializedPFindingInterventionsDataDict] = (
+            []
+        )
         p_finding_intervention_dicts: List[PFindingInterventionDataDict] = []
 
         for p_examination in self.patient_examinations.values():
@@ -148,7 +148,9 @@ class Ledger(AppBaseModelUUIDTags):
                     )
 
                     # 5. Export PFindingClassificationChoice and nested descriptors
-                    for p_finding_classification_choice in (
+                    for (
+                        p_finding_classification_choice
+                    ) in (
                         p_finding_classifications.patient_finding_classification_choices
                     ):
                         p_finding_classification_choice_dicts.append(
@@ -156,7 +158,11 @@ class Ledger(AppBaseModelUUIDTags):
                         )
 
                         # 6. Export PFindingClassificationChoiceDescriptor
-                        for p_finding_classification_choice_descriptor in p_finding_classification_choice.patient_finding_classification_choice_descriptors:
+                        for (
+                            p_finding_classification_choice_descriptor
+                        ) in (
+                            p_finding_classification_choice.patient_finding_classification_choice_descriptors
+                        ):
                             p_finding_classification_choice_descriptor_dicts.append(
                                 p_finding_classification_choice_descriptor.ddict
                             )
