@@ -1,0 +1,56 @@
+flowchart TB
+
+  YAML["YAML terminology files"]
+
+  LOADER["DataLoader or KnowledgeBase loader"]
+  KB_PYD["KnowledgeBase Pydantic models"]
+  KB_STORE["KnowledgeBase in memory store<br/>keyed by name<br/>flat references"]
+  KB_DD["KnowledgeBase DataDict"]
+
+  YAML --> LOADER
+  LOADER --> KB_PYD
+  KB_PYD --> KB_STORE
+  KB_PYD --> KB_DD
+
+  DBI["DbInterface<br/>holds KnowledgeBase and Ledger<br/>validation + orchestration"]
+
+  KB_STORE --> DBI
+
+  LEDGER_STORE["Ledger in memory store<br/>keyed by uuid<br/>nested patient data"]
+  DBI --> LEDGER_STORE
+
+  PATIENT["Patient Pydantic"]
+  PEXAM["PExamination Pydantic"]
+  PFIND["PFinding Pydantic"]
+  PCLSOBJ["PFindingClassifications Pydantic"]
+  PCHOICE["PFindingClassificationChoice Pydantic"]
+  PDESC["Descriptor on choice<br/>planned"]
+
+  DBI --> PATIENT
+  DBI --> PEXAM
+  DBI --> PFIND
+  DBI --> PCLSOBJ
+  DBI --> PCHOICE
+  DBI --> PDESC
+
+  PATIENT --> LEDGER_STORE
+  PEXAM --> LEDGER_STORE
+  PFIND --> LEDGER_STORE
+  PCLSOBJ --> LEDGER_STORE
+  PCHOICE --> LEDGER_STORE
+
+  LEDGER_DD["Ledger DataDict"]
+  LEDGER_STORE --> LEDGER_DD
+
+  DJ_KB["Django KnowledgeBase models"]
+  DJ_LEDGER["Django Ledger models"]
+  DB["Database"]
+
+  KB_DD -->|"sync_from_ddict"| DJ_KB
+  LEDGER_DD -->|"sync_from_ddict"| DJ_LEDGER
+
+  DJ_KB --> DB
+  DJ_LEDGER --> DB
+
+  DB --> DJ_LEDGER
+  DJ_LEDGER --> LEDGER_DD
