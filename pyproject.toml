@@ -84,6 +84,8 @@ Homepage = "https://info.coloreg.de"
 Repository = "https://github.com/wg-lux/lx-data-models"
 
 [tool.pyright]
+extraPaths = ["lx_dtypes"]
+stubPath = "typings"
 # These settings help fix the "Unknown" errors specifically
 # reportMissingTypeStubs = false
 # reportUnknownMemberType = false
@@ -98,7 +100,7 @@ useLibraryCodeForTypes = true
 
 [tool.mypy]
 exclude = '^(\.venv|venv|env)/'
-# mypy_path = "."
+mypy_path = ["typings", "lx_dtypes"]
 plugins = ["pandera.mypy", "mypy_django_plugin.main"]
 strict = true
 warn_unused_ignores = false
@@ -111,7 +113,6 @@ DJANGO_SETTINGS_MODULE = "lx_dtypes.django_settings"
 addopts = """
     -n auto
     --dist=loadscope
-    --cov=lx_dtypes
     --cov-report=xml
     --cov-fail-under=70
 """

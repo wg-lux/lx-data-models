@@ -113,6 +113,8 @@ class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
     unit: Dict[str, UnitDataDict]
     information_source: Dict[str, InformationSourceDataDict]
     information_source_type: Dict[str, InformationSourceTypeDataDict]
+    # labelset -> links to labels
+    # label -> links to finding, intervention, classification + classificationchoice, examination
 
 
 YAML_IMPORT_SKIP_FIELDS = ["config", "uuid", "source_file", "created_at", "updated_at"]

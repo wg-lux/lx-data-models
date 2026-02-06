@@ -14,7 +14,7 @@ from lx_dtypes.utils.django_sync import parse_list_type_field, sync_from_ddict_m
 DDictT = TypeVar("DDictT")
 
 
-class KnowledgebaseBaseModelDjango(AppBaseModelNamesUUIDTagsDjango, Generic[DDictT]):
+class KnowledgebaseBaseModelDjango(Generic[DDictT], AppBaseModelNamesUUIDTagsDjango):
     """Abstract base model with UUID field."""
 
     # Override: keep uuid as unique, indexed, non-PK; use name as PK for KB models

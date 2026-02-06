@@ -126,6 +126,15 @@ from lx_dtypes.models.ledger.p_interventions.test_fixtures import (
     django_populated_p_finding_interventions_fixture,
     p_finding_interventions_fixture,
 )
+from lx_dtypes.models.ledger.p_video.test_fixtures import (
+    patient_video_file_data_dict_fixture,
+    patient_video_file_fixture,
+    raw_video_file_path,
+)
+from lx_dtypes.models.ledger.p_video_segment.test_fixtures import (
+    p_video_segment_data_dict_fixture,
+    p_video_segment_fixture,
+)
 from lx_dtypes.models.ledger.patient.test_fixtures import (
     django_patient_fixture,
     patient_fixture,
@@ -238,8 +247,15 @@ __all__ = [
     # Patient Fixtures
     "patient_fixture",
     "django_patient_fixture",
+    # Video Base Model Fixtures
+    "raw_video_file_path",
+    "patient_video_file_data_dict_fixture",
+    "patient_video_file_fixture",
     # STAR UGI
     "star_ugi_yaml_data_loader",
     "star_ugi_initialized_kb_config",
     "star_ugi_knowledge_base",
+    # Video Segment Fixtures
+    "p_video_segment_data_dict_fixture",
+    "p_video_segment_fixture",
 ]

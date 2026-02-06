@@ -67,7 +67,6 @@ FieldNames = Enum(
         "UNIT_TYPES": "unit_types",
         "UNIT": "unit",
         "UNITS": "units",
-        #
         "PATIENT_FINDINGS": "patient_findings",
         "PATIENT_INDICATIONS": "patient_indications",
         "PATIENT_EXAMINATIONS": "patient_examinations",
@@ -77,6 +76,12 @@ FieldNames = Enum(
         "PATIENT_FINDING_INTERVENTIONS": "patient_finding_interventions",
         "PATIENT_FINDING_INTERVENTION": "patient_finding_intervention",
         "PATIENTS": "patients",
+        "PATIENT_VIDEO_FILE": "patient_video_file",
+        "PATIENT_VIDEO_SEGMENTS": "patient_video_segments",
+        "PATIENT_VIDEO_SEGMENT_STATE": "patient_video_segment_state",
+        "SENSITIVE_META": "sensitive_meta",
+        "SENSITIVE_META_STATE": "sensitive_meta_state",
+        "PSEUDO_EXAMINERS": "pseudo_examiners",
     },
 )
 
@@ -206,6 +211,59 @@ PATIENT_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
     m2m_fields=PATIENT_MODEL_M2M_FIELDS
 )
 PATIENT_MODEL_NESTED_FIELDS: List[str] = []
+
+PATIENT_FILE_MIXIN_M2M_FIELDS: List[str] = []
+PATIENT_FILE_MIXIN_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=PATIENT_FILE_MIXIN_M2M_FIELDS
+)
+PATIENT_FILE_MIXIN_NESTED_FIELDS: List[str] = []
+
+PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS: List[str] = [] + PATIENT_FILE_MIXIN_M2M_FIELDS
+PATIENT_VIDEO_FILE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS
+)
+PATIENT_VIDEO_FILE_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_VIDEO_SEGMENTS.value,
+] + PATIENT_FILE_MIXIN_NESTED_FIELDS
+
+PATIENT_VIDEO_SEGMENT_MODEL_M2M_FIELDS: List[str] = []
+PATIENT_VIDEO_SEGMENT_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=PATIENT_VIDEO_SEGMENT_MODEL_M2M_FIELDS
+)
+PATIENT_VIDEO_SEGMENT_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_VIDEO_SEGMENT_STATE.value,
+]
+
+PATIENT_VIDEO_SEGMENT_STATE_MODEL_M2M_FIELDS: List[str] = []
+PATIENT_VIDEO_SEGMENT_STATE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=PATIENT_VIDEO_SEGMENT_STATE_MODEL_M2M_FIELDS
+)
+PATIENT_VIDEO_SEGMENT_STATE_MODEL_NESTED_FIELDS: List[str] = []
+
+
+SENSITIVE_META_STATE_MODEL_M2M_FIELDS: List[str] = []
+SENSITIVE_META_STATE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=SENSITIVE_META_STATE_MODEL_M2M_FIELDS
+)
+SENSITIVE_META_STATE_MODEL_NESTED_FIELDS: List[str] = []
+# RAW_PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS: List[str] = [] + PATIENT_FILE_MIXIN_M2M_FIELDS
+# RAW_PATIENT_VIDEO_FILE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+#     m2m_fields=RAW_PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS
+# )
+# RAW_PATIENT_VIDEO_FILE_MODEL_NESTED_FIELDS: List[str] = (
+#     [] + PATIENT_FILE_MIXIN_NESTED_FIELDS
+# )
+
+SENSITIVE_META_MODEL_M2M_FIELDS: List[str] = [
+    FieldNames.PSEUDO_EXAMINERS.value,  # TODO Will cause an issue; need to modify lookups to handle PSEUDO_EXAMINERS -> Examiner model mapping
+]
+SENSITIVE_META_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=SENSITIVE_META_MODEL_M2M_FIELDS
+)
+SENSITIVE_META_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.SENSITIVE_META_STATE.value,
+]
+
 ## KNOWLEDGE BASE MODELS LIST TYPE FIELDS
 CITATION_MODEL_M2M_FIELDS: List[str] = []
 CITATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(

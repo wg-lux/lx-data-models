@@ -2220,6 +2220,13 @@
           },
           "title": "Examiners",
           "type": "object"
+        },
+        "patient_videos": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PatientVideoFile"
+          },
+          "title": "Patient Videos",
+          "type": "object"
         }
       },
       "title": "Ledger",
@@ -3066,6 +3073,80 @@
         }
       },
       "title": "Patient",
+      "type": "object"
+    },
+    "PatientVideoFile": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "external_ids": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "External Ids",
+          "type": "object"
+        },
+        "patient": {
+          "title": "Patient",
+          "type": "string"
+        },
+        "patient_examination": {
+          "title": "Patient Examination",
+          "type": "string"
+        },
+        "fnd": {
+          "$ref": "#/$defs/FilesAndDirsModel"
+        }
+      },
+      "required": [
+        "patient",
+        "patient_examination",
+        "fnd"
+      ],
+      "title": "PatientVideoFile",
       "type": "object"
     },
     "Unit": {

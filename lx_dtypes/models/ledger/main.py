@@ -90,6 +90,15 @@ from .p_interventions import (
     l_p_finding_interventions_lookup,
     l_p_finding_interventions_models,
 )
+from .p_video import (
+    LPVideoLookupType,
+    l_p_video_ddicts,
+    # LPVideoDjangoLookupType, # TODO
+    # l_p_video_django_lookup, # TODO
+    # l_p_video_django_models, # TODO
+    l_p_video_lookup,
+    l_p_video_models,
+)
 from .patient import (
     LPatientDjangoLookupType,
     LPatientLookupType,
@@ -113,6 +122,7 @@ class LedgerModelsLookupType(
     LPFindingInterventionsLookupType,
     LPFindingInterventionLookupType,
     LPatientLookupType,
+    LPVideoLookupType,
 ):
     pass
 
@@ -129,6 +139,7 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_p_finding_interventions_lookup,
     **l_p_finding_intervention_lookup,
     **l_patient_lookup,
+    **l_p_video_lookup,
 )
 
 
@@ -144,6 +155,7 @@ class LedgerModelsDjangoLookupType(
     LPFindingInterventionsDjangoLookupType,
     LPFindingInterventionDjangoLookupType,
     LPatientDjangoLookupType,
+    # LPVideoDjangoLookupType, # TODO
 ):
     pass
 
@@ -161,6 +173,7 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
         **l_p_finding_interventions_django_lookup,
         **l_p_finding_intervention_django_lookup,
         **l_patient_django_lookup,
+        # **l_p_video_django_lookup, # TODO
     )
 )
 
@@ -176,6 +189,7 @@ L_MODELS = Union[
     l_p_finding_interventions_models,
     l_p_finding_intervention_models,
     l_patient_models,
+    l_p_video_models,
 ]
 
 L_MODELS_DJANGO = Union[
@@ -190,6 +204,7 @@ L_MODELS_DJANGO = Union[
     l_p_finding_interventions_django_models,
     l_p_finding_intervention_django_models,
     l_patient_django_models,
+    # l_p_video_django_models, # TODO
 ]
 
 L_DDICTS = Union[
@@ -204,10 +219,12 @@ L_DDICTS = Union[
     l_p_finding_interventions_ddicts,
     l_p_finding_intervention_ddicts,
     l_patient_ddicts,
+    l_p_video_ddicts,
 ]
 L_MODEL_NAMES_LITERAL = Literal[
     "Center",
     "Examiner",
+    "Patient",
     "PExamination",
     "PFinding",
     "PIndication",
@@ -215,11 +232,14 @@ L_MODEL_NAMES_LITERAL = Literal[
     "PFindingClassificationChoice",
     "PFindingInterventions",
     "PFindingIntervention",
+    "PatientVideoFile",
+    "RawPatientVideoFile",
 ]
 
 L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "Center",
     "Examiner",
+    "Patient",
     "PExamination",
     "PFinding",
     "PIndication",
@@ -227,6 +247,8 @@ L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "PFindingClassificationChoice",
     "PFindingInterventions",
     "PFindingIntervention",
+    "PatientVideoFile",
+    "RawPatientVideoFile",
 ]
 
 __all__ = [

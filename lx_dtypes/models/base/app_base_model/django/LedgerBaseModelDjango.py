@@ -15,8 +15,8 @@ DDictT = TypeVar("DDictT")
 
 
 class LedgerBaseModelDjango(
-    AppBaseModelUUIDTagsDjango,
     Generic[DDictT],
+    AppBaseModelUUIDTagsDjango,
 ):
     """Abstract base model with UUID field."""
 

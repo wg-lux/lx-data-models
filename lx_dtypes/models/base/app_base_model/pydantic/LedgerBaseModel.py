@@ -1,31 +1,30 @@
-from abc import ABC, abstractmethod
-from typing import Any, ClassVar, Dict, Generic, List, TypeVar
+from abc import abstractmethod
+from typing import Any, ClassVar, Dict, List, TypeVar
 
-from pydantic import Field, model_validator
+from pydantic import Field
 
-from lx_dtypes.serialization import parse_str_list, serialize_str_list
+from lx_dtypes.serialization import serialize_str_list
 
 from .AppBaseModelUUIDTags import (
     AppBaseModelUUIDTags,
+)
+from .InterfaceMixIns import (
+    DDictMixIn,
+    ListFieldSerializationMixIn,
 )
 
 DDictT = TypeVar("DDictT")
 
 
-class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
+class LedgerBaseModel(
+    ListFieldSerializationMixIn,
+    AppBaseModelUUIDTags,
+    DDictMixIn[DDictT],
+    # Generic[DDictT],
+):
     external_ids: Dict[str, str] = Field(default_factory=dict)
     serialized_model_cls: ClassVar[Any] = None
     serialized_ddict_cls: ClassVar[Any] = None
-
-    @property
-    @abstractmethod
-    def ddict_class(self) -> type[DDictT]:
-        """
-        The DataDict class associated with this model.
-
-        Returns:
-            type[DDictT]: The DataDict type used to construct materialized ddict instances.
-        """
 
     @property
     def serialized_ddict_class(self) -> type[Any]:
@@ -39,16 +38,6 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
         """
 
         return self.serialized_ddict_cls or self.ddict_class
-
-    @classmethod
-    @abstractmethod
-    def list_type_fields(cls) -> List[str]:
-        """
-        Identify the DataDict field names whose values are lists.
-
-        Returns:
-            List[str]: Field names in the associated DataDict that should be treated as lists.
-        """
 
     @classmethod
     @abstractmethod
@@ -72,14 +61,20 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
         return cls.serialized_model_cls or cls
 
     @property
-    def ddict(self) -> DDictT:
+    def serialized_model(self) -> "LedgerBaseModel[Any]":
         """
-        Materializes the DataDict associated with this model from the model's data.
+        Produce a serialized model with nested ledger models replaced by UUID strings.
 
         Returns:
-            ddict (DDictT): An instance of the model's DataDict class constructed from the model's dumped data.
+            An instance of the serialized model class (`serialized_model_class`) containing the model's data with nested ledger items flattened to UUID strings.
         """
-        return self.ddict_class(**self.model_dump())
+
+        data = self.model_dump()
+        for field in self.nested_fields():
+            data[field] = self._flatten_nested(data.get(field))
+
+        serialized_model = self.serialized_model_class().model_validate(data)
+        return serialized_model
 
     @property
     def serialized_ddict(self) -> Any:
@@ -89,44 +84,8 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
         Returns:
             An instance of the serialized DataDict class (`serialized_ddict_class`) containing the model's data with nested ledger items flattened to UUID strings.
         """
-
-        data = self.model_dump()
-        for field in self.nested_fields():
-            data[field] = self._flatten_nested(data.get(field))
-
-        serialized_model = self.serialized_model_class().model_validate(data)
+        serialized_model = self.serialized_model
         return self.serialized_ddict_class(**serialized_model.model_dump())
-
-    @model_validator(mode="before")
-    @classmethod
-    def _coerce_list_fields(cls, data: Any) -> Any:
-        """
-        Coerce fields declared as list-type into Python lists within a shallow copy of the input mapping.
-
-        Parameters:
-            data (Any): A mapping-like input (will be converted to a dict) whose keys may include fields returned by list_type_fields().
-
-        Returns:
-            dict: A shallow copy of the input with each field named in list_type_fields() replaced by the result of parse_str_list(data.get(field)).
-        """
-        data = dict(data)
-        for field in cls.list_type_fields():
-            data[field] = parse_str_list(data.get(field))
-        return data
-
-    def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
-        """
-        Return the model's data with any list-typed fields converted to their serialized string form.
-
-        The returned dictionary is the same as the standard model dump except each field named in list_type_fields() is replaced by the value produced by serialize_str_list for that field.
-
-        Returns:
-            dict: Model data with list-type fields serialized to comma-separated string representations.
-        """
-        dumped = super().model_dump(*args, **kwargs)
-        for field in self.list_type_fields():
-            dumped[field] = serialize_str_list(dumped[field])
-        return dumped
 
     def _flatten_nested(self, value: Any) -> Any:
         """
@@ -157,24 +116,3 @@ class LedgerBaseModel(AppBaseModelUUIDTags, ABC, Generic[DDictT]):
                 return str(value["uuid"])
             return {k: self._flatten_nested(v) for k, v in value.items()}
         return value
-
-    @classmethod
-    def validate_ddict(cls, input_dict: Dict[str, Any]) -> bool:
-        """
-        Validate that an input mapping can be converted into this model and materialized as its DataDict.
-
-        Parameters:
-            input_dict (Dict[str, Any]): Mapping representing the DataDict to validate.
-
-        Returns:
-            bool: `True` if validation and materialization succeed.
-
-        Raises:
-            ValueError: If validation or materialization fails; the exception message describes the problem.
-        """
-        try:
-            instance = cls.model_validate(input_dict)
-            _ = instance.ddict  # Verify ddict can be materialized
-            return True
-        except Exception as e:
-            raise ValueError(f"Invalid DataDict: {e}")

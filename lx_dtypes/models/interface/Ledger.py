@@ -33,6 +33,12 @@ from lx_dtypes.models.ledger.p_intervention.DataDict import PFindingIntervention
 from lx_dtypes.models.ledger.p_interventions.DataDict import (
     SerializedPFindingInterventionsDataDict,
 )
+from lx_dtypes.models.ledger.p_video import (
+    PatientVideoFile,
+    PatientVideoFileDataDict,
+    # RawPatientVideoFileDataDict,
+    # RawVideoFile,
+)
 from lx_dtypes.models.ledger.patient import Patient, PatientDataDict
 
 
@@ -52,12 +58,16 @@ class LedgerRecordList(TypedDict):
     ]
     p_finding_interventions: List[SerializedPFindingInterventionsDataDict]
     p_finding_intervention: List[PFindingInterventionDataDict]
+    p_videos: List[PatientVideoFileDataDict]
+    # p_raw_videos: List[RawPatientVideoFileDataDict]
 
 
 class LedgerDataDict(AppBaseModelUUIDTagsDataDict):
     patient_examinations: Dict[str, PExaminationDataDict]
     patients: Dict[str, PatientDataDict]
     centers: Dict[str, CenterDataDict]
+    patient_videos: Dict[str, PatientVideoFileDataDict]
+    # raw_patient_videos: Dict[str, RawPatientVideoFileDataDict]
 
 
 class Ledger(AppBaseModelUUIDTags):
@@ -65,6 +75,12 @@ class Ledger(AppBaseModelUUIDTags):
     patients: Dict[str, Patient] = Field(default_factory=dict)
     centers: Dict[str, Center] = Field(default_factory=dict)
     examiners: Dict[str, Examiner] = Field(default_factory=dict)
+    patient_videos: Dict[str, PatientVideoFile] = Field(default_factory=dict)
+    # raw_patient_videos: Dict[str, RawVideoFile] = Field(default_factory=dict)
+    # patient_images: Dict[str, PFile] = Field(default_factory=dict)
+    # patient_pdfs: Dict[str, PFile] = Field(default_factory=dict)
+    # video_segment_annotations
+    # image_annotations
 
     def patient_exists(self, patient_uuid: str) -> bool:
         """
@@ -210,6 +226,8 @@ class Ledger(AppBaseModelUUIDTags):
                 - p_finding_classification_choice_descriptors: List of classification choice descriptor data dicts.
                 - p_finding_interventions: List of serialized finding interventions data dicts.
                 - p_finding_intervention: List of individual finding intervention data dicts.
+                - patient_video_file_dicts (List[PatientVideoFileDataDict]): Serialized patient video file records.
+                - raw_patient_video_file_dicts (List[RawPatientVideoFileDataDict]): Serialized raw patient video file records.
         """
         patient_dicts: List[PatientDataDict] = [
             r.serialized_ddict for r in self.patients.values()
@@ -220,6 +238,9 @@ class Ledger(AppBaseModelUUIDTags):
         center_dicts: List[CenterDataDict] = [
             r.serialized_ddict for r in self.centers.values()
         ]
+
+        video_dicts = [r.serialized_ddict for r in self.patient_videos.values()]
+        # raw_video_dicts = [r.serialized_ddict for r in self.raw_patient_videos.values()]
 
         (
             p_examination_dicts,
@@ -244,5 +265,7 @@ class Ledger(AppBaseModelUUIDTags):
             p_finding_classification_choice_descriptors=p_finding_classification_choice_descriptor_dicts,
             p_finding_interventions=p_finding_interventions_dicts,
             p_finding_intervention=p_finding_intervention_dicts,
+            p_videos=video_dicts,
+            # p_raw_videos=raw_video_dicts,
         )
         return record_list

@@ -1,4 +1,8 @@
+from pathlib import Path
 from typing import Union
+
+import numpy as np
+from cv2 import VideoWriter, VideoWriter_fourcc
 
 from lx_dtypes.models.knowledge_base import KB_MODELS_DJANGO
 from lx_dtypes.models.ledger import L_MODELS_DJANGO
@@ -27,3 +31,88 @@ def validate_django_fixture(
 
         value_from_ddict = _ddict.get(field, [])
         assert isinstance(value_from_ddict, list)
+
+
+def create_random_noise_video(
+    output_path: Path,
+    duration_sec: int = 5,
+    fps: int = 50,
+    width: int = 1920,
+    height: int = 1080,
+    fourcc_str: str = "mp4v",
+    overwrite: bool = True,
+) -> bool:
+    if output_path.exists() and not overwrite:
+        return False
+    elif output_path.exists() and overwrite:
+        output_path.unlink()
+
+    if len(fourcc_str) != 4:
+        raise ValueError("fourcc_str must be exactly 4 characters long.")
+
+    try:
+        fourcc = VideoWriter_fourcc(*fourcc_str)  # type: ignore
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to create fourcc for {fourcc_str} codec. Ensure OpenCV is properly installed."
+        ) from e
+
+    n_frames = duration_sec * fps
+    try:
+        out = VideoWriter(str(output_path), fourcc, fps, (width, height))
+
+        for _ in range(n_frames):
+            frame = np.random.randint(0, 256, (height, width, 3), dtype=np.uint8)
+            out.write(frame)
+
+        out.release()
+        return True
+    except Exception as e:
+        # cleanup
+        if output_path.exists():
+            output_path.unlink()
+        raise RuntimeError(
+            f"Failed to create random noise video at {output_path}."
+        ) from e
+
+
+def create_black_video(
+    output_path: Path,
+    duration_sec: int = 5,
+    fps: int = 50,
+    width: int = 1920,
+    height: int = 1080,
+    fourcc_str: str = "mp4v",
+    overwrite: bool = True,
+) -> bool:
+    if output_path.exists() and not overwrite:
+        return False
+    elif output_path.exists() and overwrite:
+        output_path.unlink()
+
+    if len(fourcc_str) != 4:
+        raise ValueError("fourcc_str must be exactly 4 characters long.")
+
+    try:
+        fourcc = VideoWriter_fourcc(*fourcc_str)  # type: ignore
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to create fourcc for {fourcc_str} codec. Ensure OpenCV is properly installed."
+        ) from e
+
+    n_frames = duration_sec * fps
+
+    try:
+        out = VideoWriter(str(output_path), fourcc, fps, (width, height))
+
+        black_frame = np.zeros((height, width, 3), dtype=np.uint8)
+        for _ in range(n_frames):
+            out.write(black_frame)
+
+        out.release()
+        return True
+    except Exception as e:
+        # cleanup
+        if output_path.exists():
+            output_path.unlink()
+        raise RuntimeError(f"Failed to create black video at {output_path}.") from e
