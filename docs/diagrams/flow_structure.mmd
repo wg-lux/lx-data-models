@@ -1,0 +1,30 @@
+flowchart TD
+
+    %% Left side: patient workflow
+    Start((Start))
+    CP[Create Patient]
+    PE[Patient Examination]
+    PF[Patient Finding]
+    PCC[Patient Classification Choice]
+
+    Start --> CP
+    CP --> PE
+    PE --> PF
+    PF --> PCC
+
+    %% Right side: medical knowledge
+    KB[Knowledge Base]
+    EX[Examination]
+    FI[Finding]
+    CL[Classification]
+    CC[Classification Choice]
+
+    KB --> EX
+    KB --> FI
+    KB --> CL
+    CL --> CC
+
+    %% Cross-links between knowledge and patient data
+    EX --> PE
+    FI --> PF
+    CC --> PCC
