@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Self, Tuple, TypedDict, Union, cast
+from typing import Any, Dict, List, Self, Tuple, TypedDict, Union, cast
 
 import yaml
 from pydantic import Field
@@ -87,6 +87,37 @@ from lx_dtypes.models.knowledge_base.intervention.InterventionType import (
 from lx_dtypes.models.knowledge_base.intervention.InterventionTypeDataDict import (
     InterventionTypeDataDict,
 )
+from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
+    ExaminationValidator,
+)
+from lx_dtypes.models.knowledge_base.report_template.ExaminationValidatorDataDict import (
+    ExaminationValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
+    FindingsValidator,
+)
+from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict import (
+    FindingsValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.report_template.ReportFinding import ReportFinding
+from lx_dtypes.models.knowledge_base.report_template.ReportFindingDataDict import (
+    ReportFindingDataDict,
+)
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
+    ReportTemplate,
+)
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict import (
+    ReportTemplateDataDict,
+)
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSection import (
+    ReportTemplateSection,
+)
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSectionDataDict import (
+    ReportTemplateSectionDataDict,
+)
+from lx_dtypes.models.knowledge_base.report_template.common import (
+    ReportTemplateFindingRequirement,
+)
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 from lx_dtypes.models.knowledge_base.unit.UnitDataDict import UnitDataDict
 from lx_dtypes.models.knowledge_base.unit.UnitType import UnitType
@@ -113,6 +144,11 @@ class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
     unit: Dict[str, UnitDataDict]
     information_source: Dict[str, InformationSourceDataDict]
     information_source_type: Dict[str, InformationSourceTypeDataDict]
+    report_template_section: Dict[str, ReportTemplateSectionDataDict]
+    report_finding: Dict[str, ReportFindingDataDict]
+    findings_validator: Dict[str, FindingsValidatorDataDict]
+    examination_validator: Dict[str, ExaminationValidatorDataDict]
+    report_template: Dict[str, ReportTemplateDataDict]
     # labelset -> links to labels
     # label -> links to finding, intervention, classification + classificationchoice, examination
 
@@ -138,6 +174,11 @@ class KnowledgeBaseRecordList(TypedDict):
     unit_types: List[UnitTypeDataDict]
     information_sources: List[InformationSourceDataDict]
     information_source_types: List[InformationSourceTypeDataDict]
+    report_template_sections: List[ReportTemplateSectionDataDict]
+    report_findings: List[ReportFindingDataDict]
+    findings_validators: List[FindingsValidatorDataDict]
+    examination_validators: List[ExaminationValidatorDataDict]
+    report_templates: List[ReportTemplateDataDict]
 
 
 class KnowledgeBase(AppBaseModelUUIDTags):
@@ -163,6 +204,15 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     information_source_type: Dict[str, InformationSourceType] = Field(
         default_factory=dict
     )
+    report_template_section: Dict[str, ReportTemplateSection] = Field(
+        default_factory=dict
+    )
+    report_finding: Dict[str, ReportFinding] = Field(default_factory=dict)
+    findings_validator: Dict[str, FindingsValidator] = Field(default_factory=dict)
+    examination_validator: Dict[str, ExaminationValidator] = Field(
+        default_factory=dict
+    )
+    report_template: Dict[str, ReportTemplate] = Field(default_factory=dict)
 
     def get_classification(self, name: str) -> Classification:
         """
@@ -336,6 +386,80 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             Unit: The Unit instance corresponding to the provided name.
         """
         return self.unit[name]
+
+    def get_report_template(self, name: str) -> ReportTemplate:
+        """
+        Retrieve a ReportTemplate by name.
+
+        Parameters:
+            name (str): The report template name.
+
+        Returns:
+            ReportTemplate: The template with the given name.
+        """
+        return self.report_template[name]
+
+    def export_report_template(self, name: str) -> Dict[str, Any]:
+        """
+        Export a report template in a frontend-friendly resolved JSON shape.
+
+        The export resolves section references and validator references by name.
+        """
+        template = self.get_report_template(name)
+        sections: List[Dict[str, Any]] = []
+
+        for section_name in template.report_sections:
+            section = self.report_template_section[section_name]
+            resolved_findings: List[Dict[str, Any]] = []
+            for finding_ref in section.findings:
+                if isinstance(finding_ref, str):
+                    if finding_ref in self.report_finding:
+                        finding_req = self.report_finding[finding_ref].as_requirement()
+                    else:
+                        finding_req = ReportTemplateFindingRequirement(
+                            finding=finding_ref
+                        )
+                else:
+                    finding_req = finding_ref
+                resolved_findings.append(finding_req.model_dump())
+
+            sections.append(
+                {
+                    "name": section.name,
+                    "position": section.position,
+                    "types": section.types,
+                    "findings": resolved_findings,
+                }
+            )
+
+        return {
+            "name": template.name,
+            "examination": template.examination,
+            "report_sections": sections,
+            "validators": {
+                "examination_validators": [
+                    self.examination_validator[v].model_dump()
+                    if v in self.examination_validator
+                    else v
+                    for v in template.validators.examination_validators
+                ],
+                "findings_validators": [
+                    self.findings_validator[v].model_dump()
+                    if v in self.findings_validator
+                    else v
+                    for v in template.validators.findings_validators
+                ],
+            },
+        }
+
+    def export_report_templates(self) -> List[Dict[str, Any]]:
+        """
+        Export all report templates as a list of frontend-friendly dicts.
+        """
+        return [
+            self.export_report_template(template_name)
+            for template_name in self.report_template.keys()
+        ]
 
     @property
     def ddict_class(self) -> type[KnowledgeBaseDDict]:
@@ -565,6 +689,15 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         information_source_type_records = [
             r.ddict for r in self.information_source_type.values()
         ]
+        report_template_section_records = [
+            r.ddict for r in self.report_template_section.values()
+        ]
+        report_finding_records = [r.ddict for r in self.report_finding.values()]
+        findings_validator_records = [r.ddict for r in self.findings_validator.values()]
+        examination_validator_records = [
+            r.ddict for r in self.examination_validator.values()
+        ]
+        report_template_records = [r.ddict for r in self.report_template.values()]
 
         record_lists = KnowledgeBaseRecordList(
             citations=citation_records,
@@ -584,6 +717,11 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             unit_types=unit_type_records,
             information_sources=information_source_records,
             information_source_types=information_source_type_records,
+            report_template_sections=report_template_section_records,
+            report_findings=report_finding_records,
+            findings_validators=findings_validator_records,
+            examination_validators=examination_validator_records,
+            report_templates=report_template_records,
         )
 
         return record_lists

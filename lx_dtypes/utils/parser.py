@@ -10,6 +10,10 @@ from lx_dtypes.models.knowledge_base import (
     knowledge_base_models_lookup,
 )
 
+MODEL_NAME_ALIASES: Dict[str, str] = {
+    "finding_validator": "findings_validator",
+}
+
 
 def snake_to_camel(snake_str: str) -> str:
     components = snake_str.split("_")
@@ -51,6 +55,7 @@ def parse_shallow_object(
 
         target_model_name = item.get("model")
         assert target_model_name is not None, "Each item must have a 'model' field."
+        target_model_name = MODEL_NAME_ALIASES.get(target_model_name, target_model_name)
         target_model_name_camel = snake_to_camel(target_model_name)
         assert target_model_name_camel in KB_MODEL_NAMES_ORDERED, (
             f"Unknown model name: {target_model_name_camel}"

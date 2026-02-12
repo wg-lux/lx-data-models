@@ -18,6 +18,7 @@ api/index
 
 guides/pydantic-cheatsheet
 guides/dates-and-times
+guides/report-template-infrastructure
 ```
 
 ## Quick Links

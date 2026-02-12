@@ -1,0 +1,83 @@
+- model: findings_validator
+  name: polyp_has_lst_if_large
+  finding: esophagus_polyp
+  operator: ASD
+  query:
+    finding: esophagus_polyp
+    operator: ASD
+    condition:
+      any:
+        - classification: size_mm
+          comparator: gt
+          value: 10
+        - classification: size_cat
+          comparator: eq
+          value: large
+      then_requires:
+        - classification: lst
+
+- model: report_finding
+  name: star_upper_gi_mucosa_esophagus_abnormal
+  finding: star_upper_gi_mucosa_esophagus_abnormal
+  required: true
+  multiple_allowed: false
+  classifications: []
+
+- model: report_template_section
+  name: examination_baseline
+  position: 0
+  types: []
+  findings:
+    - finding: esophagus_polyp
+      required: false
+      multiple_allowed: true
+      classifications:
+        - classification: size_mm
+          required: true
+    - star_upper_gi_mucosa_esophagus_abnormal
+
+- model: report_template_section
+  name: xx
+  position: 1
+  types: []
+  findings: []
+
+- model: finding_validator
+  name: star_upper_gi_mucosa_esophagus_abnormal_reported
+  finding: star_upper_gi_mucosa_esophagus_abnormal
+  operator: exists
+  query:
+    finding: star_upper_gi_mucosa_esophagus_abnormal
+    operator: exists
+
+- model: examination_validator
+  name: gastroscopy_has_baseline_info
+  finding_validators:
+    - star_upper_gi_mucosa_esophagus_abnormal_reported
+  examination_validators: []
+
+- model: examination_validator
+  name: star_upper_gi_main
+  finding_validators:
+    - star_upper_gi_mucosa_esophagus_abnormal_reported
+  examination_validators: []
+
+- model: report_template
+  name: star_upper_gi_main
+  examination: star_upper_gi_endoscopy
+  report_sections:
+    - examination_baseline
+    - xx
+  validators:
+    examination_validators:
+      - gastroscopy_has_baseline_info
+    findings_validators:
+      - polyp_has_lst_if_large
+
+- model: report_template
+  name: ukw_gastroscopy
+  examination: star_upper_gi_endoscopy
+  report_sections: []
+  validators:
+    examination_validators: []
+    findings_validators: []
