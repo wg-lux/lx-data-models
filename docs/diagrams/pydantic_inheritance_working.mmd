@@ -1,0 +1,59 @@
+flowchart TB
+
+%% =========================
+%% AppBaseModel foundation
+%% =========================
+ABM["AppBaseModel"]
+ABM_D1["ConfigDict: strict validation<br/>extra=forbid, validate_default, str_strip_whitespace"]
+ABM_D2["Serialization defaults<br/>model_dump(): by_alias=True, round_trip=True"]
+ABM_D3["Time + bytes JSON settings<br/>ser_json_temporal, ser_json_timedelta, ser_json_bytes"]
+ABM_D4["Helpers<br/>from_yaml_file(), to_yaml()<br/>source_file excluded"]
+
+ABM --> ABM_D1
+ABM --> ABM_D2
+ABM --> ABM_D3
+ABM --> ABM_D4
+
+ABM_UUID["AppBaseModelUUIDTags<br/>+ uuid<br/>+ tags"]
+ABM_NAMES["AppBaseModelNamesUUIDTags<br/>+ name, name_de, name_en, description<br/>translation fallback"]
+
+ABM --> ABM_UUID
+ABM_UUID --> ABM_NAMES
+
+%% =========================
+%% Knowledge base branch
+%% =========================
+KB_BASE["KnowledgebaseBaseModel[TDataDict]"]
+KB_D1["Name-keyed usage (KnowledgeBase stores dict[name -> model])"]
+KB_D2["ddict property<br/>materializes TypedDict from model_dump()"]
+KB_D3["List coercion<br/>before-validate: parse_str_list<br/>dump: serialize_str_list"]
+KB_D4["validate_ddict()<br/>checks model + ddict materialization"]
+
+ABM_NAMES --> KB_BASE
+KB_BASE --> KB_D1
+KB_BASE --> KB_D2
+KB_BASE --> KB_D3
+KB_BASE --> KB_D4
+
+KB_MODELS["KB models (examples)<br/>Examination, Finding, Classification,<br/>ClassificationChoice, ClassificationChoiceDescriptor,<br/>Unit, Indication, Intervention,<br/>InformationSource, Citation"]
+KB_BASE --> KB_MODELS
+
+%% =========================
+%% Ledger branch
+%% =========================
+L_BASE["LedgerBaseModel[TDataDict]"]
+L_D1["UUID-keyed usage (Ledger stores dict[uuid -> model])"]
+L_D2["ddict property<br/>materializes TypedDict"]
+L_D3["serialized_ddict<br/>flattens nested ledger models to UUID strings"]
+L_D4["nested_fields()<br/>declares what gets flattened"]
+L_D5["validate_ddict()"]
+
+ABM_UUID --> L_BASE
+L_BASE --> L_D1
+L_BASE --> L_D2
+L_BASE --> L_D3
+L_BASE --> L_D4
+L_BASE --> L_D5
+
+L_MODELS["Ledger models (examples)<br/>Patient, PExamination, PFinding,<br/>PFindingClassifications, PFindingClassificationChoice,<br/>PFindingClassificationChoiceDescriptor,<br/>Center, Examiner, PIndication, PIntervention"]
+L_BASE --> L_MODELS
