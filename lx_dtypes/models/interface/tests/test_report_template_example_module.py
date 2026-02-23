@@ -12,7 +12,7 @@ def test_report_template_example_module_yaml_json_roundtrip() -> None:
 
     exported = kb.export_report_template("star_upper_gi_main")
 
-    exported_json = json.dumps(exported, sort_keys=True)
+    exported_json = json.dumps(exported, sort_keys=True, default=str)
     exported_back = json.loads(exported_json)
 
     assert exported_back["name"] == "star_upper_gi_main"
