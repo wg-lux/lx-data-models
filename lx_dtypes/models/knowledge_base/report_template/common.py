@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, TypedDict, Union
+from typing import Any, Dict, List, Literal, TypedDict, Union
 
 from pydantic import BaseModel, Field
 
@@ -28,6 +28,13 @@ class FindingsValidatorQueryDataDict(TypedDict, total=False):
     params: Dict[str, Any]
 
 
+class ReportTemplateSectionFieldDataDict(TypedDict, total=False):
+    key: str
+    required: bool
+    label: str
+    source: Literal["patient", "patient_examination", "history"]
+
+
 class ReportTemplateClassificationRequirement(BaseModel):
     classification: str
     required: bool = False
@@ -45,6 +52,13 @@ class ReportTemplateFindingRequirement(BaseModel):
 class ReportTemplateValidators(BaseModel):
     examination_validators: List[str] = Field(default_factory=list)
     findings_validators: List[str] = Field(default_factory=list)
+
+
+class ReportTemplateSectionField(BaseModel):
+    key: str
+    required: bool = False
+    label: str | None = None
+    source: Literal["patient", "patient_examination", "history"] | None = None
 
 
 ReportTemplateFindingRequirementInput = Union[

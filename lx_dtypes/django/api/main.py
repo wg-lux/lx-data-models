@@ -14,7 +14,14 @@ api = NinjaAPI()
 
 @lru_cache(maxsize=1)
 def _kb_loader() -> DataLoader:
-    loader = DataLoader(input_dirs=[Path("./lx_dtypes/data/")])
+    package_data_dir = Path(__file__).resolve().parents[2] / "data"
+    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
+    input_dirs = [
+        data_dir
+        for data_dir in (package_data_dir, legacy_cwd_data_dir)
+        if data_dir.exists()
+    ]
+    loader = DataLoader(input_dirs=input_dirs or [package_data_dir])
     loader.load_module_configs()
     return loader
 

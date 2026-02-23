@@ -81,3 +81,27 @@
   validators:
     examination_validators: []
     findings_validators: []
+
+- model: report_finding
+  name: base_required_finding
+  finding: base_required_finding
+  required: true
+  multiple_allowed: false
+  classifications: []
+
+- model: report_template_section
+  name: base_required_section
+  position: 0
+  types:
+    - baseline
+  findings:
+    - base_required_finding
+
+- model: report_template
+  name: base_report_template
+  examination: generic_endoscopy
+  report_sections:
+    - base_required_section
+  validators:
+    examination_validators: []
+    findings_validators: []
