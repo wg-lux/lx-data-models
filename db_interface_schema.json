@@ -15,21 +15,6 @@
       "title": "AnonymizationState",
       "type": "string"
     },
-    "AnonymizationState": {
-      "description": "Enumeration for the various states of the anonymization process.\n\nCheat Sheet:\nDesired Status (AnonymizationState) Boolean Flags to Set in create()\nVALIDATED   anonymization_validated=True\nDONE_PROCESSING_ANONYMIZATION       sensitive_meta_processed=True, anonymization_validated=False\nANONYMIZED  anonymized=True, sensitive_meta_processed=False\nPROCESSING_ANONYMIZING      processing_started=True, frames_extracted=True (Video only)\nEXTRACTING_FRAMES   was_created=True, frames_extracted=False (Video only)\nFAILED      processing_error=True (if field exists)\nSTARTED     processing_started=True\nNOT_STARTED No flags (defaults are usually False)\n\nArgs:\n    str (_type_): _description_\n    Enum (_type_): _description_",
-      "enum": [
-        "not_started",
-        "extracting_frames",
-        "processing_anonymization",
-        "done_processing_anonymization",
-        "validated",
-        "failed",
-        "started",
-        "anonymized"
-      ],
-      "title": "AnonymizationState",
-      "type": "string"
-    },
     "Center": {
       "additionalProperties": false,
       "properties": {
