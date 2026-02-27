@@ -2,6 +2,9 @@
 
 This guide explains exactly how the report-template YAML is loaded, validated, and exported to frontend JSON in this repository.
 
+Start here for a beginner authoring guide:
+- `lx_dtypes/data/report_template_examples/README.md`
+
 ## Goal
 
 You define report templates in YAML (sections, required findings, validators), and the backend:
