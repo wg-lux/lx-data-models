@@ -20,14 +20,10 @@ if TYPE_CHECKING:
 
 
 class ClassificationDjango(KnowledgebaseBaseModelDjango[ClassificationDataDict]):
-    classification_types: models.ManyToManyField[
-        "ClassificationTypeDjango", "ClassificationTypeDjango"
-    ] = models.ManyToManyField(
+    classification_types: models.ManyToManyField = models.ManyToManyField(
         "ClassificationTypeDjango", related_name=FieldNames.CLASSIFICATIONS.value
     )
-    classification_choices: models.ManyToManyField[
-        "ClassificationChoiceDjango", "ClassificationChoiceDjango"
-    ] = models.ManyToManyField(
+    classification_choices: models.ManyToManyField = models.ManyToManyField(
         "ClassificationChoiceDjango",
         related_name=FieldNames.CLASSIFICATIONS.value,
     )

@@ -21,14 +21,10 @@ if TYPE_CHECKING:
 
 
 class IndicationDjango(KnowledgebaseBaseModelDjango[IndicationDataDict]):
-    indication_types: models.ManyToManyField[
-        "IndicationTypeDjango", "IndicationTypeDjango"
-    ] = models.ManyToManyField(
+    indication_types: models.ManyToManyField = models.ManyToManyField(
         "IndicationTypeDjango", related_name=FieldNames.INDICATIONS.value
     )
-    interventions: models.ManyToManyField[
-        "InterventionDjango", "InterventionDjango"
-    ] = models.ManyToManyField(
+    interventions: models.ManyToManyField = models.ManyToManyField(
         "InterventionDjango", related_name=FieldNames.INDICATIONS.value
     )
 

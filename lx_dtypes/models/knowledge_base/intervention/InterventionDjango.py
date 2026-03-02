@@ -17,9 +17,7 @@ if TYPE_CHECKING:
 
 
 class InterventionDjango(KnowledgebaseBaseModelDjango[InterventionDataDict]):
-    intervention_types: models.ManyToManyField[
-        "InterventionTypeDjango", "InterventionTypeDjango"
-    ] = models.ManyToManyField(
+    intervention_types: models.ManyToManyField = models.ManyToManyField(
         "InterventionTypeDjango", related_name=FieldNames.INTERVENTIONS.value
     )
 

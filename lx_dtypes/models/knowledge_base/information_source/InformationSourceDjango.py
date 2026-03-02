@@ -20,10 +20,7 @@ if TYPE_CHECKING:
 class InformationSourceDjango(
     KnowledgebaseBaseModelDjango["InformationSourceDataDict"]
 ):
-    information_source_types: models.ManyToManyField[
-        "InformationSourceTypeDjango",
-        "InformationSourceTypeDjango",
-    ] = models.ManyToManyField(
+    information_source_types: models.ManyToManyField = models.ManyToManyField(
         "InformationSourceTypeDjango",
         related_name=FieldNames.INFORMATION_SOURCES.value,
     )
