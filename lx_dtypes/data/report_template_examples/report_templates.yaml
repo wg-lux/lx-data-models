@@ -105,3 +105,107 @@
   validators:
     examination_validators: []
     findings_validators: []
+
+- model: findings_validator
+  name: colonoscopy_training_deepest_location_recorded
+  finding: colonoscopy_deepest_viewed_location
+  operator: exists
+  query:
+    finding: colonoscopy_deepest_viewed_location
+    operator: exists
+
+- model: findings_validator
+  name: colonoscopy_training_polyp_recorded
+  finding: colon_polyp
+  operator: exists
+  query:
+    finding: colon_polyp
+    operator: exists
+
+- model: examination_validator
+  name: colonoscopy_training_minimum_documentation
+  finding_validators:
+    - colonoscopy_training_deepest_location_recorded
+  examination_validators: []
+
+- model: report_finding
+  name: colonoscopy_training_bowel_prep_simplified
+  finding: bowel_preparation_simplified
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: bowel_prep_boston_simplified
+      required: true
+
+- model: report_finding
+  name: colonoscopy_training_deepest_location
+  finding: colonoscopy_deepest_viewed_location
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: colonoscopy_location_default
+      required: true
+    - classification: colonoscopy_not_complete_reason
+      required: false
+
+- model: report_finding
+  name: colonoscopy_training_withdrawal_time
+  finding: colonoscopy_withdrawal_time_minutes
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: time_minutes_generic
+      required: true
+
+- model: report_finding
+  name: colonoscopy_training_polyp
+  finding: colon_polyp
+  required: false
+  multiple_allowed: true
+  classifications:
+    - classification: colonoscopy_location_default
+      required: true
+    - classification: lesion_size_mm
+      required: true
+    - classification: colon_lesion_paris
+      required: false
+
+- model: report_finding
+  name: colonoscopy_training_diverticule
+  finding: colon_diverticule
+  required: false
+  multiple_allowed: true
+  classifications:
+    - classification: colonoscopy_location_default
+      required: true
+
+- model: report_template_section
+  name: colonoscopy_training_baseline
+  position: 0
+  types:
+    - baseline
+  findings:
+    - colonoscopy_training_bowel_prep_simplified
+    - colonoscopy_training_deepest_location
+    - colonoscopy_training_withdrawal_time
+
+- model: report_template_section
+  name: colonoscopy_training_observations
+  position: 1
+  types:
+    - findings
+  findings:
+    - colonoscopy_training_polyp
+    - colonoscopy_training_diverticule
+
+- model: report_template
+  name: colonoscopy_training_basic
+  examination: colonoscopy
+  report_sections:
+    - colonoscopy_training_baseline
+    - colonoscopy_training_observations
+  validators:
+    examination_validators:
+      - colonoscopy_training_minimum_documentation
+    findings_validators:
+      - colonoscopy_training_polyp_recorded
