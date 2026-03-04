@@ -110,25 +110,35 @@ class ReportTemplateValidatorsDataDict(TypedDict):
     findings_validators: List[str]
 
 
-class FindingsValidatorConditionRuleDataDict(TypedDict, total=False):
+FindingsValidatorOperatorLiteral = Literal["exists", "missing", "conditional"]
+FindingsValidatorComparatorLiteral = Literal[
+    "eq",
+    "ne",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "in",
+    "not_in",
+]
+
+
+class FindingsValidatorConditionClauseDataDict(TypedDict, total=False):
     classification: str
-    comparator: FindingsValidatorComparator
+    comparator: FindingsValidatorComparatorLiteral
     value: Any
-
-
-class FindingsValidatorRequiredClassificationDataDict(TypedDict, total=False):
-    classification: str
+    values: List[Any]
 
 
 class FindingsValidatorConditionDataDict(TypedDict, total=False):
-    any: List[FindingsValidatorConditionRuleDataDict]
-    all: List[FindingsValidatorConditionRuleDataDict]
-    then_requires: List[FindingsValidatorRequiredClassificationDataDict]
+    any: List[FindingsValidatorConditionClauseDataDict]
+    all: List[FindingsValidatorConditionClauseDataDict]
+    then_requires: List[Dict[str, Any]]
 
 
 class FindingsValidatorQueryDataDict(TypedDict, total=False):
     finding: str
-    operator: FindingsValidatorOperator
+    operator: str
     params: Dict[str, Any]
     condition: FindingsValidatorConditionDataDict
 

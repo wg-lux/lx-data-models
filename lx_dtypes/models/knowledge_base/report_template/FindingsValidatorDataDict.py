@@ -2,6 +2,7 @@ from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict i
     KnowledgebaseBaseModelDataDict,
 )
 from lx_dtypes.models.knowledge_base.report_template.common import (
+    FindingsValidatorOperatorLiteral,
     FindingsValidatorQueryDataDict,
 )
 
@@ -9,4 +10,4 @@ from lx_dtypes.models.knowledge_base.report_template.common import (
 class FindingsValidatorDataDict(KnowledgebaseBaseModelDataDict):
     query: FindingsValidatorQueryDataDict
     finding: str
-    operator: str
+    operator: FindingsValidatorOperatorLiteral
