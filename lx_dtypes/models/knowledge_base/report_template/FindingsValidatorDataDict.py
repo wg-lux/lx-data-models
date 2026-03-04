@@ -1,11 +1,12 @@
-from typing import Any, Dict
-
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
+)
+from lx_dtypes.models.knowledge_base.report_template.common import (
+    FindingsValidatorQueryDataDict,
 )
 
 
 class FindingsValidatorDataDict(KnowledgebaseBaseModelDataDict):
-    query: Dict[str, Any]
+    query: FindingsValidatorQueryDataDict
     finding: str
     operator: str

@@ -1,8 +1,96 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Dict, List, Literal, TypedDict, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+FindingsValidatorOperator = Literal[
+    "exists",
+    "present",
+    "not_exists",
+    "absent",
+    "missing",
+    "condition",
+]
+FindingsValidatorComparator = Literal[
+    "eq",
+    "ne",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "in",
+    "exists",
+    "present",
+]
+
+FINDINGS_VALIDATOR_OPERATORS: tuple[FindingsValidatorOperator, ...] = (
+    "exists",
+    "present",
+    "not_exists",
+    "absent",
+    "missing",
+    "condition",
+)
+FINDINGS_VALIDATOR_COMPARATORS: tuple[FindingsValidatorComparator, ...] = (
+    "eq",
+    "ne",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "in",
+    "exists",
+    "present",
+)
+
+DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES: dict[str, FindingsValidatorOperator] = {
+    "if": "condition",
+    "not-exists": "not_exists",
+    "not exists": "not_exists",
+}
+DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES: dict[
+    str, FindingsValidatorComparator
+] = {
+    "==": "eq",
+    "!=": "ne",
+    ">": "gt",
+    ">=": "gte",
+    "<": "lt",
+    "<=": "lte",
+}
+
+
+class DeprecatedReportTemplateValueWarning(UserWarning):
+    pass
+
+
+def _normalize_value_with_alias(
+    raw_value: Any,
+    *,
+    field_name: str,
+    valid_values: tuple[str, ...],
+    deprecated_aliases: dict[str, str],
+) -> str:
+    normalized = str(raw_value).strip().lower()
+    if not normalized:
+        raise ValueError(f"{field_name} cannot be empty")
+    if normalized in valid_values:
+        return normalized
+    if normalized in deprecated_aliases:
+        canonical = deprecated_aliases[normalized]
+        warnings.warn(
+            (
+                f"Deprecated {field_name} alias '{raw_value}' detected; "
+                f"use '{canonical}' instead."
+            ),
+            DeprecatedReportTemplateValueWarning,
+            stacklevel=3,
+        )
+        return canonical
+    allowed = ", ".join(valid_values)
+    raise ValueError(f"Unsupported {field_name} '{raw_value}'. Allowed: {allowed}")
 
 
 class ReportTemplateClassificationRequirementDataDict(TypedDict):
@@ -22,10 +110,27 @@ class ReportTemplateValidatorsDataDict(TypedDict):
     findings_validators: List[str]
 
 
+class FindingsValidatorConditionRuleDataDict(TypedDict, total=False):
+    classification: str
+    comparator: FindingsValidatorComparator
+    value: Any
+
+
+class FindingsValidatorRequiredClassificationDataDict(TypedDict, total=False):
+    classification: str
+
+
+class FindingsValidatorConditionDataDict(TypedDict, total=False):
+    any: List[FindingsValidatorConditionRuleDataDict]
+    all: List[FindingsValidatorConditionRuleDataDict]
+    then_requires: List[FindingsValidatorRequiredClassificationDataDict]
+
+
 class FindingsValidatorQueryDataDict(TypedDict, total=False):
     finding: str
-    operator: str
+    operator: FindingsValidatorOperator
     params: Dict[str, Any]
+    condition: FindingsValidatorConditionDataDict
 
 
 class ReportTemplateSectionFieldDataDict(TypedDict, total=False):
@@ -52,6 +157,61 @@ class ReportTemplateFindingRequirement(BaseModel):
 class ReportTemplateValidators(BaseModel):
     examination_validators: List[str] = Field(default_factory=list)
     findings_validators: List[str] = Field(default_factory=list)
+
+
+class FindingsValidatorConditionRule(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    classification: str
+    comparator: FindingsValidatorComparator = "eq"
+    value: Any | None = None
+
+    @field_validator("comparator", mode="before")
+    @classmethod
+    def normalize_comparator(cls, value: Any) -> Any:
+        return _normalize_value_with_alias(
+            value,
+            field_name="findings_validator.comparator",
+            valid_values=FINDINGS_VALIDATOR_COMPARATORS,
+            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
+        )
+
+
+class FindingsValidatorRequiredClassification(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    classification: str
+
+
+class FindingsValidatorCondition(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    any: List[FindingsValidatorConditionRule] = Field(default_factory=list)
+    all: List[FindingsValidatorConditionRule] = Field(default_factory=list)
+    then_requires: List[FindingsValidatorRequiredClassification] = Field(
+        default_factory=list
+    )
+
+
+class FindingsValidatorQuery(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    finding: str | None = None
+    operator: FindingsValidatorOperator | None = None
+    params: Dict[str, Any] = Field(default_factory=dict)
+    condition: FindingsValidatorCondition | None = None
+
+    @field_validator("operator", mode="before")
+    @classmethod
+    def normalize_operator(cls, value: Any) -> Any:
+        if value is None:
+            return None
+        return _normalize_value_with_alias(
+            value,
+            field_name="findings_validator.operator",
+            valid_values=FINDINGS_VALIDATOR_OPERATORS,
+            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
+        )
 
 
 class ReportTemplateSectionField(BaseModel):

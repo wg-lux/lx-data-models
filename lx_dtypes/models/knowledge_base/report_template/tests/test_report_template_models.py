@@ -1,12 +1,21 @@
 from __future__ import annotations
 
+import pytest
+from pydantic import ValidationError
+
 from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
     ExaminationValidator,
+)
+from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
+    FindingsValidator,
 )
 from lx_dtypes.models.knowledge_base.report_template.ReportFinding import ReportFinding
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import ReportTemplate
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSection import (
     ReportTemplateSection,
+)
+from lx_dtypes.models.knowledge_base.report_template.common import (
+    DeprecatedReportTemplateValueWarning,
 )
 from lx_dtypes.models.knowledge_base.report_template.common import (
     ReportTemplateClassificationRequirement,
@@ -61,6 +70,131 @@ def test_examination_validator_accepts_string_fields_via_list_coercion() -> None
     )
     assert ev.finding_validators == ["fv_1"]
     assert ev.examination_validators == ["ev_0"]
+
+
+def test_findings_validator_query_supports_condition_shape() -> None:
+    fv = FindingsValidator.model_validate(
+        {
+            "name": "polyp_has_lst_if_large",
+            "finding": "esophagus_polyp",
+            "operator": "condition",
+            "query": {
+                "finding": "esophagus_polyp",
+                "operator": "condition",
+                "condition": {
+                    "any": [
+                        {
+                            "classification": "size_mm",
+                            "comparator": "gt",
+                            "value": 10,
+                        }
+                    ],
+                    "then_requires": [{"classification": "lst"}],
+                },
+            },
+        }
+    )
+
+    assert fv.query.finding == "esophagus_polyp"
+    assert fv.query.operator == "condition"
+    condition = fv.query.condition
+    assert condition is not None
+    assert condition.any[0].classification == "size_mm"
+    assert condition.then_requires[0].classification == "lst"
+
+
+def test_findings_validator_operator_asd_is_rejected() -> None:
+    with pytest.raises(ValidationError):
+        FindingsValidator.model_validate(
+            {
+                "name": "legacy_asd_operator",
+                "finding": "esophagus_polyp",
+                "operator": "ASD",
+                "query": {"finding": "esophagus_polyp", "operator": "ASD"},
+            }
+        )
+
+
+def test_findings_validator_comparator_alias_normalizes_with_warning() -> None:
+    with pytest.warns(DeprecatedReportTemplateValueWarning, match=">"):
+        fv = FindingsValidator.model_validate(
+            {
+                "name": "legacy_comparator_alias",
+                "finding": "esophagus_polyp",
+                "operator": "condition",
+                "query": {
+                    "finding": "esophagus_polyp",
+                    "operator": "condition",
+                    "condition": {
+                        "any": [
+                            {
+                                "classification": "size_mm",
+                                "comparator": ">",
+                                "value": 10,
+                            }
+                        ]
+                    },
+                },
+            }
+        )
+
+    assert fv.query.condition is not None
+    assert fv.query.condition.any[0].comparator == "gt"
+
+
+def test_findings_validator_query_rejects_unknown_fields() -> None:
+    with pytest.raises(ValidationError):
+        FindingsValidator.model_validate(
+            {
+                "name": "invalid",
+                "finding": "esophagus_polyp",
+                "operator": "exists",
+                "query": {
+                    "finding": "esophagus_polyp",
+                    "operator": "exists",
+                    "unexpected_key": "nope",
+                },
+            }
+        )
+
+
+def test_findings_validator_query_rejects_unknown_operator() -> None:
+    with pytest.raises(ValidationError):
+        FindingsValidator.model_validate(
+            {
+                "name": "invalid_operator",
+                "finding": "esophagus_polyp",
+                "operator": "unsupported_op",
+                "query": {
+                    "finding": "esophagus_polyp",
+                    "operator": "unsupported_op",
+                },
+            }
+        )
+
+
+def test_findings_validator_query_rejects_unknown_comparator() -> None:
+    with pytest.raises(ValidationError):
+        FindingsValidator.model_validate(
+            {
+                "name": "invalid_comparator",
+                "finding": "esophagus_polyp",
+                "operator": "condition",
+                "query": {
+                    "finding": "esophagus_polyp",
+                    "operator": "condition",
+                    "condition": {
+                        "any": [
+                            {
+                                "classification": "size_mm",
+                                "comparator": "around",
+                                "value": 10,
+                            }
+                        ]
+                    },
+                },
+            }
+        )
 
 
 def test_report_template_section_supports_mixed_finding_inputs() -> None:

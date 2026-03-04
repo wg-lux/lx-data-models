@@ -50,6 +50,23 @@ from .ReportTemplate import ReportTemplate
 from .ReportTemplateDataDict import ReportTemplateDataDict
 from .ReportTemplateSection import ReportTemplateSection
 from .ReportTemplateSectionDataDict import ReportTemplateSectionDataDict
+from .common import (
+    DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
+    DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
+    FINDINGS_VALIDATOR_COMPARATORS,
+    FINDINGS_VALIDATOR_OPERATORS,
+    DeprecatedReportTemplateValueWarning,
+    FindingsValidatorComparator,
+    FindingsValidatorCondition,
+    FindingsValidatorConditionDataDict,
+    FindingsValidatorConditionRule,
+    FindingsValidatorConditionRuleDataDict,
+    FindingsValidatorOperator,
+    FindingsValidatorQuery,
+    FindingsValidatorQueryDataDict,
+    FindingsValidatorRequiredClassification,
+    FindingsValidatorRequiredClassificationDataDict,
+)
 
 
 class KbReportTemplateLookupType(TypedDict):
@@ -125,6 +142,21 @@ __all__ = [
     "ReportFindingDataDict",
     "FindingsValidator",
     "FindingsValidatorDataDict",
+    "FindingsValidatorOperator",
+    "FindingsValidatorComparator",
+    "FINDINGS_VALIDATOR_OPERATORS",
+    "FINDINGS_VALIDATOR_COMPARATORS",
+    "DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES",
+    "DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES",
+    "DeprecatedReportTemplateValueWarning",
+    "FindingsValidatorQuery",
+    "FindingsValidatorQueryDataDict",
+    "FindingsValidatorCondition",
+    "FindingsValidatorConditionDataDict",
+    "FindingsValidatorConditionRule",
+    "FindingsValidatorConditionRuleDataDict",
+    "FindingsValidatorRequiredClassification",
+    "FindingsValidatorRequiredClassificationDataDict",
     "ExaminationValidator",
     "ExaminationValidatorDataDict",
     "LookupInitRequest",

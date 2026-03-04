@@ -105,6 +105,26 @@ Recommendation:
 Recommendation:
 - Always write `findings_validator` to avoid confusion.
 
+## Findings Validator Operators And Comparators
+
+Canonical operators:
+- `exists`
+- `present`
+- `not_exists`
+- `absent`
+- `missing`
+- `condition`
+
+Canonical comparators:
+- `eq`, `ne`
+- `gt`, `gte`
+- `lt`, `lte`
+- `in`
+- `exists`, `present`
+
+Deprecated aliases are still accepted with a warning:
+- comparator symbols like `>`, `<`, `==`, `!=` -> canonical forms
+
 ## Quick Validation Checklist
 
 Before committing:
