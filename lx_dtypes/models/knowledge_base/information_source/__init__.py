@@ -30,11 +30,16 @@ kb_information_source_django_lookup = KbInformationSourceDjangoLookupType(
 
 class KbInformationSourceLookupType(TypedDict):
     InformationSource: type[InformationSource]
+    InformationSourceDataDict: type[InformationSourceDataDict]
     InformationSourceType: type[InformationSourceType]
+    InformationSourceTypeDataDict: type[InformationSourceTypeDataDict]
 
 
 kb_information_source_lookup = KbInformationSourceLookupType(
-    InformationSource=InformationSource, InformationSourceType=InformationSourceType
+    InformationSource=InformationSource,
+    InformationSourceDataDict=InformationSourceDataDict,
+    InformationSourceType=InformationSourceType,
+    InformationSourceTypeDataDict=InformationSourceTypeDataDict,
 )
 
 kb_information_source_models = Union[InformationSource, InformationSourceType]

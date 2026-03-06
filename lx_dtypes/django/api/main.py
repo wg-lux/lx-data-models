@@ -2,14 +2,19 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Literal
 
-from ninja import NinjaAPI
+from ninja import NinjaAPI, Schema
 from ninja.errors import HttpError
+from pydantic import Field
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
 
 from .request_types import BaseRequest
 
 api = NinjaAPI()
+
+
+class ReportTemplateValidationRequest(Schema):
+    findings: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 @lru_cache(maxsize=1)
@@ -76,3 +81,34 @@ def report_templates_by_examination(
         if template.examination == examination_name
     ]
     return matches
+
+
+@api.post("/report-templates/{module_name}/{template_name}/validate")
+def validate_report_template_runtime(
+    request: BaseRequest,
+    module_name: str,
+    template_name: str,
+    payload: ReportTemplateValidationRequest,
+) -> Dict[str, Any]:
+    """
+    Execute report-template validator logic against runtime finding payload data.
+    """
+    kb = _load_module_kb(module_name)
+    try:
+        return kb.evaluate_report_template_validators(
+            template_name, reported_findings=payload.findings
+        )
+    except KeyError as exc:
+        raise HttpError(
+            404,
+            f"Report template '{template_name}' not found in module '{module_name}'.",
+        ) from exc
+
+
+@api.get("/core-concepts/{module_name}")
+def core_concepts_by_module(request: BaseRequest, module_name: str) -> Dict[str, Any]:
+    """
+    Return canonical core concept payloads for one KB module.
+    """
+    kb = _load_module_kb(module_name)
+    return kb.export_core_concepts()

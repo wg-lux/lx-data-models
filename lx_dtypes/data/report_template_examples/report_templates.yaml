@@ -34,7 +34,6 @@
       classifications:
         - classification: size_mm
           required: true
-    - star_upper_gi_mucosa_esophagus_abnormal
 
 - model: report_template_section
   name: xx
@@ -42,7 +41,7 @@
   types: []
   findings: []
 
-- model: finding_validator
+- model: findings_validator
   name: star_upper_gi_mucosa_esophagus_abnormal_reported
   finding: star_upper_gi_mucosa_esophagus_abnormal
   operator: exists

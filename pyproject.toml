@@ -79,6 +79,10 @@ docs = [
   "furo>=2025.9.25",
 ]
 
+[project.scripts]
+ok = "lx_dtypes.scripts.lint_kb_yaml:main"
+
+
 [project.urls]
 Homepage = "https://info.coloreg.de"
 Repository = "https://github.com/wg-lux/lx-data-models"

@@ -16,8 +16,6 @@ from lx_dtypes.models.knowledge_base.report_template.common import (
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict import (
     FindingsValidatorDataDict,
 )
-
-
 SUPPORTED_FINDINGS_VALIDATOR_OPERATORS: tuple[FindingsValidatorOperatorLiteral, ...] = (
     "exists",
     "missing",

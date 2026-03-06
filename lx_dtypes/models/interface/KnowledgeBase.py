@@ -10,6 +10,7 @@ from lx_dtypes.models.base.app_base_model.ddict.AppBaseModelUUIDTagsDataDict imp
 from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelUUIDTags import (
     AppBaseModelUUIDTags,
 )
+from lx_dtypes.models.contracts import kb_to_core_concepts_payload
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.knowledge_base import (
     KB_MODEL_NAMES_LITERAL,
@@ -115,6 +116,10 @@ from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSection impor
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSectionDataDict import (
     ReportTemplateSectionDataDict,
 )
+from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+    ReportTemplateRuntimeValidationResultDataDict,
+    evaluate_report_template_validators_runtime,
+)
 from lx_dtypes.models.knowledge_base.report_template.common import (
     ReportTemplateFindingRequirement,
 )
@@ -122,7 +127,11 @@ from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 from lx_dtypes.models.knowledge_base.unit.UnitDataDict import UnitDataDict
 from lx_dtypes.models.knowledge_base.unit.UnitType import UnitType
 from lx_dtypes.models.knowledge_base.unit.UnitTypeDataDict import UnitTypeDataDict
-from lx_dtypes.utils.parser import camel_to_snake, parse_shallow_object, snake_to_camel
+from lx_dtypes.utils.parser import (
+    camel_to_snake,
+    parse_shallow_object_with_meta,
+    snake_to_camel,
+)
 
 
 class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
@@ -461,6 +470,36 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             for template_name in self.report_template.keys()
         ]
 
+    def export_core_concepts(self) -> Dict[str, Any]:
+        """
+        Export canonical core concept payloads for frontend consumption.
+        """
+        payload = kb_to_core_concepts_payload(self)
+        return payload.model_dump(mode="json")
+
+    def evaluate_report_template_validators(
+        self,
+        name: str,
+        reported_findings: List[Dict[str, Any]] | None = None,
+    ) -> ReportTemplateRuntimeValidationResultDataDict:
+        """
+        Execute report-template validators against runtime finding payload data.
+
+        Parameters:
+            name (str): The report template name.
+            reported_findings (List[Dict[str, Any]] | None): Runtime findings payloads.
+
+        Returns:
+            ReportTemplateRuntimeValidationResultDataDict: Runtime validator execution result.
+        """
+        template = self.get_report_template(name)
+        return evaluate_report_template_validators_runtime(
+            template,
+            findings_validators=self.findings_validator,
+            examination_validators=self.examination_validator,
+            reported_findings=reported_findings or [],
+        )
+
     @property
     def ddict_class(self) -> type[KnowledgeBaseDDict]:
         """
@@ -503,18 +542,36 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             # "source_file": source_file,  # Can be removed?
         }
         kb = cls.model_validate(kb_source_dict)
+        seen_records: Dict[Tuple[str, str], Tuple[Path, int, int]] = {}
         data = config.data
         submodule_files = data.get_files_with_suffix(".yaml")
         for sm_file in submodule_files:
-            parsed_object_generator = parse_shallow_object(sm_file, kb_module_name=name)
-            for parsed_object in parsed_object_generator:
+            parsed_entries = parse_shallow_object_with_meta(
+                sm_file, kb_module_name=name
+            )
+            # Hard error for duplicate module names in the same KnowledgeBase -> Used by Parser
+            for parsed_entry in parsed_entries:
+                parsed_object = parsed_entry.parsed_object
                 model_name = camel_to_snake(type(parsed_object).__name__)
                 object_name = parsed_object.name
+                duplicate_key = (model_name, object_name)
+                existing_ref = seen_records.get(duplicate_key)
+                if existing_ref is not None:
+                    prev_file, prev_line, prev_column = existing_ref
+                    raise ValueError(
+                        f"Duplicate '{model_name}' name '{object_name}' in module "
+                        f"'{name}': {prev_file}:{prev_line}:{prev_column} and "
+                        f"{parsed_entry.source_file}:{parsed_entry.line}:"
+                        f"{parsed_entry.column}"
+                    )
+                seen_records[duplicate_key] = (
+                    parsed_entry.source_file,
+                    parsed_entry.line,
+                    parsed_entry.column,
+                )
                 if not hasattr(kb, model_name):
                     raise ValueError(f"KnowledgeBase has no attribute '{model_name}'")
                 model_dict: Dict[str, KB_MODELS] = getattr(kb, model_name)
-                if object_name in model_dict:
-                    pass  # or raise warning?
                 model_dict[object_name] = parsed_object
 
                 # set the updated dict back to the kb

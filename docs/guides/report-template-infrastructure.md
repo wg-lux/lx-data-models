@@ -10,7 +10,7 @@ Start here for a beginner authoring guide:
 You define report templates in YAML (sections, required findings, validators), and the backend:
 
 1. parses YAML into typed Pydantic models,
-2. stores them in `KnowledgeBase`,
+2. stores them in `KnowledgeBase` (KB),
 3. exports resolved JSON for frontend consumption.
 
 ## Important Files
@@ -29,7 +29,7 @@ You define report templates in YAML (sections, required findings, validators), a
 
 Think of the flow as:
 
-`YAML -> parse_shallow_object -> typed model -> KnowledgeBase dictionaries -> export_report_template -> frontend JSON`
+`YAML -> parse_shallow_object (A method, that will parse a yaml file into a pydantic structure) -> typed model -> KnowledgeBase dictionaries -> export_report_template -> frontend JSON`
 
 ## YAML Model Types
 
@@ -116,11 +116,36 @@ Current scope:
 - Typed YAML parsing
 - In-memory `KnowledgeBase` storage
 - Frontend JSON export
+- Runtime validator execution for `exists`, `missing`, and `conditional` operators via:
+  - `KnowledgeBase.evaluate_report_template_validators(...)`
+  - `POST /base_api/report-templates/{module_name}/{template_name}/validate`
 
 Not implemented yet:
 
-- Runtime execution engine for validator logic (`operator`, query conditions)
 - Dedicated Django ORM models/migrations for report-template entities
+
+## Runtime Validator Payload Shape
+
+Use either:
+
+- `KnowledgeBase.evaluate_report_template_validators(template_name, reported_findings=[...])`
+- `POST /base_api/report-templates/{module_name}/{template_name}/validate`
+
+Expected payload example:
+
+```json
+{
+  "findings": [
+    {
+      "finding": "esophagus_polyp",
+      "classifications": [
+        {"classification": "size_mm", "value": 12},
+        {"classification": "lst", "value": "present"}
+      ]
+    }
+  ]
+}
+```
 
 ## Practical YAML Tips
 

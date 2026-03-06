@@ -50,6 +50,15 @@ from .ReportTemplate import ReportTemplate
 from .ReportTemplateDataDict import ReportTemplateDataDict
 from .ReportTemplateSection import ReportTemplateSection
 from .ReportTemplateSectionDataDict import ReportTemplateSectionDataDict
+from .ValidatorRuntime import (
+    ExaminationValidatorDependencyStatusDataDict,
+    ExaminationValidatorExecutionDataDict,
+    FindingsValidatorExecutionDataDict,
+    ReportTemplateRuntimeValidationResultDataDict,
+    RuntimeValidationIssueDataDict,
+    evaluate_findings_validator_runtime,
+    evaluate_report_template_validators_runtime,
+)
 from .common import (
     DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
     DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
@@ -60,12 +69,10 @@ from .common import (
     FindingsValidatorCondition,
     FindingsValidatorConditionDataDict,
     FindingsValidatorConditionRule,
-    FindingsValidatorConditionRuleDataDict,
     FindingsValidatorOperator,
     FindingsValidatorQuery,
     FindingsValidatorQueryDataDict,
     FindingsValidatorRequiredClassification,
-    FindingsValidatorRequiredClassificationDataDict,
 )
 
 
@@ -154,11 +161,16 @@ __all__ = [
     "FindingsValidatorCondition",
     "FindingsValidatorConditionDataDict",
     "FindingsValidatorConditionRule",
-    "FindingsValidatorConditionRuleDataDict",
     "FindingsValidatorRequiredClassification",
-    "FindingsValidatorRequiredClassificationDataDict",
     "ExaminationValidator",
     "ExaminationValidatorDataDict",
+    "RuntimeValidationIssueDataDict",
+    "ExaminationValidatorDependencyStatusDataDict",
+    "FindingsValidatorExecutionDataDict",
+    "ExaminationValidatorExecutionDataDict",
+    "ReportTemplateRuntimeValidationResultDataDict",
+    "evaluate_findings_validator_runtime",
+    "evaluate_report_template_validators_runtime",
     "LookupInitRequest",
     "LookupInitRequestDataDict",
     "LookupPartsPatchRequest",
