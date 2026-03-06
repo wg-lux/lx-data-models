@@ -293,7 +293,7 @@ def _load_yaml_items(file_path: Path) -> tuple[list[_YamlItem], list[KbYamlLintI
                 file=file_path,
                 line=1,
                 column=1,
-                message="YAML root must be a list of records.",
+                message="YAML root must be a list of records and therefore start with a -.",
             )
         )
         return [], issues
