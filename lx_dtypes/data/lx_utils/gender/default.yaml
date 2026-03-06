@@ -1,5 +1,5 @@
-model: gender
-fields:
-  name: male
-  abbreviation: M
-  description: Male
+- model: gender
+  fields:
+    name: male
+    abbreviation: M
+    description: Male

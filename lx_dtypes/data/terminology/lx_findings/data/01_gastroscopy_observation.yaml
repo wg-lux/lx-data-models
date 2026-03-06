@@ -62,12 +62,6 @@
     - observation
 
 - model: finding
-  name: "gastroscopy_stenosis"
-  description: "Stenosis"
-  finding_types:
-    - observation
-
-- model: finding
   name: "gastroscopy_ectopic_gastric_mucosa"
   description: "Ectopic Gastric Mucosa"
   finding_types:
