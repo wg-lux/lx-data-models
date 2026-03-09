@@ -1,10 +1,9 @@
 - model: finding
-
   name: "gastroscopy_polyp"
   description: "Polyp"
   finding_types:
     - observation
-    #TODO add classifications and interventions
+    #TODO add finding_classifications and finding_interventions
 
 - model: finding
   name: "gastroscopy_ulcer"

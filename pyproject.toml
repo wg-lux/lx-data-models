@@ -113,10 +113,9 @@ warn_unused_ignores = false
 django_settings_module = "lx_dtypes.django_settings"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "lx_dtypes.django_settings"
+DJANGO_SETTINGS_MODULE = "lx_dtypes.django_settings_ci_test"
 addopts = """
-    -n auto
-    --dist=loadscope
+    --ds=lx_dtypes.django_settings_ci_test
     --cov-report=xml
     --cov-fail-under=70
 """
