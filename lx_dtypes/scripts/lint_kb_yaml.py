@@ -16,6 +16,11 @@ from lx_dtypes.utils.kb_yaml_lint import (
 def parse_args() -> argparse.Namespace:
     project_root = Path(__file__).resolve().parents[2]
     default_data_path = project_root / "lx_dtypes" / "data"
+    default_config_paths = [
+        default_data_path / "sample_knowledge_base" / "config.yaml",
+        default_data_path / "report_template_examples" / "config.yaml",
+        default_data_path / "star_upper_gi" / "config.yaml",
+    ]
 
     parser = argparse.ArgumentParser(
         description=(
@@ -27,19 +32,23 @@ def parse_args() -> argparse.Namespace:
         "paths",
         nargs="*",
         type=Path,
-        default=[default_data_path],
+        default=[],
         help=(
-            "YAML files or directories to lint. If a path is 'config.yaml', "
-            "its configured data files/dirs are linted."
+            "YAML files or directories to lint. If omitted, canonical module "
+            "configs are linted. If a path is 'config.yaml', its configured "
+            "data files/dirs (including dependencies/modules) are linted."
         ),
     )
     parser.add_argument(
         "--config",
         action="append",
         dest="config_paths",
-        default=[],
+        default=default_config_paths,
         type=Path,
-        help="Additional module config.yaml files to expand and lint.",
+        help=(
+            "Module config.yaml files to expand and lint recursively. "
+            "Defaults to canonical entry modules."
+        ),
     )
     parser.add_argument(
         "--strict-aliases",

@@ -95,8 +95,18 @@ def _issue(
 
 def _discover_yaml_files_from_module_config(
     config_path: Path,
+    *,
+    module_index: dict[str, list[Path]] | None = None,
+    visited_configs: set[Path] | None = None,
 ) -> tuple[list[Path], list[KbYamlLintIssue]]:
+    config_path = config_path.resolve()
     issues: list[KbYamlLintIssue] = []
+    if visited_configs is None:
+        visited_configs = set()
+    if config_path in visited_configs:
+        return [], issues
+    visited_configs.add(config_path)
+
     if not config_path.exists():
         return [], [
             _issue(
@@ -139,11 +149,36 @@ def _discover_yaml_files_from_module_config(
             )
         ]
 
+    if module_index is None:
+        search_root = config_path.parent.parent.resolve()
+        module_index = {}
+        for nested in sorted(search_root.rglob("config.yaml")):
+            nested_resolved = nested.resolve()
+            if nested_resolved == config_path:
+                module_name = loaded.get("name")
+                if isinstance(module_name, str) and module_name.strip():
+                    module_index.setdefault(module_name.strip(), []).append(
+                        nested_resolved
+                    )
+                continue
+
+            nested_text = nested_resolved.read_text(encoding="utf-8")
+            try:
+                nested_loaded = yaml.safe_load(nested_text)
+            except yaml.YAMLError:
+                # Syntax issues in nested configs are reported once that module is linted.
+                continue
+            if not isinstance(nested_loaded, dict):
+                continue
+            module_name = nested_loaded.get("name")
+            if isinstance(module_name, str) and module_name.strip():
+                module_index.setdefault(module_name.strip(), []).append(nested_resolved)
+
     data = loaded.get("data")
     if data is None:
         # Aggregator modules can define only `modules`/`depends_on` without local YAML.
-        return [], issues
-    if not isinstance(data, dict):
+        files: list[Path] = []
+    elif not isinstance(data, dict):
         return [], [
             _issue(
                 code="missing_config_data",
@@ -154,39 +189,106 @@ def _discover_yaml_files_from_module_config(
                 message="Config YAML must define a mapping under key 'data'.",
             )
         ]
+    else:
+        base_dir = config_path.parent
+        files = []
 
-    base_dir = config_path.parent
-    files: list[Path] = []
+        configured_files = data.get("files", [])
+        if isinstance(configured_files, list):
+            for rel_path in configured_files:
+                if not isinstance(rel_path, str):
+                    continue
+                file_path = (base_dir / rel_path).resolve()
+                if file_path.suffix in {".yaml", ".yml"}:
+                    files.append(file_path)
 
-    configured_files = data.get("files", [])
-    if isinstance(configured_files, list):
-        for rel_path in configured_files:
-            if not isinstance(rel_path, str):
-                continue
-            file_path = (base_dir / rel_path).resolve()
-            if file_path.suffix in {".yaml", ".yml"}:
-                files.append(file_path)
-
-    configured_dirs = data.get("dirs", [])
-    if isinstance(configured_dirs, list):
-        for rel_dir in configured_dirs:
-            if not isinstance(rel_dir, str):
-                continue
-            dir_path = (base_dir / rel_dir).resolve()
-            if not dir_path.exists():
-                issues.append(
-                    _issue(
-                        code="missing_config_data_dir",
-                        severity="warning",
-                        file=config_path,
-                        line=1,
-                        column=1,
-                        message=f"Configured data directory does not exist: {dir_path}",
+        configured_dirs = data.get("dirs", [])
+        if isinstance(configured_dirs, list):
+            for rel_dir in configured_dirs:
+                if not isinstance(rel_dir, str):
+                    continue
+                dir_path = (base_dir / rel_dir).resolve()
+                if not dir_path.exists():
+                    issues.append(
+                        _issue(
+                            code="missing_config_data_dir",
+                            severity="warning",
+                            file=config_path,
+                            line=1,
+                            column=1,
+                            message=(
+                                f"Configured data directory does not exist: {dir_path}"
+                            ),
+                        )
                     )
+                    continue
+                files.extend(sorted(dir_path.rglob("*.yaml")))
+                files.extend(sorted(dir_path.rglob("*.yml")))
+
+    def _resolve_module_config(
+        module_name: str,
+    ) -> tuple[Path | None, list[KbYamlLintIssue]]:
+        candidates = sorted(set(module_index.get(module_name, [])))
+        if not candidates:
+            return None, [
+                _issue(
+                    code="missing_config_module",
+                    severity="warning",
+                    file=config_path,
+                    line=1,
+                    column=1,
+                    message=f"Referenced module '{module_name}' has no config.yaml.",
                 )
-                continue
-            files.extend(sorted(dir_path.rglob("*.yaml")))
-            files.extend(sorted(dir_path.rglob("*.yml")))
+            ]
+        if len(candidates) == 1:
+            return candidates[0], []
+
+        visited_matches = [c for c in candidates if c in visited_configs]
+        if visited_matches:
+            selected = sorted(visited_matches)[0]
+            return selected, []
+
+        current_group = config_path.parent.parent.resolve()
+        same_group = [c for c in candidates if c.parent.parent.resolve() == current_group]
+        if len(same_group) == 1:
+            return same_group[0], []
+
+        selected = same_group[0] if same_group else candidates[0]
+        return selected, [
+            _issue(
+                code="ambiguous_module_config",
+                severity="warning",
+                file=config_path,
+                line=1,
+                column=1,
+                message=(
+                    f"Module '{module_name}' is defined in multiple configs; "
+                    f"selected '{selected}'."
+                ),
+            )
+        ]
+
+    referenced_modules: list[str] = []
+    for key in ("depends_on", "modules"):
+        raw_modules = loaded.get(key, [])
+        if not isinstance(raw_modules, list):
+            continue
+        for entry in raw_modules:
+            if isinstance(entry, str) and entry.strip():
+                referenced_modules.append(entry.strip())
+
+    for module_name in referenced_modules:
+        module_config_path, resolution_issues = _resolve_module_config(module_name)
+        issues.extend(resolution_issues)
+        if module_config_path is None:
+            continue
+        nested_files, nested_issues = _discover_yaml_files_from_module_config(
+            module_config_path,
+            module_index=module_index,
+            visited_configs=visited_configs,
+        )
+        files.extend(nested_files)
+        issues.extend(nested_issues)
 
     deduped: list[Path] = []
     seen: set[Path] = set()
@@ -206,9 +308,32 @@ def discover_yaml_files(
 ) -> tuple[list[Path], list[KbYamlLintIssue]]:
     issues: list[KbYamlLintIssue] = []
     files: list[Path] = []
+    visited_configs: set[Path] = set()
+    module_index: dict[str, list[Path]] = {}
+
+    def _extend_module_index(search_root: Path) -> None:
+        for nested in sorted(search_root.rglob("config.yaml")):
+            nested_resolved = nested.resolve()
+            nested_text = nested_resolved.read_text(encoding="utf-8")
+            try:
+                nested_loaded = yaml.safe_load(nested_text)
+            except yaml.YAMLError:
+                continue
+            if not isinstance(nested_loaded, dict):
+                continue
+            module_name = nested_loaded.get("name")
+            if isinstance(module_name, str) and module_name.strip():
+                module_index.setdefault(module_name.strip(), []).append(nested_resolved)
 
     for config_path in config_paths:
-        discovered, config_issues = _discover_yaml_files_from_module_config(config_path)
+        _extend_module_index(config_path.resolve().parent.parent)
+
+    for config_path in config_paths:
+        discovered, config_issues = _discover_yaml_files_from_module_config(
+            config_path,
+            module_index=module_index,
+            visited_configs=visited_configs,
+        )
         files.extend(discovered)
         issues.extend(config_issues)
 
