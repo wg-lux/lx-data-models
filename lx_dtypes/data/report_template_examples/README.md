@@ -150,6 +150,40 @@ Test API output:
 - `GET /base_api/report-templates/{module_name}/{template_name}`
 - `GET /base_api/report-templates/by-examination/{module_name}/{examination_name}`
 
+## Mapping To `base_api` Requirement Objects
+
+When using the new requirement endpoints in `lx_dtypes/django/api/main.py`, requirement objects are projected directly from report templates and validators.
+
+Requirement set projection:
+- Endpoint: `GET /base_api/requirement-sets`
+- One requirement set == one `report_template`
+- `requirement_set.name` == `report_template.name`
+- `requirement_set.type` == `report_template.examination`
+- `requirement_set.id` == 1-based index over `sorted(report_template names)`
+
+Requirement projection inside each set:
+- Validators are flattened in this order:
+  1. `report_template.validators.findings_validators`
+  2. `report_template.validators.examination_validators`
+- `requirement.name` == validator name
+- `requirement.kind` == `findings_validator` or `examination_validator`
+- `requirement.id` == 1-based local index within that requirement set
+
+Evaluation projection:
+- Endpoint: `POST /base_api/evaluate-requirement-set`
+- Selected set ids resolve back to template names.
+- Runtime call per template:
+  - `kb.evaluate_report_template_validators(template_name, reported_findings=...)`
+- Result row mapping:
+  - `requirement_name` -> runtime validator `name`
+  - `met` -> runtime validator `ok`
+  - `details` -> summary message built from validator issues
+  - `validator_result` -> full validator runtime object
+
+Notes:
+- These projected IDs are not persisted DB IDs.
+- IDs can change when template names/order change.
+
 ## Next Read
 
 For deeper internals, read:

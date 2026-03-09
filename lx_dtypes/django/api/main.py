@@ -26,6 +26,22 @@ from .request_types import BaseRequest
 
 api = NinjaAPI()
 
+class StructuredApiError(Exception):
+    def __init__(self, status_code: int, code: str, message: str):
+        self.status_code = status_code
+        self.code = code
+        self.message = message
+        super().__init__(message)
+
+
+@api.exception_handler(StructuredApiError)
+def handle_structured_api_error(request: Any, exc: StructuredApiError):
+    return api.create_response(
+        request,
+        {"code": exc.code, "message": exc.message},
+        status=exc.status_code,
+    )
+
 
 class StructuredApiError(Exception):
     def __init__(self, status_code: int, code: str, message: str):
@@ -133,6 +149,13 @@ def _active_patient_findings_queryset() -> QuerySet[PatientFinding]:
     return PatientFinding.objects.filter(is_active=True).select_related(
         "patient_examination", "finding"
     )
+
+
+def _request_user_if_authenticated(request: BaseRequest) -> Optional[Any]:
+    user = getattr(request, "user", None)
+    if getattr(user, "is_authenticated", False):
+        return user
+    return None
 
 
 def _serialize_choice(choice: FindingClassificationChoice) -> Dict[str, Any]:
@@ -607,7 +630,17 @@ def create_patient_finding(
         raise
     except ValidationError as exc:
         message = str(exc)
-        code = "required-finding" if "Erforderliche Findings fehlen" in message else "invalid-finding"
+        normalized_message = message.lower()
+        if "erforderliche findings fehlen" in normalized_message:
+            code = "required-finding"
+        elif (
+            "unique_active_finding_per_examination" in normalized_message
+            or "already exists" in normalized_message
+            or "bereits" in normalized_message
+        ):
+            code = "duplicate-finding"
+        else:
+            code = "invalid-finding"
         _api_error(400, code, message)
 
 
@@ -641,7 +674,11 @@ def patch_patient_finding(
                 patient_finding.deactivated_by = None
             else:
                 patient_finding.is_active = False
-                patient_finding.deactivated_at = timezone.now()
+                actor = _request_user_if_authenticated(request)
+                patient_finding.deactivated_by = actor
+                patient_finding.deactivated_at = (
+                    timezone.now() if actor is not None else None
+                )
 
         patient_finding.save()
 
@@ -664,9 +701,13 @@ def delete_patient_finding(
         _api_error(404, "not-found", f"Patient finding '{patient_finding_id}' not found.")
     assert patient_finding is not None
 
+    actor = _request_user_if_authenticated(request)
     patient_finding.is_active = False
-    patient_finding.deactivated_at = timezone.now()
-    patient_finding.save(update_fields=["is_active", "deactivated_at"])
+    patient_finding.deactivated_by = actor
+    patient_finding.deactivated_at = timezone.now() if actor is not None else None
+    patient_finding.save(
+        update_fields=["is_active", "deactivated_at", "deactivated_by"]
+    )
     return {"success": True, "id": patient_finding_id}
 
 
