@@ -7,6 +7,7 @@ into pytest runs.
 
 from __future__ import annotations
 
+import os
 import tempfile
 from pathlib import Path
 from typing import Any, cast
@@ -61,3 +62,7 @@ if "endoreg_db" not in INSTALLED_APPS:
     INSTALLED_APPS.append("endoreg_db")
 
 ROOT_URLCONF = "lx_dtypes.django.urls"
+
+# Keep dtypes-backed findings API tests deterministic in CI by using a
+# guaranteed module from lx_dtypes/data, unless explicitly overridden.
+os.environ.setdefault("LX_DTYPES_FINDINGS_MODULE", "report_template_examples")

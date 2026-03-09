@@ -42,24 +42,6 @@ def handle_structured_api_error(request: Any, exc: StructuredApiError):
         status=exc.status_code,
     )
 
-
-class StructuredApiError(Exception):
-    def __init__(self, status_code: int, code: str, message: str):
-        self.status_code = status_code
-        self.code = code
-        self.message = message
-        super().__init__(message)
-
-
-@api.exception_handler(StructuredApiError)
-def handle_structured_api_error(request: Any, exc: StructuredApiError):
-    return api.create_response(
-        request,
-        {"code": exc.code, "message": exc.message},
-        status=exc.status_code,
-    )
-
-
 class ReportTemplateValidationRequest(Schema):
     findings: List[Dict[str, Any]] = Field(default_factory=list)
 
