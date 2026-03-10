@@ -27,8 +27,9 @@ except Exception:  # pragma: no cover - fallback for standalone lx-data-models u
         "django.contrib.sessions",
         "django.contrib.messages",
         "django.contrib.staticfiles",
-        "rest_framework",
     ]
+    if importlib.util.find_spec("rest_framework") is not None:
+        required_apps.append("rest_framework")
     if importlib.util.find_spec("endoreg_db") is not None:
         required_apps.append("endoreg_db")
 

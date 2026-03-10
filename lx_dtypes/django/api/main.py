@@ -18,6 +18,7 @@ from lx_dtypes.models.interface.DataLoader import DataLoader
 from .request_types import BaseRequest
 
 api = NinjaAPI()
+DEFAULT_REQUIREMENT_MODULE = "report_template_examples"
 
 if TYPE_CHECKING:
     from endoreg_db.models import (
@@ -72,6 +73,16 @@ class ReportTemplateValidationRequest(Schema):
     findings: List[Dict[str, Any]] = Field(default_factory=list)
 
 
+class EvaluateRequirementSetRequest(Schema):
+    requirement_set_id: int | None = None
+    requirement_set_ids: List[int] = Field(default_factory=list)
+    requirementSetIds: List[int] = Field(default_factory=list)
+    patient_examination_id: int | None = None
+    module_name: str | None = None
+    reported_findings: List[Dict[str, Any]] = Field(default_factory=list)
+    findings: List[Dict[str, Any]] = Field(default_factory=list)
+
+
 class PatientFindingClassificationInput(Schema):
     classification: int
     choice: int
@@ -118,6 +129,13 @@ def _load_module_kb(module_name: str):
 
 def _findings_module_name() -> str:
     return os.getenv("LX_DTYPES_FINDINGS_MODULE", "lx_knowledge_base")
+
+
+def _to_int(value: Any) -> int | None:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def _norm_name(value: Optional[str]) -> str:
@@ -332,6 +350,90 @@ def _require_endoreg_db() -> None:
         )
 
 
+def _stable_requirement_sets(
+    kb: Any,
+    *,
+    module_name: str,
+) -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    for template_id, template_name in enumerate(sorted(kb.report_template.keys()), start=1):
+        template = kb.report_template[template_name]
+        requirements: List[Dict[str, Any]] = []
+        requirement_id = 1
+        for validator_name in template.validators.findings_validators:
+            requirements.append(
+                {
+                    "id": requirement_id,
+                    "name": str(validator_name),
+                    "description": "Findings validator",
+                    "kind": "findings_validator",
+                    "met": False,
+                }
+            )
+            requirement_id += 1
+        for validator_name in template.validators.examination_validators:
+            requirements.append(
+                {
+                    "id": requirement_id,
+                    "name": str(validator_name),
+                    "description": "Examination validator",
+                    "kind": "examination_validator",
+                    "met": False,
+                }
+            )
+            requirement_id += 1
+
+        rows.append(
+            {
+                "id": template_id,
+                "name": template_name,
+                "description": f"Report template requirements for '{template_name}'.",
+                "type": str(template.examination),
+                "module_name": module_name,
+                "template_name": template_name,
+                "requirements": requirements,
+                "met": False,
+            }
+        )
+    return rows
+
+
+def _collect_requirement_set_ids(
+    payload: EvaluateRequirementSetRequest,
+) -> tuple[List[int], bool]:
+    candidates: List[Any] = []
+    if payload.requirement_set_id is not None:
+        candidates.append(payload.requirement_set_id)
+    candidates.extend(payload.requirement_set_ids or [])
+    candidates.extend(payload.requirementSetIds or [])
+
+    ids: List[int] = []
+    seen: set[int] = set()
+    for candidate in candidates:
+        set_id = _to_int(candidate)
+        if set_id is None or set_id <= 0 or set_id in seen:
+            continue
+        seen.add(set_id)
+        ids.append(set_id)
+    return ids, bool(candidates)
+
+
+def _validator_details(validator_result: Dict[str, Any]) -> str:
+    if bool(validator_result.get("ok")):
+        return "Validator passed"
+
+    issues = validator_result.get("issues")
+    if isinstance(issues, list):
+        issue_messages = [
+            str(issue.get("message"))
+            for issue in issues
+            if isinstance(issue, dict) and issue.get("message")
+        ]
+        if issue_messages:
+            return " | ".join(issue_messages[:3])
+    return "Validator failed"
+
+
 def _validate_finding_for_examination(
     finding: Finding,
     patient_examination: PatientExamination,
@@ -509,6 +611,126 @@ def core_concepts_by_module(request: BaseRequest, module_name: str) -> Dict[str,
     """
     kb = _load_module_kb(module_name)
     return kb.export_core_concepts()
+
+
+@api.get("/requirement-sets")
+def base_api_requirement_sets(
+    request: BaseRequest,
+    module_name: str = DEFAULT_REQUIREMENT_MODULE,
+    examination_name: str | None = None,
+) -> List[Dict[str, Any]]:
+    kb = _load_module_kb(module_name)
+    requirement_sets = _stable_requirement_sets(kb, module_name=module_name)
+    if not examination_name:
+        return requirement_sets
+    return [
+        row
+        for row in requirement_sets
+        if str(row.get("type", "")) == str(examination_name)
+    ]
+
+
+@api.get("/requirement-sets/{requirement_set_id}")
+def base_api_requirement_set_detail(
+    request: BaseRequest,
+    requirement_set_id: int,
+    module_name: str = DEFAULT_REQUIREMENT_MODULE,
+) -> Dict[str, Any]:
+    if requirement_set_id <= 0:
+        raise HttpError(400, "requirement_set_id must be a positive integer.")
+    kb = _load_module_kb(module_name)
+    requirement_sets = _stable_requirement_sets(kb, module_name=module_name)
+    for requirement_set in requirement_sets:
+        if requirement_set["id"] == requirement_set_id:
+            return requirement_set
+    raise HttpError(404, f"RequirementSet with id {requirement_set_id} does not exist.")
+
+
+@api.post("/evaluate-requirement-set")
+def base_api_evaluate_requirement_set(
+    request: BaseRequest, payload: EvaluateRequirementSetRequest
+) -> Dict[str, Any]:
+    module_name = str(payload.module_name or DEFAULT_REQUIREMENT_MODULE)
+    kb = _load_module_kb(module_name)
+    requirement_sets = _stable_requirement_sets(kb, module_name=module_name)
+    requirement_set_map = {row["id"]: row for row in requirement_sets}
+
+    selected_set_ids, set_ids_provided = _collect_requirement_set_ids(payload)
+    if not selected_set_ids:
+        if set_ids_provided:
+            selected_set_ids = []
+        else:
+            selected_set_ids = list(requirement_set_map.keys())
+
+    errors: List[str] = []
+    if set_ids_provided and not selected_set_ids:
+        errors.append(
+            "At least one valid positive requirement_set_id must be provided."
+        )
+    patient_examination_id = _to_int(payload.patient_examination_id)
+    reported_findings = payload.reported_findings or payload.findings or []
+
+    results: List[Dict[str, Any]] = []
+    seen_set_ids: set[int] = set()
+    for set_id in selected_set_ids:
+        requirement_set = requirement_set_map.get(set_id)
+        if requirement_set is None:
+            errors.append(f"No RequirementSets found for IDs: [{set_id}]")
+            continue
+
+        template_name = str(requirement_set.get("template_name") or requirement_set["name"])
+        try:
+            runtime = kb.evaluate_report_template_validators(
+                template_name, reported_findings=reported_findings
+            )
+        except Exception as exc:
+            errors.append(
+                f"Requirement evaluation failed for set {set_id} ('{template_name}'): {exc}"
+            )
+            continue
+
+        seen_set_ids.add(set_id)
+        findings_results = runtime.get("findings_validators") or []
+        examination_results = runtime.get("examination_validators") or []
+        for validator_result in [*findings_results, *examination_results]:
+            if not isinstance(validator_result, dict):
+                continue
+            requirement_name = str(validator_result.get("name") or "unknown_validator")
+            met = bool(validator_result.get("ok"))
+            detail = _validator_details(validator_result)
+
+            results.append(
+                {
+                    "requirement_set_id": set_id,
+                    "requirement_set_name": str(requirement_set["name"]),
+                    "requirement_name": requirement_name,
+                    "met": met,
+                    "details": detail,
+                    "validator_result": validator_result,
+                    "error": None,
+                    "status": "PASSED" if met else "FAILED",
+                }
+            )
+
+    if errors and results:
+        status_label = "partial"
+    elif errors:
+        status_label = "failed"
+    else:
+        status_label = "ok"
+
+    return {
+        "ok": not errors,
+        "errors": errors,
+        "meta": {
+            "patient_examination_id": patient_examination_id,
+            "module_name": module_name,
+            "sets_evaluated": len(seen_set_ids),
+            "requirements_evaluated": len(results),
+            "status": status_label,
+        },
+        "results": results,
+    }
 
 
 @api.get("/examinations/{examination_id}/findings/")

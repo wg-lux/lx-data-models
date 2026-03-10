@@ -5,6 +5,7 @@ description: |
 version: 0.1.0
 modules:
   - lx_units
+  - lx_classification_choices
 
 data:
   files:
