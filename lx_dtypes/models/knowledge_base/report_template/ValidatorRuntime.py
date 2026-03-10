@@ -78,7 +78,7 @@ def _normalize_identifier(value: Any) -> str:
     if value is None:
         return ""
     if isinstance(value, str):
-        return value.strip()
+        return value.strip().lower().replace("-", "_").replace(" ", "_")
     if isinstance(value, (int, float, bool)):
         return str(value)
     if isinstance(value, Mapping):
@@ -88,7 +88,7 @@ def _normalize_identifier(value: Any) -> str:
                 if token:
                     return token
         return ""
-    return str(value).strip()
+    return str(value).strip().lower().replace("-", "_").replace(" ", "_")
 
 
 def _extract_classification_value(payload: Mapping[str, Any]) -> Any:
@@ -129,6 +129,10 @@ def _normalize_classifications(raw: Any) -> Dict[str, List[Any]]:
 
     if isinstance(raw, Mapping):
         for class_name, class_value in raw.items():
+            if isinstance(class_value, Mapping):
+                extracted_value = _extract_classification_value(class_value)
+                if extracted_value is not None:
+                    class_value = extracted_value
             _add_classification_value(normalized, class_name, class_value)
         return normalized
 

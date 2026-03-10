@@ -106,6 +106,60 @@ def test_evaluate_findings_validator_conditional_requires_then_classifications()
     assert passing_result["triggered_occurrences"] == 1
 
 
+def test_evaluate_findings_validator_normalizes_runtime_identifiers_and_mapping_payloads() -> None:
+    conditional_validator = FindingsValidator.model_validate(
+        {
+            "name": "polyp_has_lst_if_large",
+            "finding": "Esophagus Polyp",
+            "operator": "condition",
+            "query": {
+                "finding": "esophagus-polyp",
+                "operator": "condition",
+                "condition": {
+                    "all": [
+                        {
+                            "classification": "Size Mm",
+                            "comparator": ">",
+                            "value": 10,
+                        }
+                    ],
+                    "then_requires": [{"classification": "LST"}],
+                },
+            },
+        }
+    )
+
+    passing_payload = [
+        {
+            "finding": "esophagus-polyp",
+            "classifications": {
+                "size mm": {"value": 12},
+                "lst": {"value": "present"},
+            },
+        }
+    ]
+    failing_payload = [
+        {
+            "finding": "Esophagus Polyp",
+            "classifications": {
+                "size-mm": {"classification_choice": 12},
+            },
+        }
+    ]
+
+    passing_result = evaluate_findings_validator_runtime(
+        conditional_validator, reported_findings=passing_payload
+    )
+    failing_result = evaluate_findings_validator_runtime(
+        conditional_validator, reported_findings=failing_payload
+    )
+
+    assert passing_result["ok"] is True
+    assert passing_result["triggered_occurrences"] == 1
+    assert failing_result["ok"] is False
+    assert failing_result["missing_required_classifications"] == ["lst"]
+
+
 def test_runtime_engine_evaluates_template_with_exam_dependencies() -> None:
     template = ReportTemplate.model_validate(
         {

@@ -109,21 +109,19 @@ Recommendation:
 
 Canonical operators:
 - `exists`
-- `present`
-- `not_exists`
-- `absent`
 - `missing`
-- `condition`
+- `conditional`
 
 Canonical comparators:
 - `eq`, `ne`
 - `gt`, `gte`
 - `lt`, `lte`
 - `in`
-- `exists`, `present`
+- `not_in`
 
-Deprecated aliases are still accepted with a warning:
-- comparator symbols like `>`, `<`, `==`, `!=` -> canonical forms
+YAML rule:
+- Use only the canonical values above in committed knowledge-base YAML.
+- Deprecated aliases may still be accepted at direct model-parse time for backward compatibility, but they must not appear in persisted terminology or report-template files.
 
 ## Quick Validation Checklist
 

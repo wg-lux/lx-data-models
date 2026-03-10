@@ -1,13 +1,14 @@
 from collections.abc import Mapping
 from typing import Any, List
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from lx_dtypes.factories import str_unknown_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
 )
 from lx_dtypes.models.knowledge_base.report_template.common import (
+    DeprecatedReportTemplateValueWarning,
     FindingsValidatorComparatorLiteral,
     FindingsValidatorConditionDataDict,
     FindingsValidatorOperatorLiteral,
@@ -31,6 +32,58 @@ SUPPORTED_FINDINGS_VALIDATOR_COMPARATORS: tuple[FindingsValidatorComparatorLiter
     "in",
     "not_in",
 )
+DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES: dict[str, FindingsValidatorOperatorLiteral] = {
+    "present": "exists",
+    "absent": "missing",
+    "not_exists": "missing",
+    "not-exists": "missing",
+    "not exists": "missing",
+    "condition": "conditional",
+    "if": "conditional",
+}
+DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES: dict[
+    str, FindingsValidatorComparatorLiteral
+] = {
+    "==": "eq",
+    "!=": "ne",
+    ">": "gt",
+    ">=": "gte",
+    "<": "lt",
+    "<=": "lte",
+}
+
+
+def _normalize_identifier(value: Any) -> str:
+    return str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
+
+
+def _normalize_value_with_alias(
+    raw_value: Any,
+    *,
+    field_name: str,
+    valid_values: tuple[str, ...],
+    deprecated_aliases: dict[str, str],
+) -> str:
+    normalized = _normalize_identifier(raw_value)
+    if not normalized:
+        raise ValueError(f"{field_name} cannot be empty.")
+    if normalized in valid_values:
+        return normalized
+    if normalized in deprecated_aliases:
+        canonical = deprecated_aliases[normalized]
+        import warnings
+
+        warnings.warn(
+            (
+                f"Deprecated {field_name} alias '{raw_value}' detected; "
+                f"use '{canonical}' instead."
+            ),
+            DeprecatedReportTemplateValueWarning,
+            stacklevel=3,
+        )
+        return canonical
+    allowed = ", ".join(valid_values)
+    raise ValueError(f"Unsupported {field_name} '{raw_value}'. Allowed: {allowed}")
 
 
 class FindingsValidatorConditionClause(BaseModel):
@@ -40,6 +93,21 @@ class FindingsValidatorConditionClause(BaseModel):
     comparator: FindingsValidatorComparatorLiteral = "eq"
     value: Any = None
     values: list[Any] | None = None
+
+    @field_validator("classification", mode="before")
+    @classmethod
+    def normalize_classification(cls, value: Any) -> str:
+        return _normalize_identifier(value)
+
+    @field_validator("comparator", mode="before")
+    @classmethod
+    def normalize_comparator(cls, value: Any) -> str:
+        return _normalize_value_with_alias(
+            value,
+            field_name="findings_validator.comparator",
+            valid_values=SUPPORTED_FINDINGS_VALIDATOR_COMPARATORS,
+            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
+        )
 
     @model_validator(mode="after")
     def validate_comparator_payload(self) -> "FindingsValidatorConditionClause":
@@ -61,12 +129,25 @@ class FindingsValidatorConditionClause(BaseModel):
         return self
 
 
+class FindingsValidatorRequiredClassification(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    classification: str
+
+    @field_validator("classification", mode="before")
+    @classmethod
+    def normalize_classification(cls, value: Any) -> str:
+        return _normalize_identifier(value)
+
+
 class FindingsValidatorCondition(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     any: list[FindingsValidatorConditionClause] = Field(default_factory=list)
     all: list[FindingsValidatorConditionClause] = Field(default_factory=list)
-    then_requires: list[dict[str, Any]] = Field(default_factory=list)
+    then_requires: list[FindingsValidatorRequiredClassification] = Field(
+        default_factory=list
+    )
 
     @model_validator(mode="after")
     def validate_branches(self) -> "FindingsValidatorCondition":
@@ -86,6 +167,23 @@ class FindingsValidatorQuery(BaseModel):
     operator: FindingsValidatorOperatorLiteral = "exists"
     params: dict[str, Any] = Field(default_factory=dict)
     condition: FindingsValidatorCondition | None = None
+
+    @field_validator("finding", mode="before")
+    @classmethod
+    def normalize_finding(cls, value: Any) -> str | None:
+        if value is None:
+            return None
+        return _normalize_identifier(value)
+
+    @field_validator("operator", mode="before")
+    @classmethod
+    def normalize_operator(cls, value: Any) -> str:
+        return _normalize_value_with_alias(
+            value,
+            field_name="findings_validator.operator",
+            valid_values=SUPPORTED_FINDINGS_VALIDATOR_OPERATORS,
+            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
+        )
 
     @model_validator(mode="after")
     def validate_operator_semantics(self) -> "FindingsValidatorQuery":
@@ -110,6 +208,21 @@ class FindingsValidator(KnowledgebaseBaseModel[FindingsValidatorDataDict]):
     query: FindingsValidatorQuery = Field(default_factory=FindingsValidatorQuery)
     finding: str = Field(default_factory=str_unknown_factory)
     operator: FindingsValidatorOperatorLiteral = "exists"
+
+    @field_validator("finding", mode="before")
+    @classmethod
+    def normalize_finding(cls, value: Any) -> str:
+        return _normalize_identifier(value)
+
+    @field_validator("operator", mode="before")
+    @classmethod
+    def normalize_operator(cls, value: Any) -> str:
+        return _normalize_value_with_alias(
+            value,
+            field_name="findings_validator.operator",
+            valid_values=SUPPORTED_FINDINGS_VALIDATOR_OPERATORS,
+            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
+        )
 
     @model_validator(mode="before")
     @classmethod

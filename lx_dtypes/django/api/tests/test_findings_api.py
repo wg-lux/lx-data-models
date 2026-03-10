@@ -4,6 +4,8 @@ from datetime import date
 import pytest
 from django.test import Client
 
+pytest.importorskip("endoreg_db")
+
 from endoreg_db.models import (
     Center,
     Examination,

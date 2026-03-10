@@ -60,6 +60,7 @@ FieldNames = Enum(
         "EXAMINATIONS": "examinations",
         "INTERVENTION": "intervention",
         "INTERVENTIONS": "interventions",
+        "CAUSED_BY_INTERVENTIONS": "caused_by_interventions",
         "INTERVENTION_TYPES": "intervention_types",
         "INFORMATION_SOURCES": "information_sources",
         "INFORMATION_SOURCE_TYPES": "information_source_types",
@@ -303,6 +304,7 @@ FINDING_M2M_FIELDS: List[str] = [
     FieldNames.FINDING_TYPES.value,
     FieldNames.CLASSIFICATIONS.value,
     FieldNames.INTERVENTIONS.value,
+    FieldNames.CAUSED_BY_INTERVENTIONS.value,
 ]
 FINDING_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(m2m_fields=FINDING_M2M_FIELDS)
 

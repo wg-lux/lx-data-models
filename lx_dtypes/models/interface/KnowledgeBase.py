@@ -52,6 +52,8 @@ from lx_dtypes.models.knowledge_base.examination.ExaminationType import Examinat
 from lx_dtypes.models.knowledge_base.examination.ExaminationTypeDataDict import (
     ExaminationTypeDataDict,
 )
+from lx_dtypes.models.knowledge_base.gender.Gender import Gender
+from lx_dtypes.models.knowledge_base.gender.GenderDataDict import GenderDataDict
 from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.finding._FindingType import FindingType
 from lx_dtypes.models.knowledge_base.finding.FindingDataDict import FindingDataDict
@@ -143,6 +145,7 @@ class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
     classification_choice_descriptor: Dict[str, ClassificationChoiceDescriptorDataDict]
     examination: Dict[str, ExaminationDataDict]
     examination_type: Dict[str, ExaminationTypeDataDict]
+    gender: Dict[str, GenderDataDict]
     finding: Dict[str, FindingDataDict]
     finding_type: Dict[str, FindingTypeDataDict]
     indication: Dict[str, IndicationDataDict]
@@ -173,6 +176,7 @@ class KnowledgeBaseRecordList(TypedDict):
     classification_choice_descriptors: List[ClassificationChoiceDescriptorDataDict]
     examinations: List[ExaminationDataDict]
     examination_types: List[ExaminationTypeDataDict]
+    genders: List[GenderDataDict]
     findings: List[FindingDataDict]
     finding_types: List[FindingTypeDataDict]
     indications: List[IndicationDataDict]
@@ -201,6 +205,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     )
     examination: Dict[str, Examination] = Field(default_factory=dict)
     examination_type: Dict[str, ExaminationType] = Field(default_factory=dict)
+    gender: Dict[str, Gender] = Field(default_factory=dict)
     finding: Dict[str, Finding] = Field(default_factory=dict)
     finding_type: Dict[str, FindingType] = Field(default_factory=dict)
     indication: Dict[str, Indication] = Field(default_factory=dict)
@@ -734,6 +739,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         ]
         examination_records = [r.ddict for r in self.examination.values()]
         examination_type_records = [r.ddict for r in self.examination_type.values()]
+        gender_records = [r.ddict for r in self.gender.values()]
         finding_records = [r.ddict for r in self.finding.values()]
         finding_type_records = [r.ddict for r in self.finding_type.values()]
         indication_records = [r.ddict for r in self.indication.values()]
@@ -764,6 +770,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             classification_choice_descriptors=classification_choice_descriptor_records,
             examinations=examination_records,
             examination_types=examination_type_records,
+            genders=gender_records,
             findings=finding_records,
             finding_types=finding_type_records,
             indications=indication_records,

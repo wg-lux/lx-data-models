@@ -114,7 +114,8 @@ def test_findings_validator_conditional_accepts_condition_clauses() -> None:
     assert validator.query.condition is not None
     assert len(validator.query.condition.any) == 2
     assert validator.query.condition.any[0].comparator == "gt"
-    assert validator.query.condition.then_requires == [{"classification": "lst"}]
+    assert len(validator.query.condition.then_requires) == 1
+    assert validator.query.condition.then_requires[0].classification == "lst"
 
 
 def test_findings_validator_rejects_condition_for_non_conditional_operators() -> None:

@@ -2,3 +2,6 @@ name: gender_data
 description: Gender utility data.
 version: 0.1.0
 modules: []
+data:
+  files:
+    - ./default.yaml

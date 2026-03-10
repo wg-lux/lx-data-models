@@ -59,6 +59,9 @@ def finding_fixture(
         interventions=[
             intervention_fixture.name,
         ],
+        caused_by_interventions=[
+            intervention_fixture.name,
+        ],
         finding_types=[finding_type_fixture.name],
     )
 

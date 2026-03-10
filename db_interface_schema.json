@@ -1413,6 +1413,20 @@
             }
           ],
           "title": "Interventions"
+        },
+        "caused_by_interventions": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Caused By Interventions"
         }
       },
       "required": [
@@ -1563,9 +1577,7 @@
           "type": "string"
         },
         "query": {
-          "additionalProperties": true,
-          "title": "Query",
-          "type": "object"
+          "$ref": "#/$defs/FindingsValidatorQuery"
         },
         "finding": {
           "title": "Finding",
@@ -1573,6 +1585,11 @@
         },
         "operator": {
           "default": "exists",
+          "enum": [
+            "exists",
+            "missing",
+            "conditional"
+          ],
           "title": "Operator",
           "type": "string"
         }
@@ -1581,6 +1598,225 @@
         "name"
       ],
       "title": "FindingsValidator",
+      "type": "object"
+    },
+    "FindingsValidatorCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "any": {
+          "items": {
+            "$ref": "#/$defs/FindingsValidatorConditionClause"
+          },
+          "title": "Any",
+          "type": "array"
+        },
+        "all": {
+          "items": {
+            "$ref": "#/$defs/FindingsValidatorConditionClause"
+          },
+          "title": "All",
+          "type": "array"
+        },
+        "then_requires": {
+          "items": {
+            "$ref": "#/$defs/FindingsValidatorRequiredClassification"
+          },
+          "title": "Then Requires",
+          "type": "array"
+        }
+      },
+      "title": "FindingsValidatorCondition",
+      "type": "object"
+    },
+    "FindingsValidatorConditionClause": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "title": "Classification",
+          "type": "string"
+        },
+        "comparator": {
+          "default": "eq",
+          "enum": [
+            "eq",
+            "ne",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "in",
+            "not_in"
+          ],
+          "title": "Comparator",
+          "type": "string"
+        },
+        "value": {
+          "default": null,
+          "title": "Value"
+        },
+        "values": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Values"
+        }
+      },
+      "required": [
+        "classification"
+      ],
+      "title": "FindingsValidatorConditionClause",
+      "type": "object"
+    },
+    "FindingsValidatorQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "finding": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finding"
+        },
+        "operator": {
+          "default": "exists",
+          "enum": [
+            "exists",
+            "missing",
+            "conditional"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": true,
+          "title": "Params",
+          "type": "object"
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FindingsValidatorCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "FindingsValidatorQuery",
+      "type": "object"
+    },
+    "FindingsValidatorRequiredClassification": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "title": "Classification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "classification"
+      ],
+      "title": "FindingsValidatorRequiredClassification",
+      "type": "object"
+    },
+    "Gender": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "abbreviation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Abbreviation"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Gender",
       "type": "object"
     },
     "Indication": {
@@ -2180,6 +2416,13 @@
             "$ref": "#/$defs/ExaminationType"
           },
           "title": "Examination Type",
+          "type": "object"
+        },
+        "gender": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Gender"
+          },
+          "title": "Gender",
           "type": "object"
         },
         "finding": {
@@ -4410,11 +4653,18 @@
           "title": "Abbreviation"
         },
         "unit_types": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Unit Types",
-          "type": "array"
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Unit Types"
         }
       },
       "required": [

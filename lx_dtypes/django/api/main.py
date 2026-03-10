@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Set
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Set, cast
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
@@ -11,20 +13,44 @@ from ninja import NinjaAPI, Schema
 from ninja.errors import HttpError
 from pydantic import Field
 
-from endoreg_db.models import (
-    Examination,
-    Finding,
-    FindingClassification,
-    FindingClassificationChoice,
-    PatientExamination,
-    PatientFinding,
-    PatientFindingClassification,
-)
 from lx_dtypes.models.interface.DataLoader import DataLoader
 
 from .request_types import BaseRequest
 
 api = NinjaAPI()
+
+if TYPE_CHECKING:
+    from endoreg_db.models import (
+        Examination,
+        Finding,
+        FindingClassification,
+        FindingClassificationChoice,
+        PatientExamination,
+        PatientFinding,
+        PatientFindingClassification,
+    )
+
+try:
+    from endoreg_db.models import (
+        Examination,
+        Finding,
+        FindingClassification,
+        FindingClassificationChoice,
+        PatientExamination,
+        PatientFinding,
+        PatientFindingClassification,
+    )
+
+    ENDOREG_DB_AVAILABLE = True
+except ModuleNotFoundError:
+    ENDOREG_DB_AVAILABLE = False
+    Examination = cast(Any, None)
+    Finding = cast(Any, None)
+    FindingClassification = cast(Any, None)
+    FindingClassificationChoice = cast(Any, None)
+    PatientExamination = cast(Any, None)
+    PatientFinding = cast(Any, None)
+    PatientFindingClassification = cast(Any, None)
 
 class StructuredApiError(Exception):
     def __init__(self, status_code: int, code: str, message: str):
@@ -128,6 +154,7 @@ def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
 
 
 def _active_patient_findings_queryset() -> QuerySet[PatientFinding]:
+    _require_endoreg_db()
     return PatientFinding.objects.filter(is_active=True).select_related(
         "patient_examination", "finding"
     )
@@ -294,6 +321,15 @@ def _resolve_kb_classification_choice_names(
 
 def _api_error(status: int, code: str, message: str) -> None:
     raise StructuredApiError(status, code, message)
+
+
+def _require_endoreg_db() -> None:
+    if not ENDOREG_DB_AVAILABLE:
+        _api_error(
+            503,
+            "dependency-missing",
+            "The optional dependency 'endoreg_db' is required for findings API routes.",
+        )
 
 
 def _validate_finding_for_examination(
@@ -479,6 +515,7 @@ def core_concepts_by_module(request: BaseRequest, module_name: str) -> Dict[str,
 def findings_by_examination(
     request: BaseRequest, examination_id: int
 ) -> List[Dict[str, Any]]:
+    _require_endoreg_db()
     module_name = _findings_module_name()
     examination = Examination.objects.filter(id=examination_id).first()
     if not examination:
@@ -515,6 +552,7 @@ def findings_by_examination(
 def classifications_by_finding(
     request: BaseRequest, finding_id: int
 ) -> List[Dict[str, Any]]:
+    _require_endoreg_db()
     module_name = _findings_module_name()
     finding = Finding.objects.filter(id=finding_id).first()
     if not finding:
@@ -536,6 +574,7 @@ def classifications_by_finding(
 def choices_by_classification(
     request: BaseRequest, classification_id: int
 ) -> Dict[str, Any]:
+    _require_endoreg_db()
     module_name = _findings_module_name()
     classification = FindingClassification.objects.filter(id=classification_id).first()
     if not classification:
@@ -567,6 +606,7 @@ def list_patient_findings(
 def create_patient_finding(
     request: BaseRequest, payload: PatientFindingCreateRequest
 ) -> Dict[str, Any]:
+    _require_endoreg_db()
     module_name = _findings_module_name()
     patient_examination = PatientExamination.objects.filter(
         id=payload.patient_examination
@@ -630,6 +670,7 @@ def create_patient_finding(
 def patch_patient_finding(
     request: BaseRequest, patient_finding_id: int, payload: PatientFindingUpdateRequest
 ) -> Dict[str, Any]:
+    _require_endoreg_db()
     module_name = _findings_module_name()
     patient_finding = _active_patient_findings_queryset().filter(id=patient_finding_id).first()
     if not patient_finding:
@@ -678,6 +719,7 @@ def patch_patient_finding(
 def delete_patient_finding(
     request: BaseRequest, patient_finding_id: int
 ) -> Dict[str, Any]:
+    _require_endoreg_db()
     patient_finding = _active_patient_findings_queryset().filter(id=patient_finding_id).first()
     if not patient_finding:
         _api_error(404, "not-found", f"Patient finding '{patient_finding_id}' not found.")
@@ -699,6 +741,7 @@ def set_patient_finding_classifications(
     patient_finding_id: int,
     payload: PatientFindingClassificationsRequest,
 ) -> Dict[str, Any]:
+    _require_endoreg_db()
     module_name = _findings_module_name()
     patient_finding = _active_patient_findings_queryset().filter(id=patient_finding_id).first()
     if not patient_finding:

@@ -73,30 +73,31 @@ def test_examination_validator_accepts_string_fields_via_list_coercion() -> None
 
 
 def test_findings_validator_query_supports_condition_shape() -> None:
-    fv = FindingsValidator.model_validate(
-        {
-            "name": "polyp_has_lst_if_large",
-            "finding": "esophagus_polyp",
-            "operator": "condition",
-            "query": {
+    with pytest.warns(DeprecatedReportTemplateValueWarning, match="condition"):
+        fv = FindingsValidator.model_validate(
+            {
+                "name": "polyp_has_lst_if_large",
                 "finding": "esophagus_polyp",
                 "operator": "condition",
-                "condition": {
-                    "any": [
-                        {
-                            "classification": "size_mm",
-                            "comparator": "gt",
-                            "value": 10,
-                        }
-                    ],
-                    "then_requires": [{"classification": "lst"}],
+                "query": {
+                    "finding": "esophagus_polyp",
+                    "operator": "condition",
+                    "condition": {
+                        "any": [
+                            {
+                                "classification": "size_mm",
+                                "comparator": "gt",
+                                "value": 10,
+                            }
+                        ],
+                        "then_requires": [{"classification": "lst"}],
+                    },
                 },
-            },
-        }
-    )
+            }
+        )
 
     assert fv.query.finding == "esophagus_polyp"
-    assert fv.query.operator == "condition"
+    assert fv.query.operator == "conditional"
     condition = fv.query.condition
     assert condition is not None
     assert condition.any[0].classification == "size_mm"

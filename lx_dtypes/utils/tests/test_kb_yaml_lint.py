@@ -82,6 +82,44 @@ def test_linter_flags_alias_and_mixed_style(tmp_path: Path) -> None:
     assert alias_issue.severity == "error"
 
 
+def test_linter_rejects_deprecated_findings_validator_identifiers(tmp_path: Path) -> None:
+    data_file = tmp_path / "report_templates.yaml"
+    data_file.write_text(
+        (
+            "- model: findings_validator\n"
+            "  name: legacy_validator\n"
+            "  finding: finding_a\n"
+            "  operator: condition\n"
+            "  query:\n"
+            "    finding: finding_a\n"
+            "    operator: present\n"
+            "    condition:\n"
+            "      all:\n"
+            "        - classification: size_mm\n"
+            "          comparator: '>'\n"
+            "          value: 10\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+    operator_issues = [
+        issue for issue in issues if issue.code == "deprecated_findings_validator_operator"
+    ]
+    comparator_issues = [
+        issue
+        for issue in issues
+        if issue.code == "deprecated_findings_validator_comparator"
+    ]
+
+    assert len(operator_issues) == 2
+    assert all(issue.severity == "error" for issue in operator_issues)
+    assert len(comparator_issues) == 1
+    assert comparator_issues[0].severity == "error"
+    assert "conditional" in operator_issues[0].message or "exists" in operator_issues[0].message
+    assert "gt" in comparator_issues[0].message
+
+
 def test_discover_yaml_files_expands_module_config(tmp_path: Path) -> None:
     module_dir = tmp_path / "module"
     data_dir = module_dir / "data"
@@ -106,3 +144,38 @@ def test_discover_yaml_files_expands_module_config(tmp_path: Path) -> None:
     files, issues = discover_yaml_files(paths=[], config_paths=[config_file])
     assert issues == []
     assert files == [target_file.resolve()]
+
+
+def test_linter_scopes_duplicate_names_by_nearest_config(tmp_path: Path) -> None:
+    module_a = tmp_path / "module_a"
+    module_b = tmp_path / "module_b"
+    (module_a / "data").mkdir(parents=True)
+    (module_b / "data").mkdir(parents=True)
+    (module_a / "config.yaml").write_text("name: a\ndata:\n  dirs:\n    - ./data\n", encoding="utf-8")
+    (module_b / "config.yaml").write_text("name: b\ndata:\n  dirs:\n    - ./data\n", encoding="utf-8")
+    (module_a / "data" / "units.yaml").write_text("- model: unit\n  name: percent\n", encoding="utf-8")
+    (module_b / "data" / "units.yaml").write_text("- model: unit\n  name: percent\n", encoding="utf-8")
+
+    issues = lint_kb_yaml_files(
+        [module_a / "data" / "units.yaml", module_b / "data" / "units.yaml"]
+    )
+
+    assert [issue for issue in issues if issue.code == "duplicate_name"] == []
+
+
+def test_parser_supports_gender_model(tmp_path: Path) -> None:
+    data_file = tmp_path / "gender.yaml"
+    data_file.write_text(
+        (
+            "- model: gender\n"
+            "  name: male\n"
+            "  abbreviation: M\n"
+            "  description: Male\n"
+        ),
+        encoding="utf-8",
+    )
+
+    parsed = parse_shallow_object_with_meta(data_file, kb_module_name="demo")
+    assert len(parsed) == 1
+    assert parsed[0].model_name == "gender"
+    assert parsed[0].parsed_object.name == "male"

@@ -7,6 +7,7 @@ into pytest runs.
 
 from __future__ import annotations
 
+import importlib.util
 import os
 import tempfile
 from pathlib import Path
@@ -26,9 +27,10 @@ except Exception:  # pragma: no cover - fallback for standalone lx-data-models u
         "django.contrib.sessions",
         "django.contrib.messages",
         "django.contrib.staticfiles",
-        "endoreg_db",
         "rest_framework",
     ]
+    if importlib.util.find_spec("endoreg_db") is not None:
+        required_apps.append("endoreg_db")
 
     for app in required_apps:
         if app not in INSTALLED_APPS:
@@ -58,7 +60,10 @@ INSTALLED_APPS = list(INSTALLED_APPS)  # type: ignore[name-defined]
 if "lx_dtypes.django.apps.LxDtypesDjangoConfig" not in INSTALLED_APPS:
     INSTALLED_APPS.append("lx_dtypes.django.apps.LxDtypesDjangoConfig")
 
-if "endoreg_db" not in INSTALLED_APPS:
+if (
+    importlib.util.find_spec("endoreg_db") is not None
+    and "endoreg_db" not in INSTALLED_APPS
+):
     INSTALLED_APPS.append("endoreg_db")
 
 ROOT_URLCONF = "lx_dtypes.django.urls"

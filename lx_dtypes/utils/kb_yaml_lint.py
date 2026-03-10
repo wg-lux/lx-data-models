@@ -6,6 +6,11 @@ from typing import Any, Dict, Iterable, Literal, Sequence
 
 import yaml
 
+from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
+    DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
+    DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
+)
+
 LintSeverity = Literal["error", "warning"]
 
 MODEL_NAME_ALIASES: dict[str, str] = {
@@ -20,6 +25,7 @@ KNOWN_MODEL_NAMES: set[str] = {
     "classification_choice_descriptor",
     "examination",
     "examination_type",
+    "gender",
     "finding",
     "finding_type",
     "indication",
@@ -65,6 +71,7 @@ class _YamlItem:
     file: Path
     line: int
     column: int
+    scope: Path
 
 
 @dataclass(frozen=True)
@@ -72,6 +79,86 @@ class _DefinitionLocation:
     file: Path
     line: int
     column: int
+
+
+def _scope_for_yaml_file(file_path: Path) -> Path:
+    resolved = file_path.resolve()
+    for parent in resolved.parents:
+        if (parent / "config.yaml").exists():
+            return parent
+    return resolved.parent
+
+
+def _iter_deprecated_findings_validator_issues(
+    item: _YamlItem,
+) -> Iterable[KbYamlLintIssue]:
+    payload = item.payload
+    top_level_operator = payload.get("operator")
+    if isinstance(top_level_operator, str):
+        normalized = top_level_operator.strip().lower()
+        if normalized in DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES:
+            canonical = DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES[normalized]
+            yield _issue(
+                code="deprecated_findings_validator_operator",
+                severity="error",
+                file=item.file,
+                line=item.line,
+                column=item.column,
+                message=(
+                    f"Deprecated findings-validator operator '{top_level_operator}' "
+                    f"used in YAML; use canonical operator '{canonical}'."
+                ),
+            )
+
+    query = payload.get("query")
+    if isinstance(query, dict):
+        query_operator = query.get("operator")
+        if isinstance(query_operator, str):
+            normalized = query_operator.strip().lower()
+            if normalized in DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES:
+                canonical = DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES[normalized]
+                yield _issue(
+                    code="deprecated_findings_validator_operator",
+                    severity="error",
+                    file=item.file,
+                    line=item.line,
+                    column=item.column,
+                    message=(
+                        f"Deprecated findings-validator query.operator "
+                        f"'{query_operator}' used in YAML; use canonical operator "
+                        f"'{canonical}'."
+                    ),
+                )
+
+        condition = query.get("condition")
+        if isinstance(condition, dict):
+            for branch_name in ("any", "all"):
+                branch = condition.get(branch_name)
+                if not isinstance(branch, list):
+                    continue
+                for clause in branch:
+                    if not isinstance(clause, dict):
+                        continue
+                    comparator = clause.get("comparator")
+                    if not isinstance(comparator, str):
+                        continue
+                    normalized = comparator.strip().lower()
+                    if normalized not in DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES:
+                        continue
+                    canonical = DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES[
+                        normalized
+                    ]
+                    yield _issue(
+                        code="deprecated_findings_validator_comparator",
+                        severity="error",
+                        file=item.file,
+                        line=item.line,
+                        column=item.column,
+                        message=(
+                            f"Deprecated findings-validator comparator '{comparator}' "
+                            f"used in YAML; use canonical comparator '{canonical}'."
+                        ),
+                    )
 
 
 def _issue(
@@ -333,6 +420,7 @@ def _load_yaml_items(file_path: Path) -> tuple[list[_YamlItem], list[KbYamlLintI
         return [], issues
 
     items: list[_YamlItem] = []
+    scope = _scope_for_yaml_file(file_path)
     for idx, raw_item in enumerate(loaded):
         node = composed.value[idx] if idx < len(composed.value) else None
         line = int(node.start_mark.line) + 1 if node is not None else 1
@@ -355,6 +443,7 @@ def _load_yaml_items(file_path: Path) -> tuple[list[_YamlItem], list[KbYamlLintI
                 file=file_path,
                 line=line,
                 column=column,
+                scope=scope,
             )
         )
     return items, issues
@@ -367,7 +456,7 @@ def lint_kb_yaml_files(
     strict_mixed_styles: bool = False,
 ) -> list[KbYamlLintIssue]:
     issues: list[KbYamlLintIssue] = []
-    definitions: dict[tuple[str, str], _DefinitionLocation] = {}
+    definitions: dict[tuple[Path, str, str], _DefinitionLocation] = {}
 
     for file_path in sorted(set(path.resolve() for path in yaml_files)):
         if not file_path.exists():
@@ -444,7 +533,7 @@ def lint_kb_yaml_files(
                 )
                 continue
 
-            definition_key = (model_name, name.strip())
+            definition_key = (item.scope, model_name, name.strip())
             existing = definitions.get(definition_key)
             if existing is not None:
                 issues.append(
@@ -467,6 +556,9 @@ def lint_kb_yaml_files(
                     line=item.line,
                     column=item.column,
                 )
+
+            if model_name == "findings_validator":
+                issues.extend(_iter_deprecated_findings_validator_issues(item))
 
             if model_name != "report_template_section":
                 continue
