@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING
-
 from django.db import models
 
 from lx_dtypes.models.base.app_base_model.django.KnowledgebaseBaseModelDjango import (
@@ -10,12 +8,6 @@ from lx_dtypes.names import CLASSIFICATION_CHOICE_MODEL_LIST_TYPE_FIELDS, FieldN
 from .ClassificationChoiceDataDict import (
     ClassificationChoiceDataDict,
 )
-
-if TYPE_CHECKING:
-    from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptorDjango import (
-        ClassificationChoiceDescriptorDjango,
-    )
-
 
 class ClassificationChoiceDjango(
     KnowledgebaseBaseModelDjango[ClassificationChoiceDataDict]

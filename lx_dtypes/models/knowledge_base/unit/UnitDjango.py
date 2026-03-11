@@ -11,8 +11,8 @@ from lx_dtypes.models.knowledge_base.unit.UnitDataDict import (
 from lx_dtypes.names import UNIT_MODEL_LIST_TYPE_FIELDS, FieldNames
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.knowledge_base.unit.UnitTypeDjango import (
-        UnitTypeDjango,
+    from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptorDjango import (
+        ClassificationChoiceDescriptorDjango,
     )
 
 from lx_dtypes.utils.django_field_types import CharFieldType
@@ -25,10 +25,6 @@ class UnitDjango(KnowledgebaseBaseModelDjango[UnitDataDict]):
     abbreviation: CharFieldType = models.CharField(max_length=50)
 
     if TYPE_CHECKING:
-        from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptorDjango import (
-            ClassificationChoiceDescriptorDjango,
-        )
-
         classification_choice_descriptors: models.QuerySet[
             "ClassificationChoiceDescriptorDjango"
         ]

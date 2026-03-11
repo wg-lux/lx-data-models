@@ -13,6 +13,8 @@ from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, cast
 
+INSTALLED_APPS: list[str] = []
+
 try:
     # Preferred in the monorepo: tested baseline with in-memory SQLite
     from lx_annotate.settings.settings_test import *  # type: ignore # noqa: F401,F403

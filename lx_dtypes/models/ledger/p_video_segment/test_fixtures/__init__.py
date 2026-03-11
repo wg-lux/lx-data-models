@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from lx_dtypes.models.ledger.p_video import (
