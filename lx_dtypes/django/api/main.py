@@ -17,7 +17,7 @@ from lx_dtypes.models.interface.DataLoader import DataLoader
 
 from .request_types import BaseRequest
 
-api = NinjaAPI()
+api = NinjaAPI(urls_namespace="lx_dtypes_base_api")
 DEFAULT_REQUIREMENT_MODULE = "report_template_examples"
 
 if TYPE_CHECKING:
