@@ -120,7 +120,7 @@ from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     ReportTemplateRuntimeValidationResultDataDict,
     evaluate_report_template_validators_runtime,
 )
-from lx_dtypes.models.knowledge_base.report_template.common import (
+from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
     ReportTemplateFindingRequirement,
 )
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit

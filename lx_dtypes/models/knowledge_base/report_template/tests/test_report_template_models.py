@@ -3,6 +3,13 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
+from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
+    DeprecatedReportTemplateValueWarning,
+)
+from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
+    ReportTemplateClassificationRequirement,
+    ReportTemplateFindingRequirement,
+)
 from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
     ExaminationValidator,
 )
@@ -10,18 +17,13 @@ from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
     FindingsValidator,
 )
 from lx_dtypes.models.knowledge_base.report_template.ReportFinding import ReportFinding
-from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import ReportTemplate
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
+    ReportTemplate,
+    ReportTemplateValidators,
+)
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSection import (
     ReportTemplateSection,
-)
-from lx_dtypes.models.knowledge_base.report_template.common import (
-    DeprecatedReportTemplateValueWarning,
-)
-from lx_dtypes.models.knowledge_base.report_template.common import (
-    ReportTemplateClassificationRequirement,
-    ReportTemplateFindingRequirement,
     ReportTemplateSectionField,
-    ReportTemplateValidators,
 )
 
 
@@ -97,10 +99,11 @@ def test_findings_validator_query_supports_condition_shape() -> None:
 
     assert fv.query.finding == "esophagus_polyp"
     assert fv.query.operator == "condition"
+    assert fv.operator == "condition"
     condition = fv.query.condition
     assert condition is not None
     assert condition.any[0].classification == "size_mm"
-    assert condition.then_requires[0].classification == "lst"
+    assert condition.then_requires == [{"classification": "lst"}]
 
 
 def test_findings_validator_operator_asd_is_rejected() -> None:
@@ -139,7 +142,32 @@ def test_findings_validator_comparator_alias_normalizes_with_warning() -> None:
         )
 
     assert fv.query.condition is not None
+    assert fv.query.operator == "condition"
     assert fv.query.condition.any[0].comparator == "gt"
+
+
+def test_findings_validator_rejects_legacy_conditional_operator() -> None:
+    with pytest.raises(ValidationError, match="Unsupported findings_validator.operator"):
+        FindingsValidator.model_validate(
+            {
+                "name": "legacy_conditional_alias",
+                "finding": "esophagus_polyp",
+                "operator": "conditional",
+                "query": {
+                    "finding": "esophagus_polyp",
+                    "operator": "conditional",
+                    "condition": {
+                        "any": [
+                            {
+                                "classification": "size_mm",
+                                "comparator": "gt",
+                                "value": 10,
+                            }
+                        ]
+                    },
+                },
+            }
+        )
 
 
 def test_findings_validator_query_rejects_unknown_fields() -> None:

@@ -116,7 +116,7 @@ Current scope:
 - Typed YAML parsing
 - In-memory `KnowledgeBase` storage
 - Frontend JSON export
-- Runtime validator execution for `exists`, `missing`, and `conditional` operators via:
+- Runtime validator execution for `exists`, `missing`, and `condition` operators via:
   - `KnowledgeBase.evaluate_report_template_validators(...)`
   - `POST /base_api/report-templates/{module_name}/{template_name}/validate`
 

@@ -1,19 +1,29 @@
 import json
 from datetime import date
+from importlib import import_module
 
 import pytest
+from django.conf import settings
 from django.test import Client
 
-from endoreg_db.models import (
-    Center,
-    Examination,
-    Finding,
-    FindingClassification,
-    FindingClassificationChoice,
-    Gender,
-    Patient,
-    PatientExamination,
-)
+try:
+    host_models_module = getattr(settings, "LX_DTYPES_HOST_MODELS_MODULE", None)
+    if not host_models_module:
+        raise ModuleNotFoundError
+    host_models = import_module(host_models_module)
+    Center = host_models.Center
+    Examination = host_models.Examination
+    Finding = host_models.Finding
+    FindingClassification = host_models.FindingClassification
+    FindingClassificationChoice = host_models.FindingClassificationChoice
+    Gender = host_models.Gender
+    Patient = host_models.Patient
+    PatientExamination = host_models.PatientExamination
+except (ModuleNotFoundError, RuntimeError, AttributeError):  # pragma: no cover
+    pytest.skip(
+        "Host application models are required for lx_dtypes Django API integration tests.",
+        allow_module_level=True,
+    )
 
 pytestmark = pytest.mark.django_db
 

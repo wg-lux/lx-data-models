@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -31,17 +33,19 @@ if TYPE_CHECKING:
 
 
 class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
-    finding: models.ForeignKey["FindingDjango", "FindingDjango"] = models.ForeignKey(
-        "FindingDjango",
-        related_name=FieldNames.PATIENT_FINDINGS.value,
-        on_delete=models.CASCADE,
+    finding: "models.ForeignKey[FindingDjango, FindingDjango]" = (
+        models.ForeignKey(
+            "FindingDjango",
+            related_name=FieldNames.PATIENT_FINDINGS.value,
+            on_delete=models.CASCADE,
+        )
     )
-    patient_examination: models.ForeignKey[
-        "PExaminationDjango", "PExaminationDjango"
-    ] = models.ForeignKey(
-        "PExaminationDjango",
-        related_name=FieldNames.PATIENT_FINDINGS.value,
-        on_delete=models.CASCADE,
+    patient_examination: "models.ForeignKey[PExaminationDjango, PExaminationDjango]" = (
+        models.ForeignKey(
+            "PExaminationDjango",
+            related_name=FieldNames.PATIENT_FINDINGS.value,
+            on_delete=models.CASCADE,
+        )
     )
 
     if TYPE_CHECKING:

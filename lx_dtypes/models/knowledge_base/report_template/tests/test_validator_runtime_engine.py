@@ -6,7 +6,9 @@ from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
     FindingsValidator,
 )
-from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import ReportTemplate
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
+    ReportTemplate,
+)
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     evaluate_findings_validator_runtime,
     evaluate_report_template_validators_runtime,
@@ -51,10 +53,10 @@ def test_evaluate_findings_validator_conditional_requires_then_classifications()
         {
             "name": "polyp_has_lst_if_large",
             "finding": "esophagus_polyp",
-            "operator": "conditional",
+            "operator": "condition",
             "query": {
                 "finding": "esophagus_polyp",
-                "operator": "conditional",
+                "operator": "condition",
                 "condition": {
                     "all": [
                         {

@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import os
 from functools import lru_cache
+from importlib import import_module
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Set
 
 from django.core.exceptions import ValidationError
+from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.db.models import QuerySet
 from django.utils import timezone
@@ -11,20 +15,38 @@ from ninja import NinjaAPI, Schema
 from ninja.errors import HttpError
 from pydantic import Field
 
-from endoreg_db.models import (
-    Examination,
-    Finding,
-    FindingClassification,
-    FindingClassificationChoice,
-    PatientExamination,
-    PatientFinding,
-    PatientFindingClassification,
-)
 from lx_dtypes.models.interface.DataLoader import DataLoader
 
 from .request_types import BaseRequest
 
 api = NinjaAPI()
+
+
+@lru_cache(maxsize=1)
+def _orm_models():
+    module_path = getattr(settings, "LX_DTYPES_HOST_MODELS_MODULE", None) or os.getenv(
+        "LX_DTYPES_HOST_MODELS_MODULE"
+    )
+    if not module_path:
+        raise RuntimeError(
+            "LX_DTYPES_HOST_MODELS_MODULE must be configured to use lx_dtypes.django.api."
+        )
+
+    host_models = import_module(module_path)
+
+    return {
+        "Examination": getattr(host_models, "Examination"),
+        "Finding": getattr(host_models, "Finding"),
+        "FindingClassification": getattr(host_models, "FindingClassification"),
+        "FindingClassificationChoice": getattr(
+            host_models, "FindingClassificationChoice"
+        ),
+        "PatientExamination": getattr(host_models, "PatientExamination"),
+        "PatientFinding": getattr(host_models, "PatientFinding"),
+        "PatientFindingClassification": getattr(
+            host_models, "PatientFindingClassification"
+        ),
+    }
 
 class StructuredApiError(Exception):
     def __init__(self, status_code: int, code: str, message: str):
@@ -127,8 +149,9 @@ def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
     }
 
 
-def _active_patient_findings_queryset() -> QuerySet[PatientFinding]:
-    return PatientFinding.objects.filter(is_active=True).select_related(
+def _active_patient_findings_queryset() -> QuerySet[Any]:
+    patient_finding_model = _orm_models()["PatientFinding"]
+    return patient_finding_model.objects.filter(is_active=True).select_related(
         "patient_examination", "finding"
     )
 
@@ -140,7 +163,7 @@ def _request_user_if_authenticated(request: BaseRequest) -> Optional[Any]:
     return None
 
 
-def _serialize_choice(choice: FindingClassificationChoice) -> Dict[str, Any]:
+def _serialize_choice(choice: Any) -> Dict[str, Any]:
     return {
         "id": choice.id,
         "name": choice.name,
@@ -151,7 +174,7 @@ def _serialize_choice(choice: FindingClassificationChoice) -> Dict[str, Any]:
 
 
 def _serialize_classification(
-    classification: FindingClassification, *, required: bool = False
+    classification: Any, *, required: bool = False
 ) -> Dict[str, Any]:
     choices = classification.choices.all()
     classification_types = [
@@ -185,7 +208,7 @@ def _split_classifications(
 
 
 def _serialize_finding(
-    finding: Finding,
+    finding: Any,
     *,
     allowed_classification_names: Optional[Set[str]] = None,
     required_classification_names: Optional[Set[str]] = None,
@@ -221,7 +244,7 @@ def _serialize_finding(
 
 
 def _serialize_patient_finding_classification(
-    item: PatientFindingClassification,
+    item: Any,
 ) -> Dict[str, Any]:
     return {
         "id": item.id,
@@ -235,7 +258,7 @@ def _serialize_patient_finding_classification(
     }
 
 
-def _serialize_patient_finding(item: PatientFinding) -> Dict[str, Any]:
+def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
     classifications = item.classifications.filter(is_active=True).select_related(
         "classification", "classification_choice"
     )
@@ -254,7 +277,7 @@ def _serialize_patient_finding(item: PatientFinding) -> Dict[str, Any]:
 
 
 def _resolve_exam_kb_finding_names(
-    examination: Examination, *, module_name: str
+    examination: Any, *, module_name: str
 ) -> Optional[Set[str]]:
     lookup = _kb_lookup(module_name)
     exam_entry = lookup["examination"].get(_norm_name(examination.name))
@@ -267,7 +290,7 @@ def _resolve_exam_kb_finding_names(
 
 
 def _resolve_kb_finding_classification_names(
-    finding: Finding, *, module_name: str
+    finding: Any, *, module_name: str
 ) -> Optional[Set[str]]:
     lookup = _kb_lookup(module_name)
     finding_entry = lookup["finding"].get(_norm_name(finding.name))
@@ -280,7 +303,7 @@ def _resolve_kb_finding_classification_names(
 
 
 def _resolve_kb_classification_choice_names(
-    classification: FindingClassification, *, module_name: str
+    classification: Any, *, module_name: str
 ) -> Optional[Set[str]]:
     lookup = _kb_lookup(module_name)
     classification_entry = lookup["classification"].get(_norm_name(classification.name))
@@ -297,8 +320,8 @@ def _api_error(status: int, code: str, message: str) -> None:
 
 
 def _validate_finding_for_examination(
-    finding: Finding,
-    patient_examination: PatientExamination,
+    finding: Any,
+    patient_examination: Any,
     *,
     module_name: str,
 ) -> None:
@@ -323,9 +346,9 @@ def _validate_finding_for_examination(
 
 def _validate_classification_payload(
     *,
-    finding: Finding,
-    classification: FindingClassification,
-    choice: FindingClassificationChoice,
+    finding: Any,
+    classification: Any,
+    choice: Any,
     module_name: str,
 ) -> None:
     if not finding.finding_classifications.filter(id=classification.id).exists():
@@ -363,21 +386,28 @@ def _validate_classification_payload(
 
 
 def _replace_patient_finding_classifications(
-    patient_finding: PatientFinding,
+    patient_finding: Any,
     entries: List[PatientFindingClassificationInput],
     *,
     module_name: str,
 ) -> None:
     patient_finding.classifications.all().delete()
+    finding_classification_model = _orm_models()["FindingClassification"]
+    finding_classification_choice_model = _orm_models()["FindingClassificationChoice"]
+    patient_finding_classification_model = _orm_models()["PatientFindingClassification"]
     for entry in entries:
-        classification = FindingClassification.objects.filter(id=entry.classification).first()
+        classification = finding_classification_model.objects.filter(
+            id=entry.classification
+        ).first()
         if not classification:
             _api_error(
                 400,
                 "invalid-choice",
                 f"Classification id '{entry.classification}' does not exist.",
             )
-        choice = FindingClassificationChoice.objects.filter(id=entry.choice).first()
+        choice = finding_classification_choice_model.objects.filter(
+            id=entry.choice
+        ).first()
         if not choice:
             _api_error(
                 400,
@@ -392,7 +422,7 @@ def _replace_patient_finding_classifications(
             choice=choice,
             module_name=module_name,
         )
-        PatientFindingClassification.objects.create(
+        patient_finding_classification_model.objects.create(
             finding=patient_finding,
             classification=classification,
             classification_choice=choice,
@@ -480,7 +510,8 @@ def findings_by_examination(
     request: BaseRequest, examination_id: int
 ) -> List[Dict[str, Any]]:
     module_name = _findings_module_name()
-    examination = Examination.objects.filter(id=examination_id).first()
+    examination_model = _orm_models()["Examination"]
+    examination = examination_model.objects.filter(id=examination_id).first()
     if not examination:
         _api_error(404, "not-found", f"Examination '{examination_id}' not found.")
 
@@ -516,7 +547,8 @@ def classifications_by_finding(
     request: BaseRequest, finding_id: int
 ) -> List[Dict[str, Any]]:
     module_name = _findings_module_name()
-    finding = Finding.objects.filter(id=finding_id).first()
+    finding_model = _orm_models()["Finding"]
+    finding = finding_model.objects.filter(id=finding_id).first()
     if not finding:
         _api_error(404, "not-found", f"Finding '{finding_id}' not found.")
     assert finding is not None
@@ -537,7 +569,10 @@ def choices_by_classification(
     request: BaseRequest, classification_id: int
 ) -> Dict[str, Any]:
     module_name = _findings_module_name()
-    classification = FindingClassification.objects.filter(id=classification_id).first()
+    finding_classification_model = _orm_models()["FindingClassification"]
+    classification = finding_classification_model.objects.filter(
+        id=classification_id
+    ).first()
     if not classification:
         _api_error(404, "not-found", f"Classification '{classification_id}' not found.")
     assert classification is not None
@@ -568,7 +603,10 @@ def create_patient_finding(
     request: BaseRequest, payload: PatientFindingCreateRequest
 ) -> Dict[str, Any]:
     module_name = _findings_module_name()
-    patient_examination = PatientExamination.objects.filter(
+    patient_examination_model = _orm_models()["PatientExamination"]
+    finding_model = _orm_models()["Finding"]
+    patient_finding_model = _orm_models()["PatientFinding"]
+    patient_examination = patient_examination_model.objects.filter(
         id=payload.patient_examination
     ).first()
     if not patient_examination:
@@ -577,7 +615,7 @@ def create_patient_finding(
             "not-found",
             f"PatientExamination '{payload.patient_examination}' not found.",
         )
-    finding = Finding.objects.filter(id=payload.finding).first()
+    finding = finding_model.objects.filter(id=payload.finding).first()
     if not finding:
         _api_error(404, "not-found", f"Finding '{payload.finding}' not found.")
     assert patient_examination is not None
@@ -591,7 +629,7 @@ def create_patient_finding(
 
     try:
         with transaction.atomic():
-            patient_finding = PatientFinding.objects.create(
+            patient_finding = patient_finding_model.objects.create(
                 patient_examination=patient_examination,
                 finding=finding,
             )
@@ -638,7 +676,8 @@ def patch_patient_finding(
 
     with transaction.atomic():
         if payload.finding is not None:
-            finding = Finding.objects.filter(id=payload.finding).first()
+            finding_model = _orm_models()["Finding"]
+            finding = finding_model.objects.filter(id=payload.finding).first()
             if not finding:
                 _api_error(404, "not-found", f"Finding '{payload.finding}' not found.")
             assert finding is not None
@@ -706,10 +745,17 @@ def set_patient_finding_classifications(
     assert patient_finding is not None
 
     with transaction.atomic():
+        finding_classification_model = _orm_models()["FindingClassification"]
+        finding_classification_choice_model = _orm_models()[
+            "FindingClassificationChoice"
+        ]
+        patient_finding_classification_model = _orm_models()[
+            "PatientFindingClassification"
+        ]
         if payload.replace:
             patient_finding.classifications.all().delete()
         for entry in payload.classifications:
-            classification = FindingClassification.objects.filter(
+            classification = finding_classification_model.objects.filter(
                 id=entry.classification
             ).first()
             if not classification:
@@ -718,7 +764,9 @@ def set_patient_finding_classifications(
                     "invalid-choice",
                     f"Classification id '{entry.classification}' does not exist.",
                 )
-            choice = FindingClassificationChoice.objects.filter(id=entry.choice).first()
+            choice = finding_classification_choice_model.objects.filter(
+                id=entry.choice
+            ).first()
             if not choice:
                 _api_error(
                     400,
@@ -733,7 +781,7 @@ def set_patient_finding_classifications(
                 choice=choice,
                 module_name=module_name,
             )
-            PatientFindingClassification.objects.create(
+            patient_finding_classification_model.objects.create(
                 finding=patient_finding,
                 classification=classification,
                 classification_choice=choice,

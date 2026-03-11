@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import tempfile
+from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, cast
 
@@ -26,9 +27,10 @@ except Exception:  # pragma: no cover - fallback for standalone lx-data-models u
         "django.contrib.sessions",
         "django.contrib.messages",
         "django.contrib.staticfiles",
-        "endoreg_db",
-        "rest_framework",
     ]
+
+    if find_spec("rest_framework") is not None:
+        required_apps.append("rest_framework")
 
     for app in required_apps:
         if app not in INSTALLED_APPS:
@@ -57,9 +59,6 @@ except Exception:  # pragma: no cover - fallback for standalone lx-data-models u
 INSTALLED_APPS = list(INSTALLED_APPS)  # type: ignore[name-defined]
 if "lx_dtypes.django.apps.LxDtypesDjangoConfig" not in INSTALLED_APPS:
     INSTALLED_APPS.append("lx_dtypes.django.apps.LxDtypesDjangoConfig")
-
-if "endoreg_db" not in INSTALLED_APPS:
-    INSTALLED_APPS.append("endoreg_db")
 
 ROOT_URLCONF = "lx_dtypes.django.urls"
 

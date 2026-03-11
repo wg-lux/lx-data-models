@@ -1,27 +1,109 @@
 from collections.abc import Mapping
-from typing import Any, List
+import warnings
+from typing import Any, List, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from lx_dtypes.factories import str_unknown_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
 )
-from lx_dtypes.models.knowledge_base.report_template.common import (
-    FindingsValidatorComparatorLiteral,
+from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict import (
     FindingsValidatorConditionDataDict,
+    FindingsValidatorDataDict,
     FindingsValidatorOperatorLiteral,
     FindingsValidatorQueryDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict import (
-    FindingsValidatorDataDict,
-)
-SUPPORTED_FINDINGS_VALIDATOR_OPERATORS: tuple[FindingsValidatorOperatorLiteral, ...] = (
+
+FindingsValidatorOperator = Literal[
     "exists",
+    "present",
+    "not_exists",
+    "absent",
     "missing",
-    "conditional",
+    "condition",
+]
+FindingsValidatorComparator = Literal[
+    "eq",
+    "ne",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "in",
+    "exists",
+    "present",
+]
+
+FINDINGS_VALIDATOR_OPERATORS: tuple[FindingsValidatorOperator, ...] = (
+    "exists",
+    "present",
+    "not_exists",
+    "absent",
+    "missing",
+    "condition",
 )
-SUPPORTED_FINDINGS_VALIDATOR_COMPARATORS: tuple[FindingsValidatorComparatorLiteral, ...] = (
+FINDINGS_VALIDATOR_COMPARATORS: tuple[FindingsValidatorComparator, ...] = (
+    "eq",
+    "ne",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "in",
+    "exists",
+    "present",
+)
+
+DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES: dict[str, FindingsValidatorOperator] = {
+    "if": "condition",
+    "not-exists": "not_exists",
+    "not exists": "not_exists",
+}
+DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES: dict[
+    str, FindingsValidatorComparator
+] = {
+    "==": "eq",
+    "!=": "ne",
+    ">": "gt",
+    ">=": "gte",
+    "<": "lt",
+    "<=": "lte",
+}
+
+
+class DeprecatedReportTemplateValueWarning(UserWarning):
+    pass
+
+
+def _normalize_value_with_alias(
+    raw_value: Any,
+    *,
+    field_name: str,
+    valid_values: tuple[str, ...],
+    deprecated_aliases: dict[str, str],
+) -> str:
+    normalized = str(raw_value).strip().lower()
+    if not normalized:
+        raise ValueError(f"{field_name} cannot be empty")
+    if normalized in valid_values:
+        return normalized
+    if normalized in deprecated_aliases:
+        canonical = deprecated_aliases[normalized]
+        warnings.warn(
+            (
+                f"Deprecated {field_name} alias '{raw_value}' detected; "
+                f"use '{canonical}' instead."
+            ),
+            DeprecatedReportTemplateValueWarning,
+            stacklevel=3,
+        )
+        return canonical
+    allowed = ", ".join(valid_values)
+    raise ValueError(f"Unsupported {field_name} '{raw_value}'. Allowed: {allowed}")
+
+
+FindingsValidatorComparatorLiteral = Literal[
     "eq",
     "ne",
     "gt",
@@ -30,7 +112,7 @@ SUPPORTED_FINDINGS_VALIDATOR_COMPARATORS: tuple[FindingsValidatorComparatorLiter
     "lte",
     "in",
     "not_in",
-)
+]
 
 
 class FindingsValidatorConditionClause(BaseModel):
@@ -40,6 +122,16 @@ class FindingsValidatorConditionClause(BaseModel):
     comparator: FindingsValidatorComparatorLiteral = "eq"
     value: Any = None
     values: list[Any] | None = None
+
+    @field_validator("comparator", mode="before")
+    @classmethod
+    def normalize_comparator(cls, value: Any) -> Any:
+        return _normalize_value_with_alias(
+            value,
+            field_name="findings_validator.comparator",
+            valid_values=FINDINGS_VALIDATOR_COMPARATORS,
+            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
+        )
 
     @model_validator(mode="after")
     def validate_comparator_payload(self) -> "FindingsValidatorConditionClause":
@@ -59,6 +151,12 @@ class FindingsValidatorConditionClause(BaseModel):
         if self.value is None:
             raise ValueError(f"comparator '{self.comparator}' requires `value`.")
         return self
+
+
+class FindingsValidatorRequiredClassification(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    classification: str
 
 
 class FindingsValidatorCondition(BaseModel):
@@ -87,12 +185,22 @@ class FindingsValidatorQuery(BaseModel):
     params: dict[str, Any] = Field(default_factory=dict)
     condition: FindingsValidatorCondition | None = None
 
+    @field_validator("operator", mode="before")
+    @classmethod
+    def normalize_operator(cls, value: Any) -> Any:
+        return _normalize_value_with_alias(
+            value,
+            field_name="findings_validator.operator",
+            valid_values=FINDINGS_VALIDATOR_OPERATORS,
+            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
+        )
+
     @model_validator(mode="after")
     def validate_operator_semantics(self) -> "FindingsValidatorQuery":
-        if self.operator == "conditional":
+        if self.operator == "condition":
             if self.condition is None:
                 raise ValueError(
-                    "operator 'conditional' requires a populated `condition` block."
+                    "operator 'condition' requires a populated `condition` block."
                 )
             return self
         if self.condition is not None:
@@ -110,6 +218,16 @@ class FindingsValidator(KnowledgebaseBaseModel[FindingsValidatorDataDict]):
     query: FindingsValidatorQuery = Field(default_factory=FindingsValidatorQuery)
     finding: str = Field(default_factory=str_unknown_factory)
     operator: FindingsValidatorOperatorLiteral = "exists"
+
+    @field_validator("operator", mode="before")
+    @classmethod
+    def normalize_operator(cls, value: Any) -> Any:
+        return _normalize_value_with_alias(
+            value,
+            field_name="findings_validator.operator",
+            valid_values=FINDINGS_VALIDATOR_OPERATORS,
+            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
+        )
 
     @model_validator(mode="before")
     @classmethod

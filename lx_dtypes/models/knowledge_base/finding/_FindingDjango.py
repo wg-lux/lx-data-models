@@ -29,6 +29,11 @@ class FindingDjango(KnowledgebaseBaseModelDjango[FindingDataDict]):
         "InterventionDjango",
         related_name=FieldNames.FINDINGS.value,
     )
+    caused_by_interventions: models.ManyToManyField = models.ManyToManyField(
+        "InterventionDjango",
+        related_name="caused_by_findings",
+        blank=True,
+    )
     finding_types: models.ManyToManyField = (
         models.ManyToManyField(
             "FindingTypeDjango", related_name=FieldNames.FINDINGS.value

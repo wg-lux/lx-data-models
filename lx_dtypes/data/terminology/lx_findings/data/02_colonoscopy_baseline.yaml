@@ -38,6 +38,15 @@
     - bowel_prep_boston_simplified
 
 - model: finding
+  name: "colonoscopy_withdrawal_time_minutes"
+  name_de: "Rückzugszeit während der Koloskopie"
+  name_en: "Colonoscopy withdrawal time"
+  finding_types:
+    - baseline
+  classifications:
+    - time_minutes_generic
+
+- model: finding
   name: "colonoscopy_deepest_viewed_location"
   name_de: "Tiefste betrachtete Stelle während einer Koloskopie"
   name_en: "Deepest viewed location during colonoscopy"

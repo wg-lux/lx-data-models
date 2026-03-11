@@ -71,10 +71,10 @@ def test_findings_validator_conditional_requires_condition_block() -> None:
             {
                 "name": "f_validator",
                 "finding": "esophagus_polyp",
-                "operator": "conditional",
+                "operator": "condition",
                 "query": {
                     "finding": "esophagus_polyp",
-                    "operator": "conditional",
+                    "operator": "condition",
                 },
             }
         )
@@ -85,10 +85,10 @@ def test_findings_validator_conditional_accepts_condition_clauses() -> None:
         {
             "name": "polyp_has_lst_if_large",
             "finding": "esophagus_polyp",
-            "operator": "conditional",
+            "operator": "condition",
             "query": {
                 "finding": "esophagus_polyp",
-                "operator": "conditional",
+                "operator": "condition",
                 "condition": {
                     "any": [
                         {
@@ -110,7 +110,7 @@ def test_findings_validator_conditional_accepts_condition_clauses() -> None:
         }
     )
 
-    assert validator.query.operator == "conditional"
+    assert validator.query.operator == "condition"
     assert validator.query.condition is not None
     assert len(validator.query.condition.any) == 2
     assert validator.query.condition.any[0].comparator == "gt"
@@ -147,10 +147,10 @@ def test_findings_validator_enforces_clause_payload_for_comparators() -> None:
             {
                 "name": "f_validator",
                 "finding": "esophagus_polyp",
-                "operator": "conditional",
+                "operator": "condition",
                 "query": {
                     "finding": "esophagus_polyp",
-                    "operator": "conditional",
+                    "operator": "condition",
                     "condition": {
                         "all": [
                             {
@@ -167,10 +167,10 @@ def test_findings_validator_enforces_clause_payload_for_comparators() -> None:
         {
             "name": "f_validator",
             "finding": "esophagus_polyp",
-            "operator": "conditional",
+            "operator": "condition",
             "query": {
                 "finding": "esophagus_polyp",
-                "operator": "conditional",
+                "operator": "condition",
                 "condition": {
                     "all": [
                         {

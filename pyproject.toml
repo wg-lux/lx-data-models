@@ -30,6 +30,7 @@ dependencies = [
   "scikit-learn>=1.8.0",
   "scipy>=1.16.1",
   "types-pyyaml>=6.0.12.20250915",
+  "ninja>=1.13.0",
 ]
 description = "lx-data-types"
 keywords = [
@@ -104,7 +105,7 @@ useLibraryCodeForTypes = true
 
 [tool.mypy]
 exclude = '^(\.venv|venv|env)/'
-mypy_path = ["typings", "lx_dtypes"]
+mypy_path = ["typings"]
 plugins = ["pandera.mypy", "mypy_django_plugin.main"]
 strict = true
 warn_unused_ignores = false

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -24,7 +26,7 @@ if TYPE_CHECKING:
 
 
 class PFindingInterventionsDjango(LedgerBaseModelDjango[PFindingInterventionsDataDict]):
-    patient_finding: models.ForeignKey["PFindingDjango", "PFindingDjango"] = (
+    patient_finding: "models.ForeignKey[PFindingDjango, PFindingDjango]" = (
         models.ForeignKey(
             "PFindingDjango",
             related_name="patient_finding_interventions",

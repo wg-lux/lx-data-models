@@ -1,9 +1,15 @@
 from typing import TypedDict, Union
 
+from pydantic import ValidationError
+
 from .ExaminationValidator import ExaminationValidator
 from .ExaminationValidatorDataDict import ExaminationValidatorDataDict
-from .FindingsValidator import FindingsValidator
-from .FindingsValidatorDataDict import FindingsValidatorDataDict
+from .FindingsValidator import FindingsValidator as FindingsValidatorModel
+from .FindingsValidatorDataDict import (
+    FindingsValidatorConditionDataDict,
+    FindingsValidatorDataDict,
+    FindingsValidatorQueryDataDict,
+)
 from .LookupState import (
     LEGACY_LOOKUP_KEY_MAP,
     LookupInitRequest,
@@ -12,7 +18,6 @@ from .LookupState import (
     LookupRecomputeResponse,
     LookupState,
     RequirementSetSummary,
-    ValidationError,
     build_lookup_recompute_response,
     normalize_lookup_keys,
     validate_lookup_parts_response,
@@ -27,8 +32,16 @@ from .LookupStateDataDict import (
     LookupStateDataDict,
     RequirementSetSummaryDataDict,
 )
-from .ReportFinding import ReportFinding
-from .ReportFindingDataDict import ReportFindingDataDict
+from .ReportFinding import (
+    ReportFinding,
+    ReportTemplateClassificationRequirement,
+    ReportTemplateFindingRequirement,
+)
+from .ReportFindingDataDict import (
+    ReportFindingDataDict,
+    ReportTemplateClassificationRequirementDataDict,
+    ReportTemplateFindingRequirementDataDict,
+)
 from .ReportTemplateGraph import (
     ReportTemplateGraph,
     ReportTemplateGraphEdge,
@@ -46,10 +59,16 @@ from .ReportTemplateGraphDataDict import (
     ReportTemplateStructureIssueDataDict,
     ReportTemplateStructureValidationResultDataDict,
 )
-from .ReportTemplate import ReportTemplate
-from .ReportTemplateDataDict import ReportTemplateDataDict
-from .ReportTemplateSection import ReportTemplateSection
-from .ReportTemplateSectionDataDict import ReportTemplateSectionDataDict
+from .ReportTemplate import ReportTemplate, ReportTemplateValidators
+from .ReportTemplateDataDict import (
+    ReportTemplateDataDict,
+    ReportTemplateValidatorsDataDict,
+)
+from .ReportTemplateSection import ReportTemplateSection, ReportTemplateSectionField
+from .ReportTemplateSectionDataDict import (
+    ReportTemplateSectionDataDict,
+    ReportTemplateSectionFieldDataDict,
+)
 from .ValidatorRuntime import (
     ExaminationValidatorDependencyStatusDataDict,
     ExaminationValidatorExecutionDataDict,
@@ -59,7 +78,7 @@ from .ValidatorRuntime import (
     evaluate_findings_validator_runtime,
     evaluate_report_template_validators_runtime,
 )
-from .common import (
+from .FindingsValidator import (
     DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
     DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
     FINDINGS_VALIDATOR_COMPARATORS,
@@ -67,13 +86,13 @@ from .common import (
     DeprecatedReportTemplateValueWarning,
     FindingsValidatorComparator,
     FindingsValidatorCondition,
-    FindingsValidatorConditionDataDict,
-    FindingsValidatorConditionRule,
+    FindingsValidatorConditionClause,
     FindingsValidatorOperator,
     FindingsValidatorQuery,
-    FindingsValidatorQueryDataDict,
     FindingsValidatorRequiredClassification,
 )
+
+FindingsValidator = FindingsValidatorModel
 
 
 class KbReportTemplateLookupType(TypedDict):
@@ -85,7 +104,7 @@ class KbReportTemplateLookupType(TypedDict):
     ReportTemplateSectionDataDict: type[ReportTemplateSectionDataDict]
     ReportFinding: type[ReportFinding]
     ReportFindingDataDict: type[ReportFindingDataDict]
-    FindingsValidator: type[FindingsValidator]
+    FindingsValidator: type[FindingsValidatorModel]
     FindingsValidatorDataDict: type[FindingsValidatorDataDict]
     ExaminationValidator: type[ExaminationValidator]
     ExaminationValidatorDataDict: type[ExaminationValidatorDataDict]
@@ -102,7 +121,7 @@ kb_report_template_lookup = KbReportTemplateLookupType(
     ReportTemplateSectionDataDict=ReportTemplateSectionDataDict,
     ReportFinding=ReportFinding,
     ReportFindingDataDict=ReportFindingDataDict,
-    FindingsValidator=FindingsValidator,
+    FindingsValidator=FindingsValidatorModel,
     FindingsValidatorDataDict=FindingsValidatorDataDict,
     ExaminationValidator=ExaminationValidator,
     ExaminationValidatorDataDict=ExaminationValidatorDataDict,
@@ -145,8 +164,16 @@ __all__ = [
     "ReportTemplateStructureValidationResultDataDict",
     "ReportTemplateSection",
     "ReportTemplateSectionDataDict",
+    "ReportTemplateSectionField",
+    "ReportTemplateSectionFieldDataDict",
     "ReportFinding",
     "ReportFindingDataDict",
+    "ReportTemplateClassificationRequirement",
+    "ReportTemplateClassificationRequirementDataDict",
+    "ReportTemplateFindingRequirement",
+    "ReportTemplateFindingRequirementDataDict",
+    "ReportTemplateValidators",
+    "ReportTemplateValidatorsDataDict",
     "FindingsValidator",
     "FindingsValidatorDataDict",
     "FindingsValidatorOperator",
@@ -160,7 +187,7 @@ __all__ = [
     "FindingsValidatorQueryDataDict",
     "FindingsValidatorCondition",
     "FindingsValidatorConditionDataDict",
-    "FindingsValidatorConditionRule",
+    "FindingsValidatorConditionClause",
     "FindingsValidatorRequiredClassification",
     "ExaminationValidator",
     "ExaminationValidatorDataDict",

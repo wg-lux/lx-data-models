@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -25,19 +27,19 @@ if TYPE_CHECKING:
 
 
 class PIndicationDjango(LedgerBaseModelDjango[PIndicationDataDict]):
-    indication: models.ForeignKey["IndicationDjango", "IndicationDjango"] = (
+    indication: "models.ForeignKey[IndicationDjango, IndicationDjango]" = (
         models.ForeignKey(
             "IndicationDjango",
             related_name=FieldNames.PATIENT_INDICATIONS.value,
             on_delete=models.CASCADE,
         )
     )
-    patient_examination: models.ForeignKey[
-        "PExaminationDjango", "PExaminationDjango"
-    ] = models.ForeignKey(
-        "PExaminationDjango",
-        related_name=FieldNames.PATIENT_INDICATIONS.value,
-        on_delete=models.CASCADE,
+    patient_examination: "models.ForeignKey[PExaminationDjango, PExaminationDjango]" = (
+        models.ForeignKey(
+            "PExaminationDjango",
+            related_name=FieldNames.PATIENT_INDICATIONS.value,
+            on_delete=models.CASCADE,
+        )
     )
 
     @property

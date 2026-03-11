@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
@@ -9,9 +9,11 @@ from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict import (
     ReportTemplateDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.common import (
-    ReportTemplateValidators,
-)
+
+
+class ReportTemplateValidators(BaseModel):
+    examination_validators: List[str] = Field(default_factory=list)
+    findings_validators: List[str] = Field(default_factory=list)
 
 
 class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -29,19 +31,19 @@ class PFindingClassificationChoiceDescriptorDjango(
     LedgerBaseModelDjango[PFindingClassificationChoiceDescriptorDataDict]
 ):
     descriptor_value: CharFieldType = models.CharField(max_length=255)
-    classification_choice_descriptor: models.ForeignKey[
-        "ClassificationChoiceDescriptorDjango", "ClassificationChoiceDescriptorDjango"
-    ] = models.ForeignKey(
-        "ClassificationChoiceDescriptorDjango",
-        related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICE_DESCRIPTORS.value,
-        on_delete=models.CASCADE,
+    classification_choice_descriptor: "models.ForeignKey[ClassificationChoiceDescriptorDjango, ClassificationChoiceDescriptorDjango]" = (
+        models.ForeignKey(
+            "ClassificationChoiceDescriptorDjango",
+            related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICE_DESCRIPTORS.value,
+            on_delete=models.CASCADE,
+        )
     )
-    patient_finding_classification_choice: models.ForeignKey[
-        "PFindingClassificationChoiceDjango", "PFindingClassificationChoiceDjango"
-    ] = models.ForeignKey(
-        "PFindingClassificationChoiceDjango",
-        related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICE_DESCRIPTORS.value,
-        on_delete=models.CASCADE,
+    patient_finding_classification_choice: "models.ForeignKey[PFindingClassificationChoiceDjango, PFindingClassificationChoiceDjango]" = (
+        models.ForeignKey(
+            "PFindingClassificationChoiceDjango",
+            related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICE_DESCRIPTORS.value,
+            on_delete=models.CASCADE,
+        )
     )
 
     @property

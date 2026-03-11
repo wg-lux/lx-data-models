@@ -1,11 +1,13 @@
-from typing import List
+from typing import List, TypedDict
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.common import (
-    ReportTemplateValidatorsDataDict,
-)
+
+
+class ReportTemplateValidatorsDataDict(TypedDict):
+    examination_validators: List[str]
+    findings_validators: List[str]
 
 
 class ReportTemplateDataDict(KnowledgebaseBaseModelDataDict):

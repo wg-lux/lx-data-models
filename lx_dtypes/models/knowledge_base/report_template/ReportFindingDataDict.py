@@ -1,9 +1,20 @@
+from typing import List, TypedDict
+
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.common import (
-    ReportTemplateFindingRequirementDataDict,
-)
+
+
+class ReportTemplateClassificationRequirementDataDict(TypedDict):
+    classification: str
+    required: bool
+
+
+class ReportTemplateFindingRequirementDataDict(TypedDict):
+    finding: str
+    required: bool
+    multiple_allowed: bool
+    classifications: List[ReportTemplateClassificationRequirementDataDict]
 
 
 class ReportFindingDataDict(

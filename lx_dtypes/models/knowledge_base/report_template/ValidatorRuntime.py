@@ -372,7 +372,7 @@ def evaluate_findings_validator_runtime(
                     details={"matched_occurrences": len(matched_occurrences)},
                 )
             )
-    elif validator.operator == "conditional":
+    elif validator.operator == "condition":
         condition = validator.query.condition
         if condition is None:
             ok = False
@@ -380,7 +380,7 @@ def evaluate_findings_validator_runtime(
                 _build_issue(
                     code="invalid_conditional_validator_definition",
                     message=(
-                        f"Validator '{validator.name}' uses 'conditional' operator but "
+                        f"Validator '{validator.name}' uses 'condition' operator but "
                         "has no condition block."
                     ),
                     validator_name=validator.name,

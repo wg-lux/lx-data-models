@@ -7,6 +7,12 @@ from .adapters import (
     record_to_core_concept,
     records_to_core_concepts,
 )
+from .case_resolution import (
+    CaseResolutionNewPatient,
+    CaseResolutionRequest,
+    CaseResolutionResponse,
+    ValidationError,
+)
 from .core_concepts import (
     CitationCore,
     ClassificationChoiceCore,
@@ -26,6 +32,21 @@ from .core_concepts import (
     UnitCore,
     UnitTypeCore,
 )
+from .document_type import DocumentType
+from .pdf_redaction import (
+    PdfRedactionBox,
+    PdfRedactionManifest,
+    PdfRedactionPage,
+    PdfRedactionRequest,
+    PdfRedactionResponse,
+)
+from .requirement_evaluation import (
+    RequirementEvaluationMeta,
+    RequirementEvaluationRequest,
+    RequirementEvaluationResponse,
+    RequirementEvaluationResult,
+)
+from .report_context import ReportContext
 
 __all__ = [
     "CoreConceptBase",
@@ -52,4 +73,19 @@ __all__ = [
     "core_concept_to_storage",
     "kb_to_core_concepts_payload",
     "canonical_payload_to_storage",
+    "CaseResolutionNewPatient",
+    "CaseResolutionRequest",
+    "CaseResolutionResponse",
+    "ValidationError",
+    "DocumentType",
+    "PdfRedactionBox",
+    "PdfRedactionManifest",
+    "PdfRedactionPage",
+    "PdfRedactionRequest",
+    "PdfRedactionResponse",
+    "RequirementEvaluationMeta",
+    "RequirementEvaluationRequest",
+    "RequirementEvaluationResponse",
+    "RequirementEvaluationResult",
+    "ReportContext",
 ]

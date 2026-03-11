@@ -1,12 +1,18 @@
-from typing import List, Literal, NotRequired
+from typing import List, Literal, NotRequired, TypedDict
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.common import (
+from lx_dtypes.models.knowledge_base.report_template.ReportFindingDataDict import (
     ReportTemplateFindingRequirementDataDict,
-    ReportTemplateSectionFieldDataDict,
 )
+
+
+class ReportTemplateSectionFieldDataDict(TypedDict, total=False):
+    key: str
+    required: bool
+    label: str
+    source: Literal["patient", "patient_examination", "history"]
 
 
 class ReportTemplateSectionDataDict(KnowledgebaseBaseModelDataDict):
