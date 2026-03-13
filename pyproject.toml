@@ -139,7 +139,10 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-force-include = {"lx_dtypes/py.typed" = "lx_dtypes/py.typed"}
+force-include = {
+  "lx_dtypes/py.typed" = "lx_dtypes/py.typed",
+  "lx_kb_lint.py" = "lx_kb_lint.py",
+}
 packages = ["lx_dtypes"]
 
 [build-system]
@@ -157,7 +160,10 @@ exclude = [
   "storage",
   "storage/**",
 ]
-force-include = {"lx_dtypes/py.typed" = "lx_dtypes/py.typed"}
+force-include = {
+  "lx_dtypes/py.typed" = "lx_dtypes/py.typed",
+  "lx_kb_lint.py" = "lx_kb_lint.py",
+}
 
 # 🟢 HATCH ENVIRONMENTS (Bonus)
 # # You can define your test environment here instead of using tox

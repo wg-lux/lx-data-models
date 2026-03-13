@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from lx_dtypes.utils.kb_yaml_lint import (
+from lx_kb_lint import (
     discover_yaml_files,
     lint_kb_yaml_files,
     summarize_issues,

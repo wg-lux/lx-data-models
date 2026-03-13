@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 
 from lx_dtypes.utils.kb_yaml_lint import (
@@ -106,3 +107,18 @@ def test_discover_yaml_files_expands_module_config(tmp_path: Path) -> None:
     files, issues = discover_yaml_files(paths=[], config_paths=[config_file])
     assert issues == []
     assert files == [target_file.resolve()]
+
+
+def test_lx_kb_lint_shim_imports_runtime_module(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[3]
+    shim_path = repo_root / "lx_kb_lint.py"
+    spec = importlib.util.spec_from_file_location("test_lx_kb_lint_shim", shim_path)
+    assert spec is not None
+    assert spec.loader is not None
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    issues = module.lint_kb_yaml_files([tmp_path / "missing.yaml"])
+    assert len(issues) == 1
+    assert issues[0].code == "missing_file"
