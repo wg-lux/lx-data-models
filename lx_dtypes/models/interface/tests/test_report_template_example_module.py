@@ -5,7 +5,9 @@ import pytest
 import yaml
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
-from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import ReportTemplate
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
+    ReportTemplate,
+)
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateGraph import (
     validate_report_template_structure,
 )
@@ -147,7 +149,9 @@ def test_report_template_validator_inline_vs_kb_alias_parity(
     assert finding_nodes[0].name == "esophagus_polyp"
 
 
-def test_report_template_validator_broken_alias_surfaces_warning(tmp_path: Path) -> None:
+def test_report_template_validator_broken_alias_surfaces_warning(
+    tmp_path: Path,
+) -> None:
     module_dir = tmp_path / "rt_broken_alias"
     module_dir.mkdir(parents=True)
     (module_dir / "config.yaml").write_text(

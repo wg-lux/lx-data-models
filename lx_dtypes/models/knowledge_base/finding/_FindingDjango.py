@@ -9,6 +9,7 @@ from .FindingDataDict import (
     FindingDataDict,
 )
 
+
 class FindingDjango(KnowledgebaseBaseModelDjango[FindingDataDict]):
     interventions: models.ManyToManyField = models.ManyToManyField(
         "InterventionDjango",
@@ -19,10 +20,8 @@ class FindingDjango(KnowledgebaseBaseModelDjango[FindingDataDict]):
         related_name="caused_by_findings",
         blank=True,
     )
-    finding_types: models.ManyToManyField = (
-        models.ManyToManyField(
-            "FindingTypeDjango", related_name=FieldNames.FINDINGS.value
-        )
+    finding_types: models.ManyToManyField = models.ManyToManyField(
+        "FindingTypeDjango", related_name=FieldNames.FINDINGS.value
     )
     classifications: models.ManyToManyField = models.ManyToManyField(
         "ClassificationDjango",

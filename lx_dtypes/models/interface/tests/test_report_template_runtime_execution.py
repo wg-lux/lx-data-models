@@ -14,7 +14,10 @@ def test_knowledge_base_runtime_execution_for_example_template() -> None:
     failing = kb.evaluate_report_template_validators(
         "star_upper_gi_main",
         reported_findings=[
-            {"finding": "star_upper_gi_mucosa_esophagus_abnormal", "classifications": []},
+            {
+                "finding": "star_upper_gi_mucosa_esophagus_abnormal",
+                "classifications": [],
+            },
             {
                 "finding": "esophagus_polyp",
                 "classifications": [
@@ -26,7 +29,10 @@ def test_knowledge_base_runtime_execution_for_example_template() -> None:
     passing = kb.evaluate_report_template_validators(
         "star_upper_gi_main",
         reported_findings=[
-            {"finding": "star_upper_gi_mucosa_esophagus_abnormal", "classifications": []},
+            {
+                "finding": "star_upper_gi_mucosa_esophagus_abnormal",
+                "classifications": [],
+            },
             {
                 "finding": "esophagus_polyp",
                 "classifications": [

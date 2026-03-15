@@ -83,7 +83,6 @@ docs = [
 [project.scripts]
 ok = "lx_dtypes.scripts.lint_kb_yaml:main"
 
-
 [project.urls]
 Homepage = "https://info.coloreg.de"
 Repository = "https://github.com/wg-lux/lx-data-models"
@@ -139,11 +138,11 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-force-include = {
-  "lx_dtypes/py.typed" = "lx_dtypes/py.typed",
-  "lx_kb_lint.py" = "lx_kb_lint.py",
-}
 packages = ["lx_dtypes"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"lx_dtypes/py.typed" = "lx_dtypes/py.typed"
+"lx_kb_lint.py" = "lx_kb_lint.py"
 
 [build-system]
 build-backend = "hatchling.build"
@@ -160,10 +159,10 @@ exclude = [
   "storage",
   "storage/**",
 ]
-force-include = {
-  "lx_dtypes/py.typed" = "lx_dtypes/py.typed",
-  "lx_kb_lint.py" = "lx_kb_lint.py",
-}
+
+[tool.hatch.build.targets.sdist.force-include]
+"lx_dtypes/py.typed" = "lx_dtypes/py.typed"
+"lx_kb_lint.py" = "lx_kb_lint.py"
 
 # 🟢 HATCH ENVIRONMENTS (Bonus)
 # # You can define your test environment here instead of using tox

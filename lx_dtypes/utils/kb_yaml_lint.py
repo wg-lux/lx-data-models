@@ -249,7 +249,9 @@ def _discover_yaml_files_from_module_config(
             return selected, []
 
         current_group = config_path.parent.parent.resolve()
-        same_group = [c for c in candidates if c.parent.parent.resolve() == current_group]
+        same_group = [
+            c for c in candidates if c.parent.parent.resolve() == current_group
+        ]
         if len(same_group) == 1:
             return same_group[0], []
 
@@ -353,7 +355,9 @@ def discover_yaml_files(
 
         if path.is_file():
             if path.name == "config.yaml":
-                discovered, config_issues = _discover_yaml_files_from_module_config(path)
+                discovered, config_issues = _discover_yaml_files_from_module_config(
+                    path
+                )
                 files.extend(discovered)
                 issues.extend(config_issues)
                 continue

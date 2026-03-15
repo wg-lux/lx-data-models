@@ -15,7 +15,7 @@ def test_create_from_config_rejects_duplicate_model_names(tmp_path: Path) -> Non
     config_file.write_text(
         (
             "name: duplicate_module\n"
-            "version: \"1.0.0\"\n"
+            'version: "1.0.0"\n'
             "data:\n"
             "  files:\n"
             "    - records.yaml\n"

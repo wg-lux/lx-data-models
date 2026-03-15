@@ -8,6 +8,7 @@ from lx_dtypes.models.knowledge_base.indication.IndicationDataDict import (
 )
 from lx_dtypes.names import INDICATION_MODEL_LIST_TYPE_FIELDS, FieldNames
 
+
 class IndicationDjango(KnowledgebaseBaseModelDjango[IndicationDataDict]):
     indication_types: models.ManyToManyField = models.ManyToManyField(
         "IndicationTypeDjango", related_name=FieldNames.INDICATIONS.value

@@ -178,7 +178,9 @@ class LookupPartsResponse(BaseModel):
         return value
 
 
-def validate_lookup_state(payload: Mapping[str, Any] | None) -> LookupStateDataDict | None:
+def validate_lookup_state(
+    payload: Mapping[str, Any] | None,
+) -> LookupStateDataDict | None:
     if payload is None:
         return None
     model = LookupState.model_validate(payload)

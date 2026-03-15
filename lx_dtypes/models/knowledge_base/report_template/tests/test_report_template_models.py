@@ -147,7 +147,9 @@ def test_findings_validator_comparator_alias_normalizes_with_warning() -> None:
 
 
 def test_findings_validator_rejects_legacy_conditional_operator() -> None:
-    with pytest.raises(ValidationError, match="Unsupported findings_validator.operator"):
+    with pytest.raises(
+        ValidationError, match="Unsupported findings_validator.operator"
+    ):
         FindingsValidator.model_validate(
             {
                 "name": "legacy_conditional_alias",
@@ -237,7 +239,9 @@ def test_report_template_section_supports_mixed_finding_inputs() -> None:
                     "finding": "bleeding_site",
                     "required": False,
                     "multiple_allowed": False,
-                    "classifications": [{"classification": "severity", "required": True}],
+                    "classifications": [
+                        {"classification": "severity", "required": True}
+                    ],
                 },
             ],
         }
@@ -272,7 +276,11 @@ def test_report_template_section_supports_patient_history_fields() -> None:
             "section_kind": "patient_data",
             "fields": [
                 {"key": "patient_birth_date", "required": True, "source": "patient"},
-                {"key": "indication", "required": False, "source": "patient_examination"},
+                {
+                    "key": "indication",
+                    "required": False,
+                    "source": "patient_examination",
+                },
             ],
             "findings": [],
         }

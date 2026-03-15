@@ -3,7 +3,9 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 from lx_dtypes.models.knowledge_base.report_template.ReportFinding import ReportFinding
-from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import ReportTemplate
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
+    ReportTemplate,
+)
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateGraph import (
     build_report_template_graph,
     validate_report_template_knowledge_base,
@@ -124,13 +126,23 @@ def test_build_report_template_graph_creates_expected_nodes_edges_and_weights() 
     # rf_polyp has 2 classifications -> normalized edge weight 0.5
     assert (
         edges[
-            ("finding:esophagus_polyp", "classification:size_mm", "finding_to_classification")
+            (
+                "finding:esophagus_polyp",
+                "classification:size_mm",
+                "finding_to_classification",
+            )
         ].weight
         == 0.5
     )
     # validator edges currently fixed
     assert (
-        edges[("template:demo_template", "validator:exam_validator_a", "template_to_validator")].weight
+        edges[
+            (
+                "template:demo_template",
+                "validator:exam_validator_a",
+                "template_to_validator",
+            )
+        ].weight
         == 0.4
     )
 
@@ -189,7 +201,14 @@ def test_validate_report_template_knowledge_base_returns_per_template_results() 
                     "name": "sec_a",
                     "position": 0,
                     "types": [],
-                    "findings": [{"finding": "f1", "required": False, "multiple_allowed": False, "classifications": []}],
+                    "findings": [
+                        {
+                            "finding": "f1",
+                            "required": False,
+                            "multiple_allowed": False,
+                            "classifications": [],
+                        }
+                    ],
                 }
             )
         },
@@ -264,7 +283,9 @@ def test_build_report_template_graph_includes_patient_and_history_field_nodes() 
 
     assert nodes_by_id["patient_field:patient_birth_date"].node_type == "patient_field"
     assert nodes_by_id["patient_field:indication"].node_type == "patient_field"
-    assert nodes_by_id["history_field:previous_examinations"].node_type == "history_field"
+    assert (
+        nodes_by_id["history_field:previous_examinations"].node_type == "history_field"
+    )
     assert (
         "section:patient_sec",
         "patient_field:patient_birth_date",
@@ -275,9 +296,16 @@ def test_build_report_template_graph_includes_patient_and_history_field_nodes() 
         "history_field:previous_examinations",
         "section_to_history_field",
     ) in edges
-    assert edges[
-        ("section:patient_sec", "patient_field:patient_birth_date", "section_to_patient_field")
-    ].weight == 0.5
+    assert (
+        edges[
+            (
+                "section:patient_sec",
+                "patient_field:patient_birth_date",
+                "section_to_patient_field",
+            )
+        ].weight
+        == 0.5
+    )
 
 
 def test_validate_report_template_structure_validates_non_finding_sections() -> None:

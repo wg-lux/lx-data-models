@@ -280,11 +280,15 @@ def _condition_matches(
 
     any_match = True
     if any_clauses:
-        any_match = any(_evaluate_clause(clause, classifications) for clause in any_clauses)
+        any_match = any(
+            _evaluate_clause(clause, classifications) for clause in any_clauses
+        )
 
     all_match = True
     if all_clauses:
-        all_match = all(_evaluate_clause(clause, classifications) for clause in all_clauses)
+        all_match = all(
+            _evaluate_clause(clause, classifications) for clause in all_clauses
+        )
 
     return any_match and all_match
 
@@ -336,7 +340,9 @@ def evaluate_findings_validator_runtime(
     normalized_findings = _normalize_reported_findings(reported_findings)
     target_finding = validator.finding
     matched_occurrences = [
-        finding for finding in normalized_findings if finding["finding"] == target_finding
+        finding
+        for finding in normalized_findings
+        if finding["finding"] == target_finding
     ]
 
     issues: List[RuntimeValidationIssueDataDict] = []

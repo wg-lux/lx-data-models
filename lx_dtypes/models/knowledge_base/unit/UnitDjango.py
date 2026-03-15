@@ -19,8 +19,8 @@ from lx_dtypes.utils.django_field_types import CharFieldType
 
 
 class UnitDjango(KnowledgebaseBaseModelDjango[UnitDataDict]):
-    unit_types: models.ManyToManyField = (
-        models.ManyToManyField("UnitTypeDjango", related_name=FieldNames.UNITS.value)
+    unit_types: models.ManyToManyField = models.ManyToManyField(
+        "UnitTypeDjango", related_name=FieldNames.UNITS.value
     )
     abbreviation: CharFieldType = models.CharField(max_length=50)
 

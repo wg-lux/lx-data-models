@@ -42,7 +42,9 @@ def test_normalize_lookup_keys_prefers_canonical_when_both_present() -> None:
         ((12,), 12),
     ],
 )
-def test_lookup_init_request_coerces_patient_examination_id(raw: object, expected: int) -> None:
+def test_lookup_init_request_coerces_patient_examination_id(
+    raw: object, expected: int
+) -> None:
     req = LookupInitRequest.model_validate({"patient_examination_id": raw})
     assert req.patient_examination_id == expected
 

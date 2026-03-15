@@ -218,9 +218,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     )
     report_finding: Dict[str, ReportFinding] = Field(default_factory=dict)
     findings_validator: Dict[str, FindingsValidator] = Field(default_factory=dict)
-    examination_validator: Dict[str, ExaminationValidator] = Field(
-        default_factory=dict
-    )
+    examination_validator: Dict[str, ExaminationValidator] = Field(default_factory=dict)
     report_template: Dict[str, ReportTemplate] = Field(default_factory=dict)
 
     def get_classification(self, name: str) -> Classification:
@@ -618,9 +616,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 setattr(self, field_name, merged_tags)
                 continue
 
-            assert (
-                field_model_name in KB_MODEL_NAMES_ORDERED
-            ), f"Unknown model type: {field_model_name}"
+            assert field_model_name in KB_MODEL_NAMES_ORDERED, (
+                f"Unknown model type: {field_model_name}"
+            )
             field_model_name = cast(KB_MODEL_NAMES_LITERAL, field_model_name)
             TargetModel: type[KB_MODELS] = knowledge_base_models_lookup[
                 field_model_name

@@ -114,9 +114,9 @@ def parse_shallow_object(
         - File Path
         - KnowledgeBase module name (optional will be inferred in case of default string literal "unknown".)
     Output:
-        - List filled with KnowledgeBase models. Possible models in the list: 
-        Classification, ClassificationChoice, ClassificationChoiceDescriptor, 
-        Examination, Finding, FindingType, Indication, IndicationType, Intervention, InterventionType, Unit, UnitType, 
+        - List filled with KnowledgeBase models. Possible models in the list:
+        Classification, ClassificationChoice, ClassificationChoiceDescriptor,
+        Examination, Finding, FindingType, Indication, IndicationType, Intervention, InterventionType, Unit, UnitType,
         InformationSource, InformationSourceType, Citation
     """
 

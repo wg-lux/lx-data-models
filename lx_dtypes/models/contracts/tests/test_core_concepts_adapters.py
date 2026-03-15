@@ -32,7 +32,9 @@ from lx_dtypes.models.knowledge_base.information_source.InformationSourceType im
     InformationSourceType,
 )
 from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
-from lx_dtypes.models.knowledge_base.intervention.InterventionType import InterventionType
+from lx_dtypes.models.knowledge_base.intervention.InterventionType import (
+    InterventionType,
+)
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 from lx_dtypes.models.knowledge_base.unit.UnitType import UnitType
 
@@ -258,9 +260,9 @@ def test_core_concept_model_and_ddict_parity(concept: CoreConceptName) -> None:
     canonical_from_model = record_to_core_concept(concept, model_instance)
     canonical_from_ddict = record_to_core_concept(concept, model_instance.ddict)
 
-    assert canonical_from_model.model_dump(mode="python") == canonical_from_ddict.model_dump(
+    assert canonical_from_model.model_dump(
         mode="python"
-    )
+    ) == canonical_from_ddict.model_dump(mode="python")
 
 
 def test_kb_to_core_concepts_payload_exports_all_concepts() -> None:
