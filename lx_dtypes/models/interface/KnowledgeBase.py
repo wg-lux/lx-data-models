@@ -138,6 +138,8 @@ class KnowledgeBaseRecordList(TypedDict):
     unit_types: List[UnitTypeDataDict]
     information_sources: List[InformationSourceDataDict]
     information_source_types: List[InformationSourceTypeDataDict]
+    # report_templates
+    # report_sections
 
 
 class KnowledgeBase(AppBaseModelUUIDTags):

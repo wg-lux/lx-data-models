@@ -1,0 +1,16 @@
+- model: unit
+
+  name: "liters-per-minute"
+  abbreviation: "l/min"
+  name_de: "Liter pro Minute"
+  name_en: "Liters per Minute"
+  description: "liters per minute"
+
+# kilowatt-hours
+- model: unit
+
+  name: "kilowatt-hours"
+  abbreviation: "kWh"
+  name_de: "Kilowattstunden"
+  name_en: "Kilowatt-hours"
+  description: "kilowatt-hours"

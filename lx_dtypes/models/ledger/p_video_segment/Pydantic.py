@@ -40,6 +40,7 @@ class PVideoSegment(LedgerBaseModel[PVideoSegmentDataDict]):
     patient_video_file: str
     label: str  # name of label in KB
     labelset: str  # name of labelset in KB
+    # annotation info: annotator, time, ..
     export_segment: bool = False
     patient_video_segment_state: "PVideoSegmentState | None" = None
 
