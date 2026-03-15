@@ -25,9 +25,7 @@ class ReportTemplateSection(KnowledgebaseBaseModel[ReportTemplateSectionDataDict
     types: List[str] = Field(default_factory=list)
     section_kind: Literal["findings", "patient_data", "history"] = "findings"
     fields: List[ReportTemplateSectionField] = Field(default_factory=list)
-    findings: List[ReportTemplateFindingRequirement | str] = Field(
-        default_factory=list
-    )
+    findings: List[ReportTemplateFindingRequirement | str] = Field(default_factory=list)
 
     @classmethod
     def list_type_fields(cls) -> List[str]:

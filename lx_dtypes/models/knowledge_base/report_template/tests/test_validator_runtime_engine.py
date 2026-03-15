@@ -48,7 +48,9 @@ def test_evaluate_findings_validator_exists_and_missing() -> None:
     assert missing_result["matched_occurrences"] == 0
 
 
-def test_evaluate_findings_validator_conditional_requires_then_classifications() -> None:
+def test_evaluate_findings_validator_conditional_requires_then_classifications() -> (
+    None
+):
     conditional_validator = FindingsValidator.model_validate(
         {
             "name": "polyp_has_lst_if_large",

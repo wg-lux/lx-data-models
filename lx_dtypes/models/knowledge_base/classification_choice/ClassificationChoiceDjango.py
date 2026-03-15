@@ -9,6 +9,7 @@ from .ClassificationChoiceDataDict import (
     ClassificationChoiceDataDict,
 )
 
+
 class ClassificationChoiceDjango(
     KnowledgebaseBaseModelDjango[ClassificationChoiceDataDict]
 ):

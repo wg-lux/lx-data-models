@@ -37,10 +37,14 @@ def test_report_template_structure_validation_from_examples() -> None:
     )
     assert base_result.ok is True
     assert base_result.graph.template_name == "base_report_template"
-    assert base_result.graph.ordered_section_node_ids == ["section:base_required_section"]
+    assert base_result.graph.ordered_section_node_ids == [
+        "section:base_required_section"
+    ]
 
 
-def test_report_template_structure_validation_finds_missing_section(tmp_path: Path) -> None:
+def test_report_template_structure_validation_finds_missing_section(
+    tmp_path: Path,
+) -> None:
     module_dir = tmp_path / "rt_graph_module"
     module_dir.mkdir(parents=True)
 

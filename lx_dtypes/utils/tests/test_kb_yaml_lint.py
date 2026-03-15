@@ -79,7 +79,9 @@ def test_linter_flags_alias_and_mixed_style(tmp_path: Path) -> None:
     assert "mixed_finding_reference_styles" in codes
 
     strict_alias_issues = lint_kb_yaml_files([data_file], strict_aliases=True)
-    alias_issue = next(issue for issue in strict_alias_issues if issue.code == "alias_model_name")
+    alias_issue = next(
+        issue for issue in strict_alias_issues if issue.code == "alias_model_name"
+    )
     assert alias_issue.severity == "error"
 
 
@@ -93,7 +95,7 @@ def test_discover_yaml_files_expands_module_config(tmp_path: Path) -> None:
     config_file.write_text(
         (
             "name: demo_module\n"
-            "version: \"1.0.0\"\n"
+            'version: "1.0.0"\n'
             "data:\n"
             "  files:\n"
             "    - data/findings.yaml\n"

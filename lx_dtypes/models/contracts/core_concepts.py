@@ -123,8 +123,8 @@ class CoreConceptCollection(BaseModel):
     module_name: str
     classification: List[ClassificationCore] = Field(default_factory=list)
     classification_choice: List[ClassificationChoiceCore] = Field(default_factory=list)
-    classification_choice_descriptor: List[ClassificationChoiceDescriptorCore] = (
-        Field(default_factory=list)
+    classification_choice_descriptor: List[ClassificationChoiceDescriptorCore] = Field(
+        default_factory=list
     )
     examination: List[ExaminationCore] = Field(default_factory=list)
     finding: List[FindingCore] = Field(default_factory=list)
@@ -136,7 +136,9 @@ class CoreConceptCollection(BaseModel):
     unit: List[UnitCore] = Field(default_factory=list)
     unit_type: List[UnitTypeCore] = Field(default_factory=list)
     information_source: List[InformationSourceCore] = Field(default_factory=list)
-    information_source_type: List[InformationSourceTypeCore] = Field(default_factory=list)
+    information_source_type: List[InformationSourceTypeCore] = Field(
+        default_factory=list
+    )
     citation: List[CitationCore] = Field(default_factory=list)
 
     model_config = ConfigDict(extra="forbid")

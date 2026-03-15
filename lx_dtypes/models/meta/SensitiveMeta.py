@@ -97,9 +97,9 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
     @property
     def state(self) -> "SensitiveMetaState":
         state = self.sensitive_meta_state
-        assert (
-            state is not None
-        ), "sensitive_meta_state should never be None due to validator"
+        assert state is not None, (
+            "sensitive_meta_state should never be None due to validator"
+        )
         return state
 
     # ensure each meta always has a valid state referencing its UUID
@@ -111,9 +111,9 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
         if state is None:
             state = SensitiveMetaState(sensitive_meta=meta_uuid)
         else:
-            assert (
-                state.sensitive_meta == meta_uuid
-            ), "sensitive_meta_state's sensitive_meta field must reference the UUID of the meta"
+            assert state.sensitive_meta == meta_uuid, (
+                "sensitive_meta_state's sensitive_meta field must reference the UUID of the meta"
+            )
 
         self.sensitive_meta_state = state
         return self

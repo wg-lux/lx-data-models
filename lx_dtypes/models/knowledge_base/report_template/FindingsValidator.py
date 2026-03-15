@@ -169,7 +169,9 @@ class FindingsValidatorCondition(BaseModel):
     @model_validator(mode="after")
     def validate_branches(self) -> "FindingsValidatorCondition":
         if len(self.any) == 0 and len(self.all) == 0:
-            raise ValueError("condition requires at least one clause in `any` or `all`.")
+            raise ValueError(
+                "condition requires at least one clause in `any` or `all`."
+            )
         return self
 
     @property

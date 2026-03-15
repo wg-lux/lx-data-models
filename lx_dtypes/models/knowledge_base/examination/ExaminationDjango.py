@@ -21,10 +21,8 @@ if TYPE_CHECKING:
 
 
 class ExaminationDjango(KnowledgebaseBaseModelDjango[ExaminationDataDict]):
-    examination_types: "models.ManyToManyField[ExaminationTypeDjango, ExaminationTypeDjango]" = (
-        models.ManyToManyField(
-            "ExaminationTypeDjango", related_name=FieldNames.EXAMINATIONS.value
-        )
+    examination_types: "models.ManyToManyField[ExaminationTypeDjango, ExaminationTypeDjango]" = models.ManyToManyField(
+        "ExaminationTypeDjango", related_name=FieldNames.EXAMINATIONS.value
     )
     findings: "models.ManyToManyField[FindingDjango, FindingDjango]" = (
         models.ManyToManyField(

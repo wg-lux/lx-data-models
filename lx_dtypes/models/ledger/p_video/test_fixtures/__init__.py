@@ -39,6 +39,5 @@ def patient_video_file_data_dict_fixture(
 def patient_video_file_fixture(
     patient_video_file_data_dict_fixture: dict,
 ) -> "PatientVideoFile":
-
     model = PatientVideoFile.model_validate(patient_video_file_data_dict_fixture)
     return model

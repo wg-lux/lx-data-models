@@ -282,7 +282,9 @@ def canonical_payload_to_storage(
 
     for concept, kb_field in _KB_FIELDS.items():
         concept_values = getattr(collection, kb_field)
-        out[kb_field] = [core_concept_to_storage(concept, value) for value in concept_values]
+        out[kb_field] = [
+            core_concept_to_storage(concept, value) for value in concept_values
+        ]
 
     return out
 

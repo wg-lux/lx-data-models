@@ -13,7 +13,9 @@ from lx_dtypes.models.knowledge_base.report_template import (
 
 
 @pytest.fixture(params=["kb_alias", "inline"])
-def template_with_findings(request: pytest.FixtureRequest) -> tuple[
+def template_with_findings(
+    request: pytest.FixtureRequest,
+) -> tuple[
     ReportTemplate,
     dict[str, ReportTemplateSection],
     dict[str, ReportFinding],

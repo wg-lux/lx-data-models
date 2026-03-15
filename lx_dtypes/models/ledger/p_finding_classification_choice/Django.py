@@ -42,20 +42,16 @@ class PFindingClassificationChoiceDjango(
             on_delete=models.CASCADE,
         )
     )
-    classification_choice: "models.ForeignKey[ClassificationChoiceDjango, ClassificationChoiceDjango]" = (
-        models.ForeignKey(
-            "ClassificationChoiceDjango",
-            related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
-            on_delete=models.CASCADE,
-        )
+    classification_choice: "models.ForeignKey[ClassificationChoiceDjango, ClassificationChoiceDjango]" = models.ForeignKey(
+        "ClassificationChoiceDjango",
+        related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
+        on_delete=models.CASCADE,
     )
 
-    patient_finding_classifications: "models.ForeignKey[PFindingClassificationsDjango, PFindingClassificationsDjango]" = (
-        models.ForeignKey(
-            "PFindingClassificationsDjango",
-            related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
-            on_delete=models.CASCADE,
-        )
+    patient_finding_classifications: "models.ForeignKey[PFindingClassificationsDjango, PFindingClassificationsDjango]" = models.ForeignKey(
+        "PFindingClassificationsDjango",
+        related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
+        on_delete=models.CASCADE,
     )
 
     if TYPE_CHECKING:

@@ -9,6 +9,7 @@ from .InformationSourceDataDict import (
     InformationSourceDataDict,
 )
 
+
 class InformationSourceDjango(
     KnowledgebaseBaseModelDjango["InformationSourceDataDict"]
 ):

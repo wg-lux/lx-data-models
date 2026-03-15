@@ -15,7 +15,6 @@ TEST_EXPORT_DDICT_SCHEMA = Path(__file__).parent / "finding_ddict_schema.yaml"
 
 @pytest.mark.django_db
 class TestDjangoFindingFixture:
-
     def test_django_finding_fixture(
         self, django_finding_fixture: "FindingDjango"
     ) -> None:

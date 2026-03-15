@@ -98,7 +98,9 @@ class ReportTemplateStructureIssue(BaseModel):
     node_id: str | None = None
 
     def as_ddict(self) -> ReportTemplateStructureIssueDataDict:
-        return cast(ReportTemplateStructureIssueDataDict, self.model_dump(mode="python"))
+        return cast(
+            ReportTemplateStructureIssueDataDict, self.model_dump(mode="python")
+        )
 
 
 class ReportTemplateStructureValidationResult(BaseModel):
@@ -220,7 +222,11 @@ def build_report_template_graph(
             node_type="section",
             name=section_name,
             token_source=_tokenize(section_name)
-            + [token for section_type in section.types for token in _tokenize(section_type)]
+            + [
+                token
+                for section_type in section.types
+                for token in _tokenize(section_type)
+            ]
             + _tokenize(getattr(section, "section_kind", "findings"))
             + [
                 token
@@ -534,7 +540,10 @@ def validate_report_template_structure(
                 )
 
             field_source = getattr(field, "source", None)
-            if section_kind == "history" and field_source in {"patient", "patient_examination"}:
+            if section_kind == "history" and field_source in {
+                "patient",
+                "patient_examination",
+            }:
                 issues.append(
                     ReportTemplateStructureIssue(
                         code="section_field_source_mismatch",
@@ -608,7 +617,9 @@ def validate_report_template_structure(
     )
 
 
-def validate_report_template_knowledge_base(kb: Any) -> dict[str, ReportTemplateStructureValidationResult]:
+def validate_report_template_knowledge_base(
+    kb: Any,
+) -> dict[str, ReportTemplateStructureValidationResult]:
     templates = cast(Mapping[str, ReportTemplate], getattr(kb, "report_template", {}))
     sections = cast(Mapping[str, Any], getattr(kb, "report_template_section", {}))
     report_findings = cast(Mapping[str, Any], getattr(kb, "report_finding", {}))

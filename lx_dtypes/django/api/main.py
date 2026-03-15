@@ -48,6 +48,7 @@ def _orm_models():
         ),
     }
 
+
 class StructuredApiError(Exception):
     def __init__(self, status_code: int, code: str, message: str):
         self.status_code = status_code
@@ -64,6 +65,7 @@ def handle_structured_api_error(request: Any, exc: StructuredApiError):
         status=exc.status_code,
     )
 
+
 class ReportTemplateValidationRequest(Schema):
     findings: List[Dict[str, Any]] = Field(default_factory=list)
 
@@ -76,7 +78,9 @@ class PatientFindingClassificationInput(Schema):
 class PatientFindingCreateRequest(Schema):
     patient_examination: int
     finding: int
-    classifications: List[PatientFindingClassificationInput] = Field(default_factory=list)
+    classifications: List[PatientFindingClassificationInput] = Field(
+        default_factory=list
+    )
 
 
 class PatientFindingUpdateRequest(Schema):
@@ -86,7 +90,9 @@ class PatientFindingUpdateRequest(Schema):
 
 
 class PatientFindingClassificationsRequest(Schema):
-    classifications: List[PatientFindingClassificationInput] = Field(default_factory=list)
+    classifications: List[PatientFindingClassificationInput] = Field(
+        default_factory=list
+    )
     replace: bool = True
 
 
@@ -196,7 +202,9 @@ def _split_classifications(
     location: List[Dict[str, Any]] = []
     morphology: List[Dict[str, Any]] = []
     for classification in classifications:
-        c_types = {_norm_name(v) for v in classification.get("classification_types", [])}
+        c_types = {
+            _norm_name(v) for v in classification.get("classification_types", [])
+        }
         if "location" in c_types:
             location.append(classification)
         if "morphology" in c_types:
@@ -336,7 +344,10 @@ def _validate_finding_for_examination(
     kb_allowed_names = _resolve_exam_kb_finding_names(
         patient_examination.examination_safe, module_name=module_name
     )
-    if kb_allowed_names is not None and _norm_name(finding.name) not in kb_allowed_names:
+    if (
+        kb_allowed_names is not None
+        and _norm_name(finding.name) not in kb_allowed_names
+    ):
         _api_error(
             400,
             "invalid-finding",
@@ -367,7 +378,10 @@ def _validate_classification_payload(
     kb_classifications = _resolve_kb_finding_classification_names(
         finding, module_name=module_name
     )
-    if kb_classifications is not None and _norm_name(classification.name) not in kb_classifications:
+    if (
+        kb_classifications is not None
+        and _norm_name(classification.name) not in kb_classifications
+    ):
         _api_error(
             400,
             "invalid-choice",
@@ -583,7 +597,9 @@ def choices_by_classification(
     all_choices = list(classification.choices.all())
     if kb_allowed_choices is not None:
         all_choices = [
-            choice for choice in all_choices if _norm_name(choice.name) in kb_allowed_choices
+            choice
+            for choice in all_choices
+            if _norm_name(choice.name) in kb_allowed_choices
         ]
     return {"choices": [_serialize_choice(choice) for choice in all_choices]}
 
@@ -669,9 +685,13 @@ def patch_patient_finding(
     request: BaseRequest, patient_finding_id: int, payload: PatientFindingUpdateRequest
 ) -> Dict[str, Any]:
     module_name = _findings_module_name()
-    patient_finding = _active_patient_findings_queryset().filter(id=patient_finding_id).first()
+    patient_finding = (
+        _active_patient_findings_queryset().filter(id=patient_finding_id).first()
+    )
     if not patient_finding:
-        _api_error(404, "not-found", f"Patient finding '{patient_finding_id}' not found.")
+        _api_error(
+            404, "not-found", f"Patient finding '{patient_finding_id}' not found."
+        )
     assert patient_finding is not None
 
     with transaction.atomic():
@@ -717,9 +737,13 @@ def patch_patient_finding(
 def delete_patient_finding(
     request: BaseRequest, patient_finding_id: int
 ) -> Dict[str, Any]:
-    patient_finding = _active_patient_findings_queryset().filter(id=patient_finding_id).first()
+    patient_finding = (
+        _active_patient_findings_queryset().filter(id=patient_finding_id).first()
+    )
     if not patient_finding:
-        _api_error(404, "not-found", f"Patient finding '{patient_finding_id}' not found.")
+        _api_error(
+            404, "not-found", f"Patient finding '{patient_finding_id}' not found."
+        )
     assert patient_finding is not None
 
     actor = _request_user_if_authenticated(request)
@@ -739,9 +763,13 @@ def set_patient_finding_classifications(
     payload: PatientFindingClassificationsRequest,
 ) -> Dict[str, Any]:
     module_name = _findings_module_name()
-    patient_finding = _active_patient_findings_queryset().filter(id=patient_finding_id).first()
+    patient_finding = (
+        _active_patient_findings_queryset().filter(id=patient_finding_id).first()
+    )
     if not patient_finding:
-        _api_error(404, "not-found", f"Patient finding '{patient_finding_id}' not found.")
+        _api_error(
+            404, "not-found", f"Patient finding '{patient_finding_id}' not found."
+        )
     assert patient_finding is not None
 
     with transaction.atomic():
