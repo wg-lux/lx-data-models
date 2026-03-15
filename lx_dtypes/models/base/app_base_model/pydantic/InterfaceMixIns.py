@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, TypeVar
+from typing import Any, Dict, Generic, List, Mapping, TypeVar, cast
 
 from pydantic import model_validator
 
@@ -17,13 +17,14 @@ class DDictMixIn(Generic[DDictT], ABC):
     @property
     def ddict(self) -> DDictT:
         """Materialize the associated DataDict from the model's data."""
-        return self.ddict_class(**self.model_dump())  # type: ignore
+        data = cast(Any, self).model_dump()
+        return self.ddict_class(**data)
 
     @classmethod
-    def validate_ddict(cls, input_dict: Dict[str, Any]) -> bool:
+    def validate_ddict(cls, input_dict: Mapping[str, Any]) -> bool:
         """Validate that `input_dict` can construct the model and its DataDict."""
         try:
-            instance = cls.model_validate(input_dict)  # type: ignore
+            instance = cls.model_validate(dict(input_dict))  # type: ignore
             _ = instance.ddict
             return True
         except Exception as exc:  # pragma: no cover - propagates context
@@ -47,7 +48,7 @@ class ListFieldSerializationMixIn(ABC):
 
     def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         """Serialize list fields to their configured string representation."""
-        dumped = super().model_dump(*args, **kwargs)  # type: ignore
+        dumped = cast(Dict[str, Any], super().model_dump(*args, **kwargs))  # type: ignore
         for field in self.list_type_fields():
             dumped[field] = serialize_str_list(dumped[field])
         return dumped

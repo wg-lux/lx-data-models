@@ -555,13 +555,13 @@ def evaluate_report_template_validators_runtime(
         ok = True
 
         for dep_name in _as_str_list(validator.finding_validators):
-            dep_result = evaluate_finding_validator_by_name(dep_name)
+            dep_finding_result = evaluate_finding_validator_by_name(dep_name)
             findings_status.append(
                 ExaminationValidatorDependencyStatusDataDict(
-                    name=dep_name, ok=dep_result["ok"]
+                    name=dep_name, ok=dep_finding_result["ok"]
                 )
             )
-            if dep_result["ok"]:
+            if dep_finding_result["ok"]:
                 continue
             ok = False
             issues.append(
@@ -576,16 +576,16 @@ def evaluate_report_template_validators_runtime(
                     details={"dependency": dep_name},
                 )
             )
-            issues.extend(dep_result["issues"])
+            issues.extend(dep_finding_result["issues"])
 
         for dep_name in _as_str_list(validator.examination_validators):
-            dep_result = evaluate_examination_validator_by_name(dep_name, stack)
+            dep_exam_result = evaluate_examination_validator_by_name(dep_name, stack)
             exams_status.append(
                 ExaminationValidatorDependencyStatusDataDict(
-                    name=dep_name, ok=dep_result["ok"]
+                    name=dep_name, ok=dep_exam_result["ok"]
                 )
             )
-            if dep_result["ok"]:
+            if dep_exam_result["ok"]:
                 continue
             ok = False
             issues.append(
@@ -600,7 +600,7 @@ def evaluate_report_template_validators_runtime(
                     details={"dependency": dep_name},
                 )
             )
-            issues.extend(dep_result["issues"])
+            issues.extend(dep_exam_result["issues"])
 
         stack.pop()
         result = ExaminationValidatorExecutionDataDict(
@@ -623,10 +623,10 @@ def evaluate_report_template_validators_runtime(
     ]
 
     issues: List[RuntimeValidationIssueDataDict] = []
-    for result in findings_results:
-        issues.extend(result["issues"])
-    for result in exam_results:
-        issues.extend(result["issues"])
+    for finding_result in findings_results:
+        issues.extend(finding_result["issues"])
+    for exam_result in exam_results:
+        issues.extend(exam_result["issues"])
 
     ok = all(result["ok"] for result in findings_results) and all(
         result["ok"] for result in exam_results

@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 import yaml
@@ -70,6 +71,7 @@ def report_template_module(tmp_path: Path, request: pytest.FixtureRequest) -> Pa
         },
     ]
 
+    section_findings: list[str] | list[dict[str, Any]]
     if mode == "kb_alias":
         records.append(
             {

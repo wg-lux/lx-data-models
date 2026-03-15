@@ -17,6 +17,8 @@ def p_video_segment_data_dict_fixture(
     ddict = PVideoSegmentDataDict(
         **{
             "uuid": "123e4567-e89b-12d3-a456-426614174000",
+            "tags": [],
+            "external_ids": {},
             "start_frame_number": 100,
             "end_frame_number": 150,
             "patient_video_file": str(patient_video_file_fixture.uuid),

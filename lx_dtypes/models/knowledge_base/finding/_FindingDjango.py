@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from django.db import models
 
 from lx_dtypes.models.base.app_base_model.django.KnowledgebaseBaseModelDjango import (
@@ -9,21 +11,38 @@ from .FindingDataDict import (
     FindingDataDict,
 )
 
+if TYPE_CHECKING:
+    from lx_dtypes.models.knowledge_base.classification import ClassificationDjango
+    from lx_dtypes.models.knowledge_base.finding._FindingTypeDjango import (
+        FindingTypeDjango,
+    )
+    from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
+        InterventionDjango,
+    )
+
 
 class FindingDjango(KnowledgebaseBaseModelDjango[FindingDataDict]):
-    interventions: models.ManyToManyField = models.ManyToManyField(
+    interventions: models.ManyToManyField[
+        "InterventionDjango", "InterventionDjango"
+    ] = models.ManyToManyField(
         "InterventionDjango",
         related_name=FieldNames.FINDINGS.value,
     )
-    caused_by_interventions: models.ManyToManyField = models.ManyToManyField(
+    caused_by_interventions: models.ManyToManyField[
+        "InterventionDjango", "InterventionDjango"
+    ] = models.ManyToManyField(
         "InterventionDjango",
         related_name="caused_by_findings",
         blank=True,
     )
-    finding_types: models.ManyToManyField = models.ManyToManyField(
-        "FindingTypeDjango", related_name=FieldNames.FINDINGS.value
+    finding_types: models.ManyToManyField["FindingTypeDjango", "FindingTypeDjango"] = (
+        models.ManyToManyField(
+            "FindingTypeDjango", related_name=FieldNames.FINDINGS.value
+        )
     )
-    classifications: models.ManyToManyField = models.ManyToManyField(
+    classifications: models.ManyToManyField[
+        "ClassificationDjango", "ClassificationDjango"
+    ] = models.ManyToManyField(
         "ClassificationDjango",
         related_name=FieldNames.FINDINGS.value,
     )

@@ -4,26 +4,68 @@ import os
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Set
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Literal,
+    NoReturn,
+    Optional,
+    Protocol,
+    Set,
+    TypeVar,
+    cast,
+)
 
-from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import QuerySet
 from django.utils import timezone
-from ninja import NinjaAPI, Schema
 from ninja.errors import HttpError
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
 
 from .request_types import BaseRequest
 
-api = NinjaAPI(urls_namespace="lx_dtypes_base_api")
+F = TypeVar("F", bound=Callable[..., Any])
+
+
+class _RouteDecorator(Protocol):
+    def __call__(self, func: F, /) -> F: ...
+
+
+class _TypedApi(Protocol):
+    @property
+    def urls(self) -> Any: ...
+
+    def get(self, path: str, /) -> _RouteDecorator: ...
+
+    def post(self, path: str, /) -> _RouteDecorator: ...
+
+    def patch(self, path: str, /) -> _RouteDecorator: ...
+
+    def delete(self, path: str, /) -> _RouteDecorator: ...
+
+    def exception_handler(self, exc_class: type[Exception], /) -> _RouteDecorator: ...
+
+    def create_response(self, request: Any, data: Any, *, status: int) -> Any: ...
+
+
+if TYPE_CHECKING:
+    Schema = BaseModel
+    api = cast(_TypedApi, object())
+else:
+    from ninja import NinjaAPI, Schema
+
+    api = cast(_TypedApi, NinjaAPI(urls_namespace="lx_dtypes_base_api"))
 
 
 @lru_cache(maxsize=1)
-def _orm_models():
+def _orm_models() -> Dict[str, Any]:
     module_path = getattr(settings, "LX_DTYPES_HOST_MODELS_MODULE", None) or os.getenv(
         "LX_DTYPES_HOST_MODELS_MODULE"
     )
@@ -50,7 +92,7 @@ def _orm_models():
 
 
 class StructuredApiError(Exception):
-    def __init__(self, status_code: int, code: str, message: str):
+    def __init__(self, status_code: int, code: str, message: str) -> None:
         self.status_code = status_code
         self.code = code
         self.message = message
@@ -58,7 +100,7 @@ class StructuredApiError(Exception):
 
 
 @api.exception_handler(StructuredApiError)
-def handle_structured_api_error(request: Any, exc: StructuredApiError):
+def handle_structured_api_error(request: Any, exc: StructuredApiError) -> Any:
     return api.create_response(
         request,
         {"code": exc.code, "message": exc.message},
@@ -110,10 +152,10 @@ def _kb_loader() -> DataLoader:
     return loader
 
 
-def _load_module_kb(module_name: str):
+def _load_module_kb(module_name: str) -> Any:
     loader = _kb_loader()
     try:
-        return loader.load_knowledge_base(module_name)
+        return cast(Any, loader.load_knowledge_base(module_name))
     except ValueError as exc:
         raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
 
@@ -128,7 +170,7 @@ def _norm_name(value: Optional[str]) -> str:
 
 @lru_cache(maxsize=8)
 def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
-    return _load_module_kb(module_name).export_core_concepts()
+    return cast(Dict[str, Any], _load_module_kb(module_name).export_core_concepts())
 
 
 @lru_cache(maxsize=8)
@@ -157,8 +199,11 @@ def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
 
 def _active_patient_findings_queryset() -> QuerySet[Any]:
     patient_finding_model = _orm_models()["PatientFinding"]
-    return patient_finding_model.objects.filter(is_active=True).select_related(
-        "patient_examination", "finding"
+    return cast(
+        QuerySet[Any],
+        patient_finding_model.objects.filter(is_active=True).select_related(
+            "patient_examination", "finding"
+        ),
     )
 
 
@@ -323,7 +368,7 @@ def _resolve_kb_classification_choice_names(
     return {_norm_name(name) for name in choices}
 
 
-def _api_error(status: int, code: str, message: str) -> None:
+def _api_error(status: int, code: str, message: str) -> NoReturn:
     raise StructuredApiError(status, code, message)
 
 
@@ -464,7 +509,7 @@ def report_template_by_name(
     """
     kb = _load_module_kb(module_name)
     try:
-        return kb.export_report_template(template_name)
+        return cast(Dict[str, Any], kb.export_report_template(template_name))
     except KeyError as exc:
         raise HttpError(
             404,
@@ -485,7 +530,7 @@ def report_templates_by_examination(
         for template_name, template in kb.report_template.items()
         if template.examination == examination_name
     ]
-    return matches
+    return cast(List[Dict[str, Any]], matches)
 
 
 @api.post("/report-templates/{module_name}/{template_name}/validate")
@@ -500,8 +545,11 @@ def validate_report_template_runtime(
     """
     kb = _load_module_kb(module_name)
     try:
-        return kb.evaluate_report_template_validators(
-            template_name, reported_findings=payload.findings
+        return cast(
+            Dict[str, Any],
+            kb.evaluate_report_template_validators(
+                template_name, reported_findings=payload.findings
+            ),
         )
     except KeyError as exc:
         raise HttpError(
@@ -516,7 +564,7 @@ def core_concepts_by_module(request: BaseRequest, module_name: str) -> Dict[str,
     Return canonical core concept payloads for one KB module.
     """
     kb = _load_module_kb(module_name)
-    return kb.export_core_concepts()
+    return cast(Dict[str, Any], kb.export_core_concepts())
 
 
 @api.get("/examinations/{examination_id}/findings/")
@@ -575,7 +623,7 @@ def classifications_by_finding(
         allowed_classification_names=kb_allowed_classifications,
         required_classification_names=set(),
     )
-    return serialized["classifications"]
+    return cast(List[Dict[str, Any]], serialized["classifications"])
 
 
 @api.get("/classifications/{classification_id}/choices/")
