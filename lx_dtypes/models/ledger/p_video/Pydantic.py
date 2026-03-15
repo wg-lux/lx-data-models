@@ -55,7 +55,7 @@ class PatientVideoFile(PatientFileMixIn, LedgerBaseModel[PatientVideoFileDataDic
         self.patient_video_segments[str(segment.uuid)] = segment
         return segment
 
-    def update_segment(self, segment_uuid: str, **kwargs) -> "PVideoSegment":
+    def update_segment(self, segment_uuid: str, **kwargs: object) -> "PVideoSegment":
         if segment_uuid not in self.patient_video_segments:
             raise ValueError(
                 f"Segment with UUID {segment_uuid} not found in patient video file."

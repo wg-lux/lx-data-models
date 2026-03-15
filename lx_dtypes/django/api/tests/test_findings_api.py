@@ -1,6 +1,7 @@
 import json
 from datetime import date
 from importlib import import_module
+from typing import Any
 
 import pytest
 from django.conf import settings
@@ -28,7 +29,7 @@ except (ModuleNotFoundError, RuntimeError, AttributeError):  # pragma: no cover
 pytestmark = pytest.mark.django_db
 
 
-def _create_patient_examination(examination: Examination) -> PatientExamination:
+def _create_patient_examination(examination: Any) -> Any:
     gender, _ = Gender.objects.get_or_create(name="male")
     center, _ = Center.objects.get_or_create(name="Test Center")
     patient = Patient.objects.create(
@@ -45,12 +46,7 @@ def _create_patient_examination(examination: Examination) -> PatientExamination:
     )
 
 
-def _create_exam_graph() -> tuple[
-    Examination,
-    Finding,
-    FindingClassification,
-    FindingClassificationChoice,
-]:
+def _create_exam_graph() -> tuple[Any, Any, Any, Any]:
     examination = Examination.objects.create(name="colonoscopy")
     finding = Finding.objects.create(name="colon_polyp")
     examination.findings.add(finding)

@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from django.db import models
 
 from lx_dtypes.models.base.app_base_model.django.KnowledgebaseBaseModelDjango import (
@@ -8,9 +10,16 @@ from lx_dtypes.models.knowledge_base.intervention.InterventionDataDict import (
 )
 from lx_dtypes.names import INTERVENTION_MODEL_LIST_TYPE_FIELDS, FieldNames
 
+if TYPE_CHECKING:
+    from lx_dtypes.models.knowledge_base.intervention.InterventionTypeDjango import (
+        InterventionTypeDjango,
+    )
+
 
 class InterventionDjango(KnowledgebaseBaseModelDjango[InterventionDataDict]):
-    intervention_types: models.ManyToManyField = models.ManyToManyField(
+    intervention_types: models.ManyToManyField[
+        "InterventionTypeDjango", "InterventionTypeDjango"
+    ] = models.ManyToManyField(
         "InterventionTypeDjango", related_name=FieldNames.INTERVENTIONS.value
     )
 

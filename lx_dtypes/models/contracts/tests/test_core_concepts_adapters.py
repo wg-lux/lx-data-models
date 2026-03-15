@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Callable
 from pathlib import Path
+from typing import Any, Callable
 
 import pytest
 
@@ -37,6 +37,10 @@ from lx_dtypes.models.knowledge_base.intervention.InterventionType import (
 )
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 from lx_dtypes.models.knowledge_base.unit.UnitType import UnitType
+from lx_dtypes.names import (
+    ClassificationChoiceDescriptorTypes,
+    NumericDistributionChoices,
+)
 
 _LIST_FIELDS: dict[CoreConceptName, list[str]] = {
     "classification": ["classification_choices", "classification_types"],
@@ -161,9 +165,11 @@ def _sample_model_factories() -> dict[CoreConceptName, Callable[[], Any]]:
         ),
         "classification_choice_descriptor": lambda: ClassificationChoiceDescriptor(
             name="descriptor_model",
-            classification_choice_descriptor_type="numeric",
+            classification_choice_descriptor_type=(
+                ClassificationChoiceDescriptorTypes.NUMERIC
+            ),
             unit="mm",
-            numeric_distribution="uniform",
+            numeric_distribution=NumericDistributionChoices.UNIFORM,
             selection_options=["opt_1", "opt_2"],
             tags=["tag_a", "tag_b"],
         ),

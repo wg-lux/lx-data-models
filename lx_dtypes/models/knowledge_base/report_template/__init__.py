@@ -4,6 +4,19 @@ from pydantic import ValidationError
 
 from .ExaminationValidator import ExaminationValidator
 from .ExaminationValidatorDataDict import ExaminationValidatorDataDict
+from .FindingsValidator import (
+    DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
+    DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
+    FINDINGS_VALIDATOR_COMPARATORS,
+    FINDINGS_VALIDATOR_OPERATORS,
+    DeprecatedReportTemplateValueWarning,
+    FindingsValidatorComparator,
+    FindingsValidatorCondition,
+    FindingsValidatorConditionClause,
+    FindingsValidatorOperator,
+    FindingsValidatorQuery,
+    FindingsValidatorRequiredClassification,
+)
 from .FindingsValidator import FindingsValidator as FindingsValidatorModel
 from .FindingsValidatorDataDict import (
     FindingsValidatorConditionDataDict,
@@ -42,6 +55,11 @@ from .ReportFindingDataDict import (
     ReportTemplateClassificationRequirementDataDict,
     ReportTemplateFindingRequirementDataDict,
 )
+from .ReportTemplate import ReportTemplate, ReportTemplateValidators
+from .ReportTemplateDataDict import (
+    ReportTemplateDataDict,
+    ReportTemplateValidatorsDataDict,
+)
 from .ReportTemplateGraph import (
     ReportTemplateGraph,
     ReportTemplateGraphEdge,
@@ -59,11 +77,6 @@ from .ReportTemplateGraphDataDict import (
     ReportTemplateStructureIssueDataDict,
     ReportTemplateStructureValidationResultDataDict,
 )
-from .ReportTemplate import ReportTemplate, ReportTemplateValidators
-from .ReportTemplateDataDict import (
-    ReportTemplateDataDict,
-    ReportTemplateValidatorsDataDict,
-)
 from .ReportTemplateSection import ReportTemplateSection, ReportTemplateSectionField
 from .ReportTemplateSectionDataDict import (
     ReportTemplateSectionDataDict,
@@ -77,19 +90,6 @@ from .ValidatorRuntime import (
     RuntimeValidationIssueDataDict,
     evaluate_findings_validator_runtime,
     evaluate_report_template_validators_runtime,
-)
-from .FindingsValidator import (
-    DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
-    DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
-    FINDINGS_VALIDATOR_COMPARATORS,
-    FINDINGS_VALIDATOR_OPERATORS,
-    DeprecatedReportTemplateValueWarning,
-    FindingsValidatorComparator,
-    FindingsValidatorCondition,
-    FindingsValidatorConditionClause,
-    FindingsValidatorOperator,
-    FindingsValidatorQuery,
-    FindingsValidatorRequiredClassification,
 )
 
 FindingsValidator = FindingsValidatorModel
@@ -131,12 +131,10 @@ kb_report_template_lookup = KbReportTemplateLookupType(
 
 kb_report_template_models = Union[
     ReportTemplate,
-    ReportTemplateGraph,
     ReportTemplateSection,
     ReportFinding,
     FindingsValidator,
     ExaminationValidator,
-    LookupState,
 ]
 
 kb_report_template_ddicts = Union[

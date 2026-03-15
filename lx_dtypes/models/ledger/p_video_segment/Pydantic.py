@@ -78,7 +78,8 @@ class PVideoSegment(LedgerBaseModel[PVideoSegmentDataDict]):
 
     # validator to ensure that end_frame_number is greater than start_frame_number
     @field_validator("end_frame_number")
-    def check_frame_numbers(cls, end_frame_number, info: ValidationInfo):
+    @classmethod
+    def check_frame_numbers(cls, end_frame_number: int, info: ValidationInfo) -> int:
         start_frame_number = info.data.get("start_frame_number") if info.data else None
         if start_frame_number is not None and end_frame_number <= start_frame_number:
             raise ValueError("end_frame_number must be greater than start_frame_number")

@@ -3,10 +3,13 @@ import json
 from django.test import Client
 
 
-def _requirement_set_id(payload: list[dict], name: str) -> int:
+def _requirement_set_id(payload: list[dict[str, object]], name: str) -> int:
     for row in payload:
         if row.get("name") == name:
-            return int(row["id"])
+            row_id = row.get("id")
+            if isinstance(row_id, (int, str)):
+                return int(row_id)
+            raise AssertionError(f"Invalid id value in payload row: {row_id!r}")
     raise AssertionError(f"Requirement set '{name}' not found in payload")
 
 

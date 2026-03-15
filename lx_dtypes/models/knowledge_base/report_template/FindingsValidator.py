@@ -1,6 +1,6 @@
-from collections.abc import Mapping
 import warnings
-from typing import Any, List, Literal
+from collections.abc import Mapping
+from typing import Any, List, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -81,7 +81,7 @@ def _normalize_value_with_alias(
     *,
     field_name: str,
     valid_values: tuple[str, ...],
-    deprecated_aliases: dict[str, str],
+    deprecated_aliases: Mapping[str, str],
 ) -> str:
     normalized = str(raw_value).strip().lower()
     if not normalized:
@@ -176,7 +176,7 @@ class FindingsValidatorCondition(BaseModel):
 
     @property
     def ddict(self) -> FindingsValidatorConditionDataDict:
-        return self.model_dump(mode="python")
+        return cast(FindingsValidatorConditionDataDict, self.model_dump(mode="python"))
 
 
 class FindingsValidatorQuery(BaseModel):
@@ -213,7 +213,7 @@ class FindingsValidatorQuery(BaseModel):
 
     @property
     def ddict(self) -> FindingsValidatorQueryDataDict:
-        return self.model_dump(mode="python")
+        return cast(FindingsValidatorQueryDataDict, self.model_dump(mode="python"))
 
 
 class FindingsValidator(KnowledgebaseBaseModel[FindingsValidatorDataDict]):

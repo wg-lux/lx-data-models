@@ -264,9 +264,13 @@ def build_report_template_graph(
                 continue
 
             if section_kind == "patient_data":
-                field_node_type = "patient_field"
+                field_node_type: Literal["patient_field", "history_field"] = (
+                    "patient_field"
+                )
                 field_node_id = f"patient_field:{field_key}"
-                field_edge_type = "section_to_patient_field"
+                field_edge_type: Literal[
+                    "section_to_patient_field", "section_to_history_field"
+                ] = "section_to_patient_field"
             elif section_kind == "history":
                 field_node_type = "history_field"
                 field_node_id = f"history_field:{field_key}"

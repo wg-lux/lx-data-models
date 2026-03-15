@@ -186,7 +186,10 @@ def parse_shallow_object_with_meta(
         try:
             parsed_object = TargetModel.model_validate(item)
         except ValidationError as exc:
-            first_error = exc.errors(include_url=False)[0] if exc.errors() else {}
+            errors = exc.errors(include_url=False)
+            first_error: dict[str, Any] = (
+                dict(errors[0]) if errors else {"loc": (), "msg": "Validation error"}
+            )
             err_loc = ".".join(str(part) for part in first_error.get("loc", ()))
             err_msg = str(first_error.get("msg", "Validation error"))
             err_detail = f" [{err_loc}] {err_msg}" if err_loc else f" {err_msg}"

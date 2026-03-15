@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import Field, model_validator
 
 from lx_dtypes.models.base.app_base_model.ddict import StateBaseModelDataDict
@@ -25,7 +27,11 @@ class PVideoSegmentState(StateBaseModel[PVideoSegmentStateDataDict]):
 
     # model validator to make sure that either prediction or annotation is True
     @model_validator(mode="before")
-    def check_prediction_or_annotation(cls, values):
+    @classmethod
+    def check_prediction_or_annotation(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+
         prediction = values.get("prediction", False)
         annotation = values.get("annotation", False)
         if not prediction and not annotation:
