@@ -1,11 +1,6 @@
 from abc import ABC, abstractmethod
-<<<<<<< HEAD
-from typing import Any, Dict, Generic, List, TypeVar, Set, Iterable, cast
-=======
 from typing import Any, Dict, Generic, List, Mapping, TypeVar, cast, Iterable, Set
 
-from pydantic import model_validator
->>>>>>> 7534adc (mypy fixes)
 
 from pydantic import model_validator, field_serializer, SerializationInfo
 from lx_dtypes.serialization import parse_str_list, serialize_str_list
