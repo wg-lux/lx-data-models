@@ -29,12 +29,10 @@ class PFindingInterventionsDjango(LedgerBaseModelDjango[PFindingInterventionsDat
     if TYPE_CHECKING:
         patient_finding: models.ForeignKey[PFindingDjango, PFindingDjango]
 
-    patient_finding = (
-        models.ForeignKey(
-            "PFindingDjango",
-            related_name="patient_finding_interventions",
-            on_delete=models.CASCADE,
-        )
+    patient_finding = models.ForeignKey(
+        "PFindingDjango",
+        related_name="patient_finding_interventions",
+        on_delete=models.CASCADE,
     )
 
     if TYPE_CHECKING:

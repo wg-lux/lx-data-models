@@ -24,9 +24,7 @@ if TYPE_CHECKING:
 
 class FindingDjango(KnowledgebaseBaseModelDjango[FindingDataDict]):
     if TYPE_CHECKING:
-        interventions: models.ManyToManyField[
-            InterventionDjango, InterventionDjango
-        ]
+        interventions: models.ManyToManyField[InterventionDjango, InterventionDjango]
         caused_by_interventions: models.ManyToManyField[
             InterventionDjango, InterventionDjango
         ]
@@ -44,10 +42,8 @@ class FindingDjango(KnowledgebaseBaseModelDjango[FindingDataDict]):
         related_name="caused_by_findings",
         blank=True,
     )
-    finding_types = (
-        models.ManyToManyField(
-            "FindingTypeDjango", related_name=FieldNames.FINDINGS.value
-        )
+    finding_types = models.ManyToManyField(
+        "FindingTypeDjango", related_name=FieldNames.FINDINGS.value
     )
     classifications = models.ManyToManyField(
         "ClassificationDjango",

@@ -3,9 +3,6 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
-    DeprecatedReportTemplateValueWarning,
-)
 from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
     ReportTemplateClassificationRequirement,
     ReportTemplateFindingRequirement,
@@ -118,9 +115,12 @@ def test_findings_validator_operator_asd_is_rejected() -> None:
         )
 
 
-def test_findings_validator_comparator_alias_normalizes_with_warning() -> None:
-    with pytest.warns(DeprecatedReportTemplateValueWarning, match=">"):
-        fv = FindingsValidator.model_validate(
+def test_findings_validator_comparator_alias_is_rejected() -> None:
+    with pytest.raises(
+        ValidationError,
+        match="Deprecated findings_validator.comparator alias '>' is no longer supported; use 'gt' instead.",
+    ):
+        FindingsValidator.model_validate(
             {
                 "name": "legacy_comparator_alias",
                 "finding": "esophagus_polyp",
@@ -140,10 +140,6 @@ def test_findings_validator_comparator_alias_normalizes_with_warning() -> None:
                 },
             }
         )
-
-    assert fv.query.condition is not None
-    assert fv.query.operator == "condition"
-    assert fv.query.condition.any[0].comparator == "gt"
 
 
 def test_findings_validator_rejects_legacy_conditional_operator() -> None:

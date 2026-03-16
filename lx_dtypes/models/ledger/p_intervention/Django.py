@@ -38,12 +38,10 @@ class PFindingInterventionDjango(LedgerBaseModelDjango[PFindingInterventionDataD
         related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
         on_delete=models.CASCADE,
     )
-    intervention = (
-        models.ForeignKey(
-            "InterventionDjango",
-            related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
-            on_delete=models.CASCADE,
-        )
+    intervention = models.ForeignKey(
+        "InterventionDjango",
+        related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
+        on_delete=models.CASCADE,
     )
 
     @classmethod

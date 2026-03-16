@@ -50,6 +50,31 @@ def test_findings_validator_rejects_unknown_operator() -> None:
         )
 
 
+def test_findings_validator_rejects_legacy_operator_aliases() -> None:
+    for alias in ("present", "absent", "not_exists", "not-exists", "not exists", "if"):
+        with pytest.raises(ValidationError, match="no longer supported|Unsupported"):
+            FindingsValidator.model_validate(
+                {
+                    "name": f"f_validator_{alias}",
+                    "finding": "esophagus_polyp",
+                    "operator": alias,
+                }
+            )
+
+
+def test_findings_validator_accepts_canonical_operator_without_warning() -> None:
+    validator = FindingsValidator.model_validate(
+        {
+            "name": "f_validator_exists",
+            "finding": "esophagus_polyp",
+            "operator": "exists",
+        }
+    )
+
+    assert validator.operator == "exists"
+    assert validator.query.operator == "exists"
+
+
 def test_findings_validator_rejects_mismatched_query_and_top_level_operator() -> None:
     with pytest.raises(ValidationError, match="query.operator must match"):
         FindingsValidator.model_validate(
@@ -185,3 +210,29 @@ def test_findings_validator_enforces_clause_payload_for_comparators() -> None:
     )
     assert validator.query.condition is not None
     assert validator.query.condition.all[0].values == ["large", "xlarge"]
+
+
+def test_findings_validator_accepts_not_in_comparator() -> None:
+    validator = FindingsValidator.model_validate(
+        {
+            "name": "f_validator",
+            "finding": "esophagus_polyp",
+            "operator": "condition",
+            "query": {
+                "finding": "esophagus_polyp",
+                "operator": "condition",
+                "condition": {
+                    "all": [
+                        {
+                            "classification": "size_cat",
+                            "comparator": "not_in",
+                            "values": ["small", "medium"],
+                        }
+                    ]
+                },
+            },
+        }
+    )
+
+    assert validator.query.condition is not None
+    assert validator.query.condition.all[0].comparator == "not_in"

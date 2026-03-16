@@ -55,7 +55,7 @@ class SensitiveMetaDataDict(MetaBaseModelDataDict):
     gender: Optional[str]
     pseudo_examiners: Optional[Union[str, List[str]]]
 
-    sensitive_meta_state: str
+    sensitive_meta_state: Optional[Union[str, SensitiveMetaStateDataDict]]
 
     first_name: str
     last_name: str

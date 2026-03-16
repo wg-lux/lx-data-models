@@ -47,19 +47,15 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
         related_name=FieldNames.PATIENT_EXAMINATIONS.value,
         on_delete=models.CASCADE,
     )
-    examiners = (
-        models.ManyToManyField(
-            "ExaminerDjango",
-            related_name=FieldNames.PATIENT_EXAMINATIONS.value,
-        )
+    examiners = models.ManyToManyField(
+        "ExaminerDjango",
+        related_name=FieldNames.PATIENT_EXAMINATIONS.value,
     )
 
-    examination = (
-        models.ForeignKey(
-            "ExaminationDjango",
-            related_name=FieldNames.PATIENT_EXAMINATIONS.value,
-            on_delete=models.CASCADE,
-        )
+    examination = models.ForeignKey(
+        "ExaminationDjango",
+        related_name=FieldNames.PATIENT_EXAMINATIONS.value,
+        on_delete=models.CASCADE,
     )
     date: OptionalDateTimeField = models.DateTimeField(null=True, blank=True)
 

@@ -32,12 +32,10 @@ class PFindingClassificationsDjango(
     if TYPE_CHECKING:
         patient_finding: models.ForeignKey[PFindingDjango, PFindingDjango]
 
-    patient_finding = (
-        models.ForeignKey(
-            "PFindingDjango",
-            related_name=FieldNames.PATIENT_FINDING_CLASSIFICATIONS.value,
-            on_delete=models.CASCADE,
-        )
+    patient_finding = models.ForeignKey(
+        "PFindingDjango",
+        related_name=FieldNames.PATIENT_FINDING_CLASSIFICATIONS.value,
+        on_delete=models.CASCADE,
     )
 
     if TYPE_CHECKING:

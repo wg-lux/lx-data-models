@@ -1,4 +1,3 @@
-import warnings
 from collections.abc import Mapping
 from typing import Any, List, Literal, cast
 
@@ -17,9 +16,6 @@ from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict i
 
 FindingsValidatorOperator = Literal[
     "exists",
-    "present",
-    "not_exists",
-    "absent",
     "missing",
     "condition",
 ]
@@ -31,15 +27,13 @@ FindingsValidatorComparator = Literal[
     "lt",
     "lte",
     "in",
+    "not_in",
     "exists",
     "present",
 ]
 
 FINDINGS_VALIDATOR_OPERATORS: tuple[FindingsValidatorOperator, ...] = (
     "exists",
-    "present",
-    "not_exists",
-    "absent",
     "missing",
     "condition",
 )
@@ -51,15 +45,11 @@ FINDINGS_VALIDATOR_COMPARATORS: tuple[FindingsValidatorComparator, ...] = (
     "lt",
     "lte",
     "in",
+    "not_in",
     "exists",
     "present",
 )
 
-DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES: dict[str, FindingsValidatorOperator] = {
-    "if": "condition",
-    "not-exists": "not_exists",
-    "not exists": "not_exists",
-}
 DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES: dict[
     str, FindingsValidatorComparator
 ] = {
@@ -76,6 +66,21 @@ class DeprecatedReportTemplateValueWarning(UserWarning):
     pass
 
 
+def _normalize_value(
+    raw_value: Any,
+    *,
+    field_name: str,
+    valid_values: tuple[str, ...],
+) -> str:
+    normalized = str(raw_value).strip().lower()
+    if not normalized:
+        raise ValueError(f"{field_name} cannot be empty")
+    if normalized in valid_values:
+        return normalized
+    allowed = ", ".join(valid_values)
+    raise ValueError(f"Unsupported {field_name} '{raw_value}'. Allowed: {allowed}")
+
+
 def _normalize_value_with_alias(
     raw_value: Any,
     *,
@@ -90,15 +95,10 @@ def _normalize_value_with_alias(
         return normalized
     if normalized in deprecated_aliases:
         canonical = deprecated_aliases[normalized]
-        warnings.warn(
-            (
-                f"Deprecated {field_name} alias '{raw_value}' detected; "
-                f"use '{canonical}' instead."
-            ),
-            DeprecatedReportTemplateValueWarning,
-            stacklevel=3,
+        raise ValueError(
+            f"Deprecated {field_name} alias '{raw_value}' is no longer supported; "
+            f"use '{canonical}' instead."
         )
-        return canonical
     allowed = ", ".join(valid_values)
     raise ValueError(f"Unsupported {field_name} '{raw_value}'. Allowed: {allowed}")
 
@@ -190,11 +190,10 @@ class FindingsValidatorQuery(BaseModel):
     @field_validator("operator", mode="before")
     @classmethod
     def normalize_operator(cls, value: Any) -> Any:
-        return _normalize_value_with_alias(
+        return _normalize_value(
             value,
             field_name="findings_validator.operator",
             valid_values=FINDINGS_VALIDATOR_OPERATORS,
-            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
         )
 
     @model_validator(mode="after")
@@ -224,11 +223,10 @@ class FindingsValidator(KnowledgebaseBaseModel[FindingsValidatorDataDict]):
     @field_validator("operator", mode="before")
     @classmethod
     def normalize_operator(cls, value: Any) -> Any:
-        return _normalize_value_with_alias(
+        return _normalize_value(
             value,
             field_name="findings_validator.operator",
             valid_values=FINDINGS_VALIDATOR_OPERATORS,
-            deprecated_aliases=DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
         )
 
     @model_validator(mode="before")

@@ -31,15 +31,11 @@ class ExaminationDjango(KnowledgebaseBaseModelDjango[ExaminationDataDict]):
     examination_types = models.ManyToManyField(
         "ExaminationTypeDjango", related_name=FieldNames.EXAMINATIONS.value
     )
-    findings = (
-        models.ManyToManyField(
-            "FindingDjango", related_name=FieldNames.EXAMINATIONS.value
-        )
+    findings = models.ManyToManyField(
+        "FindingDjango", related_name=FieldNames.EXAMINATIONS.value
     )
-    indications = (
-        models.ManyToManyField(
-            "IndicationDjango", related_name=FieldNames.EXAMINATIONS.value
-        )
+    indications = models.ManyToManyField(
+        "IndicationDjango", related_name=FieldNames.EXAMINATIONS.value
     )
 
     @property

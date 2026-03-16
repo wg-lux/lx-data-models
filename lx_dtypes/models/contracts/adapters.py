@@ -93,7 +93,7 @@ _LIST_FIELDS: dict[CoreConceptName, list[str]] = {
     "unit_type": [],
     "information_source": ["information_source_types"],
     "information_source_type": [],
-    "citation": ["authors", "keywords"],
+    "citation": ["keywords"],
 }
 
 _DICT_FIELDS: dict[CoreConceptName, list[str]] = {

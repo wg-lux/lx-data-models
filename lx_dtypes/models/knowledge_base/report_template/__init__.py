@@ -6,7 +6,6 @@ from .ExaminationValidator import ExaminationValidator
 from .ExaminationValidatorDataDict import ExaminationValidatorDataDict
 from .FindingsValidator import (
     DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
-    DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES,
     FINDINGS_VALIDATOR_COMPARATORS,
     FINDINGS_VALIDATOR_OPERATORS,
     DeprecatedReportTemplateValueWarning,
@@ -178,7 +177,6 @@ __all__ = [
     "FindingsValidatorComparator",
     "FINDINGS_VALIDATOR_OPERATORS",
     "FINDINGS_VALIDATOR_COMPARATORS",
-    "DEPRECATED_FINDINGS_VALIDATOR_OPERATOR_ALIASES",
     "DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES",
     "DeprecatedReportTemplateValueWarning",
     "FindingsValidatorQuery",

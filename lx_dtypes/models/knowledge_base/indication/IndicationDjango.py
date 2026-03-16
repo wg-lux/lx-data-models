@@ -26,9 +26,7 @@ class IndicationDjango(KnowledgebaseBaseModelDjango[IndicationDataDict]):
         indication_types: models.ManyToManyField[
             IndicationTypeDjango, IndicationTypeDjango
         ]
-        interventions: models.ManyToManyField[
-            InterventionDjango, InterventionDjango
-        ]
+        interventions: models.ManyToManyField[InterventionDjango, InterventionDjango]
 
     indication_types = models.ManyToManyField(
         "IndicationTypeDjango", related_name=FieldNames.INDICATIONS.value

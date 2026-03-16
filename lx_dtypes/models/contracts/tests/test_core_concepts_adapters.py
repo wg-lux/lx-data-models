@@ -57,7 +57,7 @@ _LIST_FIELDS: dict[CoreConceptName, list[str]] = {
     "unit_type": [],
     "information_source": ["information_source_types"],
     "information_source_type": [],
-    "citation": ["authors", "keywords"],
+    "citation": ["keywords"],
 }
 
 
@@ -142,7 +142,7 @@ def _sample_storage_by_concept() -> dict[CoreConceptName, dict[str, Any]]:
             "name": "citation_a",
             "citation_key": "citation_key_a",
             "title": "Citation title",
-            "authors": "author_a,author_b",
+            "authors": ["author_a", "author_b"],
             "keywords": "kw_a,kw_b",
             "identifiers": {"pmid": "123"},
             "tags": "tag_a,tag_b",

@@ -5,6 +5,12 @@ This guide explains exactly how the report-template YAML is loaded, validated, a
 Start here for a beginner authoring guide:
 - `lx_dtypes/data/report_template_examples/README.md`
 
+Use that README specifically for:
+
+- adding `findings_validator` entries
+- grouping them into `examination_validator` entries
+- attaching validator-ready requirement content to `report_template.validators`
+
 ## Goal
 
 You define report templates in YAML (sections, required findings, validators), and the backend:
@@ -120,6 +126,22 @@ Current scope:
   - `KnowledgeBase.evaluate_report_template_validators(...)`
   - `POST /base_api/report-templates/{module_name}/{template_name}/validate`
 
+Operators are strict canonical-only now:
+
+- `exists`
+- `missing`
+- `condition`
+
+Comparator set used by validator-ready content:
+
+- `eq`, `ne`
+- `gt`, `gte`
+- `lt`, `lte`
+- `in`, `not_in`
+
+For migration details from legacy operator aliases, see:
+- `docs/guides/report-template-findings-validator-migration.md`
+
 Not implemented yet:
 
 - Dedicated Django ORM models/migrations for report-template entities
@@ -154,3 +176,7 @@ Expected payload example:
    - section names used in `report_template.report_sections` must exist.
    - validator names used in `report_template.validators.*` should exist.
 3. Use `finding_validator` or `findings_validator`; both parse, but canonical model is `findings_validator`.
+4. If you want the template to participate in requirement-style runtime evaluation, define:
+   - `findings_validator` records for atomic checks
+   - `examination_validator` records for grouping and recursion
+   - `report_template.validators` references that attach those validators to the template

@@ -44,12 +44,10 @@ class PFindingClassificationChoiceDjango(
             PFindingClassificationsDjango, PFindingClassificationsDjango
         ]
 
-    classification = (
-        models.ForeignKey(
-            "ClassificationDjango",
-            related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
-            on_delete=models.CASCADE,
-        )
+    classification = models.ForeignKey(
+        "ClassificationDjango",
+        related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
+        on_delete=models.CASCADE,
     )
     classification_choice = models.ForeignKey(
         "ClassificationChoiceDjango",

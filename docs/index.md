@@ -19,6 +19,7 @@ api/index
 guides/pydantic-cheatsheet
 guides/dates-and-times
 guides/report-template-infrastructure
+guides/report-template-findings-validator-migration
 ```
 
 ## Quick Links

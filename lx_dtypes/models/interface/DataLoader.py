@@ -27,6 +27,9 @@ class DataLoader(AppBaseModel):
         """
         from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
+        if not self.module_configs:
+            self.load_module_configs()
+
         kb_config = self.get_initialized_config(module_name)
         # Load root module data from YAML so the base KB is populated even when
         # there are no submodules.
@@ -74,6 +77,9 @@ class DataLoader(AppBaseModel):
 
     def get_initialized_config(self, module_name: str) -> "KnowledgeBaseConfig":
         """Return the configuration with modules ordered by dependency graph."""
+
+        if not self.module_configs:
+            self.load_module_configs()
 
         stored_config = self.module_configs.get(module_name)
         if stored_config is None:

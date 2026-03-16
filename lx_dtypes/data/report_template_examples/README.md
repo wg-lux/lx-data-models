@@ -109,9 +109,6 @@ Recommendation:
 
 Canonical operators:
 - `exists`
-- `present`
-- `not_exists`
-- `absent`
 - `missing`
 - `condition`
 
@@ -119,11 +116,122 @@ Canonical comparators:
 - `eq`, `ne`
 - `gt`, `gte`
 - `lt`, `lte`
-- `in`
-- `exists`, `present`
+- `in`, `not_in`
 
-Deprecated aliases are still accepted with a warning:
-- comparator symbols like `>`, `<`, `==`, `!=` -> canonical forms
+Do not use legacy aliases such as:
+- `present`
+- `absent`
+- `not_exists`
+- `not-exists`
+- `if`
+
+Those aliases are no longer accepted in strict validation.
+
+## Expand The Example Module With Validator-Ready Content
+
+Use this pattern when you want a report template to project into requirement-like runtime checks.
+
+### 1. Add a reusable `report_finding`
+
+```yaml
+- model: report_finding
+  name: rf_esophagus_polyp
+  finding: esophagus_polyp
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: size_mm
+      required: false
+    - classification: lst
+      required: false
+```
+
+This is frontend-facing template content. It tells the editor what finding can appear in the report, not whether the report is already complete.
+
+### 2. Add a `findings_validator`
+
+```yaml
+- model: findings_validator
+  name: polyp_has_lst_if_large
+  level: error
+  query:
+    finding: esophagus_polyp
+    operator: condition
+    condition:
+      all:
+        - classification: size_mm
+          comparator: gte
+          value: 10
+      then_requires:
+        - classification: lst
+```
+
+Use `condition` when the requirement depends on a value or classification, not just presence.
+
+Use `exists` for pure presence checks:
+
+```yaml
+- model: findings_validator
+  name: report_has_esophagus_polyp
+  level: error
+  query:
+    finding: esophagus_polyp
+    operator: exists
+```
+
+Use `missing` for explicit absence checks:
+
+```yaml
+- model: findings_validator
+  name: no_duplicate_large_polyp_marker
+  level: warning
+  query:
+    finding: duplicate_large_polyp_marker
+    operator: missing
+```
+
+### 3. Group findings validators under an `examination_validator`
+
+```yaml
+- model: examination_validator
+  name: upper_gi_baseline_requirements
+  finding_validators:
+    - report_has_esophagus_polyp
+    - polyp_has_lst_if_large
+  examination_validators: []
+```
+
+This is how you create a reusable requirement group for one examination template.
+
+### 4. Attach validators to the `report_template`
+
+```yaml
+- model: report_template
+  name: upper_gi_basic
+  examination: star_upper_gi_endoscopy
+  report_sections:
+    - baseline_section
+  validators:
+    examination_validators:
+      - upper_gi_baseline_requirements
+    findings_validators:
+      - report_has_esophagus_polyp
+      - polyp_has_lst_if_large
+```
+
+Practical rule:
+- put reusable cross-finding logic into `examination_validators`
+- put direct finding checks into `findings_validators`
+- attach both at the template level if frontend/export and runtime evaluation should see them
+
+## Validator-Ready Authoring Checklist
+
+- [ ] Every `finding` in a validator exists in the module or dependencies.
+- [ ] Every `classification` used in `condition` or `then_requires` exists for that finding.
+- [ ] Operators are canonical only: `exists`, `missing`, `condition`.
+- [ ] Comparators are canonical only: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `not_in`.
+- [ ] `report_template.validators.*` references existing validator names exactly.
+- [ ] `examination_validator.finding_validators[]` references existing `findings_validator` names exactly.
 
 ## Quick Validation Checklist
 

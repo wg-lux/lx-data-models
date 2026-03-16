@@ -23,8 +23,8 @@ class UnitDjango(KnowledgebaseBaseModelDjango[UnitDataDict]):
     if TYPE_CHECKING:
         unit_types: models.ManyToManyField[UnitTypeDjango, UnitTypeDjango]
 
-    unit_types = (
-        models.ManyToManyField("UnitTypeDjango", related_name=FieldNames.UNITS.value)
+    unit_types = models.ManyToManyField(
+        "UnitTypeDjango", related_name=FieldNames.UNITS.value
     )
     abbreviation: CharFieldType = models.CharField(max_length=50)
 

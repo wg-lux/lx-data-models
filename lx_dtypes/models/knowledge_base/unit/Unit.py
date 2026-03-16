@@ -1,6 +1,6 @@
 from typing import List, Optional, Self, Union
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
@@ -11,7 +11,7 @@ from lx_dtypes.names import UNIT_MODEL_LIST_TYPE_FIELDS
 
 class Unit(KnowledgebaseBaseModel[UnitDataDict]):
     abbreviation: Optional[str] = None
-    unit_types: Union[str, List[str]]
+    unit_types: Union[str, List[str]] = Field(default_factory=list)
 
     @property
     def ddict_class(self) -> type[UnitDataDict]:

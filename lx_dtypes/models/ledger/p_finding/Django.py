@@ -42,12 +42,10 @@ class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
         related_name=FieldNames.PATIENT_FINDINGS.value,
         on_delete=models.CASCADE,
     )
-    patient_examination = (
-        models.ForeignKey(
-            "PExaminationDjango",
-            related_name=FieldNames.PATIENT_FINDINGS.value,
-            on_delete=models.CASCADE,
-        )
+    patient_examination = models.ForeignKey(
+        "PExaminationDjango",
+        related_name=FieldNames.PATIENT_FINDINGS.value,
+        on_delete=models.CASCADE,
     )
 
     if TYPE_CHECKING:

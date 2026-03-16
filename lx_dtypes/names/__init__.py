@@ -268,7 +268,7 @@ SENSITIVE_META_MODEL_NESTED_FIELDS: List[str] = [
 ## KNOWLEDGE BASE MODELS LIST TYPE FIELDS
 CITATION_MODEL_M2M_FIELDS: List[str] = []
 CITATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
-    ["keywords", "authors"], m2m_fields=CITATION_MODEL_M2M_FIELDS
+    ["keywords"], m2m_fields=CITATION_MODEL_M2M_FIELDS
 )
 CLASSIFICATION_TYPE_M2M_FIELDS: List[str] = []
 CLASSIFICATION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
