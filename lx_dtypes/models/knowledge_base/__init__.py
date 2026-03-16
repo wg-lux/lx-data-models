@@ -15,7 +15,7 @@ if TYPE_CHECKING:
         knowledge_base_models_lookup,
     )
 
-_EXPORTED = {
+__all__ = [
     "KB_DDICTS",
     "KnowledgeBaseModelsLookupType",
     "knowledge_base_models_lookup",
@@ -25,7 +25,9 @@ _EXPORTED = {
     "KnowledgeBaseModelsDjangoLookupType",
     "knowledge_base_models_django_lookup",
     "KB_MODELS_DJANGO",
-}
+]
+
+_EXPORTED = set(__all__)
 
 
 def __getattr__(name: str) -> Any:
@@ -56,6 +58,3 @@ def __getattr__(name: str) -> Any:
         "KB_MODELS_DJANGO": KB_MODELS_DJANGO,
     }
     return exports[name]
-
-
-__all__ = list(_EXPORTED)

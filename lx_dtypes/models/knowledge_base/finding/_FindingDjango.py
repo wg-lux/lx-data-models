@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -22,27 +23,33 @@ if TYPE_CHECKING:
 
 
 class FindingDjango(KnowledgebaseBaseModelDjango[FindingDataDict]):
-    interventions: models.ManyToManyField[
-        "InterventionDjango", "InterventionDjango"
-    ] = models.ManyToManyField(
+    if TYPE_CHECKING:
+        interventions: models.ManyToManyField[
+            InterventionDjango, InterventionDjango
+        ]
+        caused_by_interventions: models.ManyToManyField[
+            InterventionDjango, InterventionDjango
+        ]
+        finding_types: models.ManyToManyField[FindingTypeDjango, FindingTypeDjango]
+        classifications: models.ManyToManyField[
+            ClassificationDjango, ClassificationDjango
+        ]
+
+    interventions = models.ManyToManyField(
         "InterventionDjango",
         related_name=FieldNames.FINDINGS.value,
     )
-    caused_by_interventions: models.ManyToManyField[
-        "InterventionDjango", "InterventionDjango"
-    ] = models.ManyToManyField(
+    caused_by_interventions = models.ManyToManyField(
         "InterventionDjango",
         related_name="caused_by_findings",
         blank=True,
     )
-    finding_types: models.ManyToManyField["FindingTypeDjango", "FindingTypeDjango"] = (
+    finding_types = (
         models.ManyToManyField(
             "FindingTypeDjango", related_name=FieldNames.FINDINGS.value
         )
     )
-    classifications: models.ManyToManyField[
-        "ClassificationDjango", "ClassificationDjango"
-    ] = models.ManyToManyField(
+    classifications = models.ManyToManyField(
         "ClassificationDjango",
         related_name=FieldNames.FINDINGS.value,
     )

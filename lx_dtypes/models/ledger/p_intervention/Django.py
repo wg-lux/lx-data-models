@@ -27,12 +27,18 @@ from .DataDict import (
 
 
 class PFindingInterventionDjango(LedgerBaseModelDjango[PFindingInterventionDataDict]):
-    patient_finding_interventions: "models.ForeignKey[PFindingInterventionsDjango, PFindingInterventionsDjango]" = models.ForeignKey(
+    if TYPE_CHECKING:
+        patient_finding_interventions: models.ForeignKey[
+            PFindingInterventionsDjango, PFindingInterventionsDjango
+        ]
+        intervention: models.ForeignKey[InterventionDjango, InterventionDjango]
+
+    patient_finding_interventions = models.ForeignKey(
         "PFindingInterventionsDjango",
         related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
         on_delete=models.CASCADE,
     )
-    intervention: "models.ForeignKey[InterventionDjango, InterventionDjango]" = (
+    intervention = (
         models.ForeignKey(
             "InterventionDjango",
             related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,

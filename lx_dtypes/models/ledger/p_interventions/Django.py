@@ -26,7 +26,10 @@ if TYPE_CHECKING:
 
 
 class PFindingInterventionsDjango(LedgerBaseModelDjango[PFindingInterventionsDataDict]):
-    patient_finding: "models.ForeignKey[PFindingDjango, PFindingDjango]" = (
+    if TYPE_CHECKING:
+        patient_finding: models.ForeignKey[PFindingDjango, PFindingDjango]
+
+    patient_finding = (
         models.ForeignKey(
             "PFindingDjango",
             related_name="patient_finding_interventions",

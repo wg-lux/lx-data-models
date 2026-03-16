@@ -39,6 +39,9 @@ if TYPE_CHECKING:
 class ClassificationChoiceDescriptorDjango(
     KnowledgebaseBaseModelDjango[ClassificationChoiceDescriptorDataDict]
 ):
+    if TYPE_CHECKING:
+        unit: models.ForeignKey[UnitDjango, UnitDjango]
+
     classification_choice_descriptor_type: CharFieldType = models.CharField(
         max_length=32,
         choices=[
@@ -52,7 +55,7 @@ class ClassificationChoiceDescriptorDjango(
         choices=[(choice.value, choice.value) for choice in NumericDistributionChoices],
         default=NumericDistributionChoices.UNIFORM.value,
     )
-    unit: models.ForeignKey["UnitDjango", "UnitDjango"] = models.ForeignKey(
+    unit = models.ForeignKey(
         "UnitDjango",
         related_name=FieldNames.CLASSIFICATION_CHOICE_DESCRIPTORS.value,
         on_delete=models.CASCADE,

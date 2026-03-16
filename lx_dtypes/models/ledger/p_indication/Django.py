@@ -27,14 +27,18 @@ if TYPE_CHECKING:
 
 
 class PIndicationDjango(LedgerBaseModelDjango[PIndicationDataDict]):
-    indication: "models.ForeignKey[IndicationDjango, IndicationDjango]" = (
+    if TYPE_CHECKING:
+        indication: models.ForeignKey[IndicationDjango, IndicationDjango]
+        patient_examination: models.ForeignKey[PExaminationDjango, PExaminationDjango]
+
+    indication = (
         models.ForeignKey(
             "IndicationDjango",
             related_name=FieldNames.PATIENT_INDICATIONS.value,
             on_delete=models.CASCADE,
         )
     )
-    patient_examination: "models.ForeignKey[PExaminationDjango, PExaminationDjango]" = (
+    patient_examination = (
         models.ForeignKey(
             "PExaminationDjango",
             related_name=FieldNames.PATIENT_INDICATIONS.value,

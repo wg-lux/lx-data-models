@@ -23,7 +23,10 @@ if TYPE_CHECKING:
 
 
 class ExaminerDjango(PersonDjango, LedgerBaseModelDjango[ExaminerDataDict]):
-    center: "models.ForeignKey[CenterDjango, CenterDjango]" = models.ForeignKey(
+    if TYPE_CHECKING:
+        center: models.ForeignKey[CenterDjango, CenterDjango]
+
+    center = models.ForeignKey(
         "CenterDjango",
         related_name=FieldNames.EXAMINERS.value,
         on_delete=models.CASCADE,
