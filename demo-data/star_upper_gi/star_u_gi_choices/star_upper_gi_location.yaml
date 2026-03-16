@@ -1,0 +1,68 @@
+- model: classification_choice
+  name: "star_upper_gi_location_esophagus_proximal"
+  name_de: "Ösophagus (proximal)"
+  name_en: "Esophagus (proximal)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_esophagus_distal"
+  name_de: "Ösophagus (distal)"
+  name_en: "Esophagus (distal)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_z_line"
+  name_de: "Z-Linie"
+  name_en: "Z-line"
+  classification_choice_descriptors:
+    - distance_cm
+
+- model: classification_choice
+  name: "star_upper_gi_location_gastroesophageal_junction"
+  name_de: "Gastroösophagealer Übergang"
+  name_en: "Gastroesophageal junction"
+  classification_choice_descriptors:
+    - distance_cm
+
+- model: classification_choice
+  name: "star_upper_gi_location_stomach_fundus"
+  name_de: "Magen (Fundus)"
+  name_en: "Stomach (Fundus)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_stomach_corpus"
+  name_de: "Magen (Corpus)"
+  name_en: "Stomach (Corpus)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_stomach_antrum"
+  name_de: "Magen (Antrum)"
+  name_en: "Stomach (Antrum)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_stomach_cardia"
+  name_de: "Magen (Kardia)"
+  name_en: "Stomach (Cardia)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_stomach_pylorus"
+  name_de: "Magen (Pylorus)"
+  name_en: "Stomach (Pylorus)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_duodenum_bulbus"
+  name_de: "Duodenum (Bulbus)"
+  name_en: "Duodenum (Bulbus)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_duodenum_descending_part"
+  name_de: "Duodenum (Pars descendens)"
+  name_en: "Duodenum (Descending part)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_papilla_major"
+  name_de: "Papilla duodeni major"
+  name_en: "Major duodenal papilla"
+
+- model: classification_choice
+  name: "star_upper_gi_location_papilla_minor"
+  name_de: "Papilla duodeni minor"
+  name_en: "Minor duodenal papilla"
