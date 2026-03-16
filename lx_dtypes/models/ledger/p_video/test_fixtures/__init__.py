@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from lx_dtypes.models.ledger.p_video import (
     PatientVideoFile,
     PatientVideoFileDataDict,
@@ -24,12 +23,15 @@ def patient_video_file_data_dict_fixture(
     ddict = PatientVideoFileDataDict(
         **{
             "uuid": "123e4567-e89b-12d3-a456-426614174000",
-            "created_at": "2024-01-01T00:00:00Z",
             "patient": "223e4567-e89b-12d3-a456-426614174111",
             "patient_examination": "323e4567-e89b-12d3-a456-426614174222",
-            "fnd": {
+            "dir": Path(raw_video_file_path),
+            "files": {
                 "file": str(raw_video_file_path),
             },
+            "dirs": {
+                "dir": Path(raw_video_file_path)
+            }
         }
     )
     return ddict
@@ -37,7 +39,7 @@ def patient_video_file_data_dict_fixture(
 
 @pytest.fixture
 def patient_video_file_fixture(
-    patient_video_file_data_dict_fixture: dict,
+    patient_video_file_data_dict_fixture: PatientVideoFileDataDict,
 ) -> "PatientVideoFile":
 
     model = PatientVideoFile.model_validate(patient_video_file_data_dict_fixture)

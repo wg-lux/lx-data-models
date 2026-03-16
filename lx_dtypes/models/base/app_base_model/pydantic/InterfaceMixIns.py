@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, TypeVar
+from typing import Any, Dict, Generic, List, TypeVar, Set, Iterable, cast
 
-from pydantic import model_validator
-
+from pydantic import model_validator, field_serializer, SerializationInfo
 from lx_dtypes.serialization import parse_str_list, serialize_str_list
 
 DDictT = TypeVar("DDictT")
+
 
 
 class DDictMixIn(Generic[DDictT], ABC):
@@ -32,22 +32,41 @@ class DDictMixIn(Generic[DDictT], ABC):
 
 class ListFieldSerializationMixIn(ABC):
     @classmethod
-    @abstractmethod
     def list_type_fields(cls) -> List[str]:
-        """Return names of fields that should be treated as serialized lists."""
+        """Default implementation, to be overridden by subclasses."""
+        return []
+
+    @classmethod
+    def _get_all_list_fields(cls) -> Set[str]:
+        """Safely aggregates fields from the MRO."""
+        all_fields: Set[str] = set()
+        for base in cls.__mro__:
+            func = getattr(base, "list_type_fields", None)
+            if func and callable(func):
+                try:
+                    fields = func()
+                    if isinstance(fields, Iterable):
+                        all_fields.update(cast(Iterable[str], fields))
+                except Exception:
+                    continue
+        return all_fields
 
     @model_validator(mode="before")
     @classmethod
     def _coerce_list_fields(cls, data: Any) -> Any:
-        """Coerce configured fields from serialized strings into Python lists."""
-        data = dict(data)
-        for field in cls.list_type_fields():
-            data[field] = parse_str_list(data.get(field))
-        return data
+        if not isinstance(data, dict):
+            return data
+            
+        data_copy = data.copy()
+        for field in cls._get_all_list_fields():
+            if field in data_copy:
+                data_copy[field] = parse_str_list(data_copy.get(field))
+        return data_copy
 
-    def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
-        """Serialize list fields to their configured string representation."""
-        dumped = super().model_dump(*args, **kwargs)  # type: ignore
-        for field in self.list_type_fields():
-            dumped[field] = serialize_str_list(dumped[field])
-        return dumped
+    @field_serializer("*", mode="plain", check_fields=False)
+    def _serialize_list_fields(self, value: Any, info: SerializationInfo) -> Any:
+        fname = getattr(info, "field_name", None)
+        
+        if fname and fname in self._get_all_list_fields():
+            return serialize_str_list(value)
+        return value
