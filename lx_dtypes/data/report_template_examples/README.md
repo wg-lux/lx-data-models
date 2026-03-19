@@ -5,6 +5,34 @@ This is the fastest, easiest guide for creating a working report template.
 If you only read one thing: all links are **exact string matches**.
 `upper_gi` is different from `upper-gi` and different from `Upper_GI`.
 
+## Before You Start
+
+This file explains the current YAML format.
+
+It does not mean the format is suitable for non-technical self-service authoring.
+
+Current readiness:
+
+- Good enough for engineers or technical product owners
+- Good enough for clinician plus engineer collaboration
+- Not good enough for unsupported editing by non-technical staff
+
+Why not:
+
+- exact string matching is required everywhere
+- validator operators must use specific canonical names
+- dependencies and references are easy to break
+- there is no form-based editor in this repository that prevents invalid combinations
+
+Recommended workflow:
+
+1. Non-technical/domain users write the intended report structure in plain language.
+2. A technical owner translates that into YAML.
+3. The technical owner runs validation.
+4. The domain user reviews the resolved output and example validation results.
+
+If you want a true non-technical workflow later, build a constrained editor on top of these models instead of asking users to edit YAML directly.
+
 ## What You Edit
 
 Create or update two files:
@@ -81,6 +109,21 @@ These fields must reference existing names exactly:
 - Do not mix separators (`_` and `-`) for ids.
 - Keep names unique inside your module.
 
+## Authoring Rule For Non-Technical Reviewers
+
+If a non-technical reviewer needs to check a template, ask them to review only:
+
+- the ordered list of sections
+- the human meaning of findings and classifications
+- the plain-language intent of each validator
+
+Do not ask them to review:
+
+- module wiring
+- YAML syntax
+- exact identifier spelling
+- operator/comparator compatibility
+
 ## Inline vs Referenced Findings
 
 Inside a section, findings can be:
@@ -148,6 +191,12 @@ Use this pattern when you want a report template to project into requirement-lik
 
 This is frontend-facing template content. It tells the editor what finding can appear in the report, not whether the report is already complete.
 
+Plain-language meaning:
+
+- "this finding may appear in the report"
+- "these classifications belong to that finding"
+- "required: true" means the report template expects it, not that an actual report already satisfies it
+
 ### 2. Add a `findings_validator`
 
 ```yaml
@@ -167,6 +216,10 @@ This is frontend-facing template content. It tells the editor what finding can a
 ```
 
 Use `condition` when the requirement depends on a value or classification, not just presence.
+
+Plain-language meaning:
+
+- "if this condition is true, then these classifications must also be present"
 
 Use `exists` for pure presence checks:
 
@@ -224,6 +277,12 @@ Practical rule:
 - put direct finding checks into `findings_validators`
 - attach both at the template level if frontend/export and runtime evaluation should see them
 
+Plain-language shortcut:
+
+- `findings_validator`: one concrete rule
+- `examination_validator`: a named bundle of rules
+- `report_template.validators`: which rules this template should actually use
+
 ## Validator-Ready Authoring Checklist
 
 - [ ] Every `finding` in a validator exists in the module or dependencies.
@@ -243,6 +302,17 @@ Before committing:
 - [ ] No `snake_case` vs `kebab-case` drift.
 - [ ] No circular `examination_validator` chains.
 
+## Release Checklist
+
+Before using a template in production:
+
+- [ ] The template loads successfully.
+- [ ] Structure validation passes.
+- [ ] Runtime validation was tested with at least one passing payload.
+- [ ] Runtime validation was tested with at least one failing payload.
+- [ ] A domain reviewer checked the resolved template output.
+- [ ] A technical owner checked the YAML references and dependency module names.
+
 ## Useful Checks
 
 Run the audit script (from `lx-data-models` root):
@@ -257,6 +327,19 @@ Test API output:
 
 - `GET /base_api/report-templates/{module_name}/{template_name}`
 - `GET /base_api/report-templates/by-examination/{module_name}/{examination_name}`
+
+## Historical Runtime Validation
+
+If you validate a historical `PExamination` payload, you can now include:
+
+- `knowledge_base_module`
+- `knowledge_base_version`
+
+Important:
+
+- `knowledge_base_version` only works when deployment has provisioned that version through `LX_DTYPES_KB_REGISTRY`
+- if the version is not available locally, runtime validation fails closed instead of silently using the current module version
+- route `module_name` is still present in the API for compatibility, but payload KB identity is authoritative when supplied
 
 ## Mapping To `base_api` Requirement Objects
 
@@ -281,7 +364,7 @@ Evaluation projection:
 - Endpoint: `POST /base_api/evaluate-requirement-set`
 - Selected set ids resolve back to template names.
 - Runtime call per template:
-  - `kb.evaluate_report_template_validators(template_name, reported_findings=...)`
+  - `kb.evaluate_report_template_validators(template_name, p_examination=...)`
 - Result row mapping:
   - `requirement_name` -> runtime validator `name`
   - `met` -> runtime validator `ok`

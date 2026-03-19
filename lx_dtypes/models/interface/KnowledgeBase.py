@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Self, Tuple, TypedDict, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Self, Tuple, TypedDict, Union, cast
 
 import yaml
 from pydantic import Field
@@ -94,6 +94,18 @@ from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import
 from lx_dtypes.models.knowledge_base.report_template.ExaminationValidatorDataDict import (
     ExaminationValidatorDataDict,
 )
+from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
+    ClassificationValidator,
+)
+from lx_dtypes.models.knowledge_base.report_template.ClassificationValidatorDataDict import (
+    ClassificationValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
+    InterventionValidator,
+)
+from lx_dtypes.models.knowledge_base.report_template.InterventionValidatorDataDict import (
+    InterventionValidatorDataDict,
+)
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
     FindingsValidator,
 )
@@ -116,11 +128,25 @@ from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSection impor
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSectionDataDict import (
     ReportTemplateSectionDataDict,
 )
+from lx_dtypes.models.knowledge_base.report_template.UnitValidator import UnitValidator
+from lx_dtypes.models.knowledge_base.report_template.UnitValidatorDataDict import (
+    UnitValidatorDataDict,
+)
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+    ClassificationValidatorExecutionDataDict,
+    ExaminationValidatorExecutionDataDict,
+    FindingsValidatorExecutionDataDict,
+    InterventionValidatorExecutionDataDict,
     ReportTemplateRuntimeValidationResultDataDict,
+    UnitValidatorExecutionDataDict,
+    evaluate_classification_validator_runtime,
+    evaluate_findings_validator_runtime,
+    evaluate_intervention_validator_runtime,
     evaluate_report_template_validators_runtime,
+    evaluate_unit_validator_runtime,
 )
 from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
+    ReportTemplateClassificationRequirement,
     ReportTemplateFindingRequirement,
 )
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
@@ -132,6 +158,10 @@ from lx_dtypes.utils.parser import (
     parse_shallow_object_with_meta,
     snake_to_camel,
 )
+
+if TYPE_CHECKING:
+    from lx_dtypes.models.interface.Ledger import Ledger
+    from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 
 class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
@@ -155,6 +185,9 @@ class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
     information_source_type: Dict[str, InformationSourceTypeDataDict]
     report_template_section: Dict[str, ReportTemplateSectionDataDict]
     report_finding: Dict[str, ReportFindingDataDict]
+    classification_validator: Dict[str, ClassificationValidatorDataDict]
+    intervention_validator: Dict[str, InterventionValidatorDataDict]
+    unit_validator: Dict[str, UnitValidatorDataDict]
     findings_validator: Dict[str, FindingsValidatorDataDict]
     examination_validator: Dict[str, ExaminationValidatorDataDict]
     report_template: Dict[str, ReportTemplateDataDict]
@@ -185,9 +218,18 @@ class KnowledgeBaseRecordList(TypedDict):
     information_source_types: List[InformationSourceTypeDataDict]
     report_template_sections: List[ReportTemplateSectionDataDict]
     report_findings: List[ReportFindingDataDict]
+    classification_validators: List[ClassificationValidatorDataDict]
+    intervention_validators: List[InterventionValidatorDataDict]
+    unit_validators: List[UnitValidatorDataDict]
     findings_validators: List[FindingsValidatorDataDict]
     examination_validators: List[ExaminationValidatorDataDict]
     report_templates: List[ReportTemplateDataDict]
+
+
+class SemanticAdmissibilityError(ValueError):
+    """
+    Raised when a structurally valid ledger instance violates KnowledgeBase semantics.
+    """
 
 
 class KnowledgeBase(AppBaseModelUUIDTags):
@@ -217,6 +259,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         default_factory=dict
     )
     report_finding: Dict[str, ReportFinding] = Field(default_factory=dict)
+    classification_validator: Dict[str, ClassificationValidator] = Field(
+        default_factory=dict
+    )
+    intervention_validator: Dict[str, InterventionValidator] = Field(
+        default_factory=dict
+    )
+    unit_validator: Dict[str, UnitValidator] = Field(default_factory=dict)
     findings_validator: Dict[str, FindingsValidator] = Field(default_factory=dict)
     examination_validator: Dict[str, ExaminationValidator] = Field(default_factory=dict)
     report_template: Dict[str, ReportTemplate] = Field(default_factory=dict)
@@ -450,6 +499,24 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                     else v
                     for v in template.validators.examination_validators
                 ],
+                "classification_validators": [
+                    self.classification_validator[v].model_dump()
+                    if v in self.classification_validator
+                    else v
+                    for v in template.validators.classification_validators
+                ],
+                "intervention_validators": [
+                    self.intervention_validator[v].model_dump()
+                    if v in self.intervention_validator
+                    else v
+                    for v in template.validators.intervention_validators
+                ],
+                "unit_validators": [
+                    self.unit_validator[v].model_dump()
+                    if v in self.unit_validator
+                    else v
+                    for v in template.validators.unit_validators
+                ],
                 "findings_validators": [
                     self.findings_validator[v].model_dump()
                     if v in self.findings_validator
@@ -475,28 +542,622 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         payload = kb_to_core_concepts_payload(self)
         return payload.model_dump(mode="json")
 
+    def reported_findings_from_p_examination(
+        self, p_examination: "PExamination"
+    ) -> List[Dict[str, Any]]:
+        reported_findings: List[Dict[str, Any]] = []
+
+        for p_finding in p_examination.patient_findings:
+            classifications_payload: List[Dict[str, Any]] = []
+            for classifications in p_finding.patient_finding_classifications:
+                for choice in classifications.patient_finding_classification_choices:
+                    base_payload: Dict[str, Any] = {
+                        "classification": choice.classification,
+                        "classification_choice": choice.classification_choice,
+                        "value": choice.classification_choice,
+                    }
+                    classifications_payload.append(base_payload)
+
+                    for (
+                        descriptor
+                    ) in choice.patient_finding_classification_choice_descriptors:
+                        descriptor_payload: Dict[str, Any] = {
+                            "classification": choice.classification,
+                            "value": descriptor.descriptor_value,
+                        }
+                        kb_descriptor = self.classification_choice_descriptor.get(
+                            descriptor.classification_choice_descriptor
+                        )
+                        if kb_descriptor is not None and kb_descriptor.unit:
+                            descriptor_payload["unit"] = kb_descriptor.unit
+                        classifications_payload.append(descriptor_payload)
+
+            interventions_payload = [
+                {"intervention": intervention.intervention}
+                for interventions in p_finding.patient_finding_interventions
+                for intervention in interventions.patient_finding_interventions
+            ]
+
+            reported_findings.append(
+                {
+                    "finding": p_finding.finding,
+                    "classifications": classifications_payload,
+                    "interventions": interventions_payload,
+                }
+            )
+
+        return reported_findings
+
+    def reported_findings_from_ledger(
+        self, ledger: "Ledger", patient_examination_uuid: str
+    ) -> List[Dict[str, Any]]:
+        p_examination = ledger.patient_examinations[patient_examination_uuid]
+        return self.reported_findings_from_p_examination(p_examination)
+
+    @staticmethod
+    def _names_as_list(value: str | List[str]) -> List[str]:
+        if isinstance(value, list):
+            return [item for item in value if item]
+        if value:
+            return [value]
+        return []
+
+    def assert_examination_admissibility(
+        self,
+        p_examination: "PExamination",
+        *,
+        template_name: str | None = None,
+    ) -> None:
+        def template_requirements_by_finding(
+            resolved_template_name: str,
+        ) -> Dict[str, ReportTemplateFindingRequirement]:
+            def ensure_requirement(finding_name: str) -> None:
+                requirements.setdefault(
+                    finding_name,
+                    ReportTemplateFindingRequirement(finding=finding_name),
+                )
+
+            def ensure_classification_requirement(
+                finding_name: str,
+                classification_name: str,
+            ) -> None:
+                ensure_requirement(finding_name)
+                requirement = requirements[finding_name]
+                if any(
+                    existing.classification == classification_name
+                    for existing in requirement.classifications
+                ):
+                    return
+                requirement.classifications.append(
+                    ReportTemplateClassificationRequirement(
+                        classification=classification_name
+                    )
+                )
+
+            def collect_from_examination_validator(validator_name: str) -> None:
+                if validator_name in visited_exam_validators:
+                    return
+                visited_exam_validators.add(validator_name)
+                examination_validator = self.examination_validator.get(validator_name)
+                if examination_validator is None:
+                    return
+                for finding_validator_name in self._names_as_list(
+                    examination_validator.finding_validators
+                ):
+                    finding_validator = self.findings_validator.get(
+                        finding_validator_name
+                    )
+                    if finding_validator is not None:
+                        ensure_requirement(finding_validator.finding)
+                        if finding_validator.query.condition is not None:
+                            for (
+                                requirement_reference
+                            ) in finding_validator.query.condition.then_requires:
+                                if requirement_reference.kind == "classification":
+                                    ensure_classification_requirement(
+                                        finding_validator.finding,
+                                        requirement_reference.classification
+                                        or requirement_reference.name,
+                                    )
+                for nested_exam_validator_name in self._names_as_list(
+                    examination_validator.examination_validators
+                ):
+                    collect_from_examination_validator(nested_exam_validator_name)
+
+            template = self.get_report_template(resolved_template_name)
+            requirements: Dict[str, ReportTemplateFindingRequirement] = {}
+            visited_exam_validators: set[str] = set()
+            for section_name in template.report_sections:
+                section = self.report_template_section.get(section_name)
+                if section is None:
+                    continue
+                for finding_ref in section.findings:
+                    if isinstance(finding_ref, str):
+                        report_finding = self.report_finding.get(finding_ref)
+                        if report_finding is None:
+                            continue
+                        requirement = report_finding.as_requirement()
+                    else:
+                        requirement = finding_ref
+                    requirements[requirement.finding] = requirement
+            for findings_validator_name in self._names_as_list(
+                template.validators.findings_validators
+            ):
+                finding_validator = self.findings_validator.get(findings_validator_name)
+                if finding_validator is not None:
+                    ensure_requirement(finding_validator.finding)
+                    if finding_validator.query.condition is not None:
+                        for (
+                            requirement_reference
+                        ) in finding_validator.query.condition.then_requires:
+                            if requirement_reference.kind == "classification":
+                                ensure_classification_requirement(
+                                    finding_validator.finding,
+                                    requirement_reference.classification
+                                    or requirement_reference.name,
+                                )
+            for classification_validator_name in self._names_as_list(
+                template.validators.classification_validators
+            ):
+                classification_validator = self.classification_validator.get(
+                    classification_validator_name
+                )
+                if classification_validator is not None:
+                    ensure_classification_requirement(
+                        classification_validator.finding,
+                        classification_validator.classification,
+                    )
+            for examination_validator_name in self._names_as_list(
+                template.validators.examination_validators
+            ):
+                collect_from_examination_validator(examination_validator_name)
+            return requirements
+
+        requirements_by_finding: Dict[str, ReportTemplateFindingRequirement]
+        if template_name is not None:
+            template = self.get_report_template(template_name)
+            if template.examination != p_examination.examination:
+                raise SemanticAdmissibilityError(
+                    "PExamination examination "
+                    f"'{p_examination.examination}' does not match report template "
+                    f"'{template_name}' examination '{template.examination}'."
+                )
+            requirements_by_finding = template_requirements_by_finding(template_name)
+        else:
+            requirements_by_finding = {}
+            examination = self.examination.get(p_examination.examination)
+            if examination is not None:
+                for finding_name in self._names_as_list(examination.findings):
+                    requirements_by_finding.setdefault(
+                        finding_name,
+                        ReportTemplateFindingRequirement(finding=finding_name),
+                    )
+            for report_template in self.report_template.values():
+                if report_template.examination != p_examination.examination:
+                    continue
+                requirements_by_finding.update(
+                    template_requirements_by_finding(report_template.name)
+                )
+            if p_examination.examination not in self.examination and not any(
+                report_template.examination == p_examination.examination
+                for report_template in self.report_template.values()
+            ):
+                raise SemanticAdmissibilityError(
+                    f"Unknown examination '{p_examination.examination}'."
+                )
+
+        allowed_findings = set(requirements_by_finding.keys())
+        for p_finding in p_examination.patient_findings:
+            kb_finding = self.finding.get(p_finding.finding)
+            requirement = requirements_by_finding.get(p_finding.finding)
+            if allowed_findings and p_finding.finding not in allowed_findings:
+                raise SemanticAdmissibilityError(
+                    f"Finding '{p_finding.finding}' is not permitted for examination "
+                    f"'{p_examination.examination}'."
+                )
+            if kb_finding is None and requirement is None:
+                raise SemanticAdmissibilityError(
+                    f"Unknown finding '{p_finding.finding}'."
+                )
+
+            allowed_classifications = (
+                set(self._names_as_list(kb_finding.classifications))
+                if kb_finding is not None
+                else set()
+            )
+            if requirement is not None:
+                allowed_classifications.update(
+                    classification_requirement.classification
+                    for classification_requirement in requirement.classifications
+                )
+            allowed_interventions = (
+                set(self._names_as_list(kb_finding.interventions))
+                if kb_finding is not None
+                else set()
+            )
+
+            for classifications in p_finding.patient_finding_classifications:
+                for choice in classifications.patient_finding_classification_choices:
+                    kb_classification = self.classification.get(choice.classification)
+                    if (
+                        kb_classification is None
+                        and choice.classification not in allowed_classifications
+                    ):
+                        raise SemanticAdmissibilityError(
+                            f"Unknown classification '{choice.classification}'."
+                        )
+                    if choice.classification not in allowed_classifications:
+                        raise SemanticAdmissibilityError(
+                            f"Classification '{choice.classification}' is not "
+                            f"permitted for finding '{p_finding.finding}'."
+                        )
+
+                    allowed_choices = (
+                        set(
+                            self._names_as_list(
+                                kb_classification.classification_choices
+                            )
+                        )
+                        if kb_classification is not None
+                        else set()
+                    )
+                    kb_choice = self.classification_choice.get(
+                        choice.classification_choice
+                    )
+                    if kb_choice is None and allowed_choices:
+                        raise SemanticAdmissibilityError(
+                            f"Unknown classification choice "
+                            f"'{choice.classification_choice}'."
+                        )
+                    if (
+                        allowed_choices
+                        and choice.classification_choice not in allowed_choices
+                    ):
+                        raise SemanticAdmissibilityError(
+                            f"Classification choice '{choice.classification_choice}' is "
+                            f"not permitted for classification '{choice.classification}'."
+                        )
+
+                    allowed_descriptors = (
+                        set(
+                            self._names_as_list(
+                                kb_choice.classification_choice_descriptors
+                            )
+                        )
+                        if kb_choice is not None
+                        else set()
+                    )
+                    for (
+                        descriptor
+                    ) in choice.patient_finding_classification_choice_descriptors:
+                        if (
+                            descriptor.classification_choice_descriptor
+                            not in self.classification_choice_descriptor
+                            and allowed_descriptors
+                        ):
+                            raise SemanticAdmissibilityError(
+                                "Unknown classification choice descriptor "
+                                f"'{descriptor.classification_choice_descriptor}'."
+                            )
+                        if (
+                            allowed_descriptors
+                            and descriptor.classification_choice_descriptor
+                            not in allowed_descriptors
+                        ):
+                            raise SemanticAdmissibilityError(
+                                "Classification choice descriptor "
+                                f"'{descriptor.classification_choice_descriptor}' is "
+                                "not permitted for classification choice "
+                                f"'{choice.classification_choice}'."
+                            )
+
+            for interventions in p_finding.patient_finding_interventions:
+                for intervention in interventions.patient_finding_interventions:
+                    if intervention.intervention not in self.intervention:
+                        raise SemanticAdmissibilityError(
+                            f"Unknown intervention '{intervention.intervention}'."
+                        )
+                    if intervention.intervention not in allowed_interventions:
+                        raise SemanticAdmissibilityError(
+                            f"Intervention '{intervention.intervention}' is not "
+                            f"permitted for finding '{p_finding.finding}'."
+                        )
+
+    def _normalized_runtime_findings_for_validation(
+        self,
+        *,
+        p_examination: "PExamination | None" = None,
+        ledger: "Ledger | None" = None,
+        patient_examination_uuid: str | None = None,
+    ) -> List[Dict[str, Any]]:
+        if p_examination is not None:
+            return self.reported_findings_from_p_examination(p_examination)
+        if ledger is not None and patient_examination_uuid is not None:
+            return self.reported_findings_from_ledger(ledger, patient_examination_uuid)
+        raise ValueError(
+            "Validation requires typed patient state via `p_examination` or "
+            "`ledger` with `patient_examination_uuid`."
+        )
+
     def evaluate_report_template_validators(
         self,
         name: str,
-        reported_findings: List[Dict[str, Any]] | None = None,
+        p_examination: "PExamination | None" = None,
+        ledger: "Ledger | None" = None,
+        patient_examination_uuid: str | None = None,
     ) -> ReportTemplateRuntimeValidationResultDataDict:
         """
-        Execute report-template validators against runtime finding payload data.
+        Execute report-template validators against typed ledger state.
 
         Parameters:
             name (str): The report template name.
-            reported_findings (List[Dict[str, Any]] | None): Runtime findings payloads.
+            p_examination (PExamination | None): Typed ledger examination instance.
+            ledger (Ledger | None): Typed ledger instance.
+            patient_examination_uuid (str | None): UUID used with `ledger`.
 
         Returns:
             ReportTemplateRuntimeValidationResultDataDict: Runtime validator execution result.
         """
+        if p_examination is not None:
+            self.assert_examination_admissibility(
+                p_examination,
+                template_name=name,
+            )
+        elif ledger is not None and patient_examination_uuid is not None:
+            self.assert_examination_admissibility(
+                ledger.patient_examinations[patient_examination_uuid],
+                template_name=name,
+            )
         template = self.get_report_template(name)
+        classification_validators = self.get_report_template_classification_validators(
+            name
+        )
+        classification_validator_names = list(
+            template.validators.classification_validators
+        )
+        classification_validator_names.extend(
+            [
+                validator_name
+                for validator_name in classification_validators.keys()
+                if validator_name not in classification_validator_names
+            ]
+        )
+        normalized_reported_findings = self._normalized_runtime_findings_for_validation(
+            p_examination=p_examination,
+            ledger=ledger,
+            patient_examination_uuid=patient_examination_uuid,
+        )
         return evaluate_report_template_validators_runtime(
             template,
+            classification_validators=classification_validators,
+            classification_validator_names=classification_validator_names,
+            intervention_validators=self.intervention_validator,
+            unit_validators=self.unit_validator,
             findings_validators=self.findings_validator,
             examination_validators=self.examination_validator,
-            reported_findings=reported_findings or [],
+            classifications=self.classification,
+            classification_choices=self.classification_choice,
+            classification_choice_descriptors=self.classification_choice_descriptor,
+            interventions=self.intervention,
+            units=self.unit,
+            reported_findings=normalized_reported_findings,
         )
+
+    def evaluate_findings_validator(
+        self,
+        validator_name: str,
+        *,
+        p_examination: "PExamination | None" = None,
+        ledger: "Ledger | None" = None,
+        patient_examination_uuid: str | None = None,
+    ) -> FindingsValidatorExecutionDataDict:
+        if p_examination is not None:
+            self.assert_examination_admissibility(p_examination)
+        elif ledger is not None and patient_examination_uuid is not None:
+            self.assert_examination_admissibility(
+                ledger.patient_examinations[patient_examination_uuid]
+            )
+        validator = self.findings_validator[validator_name]
+        normalized_reported_findings = self._normalized_runtime_findings_for_validation(
+            p_examination=p_examination,
+            ledger=ledger,
+            patient_examination_uuid=patient_examination_uuid,
+        )
+        return evaluate_findings_validator_runtime(
+            validator,
+            reported_findings=normalized_reported_findings,
+        )
+
+    def evaluate_classification_validator(
+        self,
+        validator_name: str,
+        *,
+        p_examination: "PExamination | None" = None,
+        ledger: "Ledger | None" = None,
+        patient_examination_uuid: str | None = None,
+    ) -> ClassificationValidatorExecutionDataDict:
+        if p_examination is not None:
+            self.assert_examination_admissibility(p_examination)
+        elif ledger is not None and patient_examination_uuid is not None:
+            self.assert_examination_admissibility(
+                ledger.patient_examinations[patient_examination_uuid]
+            )
+        validator = self.classification_validator[validator_name]
+        normalized_reported_findings = self._normalized_runtime_findings_for_validation(
+            p_examination=p_examination,
+            ledger=ledger,
+            patient_examination_uuid=patient_examination_uuid,
+        )
+        return evaluate_classification_validator_runtime(
+            validator,
+            classifications=self.classification,
+            classification_choices=self.classification_choice,
+            classification_choice_descriptors=self.classification_choice_descriptor,
+            reported_findings=normalized_reported_findings,
+        )
+
+    def evaluate_intervention_validator(
+        self,
+        validator_name: str,
+        *,
+        p_examination: "PExamination | None" = None,
+        ledger: "Ledger | None" = None,
+        patient_examination_uuid: str | None = None,
+    ) -> InterventionValidatorExecutionDataDict:
+        if p_examination is not None:
+            self.assert_examination_admissibility(p_examination)
+        elif ledger is not None and patient_examination_uuid is not None:
+            self.assert_examination_admissibility(
+                ledger.patient_examinations[patient_examination_uuid]
+            )
+        validator = self.intervention_validator[validator_name]
+        normalized_reported_findings = self._normalized_runtime_findings_for_validation(
+            p_examination=p_examination,
+            ledger=ledger,
+            patient_examination_uuid=patient_examination_uuid,
+        )
+        return evaluate_intervention_validator_runtime(
+            validator,
+            interventions=self.intervention,
+            reported_findings=normalized_reported_findings,
+        )
+
+    def evaluate_unit_validator(
+        self,
+        validator_name: str,
+        *,
+        p_examination: "PExamination | None" = None,
+        ledger: "Ledger | None" = None,
+        patient_examination_uuid: str | None = None,
+    ) -> UnitValidatorExecutionDataDict:
+        if p_examination is not None:
+            self.assert_examination_admissibility(p_examination)
+        elif ledger is not None and patient_examination_uuid is not None:
+            self.assert_examination_admissibility(
+                ledger.patient_examinations[patient_examination_uuid]
+            )
+        validator = self.unit_validator[validator_name]
+        normalized_reported_findings = self._normalized_runtime_findings_for_validation(
+            p_examination=p_examination,
+            ledger=ledger,
+            patient_examination_uuid=patient_examination_uuid,
+        )
+        return evaluate_unit_validator_runtime(
+            validator,
+            units=self.unit,
+            reported_findings=normalized_reported_findings,
+        )
+
+    def evaluate_examination_validator(
+        self,
+        validator_name: str,
+        *,
+        p_examination: "PExamination | None" = None,
+        ledger: "Ledger | None" = None,
+        patient_examination_uuid: str | None = None,
+    ) -> ExaminationValidatorExecutionDataDict:
+        if p_examination is not None:
+            self.assert_examination_admissibility(p_examination)
+        elif ledger is not None and patient_examination_uuid is not None:
+            self.assert_examination_admissibility(
+                ledger.patient_examinations[patient_examination_uuid]
+            )
+        normalized_reported_findings = self._normalized_runtime_findings_for_validation(
+            p_examination=p_examination,
+            ledger=ledger,
+            patient_examination_uuid=patient_examination_uuid,
+        )
+        template = ReportTemplate.model_validate(
+            {
+                "name": f"single_validator__{validator_name}",
+                "examination": "runtime_validation",
+                "report_sections": [],
+                "validators": {
+                    "classification_validators": [],
+                    "findings_validators": [],
+                    "intervention_validators": [],
+                    "examination_validators": [validator_name],
+                    "unit_validators": [],
+                },
+            }
+        )
+        result = evaluate_report_template_validators_runtime(
+            template,
+            classification_validators=self.classification_validator,
+            classification_validator_names=[],
+            intervention_validators=self.intervention_validator,
+            unit_validators=self.unit_validator,
+            findings_validators=self.findings_validator,
+            examination_validators=self.examination_validator,
+            classifications=self.classification,
+            classification_choices=self.classification_choice,
+            classification_choice_descriptors=self.classification_choice_descriptor,
+            interventions=self.intervention,
+            units=self.unit,
+            reported_findings=normalized_reported_findings,
+        )
+        return result["examination_validators"][0]
+
+    def get_report_template_classification_validators(
+        self, name: str
+    ) -> Dict[str, ClassificationValidator]:
+        template = self.get_report_template(name)
+
+        validators_by_name: Dict[str, ClassificationValidator] = {}
+        explicit_keys: set[tuple[str, str]] = set()
+        for validator_name in template.validators.classification_validators:
+            validator = self.classification_validator.get(validator_name)
+            if validator is None:
+                continue
+            validators_by_name[validator_name] = validator
+            explicit_keys.add((validator.finding, validator.classification))
+
+        for section_name in template.report_sections:
+            section = self.report_template_section.get(section_name)
+            if section is None:
+                continue
+            for finding_ref in section.findings:
+                if isinstance(finding_ref, str):
+                    report_finding = self.report_finding.get(finding_ref)
+                    if report_finding is None:
+                        continue
+                    finding_requirement = report_finding.as_requirement()
+                else:
+                    finding_requirement = finding_ref
+
+                for classification_req in finding_requirement.classifications:
+                    if not classification_req.required:
+                        continue
+                    key = (
+                        finding_requirement.finding,
+                        classification_req.classification,
+                    )
+                    if key in explicit_keys:
+                        continue
+
+                    validator_name = (
+                        "implicit_classification_validator__"
+                        f"{template.name}__{finding_requirement.finding}__"
+                        f"{classification_req.classification}"
+                    )
+                    validators_by_name[validator_name] = (
+                        ClassificationValidator.model_validate(
+                            {
+                                "name": validator_name,
+                                "finding": finding_requirement.finding,
+                                "classification": classification_req.classification,
+                                "operator": "exists",
+                                "precedence": "required",
+                                "query": {
+                                    "finding": finding_requirement.finding,
+                                    "classification": classification_req.classification,
+                                    "operator": "exists",
+                                },
+                            }
+                        )
+                    )
+
+        return validators_by_name
 
     @property
     def ddict_class(self) -> type[KnowledgeBaseDDict]:
@@ -748,6 +1409,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             r.ddict for r in self.report_template_section.values()
         ]
         report_finding_records = [r.ddict for r in self.report_finding.values()]
+        classification_validator_records = [
+            r.ddict for r in self.classification_validator.values()
+        ]
+        intervention_validator_records = [
+            r.ddict for r in self.intervention_validator.values()
+        ]
+        unit_validator_records = [r.ddict for r in self.unit_validator.values()]
         findings_validator_records = [r.ddict for r in self.findings_validator.values()]
         examination_validator_records = [
             r.ddict for r in self.examination_validator.values()
@@ -774,6 +1442,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             information_source_types=information_source_type_records,
             report_template_sections=report_template_section_records,
             report_findings=report_finding_records,
+            classification_validators=classification_validator_records,
+            intervention_validators=intervention_validator_records,
+            unit_validators=unit_validator_records,
             findings_validators=findings_validator_records,
             examination_validators=examination_validator_records,
             report_templates=report_template_records,

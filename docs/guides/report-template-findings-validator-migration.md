@@ -7,8 +7,9 @@ three runtime-supported values:
 - `missing`
 - `condition`
 
-Legacy operator strings are still accepted by the Pydantic model layer, but they
-now normalize with a deprecation warning:
+Legacy operator strings are not part of the supported persisted contract anymore.
+
+Historical aliases that should be migrated away:
 
 - `present` -> `exists`
 - `absent` -> `missing`
@@ -34,9 +35,9 @@ contract harder to reason about and weakened static typing.
 If downstream template JSON or YAML still stores `present`, `absent`, or
 `not_exists` as persisted operator values:
 
-- loading still works today,
-- a deprecation warning is emitted during model validation,
-- future cleanup may remove those aliases.
+- strict model validation can reject those values,
+- runtime behavior should not rely on those aliases,
+- downstream data should be migrated to canonical operator names before loading.
 
 Downstream code should migrate stored templates to canonical operators now.
 
@@ -109,3 +110,11 @@ operator: missing
 
 `not_in` remains a supported canonical comparator for conditional clauses. This
 migration only changes operator names, not comparator semantics.
+
+## Authoring Note
+
+This migration guide is for maintainers of YAML/JSON template data.
+
+It should not be interpreted as evidence that raw template YAML is ready for
+non-technical self-service editing. At the current repository state, operator
+migration and validator authoring remain technical maintenance tasks.

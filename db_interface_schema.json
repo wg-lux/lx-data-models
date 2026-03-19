@@ -769,6 +769,241 @@
       "title": "ClassificationType",
       "type": "object"
     },
+    "ClassificationValidator": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "query": {
+          "$ref": "#/$defs/ClassificationValidatorQuery"
+        },
+        "finding": {
+          "title": "Finding",
+          "type": "string"
+        },
+        "classification": {
+          "title": "Classification",
+          "type": "string"
+        },
+        "operator": {
+          "default": "exists",
+          "enum": [
+            "exists",
+            "missing",
+            "condition"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "precedence": {
+          "default": "required",
+          "enum": [
+            "required",
+            "optional"
+          ],
+          "title": "Precedence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ClassificationValidator",
+      "type": "object"
+    },
+    "ClassificationValidatorCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "any": {
+          "items": {
+            "$ref": "#/$defs/ClassificationValidatorConditionClause"
+          },
+          "title": "Any",
+          "type": "array"
+        },
+        "all": {
+          "items": {
+            "$ref": "#/$defs/ClassificationValidatorConditionClause"
+          },
+          "title": "All",
+          "type": "array"
+        },
+        "then_requires": {
+          "items": {
+            "$ref": "#/$defs/ValidatorRequirementReference"
+          },
+          "title": "Then Requires",
+          "type": "array"
+        }
+      },
+      "title": "ClassificationValidatorCondition",
+      "type": "object"
+    },
+    "ClassificationValidatorConditionClause": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "title": "Classification",
+          "type": "string"
+        },
+        "comparator": {
+          "default": "eq",
+          "enum": [
+            "eq",
+            "ne",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "in",
+            "not_in"
+          ],
+          "title": "Comparator",
+          "type": "string"
+        },
+        "value": {
+          "default": null,
+          "title": "Value"
+        },
+        "values": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Values"
+        }
+      },
+      "required": [
+        "classification"
+      ],
+      "title": "ClassificationValidatorConditionClause",
+      "type": "object"
+    },
+    "ClassificationValidatorQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "finding": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finding"
+        },
+        "classification": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Classification"
+        },
+        "operator": {
+          "default": "exists",
+          "enum": [
+            "exists",
+            "missing",
+            "condition"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": true,
+          "title": "Params",
+          "type": "object"
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ClassificationValidatorCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "ClassificationValidatorQuery",
+      "type": "object"
+    },
     "Examination": {
       "additionalProperties": false,
       "properties": {
@@ -1619,8 +1854,7 @@
         },
         "then_requires": {
           "items": {
-            "additionalProperties": true,
-            "type": "object"
+            "$ref": "#/$defs/ValidatorRequirementReference"
           },
           "title": "Then Requires",
           "type": "array"
@@ -2220,6 +2454,241 @@
       "title": "InterventionType",
       "type": "object"
     },
+    "InterventionValidator": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "query": {
+          "$ref": "#/$defs/InterventionValidatorQuery"
+        },
+        "finding": {
+          "title": "Finding",
+          "type": "string"
+        },
+        "intervention": {
+          "title": "Intervention",
+          "type": "string"
+        },
+        "operator": {
+          "default": "exists",
+          "enum": [
+            "exists",
+            "missing",
+            "condition"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "precedence": {
+          "default": "required",
+          "enum": [
+            "required",
+            "optional"
+          ],
+          "title": "Precedence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "InterventionValidator",
+      "type": "object"
+    },
+    "InterventionValidatorCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "any": {
+          "items": {
+            "$ref": "#/$defs/InterventionValidatorConditionClause"
+          },
+          "title": "Any",
+          "type": "array"
+        },
+        "all": {
+          "items": {
+            "$ref": "#/$defs/InterventionValidatorConditionClause"
+          },
+          "title": "All",
+          "type": "array"
+        },
+        "then_requires": {
+          "items": {
+            "$ref": "#/$defs/ValidatorRequirementReference"
+          },
+          "title": "Then Requires",
+          "type": "array"
+        }
+      },
+      "title": "InterventionValidatorCondition",
+      "type": "object"
+    },
+    "InterventionValidatorConditionClause": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "title": "Classification",
+          "type": "string"
+        },
+        "comparator": {
+          "default": "eq",
+          "enum": [
+            "eq",
+            "ne",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "in",
+            "not_in"
+          ],
+          "title": "Comparator",
+          "type": "string"
+        },
+        "value": {
+          "default": null,
+          "title": "Value"
+        },
+        "values": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Values"
+        }
+      },
+      "required": [
+        "classification"
+      ],
+      "title": "InterventionValidatorConditionClause",
+      "type": "object"
+    },
+    "InterventionValidatorQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "finding": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finding"
+        },
+        "intervention": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Intervention"
+        },
+        "operator": {
+          "default": "exists",
+          "enum": [
+            "exists",
+            "missing",
+            "condition"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": true,
+          "title": "Params",
+          "type": "object"
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InterventionValidatorCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "InterventionValidatorQuery",
+      "type": "object"
+    },
     "KnowledgeBase": {
       "additionalProperties": false,
       "properties": {
@@ -2401,6 +2870,27 @@
             "$ref": "#/$defs/ReportFinding"
           },
           "title": "Report Finding",
+          "type": "object"
+        },
+        "classification_validator": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ClassificationValidator"
+          },
+          "title": "Classification Validator",
+          "type": "object"
+        },
+        "intervention_validator": {
+          "additionalProperties": {
+            "$ref": "#/$defs/InterventionValidator"
+          },
+          "title": "Intervention Validator",
+          "type": "object"
+        },
+        "unit_validator": {
+          "additionalProperties": {
+            "$ref": "#/$defs/UnitValidator"
+          },
+          "title": "Unit Validator",
           "type": "object"
         },
         "findings_validator": {
@@ -2708,6 +3198,30 @@
         "examination": {
           "title": "Examination",
           "type": "string"
+        },
+        "knowledge_base_module": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Knowledge Base Module"
+        },
+        "knowledge_base_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Knowledge Base Version"
         },
         "patient_findings": {
           "items": {
@@ -4160,6 +4674,27 @@
           },
           "title": "Findings Validators",
           "type": "array"
+        },
+        "classification_validators": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Classification Validators",
+          "type": "array"
+        },
+        "intervention_validators": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Intervention Validators",
+          "type": "array"
+        },
+        "unit_validators": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unit Validators",
+          "type": "array"
         }
       },
       "title": "ReportTemplateValidators",
@@ -4639,6 +5174,311 @@
         "name"
       ],
       "title": "UnitType",
+      "type": "object"
+    },
+    "UnitValidator": {
+      "additionalProperties": false,
+      "properties": {
+        "source_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source File"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "uuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "format": "uuid",
+              "type": "string"
+            }
+          ],
+          "title": "Uuid"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Tags"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_de": {
+          "title": "Name De",
+          "type": "string"
+        },
+        "name_en": {
+          "title": "Name En",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "kb_module_name": {
+          "title": "Kb Module Name",
+          "type": "string"
+        },
+        "query": {
+          "$ref": "#/$defs/UnitValidatorQuery"
+        },
+        "finding": {
+          "title": "Finding",
+          "type": "string"
+        },
+        "classification": {
+          "title": "Classification",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "operator": {
+          "default": "exists",
+          "enum": [
+            "exists",
+            "missing",
+            "condition"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "precedence": {
+          "default": "required",
+          "enum": [
+            "required",
+            "optional"
+          ],
+          "title": "Precedence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "UnitValidator",
+      "type": "object"
+    },
+    "UnitValidatorCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "any": {
+          "items": {
+            "$ref": "#/$defs/UnitValidatorConditionClause"
+          },
+          "title": "Any",
+          "type": "array"
+        },
+        "all": {
+          "items": {
+            "$ref": "#/$defs/UnitValidatorConditionClause"
+          },
+          "title": "All",
+          "type": "array"
+        },
+        "then_requires": {
+          "items": {
+            "$ref": "#/$defs/ValidatorRequirementReference"
+          },
+          "title": "Then Requires",
+          "type": "array"
+        }
+      },
+      "title": "UnitValidatorCondition",
+      "type": "object"
+    },
+    "UnitValidatorConditionClause": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "title": "Classification",
+          "type": "string"
+        },
+        "comparator": {
+          "default": "eq",
+          "enum": [
+            "eq",
+            "ne",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "in",
+            "not_in"
+          ],
+          "title": "Comparator",
+          "type": "string"
+        },
+        "value": {
+          "default": null,
+          "title": "Value"
+        },
+        "values": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Values"
+        }
+      },
+      "required": [
+        "classification"
+      ],
+      "title": "UnitValidatorConditionClause",
+      "type": "object"
+    },
+    "UnitValidatorQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "finding": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finding"
+        },
+        "classification": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Classification"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "operator": {
+          "default": "exists",
+          "enum": [
+            "exists",
+            "missing",
+            "condition"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": true,
+          "title": "Params",
+          "type": "object"
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UnitValidatorCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "UnitValidatorQuery",
+      "type": "object"
+    },
+    "ValidatorRequirementReference": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "classification",
+            "finding",
+            "intervention",
+            "unit"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "finding": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finding"
+        },
+        "classification": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Classification"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "title": "ValidatorRequirementReference",
       "type": "object"
     }
   },

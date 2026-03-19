@@ -1,5 +1,17 @@
 from __future__ import annotations
 
+from lx_dtypes.models.knowledge_base.classification.Classification import (
+    Classification,
+)
+from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice import (
+    ClassificationChoice,
+)
+from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
+    ClassificationChoiceDescriptor,
+)
+from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
+    ClassificationValidator,
+)
 from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
     ExaminationValidator,
 )
@@ -10,6 +22,7 @@ from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
     ReportTemplate,
 )
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+    evaluate_classification_validator_runtime,
     evaluate_findings_validator_runtime,
     evaluate_report_template_validators_runtime,
 )
@@ -110,6 +123,82 @@ def test_evaluate_findings_validator_conditional_requires_then_classifications()
     assert passing_result["triggered_occurrences"] == 1
 
 
+def test_evaluate_classification_validator_exists_and_condition() -> None:
+    descriptor = ClassificationChoiceDescriptor.model_validate(
+        {
+            "name": "size_mm_descriptor",
+            "classification_choice_descriptor_type": "numeric",
+        }
+    )
+    choice = ClassificationChoice.model_validate(
+        {
+            "name": "size_mm_choice",
+            "classification_choice_descriptors": ["size_mm_descriptor"],
+        }
+    )
+    classification = Classification.model_validate(
+        {
+            "name": "size_mm",
+            "classification_choices": ["size_mm_choice"],
+        }
+    )
+    exists_validator = ClassificationValidator.model_validate(
+        {
+            "name": "size_mm_required",
+            "finding": "esophagus_polyp",
+            "classification": "size_mm",
+            "operator": "exists",
+        }
+    )
+    condition_validator = ClassificationValidator.model_validate(
+        {
+            "name": "lst_required_when_large",
+            "finding": "esophagus_polyp",
+            "classification": "lst",
+            "operator": "condition",
+            "query": {
+                "finding": "esophagus_polyp",
+                "classification": "lst",
+                "operator": "condition",
+                "condition": {
+                    "all": [
+                        {
+                            "classification": "size_mm",
+                            "comparator": "gt",
+                            "value": 10,
+                        }
+                    ]
+                },
+            },
+        }
+    )
+
+    failing_exists = evaluate_classification_validator_runtime(
+        exists_validator,
+        classifications={"size_mm": classification},
+        classification_choices={"size_mm_choice": choice},
+        classification_choice_descriptors={"size_mm_descriptor": descriptor},
+        reported_findings=[{"finding": "esophagus_polyp", "classifications": []}],
+    )
+    failing_condition = evaluate_classification_validator_runtime(
+        condition_validator,
+        classifications={"size_mm": classification},
+        classification_choices={"size_mm_choice": choice},
+        classification_choice_descriptors={"size_mm_descriptor": descriptor},
+        reported_findings=[
+            {
+                "finding": "esophagus_polyp",
+                "classifications": [{"classification": "size_mm", "value": 12}],
+            }
+        ],
+    )
+
+    assert failing_exists["ok"] is False
+    assert failing_exists["hint"]["data_type_hint"] == "ordered"
+    assert failing_condition["ok"] is False
+    assert failing_condition["triggered_occurrences"] == 1
+
+
 def test_runtime_engine_evaluates_template_with_exam_dependencies() -> None:
     template = ReportTemplate.model_validate(
         {
@@ -117,6 +206,7 @@ def test_runtime_engine_evaluates_template_with_exam_dependencies() -> None:
             "examination": "demo_exam",
             "report_sections": [],
             "validators": {
+                "classification_validators": [],
                 "findings_validators": ["polyp_exists"],
                 "examination_validators": ["minimum_documentation"],
             },
@@ -145,14 +235,32 @@ def test_runtime_engine_evaluates_template_with_exam_dependencies() -> None:
 
     failing = evaluate_report_template_validators_runtime(
         template,
+        classification_validators={},
+        classification_validator_names=[],
+        intervention_validators={},
+        unit_validators={},
         findings_validators=findings_validators,
         examination_validators=examination_validators,
+        classifications={},
+        classification_choices={},
+        classification_choice_descriptors={},
+        interventions={},
+        units={},
         reported_findings=[],
     )
     passing = evaluate_report_template_validators_runtime(
         template,
+        classification_validators={},
+        classification_validator_names=[],
+        intervention_validators={},
+        unit_validators={},
         findings_validators=findings_validators,
         examination_validators=examination_validators,
+        classifications={},
+        classification_choices={},
+        classification_choice_descriptors={},
+        interventions={},
+        units={},
         reported_findings=[{"finding": "esophagus_polyp", "classifications": []}],
     )
 
@@ -171,6 +279,7 @@ def test_runtime_engine_reports_unknown_and_circular_exam_validators() -> None:
             "examination": "demo_exam",
             "report_sections": [],
             "validators": {
+                "classification_validators": [],
                 "findings_validators": ["missing_validator"],
                 "examination_validators": ["missing_exam_validator"],
             },
@@ -179,8 +288,17 @@ def test_runtime_engine_reports_unknown_and_circular_exam_validators() -> None:
 
     unknown_result = evaluate_report_template_validators_runtime(
         template_with_unknown,
+        classification_validators={},
+        classification_validator_names=[],
+        intervention_validators={},
+        unit_validators={},
         findings_validators={},
         examination_validators={},
+        classifications={},
+        classification_choices={},
+        classification_choice_descriptors={},
+        interventions={},
+        units={},
         reported_findings=[],
     )
     issue_codes = {issue["code"] for issue in unknown_result["issues"]}
@@ -194,6 +312,7 @@ def test_runtime_engine_reports_unknown_and_circular_exam_validators() -> None:
             "examination": "demo_exam",
             "report_sections": [],
             "validators": {
+                "classification_validators": [],
                 "findings_validators": [],
                 "examination_validators": ["exam_a"],
             },
@@ -218,8 +337,17 @@ def test_runtime_engine_reports_unknown_and_circular_exam_validators() -> None:
 
     cycle_result = evaluate_report_template_validators_runtime(
         template_with_cycle,
+        classification_validators={},
+        classification_validator_names=[],
+        intervention_validators={},
+        unit_validators={},
         findings_validators={},
         examination_validators=cyclic_exams,
+        classifications={},
+        classification_choices={},
+        classification_choice_descriptors={},
+        interventions={},
+        units={},
         reported_findings=[],
     )
     cycle_codes = {issue["code"] for issue in cycle_result["issues"]}

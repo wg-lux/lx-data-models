@@ -11,6 +11,32 @@ Use that README specifically for:
 - grouping them into `examination_validator` entries
 - attaching validator-ready requirement content to `report_template.validators`
 
+## Status Summary
+
+Current state:
+
+- Implemented:
+  - typed YAML parsing
+  - in-memory `KnowledgeBase` storage
+  - resolved frontend JSON export
+  - structural validation and graph validation
+  - runtime validator execution
+  - version-aware runtime KB loading through `KnowledgeBaseResolver`
+  - API endpoints in `lx_dtypes/django/api/main.py` for export and validation
+- Not implemented:
+  - dedicated Django ORM persistence for report-template entities
+
+Readiness for non-technical authors:
+
+- Not ready for unsupported self-service editing.
+- Ready for a guided workflow where a technical owner maintains the YAML and non-technical staff review the medical/reporting content.
+
+Reason:
+
+- authoring still requires exact string references, canonical operator names, dependency awareness, and validation tooling
+- a small typo can break loading or silently change what gets linked
+- there is no user-facing editor with guardrails in this repository
+
 ## Goal
 
 You define report templates in YAML (sections, required findings, validators), and the backend:
@@ -44,7 +70,10 @@ The new YAML `model` values are:
 - `report_template`
 - `report_template_section`
 - `report_finding`
+- `classification_validator`
 - `findings_validator`
+- `intervention_validator`
+- `unit_validator`
 - `examination_validator`
 
 Alias supported:
@@ -87,7 +116,10 @@ This gives frontend-ready JSON with section and validator detail materialized.
 
 - `report_template_section`
 - `report_finding`
+- `classification_validator`
 - `findings_validator`
+- `intervention_validator`
+- `unit_validator`
 - `examination_validator`
 - `report_template`
 
@@ -122,9 +154,11 @@ Current scope:
 - Typed YAML parsing
 - In-memory `KnowledgeBase` storage
 - Frontend JSON export
+- Structural validation via `validate_report_template_structure(...)`
 - Runtime validator execution for `exists`, `missing`, and `condition` operators via:
   - `KnowledgeBase.evaluate_report_template_validators(...)`
   - `POST /base_api/report-templates/{module_name}/{template_name}/validate`
+- Version-aware KB loading for runtime validation when a payload carries `knowledge_base_version`
 
 Operators are strict canonical-only now:
 
@@ -146,26 +180,97 @@ Not implemented yet:
 
 - Dedicated Django ORM models/migrations for report-template entities
 
+## Validation Surface
+
+There are two different kinds of validation:
+
+1. Structure validation
+   - checks that referenced sections exist
+   - checks graph shape and template wiring
+   - useful before runtime data is involved
+2. Runtime validation
+   - checks whether reported findings satisfy the validators attached to a template
+   - useful when evaluating an actual report payload
+
+For non-technical stakeholders, this distinction matters:
+
+- structure validation answers "is this template wired correctly?"
+- runtime validation answers "does this report satisfy the template rules?"
+
+## Recommended Operating Model
+
+For the current repository state, use this split:
+
+1. Domain experts define the reporting intent
+   - sections
+   - required findings
+   - plain-language rule intent
+2. A technical owner translates that into YAML
+   - references
+   - validator operators/comparators
+   - dependency/module wiring
+3. Validation is run before rollout
+   - structure validation
+   - runtime validation with representative payloads
+4. Domain experts review the generated/exported output
+   - resolved template JSON
+   - example validation results
+
+Do not treat the raw YAML format as a safe end-user authoring surface yet.
+
 ## Runtime Validator Payload Shape
 
 Use either:
 
-- `KnowledgeBase.evaluate_report_template_validators(template_name, reported_findings=[...])`
+- `KnowledgeBase.evaluate_report_template_validators(template_name, p_examination=...)`
 - `POST /base_api/report-templates/{module_name}/{template_name}/validate`
 
-Expected payload example:
+Expected typed examination payload example:
 
 ```json
 {
-  "findings": [
+  "patient": "test_patient",
+  "knowledge_base_module": "report_template_examples",
+  "knowledge_base_version": "0.1.0",
+  "examination": "gastroscopy",
+  "patient_findings": [
     {
       "finding": "esophagus_polyp",
-      "classifications": [
-        {"classification": "size_mm", "value": 12},
-        {"classification": "lst", "value": "present"}
-      ]
+      "patient_examination": "test_exam",
+      "patient_finding_classifications": [
+        {
+          "patient_finding": "test_finding",
+          "patient_finding_classification_choices": [
+            {
+              "classification": "size_mm",
+              "classification_choice": "12",
+              "patient_finding_classifications": "test_classifications",
+              "patient_finding_classification_choice_descriptors": []
+            }
+          ]
+        }
+      ],
+      "patient_finding_interventions": []
     }
   ]
+}
+```
+
+Historical runtime note:
+
+- `knowledge_base_module` and `knowledge_base_version` are optional for current-version validation
+- when `knowledge_base_version` is provided, the runtime must resolve that historical KB version through `LX_DTYPES_KB_REGISTRY`
+- if the requested version is not provisioned locally, the runtime fails closed instead of silently using the current module version
+
+Expected registry shape:
+
+```json
+{
+  "modules": {
+    "report_template_examples": {
+      "0.1.0": "/nix/store/.../lx_dtypes/data"
+    }
+  }
 }
 ```
 

@@ -12,6 +12,8 @@ if TYPE_CHECKING:
 class PExaminationDataDict(LedgerBaseModelDataDict):
     examiners: List[str]
     examination: str
+    knowledge_base_module: Optional[str]
+    knowledge_base_version: Optional[str]
     date: Optional[str]
     patient_findings: List["PFindingDataDict"]
     patient_indications: List["PIndicationDataDict"]
@@ -21,6 +23,8 @@ class PExaminationDataDict(LedgerBaseModelDataDict):
 class SerializedPExaminationDataDict(LedgerBaseModelDataDict):
     examiners: List[str]
     examination: str
+    knowledge_base_module: Optional[str]
+    knowledge_base_version: Optional[str]
     date: Optional[str]
     patient_findings: str
     patient_indications: str

@@ -202,6 +202,21 @@ def build_report_template_graph(
                 for v_name in template.validators.findings_validators
                 for token in _tokenize(v_name)
             ]
+            + [
+                token
+                for v_name in template.validators.classification_validators
+                for token in _tokenize(v_name)
+            ]
+            + [
+                token
+                for v_name in template.validators.intervention_validators
+                for token in _tokenize(v_name)
+            ]
+            + [
+                token
+                for v_name in template.validators.unit_validators
+                for token in _tokenize(v_name)
+            ]
         ),
     )
 
@@ -360,6 +375,60 @@ def build_report_template_graph(
         )
 
     for validator_name in template.validators.findings_validators:
+        validator_node_id = f"validator:{validator_name}"
+        _add_node(
+            nodes_by_id,
+            node_id=validator_node_id,
+            node_type="validator",
+            name=validator_name,
+            token_source=_tokenize(validator_name),
+        )
+        edges.append(
+            ReportTemplateGraphEdge(
+                source_node_id=template_node_id,
+                target_node_id=validator_node_id,
+                edge_type="template_to_validator",
+                weight=0.4,
+            )
+        )
+
+    for validator_name in template.validators.classification_validators:
+        validator_node_id = f"validator:{validator_name}"
+        _add_node(
+            nodes_by_id,
+            node_id=validator_node_id,
+            node_type="validator",
+            name=validator_name,
+            token_source=_tokenize(validator_name),
+        )
+        edges.append(
+            ReportTemplateGraphEdge(
+                source_node_id=template_node_id,
+                target_node_id=validator_node_id,
+                edge_type="template_to_validator",
+                weight=0.4,
+            )
+        )
+
+    for validator_name in template.validators.intervention_validators:
+        validator_node_id = f"validator:{validator_name}"
+        _add_node(
+            nodes_by_id,
+            node_id=validator_node_id,
+            node_type="validator",
+            name=validator_name,
+            token_source=_tokenize(validator_name),
+        )
+        edges.append(
+            ReportTemplateGraphEdge(
+                source_node_id=template_node_id,
+                target_node_id=validator_node_id,
+                edge_type="template_to_validator",
+                weight=0.4,
+            )
+        )
+
+    for validator_name in template.validators.unit_validators:
         validator_node_id = f"validator:{validator_name}"
         _add_node(
             nodes_by_id,

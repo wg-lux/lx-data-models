@@ -10,7 +10,6 @@ from typing import (
     Callable,
     Dict,
     List,
-    Literal,
     NoReturn,
     Optional,
     Protocol,
@@ -27,9 +26,22 @@ from django.utils import timezone
 from ninja.errors import HttpError
 from pydantic import BaseModel, Field
 
+from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
+from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    KnowledgeBaseVersionNotFoundError,
+    clear_knowledge_base_resolver_caches,
+    load_knowledge_base,
+)
 
 from .request_types import BaseRequest
+
+from .report_template_builder import (
+    SaveReportTemplateRequest,
+    SaveReportTemplateResponse,
+    save_report_template_definition,
+)
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -108,10 +120,6 @@ def handle_structured_api_error(request: Any, exc: StructuredApiError) -> Any:
     )
 
 
-class ReportTemplateValidationRequest(Schema):
-    findings: List[Dict[str, Any]] = Field(default_factory=list)
-
-
 class PatientFindingClassificationInput(Schema):
     classification: int
     choice: int
@@ -152,12 +160,39 @@ def _kb_loader() -> DataLoader:
     return loader
 
 
-def _load_module_kb(module_name: str) -> Any:
+def _load_module_kb(module_name: str, version: str | None = None) -> Any:
+    if version:
+        try:
+            return cast(Any, load_knowledge_base(module_name, version=version))
+        except KnowledgeBaseVersionNotFoundError as exc:
+            raise HttpError(
+                409,
+                "Requested knowledge-base version is not provisioned locally for "
+                f"module '{module_name}' and version '{version}'.",
+            ) from exc
+
     loader = _kb_loader()
     try:
         return cast(Any, loader.load_knowledge_base(module_name))
     except ValueError as exc:
         raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
+
+
+def _resolve_payload_kb_identity(
+    route_module_name: str,
+    payload: PExamination,
+) -> tuple[str, str | None]:
+    payload_module_name = str(payload.knowledge_base_module or "").strip()
+    payload_version = str(payload.knowledge_base_version or "").strip() or None
+
+    if payload_module_name and payload_module_name != route_module_name:
+        raise HttpError(
+            409,
+            "Payload knowledge-base module does not match route module: "
+            f"'{payload_module_name}' != '{route_module_name}'.",
+        )
+
+    return payload_module_name or route_module_name, payload_version
 
 
 def _findings_module_name() -> str:
@@ -489,15 +524,26 @@ def _replace_patient_finding_classifications(
         )
 
 
-@api.get("/hello")
-def hello(request: BaseRequest) -> Literal["Hello world"]:
+@api.post("/report-templates/builder/templates")
+def save_report_template(
+    request: BaseRequest,
+    payload: SaveReportTemplateRequest,
+) -> SaveReportTemplateResponse:
     """
-    Return the fixed greeting used as the /hello endpoint response.
+    Persist a new report-template YAML file into one lx_dtypes knowledge-base module.
+    """
+    try:
+        saved = save_report_template_definition(payload)
+    except FileExistsError as exc:
+        raise HttpError(409, str(exc)) from exc
+    except ValueError as exc:
+        raise HttpError(400, str(exc)) from exc
 
-    Returns:
-        The exact string "Hello world" returned to clients.
-    """
-    return "Hello world"
+    _kb_loader.cache_clear()
+    _kb_core_concepts.cache_clear()
+    _kb_lookup.cache_clear()
+    clear_knowledge_base_resolver_caches()
+    return saved
 
 
 @api.get("/report-templates/{module_name}/{template_name}")
@@ -538,24 +584,136 @@ def validate_report_template_runtime(
     request: BaseRequest,
     module_name: str,
     template_name: str,
-    payload: ReportTemplateValidationRequest,
+    payload: PExamination,
 ) -> Dict[str, Any]:
     """
-    Execute report-template validator logic against runtime finding payload data.
+    Execute report-template validator logic against typed patient examination state.
     """
-    kb = _load_module_kb(module_name)
+    resolved_module_name, resolved_version = _resolve_payload_kb_identity(
+        module_name, payload
+    )
+    kb = _load_module_kb(resolved_module_name, version=resolved_version)
     try:
         return cast(
             Dict[str, Any],
             kb.evaluate_report_template_validators(
-                template_name, reported_findings=payload.findings
+                template_name, p_examination=payload
             ),
         )
+    except SemanticAdmissibilityError as exc:
+        raise HttpError(422, str(exc)) from exc
     except KeyError as exc:
         raise HttpError(
             404,
             f"Report template '{template_name}' not found in module '{module_name}'.",
         ) from exc
+
+
+@api.get("/report-templates/{module_name}/{template_name}/validate-definition")
+def validate_report_template_definition(
+    request: BaseRequest, module_name: str, template_name: str
+) -> Dict[str, Any]:
+    from lx_dtypes.models.knowledge_base.report_template import (
+        validate_report_template_structure,
+    )
+
+    kb = _load_module_kb(module_name)
+    try:
+        template = kb.get_report_template(template_name)
+    except KeyError as exc:
+        raise HttpError(
+            404,
+            f"Report template '{template_name}' not found in module '{module_name}'.",
+        ) from exc
+
+    result = validate_report_template_structure(
+        template,
+        sections=kb.report_template_section,
+        report_findings=kb.report_finding,
+        findings=kb.finding,
+    )
+    return result.model_dump(mode="json")
+
+
+@api.post("/validators/{module_name}/{validator_kind}/{validator_name}/validate")
+def validate_single_validator_runtime(
+    request: BaseRequest,
+    module_name: str,
+    validator_kind: str,
+    validator_name: str,
+    payload: PExamination,
+) -> Dict[str, Any]:
+    resolved_module_name, resolved_version = _resolve_payload_kb_identity(
+        module_name, payload
+    )
+    kb = _load_module_kb(resolved_module_name, version=resolved_version)
+
+    if validator_kind == "findings_validator":
+        if validator_name not in kb.findings_validator:
+            raise HttpError(404, f"Unknown findings validator '{validator_name}'.")
+        try:
+            return cast(
+                Dict[str, Any],
+                kb.evaluate_findings_validator(validator_name, p_examination=payload),
+            )
+        except SemanticAdmissibilityError as exc:
+            raise HttpError(422, str(exc)) from exc
+
+    if validator_kind == "classification_validator":
+        if validator_name not in kb.classification_validator:
+            raise HttpError(
+                404, f"Unknown classification validator '{validator_name}'."
+            )
+        try:
+            return cast(
+                Dict[str, Any],
+                kb.evaluate_classification_validator(
+                    validator_name,
+                    p_examination=payload,
+                ),
+            )
+        except SemanticAdmissibilityError as exc:
+            raise HttpError(422, str(exc)) from exc
+
+    if validator_kind == "intervention_validator":
+        if validator_name not in kb.intervention_validator:
+            raise HttpError(404, f"Unknown intervention validator '{validator_name}'.")
+        try:
+            return cast(
+                Dict[str, Any],
+                kb.evaluate_intervention_validator(
+                    validator_name, p_examination=payload
+                ),
+            )
+        except SemanticAdmissibilityError as exc:
+            raise HttpError(422, str(exc)) from exc
+
+    if validator_kind == "unit_validator":
+        if validator_name not in kb.unit_validator:
+            raise HttpError(404, f"Unknown unit validator '{validator_name}'.")
+        try:
+            return cast(
+                Dict[str, Any],
+                kb.evaluate_unit_validator(validator_name, p_examination=payload),
+            )
+        except SemanticAdmissibilityError as exc:
+            raise HttpError(422, str(exc)) from exc
+
+    if validator_kind == "examination_validator":
+        if validator_name not in kb.examination_validator:
+            raise HttpError(404, f"Unknown examination validator '{validator_name}'.")
+        try:
+            return cast(
+                Dict[str, Any],
+                kb.evaluate_examination_validator(
+                    validator_name,
+                    p_examination=payload,
+                ),
+            )
+        except SemanticAdmissibilityError as exc:
+            raise HttpError(422, str(exc)) from exc
+
+    raise HttpError(404, f"Unknown validator kind '{validator_kind}'.")
 
 
 @api.get("/core-concepts/{module_name}")

@@ -13,6 +13,9 @@ from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict i
     FindingsValidatorOperatorLiteral,
     FindingsValidatorQueryDataDict,
 )
+from lx_dtypes.models.knowledge_base.report_template.ValidatorRequirementReference import (
+    ValidatorRequirementReference,
+)
 
 FindingsValidatorOperator = Literal[
     "exists",
@@ -164,7 +167,7 @@ class FindingsValidatorCondition(BaseModel):
 
     any: list[FindingsValidatorConditionClause] = Field(default_factory=list)
     all: list[FindingsValidatorConditionClause] = Field(default_factory=list)
-    then_requires: list[dict[str, Any]] = Field(default_factory=list)
+    then_requires: list[ValidatorRequirementReference] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_branches(self) -> "FindingsValidatorCondition":
