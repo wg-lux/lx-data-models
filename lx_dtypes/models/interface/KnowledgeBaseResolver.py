@@ -4,9 +4,12 @@ import json
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
+
+if TYPE_CHECKING:
+    from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 
 
 class KnowledgeBaseVersionNotFoundError(LookupError):
@@ -29,6 +32,31 @@ def _default_input_dirs() -> tuple[Path, ...]:
         for data_dir in (package_data_dir, legacy_cwd_data_dir)
         if data_dir.exists()
     ) or (package_data_dir,)
+
+
+def resolve_default_data_root() -> Path | None:
+    configured_path = ""
+    try:
+        from django.conf import settings
+
+        configured_path = str(getattr(settings, "LOOKUP_DTYPES_DATA_ROOT", "")).strip()
+    except Exception:
+        configured_path = ""
+
+    if configured_path:
+        configured_root = Path(configured_path).expanduser().resolve()
+        if configured_root.exists():
+            return configured_root
+
+    package_data_dir = Path(__file__).resolve().parents[2] / "data"
+    if package_data_dir.exists():
+        return package_data_dir
+
+    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
+    if legacy_cwd_data_dir.exists():
+        return legacy_cwd_data_dir
+
+    return None
 
 
 def _get_registry_path() -> Path | None:
@@ -131,6 +159,16 @@ def resolve_versioned_input_dirs(
 
 
 @lru_cache(maxsize=64)
+def _load_module_config_cached(
+    module_name: str,
+    input_dir_strings: tuple[str, ...],
+) -> "KnowledgeBaseConfig":
+    loader = DataLoader(input_dirs=[Path(path) for path in input_dir_strings])
+    loader.load_module_configs()
+    return loader.get_initialized_config(module_name)
+
+
+@lru_cache(maxsize=64)
 def _load_knowledge_base_cached(
     module_name: str,
     input_dir_strings: tuple[str, ...],
@@ -138,6 +176,40 @@ def _load_knowledge_base_cached(
     loader = DataLoader(input_dirs=[Path(path) for path in input_dir_strings])
     loader.load_module_configs()
     return loader.load_knowledge_base(module_name)
+
+
+def load_module_config(
+    module_name: str,
+    *,
+    version: str | None = None,
+    input_dirs: Sequence[Path] | None = None,
+) -> "KnowledgeBaseConfig":
+    resolved_input_dirs = (
+        resolve_versioned_input_dirs(module_name, version)
+        if version
+        else tuple(input_dirs or _default_input_dirs())
+    )
+    return _load_module_config_cached(
+        module_name,
+        tuple(str(path) for path in resolved_input_dirs),
+    )
+
+
+def get_knowledge_base_identity(
+    module_name: str,
+    *,
+    version: str | None = None,
+    input_dirs: Sequence[Path] | None = None,
+) -> tuple[str, str]:
+    if version is not None:
+        return module_name, version
+
+    module_config = load_module_config(
+        module_name,
+        version=version,
+        input_dirs=input_dirs,
+    )
+    return module_config.name, module_config.version
 
 
 def load_knowledge_base(
@@ -159,13 +231,17 @@ def load_knowledge_base(
 
 def clear_knowledge_base_resolver_caches() -> None:
     _load_registry.cache_clear()
+    _load_module_config_cached.cache_clear()
     _load_knowledge_base_cached.cache_clear()
 
 
 __all__ = [
     "clear_knowledge_base_resolver_caches",
+    "get_knowledge_base_identity",
     "KnowledgeBaseRegistryError",
     "KnowledgeBaseVersionNotFoundError",
     "load_knowledge_base",
+    "load_module_config",
+    "resolve_default_data_root",
     "resolve_versioned_input_dirs",
 ]

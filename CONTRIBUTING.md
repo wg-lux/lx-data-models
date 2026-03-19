@@ -104,6 +104,20 @@ local run guarantees that CI will agree.
    uploads to TestPyPI, then PyPI for tagged releases—no API tokens required.
 6. Announce in the relevant channels and update documentation badges.
 
+Shortcut commands:
+
+```bash
+lx-dtypes-release prepare 0.1.2
+lx-dtypes-release build
+git tag v0.1.2 && git push origin v0.1.2
+```
+
+To provision a historical KB version for runtime lookup:
+
+```bash
+lx-dtypes-kb-registry add-current /path/to/kb_registry.json --module report_template_examples
+```
+
 ## Specific Guides
 ### Importer
 Based on the example in `lx_dtypes/importer/smartie`, you can create import modules for your own datasets. When requesting a pull request to add a new importer, please ensure that:

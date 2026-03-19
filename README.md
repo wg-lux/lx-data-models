@@ -137,6 +137,32 @@ Read the Docs or GitHub Pages.
 	environments; approve those environments as needed and the workflow will
 	push to TestPyPI first, then PyPI.
 
+### Easier Release Commands
+
+```bash
+lx-dtypes-release current
+lx-dtypes-release prepare 0.1.2
+lx-dtypes-release build
+git tag v0.1.2 && git push origin v0.1.2
+```
+
+### Easier KB Registry Commands
+
+Register the current installed knowledge base version and data root:
+
+```bash
+lx-dtypes-kb-registry add-current /path/to/kb_registry.json --module report_template_examples
+```
+
+Register an explicit historical version from a provisioned path:
+
+```bash
+lx-dtypes-kb-registry add /path/to/kb_registry.json \
+  --module report_template_examples \
+  --version 0.1.0 \
+  --input-dir /nix/store/.../site-packages/lx_dtypes/data
+```
+
 ## Contributing
 See `CONTRIBUTING.md` for the full workflow, coding standards, and release
 guidelines. Bug reports and pull requests are welcome!

@@ -73,6 +73,16 @@ _CONTRACT_EXPORTS = {
     "canonical_payload_to_storage",
 }
 
+_INTERFACE_EXPORTS = {
+    "KnowledgeBaseRegistryError",
+    "KnowledgeBaseVersionNotFoundError",
+    "get_knowledge_base_identity",
+    "load_knowledge_base",
+    "load_module_config",
+    "resolve_default_data_root",
+    "resolve_versioned_input_dirs",
+}
+
 
 def __getattr__(name: str) -> Any:
     if name in _REPORT_TEMPLATE_EXPORTS:
@@ -81,6 +91,10 @@ def __getattr__(name: str) -> Any:
 
     if name in _CONTRACT_EXPORTS:
         module = import_module("lx_dtypes.models.contracts")
+        return getattr(module, name)
+
+    if name in _INTERFACE_EXPORTS:
+        module = import_module("lx_dtypes.models.interface")
         return getattr(module, name)
 
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
@@ -151,4 +165,11 @@ __all__ = [
     "core_concept_to_storage",
     "kb_to_core_concepts_payload",
     "canonical_payload_to_storage",
+    "KnowledgeBaseRegistryError",
+    "KnowledgeBaseVersionNotFoundError",
+    "get_knowledge_base_identity",
+    "load_knowledge_base",
+    "load_module_config",
+    "resolve_default_data_root",
+    "resolve_versioned_input_dirs",
 ]

@@ -82,6 +82,8 @@ docs = [
 
 [project.scripts]
 ok = "lx_dtypes.scripts.lint_kb_yaml:main"
+lx-dtypes-kb-registry = "lx_dtypes.scripts.kb_registry:main"
+lx-dtypes-release = "lx_dtypes.scripts.release:main"
 
 [project.urls]
 Homepage = "https://info.coloreg.de"
