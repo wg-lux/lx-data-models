@@ -34,10 +34,10 @@ if TYPE_CHECKING:
 
 class PFindingDjango(LedgerBaseModelDjango[PFindingDataDict]):
     if TYPE_CHECKING:
-        finding: models.ForeignKey[FindingDjango, FindingDjango]
+        finding: models.ForeignKey[FindingDjango, FindingDjango]  # type: ignore[misc]
         patient_examination: models.ForeignKey[PExaminationDjango, PExaminationDjango]
 
-    finding = models.ForeignKey(
+    finding = models.ForeignKey(  # type: ignore[misc]
         "FindingDjango",
         related_name=FieldNames.PATIENT_FINDINGS.value,
         on_delete=models.CASCADE,

@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Any, List, Literal, cast
+from typing import List, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -21,6 +21,7 @@ from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
     FindingsValidatorConditionClause,
     _normalize_value,
 )
+from lx_dtypes.models.knowledge_base.report_template.ValueTypes import ValidationParams
 
 ClassificationValidatorOperator = Literal["exists", "missing", "condition"]
 ClassificationValidatorPrecedence = Literal["required", "optional"]
@@ -68,12 +69,12 @@ class ClassificationValidatorQuery(BaseModel):
     finding: str | None = None
     classification: str | None = None
     operator: ClassificationValidatorOperatorLiteral = "exists"
-    params: dict[str, Any] = Field(default_factory=dict)
+    params: ValidationParams = Field(default_factory=dict)
     condition: ClassificationValidatorCondition | None = None
 
     @field_validator("operator", mode="before")
     @classmethod
-    def normalize_operator(cls, value: Any) -> Any:
+    def normalize_operator(cls, value: object) -> object:
         return _normalize_value(
             value,
             field_name="classification_validator.operator",
@@ -82,12 +83,12 @@ class ClassificationValidatorQuery(BaseModel):
 
     @field_validator("condition", mode="before")
     @classmethod
-    def normalize_condition(cls, value: Any) -> Any:
+    def normalize_condition(cls, value: object) -> object:
         return value
 
     @field_validator("classification", mode="before")
     @classmethod
-    def normalize_classification(cls, value: Any) -> Any:
+    def normalize_classification(cls, value: object) -> object:
         if value is None:
             return value
         token = str(value).strip()
@@ -97,7 +98,7 @@ class ClassificationValidatorQuery(BaseModel):
 
     @field_validator("finding", mode="before")
     @classmethod
-    def normalize_finding(cls, value: Any) -> Any:
+    def normalize_finding(cls, value: object) -> object:
         if value is None:
             return value
         token = str(value).strip()
@@ -137,7 +138,7 @@ class ClassificationValidator(KnowledgebaseBaseModel[ClassificationValidatorData
 
     @field_validator("operator", mode="before")
     @classmethod
-    def normalize_operator(cls, value: Any) -> Any:
+    def normalize_operator(cls, value: object) -> object:
         return _normalize_value(
             value,
             field_name="classification_validator.operator",
@@ -146,7 +147,7 @@ class ClassificationValidator(KnowledgebaseBaseModel[ClassificationValidatorData
 
     @field_validator("precedence", mode="before")
     @classmethod
-    def normalize_precedence(cls, value: Any) -> Any:
+    def normalize_precedence(cls, value: object) -> object:
         return _normalize_value(
             value,
             field_name="classification_validator.precedence",
@@ -155,7 +156,7 @@ class ClassificationValidator(KnowledgebaseBaseModel[ClassificationValidatorData
 
     @model_validator(mode="before")
     @classmethod
-    def normalize_query_defaults(cls, value: Any) -> Any:
+    def normalize_query_defaults(cls, value: object) -> object:
         if not isinstance(value, Mapping):
             return value
         data = dict(value)

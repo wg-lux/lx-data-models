@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Literal, TypedDict
+from typing import List, Literal, TypedDict
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
@@ -8,6 +8,10 @@ from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict i
 )
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRequirementReferenceDataDict import (
     ValidatorRequirementReferenceDataDict,
+)
+from lx_dtypes.models.knowledge_base.report_template.ValueTypes import (
+    ValidationParams,
+    ValidationScalar,
 )
 
 ClassificationValidatorOperatorLiteral = Literal["exists", "missing", "condition"]
@@ -23,8 +27,8 @@ ClassificationValidatorHintDataTypeLiteral = Literal[
 class ClassificationValidatorConditionClauseDataDict(TypedDict, total=False):
     classification: str
     comparator: FindingsValidatorComparatorLiteral
-    value: Any
-    values: List[Any]
+    value: ValidationScalar
+    values: List[ValidationScalar]
 
 
 class ClassificationValidatorConditionDataDict(TypedDict, total=False):
@@ -37,7 +41,7 @@ class ClassificationValidatorQueryDataDict(TypedDict, total=False):
     finding: str
     classification: str
     operator: ClassificationValidatorOperatorLiteral
-    params: Dict[str, Any]
+    params: ValidationParams
     condition: ClassificationValidatorConditionDataDict
 
 

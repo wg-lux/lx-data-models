@@ -34,10 +34,28 @@
         "type": "github"
       }
     },
+    "nixtest": {
+      "locked": {
+        "dir": "lib",
+        "lastModified": 1769441055,
+        "narHash": "sha256-SrHLnM3UMzpj5/o52yf3lFOVpsIGEU5nAFUkdeJO1bM=",
+        "owner": "TECHNOFAB",
+        "repo": "nixtest",
+        "rev": "9f9fcb85349003edb554574d0e3f623811866f50",
+        "type": "gitlab"
+      },
+      "original": {
+        "dir": "lib",
+        "owner": "TECHNOFAB",
+        "repo": "nixtest",
+        "type": "gitlab"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "nixtest": "nixtest"
       }
     },
     "systems": {

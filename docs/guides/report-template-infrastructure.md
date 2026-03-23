@@ -256,7 +256,249 @@ Expected typed examination payload example:
 }
 ```
 
-Historical runtime note:
+## Runtime Validator Semantics
+
+Runtime validation is executed in `ValidatorRuntime.py`. The runtime does not inspect raw YAML directly. It evaluates already-parsed typed models and first normalizes the incoming reported findings payload into this effective shape per finding occurrence:
+
+- `finding`: normalized finding name
+- `classifications`: `dict[str, list[Any]]`
+- `classification_units`: `dict[str, list[str]]`
+- `interventions`: `list[str]`
+
+Normalization matters because the validators operate on this normalized structure, not on the original JSON field layout.
+
+The runtime/model whitelist for validator comparison values is explicit:
+
+- scalar values allowed in comparisons: `str | int | float | bool`
+- list values allowed in params or multi-value payloads: `list[str] | list[int] | list[float] | list[bool]`
+
+The validator model layer no longer uses open-ended `Any` for condition values or params.
+
+### What each validator validates
+
+`findings_validator`
+
+- Target fields: `finding`, `operator`
+- `exists`: passes if at least one occurrence of the target finding is present
+- `missing`: passes if no occurrence of the target finding is present
+- `condition`: for each occurrence of the target finding, evaluates the condition against that occurrence's classifications
+- If the condition matches, `then_requires` is enforced
+- `then_requires` can require:
+  - classifications on the same finding occurrence
+  - other findings anywhere in the normalized report
+  - interventions on the same finding occurrence
+  - units attached to a named classification on the same occurrence
+
+`classification_validator`
+
+- Target fields: `finding`, `classification`, `operator`, `precedence`
+- `exists`: passes if any occurrence of the target finding contains the target classification
+- `missing`: passes if all occurrences of the target finding do not contain the target classification
+- `condition`: for each occurrence of the target finding, evaluates the condition against that occurrence's classifications
+- If the condition matches, the target classification must be present and any `then_requires` references must also be satisfied
+- Returns a `hint` block derived from KB metadata, for example whether the classification appears binary, ordered, or non-categorical
+
+`intervention_validator`
+
+- Target fields: `finding`, `intervention`, `operator`, `precedence`
+- `exists`: passes if any occurrence of the target finding contains the target intervention
+- `missing`: passes if all occurrences of the target finding do not contain the target intervention
+- `condition`: for each occurrence of the target finding, evaluates the condition against that occurrence's classifications
+- If the condition matches, the target intervention must be present and any `then_requires` references must also be satisfied
+
+`unit_validator`
+
+- Target fields: `finding`, `classification`, `unit`, `operator`, `precedence`
+- `exists`: passes if any occurrence of the target finding contains the target unit under the target classification
+- `missing`: passes if all occurrences of the target finding do not contain that unit under that classification
+- `condition`: for each occurrence of the target finding, evaluates the condition against that occurrence's classifications
+- If the condition matches, the target unit must be present and any `then_requires` references must also be satisfied
+
+`examination_validator`
+
+- Does not inspect finding payload values directly
+- It is a dependency validator that aggregates:
+  - `finding_validators`
+  - `examination_validators`
+- It passes only if all referenced dependencies pass
+- It also detects circular `examination_validator` references and returns an explicit runtime issue for that case
+
+### Is validation purely string-based?
+
+No. Identifier matching is mostly string-based, but value comparison is not purely string-based.
+
+String-based parts:
+
+- finding names
+- classification names
+- intervention names
+- unit names
+- validator names and dependency references
+
+Value-aware parts:
+
+- condition clause comparisons for classification values
+- unit presence checks
+- intervention presence checks
+
+The runtime normalizes identifiers with permissive extraction rules. For mappings, it tries keys such as `name`, `key`, `slug`, `id`, `pk`, and `value` when turning something into an identifier.
+
+For classification payload values, the runtime accepts multiple shapes and extracts a value from the first matching key:
+
+- `value`
+- `classification_choice`
+- `classificationChoice`
+- `choice`
+- `values` for list-style payloads
+
+This means identifier matching is string-oriented, but condition evaluation operates on actual extracted values.
+
+### How numbers are handled
+
+Number handling is implemented by `_coerce_numeric`, `_value_equals`, and `_compare_ordered`.
+
+Rules:
+
+- `int` and `float` values are treated as numeric
+- numeric strings such as `"12"` or `"12.5"` are coerced to numbers
+- booleans are explicitly not treated as numbers
+- empty strings do not coerce to numbers
+
+Comparator behavior:
+
+- `eq` and `ne`
+  - first try numeric equality if both sides can be coerced to numbers
+  - otherwise compare via string form
+- `gt`, `gte`, `lt`, `lte`
+  - use numeric comparison if both sides can be coerced to numbers
+  - otherwise fall back to lexical string comparison
+- `in`, `not_in`
+  - compare each candidate using the same equality logic as `eq`
+
+Practical consequences:
+
+- `"12"` and `12` compare equal
+- `"12.0"` and `12` compare equal
+- `"abc"` and `10` are compared as strings if a numeric comparator reaches them
+- `True` is not treated as `1`
+
+### Condition evaluation model
+
+Conditions are evaluated against one finding occurrence at a time.
+
+- `any`: at least one clause must match if the list is populated
+- `all`: every clause must match if the list is populated
+- both can be present; the occurrence must satisfy both branches
+
+Each clause reads values from the normalized `classifications[classification_name]` bucket for that occurrence.
+
+For `condition` validators:
+
+- `triggered_occurrences` counts how many finding occurrences matched the condition
+- validation only fails for those triggered occurrences
+- non-triggering occurrences are ignored for the conditional requirement itself
+
+### What is returned
+
+Top-level template validation returns a `ReportTemplateRuntimeValidationResultDataDict` with:
+
+- `template_name`
+- `ok`
+- `evaluated_findings_count`
+- `classification_validators`
+- `intervention_validators`
+- `findings_validators`
+- `examination_validators`
+- `unit_validators`
+- `issues`
+
+`ok` is the conjunction of all validator result `ok` values. `issues` is the flattened union of every child validator issue list.
+
+Per-validator result shapes:
+
+`findings_validator` result:
+
+- `name`
+- `ok`
+- `operator`
+- `finding`
+- `matched_occurrences`
+- `triggered_occurrences`
+- `missing_required_classifications`
+- `issues`
+
+`classification_validator` result:
+
+- `name`
+- `ok`
+- `operator`
+- `finding`
+- `classification`
+- `precedence`
+- `matched_occurrences`
+- `triggered_occurrences`
+- `hint`
+- `issues`
+
+`intervention_validator` result:
+
+- `name`
+- `ok`
+- `operator`
+- `finding`
+- `intervention`
+- `precedence`
+- `matched_occurrences`
+- `triggered_occurrences`
+- `hint`
+- `issues`
+
+`unit_validator` result:
+
+- `name`
+- `ok`
+- `operator`
+- `finding`
+- `classification`
+- `unit`
+- `precedence`
+- `matched_occurrences`
+- `triggered_occurrences`
+- `hint`
+- `issues`
+
+`examination_validator` result:
+
+- `name`
+- `ok`
+- `finding_validator_status`
+- `examination_validator_status`
+- `issues`
+
+Each issue object contains:
+
+- `code`
+- `level`
+- `message`
+- `validator_name`
+- `validator_kind`
+- optional `details`
+
+### Failure modes documented by the runtime
+
+The runtime returns explicit issues for several classes of failures:
+
+- required finding, classification, intervention, or unit missing
+- something present that should be missing
+- unknown referenced validator name
+- invalid conditional validator definition
+- failed dependency in an `examination_validator`
+- circular `examination_validator` dependency
+
+This is why callers should inspect both:
+
+- top-level `ok` for pass/fail
+- `issues` and the per-validator arrays for actionable detail
 
 - `knowledge_base_module` and `knowledge_base_version` are optional for current-version validation
 - when `knowledge_base_version` is provided, the runtime must resolve that historical KB version through `LX_DTYPES_KB_REGISTRY`

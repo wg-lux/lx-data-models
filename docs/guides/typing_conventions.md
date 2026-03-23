@@ -17,6 +17,9 @@ Do not use Django ORM models as transport contracts.
 - Keep relation field annotations safe for runtime import.
 - Use `TYPE_CHECKING` imports only for static-only related model references.
 - Avoid patterns that force Django field generics to evaluate at runtime without postponed annotations.
+- If `django-stubs` cannot resolve a relation annotation but the runtime pattern
+  is correct, use a narrow `# type: ignore[misc]` on the annotation rather than
+  adding runtime imports solely for typing.
 
 Recommended pattern:
 
@@ -51,5 +54,4 @@ class Example(models.Model):
 2. Route cross-service payloads through contract models.
 3. Replace repeated domain strings with enums or value objects.
 4. Keep one typing style across `knowledge_base`, `ledger`, and `contracts`.
-
 

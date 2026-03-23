@@ -43,6 +43,17 @@ community standards. Please be respectful and constructive in all interactions.
 - **Commits**: Keep commits focused. Use descriptive titles (optionally
   Conventional Commits). Reference issues/PRs when applicable.
 
+### Package Boundary Rules
+
+- Treat `lx-data-models` as a package consumed by sibling services.
+- Prefer imports from public package modules instead of deep leaf modules when
+  those exports exist.
+- Never import package tests, test fixtures, or example scripts from consumer
+  applications.
+- Example/demo outputs belong under `temp/generated_exports/`.
+- Tests must use `tmp_path` or dedicated fixture directories rather than
+  repository-root generated files.
+
 ## Pre-commit Hooks (optional but recommended)
 
 ```bash

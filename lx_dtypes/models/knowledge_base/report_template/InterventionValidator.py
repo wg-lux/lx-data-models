@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Any, List, Literal, cast
+from typing import List, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -21,6 +21,7 @@ from lx_dtypes.models.knowledge_base.report_template.InterventionValidatorDataDi
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRequirementReference import (
     ValidatorRequirementReference,
 )
+from lx_dtypes.models.knowledge_base.report_template.ValueTypes import ValidationParams
 
 InterventionValidatorOperator = Literal["exists", "missing", "condition"]
 InterventionValidatorPrecedence = Literal["required", "optional"]
@@ -68,12 +69,12 @@ class InterventionValidatorQuery(BaseModel):
     finding: str | None = None
     intervention: str | None = None
     operator: InterventionValidatorOperatorLiteral = "exists"
-    params: dict[str, Any] = Field(default_factory=dict)
+    params: ValidationParams = Field(default_factory=dict)
     condition: InterventionValidatorCondition | None = None
 
     @field_validator("operator", mode="before")
     @classmethod
-    def normalize_operator(cls, value: Any) -> Any:
+    def normalize_operator(cls, value: object) -> object:
         return _normalize_value(
             value,
             field_name="intervention_validator.operator",
@@ -110,7 +111,7 @@ class InterventionValidator(KnowledgebaseBaseModel[InterventionValidatorDataDict
 
     @field_validator("operator", mode="before")
     @classmethod
-    def normalize_operator(cls, value: Any) -> Any:
+    def normalize_operator(cls, value: object) -> object:
         return _normalize_value(
             value,
             field_name="intervention_validator.operator",
@@ -119,7 +120,7 @@ class InterventionValidator(KnowledgebaseBaseModel[InterventionValidatorDataDict
 
     @field_validator("precedence", mode="before")
     @classmethod
-    def normalize_precedence(cls, value: Any) -> Any:
+    def normalize_precedence(cls, value: object) -> object:
         return _normalize_value(
             value,
             field_name="intervention_validator.precedence",
@@ -128,7 +129,7 @@ class InterventionValidator(KnowledgebaseBaseModel[InterventionValidatorDataDict
 
     @model_validator(mode="before")
     @classmethod
-    def normalize_query_defaults(cls, value: Any) -> Any:
+    def normalize_query_defaults(cls, value: object) -> object:
         if not isinstance(value, Mapping):
             return value
         data = dict(value)

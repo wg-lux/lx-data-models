@@ -14,11 +14,7 @@ let
   buildInputs = with pkgs; [
     python312
     stdenv.cc.cc
-    tesseract
-    glib
     openssh
-    cmake
-    gcc
     pkg-config
     protobuf
     libglvnd
@@ -48,8 +44,22 @@ in
   dotenv.enable = true;
   dotenv.disableHint = true;
 
-  packages = runtimePackages ++ buildInputs;
-
+  packages = lib.unique (runtimePackages ++ buildInputs);
+  outputs =
+    lib.optionalAttrs (inputs ? pyproject-nix) (
+      let
+        python_package = pkgs.callPackage ./python-package.nix { };
+        kb_package = pkgs.callPackage ./package.nix { };
+        app_package = pkgs.callPackage ./app-package.nix {
+          inherit kb_package python_package;
+        };
+      in
+      {
+        python = python_package;
+        kb = kb_package;
+        app = app_package;
+      }
+    );
   env = {
     # include runtimePackages as well so runtime native libs (e.g. zlib) are on LD_LIBRARY_PATH
     LD_LIBRARY_PATH =

@@ -31,14 +31,14 @@ class PFindingInterventionDjango(LedgerBaseModelDjango[PFindingInterventionDataD
         patient_finding_interventions: models.ForeignKey[
             PFindingInterventionsDjango, PFindingInterventionsDjango
         ]
-        intervention: models.ForeignKey[InterventionDjango, InterventionDjango]
+        intervention: models.ForeignKey[InterventionDjango, InterventionDjango]  # type: ignore[misc]
 
     patient_finding_interventions = models.ForeignKey(
         "PFindingInterventionsDjango",
         related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
         on_delete=models.CASCADE,
     )
-    intervention = models.ForeignKey(
+    intervention = models.ForeignKey(  # type: ignore[misc]
         "InterventionDjango",
         related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
         on_delete=models.CASCADE,

@@ -4,12 +4,12 @@
 }:
 
 let
-  pname = "star-endoscopy-kb";
+  kbSource = ./demo-data/star_upper_gi;
+  kbModuleName = builtins.baseNameOf (toString kbSource);
+  pname = "lx-dtypes-kb-${lib.replaceStrings [ "_" ] [ "-" ] kbModuleName}";
   version = "0.1.0";
 
-  kbModuleName = "star_upper_gi";
   kbModuleVersion = "0.1.0";
-  kbSource = ./demo-data/star_upper_gi;
 in
 stdenvNoCC.mkDerivation {
   inherit pname version;
@@ -46,7 +46,7 @@ stdenvNoCC.mkDerivation {
   '';
 
   meta = with lib; {
-    description = "STAR upper GI endoscopy knowledge-base bundle packaged for lx-dtypes registry consumption";
+    description = "Knowledge-base bundle for ${kbModuleName} packaged for lx-dtypes registry consumption";
     license = licenses.mit;
     platforms = platforms.linux;
   };

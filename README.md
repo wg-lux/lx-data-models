@@ -62,6 +62,16 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
+## Architecture Notes
+
+- Treat `lx-data-models` as a package boundary when consumed by sibling
+  services.
+- Import package-owned symbols through public modules where available.
+- Keep demo outputs under `temp/generated_exports/`; tests should use `tmp_path`
+  instead of writing repository-root artifacts.
+- Do not import from `lx_dtypes...tests` or `...test_fixtures` in consuming
+  applications.
+
 ## Migrations
 
 The following command shortcuts are available for managing migratons, see line below for what they do:

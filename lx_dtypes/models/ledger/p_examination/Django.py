@@ -40,7 +40,7 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
     if TYPE_CHECKING:
         patient: models.ForeignKey[PatientDjango, PatientDjango]
         examiners: models.ManyToManyField[ExaminerDjango, ExaminerDjango]
-        examination: models.ForeignKey[ExaminationDjango, ExaminationDjango]
+        examination: models.ForeignKey[ExaminationDjango, ExaminationDjango]  # type: ignore[misc]
 
     patient = models.ForeignKey(
         "PatientDjango",
@@ -52,7 +52,7 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
         related_name=FieldNames.PATIENT_EXAMINATIONS.value,
     )
 
-    examination = models.ForeignKey(
+    examination = models.ForeignKey(  # type: ignore[misc]
         "ExaminationDjango",
         related_name=FieldNames.PATIENT_EXAMINATIONS.value,
         on_delete=models.CASCADE,

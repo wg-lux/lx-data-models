@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, Mapping, Sequence, TypedDict
+from typing import Dict, List, Literal, Mapping, Sequence, TypedDict
 
 from ..classification.Classification import Classification
 from ..classification_choice.ClassificationChoice import ClassificationChoice
@@ -29,6 +29,11 @@ from .ReportTemplate import ReportTemplate
 from .UnitValidator import UnitValidator, UnitValidatorCondition
 from .UnitValidatorDataDict import UnitValidatorHintDataDict
 from .ValidatorRequirementReference import ValidatorRequirementReference
+from .ValueTypes import (
+    ValidationIssueDetails,
+    ValidationScalar,
+    ValidationValue,
+)
 
 
 class RuntimeValidationIssueDataDict(TypedDict, total=False):
@@ -44,7 +49,7 @@ class RuntimeValidationIssueDataDict(TypedDict, total=False):
         "template",
         "unit_validator",
     ]
-    details: Dict[str, Any]
+    details: ValidationIssueDetails
 
 
 class ExaminationValidatorDependencyStatusDataDict(TypedDict):
@@ -125,12 +130,12 @@ class ReportTemplateRuntimeValidationResultDataDict(TypedDict):
 
 class _RuntimeFindingOccurrence(TypedDict):
     finding: str
-    classifications: Dict[str, List[Any]]
+    classifications: Dict[str, List[ValidationScalar]]
     classification_units: Dict[str, List[str]]
     interventions: List[str]
 
 
-def _as_str_list(value: Any) -> List[str]:
+def _as_str_list(value: object) -> List[str]:
     if value in (None, ""):
         return []
     if isinstance(value, str):
@@ -146,7 +151,7 @@ def _as_str_list(value: Any) -> List[str]:
     return [token] if token else []
 
 
-def _normalize_identifier(value: Any) -> str:
+def _normalize_identifier(value: object) -> str:
     if value is None:
         return ""
     if isinstance(value, str):
@@ -163,18 +168,42 @@ def _normalize_identifier(value: Any) -> str:
     return str(value).strip()
 
 
-def _extract_classification_value(payload: Mapping[str, Any]) -> Any:
+def _coerce_validation_scalar(value: object) -> ValidationScalar | None:
+    if value is None:
+        return None
+    if isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, Mapping):
+        token = _normalize_identifier(value)
+        return token or None
+    return str(value)
+
+
+def _coerce_validation_value(value: object) -> ValidationValue | None:
+    if isinstance(value, list):
+        result: list[ValidationScalar] = []
+        for item in value:
+            coerced = _coerce_validation_scalar(item)
+            if coerced is not None:
+                result.append(coerced)
+        return result
+    return _coerce_validation_scalar(value)
+
+
+def _extract_classification_value(
+    payload: Mapping[str, object],
+) -> ValidationValue | None:
     for key in ("value", "classification_choice", "classificationChoice", "choice"):
         if key in payload:
-            return payload.get(key)
+            return _coerce_validation_value(payload.get(key))
     if "values" in payload:
         values = payload.get("values")
         if isinstance(values, list):
-            return values
+            return _coerce_validation_value(values)
     return None
 
 
-def _extract_classification_unit(payload: Mapping[str, Any]) -> str | None:
+def _extract_classification_unit(payload: Mapping[str, object]) -> str | None:
     for key in ("unit", "unit_name", "classification_unit"):
         if key in payload:
             unit_name = _normalize_identifier(payload.get(key))
@@ -184,7 +213,9 @@ def _extract_classification_unit(payload: Mapping[str, Any]) -> str | None:
 
 
 def _add_classification_value(
-    target: Dict[str, List[Any]], classification_name: Any, value: Any
+    target: Dict[str, List[ValidationScalar]],
+    classification_name: object,
+    value: ValidationValue | None,
 ) -> None:
     normalized_name = _normalize_identifier(classification_name)
     if not normalized_name:
@@ -193,8 +224,7 @@ def _add_classification_value(
     bucket = target.setdefault(normalized_name, [])
     if isinstance(value, list):
         for item in value:
-            if item is not None:
-                bucket.append(item)
+            bucket.append(item)
         return
     if value is not None:
         bucket.append(value)
@@ -204,7 +234,7 @@ def _add_classification_value(
 
 
 def _add_classification_unit(
-    target: Dict[str, List[str]], classification_name: Any, unit_name: Any
+    target: Dict[str, List[str]], classification_name: object, unit_name: object
 ) -> None:
     normalized_name = _normalize_identifier(classification_name)
     normalized_unit = _normalize_identifier(unit_name)
@@ -214,7 +244,7 @@ def _add_classification_unit(
     bucket.append(normalized_unit)
 
 
-def _normalize_interventions(raw: Any) -> List[str]:
+def _normalize_interventions(raw: object) -> List[str]:
     if raw is None:
         return []
     if isinstance(raw, Mapping):
@@ -241,9 +271,9 @@ def _normalize_interventions(raw: Any) -> List[str]:
 
 
 def _normalize_classifications(
-    raw: Any,
-) -> tuple[Dict[str, List[Any]], Dict[str, List[str]]]:
-    normalized: Dict[str, List[Any]] = {}
+    raw: object,
+) -> tuple[Dict[str, List[ValidationScalar]], Dict[str, List[str]]]:
+    normalized: Dict[str, List[ValidationScalar]] = {}
     units: Dict[str, List[str]] = {}
     if raw is None:
         return normalized, units
@@ -276,7 +306,7 @@ def _normalize_classifications(
 
 
 def _normalize_reported_findings(
-    reported_findings: Sequence[Mapping[str, Any]] | None,
+    reported_findings: Sequence[Mapping[str, object]] | None,
 ) -> List[_RuntimeFindingOccurrence]:
     if not reported_findings:
         return []
@@ -309,7 +339,7 @@ def _normalize_reported_findings(
     return occurrences
 
 
-def _coerce_numeric(value: Any) -> float | None:
+def _coerce_numeric(value: ValidationScalar) -> float | None:
     if isinstance(value, bool):
         return None
     if isinstance(value, (int, float)):
@@ -325,7 +355,7 @@ def _coerce_numeric(value: Any) -> float | None:
     return None
 
 
-def _value_equals(left: Any, right: Any) -> bool:
+def _value_equals(left: ValidationScalar, right: ValidationScalar) -> bool:
     if left == right:
         return True
 
@@ -337,7 +367,9 @@ def _value_equals(left: Any, right: Any) -> bool:
     return str(left) == str(right)
 
 
-def _compare_ordered(left: Any, right: Any, operator: str) -> bool:
+def _compare_ordered(
+    left: ValidationScalar, right: ValidationScalar, operator: str
+) -> bool:
     left_num = _coerce_numeric(left)
     right_num = _coerce_numeric(right)
 
@@ -366,25 +398,33 @@ def _compare_ordered(left: Any, right: Any, operator: str) -> bool:
 
 
 def _evaluate_clause(
-    clause: FindingsValidatorConditionClause, classifications: Mapping[str, List[Any]]
+    clause: FindingsValidatorConditionClause,
+    classifications: Mapping[str, List[ValidationScalar]],
 ) -> bool:
     actual_values = classifications.get(clause.classification, [])
     if not actual_values:
         return False
 
     comparator = clause.comparator
+    clause_value = clause.value
     if comparator == "eq":
-        return any(_value_equals(value, clause.value) for value in actual_values)
+        if clause_value is None:
+            return False
+        return any(_value_equals(value, clause_value) for value in actual_values)
     if comparator == "ne":
-        return all(not _value_equals(value, clause.value) for value in actual_values)
+        if clause_value is None:
+            return False
+        return all(not _value_equals(value, clause_value) for value in actual_values)
     if comparator in {"gt", "gte", "lt", "lte"}:
+        if clause_value is None:
+            return False
         return any(
-            _compare_ordered(value, clause.value, comparator) for value in actual_values
+            _compare_ordered(value, clause_value, comparator) for value in actual_values
         )
 
     expected_values = clause.values or []
-    if clause.value is not None and not expected_values:
-        expected_values = [clause.value]
+    if clause_value is not None and not expected_values:
+        expected_values = [clause_value]
     if not expected_values:
         return False
 
@@ -402,7 +442,8 @@ def _evaluate_clause(
 
 
 def _condition_matches(
-    condition: FindingsValidatorCondition, classifications: Mapping[str, List[Any]]
+    condition: FindingsValidatorCondition,
+    classifications: Mapping[str, List[ValidationScalar]],
 ) -> bool:
     any_clauses = list(condition.any or [])
     all_clauses = list(condition.all or [])
@@ -428,7 +469,7 @@ def _classification_condition_matches(
         | InterventionValidatorCondition
         | UnitValidatorCondition
     ),
-    classifications: Mapping[str, List[Any]],
+    classifications: Mapping[str, List[ValidationScalar]],
 ) -> bool:
     any_clauses = list(condition.any or [])
     all_clauses = list(condition.all or [])
@@ -449,7 +490,8 @@ def _classification_condition_matches(
 
 
 def _missing_required_classifications(
-    condition: FindingsValidatorCondition, classifications: Mapping[str, List[Any]]
+    condition: FindingsValidatorCondition,
+    classifications: Mapping[str, List[ValidationScalar]],
 ) -> List[str]:
     missing: List[str] = []
     for requirement in condition.then_requires or []:
@@ -513,7 +555,7 @@ def _build_issue(
         "template",
     ],
     level: Literal["error", "warning"] = "error",
-    details: Dict[str, Any] | None = None,
+    details: ValidationIssueDetails | None = None,
 ) -> RuntimeValidationIssueDataDict:
     issue = RuntimeValidationIssueDataDict(
         code=code,
@@ -647,7 +689,7 @@ def _build_unit_hint(
 def evaluate_findings_validator_runtime(
     validator: FindingsValidator,
     *,
-    reported_findings: Sequence[Mapping[str, Any]] | None = None,
+    reported_findings: Sequence[Mapping[str, object]] | None = None,
 ) -> FindingsValidatorExecutionDataDict:
     normalized_findings = _normalize_reported_findings(reported_findings)
     target_finding = validator.finding
@@ -783,7 +825,7 @@ def evaluate_classification_validator_runtime(
     classifications: Mapping[str, Classification],
     classification_choices: Mapping[str, ClassificationChoice],
     classification_choice_descriptors: Mapping[str, ClassificationChoiceDescriptor],
-    reported_findings: Sequence[Mapping[str, Any]] | None = None,
+    reported_findings: Sequence[Mapping[str, object]] | None = None,
 ) -> ClassificationValidatorExecutionDataDict:
     normalized_findings = _normalize_reported_findings(reported_findings)
     target_finding = validator.finding
@@ -957,7 +999,7 @@ def evaluate_intervention_validator_runtime(
     validator: InterventionValidator,
     *,
     interventions: Mapping[str, Intervention],
-    reported_findings: Sequence[Mapping[str, Any]] | None = None,
+    reported_findings: Sequence[Mapping[str, object]] | None = None,
 ) -> InterventionValidatorExecutionDataDict:
     normalized_findings = _normalize_reported_findings(reported_findings)
     matched_occurrences = [
@@ -1084,7 +1126,7 @@ def evaluate_unit_validator_runtime(
     validator: UnitValidator,
     *,
     units: Mapping[str, Unit],
-    reported_findings: Sequence[Mapping[str, Any]] | None = None,
+    reported_findings: Sequence[Mapping[str, object]] | None = None,
 ) -> UnitValidatorExecutionDataDict:
     normalized_findings = _normalize_reported_findings(reported_findings)
     matched_occurrences = [
@@ -1220,7 +1262,7 @@ def evaluate_report_template_validators_runtime(
     classification_choice_descriptors: Mapping[str, ClassificationChoiceDescriptor],
     interventions: Mapping[str, Intervention],
     units: Mapping[str, Unit],
-    reported_findings: Sequence[Mapping[str, Any]] | None = None,
+    reported_findings: Sequence[Mapping[str, object]] | None = None,
 ) -> ReportTemplateRuntimeValidationResultDataDict:
     normalized_findings = _normalize_reported_findings(reported_findings)
 

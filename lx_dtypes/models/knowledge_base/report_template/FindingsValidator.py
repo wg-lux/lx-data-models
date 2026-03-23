@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Any, List, Literal, cast
+from typing import List, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -15,6 +15,10 @@ from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict i
 )
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRequirementReference import (
     ValidatorRequirementReference,
+)
+from lx_dtypes.models.knowledge_base.report_template.ValueTypes import (
+    ValidationParams,
+    ValidationScalar,
 )
 
 FindingsValidatorOperator = Literal[
@@ -70,7 +74,7 @@ class DeprecatedReportTemplateValueWarning(UserWarning):
 
 
 def _normalize_value(
-    raw_value: Any,
+    raw_value: object,
     *,
     field_name: str,
     valid_values: tuple[str, ...],
@@ -85,7 +89,7 @@ def _normalize_value(
 
 
 def _normalize_value_with_alias(
-    raw_value: Any,
+    raw_value: object,
     *,
     field_name: str,
     valid_values: tuple[str, ...],
@@ -123,12 +127,12 @@ class FindingsValidatorConditionClause(BaseModel):
 
     classification: str
     comparator: FindingsValidatorComparatorLiteral = "eq"
-    value: Any = None
-    values: list[Any] | None = None
+    value: ValidationScalar | None = None
+    values: list[ValidationScalar] | None = None
 
     @field_validator("comparator", mode="before")
     @classmethod
-    def normalize_comparator(cls, value: Any) -> Any:
+    def normalize_comparator(cls, value: object) -> object:
         return _normalize_value_with_alias(
             value,
             field_name="findings_validator.comparator",
@@ -187,12 +191,12 @@ class FindingsValidatorQuery(BaseModel):
 
     finding: str | None = None
     operator: FindingsValidatorOperatorLiteral = "exists"
-    params: dict[str, Any] = Field(default_factory=dict)
+    params: ValidationParams = Field(default_factory=dict)
     condition: FindingsValidatorCondition | None = None
 
     @field_validator("operator", mode="before")
     @classmethod
-    def normalize_operator(cls, value: Any) -> Any:
+    def normalize_operator(cls, value: object) -> object:
         return _normalize_value(
             value,
             field_name="findings_validator.operator",
@@ -225,7 +229,7 @@ class FindingsValidator(KnowledgebaseBaseModel[FindingsValidatorDataDict]):
 
     @field_validator("operator", mode="before")
     @classmethod
-    def normalize_operator(cls, value: Any) -> Any:
+    def normalize_operator(cls, value: object) -> object:
         return _normalize_value(
             value,
             field_name="findings_validator.operator",
@@ -234,7 +238,7 @@ class FindingsValidator(KnowledgebaseBaseModel[FindingsValidatorDataDict]):
 
     @model_validator(mode="before")
     @classmethod
-    def normalize_query_defaults(cls, value: Any) -> Any:
+    def normalize_query_defaults(cls, value: object) -> object:
         if not isinstance(value, Mapping):
             return value
         data = dict(value)
