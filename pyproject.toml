@@ -111,6 +111,10 @@ plugins = ["pandera.mypy", "mypy_django_plugin.main"]
 strict = true
 warn_unused_ignores = false
 
+[[tool.mypy.overrides]]
+module = ["cv2", "cv2.*"]
+ignore_errors = true
+
 [tool.django-stubs]
 django_settings_module = "lx_dtypes.django_settings"
 
