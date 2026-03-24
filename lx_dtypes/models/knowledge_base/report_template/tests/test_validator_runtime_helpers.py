@@ -226,21 +226,32 @@ def test_classification_data_type_hint_covers_binary_and_non_categorical() -> No
         }
     )
 
-    assert runtime._classification_data_type_hint(
-        classification=binary_classification,
-        classification_choices={"present_choice": binary_choice},
-        classification_choice_descriptors={"present_descriptor": boolean_descriptor},
-    )[0] == "binary"
-    assert runtime._classification_data_type_hint(
-        classification=numeric_classification,
-        classification_choices={"size_choice": numeric_choice},
-        classification_choice_descriptors={"size_descriptor": numeric_descriptor},
-    )[0] == "non_categorical"
-    assert runtime._classification_data_type_hint(
-        classification=None,
-        classification_choices={},
-        classification_choice_descriptors={},
-    )[0] == "unknown"
+    assert (
+        runtime._classification_data_type_hint(
+            classification=binary_classification,
+            classification_choices={"present_choice": binary_choice},
+            classification_choice_descriptors={
+                "present_descriptor": boolean_descriptor
+            },
+        )[0]
+        == "binary"
+    )
+    assert (
+        runtime._classification_data_type_hint(
+            classification=numeric_classification,
+            classification_choices={"size_choice": numeric_choice},
+            classification_choice_descriptors={"size_descriptor": numeric_descriptor},
+        )[0]
+        == "non_categorical"
+    )
+    assert (
+        runtime._classification_data_type_hint(
+            classification=None,
+            classification_choices={},
+            classification_choice_descriptors={},
+        )[0]
+        == "unknown"
+    )
 
 
 def test_findings_runtime_reports_missing_generic_references() -> None:
@@ -344,7 +355,9 @@ def test_intervention_validator_runtime_covers_condition_missing_and_unsupported
                     "intervention": "resection",
                     "operator": "invalid",
                     "precedence": "required",
-                    "query": type("_UnsupportedInterventionQuery", (), {"condition": None})(),
+                    "query": type(
+                        "_UnsupportedInterventionQuery", (), {"condition": None}
+                    )(),
                 },
             )(),
         ),

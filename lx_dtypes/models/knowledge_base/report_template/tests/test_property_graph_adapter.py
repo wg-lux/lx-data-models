@@ -72,9 +72,7 @@ def test_report_template_property_graph_adapter_projects_domain_semantics() -> N
                 "finding": "esophagus_polyp",
                 "required": True,
                 "multiple_allowed": False,
-                "classifications": [
-                    {"classification": "size_mm", "required": True}
-                ],
+                "classifications": [{"classification": "size_mm", "required": True}],
             }
         )
     }

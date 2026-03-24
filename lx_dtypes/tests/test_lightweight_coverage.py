@@ -37,7 +37,9 @@ def test_release_helpers_cover_validation_and_main(
     assert args.command == "current"
 
 
-def test_lint_kb_yaml_main_reports_success(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+def test_lint_kb_yaml_main_reports_success(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     fake_args = argparse.Namespace(
         paths=[],
         config_paths=[Path("config.yaml")],
@@ -64,7 +66,9 @@ def test_lint_kb_yaml_main_reports_success(monkeypatch: pytest.MonkeyPatch, caps
     )
 
     assert lint_kb_yaml.main() == 0
-    assert "Scanned 1 YAML file(s): 0 error(s), 0 warning(s)." in capsys.readouterr().out
+    assert (
+        "Scanned 1 YAML file(s): 0 error(s), 0 warning(s)." in capsys.readouterr().out
+    )
 
 
 def test_lint_kb_yaml_main_fails_when_warnings_requested(
