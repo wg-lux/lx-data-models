@@ -194,7 +194,7 @@ def test_evaluate_classification_validator_exists_and_condition() -> None:
     )
 
     assert failing_exists["ok"] is False
-    assert failing_exists["hint"]["data_type_hint"] == "ordered"
+    assert failing_exists["hint"]["data_type_hint"] == "non_categorical"
     assert failing_condition["ok"] is False
     assert failing_condition["triggered_occurrences"] == 1
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from types import SimpleNamespace
+from typing import cast
 
 from lx_dtypes.models.knowledge_base.classification.Classification import (
     Classification,
@@ -16,6 +16,7 @@ from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator imp
     ClassificationValidator,
 )
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
+    FindingsValidatorConditionClause,
     FindingsValidator,
 )
 from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
@@ -26,6 +27,7 @@ from lx_dtypes.models.knowledge_base.report_template.ValidatorRequirementReferen
     ValidatorRequirementReference,
 )
 from lx_dtypes.models.knowledge_base.report_template import ValidatorRuntime as runtime
+from lx_dtypes.models.knowledge_base.report_template.ValueTypes import ValidationScalar
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 
 
@@ -72,14 +74,14 @@ def test_runtime_normalizers_cover_mapping_and_sequence_shapes() -> None:
 
 
 def test_runtime_clause_evaluation_covers_all_comparators() -> None:
-    values = {
+    values: dict[str, list[ValidationScalar]] = {
         "size_mm": [12, "15"],
         "morphology": ["sessile"],
         "location": ["left_colon"],
     }
 
     assert runtime._evaluate_clause(
-        runtime.FindingsValidatorConditionClause(
+        FindingsValidatorConditionClause(
             classification="morphology",
             comparator="eq",
             value="sessile",
@@ -87,7 +89,7 @@ def test_runtime_clause_evaluation_covers_all_comparators() -> None:
         values,
     )
     assert runtime._evaluate_clause(
-        runtime.FindingsValidatorConditionClause(
+        FindingsValidatorConditionClause(
             classification="morphology",
             comparator="ne",
             value="pedunculated",
@@ -95,7 +97,7 @@ def test_runtime_clause_evaluation_covers_all_comparators() -> None:
         values,
     )
     assert runtime._evaluate_clause(
-        runtime.FindingsValidatorConditionClause(
+        FindingsValidatorConditionClause(
             classification="size_mm",
             comparator="gt",
             value=10,
@@ -103,7 +105,7 @@ def test_runtime_clause_evaluation_covers_all_comparators() -> None:
         values,
     )
     assert runtime._evaluate_clause(
-        runtime.FindingsValidatorConditionClause(
+        FindingsValidatorConditionClause(
             classification="size_mm",
             comparator="gte",
             value=12,
@@ -111,7 +113,7 @@ def test_runtime_clause_evaluation_covers_all_comparators() -> None:
         values,
     )
     assert runtime._evaluate_clause(
-        runtime.FindingsValidatorConditionClause(
+        FindingsValidatorConditionClause(
             classification="size_mm",
             comparator="lt",
             value=20,
@@ -119,7 +121,7 @@ def test_runtime_clause_evaluation_covers_all_comparators() -> None:
         values,
     )
     assert runtime._evaluate_clause(
-        runtime.FindingsValidatorConditionClause(
+        FindingsValidatorConditionClause(
             classification="size_mm",
             comparator="lte",
             value=12,
@@ -127,7 +129,7 @@ def test_runtime_clause_evaluation_covers_all_comparators() -> None:
         values,
     )
     assert runtime._evaluate_clause(
-        runtime.FindingsValidatorConditionClause(
+        FindingsValidatorConditionClause(
             classification="location",
             comparator="in",
             values=["left_colon", "rectum"],
@@ -135,7 +137,7 @@ def test_runtime_clause_evaluation_covers_all_comparators() -> None:
         values,
     )
     assert runtime._evaluate_clause(
-        runtime.FindingsValidatorConditionClause(
+        FindingsValidatorConditionClause(
             classification="location",
             comparator="not_in",
             values=["right_colon"],
@@ -143,7 +145,7 @@ def test_runtime_clause_evaluation_covers_all_comparators() -> None:
         values,
     )
     assert not runtime._evaluate_clause(
-        runtime.FindingsValidatorConditionClause(
+        FindingsValidatorConditionClause(
             classification="missing",
             comparator="eq",
             value="x",
@@ -184,26 +186,44 @@ def test_missing_requirement_references_cover_all_reference_kinds() -> None:
 
 
 def test_classification_data_type_hint_covers_binary_and_non_categorical() -> None:
-    boolean_descriptor = SimpleNamespace(
-        classification_choice_descriptor_type="boolean",
-        selection_multiple=False,
+    boolean_descriptor = ClassificationChoiceDescriptor.model_validate(
+        {
+            "name": "present_descriptor",
+            "classification_choice_descriptor_type": "boolean",
+            "selection_multiple": False,
+        }
     )
-    numeric_descriptor = SimpleNamespace(
-        classification_choice_descriptor_type="numeric",
-        selection_multiple=False,
+    numeric_descriptor = ClassificationChoiceDescriptor.model_validate(
+        {
+            "name": "size_descriptor",
+            "classification_choice_descriptor_type": "numeric",
+            "selection_multiple": False,
+        }
     )
-    binary_choice = SimpleNamespace(
-        classification_choice_descriptors=["present_descriptor"],
+    binary_choice = ClassificationChoice.model_validate(
+        {
+            "name": "present_choice",
+            "classification_choice_descriptors": ["present_descriptor"],
+        }
     )
-    numeric_choice = SimpleNamespace(
-        classification_choice_descriptors=["size_descriptor"],
+    numeric_choice = ClassificationChoice.model_validate(
+        {
+            "name": "size_choice",
+            "classification_choice_descriptors": ["size_descriptor"],
+        }
     )
 
-    binary_classification = SimpleNamespace(
-        classification_choices=["present_choice", "absent_choice"],
+    binary_classification = Classification.model_validate(
+        {
+            "name": "binary_classification",
+            "classification_choices": ["present_choice", "absent_choice"],
+        }
     )
-    numeric_classification = SimpleNamespace(
-        classification_choices=["size_choice"],
+    numeric_classification = Classification.model_validate(
+        {
+            "name": "numeric_classification",
+            "classification_choices": ["size_choice"],
+        }
     )
 
     assert runtime._classification_data_type_hint(
@@ -313,13 +333,20 @@ def test_intervention_validator_runtime_covers_condition_missing_and_unsupported
         ],
     )
     unsupported_result = runtime.evaluate_intervention_validator_runtime(
-        SimpleNamespace(
-            name="bad_intervention",
-            finding="colon_polyp",
-            intervention="resection",
-            operator="invalid",
-            precedence="required",
-            query=SimpleNamespace(condition=None),
+        cast(
+            InterventionValidator,
+            type(
+                "_UnsupportedInterventionValidator",
+                (),
+                {
+                    "name": "bad_intervention",
+                    "finding": "colon_polyp",
+                    "intervention": "resection",
+                    "operator": "invalid",
+                    "precedence": "required",
+                    "query": type("_UnsupportedInterventionQuery", (), {"condition": None})(),
+                },
+            )(),
         ),
         interventions={},
         reported_findings=[],
@@ -409,14 +436,21 @@ def test_unit_validator_runtime_covers_exists_missing_condition_and_unsupported(
         reported_findings=payload,
     )
     unsupported = runtime.evaluate_unit_validator_runtime(
-        SimpleNamespace(
-            name="bad_unit",
-            finding="colon_polyp",
-            classification="size_mm",
-            unit="mm",
-            operator="invalid",
-            precedence="required",
-            query=SimpleNamespace(condition=None),
+        cast(
+            UnitValidator,
+            type(
+                "_UnsupportedUnitValidator",
+                (),
+                {
+                    "name": "bad_unit",
+                    "finding": "colon_polyp",
+                    "classification": "size_mm",
+                    "unit": "mm",
+                    "operator": "invalid",
+                    "precedence": "required",
+                    "query": type("_UnsupportedUnitQuery", (), {"condition": None})(),
+                },
+            )(),
         ),
         units={},
         reported_findings=[],
@@ -457,12 +491,25 @@ def test_classification_validator_runtime_covers_missing_condition_and_unsupport
         }
     )
 
-    choice = SimpleNamespace(classification_choice_descriptors=["size_descriptor"])
-    descriptor = SimpleNamespace(
-        classification_choice_descriptor_type="numeric",
-        selection_multiple=False,
+    choice = ClassificationChoice.model_validate(
+        {
+            "name": "size_choice",
+            "classification_choice_descriptors": ["size_descriptor"],
+        }
     )
-    classification = SimpleNamespace(classification_choices=["size_choice"])
+    descriptor = ClassificationChoiceDescriptor.model_validate(
+        {
+            "name": "size_descriptor",
+            "classification_choice_descriptor_type": "numeric",
+            "selection_multiple": False,
+        }
+    )
+    classification = Classification.model_validate(
+        {
+            "name": "lst",
+            "classification_choices": ["size_choice"],
+        }
+    )
 
     result = runtime.evaluate_classification_validator_runtime(
         validator,
@@ -478,13 +525,24 @@ def test_classification_validator_runtime_covers_missing_condition_and_unsupport
         ],
     )
     unsupported = runtime.evaluate_classification_validator_runtime(
-        SimpleNamespace(
-            name="bad_classification",
-            finding="colon_polyp",
-            classification="lst",
-            operator="invalid",
-            precedence="required",
-            query=SimpleNamespace(condition=None),
+        cast(
+            ClassificationValidator,
+            type(
+                "_UnsupportedClassificationValidator",
+                (),
+                {
+                    "name": "bad_classification",
+                    "finding": "colon_polyp",
+                    "classification": "lst",
+                    "operator": "invalid",
+                    "precedence": "required",
+                    "query": type(
+                        "_UnsupportedClassificationQuery",
+                        (),
+                        {"condition": None},
+                    )(),
+                },
+            )(),
         ),
         classifications={},
         classification_choices={},

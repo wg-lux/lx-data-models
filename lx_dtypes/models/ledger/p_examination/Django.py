@@ -44,8 +44,6 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
         patient: models.ForeignKey[PatientDjango, PatientDjango]
         examiners: models.ManyToManyField[ExaminerDjango, ExaminerDjango]
         examination: models.ForeignKey[ExaminationDjango, ExaminationDjango]  # type: ignore[misc]
-        knowledge_base_module: OptionalCharFieldType
-        knowledge_base_version: OptionalCharFieldType
 
     patient = models.ForeignKey(
         "PatientDjango",

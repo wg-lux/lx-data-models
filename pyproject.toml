@@ -105,7 +105,7 @@ exclude = [
 useLibraryCodeForTypes = true
 
 [tool.mypy]
-exclude = '^(\.venv|venv|env)/'
+exclude = '^(typings/|\.venv/|venv/|env/)'
 mypy_path = ["typings"]
 plugins = ["pandera.mypy", "mypy_django_plugin.main"]
 strict = true

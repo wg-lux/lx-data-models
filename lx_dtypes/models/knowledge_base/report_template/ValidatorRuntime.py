@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from enum import Enum
 from typing import Dict, List, Literal, Mapping, Sequence, TypedDict
 
 from ..classification.Classification import Classification
@@ -168,6 +168,8 @@ def _as_str_list(value: object) -> List[str]:
 def _normalize_identifier(value: object) -> str:
     if value is None:
         return ""
+    if isinstance(value, Enum):
+        return _normalize_identifier(value.value)
     if isinstance(value, str):
         return value.strip()
     if isinstance(value, (int, float, bool)):
