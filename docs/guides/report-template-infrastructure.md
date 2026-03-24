@@ -1,15 +1,66 @@
 # Report Template Infrastructure
 
-This guide explains exactly how the report-template YAML is loaded, validated, and exported to frontend JSON in this repository.
+This is the main system overview for report templates in this repository.
 
-Start here for a beginner authoring guide:
-- `lx_dtypes/data/report_template_examples/README.md`
+It explains how report-template YAML is:
+
+- authored
+- loaded into typed models
+- validated structurally
+- validated at runtime against report payloads
+- exported to frontend JSON
+
+Read the guides in this order:
+
+1. Beginner authoring guide: `lx_dtypes/data/report_template_examples/README.md`
+2. This infrastructure guide
+3. `docs/guides/report-template-graph-validation.md`
+4. `docs/guides/report-template-findings-validator-migration.md`
 
 Use that README specifically for:
 
 - adding `findings_validator` entries
 - grouping them into `examination_validator` entries
 - attaching validator-ready requirement content to `report_template.validators`
+
+Use this guide when you want the full mental model rather than a copy-paste starter.
+
+## Who This Is For
+
+This guide is for:
+
+- engineers implementing or integrating report-template behavior
+- technical maintainers authoring YAML
+- reviewers trying to understand where validation happens
+
+It is not primarily a non-technical authoring guide.
+
+## Vocabulary
+
+These terms are easy to blur together. Keep them separate:
+
+- `report_template`
+  A frontend-facing template definition for one examination type.
+- `report_template_section`
+  A named section inside a template.
+- `report_finding`
+  A template-facing finding entry that can appear in a section.
+- `findings_validator`
+  A runtime rule about presence, absence, or conditional requirements for findings.
+- `classification_validator`
+  A runtime rule about classifications on a finding.
+- `intervention_validator`
+  A runtime rule about interventions on a finding.
+- `unit_validator`
+  A runtime rule about units attached to a classification.
+- `examination_validator`
+  A dependency/grouping validator that aggregates other validators.
+- structure validation
+  Checks whether the template is wired correctly.
+- graph validation
+  Builds and checks a typed graph representation of template structure.
+- runtime validation
+  Evaluates an actual reported examination payload against template validators.
 
 ## Status Summary
 
@@ -45,6 +96,10 @@ You define report templates in YAML (sections, required findings, validators), a
 2. stores them in `KnowledgeBase` (KB),
 3. exports resolved JSON for frontend consumption.
 
+In short:
+
+`YAML authoring -> typed KB models -> structure/graph validation -> runtime validation -> frontend export`
+
 ## Important Files
 
 - Example module config: `lx_dtypes/data/report_template_examples/config.yaml`
@@ -61,7 +116,14 @@ You define report templates in YAML (sections, required findings, validators), a
 
 Think of the flow as:
 
-`YAML -> parse_shallow_object (A method, that will parse a yaml file into a pydantic structure) -> typed model -> KnowledgeBase dictionaries -> export_report_template -> frontend JSON`
+`YAML -> parse_shallow_object(...) -> typed model -> KnowledgeBase dictionaries -> export_report_template(...) -> frontend JSON`
+
+The most important distinction is:
+
+- authoring and structure validation happen on template definitions
+- runtime validation happens on an actual patient examination payload
+
+The runtime does not evaluate raw YAML directly. It evaluates already-parsed typed models.
 
 ## YAML Model Types
 
@@ -196,6 +258,19 @@ For non-technical stakeholders, this distinction matters:
 
 - structure validation answers "is this template wired correctly?"
 - runtime validation answers "does this report satisfy the template rules?"
+
+Graph validation is a third, narrower layer:
+
+3. Graph validation
+   - builds a typed graph from the already-loaded report-template structure
+   - checks graph-oriented structure issues
+   - supports downstream scoring/recommendation use cases
+
+Use:
+
+- structure validation when you are authoring or reviewing template wiring
+- graph validation when you need graph-shaped downstream data or graph-specific checks
+- runtime validation when you have an actual examination payload to evaluate
 
 ## Recommended Operating Model
 
@@ -500,6 +575,8 @@ This is why callers should inspect both:
 - top-level `ok` for pass/fail
 - `issues` and the per-validator arrays for actionable detail
 
+Version-aware runtime loading is separate from template authoring:
+
 - `knowledge_base_module` and `knowledge_base_version` are optional for current-version validation
 - when `knowledge_base_version` is provided, the runtime must resolve that historical KB version through `LX_DTYPES_KB_REGISTRY`
 - if the requested version is not provisioned locally, the runtime fails closed instead of silently using the current module version
@@ -527,3 +604,10 @@ Expected registry shape:
    - `findings_validator` records for atomic checks
    - `examination_validator` records for grouping and recursion
    - `report_template.validators` references that attach those validators to the template
+
+## Related Guides
+
+- Beginner authoring: `lx_dtypes/data/report_template_examples/README.md`
+- Graph-specific validation: `docs/guides/report-template-graph-validation.md`
+- Operator migration for persisted validator data: `docs/guides/report-template-findings-validator-migration.md`
+- Intentionally broken audit fixture: `docs/guides/fixtures/report-template-chaos/README.md`

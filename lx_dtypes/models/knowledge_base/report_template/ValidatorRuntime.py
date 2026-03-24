@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Dict, List, Literal, Mapping, Sequence, TypedDict
 
 from ..classification.Classification import Classification
@@ -133,6 +134,19 @@ class _RuntimeFindingOccurrence(TypedDict):
     classifications: Dict[str, List[ValidationScalar]]
     classification_units: Dict[str, List[str]]
     interventions: List[str]
+
+
+@dataclass(frozen=True)
+class _NormalizedConditionClause:
+    classification: str
+    comparator: str
+    expected_values: tuple[ValidationScalar, ...]
+
+
+@dataclass(frozen=True)
+class _NormalizedCondition:
+    any_clauses: tuple[_NormalizedConditionClause, ...]
+    all_clauses: tuple[_NormalizedConditionClause, ...]
 
 
 def _as_str_list(value: object) -> List[str]:
@@ -397,8 +411,49 @@ def _compare_ordered(
     return False
 
 
-def _evaluate_clause(
+def _normalize_condition_clause(
     clause: FindingsValidatorConditionClause,
+) -> _NormalizedConditionClause | None:
+    expected_values = tuple(clause.values or ())
+    if clause.value is not None and not expected_values:
+        expected_values = (clause.value,)
+    if not clause.classification or not expected_values:
+        return None
+    return _NormalizedConditionClause(
+        classification=clause.classification,
+        comparator=clause.comparator,
+        expected_values=expected_values,
+    )
+
+
+def _normalize_condition(
+    condition: (
+        FindingsValidatorCondition
+        | ClassificationValidatorCondition
+        | InterventionValidatorCondition
+        | UnitValidatorCondition
+    ),
+) -> _NormalizedCondition:
+    any_clauses = tuple(
+        normalized
+        for clause in condition.any or []
+        for normalized in [_normalize_condition_clause(clause)]
+        if normalized is not None
+    )
+    all_clauses = tuple(
+        normalized
+        for clause in condition.all or []
+        for normalized in [_normalize_condition_clause(clause)]
+        if normalized is not None
+    )
+    return _NormalizedCondition(
+        any_clauses=any_clauses,
+        all_clauses=all_clauses,
+    )
+
+
+def _evaluate_clause(
+    clause: _NormalizedConditionClause,
     classifications: Mapping[str, List[ValidationScalar]],
 ) -> bool:
     actual_values = classifications.get(clause.classification, [])
@@ -406,27 +461,22 @@ def _evaluate_clause(
         return False
 
     comparator = clause.comparator
-    clause_value = clause.value
+    primary_expected_value = clause.expected_values[0]
     if comparator == "eq":
-        if clause_value is None:
-            return False
-        return any(_value_equals(value, clause_value) for value in actual_values)
-    if comparator == "ne":
-        if clause_value is None:
-            return False
-        return all(not _value_equals(value, clause_value) for value in actual_values)
-    if comparator in {"gt", "gte", "lt", "lte"}:
-        if clause_value is None:
-            return False
         return any(
-            _compare_ordered(value, clause_value, comparator) for value in actual_values
+            _value_equals(value, primary_expected_value) for value in actual_values
+        )
+    if comparator == "ne":
+        return all(
+            not _value_equals(value, primary_expected_value) for value in actual_values
+        )
+    if comparator in {"gt", "gte", "lt", "lte"}:
+        return any(
+            _compare_ordered(value, primary_expected_value, comparator)
+            for value in actual_values
         )
 
-    expected_values = clause.values or []
-    if clause_value is not None and not expected_values:
-        expected_values = [clause_value]
-    if not expected_values:
-        return False
+    expected_values = clause.expected_values
 
     if comparator == "in":
         return any(
@@ -445,8 +495,9 @@ def _condition_matches(
     condition: FindingsValidatorCondition,
     classifications: Mapping[str, List[ValidationScalar]],
 ) -> bool:
-    any_clauses = list(condition.any or [])
-    all_clauses = list(condition.all or [])
+    normalized_condition = _normalize_condition(condition)
+    any_clauses = normalized_condition.any_clauses
+    all_clauses = normalized_condition.all_clauses
 
     any_match = True
     if any_clauses:
@@ -471,8 +522,9 @@ def _classification_condition_matches(
     ),
     classifications: Mapping[str, List[ValidationScalar]],
 ) -> bool:
-    any_clauses = list(condition.any or [])
-    all_clauses = list(condition.all or [])
+    normalized_condition = _normalize_condition(condition)
+    any_clauses = normalized_condition.any_clauses
+    all_clauses = normalized_condition.all_clauses
 
     any_match = True
     if any_clauses:

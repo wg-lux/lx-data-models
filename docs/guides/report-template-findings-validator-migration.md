@@ -1,7 +1,13 @@
 # Findings Validator Operator Migration
 
-As of March 16, 2026, findings-validator operators use a canonical namespace with
-three runtime-supported values:
+This guide is a focused migration note for persisted findings-validator data.
+
+Read this after:
+
+1. `lx_dtypes/data/report_template_examples/README.md`
+2. `docs/guides/report-template-infrastructure.md`
+
+As of March 16, 2026, findings-validator operators use a canonical namespace with three runtime-supported values:
 
 - `exists`
 - `missing`
@@ -30,6 +36,12 @@ The extra names looked like distinct operators, but they were aliases rather tha
 independent runtime semantics. Keeping them as first-class operator values made the
 contract harder to reason about and weakened static typing.
 
+In short:
+
+- runtime semantics did not change
+- persisted names became stricter
+- old aliases should be normalized to canonical values
+
 ## Breaking Change Scope
 
 If downstream template JSON or YAML still stores `present`, `absent`, or
@@ -40,6 +52,8 @@ If downstream template JSON or YAML still stores `present`, `absent`, or
 - downstream data should be migrated to canonical operator names before loading.
 
 Downstream code should migrate stored templates to canonical operators now.
+
+If you are authoring new template data, do not use aliases at all.
 
 ## Migration Script
 
@@ -118,3 +132,9 @@ This migration guide is for maintainers of YAML/JSON template data.
 It should not be interpreted as evidence that raw template YAML is ready for
 non-technical self-service editing. At the current repository state, operator
 migration and validator authoring remain technical maintenance tasks.
+
+## Related Guides
+
+- System overview and validator runtime semantics: `docs/guides/report-template-infrastructure.md`
+- Graph-specific validation: `docs/guides/report-template-graph-validation.md`
+- Beginner authoring guide: `lx_dtypes/data/report_template_examples/README.md`
