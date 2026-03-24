@@ -259,6 +259,11 @@ For non-technical stakeholders, this distinction matters:
 - structure validation answers "is this template wired correctly?"
 - runtime validation answers "does this report satisfy the template rules?"
 
+For why runtime execution payloads are not modeled as canonical `ddict` objects
+with `uuid`, see:
+
+- `docs/guides/runtime-output-vs-canonical-ddict.md`
+
 Graph validation is a third, narrower layer:
 
 3. Graph validation

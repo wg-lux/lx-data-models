@@ -27,6 +27,19 @@ class TestPExaminationFixtures:
             Path(__file__).parent / "p_examination_fixture.yaml"
         )
 
+    def test_p_examination_fixture_preserves_knowledge_base_identity(self) -> None:
+        fixture = PExamination(
+            patient="patient-1",
+            examination="sample_examination",
+            knowledge_base_module="report_template_examples",
+            knowledge_base_version="0.1.0",
+        )
+
+        ddict = fixture.ddict
+
+        assert ddict["knowledge_base_module"] == "report_template_examples"
+        assert ddict["knowledge_base_version"] == "0.1.0"
+
 
 @pytest.mark.django_db
 class TestDjangoPExaminationFixture:
@@ -63,3 +76,21 @@ class TestDjangoPExaminationFixture:
             Path(__file__).parent / "populated_p_examination_fixture.yaml"
         )
         validate_django_fixture(django_populated_p_examination_fixture)
+
+    def test_django_p_examination_syncs_knowledge_base_identity(
+        self,
+        p_examination_fixture: PExamination,
+    ) -> None:
+        instance = PExaminationDjango.sync_from_ddict(
+            p_examination_fixture.model_copy(
+                update={
+                    "knowledge_base_module": "report_template_examples",
+                    "knowledge_base_version": "0.1.0",
+                }
+            ).ddict
+        )
+
+        assert instance.knowledge_base_module == "report_template_examples"
+        assert instance.knowledge_base_version == "0.1.0"
+        assert instance.ddict["knowledge_base_module"] == "report_template_examples"
+        assert instance.ddict["knowledge_base_version"] == "0.1.0"
