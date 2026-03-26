@@ -31,6 +31,16 @@ from lx_dtypes.models.knowledge_base.report_template.ValueTypes import Validatio
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 
 
+def _normalize_clause_or_fail(
+    clause: FindingsValidatorConditionClause,
+) -> runtime._NormalizedConditionClause:
+    normalized = runtime._normalize_condition_clause(clause)
+    assert (
+        normalized is not None
+    ), "test clause should always normalize to a condition clause"
+    return normalized
+
+
 def test_runtime_normalizers_cover_mapping_and_sequence_shapes() -> None:
     classifications, units = runtime._normalize_classifications(
         [
@@ -81,77 +91,184 @@ def test_runtime_clause_evaluation_covers_all_comparators() -> None:
     }
 
     assert runtime._evaluate_clause(
-        FindingsValidatorConditionClause(
-            classification="morphology",
-            comparator="eq",
-            value="sessile",
-        ),
-        values,
-    )
-    assert runtime._evaluate_clause(
-        FindingsValidatorConditionClause(
-            classification="morphology",
-            comparator="ne",
-            value="pedunculated",
-        ),
-        values,
-    )
-    assert runtime._evaluate_clause(
-        FindingsValidatorConditionClause(
-            classification="size_mm",
-            comparator="gt",
-            value=10,
-        ),
-        values,
-    )
-    assert runtime._evaluate_clause(
-        FindingsValidatorConditionClause(
-            classification="size_mm",
-            comparator="gte",
-            value=12,
-        ),
-        values,
-    )
-    assert runtime._evaluate_clause(
-        FindingsValidatorConditionClause(
-            classification="size_mm",
-            comparator="lt",
-            value=20,
-        ),
-        values,
-    )
-    assert runtime._evaluate_clause(
-        FindingsValidatorConditionClause(
-            classification="size_mm",
-            comparator="lte",
-            value=12,
-        ),
-        values,
-    )
-    assert runtime._evaluate_clause(
-        FindingsValidatorConditionClause(
-            classification="location",
-            comparator="in",
-            values=["left_colon", "rectum"],
-        ),
-        values,
-    )
-    assert runtime._evaluate_clause(
-        FindingsValidatorConditionClause(
-            classification="location",
-            comparator="not_in",
-            values=["right_colon"],
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="morphology",
+                comparator="eq",
+                value="sessile",
+            )
         ),
         values,
     )
     assert not runtime._evaluate_clause(
-        FindingsValidatorConditionClause(
-            classification="missing",
-            comparator="eq",
-            value="x",
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="morphology",
+                comparator="eq",
+                value="pedunculated",
+            )
         ),
         values,
     )
+    assert runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="morphology",
+                comparator="ne",
+                value="pedunculated",
+            )
+        ),
+        values,
+    )
+    assert not runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="morphology",
+                comparator="ne",
+                value="sessile",
+            )
+        ),
+        values,
+    )
+    assert runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="size_mm",
+                comparator="gt",
+                value=10,
+            )
+        ),
+        values,
+    )
+    assert runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="size_mm",
+                comparator="gt",
+                value=12,
+            )
+        ),
+        values,
+    )
+    assert runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="size_mm",
+                comparator="gte",
+                value=12,
+            )
+        ),
+        values,
+    )
+    assert runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="size_mm",
+                comparator="gte",
+                value=13,
+            )
+        ),
+        values,
+    )
+    assert runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="size_mm",
+                comparator="lt",
+                value=20,
+            )
+        ),
+        values,
+    )
+    assert not runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="size_mm",
+                comparator="lt",
+                value=12,
+            )
+        ),
+        values,
+    )
+    assert runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="size_mm",
+                comparator="lte",
+                value=12,
+            )
+        ),
+        values,
+    )
+    assert not runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="size_mm",
+                comparator="lte",
+                value=11,
+            )
+        ),
+        values,
+    )
+    assert runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="location",
+                comparator="in",
+                values=["left_colon", "rectum"],
+            )
+        ),
+        values,
+    )
+    assert not runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="location",
+                comparator="in",
+                values=["transverse"],
+            )
+        ),
+        values,
+    )
+    assert runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="location",
+                comparator="not_in",
+                values=["right_colon"],
+            )
+        ),
+        values,
+    )
+    assert not runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="location",
+                comparator="not_in",
+                values=["left_colon"],
+            )
+        ),
+        values,
+    )
+    assert not runtime._evaluate_clause(
+        _normalize_clause_or_fail(
+            FindingsValidatorConditionClause(
+                classification="missing",
+                comparator="eq",
+                value="x",
+            )
+        ),
+        values,
+    )
+
+
+def test_normalize_condition_clause_returns_none_for_blank_classification() -> None:
+    clause = FindingsValidatorConditionClause(
+        classification="",
+        comparator="eq",
+        value="x",
+    )
+    assert runtime._normalize_condition_clause(clause) is None
 
 
 def test_missing_requirement_references_cover_all_reference_kinds() -> None:

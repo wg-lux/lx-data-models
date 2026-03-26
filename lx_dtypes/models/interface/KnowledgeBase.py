@@ -1,5 +1,16 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Self, Tuple, TypedDict, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Literal,
+    Self,
+    Tuple,
+    TypedDict,
+    Union,
+    cast,
+)
 
 import yaml
 from pydantic import Field
@@ -128,6 +139,14 @@ from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSection impor
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSectionDataDict import (
     ReportTemplateSectionDataDict,
 )
+from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
+    ReportTemplateLifecycleStatusLiteral,
+    ReportTemplateReadinessIssue,
+    ReportTemplateReadinessSummary,
+)
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplateGraph import (
+    validate_report_template_structure,
+)
 from lx_dtypes.models.knowledge_base.report_template.UnitValidator import UnitValidator
 from lx_dtypes.models.knowledge_base.report_template.UnitValidatorDataDict import (
     UnitValidatorDataDict,
@@ -158,6 +177,12 @@ from lx_dtypes.utils.parser import (
     parse_shallow_object_with_meta,
     snake_to_camel,
 )
+from lx_dtypes.utils.report_template_registry import (
+    load_report_template_registry,
+    registry_path_for_module,
+)
+from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
+from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.Ledger import Ledger
@@ -195,7 +220,14 @@ class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
     # label -> links to finding, intervention, classification + classificationchoice, examination
 
 
-YAML_IMPORT_SKIP_FIELDS = ["config", "uuid", "source_file", "created_at", "updated_at"]
+YAML_IMPORT_SKIP_FIELDS = [
+    "config",
+    "uuid",
+    "source_file",
+    "created_at",
+    "updated_at",
+    "report_template_lifecycle_status",
+]
 
 
 class KnowledgeBaseRecordList(TypedDict):
@@ -269,6 +301,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     findings_validator: Dict[str, FindingsValidator] = Field(default_factory=dict)
     examination_validator: Dict[str, ExaminationValidator] = Field(default_factory=dict)
     report_template: Dict[str, ReportTemplate] = Field(default_factory=dict)
+    report_template_lifecycle_status: Dict[str, ReportTemplateLifecycleStatusLiteral] = (
+        Field(default_factory=dict, exclude=True)
+    )
 
     def get_classification(self, name: str) -> Classification:
         """
@@ -455,85 +490,55 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         """
         return self.report_template[name]
 
-    def export_report_template(self, name: str) -> Dict[str, Any]:
-        """
-        Export a report template in a frontend-friendly resolved JSON shape.
+    def get_report_template_lifecycle_status(
+        self, name: str
+    ) -> ReportTemplateLifecycleStatusLiteral:
+        return self.report_template_lifecycle_status.get(name, "published")
 
-        The export resolves section references and validator references by name.
-        """
-        template = self.get_report_template(name)
-        sections: List[Dict[str, Any]] = []
-
-        for section_name in template.report_sections:
-            section = self.report_template_section[section_name]
-            resolved_findings: List[Dict[str, Any]] = []
-            for finding_ref in section.findings:
-                if isinstance(finding_ref, str):
-                    if finding_ref in self.report_finding:
-                        finding_req = self.report_finding[finding_ref].as_requirement()
-                    else:
-                        finding_req = ReportTemplateFindingRequirement(
-                            finding=finding_ref
-                        )
-                else:
-                    finding_req = finding_ref
-                resolved_findings.append(finding_req.model_dump())
-
-            sections.append(
-                {
-                    "name": section.name,
-                    "position": section.position,
-                    "types": section.types,
-                    "findings": resolved_findings,
-                }
-            )
-
-        return {
-            "name": template.name,
-            "examination": template.examination,
-            "report_sections": sections,
-            "validators": {
-                "examination_validators": [
-                    self.examination_validator[v].model_dump()
-                    if v in self.examination_validator
-                    else v
-                    for v in template.validators.examination_validators
-                ],
-                "classification_validators": [
-                    self.classification_validator[v].model_dump()
-                    if v in self.classification_validator
-                    else v
-                    for v in template.validators.classification_validators
-                ],
-                "intervention_validators": [
-                    self.intervention_validator[v].model_dump()
-                    if v in self.intervention_validator
-                    else v
-                    for v in template.validators.intervention_validators
-                ],
-                "unit_validators": [
-                    self.unit_validator[v].model_dump()
-                    if v in self.unit_validator
-                    else v
-                    for v in template.validators.unit_validators
-                ],
-                "findings_validators": [
-                    self.findings_validator[v].model_dump()
-                    if v in self.findings_validator
-                    else v
-                    for v in template.validators.findings_validators
-                ],
-            },
-        }
-
-    def export_report_templates(self) -> List[Dict[str, Any]]:
-        """
-        Export all report templates as a list of frontend-friendly dicts.
-        """
+    def published_report_template_names(self) -> List[str]:
         return [
-            self.export_report_template(template_name)
+            template_name
             for template_name in self.report_template.keys()
+            if self.get_report_template_lifecycle_status(template_name) == "published"
         ]
+
+
+
+
+
+
+
+
+    def export_report_template_preview(self, name: str) -> Dict[str, Any]:
+        validator = ReportTemplateValidator(kb=self, compiler=ReportTemplateCompiler(kb=self))
+        validated_and_compiled = validator.validate_and_compile(name, mode="preview")
+        return cast(Dict[str, Any], validated_and_compiled["template"])
+
+    def export_report_template(self, name: str) -> Dict[str, Any]:
+        validator = ReportTemplateValidator(kb=self, compiler=ReportTemplateCompiler(kb=self))
+        validated_and_compiled = validator.validate_and_compile(name, mode="production")
+        summary = cast(ReportTemplateReadinessSummary, validated_and_compiled["summary"])
+        if summary.lifecycle_status != "published":
+            raise KeyError(
+                f"Report template '{name}' is not published for production export."
+            )
+        if not summary.can_publish:
+            raise KeyError(
+                f"Report template '{name}' is not production-ready for export."
+            )
+        return cast(Dict[str, Any], validated_and_compiled["template"])
+
+    def export_report_templates(self, *, published_only: bool = True) -> List[Dict[str, Any]]:
+        """
+        Export report templates as frontend-friendly dicts.
+        """
+        template_names = (
+            self.published_report_template_names()
+            if published_only
+            else list(self.report_template.keys())
+        )
+        exporter = self.export_report_template if published_only else self.export_report_template_preview
+        return [exporter(template_name) for template_name in template_names]
 
     def export_core_concepts(self) -> Dict[str, Any]:
         """
@@ -1201,10 +1206,18 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             # "source_file": source_file,  # Can be removed?
         }
         kb = cls.model_validate(kb_source_dict)
+        registry_path: Path | None = None
+        if config.source_file is not None:
+            kb.report_template_lifecycle_status = load_report_template_registry(
+                config.source_file.parent
+            )
+            registry_path = registry_path_for_module(config.source_file.parent).resolve()
         seen_records: Dict[Tuple[str, str], Tuple[Path, int, int]] = {}
         data = config.data
         submodule_files = data.get_files_with_suffix(".yaml")
         for sm_file in submodule_files:
+            if registry_path is not None and sm_file.resolve() == registry_path:
+                continue
             parsed_entries = parse_shallow_object_with_meta(
                 sm_file, kb_module_name=name
             )
@@ -1275,6 +1288,17 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 other_tags = set(getattr(other, "tags", []))
                 merged_tags = list(current_tags.union(other_tags))
                 setattr(self, field_name, merged_tags)
+                continue
+
+            if field_name == "report_template_lifecycle_status":
+                current_lifecycle = dict(
+                    getattr(self, "report_template_lifecycle_status", {})
+                )
+                other_lifecycle = dict(
+                    getattr(other, "report_template_lifecycle_status", {})
+                )
+                current_lifecycle.update(other_lifecycle)
+                setattr(self, field_name, current_lifecycle)
                 continue
 
             assert field_model_name in KB_MODEL_NAMES_ORDERED, (
@@ -1359,95 +1383,56 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def export_record_lists(self) -> KnowledgeBaseRecordList:
         """
         Collects each knowledge-base model into lists of their ddict (data-dictionary) representations and returns them grouped in a KnowledgeBaseRecordList.
-
-        Returns:
-            KnowledgeBaseRecordList: A TypedDict containing lists of data-dictionary records for each KB category with keys:
-                - citations
-                - classifications
-                - classification_types
-                - classification_choices
-                - classification_choice_descriptors
-                - examinations
-                - examination_types
-                - findings
-                - finding_types
-                - indications
-                - indication_types
-                - interventions
-                - intervention_types
-                - units
-                - unit_types
-                - information_sources
-                - information_source_types
         """
-        citation_records = [r.ddict for r in self.citation.values()]
-        classification_records = [r.ddict for r in self.classification.values()]
-        classification_type_records = [
-            r.ddict for r in self.classification_type.values()
-        ]
-        classification_choice_records = [
-            r.ddict for r in self.classification_choice.values()
-        ]
-        classification_choice_descriptor_records = [
-            r.ddict for r in self.classification_choice_descriptor.values()
-        ]
-        examination_records = [r.ddict for r in self.examination.values()]
-        examination_type_records = [r.ddict for r in self.examination_type.values()]
-        finding_records = [r.ddict for r in self.finding.values()]
-        finding_type_records = [r.ddict for r in self.finding_type.values()]
-        indication_records = [r.ddict for r in self.indication.values()]
-        indication_type_records = [r.ddict for r in self.indication_type.values()]
-        intervention_records = [r.ddict for r in self.intervention.values()]
-        intervention_type_records = [r.ddict for r in self.intervention_type.values()]
-        unit_records = [r.ddict for r in self.unit.values()]
-        unit_type_records = [r.ddict for r in self.unit_type.values()]
-        information_source_records = [r.ddict for r in self.information_source.values()]
-        information_source_type_records = [
-            r.ddict for r in self.information_source_type.values()
-        ]
-        report_template_section_records = [
-            r.ddict for r in self.report_template_section.values()
-        ]
-        report_finding_records = [r.ddict for r in self.report_finding.values()]
-        classification_validator_records = [
-            r.ddict for r in self.classification_validator.values()
-        ]
-        intervention_validator_records = [
-            r.ddict for r in self.intervention_validator.values()
-        ]
-        unit_validator_records = [r.ddict for r in self.unit_validator.values()]
-        findings_validator_records = [r.ddict for r in self.findings_validator.values()]
-        examination_validator_records = [
-            r.ddict for r in self.examination_validator.values()
-        ]
-        report_template_records = [r.ddict for r in self.report_template.values()]
-
-        record_lists = KnowledgeBaseRecordList(
-            citations=citation_records,
-            classifications=classification_records,
-            classification_types=classification_type_records,
-            classification_choices=classification_choice_records,
-            classification_choice_descriptors=classification_choice_descriptor_records,
-            examinations=examination_records,
-            examination_types=examination_type_records,
-            findings=finding_records,
-            finding_types=finding_type_records,
-            indications=indication_records,
-            indication_types=indication_type_records,
-            interventions=intervention_records,
-            intervention_types=intervention_type_records,
-            units=unit_records,
-            unit_types=unit_type_records,
-            information_sources=information_source_records,
-            information_source_types=information_source_type_records,
-            report_template_sections=report_template_section_records,
-            report_findings=report_finding_records,
-            classification_validators=classification_validator_records,
-            intervention_validators=intervention_validator_records,
-            unit_validators=unit_validator_records,
-            findings_validators=findings_validator_records,
-            examination_validators=examination_validator_records,
-            report_templates=report_template_records,
+        return KnowledgeBaseRecordList(
+            citations=[record.ddict for record in self.citation.values()],
+            classifications=[record.ddict for record in self.classification.values()],
+            classification_types=[
+                record.ddict for record in self.classification_type.values()
+            ],
+            classification_choices=[
+                record.ddict for record in self.classification_choice.values()
+            ],
+            classification_choice_descriptors=[
+                record.ddict
+                for record in self.classification_choice_descriptor.values()
+            ],
+            examinations=[record.ddict for record in self.examination.values()],
+            examination_types=[
+                record.ddict for record in self.examination_type.values()
+            ],
+            findings=[record.ddict for record in self.finding.values()],
+            finding_types=[record.ddict for record in self.finding_type.values()],
+            indications=[record.ddict for record in self.indication.values()],
+            indication_types=[record.ddict for record in self.indication_type.values()],
+            interventions=[record.ddict for record in self.intervention.values()],
+            intervention_types=[
+                record.ddict for record in self.intervention_type.values()
+            ],
+            units=[record.ddict for record in self.unit.values()],
+            unit_types=[record.ddict for record in self.unit_type.values()],
+            information_sources=[
+                record.ddict for record in self.information_source.values()
+            ],
+            information_source_types=[
+                record.ddict for record in self.information_source_type.values()
+            ],
+            report_template_sections=[
+                record.ddict for record in self.report_template_section.values()
+            ],
+            report_findings=[record.ddict for record in self.report_finding.values()],
+            classification_validators=[
+                record.ddict for record in self.classification_validator.values()
+            ],
+            intervention_validators=[
+                record.ddict for record in self.intervention_validator.values()
+            ],
+            unit_validators=[record.ddict for record in self.unit_validator.values()],
+            findings_validators=[
+                record.ddict for record in self.findings_validator.values()
+            ],
+            examination_validators=[
+                record.ddict for record in self.examination_validator.values()
+            ],
+            report_templates=[record.ddict for record in self.report_template.values()],
         )
-
-        return record_lists

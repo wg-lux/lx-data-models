@@ -1,5 +1,9 @@
 # Report Template Infrastructure
 
+This guide explains how report-template YAML is loaded, validated, exported, and evaluated at runtime in this repository.
+
+Start here for a beginner authoring guide:
+- `lx_dtypes/data/report_template_examples/README.md`
 This is the main system overview for report templates in this repository.
 
 It explains how report-template YAML is:
@@ -96,6 +100,26 @@ You define report templates in YAML (sections, required findings, validators), a
 2. stores them in `KnowledgeBase` (KB),
 3. exports resolved JSON for frontend consumption.
 
+## What A New Reader Should Understand First
+
+A report template is not a filled medical report.
+
+It is a knowledge-base definition that answers four questions:
+
+1. Which examination is this template for?
+2. Which sections should a report of that type contain?
+3. Which findings or fields belong in those sections?
+4. Which validation rules should be evaluated against a real report payload?
+
+The important separation is:
+
+- template structure:
+  sections, findings, optional section fields
+- runtime validation:
+  validator objects evaluated against `PExamination`
+
+If you mix those two ideas together, the codebase becomes hard to follow.
+
 In short:
 
 `YAML authoring -> typed KB models -> structure/graph validation -> runtime validation -> frontend export`
@@ -116,6 +140,11 @@ In short:
 
 Think of the flow as:
 
+`YAML -> parse_shallow_object (A method, that will parse a yaml file into a pydantic structure) -> typed model -> KnowledgeBase dictionaries -> export_report_template -> frontend JSON`
+
+For runtime validation, add one more stage:
+
+`frontend/API payload -> PExamination -> evaluate_report_template_validators(...) -> runtime result`
 `YAML -> parse_shallow_object(...) -> typed model -> KnowledgeBase dictionaries -> export_report_template(...) -> frontend JSON`
 
 The most important distinction is:
@@ -141,6 +170,25 @@ The new YAML `model` values are:
 Alias supported:
 
 - `finding_validator` is accepted and mapped to `findings_validator` in `lx_dtypes/utils/parser.py`.
+
+## Current Contract Deltas
+
+If you are working from an older report-template summary, these are the important updates:
+
+- `report_template.validators` now includes:
+  - `examination_validators`
+  - `classification_validators`
+  - `intervention_validators`
+  - `unit_validators`
+  - `findings_validators`
+- `report_template_section` now also supports:
+  - `section_kind`
+  - `fields`
+- `findings_validator` is stricter:
+  - operators are canonical-only
+  - `query.finding` / `query.operator` must align with the top-level `finding` / `operator`
+  - `condition` rules have explicit structure and requirement references
+- duplicate record names inside one module are now a hard load error with file and line information
 
 ## How Loading Works
 
@@ -171,6 +219,17 @@ Use:
    - `validators.findings_validators` names -> expanded validator dicts when found.
 
 This gives frontend-ready JSON with section and validator detail materialized.
+
+Important current behavior:
+
+- missing `report_template_section` references are a hard failure during export
+- missing validator references are soft and remain as strings in the export
+- exported sections currently materialize:
+  - `name`
+  - `position`
+  - `types`
+  - resolved `findings`
+- `section_kind` and `fields` exist in the typed model, but are not currently included in `export_report_template(...)`
 
 ## What Is Stored in KnowledgeBase
 
@@ -258,6 +317,11 @@ For non-technical stakeholders, this distinction matters:
 
 - structure validation answers "is this template wired correctly?"
 - runtime validation answers "does this report satisfy the template rules?"
+
+There is also a lower-level parse/load boundary before those:
+
+- parser/model validation answers "does this YAML item match the expected Pydantic model?"
+- `KnowledgeBase` loading answers "can these validated objects be assembled into one KB without duplicate names?"
 
 For why runtime execution payloads are not modeled as canonical `ddict` objects
 with `uuid`, see:

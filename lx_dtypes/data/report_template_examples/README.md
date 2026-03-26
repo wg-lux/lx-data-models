@@ -5,6 +5,47 @@ This is the fastest, easiest guide for creating a working report template.
 If you only read one thing: all links are **exact string matches**.
 `upper_gi` is different from `upper-gi` and different from `Upper_GI`.
 
+## What A Report Template Actually Is
+
+A report template is not the medical report itself.
+
+It is a definition that says:
+
+- which examination the template belongs to
+- which sections should appear in the report
+- which findings belong in those sections
+- which extra rules should be checked when a real report is validated
+
+Think of it as two layers combined:
+
+1. Structure
+   What the report is supposed to contain.
+2. Validation rules
+   What makes a filled report complete or incomplete.
+
+In this repository, a report template is loaded from YAML into Pydantic models, stored in the `KnowledgeBase`, exported into resolved JSON for frontend/API use, and optionally evaluated against a real `PExamination` payload at runtime.
+
+## The Five Pieces You Need To Know
+
+When you read report-template YAML, separate these objects clearly:
+
+- `report_finding`
+  A reusable finding requirement. It says "this finding may appear here, and these classifications belong with it."
+- `report_template_section`
+  A named section inside the report template. It groups findings and controls ordering.
+- `findings_validator`
+  One concrete rule about a finding. Example: "if size is >= 10, `lst` must also be present."
+- `examination_validator`
+  A named bundle of validator references. It lets you compose multiple checks into one reusable group.
+- `report_template`
+  The top-level object tying everything together for one examination.
+
+That means:
+
+- sections define what the report looks like
+- validators define how completion is judged
+- the template chooses which sections and validators are used
+
 ## Before You Start
 
 This file explains the current YAML format.
@@ -70,8 +111,10 @@ Rules:
 - model: report_template_section
   name: baseline_section
   position: 0
+  section_kind: findings
   types:
     - baseline
+  fields: []
   findings:
     - esophagus_polyp_finding
 
@@ -101,6 +144,13 @@ These fields must reference existing names exactly:
 - `report_template.validators.findings_validators[]` -> `findings_validator.name`
 - `examination_validator.finding_validators[]` -> `findings_validator.name`
 - `examination_validator.examination_validators[]` -> `examination_validator.name`
+
+Important distinction:
+
+- `report_template_section.findings[]` decides which findings the template exposes
+- `report_template.validators.*[]` decides which extra runtime checks the template executes
+
+Those are related, but they are not the same thing.
 
 ## Naming Rules (Strongly Recommended)
 
@@ -141,6 +191,38 @@ Recommendation:
 - For beginners, use **string references only** for consistency.
 - If you mix styles, keep field names consistent.
 
+## Section Kinds And Fields
+
+`report_template_section` is no longer only a bucket of findings.
+
+It can also describe non-finding sections:
+
+- `section_kind: findings`
+- `section_kind: patient_data`
+- `section_kind: history`
+
+Optional `fields` let you declare simple section fields such as patient-level or history-level keys:
+
+```yaml
+- model: report_template_section
+  name: patient_context
+  position: 1
+  section_kind: patient_data
+  fields:
+    - key: age
+      required: true
+      source: patient
+    - key: asa_score
+      required: false
+      source: history
+  findings: []
+```
+
+Newcomer shortcut:
+
+- use `findings` when the section is about reportable findings
+- use `fields` when the section is about plain patient/history metadata
+
 ## Validator Alias Note
 
 `finding_validator` is accepted as an alias for `findings_validator`.
@@ -169,6 +251,25 @@ Do not use legacy aliases such as:
 - `if`
 
 Those aliases are no longer accepted in strict validation.
+
+## What Validates What
+
+This is the boundary that usually confuses new readers:
+
+- YAML parsing validates shape:
+  "is this record a valid `report_template`/`findings_validator`/etc. object?"
+- `KnowledgeBase` loading validates wiring:
+  "do these records load cleanly into the module, and are names unique?"
+- structure/graph validation checks references and dependency layout:
+  "does this template point at sensible sections and validators?"
+- runtime validation checks a real report payload:
+  "does this actual `PExamination` satisfy the template rules?"
+
+So:
+
+- a template can be syntactically valid YAML and still be a bad design
+- a template can load successfully and still fail runtime checks for a real report
+- `required: true` in template content means "expected by the template", not "already satisfied by some incoming report"
 
 ## Expand The Example Module With Validator-Ready Content
 

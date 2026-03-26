@@ -266,6 +266,40 @@ def test_base_api_report_template_runtime_validation() -> None:
     assert partial_findings_payload["findings_validators"][0]["ok"] is False
 
 
+def test_base_api_report_template_runtime_validation_from_ledger() -> None:
+    client = Client()
+    examination = Examination.objects.create(name="colonoscopy")
+    patient_examination = _create_patient_examination(examination)
+
+    response = client.post(
+        (
+            "/base_api/report-templates/report_template_examples/"
+            f"colonoscopy_training_basic/validate-from-ledger/{patient_examination.id}"
+        ),
+        secure=True,
+    )
+
+    assert response.status_code == 200, response.content.decode()
+    payload = response.json()
+    assert payload["template_name"] == "colonoscopy_training_basic"
+    assert payload["evaluated_findings_count"] == 0
+    assert payload["ok"] is False
+    assert any(issue["code"] == "finding_not_present" for issue in payload["issues"])
+
+
+def test_base_api_report_template_runtime_validation_from_ledger_not_found() -> None:
+    client = Client()
+    response = client.post(
+        (
+            "/base_api/report-templates/report_template_examples/"
+            "colonoscopy_training_basic/validate-from-ledger/999999"
+        ),
+        secure=True,
+    )
+    assert response.status_code == 404
+    assert "PatientExamination '999999' not found." in response.content.decode()
+
+
 def test_base_api_patient_findings_validation_invalid_choice() -> None:
     client = Client()
     examination, finding, classification, _choice = _create_exam_graph()

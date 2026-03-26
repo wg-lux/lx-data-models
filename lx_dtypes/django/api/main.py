@@ -28,7 +28,6 @@ from pydantic import BaseModel, Field
 
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.interface.DataLoader import DataLoader
-from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseVersionNotFoundError,
     clear_knowledge_base_resolver_caches,
@@ -37,11 +36,7 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
 
 from .request_types import BaseRequest
 
-from .report_template_builder import (
-    SaveReportTemplateRequest,
-    SaveReportTemplateResponse,
-    save_report_template_definition,
-)
+from .report_template_routes import register_report_template_routes
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -178,6 +173,15 @@ def _load_module_kb(module_name: str, version: str | None = None) -> Any:
         raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
 
 
+def _clear_kb_caches() -> None:
+    cache_clear = getattr(_kb_loader, "cache_clear", None)
+    if callable(cache_clear):
+        cache_clear()
+    _kb_core_concepts.cache_clear()
+    _kb_lookup.cache_clear()
+    clear_knowledge_base_resolver_caches()
+
+
 def _resolve_payload_kb_identity(
     route_module_name: str,
     payload: PExamination,
@@ -193,6 +197,138 @@ def _resolve_payload_kb_identity(
         )
 
     return payload_module_name or route_module_name, payload_version
+
+
+def _runtime_descriptor_payloads_from_mapping(
+    value: object, *, parent_choice_ref: str
+) -> list[dict[str, object]]:
+    if not isinstance(value, dict):
+        return []
+
+    payloads: list[dict[str, object]] = []
+    for descriptor_name, descriptor_value in value.items():
+        normalized_name = str(descriptor_name or "").strip()
+        if not normalized_name:
+            continue
+        if not isinstance(descriptor_value, (str, int, float, bool, list)):
+            continue
+        payloads.append(
+            {
+                "classification_choice_descriptor": normalized_name,
+                "descriptor_value": descriptor_value,
+                "patient_finding_classification_choice": parent_choice_ref,
+            }
+        )
+    return payloads
+
+
+def _as_str_list_from_relation(relation: object) -> list[str]:
+    if relation is None:
+        return []
+    if hasattr(relation, "all"):
+        return [str(getattr(item, "pk", item)) for item in relation.all()]  # type: ignore[misc]
+    if isinstance(relation, list):
+        return [str(item) for item in relation]
+    return [str(relation)]
+
+
+def _build_p_examination_payload_from_host_ledger(
+    patient_examination: object, *, route_module_name: str
+) -> PExamination:
+    patient_examination_id = getattr(patient_examination, "id", None)
+    if patient_examination_id is None:
+        raise ValueError("PatientExamination is missing an id.")
+
+    examination_obj = (
+        getattr(patient_examination, "examination_safe", None)
+        or getattr(patient_examination, "examination", None)
+    )
+    examination_name = str(getattr(examination_obj, "name", "") or "").strip()
+    if not examination_name:
+        raise ValueError(
+            f"PatientExamination '{patient_examination_id}' is missing examination name."
+        )
+
+    patient_value = getattr(patient_examination, "patient_id", None)
+    if patient_value is None:
+        patient_obj = getattr(patient_examination, "patient", None)
+        patient_value = getattr(patient_obj, "pk", None)
+    patient_token = str(patient_value or f"patient_examination_{patient_examination_id}")
+
+    module_from_ledger = str(
+        getattr(patient_examination, "knowledge_base_module", "") or ""
+    ).strip()
+    version_from_ledger = str(
+        getattr(patient_examination, "knowledge_base_version", "") or ""
+    ).strip()
+
+    patient_findings_qs = _active_patient_findings_queryset().filter(
+        patient_examination_id=patient_examination_id
+    )
+    patient_findings_payload: list[dict[str, object]] = []
+    for patient_finding in patient_findings_qs:
+        finding_name = str(getattr(patient_finding.finding, "name", "") or "").strip()
+        if not finding_name:
+            continue
+
+        classifications_payload: list[dict[str, object]] = []
+        active_classifications = (
+            patient_finding.classifications.filter(is_active=True)
+            .select_related("classification", "classification_choice")
+            .all()
+        )
+        for index, item in enumerate(active_classifications):
+            classification_name = str(getattr(item.classification, "name", "") or "").strip()
+            choice_name = str(getattr(item.classification_choice, "name", "") or "").strip()
+            if not classification_name:
+                continue
+            if not choice_name:
+                choice_name = classification_name
+
+            choice_ref = (
+                f"pe_{patient_examination_id}_pf_{patient_finding.id}_choice_{index + 1}"
+            )
+            classifications_payload.append(
+                {
+                    "classification": classification_name,
+                    "classification_choice": choice_name,
+                    "patient_finding_classifications": str(item.id),
+                    "patient_finding_classification_choice_descriptors": (
+                        _runtime_descriptor_payloads_from_mapping(
+                            getattr(item, "numerical_descriptors", {}),
+                            parent_choice_ref=choice_ref,
+                        )
+                    ),
+                }
+            )
+
+        patient_findings_payload.append(
+            {
+                "finding": finding_name,
+                "patient_examination": str(patient_examination_id),
+                "patient_finding_classifications": [
+                    {
+                        "patient_finding": str(patient_finding.id),
+                        "patient_finding_classification_choices": classifications_payload,
+                    }
+                ]
+                if classifications_payload
+                else [],
+                "patient_finding_interventions": [],
+            }
+        )
+
+    payload = {
+        "patient": patient_token,
+        "examiners": _as_str_list_from_relation(
+            getattr(patient_examination, "examiners", None)
+        ),
+        "examination": examination_name,
+        "knowledge_base_module": module_from_ledger or route_module_name,
+        "knowledge_base_version": version_from_ledger or None,
+        "patient_findings": patient_findings_payload,
+    }
+    return PExamination.model_validate(payload)
 
 
 def _findings_module_name() -> str:
@@ -524,196 +660,18 @@ def _replace_patient_finding_classifications(
         )
 
 
-@api.post("/report-templates/builder/templates")
-def save_report_template(
-    request: BaseRequest,
-    payload: SaveReportTemplateRequest,
-) -> SaveReportTemplateResponse:
-    """
-    Persist a new report-template YAML file into one lx_dtypes knowledge-base module.
-    """
-    try:
-        saved = save_report_template_definition(payload)
-    except FileExistsError as exc:
-        raise HttpError(409, str(exc)) from exc
-    except ValueError as exc:
-        raise HttpError(400, str(exc)) from exc
-
-    _kb_loader.cache_clear()
-    _kb_core_concepts.cache_clear()
-    _kb_lookup.cache_clear()
-    clear_knowledge_base_resolver_caches()
-    return saved
-
-
-@api.get("/report-templates/{module_name}/{template_name}")
-def report_template_by_name(
-    request: BaseRequest, module_name: str, template_name: str
-) -> Dict[str, Any]:
-    """
-    Return a resolved report template JSON payload by module/template name.
-    """
-    kb = _load_module_kb(module_name)
-    try:
-        return cast(Dict[str, Any], kb.export_report_template(template_name))
-    except KeyError as exc:
-        raise HttpError(
-            404,
-            f"Report template '{template_name}' not found in module '{module_name}'.",
-        ) from exc
-
-
-@api.get("/report-templates/by-examination/{module_name}/{examination_name}")
-def report_templates_by_examination(
-    request: BaseRequest, module_name: str, examination_name: str
-) -> List[Dict[str, Any]]:
-    """
-    Return all resolved report templates for the given examination in one module.
-    """
-    kb = _load_module_kb(module_name)
-    matches = [
-        kb.export_report_template(template_name)
-        for template_name, template in kb.report_template.items()
-        if template.examination == examination_name
-    ]
-    return cast(List[Dict[str, Any]], matches)
-
-
-@api.post("/report-templates/{module_name}/{template_name}/validate")
-def validate_report_template_runtime(
-    request: BaseRequest,
-    module_name: str,
-    template_name: str,
-    payload: PExamination,
-) -> Dict[str, Any]:
-    """
-    Execute report-template validator logic against typed patient examination state.
-    """
-    resolved_module_name, resolved_version = _resolve_payload_kb_identity(
-        module_name, payload
-    )
-    kb = _load_module_kb(resolved_module_name, version=resolved_version)
-    try:
-        return cast(
-            Dict[str, Any],
-            kb.evaluate_report_template_validators(
-                template_name, p_examination=payload
-            ),
-        )
-    except SemanticAdmissibilityError as exc:
-        raise HttpError(422, str(exc)) from exc
-    except KeyError as exc:
-        raise HttpError(
-            404,
-            f"Report template '{template_name}' not found in module '{module_name}'.",
-        ) from exc
-
-
-@api.get("/report-templates/{module_name}/{template_name}/validate-definition")
-def validate_report_template_definition(
-    request: BaseRequest, module_name: str, template_name: str
-) -> Dict[str, Any]:
-    from lx_dtypes.models.knowledge_base.report_template import (
-        validate_report_template_structure,
-    )
-
-    kb = _load_module_kb(module_name)
-    try:
-        template = kb.get_report_template(template_name)
-    except KeyError as exc:
-        raise HttpError(
-            404,
-            f"Report template '{template_name}' not found in module '{module_name}'.",
-        ) from exc
-
-    result = validate_report_template_structure(
-        template,
-        sections=kb.report_template_section,
-        report_findings=kb.report_finding,
-        findings=kb.finding,
-    )
-    return result.model_dump(mode="json")
-
-
-@api.post("/validators/{module_name}/{validator_kind}/{validator_name}/validate")
-def validate_single_validator_runtime(
-    request: BaseRequest,
-    module_name: str,
-    validator_kind: str,
-    validator_name: str,
-    payload: PExamination,
-) -> Dict[str, Any]:
-    resolved_module_name, resolved_version = _resolve_payload_kb_identity(
-        module_name, payload
-    )
-    kb = _load_module_kb(resolved_module_name, version=resolved_version)
-
-    if validator_kind == "findings_validator":
-        if validator_name not in kb.findings_validator:
-            raise HttpError(404, f"Unknown findings validator '{validator_name}'.")
-        try:
-            return cast(
-                Dict[str, Any],
-                kb.evaluate_findings_validator(validator_name, p_examination=payload),
-            )
-        except SemanticAdmissibilityError as exc:
-            raise HttpError(422, str(exc)) from exc
-
-    if validator_kind == "classification_validator":
-        if validator_name not in kb.classification_validator:
-            raise HttpError(
-                404, f"Unknown classification validator '{validator_name}'."
-            )
-        try:
-            return cast(
-                Dict[str, Any],
-                kb.evaluate_classification_validator(
-                    validator_name,
-                    p_examination=payload,
-                ),
-            )
-        except SemanticAdmissibilityError as exc:
-            raise HttpError(422, str(exc)) from exc
-
-    if validator_kind == "intervention_validator":
-        if validator_name not in kb.intervention_validator:
-            raise HttpError(404, f"Unknown intervention validator '{validator_name}'.")
-        try:
-            return cast(
-                Dict[str, Any],
-                kb.evaluate_intervention_validator(
-                    validator_name, p_examination=payload
-                ),
-            )
-        except SemanticAdmissibilityError as exc:
-            raise HttpError(422, str(exc)) from exc
-
-    if validator_kind == "unit_validator":
-        if validator_name not in kb.unit_validator:
-            raise HttpError(404, f"Unknown unit validator '{validator_name}'.")
-        try:
-            return cast(
-                Dict[str, Any],
-                kb.evaluate_unit_validator(validator_name, p_examination=payload),
-            )
-        except SemanticAdmissibilityError as exc:
-            raise HttpError(422, str(exc)) from exc
-
-    if validator_kind == "examination_validator":
-        if validator_name not in kb.examination_validator:
-            raise HttpError(404, f"Unknown examination validator '{validator_name}'.")
-        try:
-            return cast(
-                Dict[str, Any],
-                kb.evaluate_examination_validator(
-                    validator_name,
-                    p_examination=payload,
-                ),
-            )
-        except SemanticAdmissibilityError as exc:
-            raise HttpError(422, str(exc)) from exc
-
-    raise HttpError(404, f"Unknown validator kind '{validator_kind}'.")
+register_report_template_routes(
+    api,
+    load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
+    clear_kb_caches=lambda: _clear_kb_caches(),
+    resolve_payload_kb_identity=lambda *args, **kwargs: _resolve_payload_kb_identity(
+        *args, **kwargs
+    ),
+    orm_models=lambda: _orm_models(),
+    build_p_examination_payload_from_host_ledger=lambda *args, **kwargs: (
+        _build_p_examination_payload_from_host_ledger(*args, **kwargs)
+    ),
+)
 
 
 @api.get("/core-concepts/{module_name}")

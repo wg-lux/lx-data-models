@@ -91,6 +91,16 @@ from .ReportTemplateDataDict import (
     ReportTemplateDataDict,
     ReportTemplateValidatorsDataDict,
 )
+from .TemplateReadiness import (
+    ReportTemplateIssueScopeLiteral,
+    ReportTemplateIssueSeverityLiteral,
+    ReportTemplateLifecycleStatusLiteral,
+    ReportTemplateReadinessIssue,
+    ReportTemplateReadinessIssueDataDict,
+    ReportTemplateReadinessLiteral,
+    ReportTemplateReadinessSummary,
+    ReportTemplateReadinessSummaryDataDict,
+)
 from .ReportTemplateGraph import (
     ReportTemplateGraph,
     ReportTemplateGraphEdge,
@@ -222,6 +232,14 @@ __all__ = [
     "ReportTemplateFindingRequirementDataDict",
     "ReportTemplateValidators",
     "ReportTemplateValidatorsDataDict",
+    "ReportTemplateLifecycleStatusLiteral",
+    "ReportTemplateReadinessLiteral",
+    "ReportTemplateIssueSeverityLiteral",
+    "ReportTemplateIssueScopeLiteral",
+    "ReportTemplateReadinessIssue",
+    "ReportTemplateReadinessIssueDataDict",
+    "ReportTemplateReadinessSummary",
+    "ReportTemplateReadinessSummaryDataDict",
     "ClassificationValidator",
     "ClassificationValidatorDataDict",
     "ClassificationValidatorOperator",

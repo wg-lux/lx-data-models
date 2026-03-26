@@ -417,9 +417,7 @@ def _compare_ordered(
 def _normalize_condition_clause(
     clause: FindingsValidatorConditionClause,
 ) -> _NormalizedConditionClause | None:
-    expected_values = tuple(clause.values or ())
-    if clause.value is not None and not expected_values:
-        expected_values = (clause.value,)
+    expected_values = clause.expected_values
     if not clause.classification or not expected_values:
         return None
     return _NormalizedConditionClause(

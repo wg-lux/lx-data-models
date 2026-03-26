@@ -121,6 +121,8 @@ class LedgerBaseModelDjango(
         pk_field_name = self.ddict_pk_field_name()
         fk_fields = set(self.fk_fields())
         for field in fields:
+            if not hasattr(self, field) and field not in m2m_field_names and field not in fk_fields:
+                continue
             if field in nested_fields:
                 print(f"Processing nested field: {field}")
                 # Nested objects are handled separately; skip here to avoid missing reverse attrs
@@ -183,6 +185,23 @@ class LedgerBaseModelDjango(
         pk_field_name = cls.ddict_pk_field_name()
         # Split m2m values out so they can be set after the instance is saved.
         defaults_dict = dict(defaults)  # type: ignore
+        model_field_names = {
+            field.name
+            for field in cls._meta.get_fields()  # type: ignore[attr-defined]
+            if getattr(field, "concrete", False)
+        }
+        writable_property_names = {
+            property_name
+            for property_name in cls._meta._property_names  # type: ignore[attr-defined]
+            if hasattr(getattr(cls, property_name, None), "fset")
+            and getattr(cls, property_name).fset is not None
+        }
+        allowed_default_names = model_field_names | writable_property_names
+        defaults_dict = {
+            field_name: value
+            for field_name, value in defaults_dict.items()
+            if field_name in allowed_default_names
+        }
         m2m_field_names = set(cls.m2m_fields())
         m2m_values: dict[str, object] = {}
         fk_field_names = set(cls.fk_fields())

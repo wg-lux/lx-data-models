@@ -7,6 +7,14 @@ from typing import Any, Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
+    ReportTemplateLifecycleStatusLiteral,
+    ReportTemplateReadinessSummaryDataDict,
+)
+from lx_dtypes.utils.report_template_registry import (
+    set_report_template_lifecycle_status,
+)
+
 MODULES_ROOT = Path(__file__).resolve().parents[2] / "data"
 GENERATED_DIR_NAME = "generated_templates"
 
@@ -124,6 +132,15 @@ class SaveReportTemplateResponse(BaseModel):
     path: str
     template_name: str
     records_written: int
+    lifecycle_status: ReportTemplateLifecycleStatusLiteral = "draft"
+    readiness: ReportTemplateReadinessSummaryDataDict | None = None
+
+
+class PublishReportTemplateResponse(BaseModel):
+    module_name: str
+    template_name: str
+    lifecycle_status: ReportTemplateLifecycleStatusLiteral
+    readiness: ReportTemplateReadinessSummaryDataDict | None = None
 
 
 def module_dir(module_name: str, *, modules_root: Path | None = None) -> Path:
@@ -339,6 +356,9 @@ def save_report_template_definition(
         yaml.safe_dump(records, sort_keys=False, allow_unicode=True),
         encoding="utf-8",
     )
+    set_report_template_lifecycle_status(
+        module_path, payload.template_name.strip(), "draft"
+    )
 
     return SaveReportTemplateResponse(
         module_name=module_name,
@@ -346,4 +366,22 @@ def save_report_template_definition(
         path=str(output_path),
         template_name=payload.template_name.strip(),
         records_written=len(records),
+        lifecycle_status="draft",
+    )
+
+
+def set_saved_report_template_lifecycle(
+    *,
+    module_name: str,
+    template_name: str,
+    lifecycle_status: ReportTemplateLifecycleStatusLiteral,
+    modules_root: Path | None = None,
+) -> PublishReportTemplateResponse:
+    modules_root = modules_root or MODULES_ROOT
+    module_path = module_dir(module_name, modules_root=modules_root)
+    set_report_template_lifecycle_status(module_path, template_name, lifecycle_status)
+    return PublishReportTemplateResponse(
+        module_name=module_name,
+        template_name=template_name,
+        lifecycle_status=lifecycle_status,
     )

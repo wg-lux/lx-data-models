@@ -147,8 +147,9 @@ def test_report_template_definition_validation_api() -> None:
     )
     assert response.status_code == 200
     payload = response.json()
-    assert payload["ok"] is True
-    assert "graph" in payload
+    assert payload["lifecycle_status"] == "published"
+    assert payload["can_preview"] is True
+    assert payload["can_publish"] is True
 
 
 def test_single_validator_runtime_validation_api() -> None:
