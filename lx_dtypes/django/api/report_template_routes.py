@@ -18,6 +18,7 @@ from .report_template_builder import (
     save_report_template_definition,
     set_saved_report_template_lifecycle,
 )
+from .lookup_tracker import register_runtime_lookup_tracker
 from .request_types import BaseRequest
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -46,7 +47,9 @@ def _compile_report_template(
 def _load_builder_module_kb(module_name: str) -> Any:
     loader = DataLoader(input_dirs=[report_template_builder.MODULES_ROOT])
     loader.load_module_configs()
-    return loader.load_knowledge_base(module_name)
+    kb = loader.load_knowledge_base(module_name)
+    register_runtime_lookup_tracker(kb)
+    return kb
 
 
 def register_report_template_routes(

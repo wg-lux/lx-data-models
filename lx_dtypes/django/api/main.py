@@ -37,6 +37,7 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
 from .request_types import BaseRequest
 
 from .report_template_routes import register_report_template_routes
+from .lookup_tracker import register_runtime_lookup_tracker
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -158,19 +159,23 @@ def _kb_loader() -> DataLoader:
 def _load_module_kb(module_name: str, version: str | None = None) -> Any:
     if version:
         try:
-            return cast(Any, load_knowledge_base(module_name, version=version))
+            kb = cast(Any, load_knowledge_base(module_name, version=version))
         except KnowledgeBaseVersionNotFoundError as exc:
             raise HttpError(
                 409,
                 "Requested knowledge-base version is not provisioned locally for "
                 f"module '{module_name}' and version '{version}'.",
             ) from exc
+        register_runtime_lookup_tracker(kb)
+        return kb
 
     loader = _kb_loader()
     try:
-        return cast(Any, loader.load_knowledge_base(module_name))
+        kb = cast(Any, loader.load_knowledge_base(module_name))
     except ValueError as exc:
         raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
+    register_runtime_lookup_tracker(kb)
+    return kb
 
 
 def _clear_kb_caches() -> None:
