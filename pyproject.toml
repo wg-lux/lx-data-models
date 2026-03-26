@@ -30,7 +30,6 @@ dependencies = [
   "scikit-learn>=1.8.0",
   "scipy>=1.16.1",
   "types-pyyaml>=6.0.12.20250915",
-  "ninja>=1.13.0",
 ]
 description = "lx-data-types"
 keywords = [

@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Protocol, TypeVar, cast
+from typing import Any, Callable, Dict, List, Literal, Protocol, TypeVar, cast
 
 from ninja.errors import HttpError
 
+from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
+from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
+from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
+from . import report_template_builder
 from .report_template_builder import (
     PublishReportTemplateResponse,
     SaveReportTemplateRequest,
@@ -27,6 +31,22 @@ class _TypedApi(Protocol):
     def get(self, path: str, /) -> _RouteDecorator: ...
 
     def post(self, path: str, /) -> _RouteDecorator: ...
+
+
+def _compile_report_template(
+    kb: Any,
+    template_name: str,
+    *,
+    mode: Literal["preview", "publish", "production"],
+) -> Dict[str, Any]:
+    validator = ReportTemplateValidator(kb=kb, compiler=ReportTemplateCompiler(kb=kb))
+    return cast(Dict[str, Any], validator.validate_and_compile(template_name, mode=mode))
+
+
+def _load_builder_module_kb(module_name: str) -> Any:
+    loader = DataLoader(input_dirs=[report_template_builder.MODULES_ROOT])
+    loader.load_module_configs()
+    return loader.load_knowledge_base(module_name)
 
 
 def register_report_template_routes(
@@ -55,8 +75,10 @@ def register_report_template_routes(
             raise HttpError(400, str(exc)) from exc
 
         clear_kb_caches()
-        kb = load_module_kb(saved.module_name)
-        compiled = kb.compile_report_template(saved.template_name, mode="preview")
+        kb = _load_builder_module_kb(saved.module_name)
+        compiled = _compile_report_template(
+            kb, saved.template_name, mode="preview"
+        )
         saved.readiness = compiled["summary"].model_dump(mode="json")
         return saved
 
@@ -92,7 +114,7 @@ def register_report_template_routes(
                 continue
             if kb.get_report_template_lifecycle_status(template_name) != "published":
                 continue
-            compiled = kb.compile_report_template(template_name, mode="production")
+            compiled = _compile_report_template(kb, template_name, mode="production")
             if not compiled["summary"].can_publish:
                 continue
             matches.append(kb.export_report_template(template_name))
@@ -121,9 +143,9 @@ def register_report_template_routes(
         request: BaseRequest, module_name: str, template_name: str
     ) -> PublishReportTemplateResponse:
         del request
-        kb = load_module_kb(module_name)
+        kb = _load_builder_module_kb(module_name)
         try:
-            compiled = kb.compile_report_template(template_name, mode="publish")
+            compiled = _compile_report_template(kb, template_name, mode="publish")
         except KeyError as exc:
             raise HttpError(
                 404,
@@ -143,9 +165,9 @@ def register_report_template_routes(
             lifecycle_status="published",
         )
         clear_kb_caches()
-        refreshed_kb = load_module_kb(module_name)
-        refreshed = refreshed_kb.compile_report_template(
-            template_name, mode="production"
+        refreshed_kb = _load_builder_module_kb(module_name)
+        refreshed = _compile_report_template(
+            refreshed_kb, template_name, mode="production"
         )
         response.readiness = refreshed["summary"].model_dump(mode="json")
         return response
@@ -157,7 +179,7 @@ def register_report_template_routes(
         request: BaseRequest, module_name: str, template_name: str
     ) -> PublishReportTemplateResponse:
         del request
-        kb = load_module_kb(module_name)
+        kb = _load_builder_module_kb(module_name)
         if template_name not in kb.report_template:
             raise HttpError(
                 404,
@@ -170,8 +192,10 @@ def register_report_template_routes(
             lifecycle_status="draft",
         )
         clear_kb_caches()
-        refreshed_kb = load_module_kb(module_name)
-        refreshed = refreshed_kb.compile_report_template(template_name, mode="preview")
+        refreshed_kb = _load_builder_module_kb(module_name)
+        refreshed = _compile_report_template(
+            refreshed_kb, template_name, mode="preview"
+        )
         response.readiness = refreshed["summary"].model_dump(mode="json")
         return response
 
@@ -258,9 +282,9 @@ def register_report_template_routes(
         request: BaseRequest, module_name: str, template_name: str
     ) -> Dict[str, Any]:
         del request
-        kb = load_module_kb(module_name)
+        kb = _load_builder_module_kb(module_name)
         try:
-            compiled = kb.compile_report_template(template_name, mode="preview")
+            compiled = _compile_report_template(kb, template_name, mode="preview")
         except KeyError as exc:
             raise HttpError(
                 404,
