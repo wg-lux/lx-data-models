@@ -51,7 +51,9 @@ def main() -> int:
             compiled = validator.validate_and_compile(template_name, mode="publish")
             summary = ReportTemplateReadinessSummary.model_validate(compiled["summary"])
             is_published = summary.lifecycle_status == "published"
-            warning_failure = args.fail_on_warning and is_published and summary.warning_issues
+            warning_failure = (
+                args.fail_on_warning and is_published and summary.warning_issues
+            )
             if is_published and not summary.can_publish:
                 has_failures = True
             if warning_failure:

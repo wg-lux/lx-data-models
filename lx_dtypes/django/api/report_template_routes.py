@@ -105,14 +105,18 @@ def register_report_template_routes(
         del request
         kb = load_module_kb(module_name)
         try:
-            return cast(Dict[str, Any], kb.export_report_template_preview(template_name))
+            return cast(
+                Dict[str, Any], kb.export_report_template_preview(template_name)
+            )
         except KeyError as exc:
             raise HttpError(
                 404,
                 f"Report template '{template_name}' not found in module '{module_name}'.",
             ) from exc
 
-    @api.post("/report-templates/builder/templates/{module_name}/{template_name}/publish")
+    @api.post(
+        "/report-templates/builder/templates/{module_name}/{template_name}/publish"
+    )
     def publish_report_template(
         request: BaseRequest, module_name: str, template_name: str
     ) -> PublishReportTemplateResponse:
@@ -140,11 +144,15 @@ def register_report_template_routes(
         )
         clear_kb_caches()
         refreshed_kb = load_module_kb(module_name)
-        refreshed = refreshed_kb.compile_report_template(template_name, mode="production")
+        refreshed = refreshed_kb.compile_report_template(
+            template_name, mode="production"
+        )
         response.readiness = refreshed["summary"].model_dump(mode="json")
         return response
 
-    @api.post("/report-templates/builder/templates/{module_name}/{template_name}/unpublish")
+    @api.post(
+        "/report-templates/builder/templates/{module_name}/{template_name}/unpublish"
+    )
     def unpublish_report_template(
         request: BaseRequest, module_name: str, template_name: str
     ) -> PublishReportTemplateResponse:
@@ -280,7 +288,9 @@ def register_report_template_routes(
             try:
                 return cast(
                     Dict[str, Any],
-                    kb.evaluate_findings_validator(validator_name, p_examination=payload),
+                    kb.evaluate_findings_validator(
+                        validator_name, p_examination=payload
+                    ),
                 )
             except SemanticAdmissibilityError as exc:
                 raise HttpError(422, str(exc)) from exc

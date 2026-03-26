@@ -4,7 +4,6 @@ from typing import (
     Any,
     Dict,
     List,
-    Literal,
     Self,
     Tuple,
     TypedDict,
@@ -141,11 +140,7 @@ from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSectionDataDi
 )
 from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
     ReportTemplateLifecycleStatusLiteral,
-    ReportTemplateReadinessIssue,
     ReportTemplateReadinessSummary,
-)
-from lx_dtypes.models.knowledge_base.report_template.ReportTemplateGraph import (
-    validate_report_template_structure,
 )
 from lx_dtypes.models.knowledge_base.report_template.UnitValidator import UnitValidator
 from lx_dtypes.models.knowledge_base.report_template.UnitValidatorDataDict import (
@@ -301,9 +296,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     findings_validator: Dict[str, FindingsValidator] = Field(default_factory=dict)
     examination_validator: Dict[str, ExaminationValidator] = Field(default_factory=dict)
     report_template: Dict[str, ReportTemplate] = Field(default_factory=dict)
-    report_template_lifecycle_status: Dict[str, ReportTemplateLifecycleStatusLiteral] = (
-        Field(default_factory=dict, exclude=True)
-    )
+    report_template_lifecycle_status: Dict[
+        str, ReportTemplateLifecycleStatusLiteral
+    ] = Field(default_factory=dict, exclude=True)
 
     def get_classification(self, name: str) -> Classification:
         """
@@ -502,22 +497,21 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             if self.get_report_template_lifecycle_status(template_name) == "published"
         ]
 
-
-
-
-
-
-
-
     def export_report_template_preview(self, name: str) -> Dict[str, Any]:
-        validator = ReportTemplateValidator(kb=self, compiler=ReportTemplateCompiler(kb=self))
+        validator = ReportTemplateValidator(
+            kb=self, compiler=ReportTemplateCompiler(kb=self)
+        )
         validated_and_compiled = validator.validate_and_compile(name, mode="preview")
         return cast(Dict[str, Any], validated_and_compiled["template"])
 
     def export_report_template(self, name: str) -> Dict[str, Any]:
-        validator = ReportTemplateValidator(kb=self, compiler=ReportTemplateCompiler(kb=self))
+        validator = ReportTemplateValidator(
+            kb=self, compiler=ReportTemplateCompiler(kb=self)
+        )
         validated_and_compiled = validator.validate_and_compile(name, mode="production")
-        summary = cast(ReportTemplateReadinessSummary, validated_and_compiled["summary"])
+        summary = cast(
+            ReportTemplateReadinessSummary, validated_and_compiled["summary"]
+        )
         if summary.lifecycle_status != "published":
             raise KeyError(
                 f"Report template '{name}' is not published for production export."
@@ -528,7 +522,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             )
         return cast(Dict[str, Any], validated_and_compiled["template"])
 
-    def export_report_templates(self, *, published_only: bool = True) -> List[Dict[str, Any]]:
+    def export_report_templates(
+        self, *, published_only: bool = True
+    ) -> List[Dict[str, Any]]:
         """
         Export report templates as frontend-friendly dicts.
         """
@@ -537,7 +533,11 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             if published_only
             else list(self.report_template.keys())
         )
-        exporter = self.export_report_template if published_only else self.export_report_template_preview
+        exporter = (
+            self.export_report_template
+            if published_only
+            else self.export_report_template_preview
+        )
         return [exporter(template_name) for template_name in template_names]
 
     def export_core_concepts(self) -> Dict[str, Any]:
@@ -1211,7 +1211,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             kb.report_template_lifecycle_status = load_report_template_registry(
                 config.source_file.parent
             )
-            registry_path = registry_path_for_module(config.source_file.parent).resolve()
+            registry_path = registry_path_for_module(
+                config.source_file.parent
+            ).resolve()
         seen_records: Dict[Tuple[str, str], Tuple[Path, int, int]] = {}
         data = config.data
         submodule_files = data.get_files_with_suffix(".yaml")

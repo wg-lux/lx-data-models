@@ -1,11 +1,20 @@
 from pathlib import Path
-from typing import Union
+from typing import Any, Union
 
 import numpy as np
-from cv2 import VideoWriter, VideoWriter_fourcc
 
 from lx_dtypes.models.knowledge_base import KB_MODELS_DJANGO
 from lx_dtypes.models.ledger import L_MODELS_DJANGO
+
+
+def _load_cv2_video_tools() -> tuple[Any, Any]:
+    try:
+        from cv2 import VideoWriter, VideoWriter_fourcc
+    except ImportError as exc:
+        raise RuntimeError(
+            "OpenCV video writer is unavailable in this environment."
+        ) from exc
+    return VideoWriter, VideoWriter_fourcc
 
 
 def validate_django_fixture(
@@ -42,6 +51,8 @@ def create_random_noise_video(
     fourcc_str: str = "mp4v",
     overwrite: bool = True,
 ) -> bool:
+    VideoWriter, VideoWriter_fourcc = _load_cv2_video_tools()
+
     if output_path.exists() and not overwrite:
         return False
     elif output_path.exists() and overwrite:
@@ -85,6 +96,8 @@ def create_black_video(
     fourcc_str: str = "mp4v",
     overwrite: bool = True,
 ) -> bool:
+    VideoWriter, VideoWriter_fourcc = _load_cv2_video_tools()
+
     if output_path.exists() and not overwrite:
         return False
     elif output_path.exists() and overwrite:

@@ -48,9 +48,15 @@ class TestDjangoPExaminationFixture:
         django_p_examination_fixture: PExaminationDjango,
     ) -> None:
         assert django_p_examination_fixture is not None
-        assert django_p_examination_fixture.knowledge_base_module == "report_template_examples"
+        assert (
+            django_p_examination_fixture.knowledge_base_module
+            == "report_template_examples"
+        )
         assert django_p_examination_fixture.knowledge_base_version == "0.1.0"
-        assert django_p_examination_fixture.ddict["knowledge_base_module"] == "report_template_examples"
+        assert (
+            django_p_examination_fixture.ddict["knowledge_base_module"]
+            == "report_template_examples"
+        )
         assert django_p_examination_fixture.ddict["knowledge_base_version"] == "0.1.0"
 
         validate_django_fixture(django_p_examination_fixture)

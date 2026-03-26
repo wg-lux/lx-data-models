@@ -239,9 +239,8 @@ def _build_p_examination_payload_from_host_ledger(
     if patient_examination_id is None:
         raise ValueError("PatientExamination is missing an id.")
 
-    examination_obj = (
-        getattr(patient_examination, "examination_safe", None)
-        or getattr(patient_examination, "examination", None)
+    examination_obj = getattr(patient_examination, "examination_safe", None) or getattr(
+        patient_examination, "examination", None
     )
     examination_name = str(getattr(examination_obj, "name", "") or "").strip()
     if not examination_name:
@@ -253,7 +252,9 @@ def _build_p_examination_payload_from_host_ledger(
     if patient_value is None:
         patient_obj = getattr(patient_examination, "patient", None)
         patient_value = getattr(patient_obj, "pk", None)
-    patient_token = str(patient_value or f"patient_examination_{patient_examination_id}")
+    patient_token = str(
+        patient_value or f"patient_examination_{patient_examination_id}"
+    )
 
     module_from_ledger = str(
         getattr(patient_examination, "knowledge_base_module", "") or ""
@@ -278,16 +279,18 @@ def _build_p_examination_payload_from_host_ledger(
             .all()
         )
         for index, item in enumerate(active_classifications):
-            classification_name = str(getattr(item.classification, "name", "") or "").strip()
-            choice_name = str(getattr(item.classification_choice, "name", "") or "").strip()
+            classification_name = str(
+                getattr(item.classification, "name", "") or ""
+            ).strip()
+            choice_name = str(
+                getattr(item.classification_choice, "name", "") or ""
+            ).strip()
             if not classification_name:
                 continue
             if not choice_name:
                 choice_name = classification_name
 
-            choice_ref = (
-                f"pe_{patient_examination_id}_pf_{patient_finding.id}_choice_{index + 1}"
-            )
+            choice_ref = f"pe_{patient_examination_id}_pf_{patient_finding.id}_choice_{index + 1}"
             classifications_payload.append(
                 {
                     "classification": classification_name,

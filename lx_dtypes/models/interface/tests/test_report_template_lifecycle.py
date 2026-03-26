@@ -6,7 +6,12 @@ from typing import Union
 from lx_dtypes.models.interface.DataLoader import DataLoader
 
 
-def _write_module(tmp_path: Path, *, lifecycle_status: str, records: list[dict[str,Union[int, str, dict[str, list[str]], list[str]]]]) -> None:
+def _write_module(
+    tmp_path: Path,
+    *,
+    lifecycle_status: str,
+    records: list[dict[str, Union[int, str, dict[str, list[str]], list[str]]]],
+) -> None:
     module_dir = tmp_path / "report_module"
     generated_dir = module_dir / "generated_templates"
     generated_dir.mkdir(parents=True)
@@ -86,12 +91,17 @@ def test_report_template_preview_keeps_draft_and_issues(tmp_path: Path) -> None:
     assert preview["lifecycle_status"] == "draft"
     assert preview["readiness"]["can_preview"] is True
     assert preview["readiness"]["can_publish"] is False
-    assert any(issue["code"] == "unknown_findings_validator_reference" for issue in preview["issues"])
+    assert any(
+        issue["code"] == "unknown_findings_validator_reference"
+        for issue in preview["issues"]
+    )
     with pytest.raises(KeyError):
         kb.export_report_template("custom_template")
 
 
-def test_report_template_production_export_requires_published_status(tmp_path: Path) -> None:
+def test_report_template_production_export_requires_published_status(
+    tmp_path: Path,
+) -> None:
     _write_module(
         tmp_path,
         lifecycle_status="draft",

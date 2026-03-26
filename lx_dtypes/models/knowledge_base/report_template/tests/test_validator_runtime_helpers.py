@@ -35,9 +35,9 @@ def _normalize_clause_or_fail(
     clause: FindingsValidatorConditionClause,
 ) -> runtime._NormalizedConditionClause:
     normalized = runtime._normalize_condition_clause(clause)
-    assert (
-        normalized is not None
-    ), "test clause should always normalize to a condition clause"
+    assert normalized is not None, (
+        "test clause should always normalize to a condition clause"
+    )
     return normalized
 
 

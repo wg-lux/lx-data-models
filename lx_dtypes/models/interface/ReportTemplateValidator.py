@@ -1,14 +1,10 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Self, Tuple, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Tuple, cast
 
-from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
-    ReportTemplate,
-)
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateGraph import (
     validate_report_template_structure,
 )
 from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
     ReportTemplateIssueSourceDataDict,
-    ReportTemplateLifecycleStatusLiteral,
     ReportTemplateReadinessIssue,
     ReportTemplateReadinessSummary,
 )
@@ -84,7 +80,9 @@ class ReportTemplateValidator:
         }:
             source = self._issue_source_for_template_record(
                 scope=cast(
-                    Literal["template", "section", "finding", "validator", "examination"],
+                    Literal[
+                        "template", "section", "finding", "validator", "examination"
+                    ],
                     scope,
                 ),
                 reference=reference,
@@ -101,7 +99,10 @@ class ReportTemplateValidator:
         )
 
     def validate_and_compile(
-        self, name: str, *, mode: Literal["preview", "publish", "production"] = "preview"
+        self,
+        name: str,
+        *,
+        mode: Literal["preview", "publish", "production"] = "preview",
     ) -> Dict[str, Any]:
         template = self.kb.get_report_template(name)
         lifecycle_status = self.kb.get_report_template_lifecycle_status(name)
@@ -255,9 +256,7 @@ class ReportTemplateValidator:
         )
         summary = ReportTemplateReadinessSummary(
             lifecycle_status=lifecycle_status,
-            readiness=cast(
-                Literal["draft", "publishable", "published"], readiness
-            ),
+            readiness=cast(Literal["draft", "publishable", "published"], readiness),
             can_preview=can_preview,
             can_publish=can_publish,
             blocking_issues=len(blocking_issues),

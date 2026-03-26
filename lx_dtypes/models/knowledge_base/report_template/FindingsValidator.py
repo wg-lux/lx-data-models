@@ -158,7 +158,7 @@ class FindingsValidatorConditionClause(BaseModel):
         if self.value is None:
             raise ValueError(f"comparator '{self.comparator}' requires `value`.")
         return self
-    
+
     @property
     def expected_values(self) -> tuple[ValidationScalar, ...]:
         """Dynamically normalizes value/values into a unified tuple."""

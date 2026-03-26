@@ -121,7 +121,11 @@ class LedgerBaseModelDjango(
         pk_field_name = self.ddict_pk_field_name()
         fk_fields = set(self.fk_fields())
         for field in fields:
-            if not hasattr(self, field) and field not in m2m_field_names and field not in fk_fields:
+            if (
+                not hasattr(self, field)
+                and field not in m2m_field_names
+                and field not in fk_fields
+            ):
                 continue
             if field in nested_fields:
                 print(f"Processing nested field: {field}")

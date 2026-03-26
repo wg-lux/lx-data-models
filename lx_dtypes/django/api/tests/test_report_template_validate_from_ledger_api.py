@@ -137,7 +137,9 @@ def test_validate_report_template_runtime_from_ledger_success(
         "_active_patient_findings_queryset",
         lambda: _FakeEmptyFindingsQueryset(),
     )
-    monkeypatch.setattr(api_main, "_load_module_kb", lambda *args, **kwargs: _FakeKnowledgeBase())
+    monkeypatch.setattr(
+        api_main, "_load_module_kb", lambda *args, **kwargs: _FakeKnowledgeBase()
+    )
 
     client = Client()
     response = client.post(

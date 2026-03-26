@@ -10,7 +10,8 @@ from lx_dtypes.models.interface.DataLoader import DataLoader
 
 
 def test_builder_save_publish_and_unpublish_flow(
-    tmp_path: Path, monkeypatch: MonkeyPatch      ) -> None:
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     module_dir = tmp_path / "builder_module"
     module_dir.mkdir(parents=True)
     (module_dir / "config.yaml").write_text(
@@ -42,6 +43,7 @@ def test_builder_save_publish_and_unpublish_flow(
     )
 
     monkeypatch.setattr(report_template_builder, "MODULES_ROOT", tmp_path)
+
     def _fresh_loader() -> DataLoader:
         loader = DataLoader(input_dirs=[tmp_path])
         loader.load_module_configs()
