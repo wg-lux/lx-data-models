@@ -12,7 +12,7 @@ from typing import (
 )
 
 import yaml
-from pydantic import Field
+from pydantic import Field, PrivateAttr
 
 from lx_dtypes.models.base.app_base_model.ddict.AppBaseModelUUIDTagsDataDict import (
     AppBaseModelUUIDTagsDataDict,
@@ -178,6 +178,7 @@ from lx_dtypes.utils.report_template_registry import (
 )
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
+from lx_dtypes.models.interface.LookupTracker import KnowledgeBaseLookupTracker
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.Ledger import Ledger
@@ -299,6 +300,68 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     report_template_lifecycle_status: Dict[
         str, ReportTemplateLifecycleStatusLiteral
     ] = Field(default_factory=dict, exclude=True)
+    _lookup_tracker: KnowledgeBaseLookupTracker = PrivateAttr(
+        default_factory=KnowledgeBaseLookupTracker
+    )
+
+    def _lookup_required(
+        self,
+        *,
+        collection_name: str,
+        key: str,
+        source: str = "knowledge_base",
+    ) -> Any:
+        collection = cast(Dict[str, Any], getattr(self, collection_name))
+        found = key in collection
+        self._lookup_tracker.record_lookup(
+            source=source,
+            target=collection_name,
+            key=key,
+            found=found,
+        )
+        return collection[key]
+
+    def _lookup_optional(
+        self,
+        *,
+        collection_name: str,
+        key: str,
+        source: str = "knowledge_base",
+    ) -> Any:
+        collection = cast(Dict[str, Any], getattr(self, collection_name))
+        found = key in collection
+        self._lookup_tracker.record_lookup(
+            source=source,
+            target=collection_name,
+            key=key,
+            found=found,
+        )
+        return collection.get(key)
+
+    def reset_lookup_tracker(self) -> None:
+        self._lookup_tracker.reset()
+
+    def get_lookup_tracker_summary(self) -> Dict[str, Any]:
+        return self._lookup_tracker.as_summary()
+
+    def export_lookup_tracker_mermaid(self) -> str:
+        return self._lookup_tracker.export_mermaid_graph()
+
+    def export_lookup_tracker_dot(self) -> str:
+        return self._lookup_tracker.export_dot_graph()
+
+    def compare_lookup_performance_to_snomed(
+        self,
+        *,
+        snomed_lookup_count: int,
+        lx_elapsed_seconds: float | None = None,
+        snomed_elapsed_seconds: float | None = None,
+    ) -> Dict[str, Any]:
+        return self._lookup_tracker.compare_to_snomed(
+            snomed_lookup_count=snomed_lookup_count,
+            lx_elapsed_seconds=lx_elapsed_seconds,
+            snomed_elapsed_seconds=snomed_elapsed_seconds,
+        )
 
     def get_classification(self, name: str) -> Classification:
         """
@@ -310,7 +373,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             Classification: The Classification instance identified by `name`.
         """
-        return self.classification[name]
+        return cast(
+            Classification,
+            self._lookup_required(collection_name="classification", key=name),
+        )
 
     def get_classification_type(self, name: str) -> ClassificationType:
         """
@@ -319,7 +385,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             The ClassificationType with the given name.
         """
-        return self.classification_type[name]
+        return cast(
+            ClassificationType,
+            self._lookup_required(collection_name="classification_type", key=name),
+        )
 
     def get_classification_choice(self, name: str) -> ClassificationChoice:
         """
@@ -331,7 +400,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             ClassificationChoice: The classification choice instance associated with `name`.
         """
-        return self.classification_choice[name]
+        return cast(
+            ClassificationChoice,
+            self._lookup_required(collection_name="classification_choice", key=name),
+        )
 
     def get_classification_choice_descriptor(
         self, name: str
@@ -345,7 +417,12 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             ClassificationChoiceDescriptor: The descriptor matching `name`.
         """
-        return self.classification_choice_descriptor[name]
+        return cast(
+            ClassificationChoiceDescriptor,
+            self._lookup_required(
+                collection_name="classification_choice_descriptor", key=name
+            ),
+        )
 
     def get_examination(self, name: str) -> Examination:
         """
@@ -354,7 +431,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             Examination: The Examination instance associated with the given name.
         """
-        return self.examination[name]
+        return cast(
+            Examination,
+            self._lookup_required(collection_name="examination", key=name),
+        )
 
     def get_examination_type(self, name: str) -> ExaminationType:
         """
@@ -369,7 +449,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Raises:
             KeyError: If no examination type with the specified name exists.
         """
-        return self.examination_type[name]
+        return cast(
+            ExaminationType,
+            self._lookup_required(collection_name="examination_type", key=name),
+        )
 
     def get_finding(self, name: str) -> Finding:
         """
@@ -384,7 +467,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Raises:
             KeyError: If no finding with the given `name` exists.
         """
-        return self.finding[name]
+        return cast(
+            Finding,
+            self._lookup_required(collection_name="finding", key=name),
+        )
 
     def get_finding_type(self, name: str) -> FindingType:
         """
@@ -399,7 +485,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Raises:
             KeyError: If no FindingType with `name` exists in the knowledge base.
         """
-        return self.finding_type[name]
+        return cast(
+            FindingType,
+            self._lookup_required(collection_name="finding_type", key=name),
+        )
 
     def get_indication(self, name: str) -> Indication:
         """
@@ -411,7 +500,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             Indication: The Indication instance matching the provided name.
         """
-        return self.indication[name]
+        return cast(
+            Indication,
+            self._lookup_required(collection_name="indication", key=name),
+        )
 
     def get_indication_type(self, name: str) -> IndicationType:
         """
@@ -420,7 +512,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             The IndicationType with the given name.
         """
-        return self.indication_type[name]
+        return cast(
+            IndicationType,
+            self._lookup_required(collection_name="indication_type", key=name),
+        )
 
     def get_intervention(self, name: str) -> Intervention:
         """
@@ -432,7 +527,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             Intervention: The Intervention instance with the given name.
         """
-        return self.intervention[name]
+        return cast(
+            Intervention,
+            self._lookup_required(collection_name="intervention", key=name),
+        )
 
     def get_intervention_type(self, name: str) -> InterventionType:
         """
@@ -447,7 +545,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Raises:
             KeyError: If no intervention type with the given name exists.
         """
-        return self.intervention_type[name]
+        return cast(
+            InterventionType,
+            self._lookup_required(collection_name="intervention_type", key=name),
+        )
 
     def get_unit_type(self, name: str) -> UnitType:
         """
@@ -459,7 +560,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             UnitType: The unit type with the given name.
         """
-        return self.unit_type[name]
+        return cast(
+            UnitType,
+            self._lookup_required(collection_name="unit_type", key=name),
+        )
 
     def get_unit(self, name: str) -> Unit:
         """
@@ -471,7 +575,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             Unit: The Unit instance corresponding to the provided name.
         """
-        return self.unit[name]
+        return cast(
+            Unit,
+            self._lookup_required(collection_name="unit", key=name),
+        )
 
     def get_report_template(self, name: str) -> ReportTemplate:
         """
@@ -483,12 +590,22 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Returns:
             ReportTemplate: The template with the given name.
         """
-        return self.report_template[name]
+        return cast(
+            ReportTemplate,
+            self._lookup_required(collection_name="report_template", key=name),
+        )
 
     def get_report_template_lifecycle_status(
         self, name: str
     ) -> ReportTemplateLifecycleStatusLiteral:
-        return self.report_template_lifecycle_status.get(name, "published")
+        status = self._lookup_optional(
+            collection_name="report_template_lifecycle_status",
+            key=name,
+            source="knowledge_base",
+        )
+        if status is None:
+            return "published"
+        return cast(ReportTemplateLifecycleStatusLiteral, status)
 
     def published_report_template_names(self) -> List[str]:
         return [
@@ -570,8 +687,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                             "classification": choice.classification,
                             "value": descriptor.descriptor_value,
                         }
-                        kb_descriptor = self.classification_choice_descriptor.get(
-                            descriptor.classification_choice_descriptor
+                        kb_descriptor = self._lookup_optional(
+                            collection_name="classification_choice_descriptor",
+                            key=descriptor.classification_choice_descriptor,
+                            source="reported_findings_from_p_examination",
                         )
                         if kb_descriptor is not None and kb_descriptor.unit:
                             descriptor_payload["unit"] = kb_descriptor.unit
@@ -643,14 +762,20 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 if validator_name in visited_exam_validators:
                     return
                 visited_exam_validators.add(validator_name)
-                examination_validator = self.examination_validator.get(validator_name)
+                examination_validator = self._lookup_optional(
+                    collection_name="examination_validator",
+                    key=validator_name,
+                    source="assert_examination_admissibility",
+                )
                 if examination_validator is None:
                     return
                 for finding_validator_name in self._names_as_list(
                     examination_validator.finding_validators
                 ):
-                    finding_validator = self.findings_validator.get(
-                        finding_validator_name
+                    finding_validator = self._lookup_optional(
+                        collection_name="findings_validator",
+                        key=finding_validator_name,
+                        source="assert_examination_admissibility",
                     )
                     if finding_validator is not None:
                         ensure_requirement(finding_validator.finding)
@@ -673,12 +798,20 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             requirements: Dict[str, ReportTemplateFindingRequirement] = {}
             visited_exam_validators: set[str] = set()
             for section_name in template.report_sections:
-                section = self.report_template_section.get(section_name)
+                section = self._lookup_optional(
+                    collection_name="report_template_section",
+                    key=section_name,
+                    source="assert_examination_admissibility",
+                )
                 if section is None:
                     continue
                 for finding_ref in section.findings:
                     if isinstance(finding_ref, str):
-                        report_finding = self.report_finding.get(finding_ref)
+                        report_finding = self._lookup_optional(
+                            collection_name="report_finding",
+                            key=finding_ref,
+                            source="assert_examination_admissibility",
+                        )
                         if report_finding is None:
                             continue
                         requirement = report_finding.as_requirement()
@@ -688,7 +821,11 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             for findings_validator_name in self._names_as_list(
                 template.validators.findings_validators
             ):
-                finding_validator = self.findings_validator.get(findings_validator_name)
+                finding_validator = self._lookup_optional(
+                    collection_name="findings_validator",
+                    key=findings_validator_name,
+                    source="assert_examination_admissibility",
+                )
                 if finding_validator is not None:
                     ensure_requirement(finding_validator.finding)
                     if finding_validator.query.condition is not None:
@@ -704,8 +841,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             for classification_validator_name in self._names_as_list(
                 template.validators.classification_validators
             ):
-                classification_validator = self.classification_validator.get(
-                    classification_validator_name
+                classification_validator = self._lookup_optional(
+                    collection_name="classification_validator",
+                    key=classification_validator_name,
+                    source="assert_examination_admissibility",
                 )
                 if classification_validator is not None:
                     ensure_classification_requirement(
@@ -730,7 +869,11 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             requirements_by_finding = template_requirements_by_finding(template_name)
         else:
             requirements_by_finding = {}
-            examination = self.examination.get(p_examination.examination)
+            examination = self._lookup_optional(
+                collection_name="examination",
+                key=p_examination.examination,
+                source="assert_examination_admissibility",
+            )
             if examination is not None:
                 for finding_name in self._names_as_list(examination.findings):
                     requirements_by_finding.setdefault(
@@ -753,7 +896,11 @@ class KnowledgeBase(AppBaseModelUUIDTags):
 
         allowed_findings = set(requirements_by_finding.keys())
         for p_finding in p_examination.patient_findings:
-            kb_finding = self.finding.get(p_finding.finding)
+            kb_finding = self._lookup_optional(
+                collection_name="finding",
+                key=p_finding.finding,
+                source="assert_examination_admissibility",
+            )
             requirement = requirements_by_finding.get(p_finding.finding)
             if allowed_findings and p_finding.finding not in allowed_findings:
                 raise SemanticAdmissibilityError(
@@ -783,7 +930,11 @@ class KnowledgeBase(AppBaseModelUUIDTags):
 
             for classifications in p_finding.patient_finding_classifications:
                 for choice in classifications.patient_finding_classification_choices:
-                    kb_classification = self.classification.get(choice.classification)
+                    kb_classification = self._lookup_optional(
+                        collection_name="classification",
+                        key=choice.classification,
+                        source="assert_examination_admissibility",
+                    )
                     if (
                         kb_classification is None
                         and choice.classification not in allowed_classifications
@@ -806,8 +957,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                         if kb_classification is not None
                         else set()
                     )
-                    kb_choice = self.classification_choice.get(
-                        choice.classification_choice
+                    kb_choice = self._lookup_optional(
+                        collection_name="classification_choice",
+                        key=choice.classification_choice,
+                        source="assert_examination_admissibility",
                     )
                     if kb_choice is None and allowed_choices:
                         raise SemanticAdmissibilityError(
@@ -1111,19 +1264,31 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         validators_by_name: Dict[str, ClassificationValidator] = {}
         explicit_keys: set[tuple[str, str]] = set()
         for validator_name in template.validators.classification_validators:
-            validator = self.classification_validator.get(validator_name)
+            validator = self._lookup_optional(
+                collection_name="classification_validator",
+                key=validator_name,
+                source="get_report_template_classification_validators",
+            )
             if validator is None:
                 continue
             validators_by_name[validator_name] = validator
             explicit_keys.add((validator.finding, validator.classification))
 
         for section_name in template.report_sections:
-            section = self.report_template_section.get(section_name)
+            section = self._lookup_optional(
+                collection_name="report_template_section",
+                key=section_name,
+                source="get_report_template_classification_validators",
+            )
             if section is None:
                 continue
             for finding_ref in section.findings:
                 if isinstance(finding_ref, str):
-                    report_finding = self.report_finding.get(finding_ref)
+                    report_finding = self._lookup_optional(
+                        collection_name="report_finding",
+                        key=finding_ref,
+                        source="get_report_template_classification_validators",
+                    )
                     if report_finding is None:
                         continue
                     finding_requirement = report_finding.as_requirement()

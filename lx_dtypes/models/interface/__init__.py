@@ -4,6 +4,7 @@ from importlib import import_module
 from typing import Any
 
 _INTERFACE_EXPORTS = {
+    "KnowledgeBaseLookupTracker",
     "KnowledgeBaseRegistryError",
     "KnowledgeBaseVersionNotFoundError",
     "get_knowledge_base_identity",
@@ -15,6 +16,10 @@ _INTERFACE_EXPORTS = {
 
 
 def __getattr__(name: str) -> Any:
+    if name == "KnowledgeBaseLookupTracker":
+        module = import_module("lx_dtypes.models.interface.LookupTracker")
+        return getattr(module, name)
+
     if name in _INTERFACE_EXPORTS:
         module = import_module("lx_dtypes.models.interface.KnowledgeBaseResolver")
         return getattr(module, name)
@@ -23,6 +28,7 @@ def __getattr__(name: str) -> Any:
 
 
 __all__ = [
+    "KnowledgeBaseLookupTracker",
     "KnowledgeBaseRegistryError",
     "KnowledgeBaseVersionNotFoundError",
     "get_knowledge_base_identity",

@@ -29,6 +29,7 @@ if TYPE_CHECKING:
         records_to_core_concepts,
     )
     from lx_dtypes.models.interface import (
+        KnowledgeBaseLookupTracker,
         KnowledgeBaseRegistryError,
         KnowledgeBaseVersionNotFoundError,
         get_knowledge_base_identity,
@@ -153,6 +154,7 @@ _CONTRACT_EXPORTS = {
 }
 
 _INTERFACE_EXPORTS = {
+    "KnowledgeBaseLookupTracker",
     "KnowledgeBaseRegistryError",
     "KnowledgeBaseVersionNotFoundError",
     "get_knowledge_base_identity",
@@ -246,6 +248,7 @@ __all__ = [
     "canonical_payload_to_storage",
     "KnowledgeBaseRegistryError",
     "KnowledgeBaseVersionNotFoundError",
+    "KnowledgeBaseLookupTracker",
     "get_knowledge_base_identity",
     "load_knowledge_base",
     "load_module_config",
