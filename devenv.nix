@@ -65,6 +65,8 @@ in
     LD_LIBRARY_PATH =
       lib.makeLibraryPath (buildInputs ++ runtimePackages)
       + ":/run/opengl-driver/lib:/run/opengl-driver-32/lib";
+    UV_PROJECT_ENVIRONMENT = ".devenv/state/venv";
+
   };
 
   languages.python = {
