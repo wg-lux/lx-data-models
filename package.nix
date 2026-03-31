@@ -7,9 +7,9 @@ let
   kbSource = ./demo-data/star_upper_gi;
   kbModuleName = builtins.baseNameOf (toString kbSource);
   pname = "lx-dtypes-kb-${lib.replaceStrings [ "_" ] [ "-" ] kbModuleName}";
-  version = "0.1.0";
+  version = "0.1.1";
 
-  kbModuleVersion = "0.1.0";
+  kbModuleVersion = "0.1.1";
 in
 stdenvNoCC.mkDerivation {
   inherit pname version;
