@@ -1,6 +1,6 @@
 from typing import Any, Protocol
 
-from ninja.testing.client import NinjaResponse
+from ninja.testing.client import NinjaResponse  # type: ignore[import-untyped]
 
 
 class TypedNinjaAPIClient(Protocol):  # minimal protocol to satisfy Pylance typing

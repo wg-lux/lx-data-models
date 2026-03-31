@@ -1,4 +1,5 @@
 from pathlib import Path
+from shutil import which
 from typing import Any
 
 import pytest
@@ -6,8 +7,10 @@ import pytest
 from lx_dtypes.utils import testing
 
 
-def test_create_black_video_uses_ffmpeg_fallback(tmp_path, monkeypatch):
-    ffmpeg_bin = testing.which("ffmpeg")
+def test_create_black_video_uses_ffmpeg_fallback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ffmpeg_bin = which("ffmpeg")
     if not ffmpeg_bin:
         pytest.skip("ffmpeg executable is not available")
 
@@ -17,7 +20,9 @@ def test_create_black_video_uses_ffmpeg_fallback(tmp_path, monkeypatch):
     monkeypatch.setattr(testing, "_load_cv2_video_tools", raise_loader)
 
     output_path = tmp_path / "black.mp4"
-    success = testing.create_black_video(output_path=output_path, duration_sec=1, fps=10)
+    success = testing.create_black_video(
+        output_path=output_path, duration_sec=1, fps=10
+    )
 
     assert success
     assert output_path.exists()

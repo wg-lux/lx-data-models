@@ -8,7 +8,10 @@ import yaml
 from lx_dtypes.django.api.report_template_builder import (
     DEFAULT_PATIENT_INFO_FIELDS,
     GENERATED_DIR_NAME,
+    ReportTemplateBuilderFinding,
+    ReportTemplateBuilderFindingValidator,
     ReportTemplateBuilderSection,
+    ReportTemplateBuilderValidatorCondition,
     SaveReportTemplateRequest,
     build_yaml_records,
     ensure_module_config_supports_generated_templates,
@@ -23,7 +26,9 @@ def test_slugify_name_normalizes_and_falls_back() -> None:
     assert slugify_name("***") == "report_template"
 
 
-def test_module_dir_validates_unknown_module_and_resolves_existing(tmp_path: Path) -> None:
+def test_module_dir_validates_unknown_module_and_resolves_existing(
+    tmp_path: Path,
+) -> None:
     module_path = tmp_path / "demo_module"
     module_path.mkdir()
 
@@ -76,7 +81,9 @@ def test_ensure_module_config_supports_generated_templates_adds_generated_dir(
     module_path.mkdir()
     config_path = module_path / "config.yaml"
     config_path.write_text(
-        yaml.safe_dump({"name": "demo", "data": {"dirs": ["./existing"]}}, sort_keys=False),
+        yaml.safe_dump(
+            {"name": "demo", "data": {"dirs": ["./existing"]}}, sort_keys=False
+        ),
         encoding="utf-8",
     )
 
@@ -88,7 +95,9 @@ def test_ensure_module_config_supports_generated_templates_adds_generated_dir(
     assert (module_path / GENERATED_DIR_NAME).is_dir()
 
 
-def test_build_yaml_records_adds_default_patient_fields_and_condition_validator() -> None:
+def test_build_yaml_records_adds_default_patient_fields_and_condition_validator() -> (
+    None
+):
     payload = SaveReportTemplateRequest(
         module_name="demo_module",
         file_name="custom_report",
@@ -103,26 +112,30 @@ def test_build_yaml_records_adds_default_patient_fields_and_condition_validator(
                 section_type="findings",
                 name="Main Findings",
                 findings=[
-                    {
-                        "finding": "colon_polyp",
-                        "validator": {
-                            "enabled": True,
-                            "operator": "condition",
-                            "condition": {
-                                "classification": "size_mm",
-                                "comparator": "gte",
-                                "value": 10,
-                                "then_requires": ["paris_classification", ""],
-                            },
-                        },
-                    }
+                    ReportTemplateBuilderFinding(
+                        finding="colon_polyp",
+                        validator=ReportTemplateBuilderFindingValidator(
+                            enabled=True,
+                            operator="condition",
+                            condition=ReportTemplateBuilderValidatorCondition(
+                                classification="size_mm",
+                                comparator="gte",
+                                value=10,
+                                then_requires=["paris_classification", ""],
+                            ),
+                        ),
+                    )
                 ],
             ),
         ],
     )
 
     records = build_yaml_records(payload)
-    patient_section = next(r for r in records if r["model"] == "report_template_section" and r["name"] == "patient_info")
+    patient_section = next(
+        r
+        for r in records
+        if r["model"] == "report_template_section" and r["name"] == "patient_info"
+    )
     assert patient_section["fields"] == DEFAULT_PATIENT_INFO_FIELDS
 
     findings_validator = next(r for r in records if r["model"] == "findings_validator")
@@ -136,7 +149,9 @@ def test_build_yaml_records_adds_default_patient_fields_and_condition_validator(
     ]
 
 
-def test_save_report_template_definition_rejects_duplicate_output_file(tmp_path: Path) -> None:
+def test_save_report_template_definition_rejects_duplicate_output_file(
+    tmp_path: Path,
+) -> None:
     module_path = tmp_path / "demo_module"
     module_path.mkdir()
     (module_path / "config.yaml").write_text(
@@ -152,7 +167,12 @@ def test_save_report_template_definition_rejects_duplicate_output_file(tmp_path:
         file_name="custom_report",
         template_name="Custom Report",
         examination="colonoscopy",
-        sections=[{"section_type": "patient_info", "name": "Patient"}],
+        sections=[
+            ReportTemplateBuilderSection(
+                section_type="patient_info",
+                name="Patient",
+            )
+        ],
     )
 
     with pytest.raises(FileExistsError, match="Template file already exists"):

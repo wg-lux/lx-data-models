@@ -49,23 +49,33 @@ class _FakeKb:
             raise KeyError(name)
         return {"name": name, "lifecycle_status": "draft"}
 
-    def evaluate_findings_validator(self, name: str, p_examination: PExamination) -> dict[str, Any]:
+    def evaluate_findings_validator(
+        self, name: str, p_examination: PExamination
+    ) -> dict[str, Any]:
         del p_examination
         return {"name": name, "kind": "findings"}
 
-    def evaluate_classification_validator(self, name: str, p_examination: PExamination) -> dict[str, Any]:
+    def evaluate_classification_validator(
+        self, name: str, p_examination: PExamination
+    ) -> dict[str, Any]:
         del p_examination
         return {"name": name, "kind": "classification"}
 
-    def evaluate_intervention_validator(self, name: str, p_examination: PExamination) -> dict[str, Any]:
+    def evaluate_intervention_validator(
+        self, name: str, p_examination: PExamination
+    ) -> dict[str, Any]:
         del p_examination
         return {"name": name, "kind": "intervention"}
 
-    def evaluate_unit_validator(self, name: str, p_examination: PExamination) -> dict[str, Any]:
+    def evaluate_unit_validator(
+        self, name: str, p_examination: PExamination
+    ) -> dict[str, Any]:
         del p_examination
         return {"name": name, "kind": "unit"}
 
-    def evaluate_examination_validator(self, name: str, p_examination: PExamination) -> dict[str, Any]:
+    def evaluate_examination_validator(
+        self, name: str, p_examination: PExamination
+    ) -> dict[str, Any]:
         del p_examination
         return {"name": name, "kind": "examination"}
 
@@ -222,7 +232,9 @@ def test_validate_from_ledger_returns_422_when_payload_build_fails(
     monkeypatch.setattr(
         api_main,
         "_build_p_examination_payload_from_host_ledger",
-        lambda *args, **kwargs: (_ for _ in ()).throw(ValueError("cannot build payload")),
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            ValueError("cannot build payload")
+        ),
     )
 
     response = client.post(

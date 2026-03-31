@@ -23,7 +23,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import QuerySet
 from django.utils import timezone
-from ninja.errors import HttpError
+from ninja.errors import HttpError  # type: ignore[import-untyped]
 from pydantic import BaseModel, Field
 
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
@@ -231,7 +231,7 @@ def _as_str_list_from_relation(relation: object) -> list[str]:
     if relation is None:
         return []
     if hasattr(relation, "all"):
-        return [str(getattr(item, "pk", item)) for item in relation.all()]  # type: ignore[misc]
+        return [str(getattr(item, "pk", item)) for item in relation.all()]
     if isinstance(relation, list):
         return [str(item) for item in relation]
     return [str(relation)]

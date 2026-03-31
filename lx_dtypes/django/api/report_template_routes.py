@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, List, Literal, Protocol, TypeVar, cast
 
-from ninja.errors import HttpError
+from ninja.errors import HttpError  # type: ignore[import-untyped]
 
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
@@ -41,7 +41,7 @@ def _compile_report_template(
     mode: Literal["preview", "publish", "production"],
 ) -> Dict[str, Any]:
     validator = ReportTemplateValidator(kb=kb, compiler=ReportTemplateCompiler(kb=kb))
-    return cast(Dict[str, Any], validator.validate_and_compile(template_name, mode=mode))
+    return validator.validate_and_compile(template_name, mode=mode)
 
 
 def _load_builder_module_kb(module_name: str) -> Any:
@@ -79,9 +79,7 @@ def register_report_template_routes(
 
         clear_kb_caches()
         kb = _load_builder_module_kb(saved.module_name)
-        compiled = _compile_report_template(
-            kb, saved.template_name, mode="preview"
-        )
+        compiled = _compile_report_template(kb, saved.template_name, mode="preview")
         saved.readiness = compiled["summary"].model_dump(mode="json")
         return saved
 
