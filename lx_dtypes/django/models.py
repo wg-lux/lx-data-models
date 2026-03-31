@@ -55,6 +55,12 @@ from lx_dtypes.models.ledger.p_finding_classifications.Django import (
     PFindingClassificationsDjango,
 )
 from lx_dtypes.models.ledger.p_indication.Django import PIndicationDjango
+from lx_dtypes.models.ledger.p_indication_classification.Django import (
+    PIndicationClassificationDjango,
+)
+from lx_dtypes.models.ledger.p_indication_classification_descriptor.Django import (
+    PIndicationClassificationDescriptorDjango,
+)
 from lx_dtypes.models.ledger.p_intervention.Django import PFindingInterventionDjango
 from lx_dtypes.models.ledger.p_interventions.Django import (
     PFindingInterventionsDjango,
@@ -88,6 +94,8 @@ __all__ = [
     "PFindingInterventionsDjango",
     "PatientDjango",
     "PIndicationDjango",
+    "PIndicationClassificationDjango",
+    "PIndicationClassificationDescriptorDjango",
     "UnitDjango",
     "UnitTypeDjango",
 ]

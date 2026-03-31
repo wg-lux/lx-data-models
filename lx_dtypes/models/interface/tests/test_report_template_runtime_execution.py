@@ -13,6 +13,13 @@ from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.Pydantic
 from lx_dtypes.models.ledger.p_finding_classifications.Pydantic import (
     PFindingClassifications,
 )
+from lx_dtypes.models.ledger.p_indication.Pydantic import PIndication
+from lx_dtypes.models.ledger.p_indication_classification.Pydantic import (
+    PIndicationClassification,
+)
+from lx_dtypes.models.ledger.p_indication_classification_descriptor.Pydantic import (
+    PIndicationClassificationDescriptor,
+)
 from lx_dtypes.models.ledger.p_intervention.Pydantic import PFindingIntervention
 from lx_dtypes.models.ledger.p_interventions.Pydantic import PFindingInterventions
 
@@ -24,12 +31,14 @@ def _build_p_examination(
     findings_payload: list[dict[str, object]],
     *,
     examination: str = "star_upper_gi_endoscopy",
+    indications_payload: list[dict[str, object]] | None = None,
 ) -> PExamination:
     p_examination = PExamination.model_validate(
         {
             "patient": "test_patient",
             "examination": examination,
             "patient_findings": [],
+            "patient_indications": [],
         }
     )
 
@@ -91,6 +100,54 @@ def _build_p_examination(
             p_finding.patient_finding_classifications.append(p_classifications)
 
         p_examination.patient_findings.append(p_finding)
+
+    for indication_payload in indications_payload or []:
+        p_indication = PIndication.model_validate(
+            {
+                "indication": indication_payload["indication"],
+                "patient_examination": str(p_examination.uuid),
+                "patient_indication_classifications": [],
+            }
+        )
+        indication_classifications = indication_payload.get("classifications", [])
+        if not isinstance(indication_classifications, list):
+            indication_classifications = []
+        for classification_payload in indication_classifications:
+            if not isinstance(classification_payload, dict):
+                continue
+            raw_value = classification_payload.get("value", "present")
+            classification_choice = classification_payload.get(
+                "classification_choice"
+            )
+            if not isinstance(classification_choice, str):
+                if isinstance(raw_value, str):
+                    classification_choice = raw_value
+                else:
+                    classification_choice = str(classification_payload["classification"])
+            p_classification = PIndicationClassification.model_validate(
+                {
+                    "classification": classification_payload["classification"],
+                    "classification_choice": classification_choice,
+                    "patient_indication": str(p_indication.uuid),
+                    "patient_indication_classification_descriptors": [],
+                }
+            )
+            if not isinstance(raw_value, str):
+                p_classification.patient_indication_classification_descriptors.append(
+                    PIndicationClassificationDescriptor.model_validate(
+                        {
+                            "descriptor_value": raw_value,
+                            "classification_choice_descriptor": (
+                                "length_mm_descriptor"
+                            ),
+                            "patient_indication_classification": str(
+                                p_classification.uuid
+                            ),
+                        }
+                    )
+                )
+            p_indication.patient_indication_classifications.append(p_classification)
+        p_examination.patient_indications.append(p_indication)
 
     return p_examination
 
@@ -292,6 +349,35 @@ def test_knowledge_base_admissibility_rejects_hallucinated_intervention() -> Non
         assert "not permitted for finding" in str(exc) or "Unknown intervention" in str(
             exc
         )
+    else:
+        raise AssertionError("Expected semantic admissibility failure")
+
+
+def test_knowledge_base_admissibility_rejects_smuggled_indication_classification() -> (
+    None
+):
+    loader = DataLoader(input_dirs=[DATA_ROOT])
+    loader.load_module_configs()
+    kb = loader.load_knowledge_base("lx_examinations")
+
+    p_examination = _build_p_examination(
+        [],
+        examination="colonoscopy",
+        indications_payload=[
+            {
+                "indication": "colonoscopy_screening",
+                "classifications": [{"classification": "size_mm", "value": 8}],
+            }
+        ],
+    )
+
+    try:
+        kb.assert_examination_admissibility(p_examination)
+    except SemanticAdmissibilityError as exc:
+        assert "size_mm" in str(exc)
+        assert "permitted for indication" in str(
+            exc
+        ) or "Unknown indication classification" in str(exc)
     else:
         raise AssertionError("Expected semantic admissibility failure")
 

@@ -142,6 +142,7 @@ in
   enterShell = ''
 
     export SYNC_CMD="${SYNC_CMD}"
+    source .devenv/state/venv/bin/activate
 
     # Ensure dependencies are synced using uv
     # Check if venv exists. If not, run sync verbosely. If it exists, sync quietly.

@@ -1,5 +1,8 @@
 import pytest
 
+from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import (
+    ClassificationDjango,
+)
 from lx_dtypes.models.knowledge_base.indication.Indication import (
     Indication,
 )
@@ -48,6 +51,7 @@ def indication_fixture(indication_type_fixture: IndicationType) -> Indication:
     return Indication(
         name="sample_indication",
         indication_types=[indication_type_fixture.name],
+        classifications=["sample_classification"],
         tags=["tag1", "tag2"],
     )
 
@@ -75,6 +79,7 @@ def django_indication_type_fixture(
 @pytest.fixture()
 def django_indication_fixture(
     indication_fixture: Indication,
+    django_classification_fixture: ClassificationDjango,
     django_intervention_fixture: InterventionDjango,
     django_indication_type_fixture: IndicationTypeDjango,
 ) -> "IndicationDjango":
