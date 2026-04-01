@@ -17,9 +17,10 @@ It explains how report-template YAML is:
 Read the guides in this order:
 
 1. Beginner authoring guide: `lx_dtypes/data/report_template_examples/README.md`
-2. This infrastructure guide
-3. `docs/guides/report-template-graph-validation.md`
-4. `docs/guides/report-template-findings-validator-migration.md`
+2. `docs/guides/django-host-integration.md`
+3. This infrastructure guide
+4. `docs/guides/report-template-graph-validation.md`
+5. `docs/guides/report-template-findings-validator-migration.md`
 
 Use that README specifically for:
 
@@ -59,6 +60,9 @@ These terms are easy to blur together. Keep them separate:
   A runtime rule about units attached to a classification.
 - `examination_validator`
   A dependency/grouping validator that aggregates other validators.
+- host Django integration contract
+  The documented settings and ORM surface required to mount `lx_dtypes.django.api`
+  in another Django project.
 - structure validation
   Checks whether the template is wired correctly.
 - graph validation

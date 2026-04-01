@@ -72,6 +72,42 @@ pip install -e ".[dev]"
 - Do not import from `lx_dtypes...tests` or `...test_fixtures` in consuming
   applications.
 
+## Django Integration
+
+If you want to use the packaged Django API in another project, do not infer the
+host-model requirements from the code. Use the explicit contract in
+[docs/guides/django-host-integration.md](docs/guides/django-host-integration.md).
+
+That guide defines:
+
+- required settings such as `LX_DTYPES_HOST_MODELS_MODULE`
+- the exact host ORM models that must be exported
+- the required fields, relations, and methods on those models
+- the supported URL mounting pattern
+
+## Prototype KB Workflow
+
+For fast local knowledge-base prototyping with `lx-terminology-editor`, keep the
+editor's `.published/` output as the handoff artifact and point
+`LX_DTYPES_KB_REGISTRY` at its registry JSON.
+
+Inside `devenv shell`, this repo exposes:
+
+- `LX_DTYPES_EDITOR_KB_REGISTRY`
+- `use_editor_kb`
+- `use_packaged_kb`
+- `show_kb_mode`
+
+Example:
+
+```bash
+use_editor_kb
+lx-dtypes-prototype-kb-smoke --module my_module --version 0.1.0-dev.1
+```
+
+This keeps prototype loading deterministic because resolution happens through
+the same versioned registry path used by `KnowledgeBaseResolver`.
+
 ## Migrations
 
 The following command shortcuts are available for managing migratons, see line below for what they do:
@@ -171,6 +207,12 @@ lx-dtypes-kb-registry add /path/to/kb_registry.json \
   --module report_template_examples \
   --version 0.1.0 \
   --input-dir /nix/store/.../site-packages/lx_dtypes/data
+```
+
+Smoke-test an explicit prototype module/version through the configured registry:
+
+```bash
+lx-dtypes-prototype-kb-smoke --module report_template_examples --version 0.1.0
 ```
 
 ## Contributing

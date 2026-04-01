@@ -48,3 +48,7 @@
     - colonoscopy_surveillance_post_polypectomy
     - colonoscopy_surveillance_ibd
     - colonoscopy_surveillance_cancer_history
+    - colonoscopy_follow_up_post_emr
+    - colonoscopy_follow_up_post_esd
+    - colonoscopy_follow_up_post_eftr
+    - colonoscopy_follow_up_residual_or_recurrent_lesion

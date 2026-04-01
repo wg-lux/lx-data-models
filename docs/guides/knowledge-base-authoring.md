@@ -51,7 +51,35 @@ The editor is the preferred authoring surface for terminology content. It can:
 
 That local registry is already in the format expected by `LX_DTYPES_KB_REGISTRY`.
 
-### 2. Move the Module into `lx-data-models`
+For deterministic prototyping in `lx-data-models`, prefer consuming that
+published registry directly instead of copying the bundle into `lx_dtypes/data`
+during early iteration.
+
+Inside `lx-data-models/devenv`:
+
+- `LX_DTYPES_EDITOR_KB_REGISTRY` points at `../lx-terminology-editor/.published/kb_registry.json`
+- `use_editor_kb` exports `LX_DTYPES_KB_REGISTRY` for the current shell
+- `use_packaged_kb` returns to packaged/default resolution
+- `lx-dtypes-prototype-kb-smoke --module <name> --version <version>` verifies that an explicit module/version resolves and loads
+
+### 2. Prototype Through The Published Registry
+
+Use the editor-published registry as the first-class prototype handoff:
+
+```bash
+cd lx-data-models
+devenv shell
+use_editor_kb
+lx-dtypes-prototype-kb-smoke --module my_module --version 0.1.0-dev.1
+```
+
+This is the recommended quick-feedback loop because:
+
+- the editor remains the single authoring surface
+- `lx_dtypes` resolves the module through the normal versioned registry path
+- the requested module and version are explicit and deterministic
+
+### 3. Move the Module into `lx-data-models`
 
 Once the bundle looks correct, copy the published module into the module source
 tree used by `lx-data-models`.
@@ -76,7 +104,7 @@ In the current package definition:
 
 If you change the published module name, update the packaged source folder to match.
 
-### 3. Lint the YAML Before Packaging
+### 4. Lint the YAML Before Packaging
 
 Run the KB linter against the module config or data directory:
 
@@ -102,7 +130,7 @@ python scripts/lint_kb_yaml.py \
 
 See `docs/guides/kb-yaml-linting.md` for the full linting behavior.
 
-### 4. Package the KB with Nix
+### 5. Package the KB with Nix
 
 `lx-data-models` exposes three Nix outputs:
 
@@ -189,7 +217,7 @@ This verifies that:
 - Prefer editing module content through `lx-terminology-editor`.
 - Keep the module folder name stable and intentional, because the current Nix package derives its module identity from that folder.
 - Lint before packaging.
-- Treat the local `.published/kb_registry.json` from `lx-terminology-editor` as the pre-Nix handoff artifact.
+- Treat the local `.published/kb_registry.json` from `lx-terminology-editor` as the pre-Nix handoff artifact and prototype source of truth.
 - Treat the Nix-installed registry JSON as the deployable handoff artifact.
 
 ## Related Guides

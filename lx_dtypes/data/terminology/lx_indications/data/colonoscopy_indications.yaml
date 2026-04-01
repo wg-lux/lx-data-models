@@ -104,3 +104,70 @@
     - "endoscopy_injection_liftup"
     - "endoscopy_biopsy_grasper_generic"
     - "endoscopy_hemoclip_generic"
+
+- model: indication
+  name: colonoscopy_follow_up_post_emr
+  description: Follow-up colonoscopy after previous endoscopic mucosal resection (EMR) to assess for residual or recurrent lesion.
+  interventions:
+    - "endoscopy_biopsy_grasper_generic"
+    - "endoscopy_cold_snare_resection_generic"
+    - "endoscopy_cold_snare_polypectomy_colorectal"
+    - "endoscopy_emr_generic"
+    - "endoscopy_cold_emr_colorectal"
+    - "endoscopy_hot_emr_colorectal"
+    - "endoscopy_margin_ablation_soft_coagulation_colorectal"
+    - "endoscopy_hot_avulsion_colorectal"
+    - "endoscopy_hemoclip_generic"
+    - "endoscopy_over_the_scope_clip_generic"
+
+- model: indication
+  name: colonoscopy_follow_up_post_esd
+  description: Follow-up colonoscopy after previous endoscopic submucosal dissection (ESD) to assess healing or recurrent lesion.
+  interventions:
+    - "endoscopy_biopsy_grasper_generic"
+    - "endoscopy_cold_snare_resection_generic"
+    - "endoscopy_cold_snare_polypectomy_colorectal"
+    - "endoscopy_emr_generic"
+    - "endoscopy_cold_emr_colorectal"
+    - "endoscopy_hot_emr_colorectal"
+    - "endoscopy_esd_generic"
+    - "endoscopy_esd_colorectal"
+    - "endoscopy_hot_avulsion_colorectal"
+    - "endoscopy_hemoclip_generic"
+    - "endoscopy_over_the_scope_clip_generic"
+
+- model: indication
+  name: colonoscopy_follow_up_post_eftr
+  description: Follow-up colonoscopy after previous endoscopic full-thickness resection (EFTR) to assess clip site or recurrent lesion.
+  interventions:
+    - "endoscopy_biopsy_grasper_generic"
+    - "endoscopy_cold_snare_resection_generic"
+    - "endoscopy_cold_snare_polypectomy_colorectal"
+    - "endoscopy_emr_generic"
+    - "endoscopy_cold_emr_colorectal"
+    - "endoscopy_hot_emr_colorectal"
+    - "endoscopy_eftr_generic"
+    - "endoscopy_eftr_colorectal"
+    - "endoscopy_hemoclip_generic"
+    - "endoscopy_over_the_scope_clip_generic"
+
+- model: indication
+  name: colonoscopy_follow_up_residual_or_recurrent_lesion
+  description: Follow-up colonoscopy for suspected residual or recurrent colorectal lesion after prior endoscopic therapy.
+  interventions:
+    - "endoscopy_biopsy_grasper_generic"
+    - "endoscopy_cold_snare_resection_generic"
+    - "endoscopy_cold_snare_polypectomy_colorectal"
+    - "endoscopy_diathermic_snare_resection_generic"
+    - "endoscopy_hot_snare_polypectomy_colorectal"
+    - "endoscopy_emr_generic"
+    - "endoscopy_cold_emr_colorectal"
+    - "endoscopy_hot_emr_colorectal"
+    - "endoscopy_esd_generic"
+    - "endoscopy_esd_colorectal"
+    - "endoscopy_eftr_generic"
+    - "endoscopy_eftr_colorectal"
+    - "endoscopy_margin_ablation_soft_coagulation_colorectal"
+    - "endoscopy_hot_avulsion_colorectal"
+    - "endoscopy_hemoclip_generic"
+    - "endoscopy_over_the_scope_clip_generic"

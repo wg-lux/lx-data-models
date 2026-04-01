@@ -65,8 +65,7 @@ in
     LD_LIBRARY_PATH =
       lib.makeLibraryPath (buildInputs ++ runtimePackages)
       + ":/run/opengl-driver/lib:/run/opengl-driver-32/lib";
-    UV_PROJECT_ENVIRONMENT = ".devenv/state/venv";
-
+    LX_DTYPES_EDITOR_KB_REGISTRY = "../lx-terminology-editor/.published/kb_registry.json";
   };
 
   languages.python = {
@@ -165,6 +164,26 @@ in
     fi
 
     env-setup
+
+    use_editor_kb() {
+      export LX_DTYPES_KB_REGISTRY="$LX_DTYPES_EDITOR_KB_REGISTRY"
+      echo "Using editor-published KB registry: $LX_DTYPES_KB_REGISTRY"
+    }
+
+    use_packaged_kb() {
+      unset LX_DTYPES_KB_REGISTRY
+      echo "Using packaged/default KB resolution."
+    }
+
+    show_kb_mode() {
+      if [ -n "$LX_DTYPES_KB_REGISTRY" ]; then
+        echo "KB mode: registry"
+        echo "LX_DTYPES_KB_REGISTRY=$LX_DTYPES_KB_REGISTRY"
+      else
+        echo "KB mode: packaged/default"
+      fi
+      echo "LX_DTYPES_EDITOR_KB_REGISTRY=$LX_DTYPES_EDITOR_KB_REGISTRY"
+    }
   '';
 
   enterTest = ''
