@@ -895,6 +895,12 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 )
 
         allowed_findings = set(requirements_by_finding.keys())
+        examination = self.examination.get(p_examination.examination)
+        allowed_indications = (
+            set(self._names_as_list(examination.indications))
+            if examination is not None
+            else set()
+        )
         for p_finding in p_examination.patient_findings:
             kb_finding = self._lookup_optional(
                 collection_name="finding",
@@ -1019,6 +1025,103 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                         raise SemanticAdmissibilityError(
                             f"Intervention '{intervention.intervention}' is not "
                             f"permitted for finding '{p_finding.finding}'."
+                        )
+
+        for p_indication in p_examination.patient_indications:
+            kb_indication = self.indication.get(p_indication.indication)
+            if kb_indication is None:
+                raise SemanticAdmissibilityError(
+                    f"Unknown indication '{p_indication.indication}'."
+                )
+            if (
+                allowed_indications
+                and p_indication.indication not in allowed_indications
+            ):
+                raise SemanticAdmissibilityError(
+                    f"Indication '{p_indication.indication}' is not permitted for "
+                    f"examination '{p_examination.examination}'."
+                )
+
+            allowed_classifications = set(
+                self._names_as_list(kb_indication.classifications)
+            )
+            for (
+                p_indication_classification
+            ) in p_indication.patient_indication_classifications:
+                kb_classification = self.classification.get(
+                    p_indication_classification.classification
+                )
+                if (
+                    kb_classification is None
+                    and p_indication_classification.classification
+                    not in allowed_classifications
+                ):
+                    raise SemanticAdmissibilityError(
+                        "Unknown indication classification "
+                        f"'{p_indication_classification.classification}'."
+                    )
+                if (
+                    p_indication_classification.classification
+                    not in allowed_classifications
+                ):
+                    raise SemanticAdmissibilityError(
+                        "Classification "
+                        f"'{p_indication_classification.classification}' is not "
+                        f"permitted for indication '{p_indication.indication}'."
+                    )
+
+                allowed_choices = (
+                    set(self._names_as_list(kb_classification.classification_choices))
+                    if kb_classification is not None
+                    else set()
+                )
+                kb_choice = self.classification_choice.get(
+                    p_indication_classification.classification_choice
+                )
+                if kb_choice is None and allowed_choices:
+                    raise SemanticAdmissibilityError(
+                        "Unknown indication classification choice "
+                        f"'{p_indication_classification.classification_choice}'."
+                    )
+                if (
+                    allowed_choices
+                    and p_indication_classification.classification_choice
+                    not in allowed_choices
+                ):
+                    raise SemanticAdmissibilityError(
+                        "Classification choice "
+                        f"'{p_indication_classification.classification_choice}' is "
+                        "not permitted for classification "
+                        f"'{p_indication_classification.classification}'."
+                    )
+
+                allowed_descriptors = (
+                    set(
+                        self._names_as_list(kb_choice.classification_choice_descriptors)
+                    )
+                    if kb_choice is not None
+                    else set()
+                )
+                for indication_descriptor in p_indication_classification.patient_indication_classification_descriptors:
+                    if (
+                        indication_descriptor.classification_choice_descriptor
+                        not in self.classification_choice_descriptor
+                        and allowed_descriptors
+                    ):
+                        raise SemanticAdmissibilityError(
+                            "Unknown indication classification choice descriptor "
+                            f"'{indication_descriptor.classification_choice_descriptor}'."
+                        )
+                    if (
+                        allowed_descriptors
+                        and indication_descriptor.classification_choice_descriptor
+                        not in allowed_descriptors
+                    ):
+                        raise SemanticAdmissibilityError(
+                            "Classification choice descriptor "
+                            f"'{indication_descriptor.classification_choice_descriptor}' is not "
+                            "permitted for classification choice "
+                            f"'{p_indication_classification.classification_choice}'."
                         )
 
     def _normalized_runtime_findings_for_validation(

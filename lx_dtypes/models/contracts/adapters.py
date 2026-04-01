@@ -85,7 +85,7 @@ _LIST_FIELDS: dict[CoreConceptName, list[str]] = {
     "examination": ["findings", "examination_types", "indications"],
     "finding": ["finding_types", "classifications", "interventions"],
     "finding_type": [],
-    "indication": ["indication_types", "interventions"],
+    "indication": ["indication_types", "classifications", "interventions"],
     "indication_type": [],
     "intervention": ["intervention_types"],
     "intervention_type": [],

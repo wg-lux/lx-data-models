@@ -70,6 +70,8 @@ FieldNames = Enum(
         "UNITS": "units",
         "PATIENT_FINDINGS": "patient_findings",
         "PATIENT_INDICATIONS": "patient_indications",
+        "PATIENT_INDICATION_CLASSIFICATIONS": "patient_indication_classifications",
+        "PATIENT_INDICATION_CLASSIFICATION_DESCRIPTORS": "patient_indication_classification_descriptors",
         "PATIENT_EXAMINATIONS": "patient_examinations",
         "PATIENT_FINDING_CLASSIFICATIONS": "patient_finding_classifications",
         "PATIENT_FINDING_CLASSIFICATION_CHOICES": "patient_finding_classification_choices",
@@ -157,7 +159,25 @@ P_INDICATION_MODEL_M2M_FIELDS: List[str] = []
 P_INDICATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
     m2m_fields=P_INDICATION_MODEL_M2M_FIELDS
 )
-P_INDICATION_MODEL_NESTED_FIELDS: List[str] = []
+P_INDICATION_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_INDICATION_CLASSIFICATIONS.value,
+]
+
+P_INDICATION_CLASSIFICATION_MODEL_M2M_FIELDS: List[str] = []
+P_INDICATION_CLASSIFICATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=P_INDICATION_CLASSIFICATION_MODEL_M2M_FIELDS
+)
+P_INDICATION_CLASSIFICATION_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_INDICATION_CLASSIFICATION_DESCRIPTORS.value,
+]
+
+P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_M2M_FIELDS: List[str] = []
+P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS: List[str] = (
+    mk_lbm_list_type_fields(
+        m2m_fields=P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_M2M_FIELDS
+    )
+)
+P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_NESTED_FIELDS: List[str] = []
 
 P_FINDING_MODEL_M2M_FIELDS: List[str] = []
 P_FINDING_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
@@ -330,6 +350,7 @@ EXAMINATION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
 
 INDICATION_M2M_FIELDS: List[str] = [
     FieldNames.INDICATION_TYPES.value,
+    FieldNames.CLASSIFICATIONS.value,
     FieldNames.INTERVENTIONS.value,
 ]
 INDICATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(

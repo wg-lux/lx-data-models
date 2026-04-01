@@ -12,6 +12,11 @@ from pathlib import Path
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(?:[A-Za-z0-9._+-]*)?$")
 PROJECT_VERSION_RE = re.compile(r'(?ms)^(\[project\].*?^\s*version\s*=\s*")([^"]+)(")')
 INIT_VERSION_RE = re.compile(r'(?m)^(__version__\s*=\s*")([^"]+)(")')
+YAML_VERSION_RE = re.compile(r"(?m)^(version:\s*)(\S+)(\s*)$")
+NIX_ATTR_VERSION_RE = re.compile(r'(?m)^(\s*version\s*=\s*")([^"]+)(";\s*)$')
+NIX_KB_MODULE_VERSION_RE = re.compile(
+    r'(?m)^(\s*kbModuleVersion\s*=\s*")([^"]+)(";\s*)$'
+)
 
 
 def _project_root() -> Path:
@@ -24,6 +29,18 @@ def _pyproject_path() -> Path:
 
 def _init_path() -> Path:
     return _project_root() / "lx_dtypes" / "__init__.py"
+
+
+def _kb_config_paths() -> tuple[Path, ...]:
+    root = _project_root()
+    return (
+        root / "lx_dtypes" / "data" / "star_upper_gi" / "config.yaml",
+        root / "demo-data" / "star_upper_gi" / "config.yaml",
+    )
+
+
+def _kb_package_path() -> Path:
+    return _project_root() / "package.nix"
 
 
 def _validate_version(version: str) -> str:
@@ -64,6 +81,34 @@ def write_project_version(version: str) -> None:
         )
         if init_count == 1:
             init_path.write_text(updated_init)
+
+    for kb_config_path in _kb_config_paths():
+        if not kb_config_path.exists():
+            continue
+        kb_config_text = kb_config_path.read_text()
+        updated_kb_config, kb_count = YAML_VERSION_RE.subn(
+            rf"\g<1>{version}\g<3>",
+            kb_config_text,
+            count=1,
+        )
+        if kb_count == 1:
+            kb_config_path.write_text(updated_kb_config)
+
+    kb_package_path = _kb_package_path()
+    if kb_package_path.exists():
+        kb_package_text = kb_package_path.read_text()
+        updated_kb_package, package_count = NIX_ATTR_VERSION_RE.subn(
+            rf"\g<1>{version}\g<3>",
+            kb_package_text,
+            count=1,
+        )
+        if package_count == 1:
+            updated_kb_package, _ = NIX_KB_MODULE_VERSION_RE.subn(
+                rf"\g<1>{version}\g<3>",
+                updated_kb_package,
+                count=1,
+            )
+            kb_package_path.write_text(updated_kb_package)
 
 
 def run_command(args: list[str], *, cwd: Path) -> None:

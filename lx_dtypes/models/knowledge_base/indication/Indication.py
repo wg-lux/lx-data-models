@@ -14,6 +14,7 @@ from lx_dtypes.names import INDICATION_MODEL_LIST_TYPE_FIELDS
 
 class Indication(KnowledgebaseBaseModel[IndicationDataDict]):
     indication_types: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
+    classifications: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
     interventions: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
 
     @classmethod

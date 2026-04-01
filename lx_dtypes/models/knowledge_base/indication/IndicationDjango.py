@@ -13,6 +13,9 @@ from lx_dtypes.models.knowledge_base.indication.IndicationDataDict import (
 from lx_dtypes.names import INDICATION_MODEL_LIST_TYPE_FIELDS, FieldNames
 
 if TYPE_CHECKING:
+    from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import (
+        ClassificationDjango,
+    )
     from lx_dtypes.models.knowledge_base.indication.IndicationTypeDjango import (
         IndicationTypeDjango,
     )
@@ -26,10 +29,16 @@ class IndicationDjango(KnowledgebaseBaseModelDjango[IndicationDataDict]):
         indication_types: models.ManyToManyField[
             IndicationTypeDjango, IndicationTypeDjango
         ]
+        classifications: models.ManyToManyField[
+            ClassificationDjango, ClassificationDjango
+        ]
         interventions: models.ManyToManyField[InterventionDjango, InterventionDjango]
 
     indication_types = models.ManyToManyField(
         "IndicationTypeDjango", related_name=FieldNames.INDICATIONS.value
+    )
+    classifications = models.ManyToManyField(
+        "ClassificationDjango", related_name=FieldNames.INDICATIONS.value
     )
     interventions = models.ManyToManyField(
         "InterventionDjango", related_name=FieldNames.INDICATIONS.value

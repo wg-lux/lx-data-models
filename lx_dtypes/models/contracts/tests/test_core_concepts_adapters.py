@@ -49,7 +49,7 @@ _LIST_FIELDS: dict[CoreConceptName, list[str]] = {
     "examination": ["findings", "examination_types", "indications"],
     "finding": ["finding_types", "classifications", "interventions"],
     "finding_type": [],
-    "indication": ["indication_types", "interventions"],
+    "indication": ["indication_types", "classifications", "interventions"],
     "indication_type": [],
     "intervention": ["intervention_types"],
     "intervention_type": [],
@@ -103,6 +103,7 @@ def _sample_storage_by_concept() -> dict[CoreConceptName, dict[str, Any]]:
         "indication": {
             "name": "indication_a",
             "indication_types": "indication_type_1",
+            "classifications": "classification_1",
             "interventions": "intervention_1,intervention_2",
             "tags": "tag_a,tag_b",
         },
@@ -194,6 +195,7 @@ def _sample_model_factories() -> dict[CoreConceptName, Callable[[], Any]]:
         "indication": lambda: Indication(
             name="indication_model",
             indication_types=["indication_type_1"],
+            classifications=["classification_1"],
             interventions=["intervention_1", "intervention_2"],
             tags=["tag_a", "tag_b"],
         ),

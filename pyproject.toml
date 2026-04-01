@@ -12,7 +12,7 @@ classifiers = [
 dependencies = [
   "bibtexparser>=1.4.0",
   "django>=6.0",
-  "django-ninja>=1.5.1",
+  "django-ninja>=1.5.3",
   "django-stubs[compatible-mypy]>=5.2.8",
   "django-stubs-ext>=5.2.8",
   "icecream>=2.1.4",
@@ -139,6 +139,12 @@ target-version = ["py312"]
 
 [tool.hatch.build]
 exclude = [
+  ".devenv",
+  ".devenv/**",
+  ".direnv",
+  ".direnv/**",
+  "result",
+  "result/**",
   "tests",
   "tests/**",
 ]
@@ -147,6 +153,7 @@ exclude = [
 packages = ["lx_dtypes"]
 
 [tool.hatch.build.targets.wheel.force-include]
+"lx_dtypes/data" = "lx_dtypes/data"
 "lx_dtypes/py.typed" = "lx_dtypes/py.typed"
 "lx_kb_lint.py" = "lx_kb_lint.py"
 
@@ -156,17 +163,24 @@ requires = ["hatchling"]
 
 [tool.hatch.build.targets.sdist]
 exclude = [
+  ".devenv",
+  ".devenv/**",
+  ".direnv",
+  ".direnv/**",
   "tests",
   "tests/**",
   "docs/production",
   "docs/production/**",
   "htmlcov",
   "htmlcov/**",
+  "result",
+  "result/**",
   "storage",
   "storage/**",
 ]
 
 [tool.hatch.build.targets.sdist.force-include]
+"lx_dtypes/data" = "lx_dtypes/data"
 "lx_dtypes/py.typed" = "lx_dtypes/py.typed"
 "lx_kb_lint.py" = "lx_kb_lint.py"
 
