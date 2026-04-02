@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("lx_dtypes_django", "0003_findingdjango_caused_by_interventions"),
         ("lx_dtypes_django", "0003_findingdjango_caused_by_interventions_and_more"),
