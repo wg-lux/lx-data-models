@@ -31,6 +31,8 @@ def p_examination_fixture(
     instance = PExamination(
         patient=str(django_patient_fixture.pk),
         examination=django_examination_fixture.name,
+        knowledge_base_module="report_template_examples",
+        knowledge_base_version="0.1.0",
         date=datetime(2024, 1, 1, 10, 0, 0, tzinfo=timezone.utc),
     )
     return instance

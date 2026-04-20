@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Literal, Mapping, cast
 
 from pydantic import BaseModel, Field
 
+from .PropertyGraph import PropertyGraph, PropertyGraphEdge, PropertyGraphNode
 from .ReportTemplate import ReportTemplate
 from .ReportTemplateGraphDataDict import (
     ReportTemplateGraphDataDict,
@@ -144,6 +145,232 @@ def _add_node(
     )
 
 
+class ReportTemplatePropertyGraphAdapter:
+    def __init__(self, *, tokenizers: list[Any] | None = None) -> None:
+        self._tokenizers = tokenizers or [_tokenize]
+
+    def _tokens(self, *parts: str | None) -> list[str]:
+        return sorted(
+            {
+                token
+                for part in parts
+                for tokenizer in self._tokenizers
+                for token in tokenizer(part)
+            }
+        )
+
+    def _add_property_node(
+        self,
+        graph: PropertyGraph,
+        *,
+        node_id: str,
+        kind: str,
+        name: str,
+        token_parts: list[str | None],
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        graph.nodes.setdefault(
+            node_id,
+            PropertyGraphNode(
+                id=node_id,
+                kind=kind,
+                labels=self._tokens(*token_parts),
+                metadata={"name": name, **(dict(metadata or {}))},
+            ),
+        )
+
+    def _add_property_edge(
+        self,
+        graph: PropertyGraph,
+        *,
+        source: str,
+        target: str,
+        kind: str,
+        weight: float = 1.0,
+        properties: Mapping[str, Any] | None = None,
+    ) -> None:
+        graph.edges.append(
+            PropertyGraphEdge(
+                source=source,
+                target=target,
+                kind=kind,
+                weight=weight,
+                properties=dict(properties or {}),
+            )
+        )
+
+    def build(
+        self,
+        template: ReportTemplate,
+        *,
+        sections: Mapping[str, "ReportTemplateSection"] | Mapping[str, Any],
+        report_findings: Mapping[str, Any],
+    ) -> PropertyGraph:
+        graph = PropertyGraph()
+        template_node_id = f"template:{template.name}"
+        self._add_property_node(
+            graph,
+            node_id=template_node_id,
+            kind="template",
+            name=template.name,
+            token_parts=[
+                template.name,
+                template.examination,
+                *template.validators.examination_validators,
+                *template.validators.findings_validators,
+                *template.validators.classification_validators,
+                *template.validators.intervention_validators,
+                *template.validators.unit_validators,
+            ],
+            metadata={"examination": template.examination},
+        )
+
+        prev_section_node_id: str | None = None
+        for index, section_name in enumerate(template.report_sections):
+            section = sections.get(section_name)
+            if section is None:
+                continue
+
+            section_node_id = f"section:{section_name}"
+            self._add_property_node(
+                graph,
+                node_id=section_node_id,
+                kind="section",
+                name=section_name,
+                token_parts=[
+                    section_name,
+                    *list(getattr(section, "types", []) or []),
+                    str(getattr(section, "section_kind", "findings")),
+                    *[
+                        str(getattr(field, "key", ""))
+                        for field in _section_fields(section)
+                    ],
+                ],
+                metadata={
+                    "position": index,
+                    "section_kind": str(getattr(section, "section_kind", "findings")),
+                },
+            )
+            self._add_property_edge(
+                graph,
+                source=template_node_id,
+                target=section_node_id,
+                kind="template_to_section",
+            )
+
+            if prev_section_node_id is not None:
+                self._add_property_edge(
+                    graph,
+                    source=prev_section_node_id,
+                    target=section_node_id,
+                    kind="section_sequence",
+                )
+            prev_section_node_id = section_node_id
+
+            section_kind = str(getattr(section, "section_kind", "findings"))
+            field_refs = _section_fields(section)
+            section_field_weight = 1.0 / max(1.0, float(len(field_refs)))
+            for field in field_refs:
+                field_key = str(getattr(field, "key", ""))
+                if not field_key:
+                    continue
+
+                if section_kind == "patient_data":
+                    field_kind = "patient_field"
+                    edge_kind = "section_to_patient_field"
+                elif section_kind == "history":
+                    field_kind = "history_field"
+                    edge_kind = "section_to_history_field"
+                else:
+                    continue
+
+                field_node_id = f"{field_kind}:{field_key}"
+                self._add_property_node(
+                    graph,
+                    node_id=field_node_id,
+                    kind=field_kind,
+                    name=field_key,
+                    token_parts=[field_key],
+                )
+                self._add_property_edge(
+                    graph,
+                    source=section_node_id,
+                    target=field_node_id,
+                    kind=edge_kind,
+                    weight=section_field_weight,
+                )
+
+            finding_refs = list(section.findings or [])
+            section_finding_weight = 1.0 / max(1.0, float(len(finding_refs)))
+            for finding_ref in finding_refs:
+                finding_name, class_names = _parse_section_finding_ref(
+                    finding_ref=finding_ref,
+                    report_findings=report_findings,
+                )
+                if not finding_name:
+                    continue
+
+                finding_node_id = f"finding:{finding_name}"
+                self._add_property_node(
+                    graph,
+                    node_id=finding_node_id,
+                    kind="finding",
+                    name=finding_name,
+                    token_parts=[finding_name],
+                )
+                self._add_property_edge(
+                    graph,
+                    source=section_node_id,
+                    target=finding_node_id,
+                    kind="section_to_finding",
+                    weight=section_finding_weight,
+                )
+
+                classification_weight = 1.0 / max(1.0, float(len(class_names)))
+                for class_name in class_names:
+                    class_node_id = f"classification:{class_name}"
+                    self._add_property_node(
+                        graph,
+                        node_id=class_node_id,
+                        kind="classification",
+                        name=class_name,
+                        token_parts=[class_name],
+                    )
+                    self._add_property_edge(
+                        graph,
+                        source=finding_node_id,
+                        target=class_node_id,
+                        kind="finding_to_classification",
+                        weight=classification_weight,
+                    )
+
+        for validator_names in (
+            template.validators.examination_validators,
+            template.validators.findings_validators,
+            template.validators.classification_validators,
+            template.validators.intervention_validators,
+            template.validators.unit_validators,
+        ):
+            for validator_name in validator_names:
+                validator_node_id = f"validator:{validator_name}"
+                self._add_property_node(
+                    graph,
+                    node_id=validator_node_id,
+                    kind="validator",
+                    name=validator_name,
+                    token_parts=[validator_name],
+                )
+                self._add_property_edge(
+                    graph,
+                    source=template_node_id,
+                    target=validator_node_id,
+                    kind="template_to_validator",
+                    weight=0.4,
+                )
+
+        return graph
+
+
 def _parse_section_finding_ref(
     *,
     finding_ref: Any,
@@ -180,200 +407,61 @@ def build_report_template_graph(
     sections: Mapping[str, "ReportTemplateSection"] | Mapping[str, Any],
     report_findings: Mapping[str, Any],
 ) -> ReportTemplateGraph:
+    property_graph = ReportTemplatePropertyGraphAdapter().build(
+        template,
+        sections=sections,
+        report_findings=report_findings,
+    )
     nodes_by_id: dict[str, ReportTemplateGraphNode] = {}
     edges: list[ReportTemplateGraphEdge] = []
-
     template_node_id = f"template:{template.name}"
-    _add_node(
-        nodes_by_id,
-        node_id=template_node_id,
-        node_type="template",
-        name=template.name,
-        token_source=(
-            _tokenize(template.name)
-            + _tokenize(template.examination)
-            + [
-                token
-                for v_name in template.validators.examination_validators
-                for token in _tokenize(v_name)
-            ]
-            + [
-                token
-                for v_name in template.validators.findings_validators
-                for token in _tokenize(v_name)
-            ]
-        ),
-    )
-
     section_node_ids: list[str] = []
-    prev_section_node_id: str | None = None
 
-    for section_name in template.report_sections:
-        section = sections.get(section_name)
-        if section is None:
-            continue
-
-        section_node_id = f"section:{section_name}"
-        section_node_ids.append(section_node_id)
-
-        _add_node(
-            nodes_by_id,
-            node_id=section_node_id,
-            node_type="section",
-            name=section_name,
-            token_source=_tokenize(section_name)
-            + [
-                token
-                for section_type in section.types
-                for token in _tokenize(section_type)
-            ]
-            + _tokenize(getattr(section, "section_kind", "findings"))
-            + [
-                token
-                for field in _section_fields(section)
-                for token in _tokenize(str(getattr(field, "key", "")))
+    for node in property_graph.nodes.values():
+        node_type = cast(
+            Literal[
+                "template",
+                "section",
+                "finding",
+                "classification",
+                "validator",
+                "patient_field",
+                "history_field",
             ],
+            node.kind,
         )
-
-        edges.append(
-            ReportTemplateGraphEdge(
-                source_node_id=template_node_id,
-                target_node_id=section_node_id,
-                edge_type="template_to_section",
-                weight=1.0,
-            )
-        )
-
-        if prev_section_node_id is not None:
-            edges.append(
-                ReportTemplateGraphEdge(
-                    source_node_id=prev_section_node_id,
-                    target_node_id=section_node_id,
-                    edge_type="section_sequence",
-                    weight=1.0,
-                )
-            )
-        prev_section_node_id = section_node_id
-
-        section_kind = str(getattr(section, "section_kind", "findings"))
-        field_refs = _section_fields(section)
-        section_field_weight = 1.0 / max(1.0, float(len(field_refs)))
-        for field in field_refs:
-            field_key = str(getattr(field, "key", ""))
-            if not field_key:
-                continue
-
-            if section_kind == "patient_data":
-                field_node_type: Literal["patient_field", "history_field"] = (
-                    "patient_field"
-                )
-                field_node_id = f"patient_field:{field_key}"
-                field_edge_type: Literal[
-                    "section_to_patient_field", "section_to_history_field"
-                ] = "section_to_patient_field"
-            elif section_kind == "history":
-                field_node_type = "history_field"
-                field_node_id = f"history_field:{field_key}"
-                field_edge_type = "section_to_history_field"
-            else:
-                continue
-
-            _add_node(
-                nodes_by_id,
-                node_id=field_node_id,
-                node_type=field_node_type,
-                name=field_key,
-                token_source=_tokenize(field_key),
-            )
-            edges.append(
-                ReportTemplateGraphEdge(
-                    source_node_id=section_node_id,
-                    target_node_id=field_node_id,
-                    edge_type=field_edge_type,
-                    weight=section_field_weight,
-                )
-            )
-
-        finding_refs = list(section.findings or [])
-        section_finding_weight = 1.0 / max(1.0, float(len(finding_refs)))
-        for finding_ref in finding_refs:
-            finding_name, class_names = _parse_section_finding_ref(
-                finding_ref=finding_ref,
-                report_findings=report_findings,
-            )
-            if not finding_name:
-                continue
-
-            finding_node_id = f"finding:{finding_name}"
-            _add_node(
-                nodes_by_id,
-                node_id=finding_node_id,
-                node_type="finding",
-                name=finding_name,
-                token_source=_tokenize(finding_name),
-            )
-
-            edges.append(
-                ReportTemplateGraphEdge(
-                    source_node_id=section_node_id,
-                    target_node_id=finding_node_id,
-                    edge_type="section_to_finding",
-                    weight=section_finding_weight,
-                )
-            )
-
-            classification_weight = 1.0 / max(1.0, float(len(class_names)))
-            for class_name in class_names:
-                class_node_id = f"classification:{class_name}"
-                _add_node(
-                    nodes_by_id,
-                    node_id=class_node_id,
-                    node_type="classification",
-                    name=class_name,
-                    token_source=_tokenize(class_name),
-                )
-                edges.append(
-                    ReportTemplateGraphEdge(
-                        source_node_id=finding_node_id,
-                        target_node_id=class_node_id,
-                        edge_type="finding_to_classification",
-                        weight=classification_weight,
-                    )
-                )
-
-    for validator_name in template.validators.examination_validators:
-        validator_node_id = f"validator:{validator_name}"
+        name = str(node.metadata.get("name", node.id))
         _add_node(
             nodes_by_id,
-            node_id=validator_node_id,
-            node_type="validator",
-            name=validator_name,
-            token_source=_tokenize(validator_name),
+            node_id=node.id,
+            node_type=node_type,
+            name=name,
+            token_source=node.labels,
         )
-        edges.append(
-            ReportTemplateGraphEdge(
-                source_node_id=template_node_id,
-                target_node_id=validator_node_id,
-                edge_type="template_to_validator",
-                weight=0.4,
-            )
-        )
+        if node_type == "section" and node.id in {
+            f"section:{section_name}" for section_name in template.report_sections
+        }:
+            section_node_ids.append(node.id)
 
-    for validator_name in template.validators.findings_validators:
-        validator_node_id = f"validator:{validator_name}"
-        _add_node(
-            nodes_by_id,
-            node_id=validator_node_id,
-            node_type="validator",
-            name=validator_name,
-            token_source=_tokenize(validator_name),
+    for edge in property_graph.edges:
+        edge_type = cast(
+            Literal[
+                "template_to_section",
+                "section_sequence",
+                "section_to_finding",
+                "section_to_patient_field",
+                "section_to_history_field",
+                "finding_to_classification",
+                "template_to_validator",
+            ],
+            edge.kind,
         )
         edges.append(
             ReportTemplateGraphEdge(
-                source_node_id=template_node_id,
-                target_node_id=validator_node_id,
-                edge_type="template_to_validator",
-                weight=0.4,
+                source_node_id=edge.source,
+                target_node_id=edge.target,
+                edge_type=edge_type,
+                weight=edge.weight,
             )
         )
 

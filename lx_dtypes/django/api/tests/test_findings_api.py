@@ -177,6 +177,129 @@ def test_base_api_patient_findings_crud_and_classifications() -> None:
     assert list_after_delete.json() == []
 
 
+def test_base_api_report_template_endpoints_shape() -> None:
+    client = Client()
+
+    by_name_res = client.get(
+        "/base_api/report-templates/report_template_examples/colonoscopy_training_basic",
+        secure=True,
+    )
+    assert by_name_res.status_code == 200, by_name_res.content.decode()
+    by_name_payload = by_name_res.json()
+    assert by_name_payload["name"] == "colonoscopy_training_basic"
+    assert by_name_payload["examination"] == "colonoscopy"
+    assert len(by_name_payload["report_sections"]) == 2
+
+    by_exam_res = client.get(
+        "/base_api/report-templates/by-examination/report_template_examples/colonoscopy",
+        secure=True,
+    )
+    assert by_exam_res.status_code == 200, by_exam_res.content.decode()
+    by_exam_payload = by_exam_res.json()
+    assert isinstance(by_exam_payload, list)
+    assert by_exam_payload
+    assert by_exam_payload[0]["name"] == "colonoscopy_training_basic"
+
+    core_concepts_res = client.get(
+        "/base_api/core-concepts/report_template_examples",
+        secure=True,
+    )
+    assert core_concepts_res.status_code == 200, core_concepts_res.content.decode()
+    core_concepts_payload = core_concepts_res.json()
+    assert "examination" in core_concepts_payload
+    assert "finding" in core_concepts_payload
+
+
+def test_base_api_report_template_runtime_validation() -> None:
+    client = Client()
+
+    missing_findings_res = client.post(
+        "/base_api/report-templates/report_template_examples/colonoscopy_training_basic/validate",
+        data=json.dumps(
+            {
+                "patient": "test_patient",
+                "examination": "colonoscopy",
+                "patient_findings": [],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+    assert missing_findings_res.status_code == 200, (
+        missing_findings_res.content.decode()
+    )
+    missing_findings_payload = missing_findings_res.json()
+    assert missing_findings_payload["template_name"] == "colonoscopy_training_basic"
+    assert missing_findings_payload["ok"] is False
+    assert any(
+        issue["code"] == "finding_not_present"
+        and issue["validator_name"] == "colonoscopy_training_polyp_recorded"
+        for issue in missing_findings_payload["issues"]
+    )
+
+    partial_findings_res = client.post(
+        "/base_api/report-templates/report_template_examples/colonoscopy_training_basic/validate",
+        data=json.dumps(
+            {
+                "patient": "test_patient",
+                "examination": "colonoscopy",
+                "patient_findings": [
+                    {
+                        "finding": "colonoscopy_deepest_viewed_location",
+                        "patient_examination": "test_exam",
+                        "patient_finding_classifications": [],
+                        "patient_finding_interventions": [],
+                    }
+                ],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+    assert partial_findings_res.status_code == 200, (
+        partial_findings_res.content.decode()
+    )
+    partial_findings_payload = partial_findings_res.json()
+    assert partial_findings_payload["ok"] is False
+    assert partial_findings_payload["evaluated_findings_count"] == 1
+    assert partial_findings_payload["examination_validators"][0]["ok"] is True
+    assert partial_findings_payload["findings_validators"][0]["ok"] is False
+
+
+def test_base_api_report_template_runtime_validation_from_ledger() -> None:
+    client = Client()
+    examination = Examination.objects.create(name="colonoscopy")
+    patient_examination = _create_patient_examination(examination)
+
+    response = client.post(
+        (
+            "/base_api/report-templates/report_template_examples/"
+            f"colonoscopy_training_basic/validate-from-ledger/{patient_examination.id}"
+        ),
+        secure=True,
+    )
+
+    assert response.status_code == 200, response.content.decode()
+    payload = response.json()
+    assert payload["template_name"] == "colonoscopy_training_basic"
+    assert payload["evaluated_findings_count"] == 0
+    assert payload["ok"] is False
+    assert any(issue["code"] == "finding_not_present" for issue in payload["issues"])
+
+
+def test_base_api_report_template_runtime_validation_from_ledger_not_found() -> None:
+    client = Client()
+    response = client.post(
+        (
+            "/base_api/report-templates/report_template_examples/"
+            "colonoscopy_training_basic/validate-from-ledger/999999"
+        ),
+        secure=True,
+    )
+    assert response.status_code == 404
+    assert "PatientExamination '999999' not found." in response.content.decode()
+
+
 def test_base_api_patient_findings_validation_invalid_choice() -> None:
     client = Client()
     examination, finding, classification, _choice = _create_exam_graph()

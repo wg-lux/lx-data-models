@@ -132,9 +132,13 @@ def test_report_template_export(tmp_path: Path) -> None:
     assert section["findings"][1]["finding"] == "esophagus_polyp"
 
     resolved_exam_validators = exported["validators"]["examination_validators"]
+    resolved_classification_validators = exported["validators"][
+        "classification_validators"
+    ]
     resolved_findings_validators = exported["validators"]["findings_validators"]
 
     assert isinstance(resolved_exam_validators[0], dict)
     assert resolved_exam_validators[0]["name"] == "gastroscopy_has_baseline_info"
+    assert resolved_classification_validators == []
     assert isinstance(resolved_findings_validators[0], dict)
     assert resolved_findings_validators[0]["name"] == "polyp_has_lst_if_large"

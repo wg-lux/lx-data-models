@@ -36,21 +36,21 @@ class PFindingClassificationChoiceDjango(
     LedgerBaseModelDjango[PFindingClassificationChoiceDataDict]
 ):
     if TYPE_CHECKING:
-        classification: models.ForeignKey[ClassificationDjango, ClassificationDjango]
+        classification: models.ForeignKey[ClassificationDjango, ClassificationDjango]  # type: ignore[misc]
         classification_choice: models.ForeignKey[
             ClassificationChoiceDjango, ClassificationChoiceDjango
-        ]
+        ]  # type: ignore[misc]
         patient_finding_classifications: models.ForeignKey[
             PFindingClassificationsDjango, PFindingClassificationsDjango
         ]
 
-    classification = models.ForeignKey(
+    classification = models.ForeignKey(  # type: ignore[misc]
         "ClassificationDjango",
         related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
         on_delete=models.CASCADE,
     )
-    classification_choice = models.ForeignKey(
-        "ClassificationChoiceDjango",
+    classification_choice = models.ForeignKey(  # type: ignore[misc]
+        "lx_dtypes_django.ClassificationChoiceDjango",
         related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
         on_delete=models.CASCADE,
     )

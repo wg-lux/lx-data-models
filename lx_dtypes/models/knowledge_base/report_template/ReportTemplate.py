@@ -14,6 +14,9 @@ from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict impo
 class ReportTemplateValidators(BaseModel):
     examination_validators: List[str] = Field(default_factory=list)
     findings_validators: List[str] = Field(default_factory=list)
+    classification_validators: List[str] = Field(default_factory=list)
+    intervention_validators: List[str] = Field(default_factory=list)
+    unit_validators: List[str] = Field(default_factory=list)
 
 
 class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):

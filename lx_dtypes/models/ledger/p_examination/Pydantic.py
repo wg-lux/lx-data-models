@@ -38,6 +38,8 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
     examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
     date: Optional[AwareDatetime] = None
     examination: str
+    knowledge_base_module: Optional[str] = None
+    knowledge_base_version: Optional[str] = None
     patient_findings: List[PFinding] = Field(default_factory=list)
     patient_indications: List[PIndication] = Field(default_factory=list)
 
@@ -193,6 +195,8 @@ class SerializedPExamination(LedgerBaseModel[SerializedPExaminationDataDict]):
     examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
     date: Optional[AwareDatetime] = None
     examination: str
+    knowledge_base_module: Optional[str] = None
+    knowledge_base_version: Optional[str] = None
     patient_findings: str = ""
     patient_indications: str = ""
 

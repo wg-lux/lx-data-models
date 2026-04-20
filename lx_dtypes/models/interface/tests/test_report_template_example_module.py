@@ -19,7 +19,7 @@ def test_report_template_example_module_yaml_json_roundtrip() -> None:
     loader.load_module_configs()
     kb = loader.load_knowledge_base("report_template_examples")
 
-    exported = kb.export_report_template("star_upper_gi_main")
+    exported = kb.export_report_template_preview("star_upper_gi_main")
 
     exported_json = json.dumps(exported, sort_keys=True, default=str)
     exported_back = json.loads(exported_json)
@@ -27,6 +27,7 @@ def test_report_template_example_module_yaml_json_roundtrip() -> None:
     assert exported_back["name"] == "star_upper_gi_main"
     assert exported_back["examination"] == "star_upper_gi_endoscopy"
     assert len(exported_back["report_sections"]) == 2
+    assert exported_back["readiness"]["can_preview"] is True
 
     template = kb.get_report_template("star_upper_gi_main")
     template_json = template.model_dump_json()

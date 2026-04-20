@@ -8,15 +8,13 @@ from lx_dtypes.utils.parser import camel_to_snake
 
 from ..DbInterface import DbInterface
 
-TEST_INTERFACE_EXPORT_FILE = Path("./test_interface_export.yaml")
-
 
 class TestKnowledgeBaseDataLoader:
     def test_knowledge_base_data_loader(self) -> None:
         # TODO
         return None
 
-    def test_db_interface_schema(self) -> None:
+    def test_db_interface_schema(self, tmp_path: Path) -> None:
         """
         Create an empty DbInterface, export its JSON schema to ./db_interface_schema.json, and verify required properties.
 
@@ -26,7 +24,7 @@ class TestKnowledgeBaseDataLoader:
 
         # Dump schema
         schema = DbInterface.model_json_schema()
-        schema_path = Path("./db_interface_schema.json")
+        schema_path = tmp_path / "db_interface_schema.json"
         schema_path.write_text(json.dumps(schema, indent=2), encoding="utf-8")
 
         assert schema_path.exists()
@@ -35,7 +33,9 @@ class TestKnowledgeBaseDataLoader:
 
 
 class TestDbInterfaceExport:
-    def test_db_interface_export(self, db_interface_fixture: "DbInterface") -> None:
+    def test_db_interface_export(
+        self, db_interface_fixture: "DbInterface", tmp_path: Path
+    ) -> None:
         """
         Validate that a DbInterface instance round-trips through model validation and YAML export/import without loss.
 
@@ -55,9 +55,10 @@ class TestDbInterfaceExport:
         new_dict = new_db_interface_instance.model_dump()
 
         # Test Dump
-        new_db_interface_instance.to_yaml(TEST_INTERFACE_EXPORT_FILE)
+        export_path = tmp_path / "db_interface_export.yaml"
+        new_db_interface_instance.to_yaml(export_path)
 
-        reimported_interface = DbInterface.from_yaml_file(TEST_INTERFACE_EXPORT_FILE)
+        reimported_interface = DbInterface.from_yaml_file(export_path)
         re_imported_dict = reimported_interface.model_dump()
         compare_fields = [camel_to_snake(name) for name in KB_MODEL_NAMES_ORDERED]
 

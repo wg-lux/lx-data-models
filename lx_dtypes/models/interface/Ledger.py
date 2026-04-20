@@ -29,6 +29,12 @@ from lx_dtypes.models.ledger.p_finding_classifications.DataDict import (
     SerializedPFindingClassificationsDataDict,
 )
 from lx_dtypes.models.ledger.p_indication.DataDict import PIndicationDataDict
+from lx_dtypes.models.ledger.p_indication_classification.DataDict import (
+    SerializedPIndicationClassificationDataDict,
+)
+from lx_dtypes.models.ledger.p_indication_classification_descriptor.DataDict import (
+    PIndicationClassificationDescriptorDataDict,
+)
 from lx_dtypes.models.ledger.p_intervention.DataDict import PFindingInterventionDataDict
 from lx_dtypes.models.ledger.p_interventions.DataDict import (
     SerializedPFindingInterventionsDataDict,
@@ -49,6 +55,10 @@ class LedgerRecordList(TypedDict):
     examiners: List[ExaminerDataDict]
     p_findings: List[SerializedPFindingDataDict]
     p_indications: List[PIndicationDataDict]
+    p_indication_classifications: List[SerializedPIndicationClassificationDataDict]
+    p_indication_classification_descriptors: List[
+        PIndicationClassificationDescriptorDataDict
+    ]
     p_finding_classifications: List[SerializedPFindingClassificationsDataDict]
     p_finding_classification_choices: List[
         SerializedPFindingClassificationChoiceDataDict
@@ -106,6 +116,8 @@ class Ledger(AppBaseModelUUIDTags):
         List[SerializedPExaminationDataDict],
         List[SerializedPFindingDataDict],
         List[PIndicationDataDict],
+        List[SerializedPIndicationClassificationDataDict],
+        List[PIndicationClassificationDescriptorDataDict],
         List[SerializedPFindingClassificationsDataDict],
         List[SerializedPFindingClassificationChoiceDataDict],
         List[PFindingClassificationChoiceDescriptorDataDict],
@@ -129,6 +141,12 @@ class Ledger(AppBaseModelUUIDTags):
         p_examination_dicts: List[SerializedPExaminationDataDict] = []
         p_finding_dicts: List[SerializedPFindingDataDict] = []
         p_indication_dicts: List[PIndicationDataDict] = []
+        p_indication_classification_dicts: List[
+            SerializedPIndicationClassificationDataDict
+        ] = []
+        p_indication_classification_descriptor_dicts: List[
+            PIndicationClassificationDescriptorDataDict
+        ] = []
         p_finding_classifications_dicts: List[
             SerializedPFindingClassificationsDataDict
         ] = []
@@ -150,6 +168,16 @@ class Ledger(AppBaseModelUUIDTags):
             # 2. Export PIndication
             for p_indication in p_examination.patient_indications:
                 p_indication_dicts.append(p_indication.serialized_ddict)
+                for (
+                    p_indication_classification
+                ) in p_indication.patient_indication_classifications:
+                    p_indication_classification_dicts.append(
+                        p_indication_classification.serialized_ddict
+                    )
+                    for p_indication_classification_descriptor in p_indication_classification.patient_indication_classification_descriptors:
+                        p_indication_classification_descriptor_dicts.append(
+                            p_indication_classification_descriptor.ddict
+                        )
 
             # 3. Export PFinding and nested classifications
             for p_finding in p_examination.patient_findings:
@@ -194,6 +222,8 @@ class Ledger(AppBaseModelUUIDTags):
             p_examination_dicts,
             p_finding_dicts,
             p_indication_dicts,
+            p_indication_classification_dicts,
+            p_indication_classification_descriptor_dicts,
             p_finding_classifications_dicts,
             p_finding_classification_choice_dicts,
             p_finding_classification_choice_descriptor_dicts,
@@ -240,6 +270,8 @@ class Ledger(AppBaseModelUUIDTags):
             p_examination_dicts,
             p_finding_dicts,
             p_indication_dicts,
+            p_indication_classification_dicts,
+            p_indication_classification_descriptor_dicts,
             p_finding_classifications_dicts,
             p_finding_classification_choice_dicts,
             p_finding_classification_choice_descriptor_dicts,
@@ -254,6 +286,10 @@ class Ledger(AppBaseModelUUIDTags):
             examiners=examiner_dicts,
             p_findings=p_finding_dicts,
             p_indications=p_indication_dicts,
+            p_indication_classifications=p_indication_classification_dicts,
+            p_indication_classification_descriptors=(
+                p_indication_classification_descriptor_dicts
+            ),
             p_finding_classifications=p_finding_classifications_dicts,
             p_finding_classification_choices=p_finding_classification_choice_dicts,
             p_finding_classification_choice_descriptors=p_finding_classification_choice_descriptor_dicts,

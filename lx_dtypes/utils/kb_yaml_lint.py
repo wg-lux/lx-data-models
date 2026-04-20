@@ -35,7 +35,6 @@ KNOWN_MODEL_NAMES: set[str] = {
     "findings_validator",
     "examination_validator",
     "report_template",
-    "lookup_state",
 }
 
 

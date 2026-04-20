@@ -67,6 +67,7 @@ class FindingTypeCore(CoreConceptBase):
 
 class IndicationCore(CoreConceptBase):
     indication_types: List[str] = Field(default_factory=list)
+    classifications: List[str] = Field(default_factory=list)
     interventions: List[str] = Field(default_factory=list)
 
 

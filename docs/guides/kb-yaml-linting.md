@@ -2,6 +2,11 @@
 
 Use the lint command to help authors produce parseable, consistent concept YAML files with explicit line references.
 
+Recommended reading order:
+
+1. `docs/guides/knowledge-base-authoring.md`
+2. `docs/guides/kb-yaml-linting.md`
+
 ## Command
 
 ```bash
@@ -37,3 +42,7 @@ python scripts/lint_kb_yaml.py \
 - Run this command in CI before loading KB modules.
 - Keep `pytest` for contract/runtime behavior tests.
 - Use linting for authoring feedback and governance checks.
+
+## Related Guides
+
+- Authoring and publication workflow: `docs/guides/knowledge-base-authoring.md`

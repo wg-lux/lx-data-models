@@ -12,7 +12,10 @@ from lx_dtypes.names import (
     P_EXAMINATION_MODEL_NESTED_FIELDS,
     FieldNames,
 )
-from lx_dtypes.utils.django_field_types import OptionalDateTimeField
+from lx_dtypes.utils.django_field_types import (
+    OptionalCharFieldType,
+    OptionalDateTimeField,
+)
 
 from .DataDict import (
     PExaminationDataDict,
@@ -40,7 +43,7 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
     if TYPE_CHECKING:
         patient: models.ForeignKey[PatientDjango, PatientDjango]
         examiners: models.ManyToManyField[ExaminerDjango, ExaminerDjango]
-        examination: models.ForeignKey[ExaminationDjango, ExaminationDjango]
+        examination: models.ForeignKey[ExaminationDjango, ExaminationDjango]  # type: ignore[misc]
 
     patient = models.ForeignKey(
         "PatientDjango",
@@ -52,10 +55,20 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
         related_name=FieldNames.PATIENT_EXAMINATIONS.value,
     )
 
-    examination = models.ForeignKey(
+    examination = models.ForeignKey(  # type: ignore[misc]
         "ExaminationDjango",
         related_name=FieldNames.PATIENT_EXAMINATIONS.value,
         on_delete=models.CASCADE,
+    )
+    knowledge_base_module: OptionalCharFieldType = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+    )
+    knowledge_base_version: OptionalCharFieldType = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
     )
     date: OptionalDateTimeField = models.DateTimeField(null=True, blank=True)
 

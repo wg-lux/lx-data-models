@@ -10,7 +10,6 @@ from typing import (
     Callable,
     Dict,
     List,
-    Literal,
     NoReturn,
     Optional,
     Protocol,
@@ -20,16 +19,25 @@ from typing import (
 )
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError, transaction
-from django.db.models import QuerySet
-from django.utils import timezone
-from ninja.errors import HttpError
-from pydantic import BaseModel, Field
+from ninja.errors import HttpError  # type: ignore[import-untyped]
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    KnowledgeBaseVersionNotFoundError,
+    clear_knowledge_base_resolver_caches,
+    load_knowledge_base,
+)
+from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
+from .findings_routes import (
+    PatientFindingClassificationInput,
+    build_p_examination_payload_from_host_ledger as _build_payload_from_host_ledger,
+    clear_findings_route_caches,
+    register_findings_routes,
+)
 from .request_types import BaseRequest
+from .report_template_routes import register_report_template_routes
+from .lookup_tracker import register_runtime_lookup_tracker
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -56,10 +64,9 @@ class _TypedApi(Protocol):
 
 
 if TYPE_CHECKING:
-    Schema = BaseModel
     api = cast(_TypedApi, object())
 else:
-    from ninja import NinjaAPI, Schema
+    from ninja import NinjaAPI
 
     api = cast(_TypedApi, NinjaAPI(urls_namespace="lx_dtypes_base_api"))
 
@@ -108,36 +115,6 @@ def handle_structured_api_error(request: Any, exc: StructuredApiError) -> Any:
     )
 
 
-class ReportTemplateValidationRequest(Schema):
-    findings: List[Dict[str, Any]] = Field(default_factory=list)
-
-
-class PatientFindingClassificationInput(Schema):
-    classification: int
-    choice: int
-
-
-class PatientFindingCreateRequest(Schema):
-    patient_examination: int
-    finding: int
-    classifications: List[PatientFindingClassificationInput] = Field(
-        default_factory=list
-    )
-
-
-class PatientFindingUpdateRequest(Schema):
-    finding: Optional[int] = None
-    is_active: Optional[bool] = None
-    classifications: Optional[List[PatientFindingClassificationInput]] = None
-
-
-class PatientFindingClassificationsRequest(Schema):
-    classifications: List[PatientFindingClassificationInput] = Field(
-        default_factory=list
-    )
-    replace: bool = True
-
-
 @lru_cache(maxsize=1)
 def _kb_loader() -> DataLoader:
     package_data_dir = Path(__file__).resolve().parents[2] / "data"
@@ -152,12 +129,82 @@ def _kb_loader() -> DataLoader:
     return loader
 
 
-def _load_module_kb(module_name: str) -> Any:
+def _load_module_kb(module_name: str, version: str | None = None) -> Any:
+    if version:
+        try:
+            kb = cast(Any, load_knowledge_base(module_name, version=version))
+        except KnowledgeBaseVersionNotFoundError as exc:
+            raise HttpError(
+                409,
+                "Requested knowledge-base version is not provisioned locally for "
+                f"module '{module_name}' and version '{version}'.",
+            ) from exc
+        register_runtime_lookup_tracker(kb)
+        return kb
+
     loader = _kb_loader()
     try:
-        return cast(Any, loader.load_knowledge_base(module_name))
+        kb = cast(Any, loader.load_knowledge_base(module_name))
     except ValueError as exc:
         raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
+    register_runtime_lookup_tracker(kb)
+    return kb
+
+
+def _clear_kb_caches() -> None:
+    cache_clear = getattr(_kb_loader, "cache_clear", None)
+    if callable(cache_clear):
+        cache_clear()
+    clear_findings_route_caches()
+    clear_knowledge_base_resolver_caches()
+
+
+def _resolve_payload_kb_identity(
+    route_module_name: str,
+    payload: PExamination,
+) -> tuple[str, str | None]:
+    payload_module_name = str(payload.knowledge_base_module or "").strip()
+    payload_version = str(payload.knowledge_base_version or "").strip() or None
+
+    if payload_module_name and payload_module_name != route_module_name:
+        raise HttpError(
+            409,
+            "Payload knowledge-base module does not match route module: "
+            f"'{payload_module_name}' != '{route_module_name}'.",
+        )
+
+    return payload_module_name or route_module_name, payload_version
+
+
+def _api_error(status: int, code: str, message: str) -> NoReturn:
+    raise StructuredApiError(status, code, message)
+
+
+def _as_str_list_from_relation(relation: object) -> list[str]:
+    if relation is None:
+        return []
+    if hasattr(relation, "all"):
+        return [str(getattr(item, "pk", item)) for item in relation.all()]
+    if isinstance(relation, list):
+        return [str(item) for item in relation]
+    return [str(relation)]
+
+
+def _active_patient_findings_queryset() -> Any:
+    from .findings_routes import _active_patient_findings_queryset as _active_queryset
+
+    return _active_queryset(lambda: _orm_models())
+
+
+def _build_p_examination_payload_from_host_ledger(
+    patient_examination: object, *, route_module_name: str
+) -> PExamination:
+    return _build_payload_from_host_ledger(
+        patient_examination,
+        route_module_name=route_module_name,
+        orm_models=lambda: _orm_models(),
+        active_patient_findings_queryset=lambda: _active_patient_findings_queryset(),
+    )
 
 
 def _findings_module_name() -> str:
@@ -195,16 +242,6 @@ def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
         "classification": classification_by_name,
         "classification_choice": choice_by_name,
     }
-
-
-def _active_patient_findings_queryset() -> QuerySet[Any]:
-    patient_finding_model = _orm_models()["PatientFinding"]
-    return cast(
-        QuerySet[Any],
-        patient_finding_model.objects.filter(is_active=True).select_related(
-            "patient_examination", "finding"
-        ),
-    )
 
 
 def _request_user_if_authenticated(request: BaseRequest) -> Optional[Any]:
@@ -368,10 +405,6 @@ def _resolve_kb_classification_choice_names(
     return {_norm_name(name) for name in choices}
 
 
-def _api_error(status: int, code: str, message: str) -> NoReturn:
-    raise StructuredApiError(status, code, message)
-
-
 def _validate_finding_for_examination(
     finding: Any,
     patient_examination: Any,
@@ -489,379 +522,22 @@ def _replace_patient_finding_classifications(
         )
 
 
-@api.get("/hello")
-def hello(request: BaseRequest) -> Literal["Hello world"]:
-    """
-    Return the fixed greeting used as the /hello endpoint response.
+register_report_template_routes(
+    api,
+    load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
+    clear_kb_caches=lambda: _clear_kb_caches(),
+    resolve_payload_kb_identity=lambda *args, **kwargs: _resolve_payload_kb_identity(
+        *args, **kwargs
+    ),
+    orm_models=lambda: _orm_models(),
+    build_p_examination_payload_from_host_ledger=lambda *args, **kwargs: (
+        _build_p_examination_payload_from_host_ledger(*args, **kwargs)
+    ),
+)
 
-    Returns:
-        The exact string "Hello world" returned to clients.
-    """
-    return "Hello world"
-
-
-@api.get("/report-templates/{module_name}/{template_name}")
-def report_template_by_name(
-    request: BaseRequest, module_name: str, template_name: str
-) -> Dict[str, Any]:
-    """
-    Return a resolved report template JSON payload by module/template name.
-    """
-    kb = _load_module_kb(module_name)
-    try:
-        return cast(Dict[str, Any], kb.export_report_template(template_name))
-    except KeyError as exc:
-        raise HttpError(
-            404,
-            f"Report template '{template_name}' not found in module '{module_name}'.",
-        ) from exc
-
-
-@api.get("/report-templates/by-examination/{module_name}/{examination_name}")
-def report_templates_by_examination(
-    request: BaseRequest, module_name: str, examination_name: str
-) -> List[Dict[str, Any]]:
-    """
-    Return all resolved report templates for the given examination in one module.
-    """
-    kb = _load_module_kb(module_name)
-    matches = [
-        kb.export_report_template(template_name)
-        for template_name, template in kb.report_template.items()
-        if template.examination == examination_name
-    ]
-    return cast(List[Dict[str, Any]], matches)
-
-
-@api.post("/report-templates/{module_name}/{template_name}/validate")
-def validate_report_template_runtime(
-    request: BaseRequest,
-    module_name: str,
-    template_name: str,
-    payload: ReportTemplateValidationRequest,
-) -> Dict[str, Any]:
-    """
-    Execute report-template validator logic against runtime finding payload data.
-    """
-    kb = _load_module_kb(module_name)
-    try:
-        return cast(
-            Dict[str, Any],
-            kb.evaluate_report_template_validators(
-                template_name, reported_findings=payload.findings
-            ),
-        )
-    except KeyError as exc:
-        raise HttpError(
-            404,
-            f"Report template '{template_name}' not found in module '{module_name}'.",
-        ) from exc
-
-
-@api.get("/core-concepts/{module_name}")
-def core_concepts_by_module(request: BaseRequest, module_name: str) -> Dict[str, Any]:
-    """
-    Return canonical core concept payloads for one KB module.
-    """
-    kb = _load_module_kb(module_name)
-    return cast(Dict[str, Any], kb.export_core_concepts())
-
-
-@api.get("/examinations/{examination_id}/findings/")
-def findings_by_examination(
-    request: BaseRequest, examination_id: int
-) -> List[Dict[str, Any]]:
-    module_name = _findings_module_name()
-    examination_model = _orm_models()["Examination"]
-    examination = examination_model.objects.filter(id=examination_id).first()
-    if not examination:
-        _api_error(404, "not-found", f"Examination '{examination_id}' not found.")
-
-    assert examination is not None
-    findings = list(examination.get_available_findings())
-    kb_allowed_finding_names = _resolve_exam_kb_finding_names(
-        examination, module_name=module_name
-    )
-    if kb_allowed_finding_names is not None:
-        findings = [
-            finding
-            for finding in findings
-            if _norm_name(finding.name) in kb_allowed_finding_names
-        ]
-
-    response = []
-    for finding in findings:
-        kb_allowed_classifications = _resolve_kb_finding_classification_names(
-            finding, module_name=module_name
-        )
-        response.append(
-            _serialize_finding(
-                finding,
-                allowed_classification_names=kb_allowed_classifications,
-                required_classification_names=set(),
-            )
-        )
-    return response
-
-
-@api.get("/findings/{finding_id}/classifications/")
-def classifications_by_finding(
-    request: BaseRequest, finding_id: int
-) -> List[Dict[str, Any]]:
-    module_name = _findings_module_name()
-    finding_model = _orm_models()["Finding"]
-    finding = finding_model.objects.filter(id=finding_id).first()
-    if not finding:
-        _api_error(404, "not-found", f"Finding '{finding_id}' not found.")
-    assert finding is not None
-
-    kb_allowed_classifications = _resolve_kb_finding_classification_names(
-        finding, module_name=module_name
-    )
-    serialized = _serialize_finding(
-        finding,
-        allowed_classification_names=kb_allowed_classifications,
-        required_classification_names=set(),
-    )
-    return cast(List[Dict[str, Any]], serialized["classifications"])
-
-
-@api.get("/classifications/{classification_id}/choices/")
-def choices_by_classification(
-    request: BaseRequest, classification_id: int
-) -> Dict[str, Any]:
-    module_name = _findings_module_name()
-    finding_classification_model = _orm_models()["FindingClassification"]
-    classification = finding_classification_model.objects.filter(
-        id=classification_id
-    ).first()
-    if not classification:
-        _api_error(404, "not-found", f"Classification '{classification_id}' not found.")
-    assert classification is not None
-
-    kb_allowed_choices = _resolve_kb_classification_choice_names(
-        classification, module_name=module_name
-    )
-    all_choices = list(classification.choices.all())
-    if kb_allowed_choices is not None:
-        all_choices = [
-            choice
-            for choice in all_choices
-            if _norm_name(choice.name) in kb_allowed_choices
-        ]
-    return {"choices": [_serialize_choice(choice) for choice in all_choices]}
-
-
-@api.get("/patient-findings/")
-def list_patient_findings(
-    request: BaseRequest, patient_examination: Optional[int] = None
-) -> List[Dict[str, Any]]:
-    queryset = _active_patient_findings_queryset()
-    if patient_examination is not None:
-        queryset = queryset.filter(patient_examination_id=patient_examination)
-    return [_serialize_patient_finding(item) for item in queryset]
-
-
-@api.post("/patient-findings/")
-def create_patient_finding(
-    request: BaseRequest, payload: PatientFindingCreateRequest
-) -> Dict[str, Any]:
-    module_name = _findings_module_name()
-    patient_examination_model = _orm_models()["PatientExamination"]
-    finding_model = _orm_models()["Finding"]
-    patient_finding_model = _orm_models()["PatientFinding"]
-    patient_examination = patient_examination_model.objects.filter(
-        id=payload.patient_examination
-    ).first()
-    if not patient_examination:
-        _api_error(
-            404,
-            "not-found",
-            f"PatientExamination '{payload.patient_examination}' not found.",
-        )
-    finding = finding_model.objects.filter(id=payload.finding).first()
-    if not finding:
-        _api_error(404, "not-found", f"Finding '{payload.finding}' not found.")
-    assert patient_examination is not None
-    assert finding is not None
-
-    _validate_finding_for_examination(
-        finding=finding,
-        patient_examination=patient_examination,
-        module_name=module_name,
-    )
-
-    try:
-        with transaction.atomic():
-            patient_finding = patient_finding_model.objects.create(
-                patient_examination=patient_examination,
-                finding=finding,
-            )
-            if payload.classifications:
-                _replace_patient_finding_classifications(
-                    patient_finding,
-                    payload.classifications,
-                    module_name=module_name,
-                )
-            return _serialize_patient_finding(patient_finding)
-    except IntegrityError as exc:
-        if "unique_active_finding_per_examination" in str(exc):
-            _api_error(
-                400,
-                "duplicate-finding",
-                f"Finding '{finding.name}' is already active for this patient examination.",
-            )
-        raise
-    except ValidationError as exc:
-        message = str(exc)
-        normalized_message = message.lower()
-        if "erforderliche findings fehlen" in normalized_message:
-            code = "required-finding"
-        elif (
-            "unique_active_finding_per_examination" in normalized_message
-            or "already exists" in normalized_message
-            or "bereits" in normalized_message
-        ):
-            code = "duplicate-finding"
-        else:
-            code = "invalid-finding"
-        _api_error(400, code, message)
-
-
-@api.patch("/patient-findings/{patient_finding_id}/")
-def patch_patient_finding(
-    request: BaseRequest, patient_finding_id: int, payload: PatientFindingUpdateRequest
-) -> Dict[str, Any]:
-    module_name = _findings_module_name()
-    patient_finding = (
-        _active_patient_findings_queryset().filter(id=patient_finding_id).first()
-    )
-    if not patient_finding:
-        _api_error(
-            404, "not-found", f"Patient finding '{patient_finding_id}' not found."
-        )
-    assert patient_finding is not None
-
-    with transaction.atomic():
-        if payload.finding is not None:
-            finding_model = _orm_models()["Finding"]
-            finding = finding_model.objects.filter(id=payload.finding).first()
-            if not finding:
-                _api_error(404, "not-found", f"Finding '{payload.finding}' not found.")
-            assert finding is not None
-            _validate_finding_for_examination(
-                finding=finding,
-                patient_examination=patient_finding.patient_examination,
-                module_name=module_name,
-            )
-            patient_finding.finding = finding
-
-        if payload.is_active is not None:
-            if payload.is_active:
-                patient_finding.is_active = True
-                patient_finding.deactivated_at = None
-                patient_finding.deactivated_by = None
-            else:
-                patient_finding.is_active = False
-                actor = _request_user_if_authenticated(request)
-                patient_finding.deactivated_by = actor
-                patient_finding.deactivated_at = (
-                    timezone.now() if actor is not None else None
-                )
-
-        patient_finding.save()
-
-        if payload.classifications is not None:
-            _replace_patient_finding_classifications(
-                patient_finding,
-                payload.classifications,
-                module_name=module_name,
-            )
-
-    return _serialize_patient_finding(patient_finding)
-
-
-@api.delete("/patient-findings/{patient_finding_id}/")
-def delete_patient_finding(
-    request: BaseRequest, patient_finding_id: int
-) -> Dict[str, Any]:
-    patient_finding = (
-        _active_patient_findings_queryset().filter(id=patient_finding_id).first()
-    )
-    if not patient_finding:
-        _api_error(
-            404, "not-found", f"Patient finding '{patient_finding_id}' not found."
-        )
-    assert patient_finding is not None
-
-    actor = _request_user_if_authenticated(request)
-    patient_finding.is_active = False
-    patient_finding.deactivated_by = actor
-    patient_finding.deactivated_at = timezone.now() if actor is not None else None
-    patient_finding.save(
-        update_fields=["is_active", "deactivated_at", "deactivated_by"]
-    )
-    return {"success": True, "id": patient_finding_id}
-
-
-@api.post("/patient-findings/{patient_finding_id}/classifications/")
-def set_patient_finding_classifications(
-    request: BaseRequest,
-    patient_finding_id: int,
-    payload: PatientFindingClassificationsRequest,
-) -> Dict[str, Any]:
-    module_name = _findings_module_name()
-    patient_finding = (
-        _active_patient_findings_queryset().filter(id=patient_finding_id).first()
-    )
-    if not patient_finding:
-        _api_error(
-            404, "not-found", f"Patient finding '{patient_finding_id}' not found."
-        )
-    assert patient_finding is not None
-
-    with transaction.atomic():
-        finding_classification_model = _orm_models()["FindingClassification"]
-        finding_classification_choice_model = _orm_models()[
-            "FindingClassificationChoice"
-        ]
-        patient_finding_classification_model = _orm_models()[
-            "PatientFindingClassification"
-        ]
-        if payload.replace:
-            patient_finding.classifications.all().delete()
-        for entry in payload.classifications:
-            classification = finding_classification_model.objects.filter(
-                id=entry.classification
-            ).first()
-            if not classification:
-                _api_error(
-                    400,
-                    "invalid-choice",
-                    f"Classification id '{entry.classification}' does not exist.",
-                )
-            choice = finding_classification_choice_model.objects.filter(
-                id=entry.choice
-            ).first()
-            if not choice:
-                _api_error(
-                    400,
-                    "invalid-choice",
-                    f"Classification choice id '{entry.choice}' does not exist.",
-                )
-            assert classification is not None
-            assert choice is not None
-            _validate_classification_payload(
-                finding=patient_finding.finding,
-                classification=classification,
-                choice=choice,
-                module_name=module_name,
-            )
-            patient_finding_classification_model.objects.create(
-                finding=patient_finding,
-                classification=classification,
-                classification_choice=choice,
-                is_active=True,
-            )
-
-    return _serialize_patient_finding(patient_finding)
+register_findings_routes(
+    api,
+    load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
+    orm_models=lambda: _orm_models(),
+    api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
+)

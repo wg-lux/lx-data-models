@@ -43,6 +43,17 @@ community standards. Please be respectful and constructive in all interactions.
 - **Commits**: Keep commits focused. Use descriptive titles (optionally
   Conventional Commits). Reference issues/PRs when applicable.
 
+### Package Boundary Rules
+
+- Treat `lx-data-models` as a package consumed by sibling services.
+- Prefer imports from public package modules instead of deep leaf modules when
+  those exports exist.
+- Never import package tests, test fixtures, or example scripts from consumer
+  applications.
+- Example/demo outputs belong under `temp/generated_exports/`.
+- Tests must use `tmp_path` or dedicated fixture directories rather than
+  repository-root generated files.
+
 ## Pre-commit Hooks (optional but recommended)
 
 ```bash
@@ -103,6 +114,20 @@ local run guarantees that CI will agree.
    `testpypi`/`pypi` environments are approved. The workflow builds packages,
    uploads to TestPyPI, then PyPI for tagged releases—no API tokens required.
 6. Announce in the relevant channels and update documentation badges.
+
+Shortcut commands:
+
+```bash
+lx-dtypes-release prepare 0.1.2
+lx-dtypes-release build
+git tag v0.1.2 && git push origin v0.1.2
+```
+
+To provision a historical KB version for runtime lookup:
+
+```bash
+lx-dtypes-kb-registry add-current /path/to/kb_registry.json --module report_template_examples
+```
 
 ## Specific Guides
 ### Importer

@@ -10,6 +10,9 @@ from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
 from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
     ExaminationValidator,
 )
+from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
+    ClassificationValidator,
+)
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
     FindingsValidator,
 )
@@ -100,7 +103,40 @@ def test_findings_validator_query_supports_condition_shape() -> None:
     condition = fv.query.condition
     assert condition is not None
     assert condition.any[0].classification == "size_mm"
-    assert condition.then_requires == [{"classification": "lst"}]
+    assert len(condition.then_requires) == 1
+    assert condition.then_requires[0].kind == "classification"
+    assert condition.then_requires[0].classification == "lst"
+
+
+def test_classification_validator_query_supports_condition_shape() -> None:
+    validator = ClassificationValidator.model_validate(
+        {
+            "name": "polyp_size_category_when_mm_present",
+            "finding": "esophagus_polyp",
+            "classification": "size_cat",
+            "operator": "condition",
+            "precedence": "required",
+            "query": {
+                "finding": "esophagus_polyp",
+                "classification": "size_cat",
+                "operator": "condition",
+                "condition": {
+                    "all": [
+                        {
+                            "classification": "size_mm",
+                            "comparator": "gt",
+                            "value": 10,
+                        }
+                    ]
+                },
+            },
+        }
+    )
+
+    assert validator.query.finding == "esophagus_polyp"
+    assert validator.query.classification == "size_cat"
+    assert validator.query.operator == "condition"
+    assert validator.precedence == "required"
 
 
 def test_findings_validator_operator_asd_is_rejected() -> None:
@@ -301,6 +337,9 @@ def test_common_models_have_expected_defaults() -> None:
     assert finding_req.classifications == []
     assert validators.examination_validators == []
     assert validators.findings_validators == []
+    assert validators.classification_validators == []
+    assert validators.intervention_validators == []
+    assert validators.unit_validators == []
 
     section_field = ReportTemplateSectionField(key="patient_gender")
     assert section_field.required is False
