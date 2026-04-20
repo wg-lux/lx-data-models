@@ -81,6 +81,12 @@ from .intervention import (
     kb_intervention_lookup,
     kb_intervention_models,
 )
+from .report_template import (
+    KbReportTemplateLookupType,
+    kb_report_template_ddicts,
+    kb_report_template_lookup,
+    kb_report_template_models,
+)
 from .unit import (
     KbUnitDjangoLookupType,
     KbUnitLookupType,
@@ -103,6 +109,7 @@ class KnowledgeBaseModelsLookupType(
     KbUnitLookupType,
     KbInformationSourceLookupType,
     KbCitationLookupType,
+    KbReportTemplateLookupType,
 ):
     pass
 
@@ -118,6 +125,7 @@ knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
     **kb_unit_lookup,
     **kb_information_source_lookup,
     **kb_citation_lookup,
+    **kb_report_template_lookup,
 )
 
 
@@ -162,6 +170,7 @@ KB_MODELS = Union[
     kb_unit_models,
     kb_information_source_models,
     kb_citation_models,
+    kb_report_template_models,
 ]
 
 KB_MODELS_DJANGO = Union[
@@ -188,6 +197,7 @@ KB_DDICTS = Union[
     kb_unit_ddicts,
     kb_information_source_ddicts,
     kb_citation_ddicts,
+    kb_report_template_ddicts,
 ]
 
 KB_MODEL_NAMES_LITERAL = Literal[
@@ -208,6 +218,14 @@ KB_MODEL_NAMES_LITERAL = Literal[
     "Examination",
     "InformationSourceType",
     "InformationSource",
+    "ReportTemplateSection",
+    "ReportFinding",
+    "ClassificationValidator",
+    "InterventionValidator",
+    "UnitValidator",
+    "FindingsValidator",
+    "ExaminationValidator",
+    "ReportTemplate",
 ]
 
 KB_MODEL_NAMES_ORDERED: List[KB_MODEL_NAMES_LITERAL] = [
@@ -228,6 +246,14 @@ KB_MODEL_NAMES_ORDERED: List[KB_MODEL_NAMES_LITERAL] = [
     "Indication",
     "ExaminationType",
     "Examination",
+    "ReportTemplateSection",
+    "ReportFinding",
+    "ClassificationValidator",
+    "InterventionValidator",
+    "UnitValidator",
+    "FindingsValidator",
+    "ExaminationValidator",
+    "ReportTemplate",
 ]
 
 

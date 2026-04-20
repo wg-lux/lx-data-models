@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -28,7 +30,10 @@ if TYPE_CHECKING:
 
 
 class PatientDjango(PersonDjango, LedgerBaseModelDjango[PatientDataDict]):
-    center: models.ForeignKey["CenterDjango", "CenterDjango"] = models.ForeignKey(
+    if TYPE_CHECKING:
+        center: models.ForeignKey[CenterDjango, CenterDjango]
+
+    center = models.ForeignKey(
         "CenterDjango",
         related_name=FieldNames.PATIENTS.value,
         on_delete=models.CASCADE,

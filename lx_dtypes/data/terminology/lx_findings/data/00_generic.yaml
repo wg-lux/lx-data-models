@@ -26,3 +26,7 @@
     - endoscopy_hemoclip_generic
     - endoscopy_over_the_scope_clip_generic
   classifications: [] #TODO active bleeding? macroscopically in sano?
+  caused_by_interventions:
+    - endoscopy_cold_snare_resection_generic
+    - endoscopy_diathermic_snare_resection_generic
+    - endoscopy_biopsy_foreceps_resection_generic

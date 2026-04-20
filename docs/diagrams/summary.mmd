@@ -1,0 +1,46 @@
+flowchart TB
+
+  %% ---------- Terminology loading ----------
+  YAML["YAML terminology files"]
+
+  LOADER["DataLoader / KnowledgeBase loader"]
+  KB_PYD["KnowledgeBase Pydantic models"]
+  KB_STORE["KnowledgeBase in-memory store<br/>keyed by name<br/>flat references"]
+
+  YAML --> LOADER
+  LOADER --> KB_PYD
+  KB_PYD --> KB_STORE
+
+  %% ---------- DbInterface ----------
+  DBI["DbInterface<br/>holds KnowledgeBase and Ledger<br/>validation + orchestration"]
+
+  KB_STORE --> DBI
+
+  %% ---------- Patient data creation ----------
+  LEDGER_STORE["Ledger in-memory store<br/>keyed by uuid<br/>nested patient data"]
+
+  DBI --> LEDGER_STORE
+
+  PATIENT["Patient Pydantic"]
+  PEXAM["PExamination Pydantic"]
+  PFIND["PFinding Pydantic"]
+  PCLSOBJ["PFindingClassifications Pydantic"]
+  PCHOICE["PFindingClassificationChoice Pydantic"]
+  PDESC["Descriptor on choice<br/>planned / not implemented"]
+
+  DBI --> PATIENT
+  DBI --> PEXAM
+  DBI --> PFIND
+  DBI --> PCLSOBJ
+  DBI --> PCHOICE
+  DBI --> PDESC
+
+  PATIENT --> LEDGER_STORE
+  PEXAM --> LEDGER_STORE
+  PFIND --> LEDGER_STORE
+  PCLSOBJ --> LEDGER_STORE
+  PCHOICE --> LEDGER_STORE
+
+  %% ---------- Serialization ----------
+  LEDGER_DD["Ledger DataDict"]
+  LEDGER_STORE --> LEDGER_DD

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -25,19 +27,21 @@ from .DataDict import (
 
 
 class PFindingInterventionDjango(LedgerBaseModelDjango[PFindingInterventionDataDict]):
-    patient_finding_interventions: models.ForeignKey[
-        "PFindingInterventionsDjango", "PFindingInterventionsDjango"
-    ] = models.ForeignKey(
+    if TYPE_CHECKING:
+        patient_finding_interventions: models.ForeignKey[
+            PFindingInterventionsDjango, PFindingInterventionsDjango
+        ]
+        intervention: models.ForeignKey[InterventionDjango, InterventionDjango]  # type: ignore[misc]
+
+    patient_finding_interventions = models.ForeignKey(
         "PFindingInterventionsDjango",
         related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
         on_delete=models.CASCADE,
     )
-    intervention: models.ForeignKey["InterventionDjango", "InterventionDjango"] = (
-        models.ForeignKey(
-            "InterventionDjango",
-            related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
-            on_delete=models.CASCADE,
-        )
+    intervention = models.ForeignKey(  # type: ignore[misc]
+        "InterventionDjango",
+        related_name=FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
+        on_delete=models.CASCADE,
     )
 
     @classmethod

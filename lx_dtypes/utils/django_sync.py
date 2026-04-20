@@ -99,7 +99,9 @@ def sync_django_db_from_interface(db_interface: "DbInterface") -> None:
         )
 
         for model_name, model_instance in module_entries_sorted:
-            django_type = knowledge_base_models_django_lookup[model_name]
+            django_type = knowledge_base_models_django_lookup.get(model_name)
+            if django_type is None:
+                continue
             model_ddict = model_instance.ddict
             try:
                 django_type.sync_from_ddict(model_ddict)  # type: ignore

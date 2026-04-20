@@ -18,6 +18,10 @@ api/index
 
 guides/pydantic-cheatsheet
 guides/dates-and-times
+guides/knowledge-base-authoring
+guides/kb-yaml-linting
+guides/report-template-infrastructure
+guides/report-template-findings-validator-migration
 ```
 
 ## Quick Links

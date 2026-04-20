@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -37,6 +39,9 @@ if TYPE_CHECKING:
 class ClassificationChoiceDescriptorDjango(
     KnowledgebaseBaseModelDjango[ClassificationChoiceDescriptorDataDict]
 ):
+    if TYPE_CHECKING:
+        unit: models.ForeignKey[UnitDjango, UnitDjango]  # type: ignore[misc]
+
     classification_choice_descriptor_type: CharFieldType = models.CharField(
         max_length=32,
         choices=[
@@ -50,7 +55,7 @@ class ClassificationChoiceDescriptorDjango(
         choices=[(choice.value, choice.value) for choice in NumericDistributionChoices],
         default=NumericDistributionChoices.UNIFORM.value,
     )
-    unit: models.ForeignKey["UnitDjango", "UnitDjango"] = models.ForeignKey(
+    unit = models.ForeignKey(  # type: ignore[misc]
         "UnitDjango",
         related_name=FieldNames.CLASSIFICATION_CHOICE_DESCRIPTORS.value,
         on_delete=models.CASCADE,

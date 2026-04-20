@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -12,18 +14,18 @@ from .InformationSourceDataDict import (
 )
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.knowledge_base.information_source.InformationSourceTypeDjango import (
-        InformationSourceTypeDjango,
-    )
+    from .InformationSourceTypeDjango import InformationSourceTypeDjango
 
 
 class InformationSourceDjango(
     KnowledgebaseBaseModelDjango["InformationSourceDataDict"]
 ):
-    information_source_types: models.ManyToManyField[
-        "InformationSourceTypeDjango",
-        "InformationSourceTypeDjango",
-    ] = models.ManyToManyField(
+    if TYPE_CHECKING:
+        information_source_types: models.ManyToManyField[
+            InformationSourceTypeDjango, InformationSourceTypeDjango
+        ]
+
+    information_source_types = models.ManyToManyField(
         "InformationSourceTypeDjango",
         related_name=FieldNames.INFORMATION_SOURCES.value,
     )

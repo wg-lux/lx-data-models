@@ -49,6 +49,7 @@ FieldNames = Enum(
         "CLASSIFICATION": "classification",
         "CLASSIFICATIONS": "classifications",
         "CLASSIFICATION_TYPES": "classification_types",
+        "CAUSED_BY_INTERVENTIONS": "caused_by_interventions",
         "FINDING": "finding",
         "FINDINGS": "findings",
         "EXAMINATION_TYPES": "examination_types",
@@ -67,9 +68,10 @@ FieldNames = Enum(
         "UNIT_TYPES": "unit_types",
         "UNIT": "unit",
         "UNITS": "units",
-        #
         "PATIENT_FINDINGS": "patient_findings",
         "PATIENT_INDICATIONS": "patient_indications",
+        "PATIENT_INDICATION_CLASSIFICATIONS": "patient_indication_classifications",
+        "PATIENT_INDICATION_CLASSIFICATION_DESCRIPTORS": "patient_indication_classification_descriptors",
         "PATIENT_EXAMINATIONS": "patient_examinations",
         "PATIENT_FINDING_CLASSIFICATIONS": "patient_finding_classifications",
         "PATIENT_FINDING_CLASSIFICATION_CHOICES": "patient_finding_classification_choices",
@@ -77,6 +79,12 @@ FieldNames = Enum(
         "PATIENT_FINDING_INTERVENTIONS": "patient_finding_interventions",
         "PATIENT_FINDING_INTERVENTION": "patient_finding_intervention",
         "PATIENTS": "patients",
+        "PATIENT_VIDEO_FILE": "patient_video_file",
+        "PATIENT_VIDEO_SEGMENTS": "patient_video_segments",
+        "PATIENT_VIDEO_SEGMENT_STATE": "patient_video_segment_state",
+        "SENSITIVE_META": "sensitive_meta",
+        "SENSITIVE_META_STATE": "sensitive_meta_state",
+        "PSEUDO_EXAMINERS": "pseudo_examiners",
     },
 )
 
@@ -151,7 +159,25 @@ P_INDICATION_MODEL_M2M_FIELDS: List[str] = []
 P_INDICATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
     m2m_fields=P_INDICATION_MODEL_M2M_FIELDS
 )
-P_INDICATION_MODEL_NESTED_FIELDS: List[str] = []
+P_INDICATION_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_INDICATION_CLASSIFICATIONS.value,
+]
+
+P_INDICATION_CLASSIFICATION_MODEL_M2M_FIELDS: List[str] = []
+P_INDICATION_CLASSIFICATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=P_INDICATION_CLASSIFICATION_MODEL_M2M_FIELDS
+)
+P_INDICATION_CLASSIFICATION_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_INDICATION_CLASSIFICATION_DESCRIPTORS.value,
+]
+
+P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_M2M_FIELDS: List[str] = []
+P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS: List[str] = (
+    mk_lbm_list_type_fields(
+        m2m_fields=P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_M2M_FIELDS
+    )
+)
+P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_NESTED_FIELDS: List[str] = []
 
 P_FINDING_MODEL_M2M_FIELDS: List[str] = []
 P_FINDING_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
@@ -206,10 +232,63 @@ PATIENT_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
     m2m_fields=PATIENT_MODEL_M2M_FIELDS
 )
 PATIENT_MODEL_NESTED_FIELDS: List[str] = []
+
+PATIENT_FILE_MIXIN_M2M_FIELDS: List[str] = []
+PATIENT_FILE_MIXIN_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=PATIENT_FILE_MIXIN_M2M_FIELDS
+)
+PATIENT_FILE_MIXIN_NESTED_FIELDS: List[str] = []
+
+PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS: List[str] = [] + PATIENT_FILE_MIXIN_M2M_FIELDS
+PATIENT_VIDEO_FILE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS
+)
+PATIENT_VIDEO_FILE_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_VIDEO_SEGMENTS.value,
+] + PATIENT_FILE_MIXIN_NESTED_FIELDS
+
+PATIENT_VIDEO_SEGMENT_MODEL_M2M_FIELDS: List[str] = []
+PATIENT_VIDEO_SEGMENT_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=PATIENT_VIDEO_SEGMENT_MODEL_M2M_FIELDS
+)
+PATIENT_VIDEO_SEGMENT_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.PATIENT_VIDEO_SEGMENT_STATE.value,
+]
+
+PATIENT_VIDEO_SEGMENT_STATE_MODEL_M2M_FIELDS: List[str] = []
+PATIENT_VIDEO_SEGMENT_STATE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=PATIENT_VIDEO_SEGMENT_STATE_MODEL_M2M_FIELDS
+)
+PATIENT_VIDEO_SEGMENT_STATE_MODEL_NESTED_FIELDS: List[str] = []
+
+
+SENSITIVE_META_STATE_MODEL_M2M_FIELDS: List[str] = []
+SENSITIVE_META_STATE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=SENSITIVE_META_STATE_MODEL_M2M_FIELDS
+)
+SENSITIVE_META_STATE_MODEL_NESTED_FIELDS: List[str] = []
+# RAW_PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS: List[str] = [] + PATIENT_FILE_MIXIN_M2M_FIELDS
+# RAW_PATIENT_VIDEO_FILE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+#     m2m_fields=RAW_PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS
+# )
+# RAW_PATIENT_VIDEO_FILE_MODEL_NESTED_FIELDS: List[str] = (
+#     [] + PATIENT_FILE_MIXIN_NESTED_FIELDS
+# )
+
+SENSITIVE_META_MODEL_M2M_FIELDS: List[str] = [
+    FieldNames.PSEUDO_EXAMINERS.value,  # TODO Will cause an issue; need to modify lookups to handle PSEUDO_EXAMINERS -> Examiner model mapping
+]
+SENSITIVE_META_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+    m2m_fields=SENSITIVE_META_MODEL_M2M_FIELDS
+)
+SENSITIVE_META_MODEL_NESTED_FIELDS: List[str] = [
+    FieldNames.SENSITIVE_META_STATE.value,
+]
+
 ## KNOWLEDGE BASE MODELS LIST TYPE FIELDS
 CITATION_MODEL_M2M_FIELDS: List[str] = []
 CITATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
-    ["keywords", "authors"], m2m_fields=CITATION_MODEL_M2M_FIELDS
+    ["keywords"], m2m_fields=CITATION_MODEL_M2M_FIELDS
 )
 CLASSIFICATION_TYPE_M2M_FIELDS: List[str] = []
 CLASSIFICATION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
@@ -245,6 +324,7 @@ FINDING_M2M_FIELDS: List[str] = [
     FieldNames.FINDING_TYPES.value,
     FieldNames.CLASSIFICATIONS.value,
     FieldNames.INTERVENTIONS.value,
+    FieldNames.CAUSED_BY_INTERVENTIONS.value,
 ]
 FINDING_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(m2m_fields=FINDING_M2M_FIELDS)
 
@@ -270,6 +350,7 @@ EXAMINATION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
 
 INDICATION_M2M_FIELDS: List[str] = [
     FieldNames.INDICATION_TYPES.value,
+    FieldNames.CLASSIFICATIONS.value,
     FieldNames.INTERVENTIONS.value,
 ]
 INDICATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(

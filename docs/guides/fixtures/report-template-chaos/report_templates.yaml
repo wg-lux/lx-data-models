@@ -1,0 +1,94 @@
+- model: report_template_section
+  name: upper-gi-esophagus
+  position: 0
+  types:
+    - baseline
+  findings:
+    - finding: polyp
+      required: true
+      multiple_allowed: false
+      classifications:
+        - classification: size_mm
+          required: true
+    - finding: inline_inconsistent_finding
+      required: false
+      multiple_allowed: true
+      classifications: []
+
+- model: report_template_section
+  name: follow_up_section
+  position: 1
+  types: []
+  findings:
+    # Mixed style on purpose: string reference + inline object.
+    - normal_finding
+    - finding: normal_finding
+      required: false
+      multiple_allowed: false
+      classifications: []
+
+- model: report_finding
+  name: normal_finding
+  finding: generic_finding
+  required: false
+  multiple_allowed: false
+  classifications: []
+
+# Collision: duplicate report_finding name in the same module.
+- model: report_finding
+  name: normal_finding
+  finding: generic_finding_duplicate
+  required: false
+  multiple_allowed: false
+  classifications: []
+
+# Alias form (finding_validator -> findings_validator)
+- model: finding_validator
+  name: alias_validator_a
+  finding: polyp
+  operator: exists
+  query:
+    finding: polyp
+    operator: exists
+
+# Canonical form
+- model: findings_validator
+  name: alias_validator_b
+  finding: polyp
+  operator: exists
+  query:
+    finding: polyp
+    operator: exists
+
+- model: examination_validator
+  name: loop_validator_a
+  finding_validators:
+    - alias_validator_a
+  examination_validators:
+    - loop_validator_b
+
+- model: examination_validator
+  name: loop_validator_b
+  finding_validators:
+    - alias_validator_b
+  examination_validators:
+    - loop_validator_a
+
+- model: report_template
+  name: chaos_upper_gi_template
+  examination: star_upper_gi_endoscopy
+  report_sections:
+    # Silent string mismatch: underscore vs hyphen.
+    - upper_gi_esophagus
+    - follow_up_section
+    # Dangling section reference.
+    - missing_section_reference
+  validators:
+    examination_validators:
+      - loop_validator_a
+      # Dangling examination validator reference.
+      - missing_exam_validator
+    findings_validators:
+      - alias_validator_a
+      # Dangling findings validator reference.
+      - missing_findings_validator

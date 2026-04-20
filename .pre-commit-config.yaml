@@ -10,13 +10,24 @@ repos:
         pass_filenames: false
   - repo: local
     hooks:
-      - id: mypy
-        name: mypy type check
-        entry: mypy lx_dtypes
+      - id: kb-yaml-lint
+        name: knowledge base yaml lint
+        entry: .devenv/state/venv/bin/python lx_dtypes/scripts/lint_kb_yaml.py
         language: system
         pass_filenames: false
-      - id: pytest
+      - id: mypy
+        name: mypy type check
+        entry: .devenv/state/venv/bin/mypy --config-file pyproject.toml
+        language: system
+        types: [python]
+      - id: pytest-suite
         name: pytest suite
-        entry: pytest
+        entry: .devenv/state/venv/bin/pytest
+        language: system
+        pass_filenames: false
+        stages: [manual]
+      - id: findings-validator-operator-guard
+        name: findings validator operator guard
+        entry: .devenv/state/venv/bin/pytest -q lx_dtypes/models/interface/tests/test_findings_validator_operator_guard.py
         language: system
         pass_filenames: false

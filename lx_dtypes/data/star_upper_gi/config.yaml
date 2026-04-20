@@ -1,17 +1,21 @@
 name: star_upper_gi
 description: |
-  Data types for recording findings, classifications, and interventions during upper gastrointestinal (GI) endoscopy procedures.
-  Based on the ESGE STAR Upper GI qualitiy improvement initiative (Esposito et al 2025, doi.org/10.1055/a-2652-8941).
-version: 0.1.0
+  Data types for recording findings, classifications, 
+  and interventions during upper gastrointestinal (GI)
+  endoscopy procedures.
+  Based on the ESGE STAR Upper GI qualitiy improvement initiative 
+  (Esposito et al 2025, doi.org/10.1055/a-2652-8941).
+version: 0.1.1
+depends_on:
+  - lx_classification_choices
 modules:
-  - lx_units
+  - lx_units # Externalized module to re-use
 
 data:
   files:
-    - "./main.yaml"
-  dirs:
+    - "./main.yaml" # Contains the data fixture for gastroscopy
+  dirs: # Subdirectories containing .yaml files for findings, classifications, etc.
     - "./star_u_gi_descriptors/"
     - "./star_u_gi_choices/"
     - "./star_u_gi_classifications/"
     - "./star_u_gi_findings/"
-    # - "./star_u_gi_interventions/"

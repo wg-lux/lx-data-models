@@ -12,7 +12,7 @@ classifiers = [
 dependencies = [
   "bibtexparser>=1.4.0",
   "django>=6.0",
-  "django-ninja>=1.5.1",
+  "django-ninja>=1.5.3",
   "django-stubs[compatible-mypy]>=5.2.8",
   "django-stubs-ext>=5.2.8",
   "icecream>=2.1.4",
@@ -45,7 +45,7 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.1.1"
+version = "0.1.3"
 
 [project.optional-dependencies]
 dev = [
@@ -79,11 +79,19 @@ docs = [
   "furo>=2025.9.25",
 ]
 
+[project.scripts]
+ok = "lx_dtypes.scripts.lint_kb_yaml:main"
+lx-dtypes-kb-registry = "lx_dtypes.scripts.kb_registry:main"
+lx-dtypes-prototype-kb-smoke = "lx_dtypes.scripts.prototype_kb_smoke:main"
+lx-dtypes-release = "lx_dtypes.scripts.release:main"
+
 [project.urls]
 Homepage = "https://info.coloreg.de"
 Repository = "https://github.com/wg-lux/lx-data-models"
 
 [tool.pyright]
+extraPaths = ["lx_dtypes"]
+stubPath = "typings"
 # These settings help fix the "Unknown" errors specifically
 # reportMissingTypeStubs = false
 # reportUnknownMemberType = false
@@ -97,21 +105,23 @@ exclude = [
 useLibraryCodeForTypes = true
 
 [tool.mypy]
-exclude = '^(\.venv|venv|env)/'
-# mypy_path = "."
+exclude = '^(typings/|\.venv/|venv/|env/)'
+mypy_path = ["typings"]
 plugins = ["pandera.mypy", "mypy_django_plugin.main"]
 strict = true
 warn_unused_ignores = false
+
+[[tool.mypy.overrides]]
+module = ["cv2", "cv2.*"]
+ignore_errors = true
 
 [tool.django-stubs]
 django_settings_module = "lx_dtypes.django_settings"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "lx_dtypes.django_settings"
+DJANGO_SETTINGS_MODULE = "lx_dtypes.django_settings_ci_test"
 addopts = """
-    -n auto
-    --dist=loadscope
-    --cov=lx_dtypes
+    --ds=lx_dtypes.django_settings_ci_test
     --cov-report=xml
     --cov-fail-under=70
 """
@@ -129,13 +139,22 @@ target-version = ["py312"]
 
 [tool.hatch.build]
 exclude = [
+  ".devenv",
+  ".devenv/**",
+  ".direnv",
+  ".direnv/**",
+  "result",
+  "result/**",
   "tests",
   "tests/**",
 ]
 
 [tool.hatch.build.targets.wheel]
-force-include = {"lx_dtypes/py.typed" = "lx_dtypes/py.typed"}
 packages = ["lx_dtypes"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"lx_dtypes/py.typed" = "lx_dtypes/py.typed"
+"lx_kb_lint.py" = "lx_kb_lint.py"
 
 [build-system]
 build-backend = "hatchling.build"
@@ -143,16 +162,26 @@ requires = ["hatchling"]
 
 [tool.hatch.build.targets.sdist]
 exclude = [
+  ".devenv",
+  ".devenv/**",
+  ".direnv",
+  ".direnv/**",
   "tests",
   "tests/**",
   "docs/production",
   "docs/production/**",
   "htmlcov",
   "htmlcov/**",
+  "result",
+  "result/**",
   "storage",
   "storage/**",
 ]
-force-include = {"lx_dtypes/py.typed" = "lx_dtypes/py.typed"}
+
+[tool.hatch.build.targets.sdist.force-include]
+"lx_dtypes/data" = "lx_dtypes/data"
+"lx_dtypes/py.typed" = "lx_dtypes/py.typed"
+"lx_kb_lint.py" = "lx_kb_lint.py"
 
 # 🟢 HATCH ENVIRONMENTS (Bonus)
 # # You can define your test environment here instead of using tox

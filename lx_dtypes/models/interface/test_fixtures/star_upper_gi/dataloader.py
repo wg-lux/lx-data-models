@@ -6,9 +6,7 @@ from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 
-YAML_REPOSITORY_DIRS = [
-    Path("./lx_dtypes/data/"),
-]
+YAML_REPOSITORY_DIRS = [Path(__file__).resolve().parents[4] / "data"]
 
 
 @fixture(scope="session")

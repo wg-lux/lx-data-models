@@ -33,7 +33,6 @@
     - baseline
   classifications: []
   interventions: []
-
 - model: finding
   name: "gastroscopy_antrum_mucosa"
   name_de: "Antrum-Schleimhaut"

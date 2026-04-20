@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -17,18 +19,14 @@ if TYPE_CHECKING:
 
 
 class InterventionDjango(KnowledgebaseBaseModelDjango[InterventionDataDict]):
-    intervention_types: models.ManyToManyField[
-        "InterventionTypeDjango", "InterventionTypeDjango"
-    ] = models.ManyToManyField(
+    if TYPE_CHECKING:
+        intervention_types: models.ManyToManyField[
+            InterventionTypeDjango, InterventionTypeDjango
+        ]
+
+    intervention_types = models.ManyToManyField(
         "InterventionTypeDjango", related_name=FieldNames.INTERVENTIONS.value
     )
-
-    if TYPE_CHECKING:
-        from lx_dtypes.models.knowledge_base.indication.IndicationDjango import (
-            IndicationDjango,
-        )
-
-        indications: models.QuerySet["IndicationDjango"]
 
     @property
     def ddict_class(self) -> type[InterventionDataDict]:

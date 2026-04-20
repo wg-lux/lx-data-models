@@ -14,6 +14,9 @@ class Finding(KnowledgebaseBaseModel[FindingDataDict]):
     finding_types: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
     classifications: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
     interventions: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
+    caused_by_interventions: Union[str, List[str]] = Field(
+        default_factory=list_of_str_factory
+    )
 
     @classmethod
     def list_type_fields(cls) -> List[str]:

@@ -1,0 +1,22 @@
+flowchart TB
+
+  ABD["AppBaseModelDataDict<br/>(TypedDict)"]
+  UUIDD["AppBaseModelUUIDTagsDataDict<br/>+ uuid: str<br/>+ tags: List[str]"]
+  NAMESD["AppBaseModelNamesUUIDTagsDataDict<br/>+ name + translations + description"]
+
+  KBDD["KnowledgebaseBaseModelDataDict<br/>+ kb_module_name"]
+  LDDD["LedgerBaseModelDataDict<br/>+ external_ids: Dict[str,str]"]
+
+  ABD --> UUIDD
+  UUIDD --> NAMESD
+  NAMESD --> KBDD
+  UUIDD --> LDDD
+
+  %% Examples
+  EXDD["ExaminationDataDict<br/>+ findings: List[str] ..."]
+  PATDD["PatientDataDict<br/>LedgerBaseModelDataDict + PersonDataDict"]
+  PEXDD["PExaminationDataDict<br/>nested PFindingDataDict etc"]
+
+  KBDD --> EXDD
+  LDDD --> PATDD
+  LDDD --> PEXDD

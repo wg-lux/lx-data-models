@@ -5,6 +5,9 @@ from ..DbInterface import DbInterface
 from ..KnowledgeBase import KnowledgeBase
 from ..KnowledgeBaseConfig import KnowledgeBaseConfig
 from ..Ledger import Ledger
+from .dataloader import *  # noqa: F401,F403
+from .names import *  # noqa: F401,F403
+from .paths import *  # noqa: F401,F403
 
 
 @pytest.fixture(scope="session")

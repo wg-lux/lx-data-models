@@ -1,0 +1,5 @@
+- model: intervention
+  name: "star_upper_gi_biopsy_performed"
+  classifications:
+    - star_upper_gi_location_classification
+    - count

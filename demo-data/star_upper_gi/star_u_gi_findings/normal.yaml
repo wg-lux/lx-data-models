@@ -1,0 +1,57 @@
+# Esophagus
+- model: finding
+  name: star_upper_gi_mucosa_esophagus_abnormal
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_location_esophagogastric_junction
+  classifications:
+    - distance_cm
+
+- model: finding
+  name: star_upper_gi_location_hiatus
+  classifications:
+    - distance_cm
+
+- model: finding
+  name: star_upper_gi_location_squamocolumnar_junction
+  classifications:
+    - distance_cm
+
+- model: finding
+  name: star_upper_gi_imaging_modality_esophagus
+  classifications:
+    - upper_gi_esophagus_imaging_modality_classification
+
+# Stomach
+- model: finding
+  name: star_upper_gi_mucosa_stomach_abnormal
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_chromoendoscopy_stomach
+  classifications:
+    - yes_no_unknown_classification
+
+# Duodenum
+- model: finding
+  name: star_upper_gi_mucosa_duodenum_abnormal
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_vili_duodenum_atrophic
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_papilla_major_visualized
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_papilla_minor_visualized
+  classifications:
+    - yes_no_unknown_classification

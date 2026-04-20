@@ -1,0 +1,11 @@
+name: report_template_examples
+version: 0.1.0
+modules: []
+depends_on:
+  - example_terminology
+
+data:
+  files:
+    - "./report_templates.yaml"
+  dirs:
+    - "./generated_templates"

@@ -1,0 +1,28 @@
+flowchart TD
+
+    %% Knowledge Base side
+    KB[Knowledge Base]
+    CL[Classification]
+    CC[Classification Choice]
+    D[Descriptor Definition]
+
+    KB --> CL
+    CL --> CC
+    CC --> D
+
+    %% Descriptor types
+    D --> DN[Numeric Descriptor]
+    D --> DB[Boolean Descriptor]
+    D --> DS[Selection Descriptor]
+    D --> DT[Text Descriptor]
+
+    %% Patient side
+    PF[Patient Finding]
+    PCC[Patient Classification Choice]
+    PDV[Patient Descriptor Value]
+
+    PF --> PCC
+    PCC --> PDV
+
+    %% Reference link
+    D -.defines rules for.-> PDV

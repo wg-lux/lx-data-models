@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -12,33 +13,39 @@ from .FindingDataDict import (
 )
 
 if TYPE_CHECKING:
-    from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import (
-        ClassificationDjango,
+    from lx_dtypes.models.knowledge_base.classification import ClassificationDjango
+    from lx_dtypes.models.knowledge_base.finding._FindingTypeDjango import (
+        FindingTypeDjango,
     )
     from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
         InterventionDjango,
     )
 
-    from ._FindingTypeDjango import (
-        FindingTypeDjango,
-    )
-
 
 class FindingDjango(KnowledgebaseBaseModelDjango[FindingDataDict]):
-    interventions: models.ManyToManyField[
-        "InterventionDjango", "InterventionDjango"
-    ] = models.ManyToManyField(
+    if TYPE_CHECKING:
+        interventions: models.ManyToManyField[InterventionDjango, InterventionDjango]
+        caused_by_interventions: models.ManyToManyField[
+            InterventionDjango, InterventionDjango
+        ]
+        finding_types: models.ManyToManyField[FindingTypeDjango, FindingTypeDjango]
+        classifications: models.ManyToManyField[
+            ClassificationDjango, ClassificationDjango
+        ]
+
+    interventions = models.ManyToManyField(
         "InterventionDjango",
         related_name=FieldNames.FINDINGS.value,
     )
-    finding_types: models.ManyToManyField["FindingTypeDjango", "FindingTypeDjango"] = (
-        models.ManyToManyField(
-            "FindingTypeDjango", related_name=FieldNames.FINDINGS.value
-        )
+    caused_by_interventions = models.ManyToManyField(
+        "InterventionDjango",
+        related_name="caused_by_findings",
+        blank=True,
     )
-    classifications: models.ManyToManyField[
-        "ClassificationDjango", "ClassificationDjango"
-    ] = models.ManyToManyField(
+    finding_types = models.ManyToManyField(
+        "FindingTypeDjango", related_name=FieldNames.FINDINGS.value
+    )
+    classifications = models.ManyToManyField(
         "ClassificationDjango",
         related_name=FieldNames.FINDINGS.value,
     )

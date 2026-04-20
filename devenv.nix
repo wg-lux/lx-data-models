@@ -14,11 +14,7 @@ let
   buildInputs = with pkgs; [
     python312
     stdenv.cc.cc
-    tesseract
-    glib
     openssh
-    cmake
-    gcc
     pkg-config
     protobuf
     libglvnd
@@ -36,7 +32,7 @@ let
 
   _module.args.buildInputs = baseBuildInputs;
 
-  SYNC_CMD = "uv sync --extra dev --extra docs";
+  SYNC_CMD = "uv sync --extra dev --extra docs --frozen --python .devenv/state/venv";  
   DJANGO_APP_NAME = "lx_dtypes.django";
   DJANGO_APP_LABEL = "lx_dtypes_django";
   DJANGO_APP_DIR = "./lx_dtypes/contrib/${DJANGO_APP_NAME}";
@@ -48,13 +44,28 @@ in
   dotenv.enable = true;
   dotenv.disableHint = true;
 
-  packages = runtimePackages ++ buildInputs;
-
+  packages = lib.unique (runtimePackages ++ buildInputs);
+  outputs =
+    lib.optionalAttrs (inputs ? pyproject-nix) (
+      let
+        python_package = pkgs.callPackage ./python-package.nix { };
+        kb_package = pkgs.callPackage ./package.nix { };
+        app_package = pkgs.callPackage ./app-package.nix {
+          inherit kb_package python_package;
+        };
+      in
+      {
+        python = python_package;
+        kb = kb_package;
+        app = app_package;
+      }
+    );
   env = {
     # include runtimePackages as well so runtime native libs (e.g. zlib) are on LD_LIBRARY_PATH
     LD_LIBRARY_PATH =
       lib.makeLibraryPath (buildInputs ++ runtimePackages)
       + ":/run/opengl-driver/lib:/run/opengl-driver-32/lib";
+    LX_DTYPES_EDITOR_KB_REGISTRY = "../lx-terminology-editor/.published/kb_registry.json";
   };
 
   languages.python = {
@@ -130,6 +141,7 @@ in
   enterShell = ''
 
     export SYNC_CMD="${SYNC_CMD}"
+    source .devenv/state/venv/bin/activate
 
     # Ensure dependencies are synced using uv
     # Check if venv exists. If not, run sync verbosely. If it exists, sync quietly.
@@ -153,6 +165,26 @@ in
     fi
 
     env-setup
+
+    use_editor_kb() {
+      export LX_DTYPES_KB_REGISTRY="$LX_DTYPES_EDITOR_KB_REGISTRY"
+      echo "Using editor-published KB registry: $LX_DTYPES_KB_REGISTRY"
+    }
+
+    use_packaged_kb() {
+      unset LX_DTYPES_KB_REGISTRY
+      echo "Using packaged/default KB resolution."
+    }
+
+    show_kb_mode() {
+      if [ -n "$LX_DTYPES_KB_REGISTRY" ]; then
+        echo "KB mode: registry"
+        echo "LX_DTYPES_KB_REGISTRY=$LX_DTYPES_KB_REGISTRY"
+      else
+        echo "KB mode: packaged/default"
+      fi
+      echo "LX_DTYPES_EDITOR_KB_REGISTRY=$LX_DTYPES_EDITOR_KB_REGISTRY"
+    }
   '';
 
   enterTest = ''

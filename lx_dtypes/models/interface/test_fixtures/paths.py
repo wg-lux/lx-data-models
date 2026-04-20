@@ -2,9 +2,10 @@ from pathlib import Path
 
 from pytest import fixture
 
-LOG_DIR = Path("./lx_dtypes/data/logs/")
+DATA_ROOT = Path(__file__).resolve().parents[3] / "data"
+LOG_DIR = DATA_ROOT / "logs"
 YAML_REPOSITORY_DIRS = [
-    Path("./lx_dtypes/data/"),
+    DATA_ROOT,
 ]
 
 SAMPLE_KNOWLEDGE_BASE_NAME = "lx_knowledge_base"
@@ -28,7 +29,7 @@ def sample_information_source_yaml_filepath() -> Path:
     Returns:
         Path: Path to "./lx_dtypes/data/information_source_data/data/unknown.yaml".
     """
-    return Path("./lx_dtypes/data/information_source_data/data/unknown.yaml")
+    return DATA_ROOT / "information_source_data" / "data" / "unknown.yaml"
 
 
 @fixture(scope="session")
@@ -39,7 +40,7 @@ def sample_citations_yaml_filepath() -> Path:
     Returns:
         Path: Path pointing to "./lx_dtypes/data/citations/data/sample_references.yaml"
     """
-    return Path("./lx_dtypes/data/citations/data/sample_references.yaml")
+    return DATA_ROOT / "citations" / "data" / "sample_references.yaml"
 
 
 @fixture(scope="session")
@@ -50,7 +51,7 @@ def sample_examinations_yaml_filepath() -> Path:
     Returns:
         Path to the colonoscopy sample examinations YAML file.
     """
-    return Path("./lx_dtypes/data/terminology/lx_examinations/data/colonoscopy.yaml")
+    return DATA_ROOT / "terminology" / "lx_examinations" / "data" / "colonoscopy.yaml"
 
 
 @fixture(scope="session")
@@ -62,8 +63,12 @@ def sample_examination_types_yaml_filepath() -> Path:
         Path: Path to the sample examination types YAML file at
         "./lx_dtypes/data/terminology/lx_examinations/data/examination_types.yaml".
     """
-    return Path(
-        "./lx_dtypes/data/terminology/lx_examinations/data/examination_types.yaml"
+    return (
+        DATA_ROOT
+        / "terminology"
+        / "lx_examinations"
+        / "data"
+        / "examination_types.yaml"
     )
 
 
@@ -75,8 +80,12 @@ def sample_indications_yaml_filepath() -> Path:
     Returns:
         Path: Filesystem path to "lx_dtypes/data/terminology/lx_indications/data/colonoscopy_indications.yaml".
     """
-    return Path(
-        "./lx_dtypes/data/terminology/lx_indications/data/colonoscopy_indications.yaml"
+    return (
+        DATA_ROOT
+        / "terminology"
+        / "lx_indications"
+        / "data"
+        / "colonoscopy_indications.yaml"
     )
 
 
@@ -88,8 +97,12 @@ def sample_interventions_yaml_filepath() -> Path:
     Returns:
         Path: Path to the sample interventions YAML file at "./lx_dtypes/data/terminology/lx_interventions/data/00_generic_endoscopy_ablation.yaml"
     """
-    return Path(
-        "./lx_dtypes/data/terminology/lx_interventions/data/00_generic_endoscopy_ablation.yaml"
+    return (
+        DATA_ROOT
+        / "terminology"
+        / "lx_interventions"
+        / "data"
+        / "00_generic_endoscopy_ablation.yaml"
     )
 
 
@@ -101,8 +114,12 @@ def sample_findings_yaml_filepath() -> Path:
     Returns:
         Path: Path to "./lx_dtypes/data/terminology/lx_findings/data/02_colonoscopy_observation.yaml".
     """
-    return Path(
-        "./lx_dtypes/data/terminology/lx_findings/data/02_colonoscopy_observation.yaml"
+    return (
+        DATA_ROOT
+        / "terminology"
+        / "lx_findings"
+        / "data"
+        / "02_colonoscopy_observation.yaml"
     )
 
 
@@ -114,8 +131,12 @@ def sample_classifications_yaml_filepath() -> Path:
     Returns:
         filepath (Path): Path to "./lx_dtypes/data/terminology/lx_classifications/data/02_colonoscopy_polyp.yaml".
     """
-    return Path(
-        "./lx_dtypes/data/terminology/lx_classifications/data/02_colonoscopy_polyp.yaml"
+    return (
+        DATA_ROOT
+        / "terminology"
+        / "lx_classifications"
+        / "data"
+        / "02_colonoscopy_polyp.yaml"
     )
 
 

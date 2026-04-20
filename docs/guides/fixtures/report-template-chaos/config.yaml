@@ -1,0 +1,11 @@
+name: report_template_chaos
+version: 0.0.1
+modules: []
+
+# Intentionally incomplete for dependency-depth auditing.
+depends_on:
+  - sample_knowledge_base
+
+data:
+  files:
+    - "./report_templates.yaml"

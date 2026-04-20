@@ -43,10 +43,13 @@ class FilesAndDirsModel(PathMixin, AppBaseModel):
         all_files += [file for file in self.files]
 
         for directory in self.dirs:
+            if not directory.exists():
+                continue
             all_files += get_files_from_dir_recursive(directory)
 
         if self.dir:
-            all_files += get_files_from_dir_recursive(self.dir)
+            if self.dir.exists():
+                all_files += get_files_from_dir_recursive(self.dir)
 
         filtered_files = [file for file in all_files if file.suffix == suffix]
 

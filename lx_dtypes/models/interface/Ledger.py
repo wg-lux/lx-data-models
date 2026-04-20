@@ -29,9 +29,21 @@ from lx_dtypes.models.ledger.p_finding_classifications.DataDict import (
     SerializedPFindingClassificationsDataDict,
 )
 from lx_dtypes.models.ledger.p_indication.DataDict import PIndicationDataDict
+from lx_dtypes.models.ledger.p_indication_classification.DataDict import (
+    SerializedPIndicationClassificationDataDict,
+)
+from lx_dtypes.models.ledger.p_indication_classification_descriptor.DataDict import (
+    PIndicationClassificationDescriptorDataDict,
+)
 from lx_dtypes.models.ledger.p_intervention.DataDict import PFindingInterventionDataDict
 from lx_dtypes.models.ledger.p_interventions.DataDict import (
     SerializedPFindingInterventionsDataDict,
+)
+from lx_dtypes.models.ledger.p_video import (
+    PatientVideoFile,
+    PatientVideoFileDataDict,
+    # RawPatientVideoFileDataDict,
+    # RawVideoFile,
 )
 from lx_dtypes.models.ledger.patient import Patient, PatientDataDict
 
@@ -43,6 +55,10 @@ class LedgerRecordList(TypedDict):
     examiners: List[ExaminerDataDict]
     p_findings: List[SerializedPFindingDataDict]
     p_indications: List[PIndicationDataDict]
+    p_indication_classifications: List[SerializedPIndicationClassificationDataDict]
+    p_indication_classification_descriptors: List[
+        PIndicationClassificationDescriptorDataDict
+    ]
     p_finding_classifications: List[SerializedPFindingClassificationsDataDict]
     p_finding_classification_choices: List[
         SerializedPFindingClassificationChoiceDataDict
@@ -52,12 +68,16 @@ class LedgerRecordList(TypedDict):
     ]
     p_finding_interventions: List[SerializedPFindingInterventionsDataDict]
     p_finding_intervention: List[PFindingInterventionDataDict]
+    p_videos: List[PatientVideoFileDataDict]
+    # p_raw_videos: List[RawPatientVideoFileDataDict]
 
 
 class LedgerDataDict(AppBaseModelUUIDTagsDataDict):
     patient_examinations: Dict[str, PExaminationDataDict]
     patients: Dict[str, PatientDataDict]
     centers: Dict[str, CenterDataDict]
+    patient_videos: Dict[str, PatientVideoFileDataDict]
+    # raw_patient_videos: Dict[str, RawPatientVideoFileDataDict]
 
 
 class Ledger(AppBaseModelUUIDTags):
@@ -65,6 +85,12 @@ class Ledger(AppBaseModelUUIDTags):
     patients: Dict[str, Patient] = Field(default_factory=dict)
     centers: Dict[str, Center] = Field(default_factory=dict)
     examiners: Dict[str, Examiner] = Field(default_factory=dict)
+    patient_videos: Dict[str, PatientVideoFile] = Field(default_factory=dict)
+    # raw_patient_videos: Dict[str, RawVideoFile] = Field(default_factory=dict)
+    # patient_images: Dict[str, PFile] = Field(default_factory=dict)
+    # patient_pdfs: Dict[str, PFile] = Field(default_factory=dict)
+    # video_segment_annotations
+    # image_annotations
 
     def patient_exists(self, patient_uuid: str) -> bool:
         """
@@ -90,6 +116,8 @@ class Ledger(AppBaseModelUUIDTags):
         List[SerializedPExaminationDataDict],
         List[SerializedPFindingDataDict],
         List[PIndicationDataDict],
+        List[SerializedPIndicationClassificationDataDict],
+        List[PIndicationClassificationDescriptorDataDict],
         List[SerializedPFindingClassificationsDataDict],
         List[SerializedPFindingClassificationChoiceDataDict],
         List[PFindingClassificationChoiceDescriptorDataDict],
@@ -113,6 +141,12 @@ class Ledger(AppBaseModelUUIDTags):
         p_examination_dicts: List[SerializedPExaminationDataDict] = []
         p_finding_dicts: List[SerializedPFindingDataDict] = []
         p_indication_dicts: List[PIndicationDataDict] = []
+        p_indication_classification_dicts: List[
+            SerializedPIndicationClassificationDataDict
+        ] = []
+        p_indication_classification_descriptor_dicts: List[
+            PIndicationClassificationDescriptorDataDict
+        ] = []
         p_finding_classifications_dicts: List[
             SerializedPFindingClassificationsDataDict
         ] = []
@@ -134,6 +168,16 @@ class Ledger(AppBaseModelUUIDTags):
             # 2. Export PIndication
             for p_indication in p_examination.patient_indications:
                 p_indication_dicts.append(p_indication.serialized_ddict)
+                for (
+                    p_indication_classification
+                ) in p_indication.patient_indication_classifications:
+                    p_indication_classification_dicts.append(
+                        p_indication_classification.serialized_ddict
+                    )
+                    for p_indication_classification_descriptor in p_indication_classification.patient_indication_classification_descriptors:
+                        p_indication_classification_descriptor_dicts.append(
+                            p_indication_classification_descriptor.ddict
+                        )
 
             # 3. Export PFinding and nested classifications
             for p_finding in p_examination.patient_findings:
@@ -178,6 +222,8 @@ class Ledger(AppBaseModelUUIDTags):
             p_examination_dicts,
             p_finding_dicts,
             p_indication_dicts,
+            p_indication_classification_dicts,
+            p_indication_classification_descriptor_dicts,
             p_finding_classifications_dicts,
             p_finding_classification_choice_dicts,
             p_finding_classification_choice_descriptor_dicts,
@@ -204,6 +250,8 @@ class Ledger(AppBaseModelUUIDTags):
                 - p_finding_classification_choice_descriptors: List of classification choice descriptor data dicts.
                 - p_finding_interventions: List of serialized finding interventions data dicts.
                 - p_finding_intervention: List of individual finding intervention data dicts.
+                - patient_video_file_dicts (List[PatientVideoFileDataDict]): Serialized patient video file records.
+                - raw_patient_video_file_dicts (List[RawPatientVideoFileDataDict]): Serialized raw patient video file records.
         """
         patient_dicts: List[PatientDataDict] = [
             r.serialized_ddict for r in self.patients.values()
@@ -215,10 +263,15 @@ class Ledger(AppBaseModelUUIDTags):
             r.serialized_ddict for r in self.centers.values()
         ]
 
+        video_dicts = [r.serialized_ddict for r in self.patient_videos.values()]
+        # raw_video_dicts = [r.serialized_ddict for r in self.raw_patient_videos.values()]
+
         (
             p_examination_dicts,
             p_finding_dicts,
             p_indication_dicts,
+            p_indication_classification_dicts,
+            p_indication_classification_descriptor_dicts,
             p_finding_classifications_dicts,
             p_finding_classification_choice_dicts,
             p_finding_classification_choice_descriptor_dicts,
@@ -233,10 +286,16 @@ class Ledger(AppBaseModelUUIDTags):
             examiners=examiner_dicts,
             p_findings=p_finding_dicts,
             p_indications=p_indication_dicts,
+            p_indication_classifications=p_indication_classification_dicts,
+            p_indication_classification_descriptors=(
+                p_indication_classification_descriptor_dicts
+            ),
             p_finding_classifications=p_finding_classifications_dicts,
             p_finding_classification_choices=p_finding_classification_choice_dicts,
             p_finding_classification_choice_descriptors=p_finding_classification_choice_descriptor_dicts,
             p_finding_interventions=p_finding_interventions_dicts,
             p_finding_intervention=p_finding_intervention_dicts,
+            p_videos=video_dicts,
+            # p_raw_videos=raw_video_dicts,
         )
         return record_list

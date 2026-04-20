@@ -72,6 +72,24 @@ from .p_indication import (
     l_p_indication_lookup,
     l_p_indication_models,
 )
+from .p_indication_classification import (
+    LPIndicationClassificationDjangoLookupType,
+    LPIndicationClassificationLookupType,
+    l_p_indication_classification_ddicts,
+    l_p_indication_classification_django_lookup,
+    l_p_indication_classification_django_models,
+    l_p_indication_classification_lookup,
+    l_p_indication_classification_models,
+)
+from .p_indication_classification_descriptor import (
+    LPIndicationClassificationDescriptorDjangoLookupType,
+    LPIndicationClassificationDescriptorLookupType,
+    l_p_indication_classification_descriptor_ddicts,
+    l_p_indication_classification_descriptor_django_lookup,
+    l_p_indication_classification_descriptor_django_models,
+    l_p_indication_classification_descriptor_lookup,
+    l_p_indication_classification_descriptor_models,
+)
 from .p_intervention import (
     LPFindingInterventionDjangoLookupType,
     LPFindingInterventionLookupType,
@@ -90,6 +108,15 @@ from .p_interventions import (
     l_p_finding_interventions_lookup,
     l_p_finding_interventions_models,
 )
+from .p_video import (
+    LPVideoLookupType,
+    l_p_video_ddicts,
+    # LPVideoDjangoLookupType, # TODO
+    # l_p_video_django_lookup, # TODO
+    # l_p_video_django_models, # TODO
+    l_p_video_lookup,
+    l_p_video_models,
+)
 from .patient import (
     LPatientDjangoLookupType,
     LPatientLookupType,
@@ -107,12 +134,15 @@ class LedgerModelsLookupType(
     LExaminerLookupType,
     LPFindingLookupType,
     LPIndicationLookupType,
+    LPIndicationClassificationLookupType,
+    LPIndicationClassificationDescriptorLookupType,
     LPFindingClassificationsLookupType,
     LPFindingClassificationChoiceLookupType,
     LPFindingClassificationChoiceDescriptorLookupType,
     LPFindingInterventionsLookupType,
     LPFindingInterventionLookupType,
     LPatientLookupType,
+    LPVideoLookupType,
 ):
     pass
 
@@ -123,12 +153,15 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_examiner_lookup,
     **l_p_finding_lookup,
     **l_p_indication_lookup,
+    **l_p_indication_classification_lookup,
+    **l_p_indication_classification_descriptor_lookup,
     **l_p_finding_classifications_lookup,
     **l_p_finding_classification_choice_lookup,
     **l_p_finding_classification_choice_descriptor_lookup,
     **l_p_finding_interventions_lookup,
     **l_p_finding_intervention_lookup,
     **l_patient_lookup,
+    **l_p_video_lookup,
 )
 
 
@@ -138,12 +171,15 @@ class LedgerModelsDjangoLookupType(
     LExaminerDjangoLookupType,
     LPFindingDjangoLookupType,
     LPIndicationDjangoLookupType,
+    LPIndicationClassificationDjangoLookupType,
+    LPIndicationClassificationDescriptorDjangoLookupType,
     LPFindingClassificationsDjangoLookupType,
     LPFindingClassificationChoiceDjangoLookupType,
     LPFindingClassificationChoiceDescriptorDjangoLookupType,
     LPFindingInterventionsDjangoLookupType,
     LPFindingInterventionDjangoLookupType,
     LPatientDjangoLookupType,
+    # LPVideoDjangoLookupType, # TODO
 ):
     pass
 
@@ -155,12 +191,15 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
         **l_examiner_django_lookup,
         **l_p_finding_django_lookup,
         **l_p_indication_django_lookup,
+        **l_p_indication_classification_django_lookup,
+        **l_p_indication_classification_descriptor_django_lookup,
         **l_p_finding_classifications_django_lookup,
         **l_p_finding_classification_choice_django_lookup,
         **l_p_finding_classification_choice_descriptor_django_lookup,
         **l_p_finding_interventions_django_lookup,
         **l_p_finding_intervention_django_lookup,
         **l_patient_django_lookup,
+        # **l_p_video_django_lookup, # TODO
     )
 )
 
@@ -170,12 +209,15 @@ L_MODELS = Union[
     l_examiner_models,
     l_p_finding_models,
     l_p_indication_models,
+    l_p_indication_classification_models,
+    l_p_indication_classification_descriptor_models,
     l_p_finding_classifications_models,
     l_p_finding_classification_choice_models,
     l_p_finding_classification_choice_descriptor_models,
     l_p_finding_interventions_models,
     l_p_finding_intervention_models,
     l_patient_models,
+    l_p_video_models,
 ]
 
 L_MODELS_DJANGO = Union[
@@ -184,12 +226,15 @@ L_MODELS_DJANGO = Union[
     l_examiner_django_models,
     l_p_finding_django_models,
     l_p_indication_django_models,
+    l_p_indication_classification_django_models,
+    l_p_indication_classification_descriptor_django_models,
     l_p_finding_classifications_django_models,
     l_p_finding_classification_choice_django_models,
     l_p_finding_classification_choice_descriptor_django_models,
     l_p_finding_interventions_django_models,
     l_p_finding_intervention_django_models,
     l_patient_django_models,
+    # l_p_video_django_models, # TODO
 ]
 
 L_DDICTS = Union[
@@ -198,35 +243,48 @@ L_DDICTS = Union[
     l_examiner_ddicts,
     l_p_finding_ddicts,
     l_p_indication_ddicts,
+    l_p_indication_classification_ddicts,
+    l_p_indication_classification_descriptor_ddicts,
     l_p_finding_classifications_ddicts,
     l_p_finding_classification_choice_ddicts,
     l_p_finding_classification_choice_descriptor_ddicts,
     l_p_finding_interventions_ddicts,
     l_p_finding_intervention_ddicts,
     l_patient_ddicts,
+    l_p_video_ddicts,
 ]
 L_MODEL_NAMES_LITERAL = Literal[
     "Center",
     "Examiner",
+    "Patient",
     "PExamination",
     "PFinding",
     "PIndication",
+    "PIndicationClassification",
+    "PIndicationClassificationDescriptor",
     "PFindingClassifications",
     "PFindingClassificationChoice",
     "PFindingInterventions",
     "PFindingIntervention",
+    "PatientVideoFile",
+    "RawPatientVideoFile",
 ]
 
 L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "Center",
     "Examiner",
+    "Patient",
     "PExamination",
     "PFinding",
     "PIndication",
+    "PIndicationClassification",
+    "PIndicationClassificationDescriptor",
     "PFindingClassifications",
     "PFindingClassificationChoice",
     "PFindingInterventions",
     "PFindingIntervention",
+    "PatientVideoFile",
+    "RawPatientVideoFile",
 ]
 
 __all__ = [

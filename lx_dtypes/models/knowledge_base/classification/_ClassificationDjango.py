@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -20,14 +22,18 @@ if TYPE_CHECKING:
 
 
 class ClassificationDjango(KnowledgebaseBaseModelDjango[ClassificationDataDict]):
-    classification_types: models.ManyToManyField[
-        "ClassificationTypeDjango", "ClassificationTypeDjango"
-    ] = models.ManyToManyField(
+    if TYPE_CHECKING:
+        classification_types: models.ManyToManyField[
+            ClassificationTypeDjango, ClassificationTypeDjango
+        ]
+        classification_choices: models.ManyToManyField[
+            ClassificationChoiceDjango, ClassificationChoiceDjango
+        ]
+
+    classification_types = models.ManyToManyField(
         "ClassificationTypeDjango", related_name=FieldNames.CLASSIFICATIONS.value
     )
-    classification_choices: models.ManyToManyField[
-        "ClassificationChoiceDjango", "ClassificationChoiceDjango"
-    ] = models.ManyToManyField(
+    classification_choices = models.ManyToManyField(
         "ClassificationChoiceDjango",
         related_name=FieldNames.CLASSIFICATIONS.value,
     )

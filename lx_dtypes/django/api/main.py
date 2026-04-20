@@ -1,18 +1,543 @@
-from typing import Literal
+from __future__ import annotations
 
-from ninja import NinjaAPI
+import os
+from functools import lru_cache
+from importlib import import_module
+from pathlib import Path
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    NoReturn,
+    Optional,
+    Protocol,
+    Set,
+    TypeVar,
+    cast,
+)
 
+from django.conf import settings
+from ninja.errors import HttpError  # type: ignore[import-untyped]
+
+from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    KnowledgeBaseVersionNotFoundError,
+    clear_knowledge_base_resolver_caches,
+    load_knowledge_base,
+)
+from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+
+from .findings_routes import (
+    PatientFindingClassificationInput,
+    build_p_examination_payload_from_host_ledger as _build_payload_from_host_ledger,
+    clear_findings_route_caches,
+    register_findings_routes,
+)
 from .request_types import BaseRequest
+from .report_template_routes import register_report_template_routes
+from .lookup_tracker import register_runtime_lookup_tracker
 
-api = NinjaAPI()
+F = TypeVar("F", bound=Callable[..., Any])
 
 
-@api.get("/hello")
-def hello(request: BaseRequest) -> Literal["Hello world"]:
-    """
-    Return the fixed greeting used as the /hello endpoint response.
+class _RouteDecorator(Protocol):
+    def __call__(self, func: F, /) -> F: ...
 
-    Returns:
-        The exact string "Hello world" returned to clients.
-    """
-    return "Hello world"
+
+class _TypedApi(Protocol):
+    @property
+    def urls(self) -> Any: ...
+
+    def get(self, path: str, /) -> _RouteDecorator: ...
+
+    def post(self, path: str, /) -> _RouteDecorator: ...
+
+    def patch(self, path: str, /) -> _RouteDecorator: ...
+
+    def delete(self, path: str, /) -> _RouteDecorator: ...
+
+    def exception_handler(self, exc_class: type[Exception], /) -> _RouteDecorator: ...
+
+    def create_response(self, request: Any, data: Any, *, status: int) -> Any: ...
+
+
+if TYPE_CHECKING:
+    api = cast(_TypedApi, object())
+else:
+    from ninja import NinjaAPI
+
+    api = cast(_TypedApi, NinjaAPI(urls_namespace="lx_dtypes_base_api"))
+
+
+@lru_cache(maxsize=1)
+def _orm_models() -> Dict[str, Any]:
+    module_path = getattr(settings, "LX_DTYPES_HOST_MODELS_MODULE", None) or os.getenv(
+        "LX_DTYPES_HOST_MODELS_MODULE"
+    )
+    if not module_path:
+        raise RuntimeError(
+            "LX_DTYPES_HOST_MODELS_MODULE must be configured to use lx_dtypes.django.api."
+        )
+
+    host_models = import_module(module_path)
+
+    return {
+        "Examination": getattr(host_models, "Examination"),
+        "Finding": getattr(host_models, "Finding"),
+        "FindingClassification": getattr(host_models, "FindingClassification"),
+        "FindingClassificationChoice": getattr(
+            host_models, "FindingClassificationChoice"
+        ),
+        "PatientExamination": getattr(host_models, "PatientExamination"),
+        "PatientFinding": getattr(host_models, "PatientFinding"),
+        "PatientFindingClassification": getattr(
+            host_models, "PatientFindingClassification"
+        ),
+    }
+
+
+class StructuredApiError(Exception):
+    def __init__(self, status_code: int, code: str, message: str) -> None:
+        self.status_code = status_code
+        self.code = code
+        self.message = message
+        super().__init__(message)
+
+
+@api.exception_handler(StructuredApiError)
+def handle_structured_api_error(request: Any, exc: StructuredApiError) -> Any:
+    return api.create_response(
+        request,
+        {"code": exc.code, "message": exc.message},
+        status=exc.status_code,
+    )
+
+
+@lru_cache(maxsize=1)
+def _kb_loader() -> DataLoader:
+    package_data_dir = Path(__file__).resolve().parents[2] / "data"
+    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
+    input_dirs = [
+        data_dir
+        for data_dir in (package_data_dir, legacy_cwd_data_dir)
+        if data_dir.exists()
+    ]
+    loader = DataLoader(input_dirs=input_dirs or [package_data_dir])
+    loader.load_module_configs()
+    return loader
+
+
+def _load_module_kb(module_name: str, version: str | None = None) -> Any:
+    if version:
+        try:
+            kb = cast(Any, load_knowledge_base(module_name, version=version))
+        except KnowledgeBaseVersionNotFoundError as exc:
+            raise HttpError(
+                409,
+                "Requested knowledge-base version is not provisioned locally for "
+                f"module '{module_name}' and version '{version}'.",
+            ) from exc
+        register_runtime_lookup_tracker(kb)
+        return kb
+
+    loader = _kb_loader()
+    try:
+        kb = cast(Any, loader.load_knowledge_base(module_name))
+    except ValueError as exc:
+        raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
+    register_runtime_lookup_tracker(kb)
+    return kb
+
+
+def _clear_kb_caches() -> None:
+    cache_clear = getattr(_kb_loader, "cache_clear", None)
+    if callable(cache_clear):
+        cache_clear()
+    clear_findings_route_caches()
+    clear_knowledge_base_resolver_caches()
+
+
+def _resolve_payload_kb_identity(
+    route_module_name: str,
+    payload: PExamination,
+) -> tuple[str, str | None]:
+    payload_module_name = str(payload.knowledge_base_module or "").strip()
+    payload_version = str(payload.knowledge_base_version or "").strip() or None
+
+    if payload_module_name and payload_module_name != route_module_name:
+        raise HttpError(
+            409,
+            "Payload knowledge-base module does not match route module: "
+            f"'{payload_module_name}' != '{route_module_name}'.",
+        )
+
+    return payload_module_name or route_module_name, payload_version
+
+
+def _api_error(status: int, code: str, message: str) -> NoReturn:
+    raise StructuredApiError(status, code, message)
+
+
+def _as_str_list_from_relation(relation: object) -> list[str]:
+    if relation is None:
+        return []
+    if hasattr(relation, "all"):
+        return [str(getattr(item, "pk", item)) for item in relation.all()]
+    if isinstance(relation, list):
+        return [str(item) for item in relation]
+    return [str(relation)]
+
+
+def _active_patient_findings_queryset() -> Any:
+    from .findings_routes import _active_patient_findings_queryset as _active_queryset
+
+    return _active_queryset(lambda: _orm_models())
+
+
+def _build_p_examination_payload_from_host_ledger(
+    patient_examination: object, *, route_module_name: str
+) -> PExamination:
+    return _build_payload_from_host_ledger(
+        patient_examination,
+        route_module_name=route_module_name,
+        orm_models=lambda: _orm_models(),
+        active_patient_findings_queryset=lambda: _active_patient_findings_queryset(),
+    )
+
+
+def _findings_module_name() -> str:
+    return os.getenv("LX_DTYPES_FINDINGS_MODULE", "lx_knowledge_base")
+
+
+def _norm_name(value: Optional[str]) -> str:
+    return str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
+
+
+@lru_cache(maxsize=8)
+def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
+    return cast(Dict[str, Any], _load_module_kb(module_name).export_core_concepts())
+
+
+@lru_cache(maxsize=8)
+def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
+    core = _kb_core_concepts(module_name)
+    examination_by_name = {
+        _norm_name(item.get("name")): item for item in core.get("examination", [])
+    }
+    finding_by_name = {
+        _norm_name(item.get("name")): item for item in core.get("finding", [])
+    }
+    classification_by_name = {
+        _norm_name(item.get("name")): item for item in core.get("classification", [])
+    }
+    choice_by_name = {
+        _norm_name(item.get("name")): item
+        for item in core.get("classification_choice", [])
+    }
+    return {
+        "examination": examination_by_name,
+        "finding": finding_by_name,
+        "classification": classification_by_name,
+        "classification_choice": choice_by_name,
+    }
+
+
+def _request_user_if_authenticated(request: BaseRequest) -> Optional[Any]:
+    user = getattr(request, "user", None)
+    if getattr(user, "is_authenticated", False):
+        return user
+    return None
+
+
+def _serialize_choice(choice: Any) -> Dict[str, Any]:
+    return {
+        "id": choice.id,
+        "name": choice.name,
+        "description": choice.description,
+        "subcategories": choice.subcategories,
+        "numerical_descriptors": choice.numerical_descriptors,
+    }
+
+
+def _serialize_classification(
+    classification: Any, *, required: bool = False
+) -> Dict[str, Any]:
+    choices = classification.choices.all()
+    classification_types = [
+        _norm_name(c_type.name) for c_type in classification.classification_types.all()
+    ]
+    return {
+        "id": classification.id,
+        "name": classification.name,
+        "description": classification.description,
+        "required": required,
+        "classification_types": classification_types,
+        "choices": [_serialize_choice(choice) for choice in choices],
+    }
+
+
+def _split_classifications(
+    classifications: List[Dict[str, Any]],
+) -> Dict[str, List[Dict[str, Any]]]:
+    location: List[Dict[str, Any]] = []
+    morphology: List[Dict[str, Any]] = []
+    for classification in classifications:
+        c_types = {
+            _norm_name(v) for v in classification.get("classification_types", [])
+        }
+        if "location" in c_types:
+            location.append(classification)
+        if "morphology" in c_types:
+            morphology.append(classification)
+    return {
+        "location_classifications": location,
+        "morphology_classifications": morphology,
+    }
+
+
+def _serialize_finding(
+    finding: Any,
+    *,
+    allowed_classification_names: Optional[Set[str]] = None,
+    required_classification_names: Optional[Set[str]] = None,
+) -> Dict[str, Any]:
+    all_classifications = finding.finding_classifications.all().prefetch_related(
+        "choices", "classification_types"
+    )
+    selected_classifications = []
+    for classification in all_classifications:
+        c_name = _norm_name(classification.name)
+        if allowed_classification_names and c_name not in allowed_classification_names:
+            continue
+        selected_classifications.append(
+            _serialize_classification(
+                classification,
+                required=(
+                    required_classification_names is not None
+                    and c_name in required_classification_names
+                ),
+            )
+        )
+    split = _split_classifications(selected_classifications)
+    return {
+        "id": finding.id,
+        "name": finding.name,
+        "description": finding.description,
+        "classifications": selected_classifications,
+        "location_classifications": split["location_classifications"],
+        "morphology_classifications": split["morphology_classifications"],
+        # Keep compatibility with legacy frontend field access:
+        "FindingClassifications": selected_classifications,
+    }
+
+
+def _serialize_patient_finding_classification(
+    item: Any,
+) -> Dict[str, Any]:
+    return {
+        "id": item.id,
+        "classification": item.classification_id,
+        "classification_choice": item.classification_choice_id,
+        "classification_name": item.classification.name,
+        "classification_choice_name": item.classification_choice.name,
+        "subcategories": item.subcategories,
+        "numerical_descriptors": item.numerical_descriptors,
+        "is_active": item.is_active,
+    }
+
+
+def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
+    classifications = item.classifications.filter(is_active=True).select_related(
+        "classification", "classification_choice"
+    )
+    return {
+        "id": item.id,
+        "patient_examination": item.patient_examination_id,
+        "finding": item.finding_id,
+        "is_active": item.is_active,
+        "created_at": item.created_at.isoformat() if item.created_at else None,
+        "updated_at": item.updated_at.isoformat() if item.updated_at else None,
+        "classifications": [
+            _serialize_patient_finding_classification(classification)
+            for classification in classifications
+        ],
+    }
+
+
+def _resolve_exam_kb_finding_names(
+    examination: Any, *, module_name: str
+) -> Optional[Set[str]]:
+    lookup = _kb_lookup(module_name)
+    exam_entry = lookup["examination"].get(_norm_name(examination.name))
+    if not exam_entry:
+        return None
+    finding_names = exam_entry.get("findings", [])
+    if not isinstance(finding_names, list):
+        return None
+    return {_norm_name(name) for name in finding_names}
+
+
+def _resolve_kb_finding_classification_names(
+    finding: Any, *, module_name: str
+) -> Optional[Set[str]]:
+    lookup = _kb_lookup(module_name)
+    finding_entry = lookup["finding"].get(_norm_name(finding.name))
+    if not finding_entry:
+        return None
+    classifications = finding_entry.get("classifications", [])
+    if not isinstance(classifications, list):
+        return None
+    return {_norm_name(name) for name in classifications}
+
+
+def _resolve_kb_classification_choice_names(
+    classification: Any, *, module_name: str
+) -> Optional[Set[str]]:
+    lookup = _kb_lookup(module_name)
+    classification_entry = lookup["classification"].get(_norm_name(classification.name))
+    if not classification_entry:
+        return None
+    choices = classification_entry.get("classification_choices", [])
+    if not isinstance(choices, list):
+        return None
+    return {_norm_name(name) for name in choices}
+
+
+def _validate_finding_for_examination(
+    finding: Any,
+    patient_examination: Any,
+    *,
+    module_name: str,
+) -> None:
+    available_findings = patient_examination.examination_safe.get_available_findings()
+    if finding not in available_findings:
+        _api_error(
+            400,
+            "invalid-finding",
+            f"Finding '{finding.name}' is not allowed for examination '{patient_examination.examination_safe.name}'.",
+        )
+
+    kb_allowed_names = _resolve_exam_kb_finding_names(
+        patient_examination.examination_safe, module_name=module_name
+    )
+    if (
+        kb_allowed_names is not None
+        and _norm_name(finding.name) not in kb_allowed_names
+    ):
+        _api_error(
+            400,
+            "invalid-finding",
+            f"Finding '{finding.name}' is not present in dtypes module '{module_name}' for examination '{patient_examination.examination_safe.name}'.",
+        )
+
+
+def _validate_classification_payload(
+    *,
+    finding: Any,
+    classification: Any,
+    choice: Any,
+    module_name: str,
+) -> None:
+    if not finding.finding_classifications.filter(id=classification.id).exists():
+        _api_error(
+            400,
+            "invalid-choice",
+            f"Classification '{classification.name}' is not valid for finding '{finding.name}'.",
+        )
+    if not classification.choices.filter(id=choice.id).exists():
+        _api_error(
+            400,
+            "invalid-choice",
+            f"Choice '{choice.name}' is not valid for classification '{classification.name}'.",
+        )
+
+    kb_classifications = _resolve_kb_finding_classification_names(
+        finding, module_name=module_name
+    )
+    if (
+        kb_classifications is not None
+        and _norm_name(classification.name) not in kb_classifications
+    ):
+        _api_error(
+            400,
+            "invalid-choice",
+            f"Classification '{classification.name}' is not defined in dtypes for finding '{finding.name}'.",
+        )
+
+    kb_choices = _resolve_kb_classification_choice_names(
+        classification, module_name=module_name
+    )
+    if kb_choices is not None and _norm_name(choice.name) not in kb_choices:
+        _api_error(
+            400,
+            "invalid-choice",
+            f"Choice '{choice.name}' is not defined in dtypes for classification '{classification.name}'.",
+        )
+
+
+def _replace_patient_finding_classifications(
+    patient_finding: Any,
+    entries: List[PatientFindingClassificationInput],
+    *,
+    module_name: str,
+) -> None:
+    patient_finding.classifications.all().delete()
+    finding_classification_model = _orm_models()["FindingClassification"]
+    finding_classification_choice_model = _orm_models()["FindingClassificationChoice"]
+    patient_finding_classification_model = _orm_models()["PatientFindingClassification"]
+    for entry in entries:
+        classification = finding_classification_model.objects.filter(
+            id=entry.classification
+        ).first()
+        if not classification:
+            _api_error(
+                400,
+                "invalid-choice",
+                f"Classification id '{entry.classification}' does not exist.",
+            )
+        choice = finding_classification_choice_model.objects.filter(
+            id=entry.choice
+        ).first()
+        if not choice:
+            _api_error(
+                400,
+                "invalid-choice",
+                f"Classification choice id '{entry.choice}' does not exist.",
+            )
+        assert classification is not None
+        assert choice is not None
+        _validate_classification_payload(
+            finding=patient_finding.finding,
+            classification=classification,
+            choice=choice,
+            module_name=module_name,
+        )
+        patient_finding_classification_model.objects.create(
+            finding=patient_finding,
+            classification=classification,
+            classification_choice=choice,
+            is_active=True,
+        )
+
+
+register_report_template_routes(
+    api,
+    load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
+    clear_kb_caches=lambda: _clear_kb_caches(),
+    resolve_payload_kb_identity=lambda *args, **kwargs: _resolve_payload_kb_identity(
+        *args, **kwargs
+    ),
+    orm_models=lambda: _orm_models(),
+    build_p_examination_payload_from_host_ledger=lambda *args, **kwargs: (
+        _build_p_examination_payload_from_host_ledger(*args, **kwargs)
+    ),
+)
+
+register_findings_routes(
+    api,
+    load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
+    orm_models=lambda: _orm_models(),
+    api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
+)

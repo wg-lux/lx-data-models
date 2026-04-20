@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -33,24 +35,27 @@ if TYPE_CHECKING:
 class PFindingClassificationChoiceDjango(
     LedgerBaseModelDjango[PFindingClassificationChoiceDataDict]
 ):
-    classification: models.ForeignKey[
-        "ClassificationDjango", "ClassificationDjango"
-    ] = models.ForeignKey(
+    if TYPE_CHECKING:
+        classification: models.ForeignKey[ClassificationDjango, ClassificationDjango]  # type: ignore[misc]
+        classification_choice: models.ForeignKey[
+            ClassificationChoiceDjango, ClassificationChoiceDjango
+        ]  # type: ignore[misc]
+        patient_finding_classifications: models.ForeignKey[
+            PFindingClassificationsDjango, PFindingClassificationsDjango
+        ]
+
+    classification = models.ForeignKey(  # type: ignore[misc]
         "ClassificationDjango",
         related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
         on_delete=models.CASCADE,
     )
-    classification_choice: models.ForeignKey[
-        "ClassificationChoiceDjango", "ClassificationChoiceDjango"
-    ] = models.ForeignKey(
-        "ClassificationChoiceDjango",
+    classification_choice = models.ForeignKey(  # type: ignore[misc]
+        "lx_dtypes_django.ClassificationChoiceDjango",
         related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
         on_delete=models.CASCADE,
     )
 
-    patient_finding_classifications: models.ForeignKey[
-        "PFindingClassificationsDjango", "PFindingClassificationsDjango"
-    ] = models.ForeignKey(
+    patient_finding_classifications = models.ForeignKey(
         "PFindingClassificationsDjango",
         related_name=FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
         on_delete=models.CASCADE,

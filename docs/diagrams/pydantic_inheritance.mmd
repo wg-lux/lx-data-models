@@ -1,0 +1,93 @@
+flowchart TB
+
+%% ======================================================
+%% 1. GLOBAL PYDANTIC FOUNDATION
+%% ======================================================
+
+classDef base fill:#eef6ff,stroke:#1d4ed8,color:#0b1220;
+classDef kb fill:#ecfdf5,stroke:#059669,color:#052014;
+classDef led fill:#fff7ed,stroke:#c2410c,color:#1f1206;
+classDef io fill:#f5f3ff,stroke:#6d28d9,color:#140a2e;
+
+ABM["AppBaseModel<br/>Pydantic Base<br/><br/>• Global ConfigDict<br/>• JSON serialization rules<br/>• model_dump defaults<br/>• YAML helpers"]:::base
+
+UUID["AppBaseModelUUIDTags<br/><br/>• uuid<br/>• tags"]:::base
+
+NAME["AppBaseModelNamesUUIDTags<br/><br/>• name<br/>• translations<br/>• description"]:::base
+
+ABM --> UUID
+UUID --> NAME
+
+
+%% ======================================================
+%% 2. DOMAIN SPLIT
+%% ======================================================
+
+KBBASE["KnowledgebaseBaseModel<br/><br/>• ddict contract<br/>• list_type_fields<br/>• string-list parsing<br/>• validate_ddict"]:::kb
+
+LDBASE["LedgerBaseModel<br/><br/>• ddict contract<br/>• nested_fields<br/>• serialized_ddict (UUID flatten)<br/>• validate_ddict"]:::led
+
+NAME --> KBBASE
+UUID --> LDBASE
+
+
+%% ======================================================
+%% 3. KNOWLEDGE BASE MODELS (Reference Terminology)
+%% ======================================================
+
+subgraph Knowledge Base Models
+KB_EX["Examination"]:::kb
+KB_FI["Finding"]:::kb
+KB_CL["Classification"]:::kb
+KB_CC["ClassificationChoice"]:::kb
+KB_DESC["ClassificationChoiceDescriptor<br/><br/>Numeric / Boolean / Selection / Text"]:::kb
+end
+
+KBBASE --> KB_EX
+KBBASE --> KB_FI
+KBBASE --> KB_CL
+KBBASE --> KB_CC
+KBBASE --> KB_DESC
+
+
+%% ======================================================
+%% 4. LEDGER MODELS (Patient Records)
+%% ======================================================
+
+subgraph Ledger Models
+L_PAT["Patient"]:::led
+L_PEX["PExamination"]:::led
+L_PF["PFinding"]:::led
+L_PCLS["PFindingClassifications"]:::led
+L_PCHO["PFindingClassificationChoice"]:::led
+L_PDESC["PFindingClassificationChoiceDescriptor<br/>stores patient value"]:::led
+end
+
+LDBASE --> L_PAT
+LDBASE --> L_PEX
+LDBASE --> L_PF
+LDBASE --> L_PCLS
+LDBASE --> L_PCHO
+LDBASE --> L_PDESC
+
+
+%% ======================================================
+%% 5. DESCRIPTOR CONNECTION
+%% ======================================================
+
+KB_DESC -. defines schema .-> L_PDESC
+L_PCHO --> L_PDESC
+
+
+%% ======================================================
+%% 6. CONTAINER LAYER
+%% ======================================================
+
+KB["KnowledgeBase Container<br/>Dict[name → KB model]"]:::io
+LEDGER["Ledger Container<br/>Dict[uuid → Ledger model]"]:::io
+DBI["DbInterface<br/>orchestrates validation + linking"]:::io
+
+KBBASE --> KB
+LDBASE --> LEDGER
+DBI --> KB
+DBI --> LEDGER
