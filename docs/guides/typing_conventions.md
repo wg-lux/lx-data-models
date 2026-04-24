@@ -1,8 +1,8 @@
-## Typing Conventions
+# Typing Conventions
 
 `lx-data-models` is intended to provide strongly typed, standardized models for use across services. To keep runtime behavior and static typing aligned, use these rules consistently.
 
-### Layer Roles
+## Layer Roles
 
 - Pydantic contract models define cross-service payloads and validation boundaries.
 - Django ORM models define persistence and relations.
@@ -10,7 +10,7 @@
 
 Do not use Django ORM models as transport contracts.
 
-### Django ORM Rules
+## Django ORM Rules
 
 - Always add `from __future__ import annotations` to Django model modules.
 - Prefer string model references in relation fields.
@@ -40,7 +40,7 @@ class Example(models.Model):
     )
 ```
 
-### Contract Rules
+## Contract Rules
 
 - Shared request and response payloads belong in `lx_dtypes.models.contracts`.
 - Validate external payloads with `model_validate(...)`.
@@ -48,7 +48,7 @@ class Example(models.Model):
 - Prefer enums over raw strings for stable domain values.
 - Use `extra="forbid"` unless compatibility requires otherwise.
 
-### Standardization Priorities
+## Standardization Priorities
 
 1. Make Django model imports runtime-safe.
 2. Route cross-service payloads through contract models.
