@@ -9,8 +9,14 @@ if TYPE_CHECKING:
         KB_MODEL_NAMES_ORDERED,
         KB_MODELS,
         KB_MODELS_DJANGO,
+        DEFAULT_FHIR_BASE_URL,
+        DEFAULT_FHIR_PUBLISHER,
+        FHIR_EXPORT_DOMAINS,
         KnowledgeBaseModelsDjangoLookupType,
         KnowledgeBaseModelsLookupType,
+        export_fhir_terminology,
+        export_fhir_terminology_bundle,
+        import_fhir_terminology,
         knowledge_base_models_django_lookup,
         knowledge_base_models_lookup,
     )
@@ -25,6 +31,12 @@ __all__ = [
     "KnowledgeBaseModelsDjangoLookupType",
     "knowledge_base_models_django_lookup",
     "KB_MODELS_DJANGO",
+    "DEFAULT_FHIR_BASE_URL",
+    "DEFAULT_FHIR_PUBLISHER",
+    "FHIR_EXPORT_DOMAINS",
+    "export_fhir_terminology",
+    "export_fhir_terminology_bundle",
+    "import_fhir_terminology",
 ]
 
 _EXPORTED = set(__all__)
@@ -40,8 +52,14 @@ def __getattr__(name: str) -> Any:
         KB_MODEL_NAMES_ORDERED,
         KB_MODELS,
         KB_MODELS_DJANGO,
+        DEFAULT_FHIR_BASE_URL,
+        DEFAULT_FHIR_PUBLISHER,
+        FHIR_EXPORT_DOMAINS,
         KnowledgeBaseModelsDjangoLookupType,
         KnowledgeBaseModelsLookupType,
+        export_fhir_terminology,
+        export_fhir_terminology_bundle,
+        import_fhir_terminology,
         knowledge_base_models_django_lookup,
         knowledge_base_models_lookup,
     )
@@ -56,5 +74,11 @@ def __getattr__(name: str) -> Any:
         "KnowledgeBaseModelsDjangoLookupType": KnowledgeBaseModelsDjangoLookupType,
         "knowledge_base_models_django_lookup": knowledge_base_models_django_lookup,
         "KB_MODELS_DJANGO": KB_MODELS_DJANGO,
+        "DEFAULT_FHIR_BASE_URL": DEFAULT_FHIR_BASE_URL,
+        "DEFAULT_FHIR_PUBLISHER": DEFAULT_FHIR_PUBLISHER,
+        "FHIR_EXPORT_DOMAINS": FHIR_EXPORT_DOMAINS,
+        "export_fhir_terminology": export_fhir_terminology,
+        "export_fhir_terminology_bundle": export_fhir_terminology_bundle,
+        "import_fhir_terminology": import_fhir_terminology,
     }
     return exports[name]

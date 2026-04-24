@@ -9,6 +9,7 @@ from ..classification_choice.ClassificationChoice import ClassificationChoice
 from ..classification_choice_descriptor.ClassificationChoiceDescriptor import (
     ClassificationChoiceDescriptor,
 )
+from ..finding._Finding import Finding
 from ..intervention.Intervention import Intervention
 from ..unit.Unit import Unit
 from .ClassificationValidator import (
@@ -135,6 +136,13 @@ class _RuntimeFindingOccurrence(TypedDict):
     classifications: Dict[str, List[ValidationScalar]]
     classification_units: Dict[str, List[str]]
     interventions: List[str]
+
+
+class FhirTerminologyValidatedFindingResultDataDict(TypedDict):
+    ok: bool
+    reported_findings: List[Dict[str, object]]
+    observations: List[Dict[str, object]]
+    issues: List[RuntimeValidationIssueDataDict]
 
 
 @dataclass(frozen=True)
@@ -322,6 +330,21 @@ def _normalize_classifications(
     return normalized, units
 
 
+def _normalize_classification_units(raw: object) -> Dict[str, List[str]]:
+    normalized: Dict[str, List[str]] = {}
+    if not isinstance(raw, Mapping):
+        return normalized
+
+    for classification_name, unit_values in raw.items():
+        if isinstance(unit_values, list):
+            for unit_name in unit_values:
+                _add_classification_unit(normalized, classification_name, unit_name)
+            continue
+        _add_classification_unit(normalized, classification_name, unit_values)
+
+    return normalized
+
+
 def _normalize_reported_findings(
     reported_findings: Sequence[Mapping[str, object]] | None,
 ) -> List[_RuntimeFindingOccurrence]:
@@ -342,6 +365,9 @@ def _normalize_reported_findings(
         classifications, classification_units = _normalize_classifications(
             finding_payload.get("classifications")
         )
+        classification_units.update(
+            _normalize_classification_units(finding_payload.get("classification_units"))
+        )
         occurrences.append(
             _RuntimeFindingOccurrence(
                 finding=finding_name,
@@ -354,6 +380,379 @@ def _normalize_reported_findings(
         )
 
     return occurrences
+
+
+def _slug(value: object) -> str:
+    token = _normalize_identifier(value).lower()
+    token = token.replace("_", "-")
+    cleaned = []
+    previous_dash = False
+    for char in token:
+        if char.isalnum():
+            cleaned.append(char)
+            previous_dash = False
+            continue
+        if not previous_dash:
+            cleaned.append("-")
+            previous_dash = True
+    return "".join(cleaned).strip("-") or "unknown"
+
+
+def _coding(system: str, code: object, display: object | None = None) -> Dict[str, str]:
+    coding = {"system": system, "code": _slug(code)}
+    display_value = _normalize_identifier(display if display is not None else code)
+    if display_value:
+        coding["display"] = display_value
+    return coding
+
+
+def _first_coding_display(value: object) -> str:
+    if not isinstance(value, Mapping):
+        return _normalize_identifier(value)
+    codings = value.get("coding")
+    if isinstance(codings, Sequence) and not isinstance(codings, (str, bytes)):
+        for coding in codings:
+            if isinstance(coding, Mapping):
+                display = _normalize_identifier(coding.get("display"))
+                if display:
+                    return display
+                code = _normalize_identifier(coding.get("code"))
+                if code:
+                    return code.replace("-", "_")
+    return _normalize_identifier(value)
+
+
+def _quantity_unit(value: object) -> str | None:
+    if not isinstance(value, Mapping):
+        return None
+    unit = _normalize_identifier(value.get("unit"))
+    if unit:
+        return unit
+    code = _normalize_identifier(value.get("code"))
+    return code or None
+
+
+def _quantity_value(value: object) -> ValidationScalar | None:
+    if not isinstance(value, Mapping):
+        return None
+    raw_value = value.get("value")
+    if isinstance(raw_value, (str, int, float, bool)):
+        return raw_value
+    return None
+
+
+def _observation_value(component: Mapping[str, object]) -> ValidationScalar:
+    if "valueCodeableConcept" in component:
+        return _first_coding_display(component.get("valueCodeableConcept"))
+    if "valueQuantity" in component:
+        quantity_value = _quantity_value(component.get("valueQuantity"))
+        return quantity_value if quantity_value is not None else True
+    if "valueString" in component:
+        return _normalize_identifier(component.get("valueString"))
+    if "valueBoolean" in component:
+        value = component.get("valueBoolean")
+        return value if isinstance(value, bool) else True
+    if "valueInteger" in component:
+        value = component.get("valueInteger")
+        return value if isinstance(value, int) else True
+    if "valueDecimal" in component:
+        value = component.get("valueDecimal")
+        return value if isinstance(value, (int, float)) else True
+    return True
+
+
+def import_fhir_observations_to_reported_findings(
+    observations: Sequence[Mapping[str, object]],
+) -> List[Dict[str, object]]:
+    """Convert FHIR Observation resources into runtime reported-finding payloads."""
+
+    reported_findings: List[Dict[str, object]] = []
+    for observation in observations:
+        if observation.get("resourceType") != "Observation":
+            continue
+        finding_name = _first_coding_display(observation.get("code"))
+        if not finding_name:
+            continue
+
+        classifications: List[Dict[str, object]] = []
+        raw_components = observation.get("component", [])
+        components = raw_components if isinstance(raw_components, Sequence) else []
+        for component in components:
+            if not isinstance(component, Mapping):
+                continue
+            classification_name = _first_coding_display(component.get("code"))
+            if not classification_name:
+                continue
+            classification_payload: Dict[str, object] = {
+                "classification": classification_name,
+                "value": _observation_value(component),
+            }
+            unit = _quantity_unit(component.get("valueQuantity"))
+            if unit:
+                classification_payload["unit"] = unit
+            classifications.append(classification_payload)
+
+        reported_findings.append(
+            {
+                "finding": finding_name,
+                "classifications": classifications,
+                "interventions": [],
+            }
+        )
+    return reported_findings
+
+
+def _component_value_for_classification(
+    value: ValidationScalar,
+    *,
+    classification_name: str,
+    unit: str | None,
+    base_url: str,
+) -> Dict[str, object]:
+    if unit and isinstance(value, (int, float)) and not isinstance(value, bool):
+        return {
+            "valueQuantity": {
+                "value": value,
+                "unit": unit,
+                "system": "http://unitsofmeasure.org",
+                "code": unit,
+            }
+        }
+    if isinstance(value, bool):
+        return {"valueBoolean": value}
+    if isinstance(value, (int, float)):
+        return {"valueDecimal": value}
+    value_text = _normalize_identifier(value)
+    if not value_text:
+        return {"valueBoolean": True}
+    return {
+        "valueCodeableConcept": {
+            "coding": [
+                _coding(
+                    f"{base_url}/CodeSystem/lx-classification-choice-cs",
+                    value_text,
+                    value_text,
+                )
+            ],
+            "text": value_text,
+        }
+    }
+
+
+def export_reported_findings_to_fhir_observations(
+    reported_findings: Sequence[Mapping[str, object]],
+    *,
+    base_url: str = "https://wg-lux.de/fhir",
+) -> List[Dict[str, object]]:
+    """Convert runtime reported-finding payloads into FHIR Observation resources."""
+
+    observations: List[Dict[str, object]] = []
+    for occurrence in _normalize_reported_findings(reported_findings):
+        finding_name = occurrence["finding"]
+        components: List[Dict[str, object]] = []
+        for classification_name, values in occurrence["classifications"].items():
+            units = occurrence["classification_units"].get(classification_name, [])
+            unit = units[0] if units else None
+            for value in values:
+                component: Dict[str, object] = {
+                    "code": {
+                        "coding": [
+                            _coding(
+                                f"{base_url}/CodeSystem/lx-classification-cs",
+                                classification_name,
+                                classification_name,
+                            )
+                        ],
+                        "text": classification_name,
+                    }
+                }
+                component.update(
+                    _component_value_for_classification(
+                        value,
+                        classification_name=classification_name,
+                        unit=unit,
+                        base_url=base_url,
+                    )
+                )
+                components.append(component)
+
+        observations.append(
+            {
+                "resourceType": "Observation",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        _coding(
+                            f"{base_url}/CodeSystem/lx-finding-cs",
+                            finding_name,
+                            finding_name,
+                        )
+                    ],
+                    "text": finding_name,
+                },
+                "component": components,
+            }
+        )
+    return observations
+
+
+def validate_reported_findings_against_terminology(
+    reported_findings: Sequence[Mapping[str, object]],
+    *,
+    findings: Mapping[str, Finding],
+    classifications: Mapping[str, Classification],
+    classification_choices: Mapping[str, ClassificationChoice],
+    units: Mapping[str, Unit],
+) -> List[RuntimeValidationIssueDataDict]:
+    """Validate normalized findings against the currently loaded YAML terminology."""
+
+    issues: List[RuntimeValidationIssueDataDict] = []
+    for occurrence_index, occurrence in enumerate(
+        _normalize_reported_findings(reported_findings)
+    ):
+        finding = findings.get(occurrence["finding"])
+        if finding is None:
+            issues.append(
+                _build_issue(
+                    code="unknown_finding",
+                    message=f"Finding '{occurrence['finding']}' is not in the KB.",
+                    validator_name="terminology",
+                    validator_kind="template",
+                    details={"occurrence_index": occurrence_index},
+                )
+            )
+            continue
+
+        allowed_classifications = set(_as_str_list(finding.classifications))
+        for classification_name, values in occurrence["classifications"].items():
+            classification = classifications.get(classification_name)
+            if classification is None:
+                issues.append(
+                    _build_issue(
+                        code="unknown_classification",
+                        message=(
+                            f"Classification '{classification_name}' is not in the KB."
+                        ),
+                        validator_name="terminology",
+                        validator_kind="template",
+                        details={"occurrence_index": occurrence_index},
+                    )
+                )
+                continue
+            if (
+                allowed_classifications
+                and classification_name not in allowed_classifications
+            ):
+                issues.append(
+                    _build_issue(
+                        code="classification_not_allowed_for_finding",
+                        message=(
+                            f"Classification '{classification_name}' is not allowed "
+                            f"for finding '{occurrence['finding']}'."
+                        ),
+                        validator_name="terminology",
+                        validator_kind="template",
+                        details={"occurrence_index": occurrence_index},
+                    )
+                )
+
+            allowed_choices = set(_as_str_list(classification.classification_choices))
+            for value in values:
+                value_name = _normalize_identifier(value)
+                if (
+                    value_name
+                    and not isinstance(value, (bool, int, float))
+                    and allowed_choices
+                    and value_name not in allowed_choices
+                    and value_name not in classification_choices
+                ):
+                    issues.append(
+                        _build_issue(
+                            code="classification_choice_not_allowed",
+                            message=(
+                                f"Choice '{value_name}' is not allowed for "
+                                f"classification '{classification_name}'."
+                            ),
+                            validator_name="terminology",
+                            validator_kind="template",
+                            details={"occurrence_index": occurrence_index},
+                        )
+                    )
+
+        for classification_name, unit_names in occurrence[
+            "classification_units"
+        ].items():
+            for unit_name in unit_names:
+                if unit_name not in units:
+                    issues.append(
+                        _build_issue(
+                            code="unknown_unit",
+                            message=f"Unit '{unit_name}' is not in the KB.",
+                            validator_name="terminology",
+                            validator_kind="template",
+                            details={
+                                "occurrence_index": occurrence_index,
+                                "classification": classification_name,
+                            },
+                        )
+                    )
+    return issues
+
+
+def import_terminology_validated_fhir_observations(
+    observations: Sequence[Mapping[str, object]],
+    *,
+    findings: Mapping[str, Finding],
+    classifications: Mapping[str, Classification],
+    classification_choices: Mapping[str, ClassificationChoice],
+    units: Mapping[str, Unit],
+) -> FhirTerminologyValidatedFindingResultDataDict:
+    """Import FHIR Observations and validate them against YAML KB terminology."""
+
+    reported_findings = import_fhir_observations_to_reported_findings(observations)
+    issues = validate_reported_findings_against_terminology(
+        reported_findings,
+        findings=findings,
+        classifications=classifications,
+        classification_choices=classification_choices,
+        units=units,
+    )
+    return FhirTerminologyValidatedFindingResultDataDict(
+        ok=not issues,
+        reported_findings=reported_findings,
+        observations=[dict(observation) for observation in observations],
+        issues=issues,
+    )
+
+
+def export_terminology_validated_fhir_observations(
+    reported_findings: Sequence[Mapping[str, object]],
+    *,
+    findings: Mapping[str, Finding],
+    classifications: Mapping[str, Classification],
+    classification_choices: Mapping[str, ClassificationChoice],
+    units: Mapping[str, Unit],
+    base_url: str = "https://wg-lux.de/fhir",
+) -> FhirTerminologyValidatedFindingResultDataDict:
+    """Validate runtime findings against YAML KB terminology and export FHIR."""
+
+    observations = export_reported_findings_to_fhir_observations(
+        reported_findings,
+        base_url=base_url,
+    )
+    issues = validate_reported_findings_against_terminology(
+        reported_findings,
+        findings=findings,
+        classifications=classifications,
+        classification_choices=classification_choices,
+        units=units,
+    )
+    return FhirTerminologyValidatedFindingResultDataDict(
+        ok=not issues,
+        reported_findings=[dict(item) for item in reported_findings],
+        observations=observations,
+        issues=issues,
+    )
 
 
 def _coerce_numeric(value: ValidationScalar) -> float | None:
@@ -456,10 +855,10 @@ def _normalize_condition(
 def _evaluate_clause(
     clause: _NormalizedConditionClause,
     classifications: Mapping[str, List[ValidationScalar]],
-) -> bool:
+) -> bool | None:
     actual_values = classifications.get(clause.classification, [])
     if not actual_values:
-        return False
+        return None
 
     comparator = clause.comparator
     primary_expected_value = clause.expected_values[0]
@@ -492,27 +891,68 @@ def _evaluate_clause(
     return False
 
 
+def _condition_evaluation(
+    condition: (
+        FindingsValidatorCondition
+        | ClassificationValidatorCondition
+        | InterventionValidatorCondition
+        | UnitValidatorCondition
+    ),
+    classifications: Mapping[str, List[ValidationScalar]],
+) -> tuple[bool | None, List[str]]:
+    normalized_condition = _normalize_condition(condition)
+    any_clauses = normalized_condition.any_clauses
+    all_clauses = normalized_condition.all_clauses
+    missing: set[str] = set()
+
+    any_match: bool | None = True
+    if any_clauses:
+        any_results = [
+            (clause, _evaluate_clause(clause, classifications))
+            for clause in any_clauses
+        ]
+        if any(result is True for _, result in any_results):
+            any_match = True
+        elif any(result is None for _, result in any_results):
+            any_match = None
+            missing.update(
+                clause.classification
+                for clause, result in any_results
+                if result is None
+            )
+        else:
+            any_match = False
+
+    all_match: bool | None = True
+    if all_clauses:
+        all_results = [
+            (clause, _evaluate_clause(clause, classifications))
+            for clause in all_clauses
+        ]
+        if any(result is False for _, result in all_results):
+            all_match = False
+        elif any(result is None for _, result in all_results):
+            all_match = None
+            missing.update(
+                clause.classification
+                for clause, result in all_results
+                if result is None
+            )
+        else:
+            all_match = True
+
+    if any_match is False or all_match is False:
+        return False, []
+    if any_match is None or all_match is None:
+        return None, sorted(missing)
+    return True, []
+
+
 def _condition_matches(
     condition: FindingsValidatorCondition,
     classifications: Mapping[str, List[ValidationScalar]],
 ) -> bool:
-    normalized_condition = _normalize_condition(condition)
-    any_clauses = normalized_condition.any_clauses
-    all_clauses = normalized_condition.all_clauses
-
-    any_match = True
-    if any_clauses:
-        any_match = any(
-            _evaluate_clause(clause, classifications) for clause in any_clauses
-        )
-
-    all_match = True
-    if all_clauses:
-        all_match = all(
-            _evaluate_clause(clause, classifications) for clause in all_clauses
-        )
-
-    return any_match and all_match
+    return _condition_evaluation(condition, classifications)[0] is True
 
 
 def _classification_condition_matches(
@@ -523,23 +963,7 @@ def _classification_condition_matches(
     ),
     classifications: Mapping[str, List[ValidationScalar]],
 ) -> bool:
-    normalized_condition = _normalize_condition(condition)
-    any_clauses = normalized_condition.any_clauses
-    all_clauses = normalized_condition.all_clauses
-
-    any_match = True
-    if any_clauses:
-        any_match = any(
-            _evaluate_clause(clause, classifications) for clause in any_clauses
-        )
-
-    all_match = True
-    if all_clauses:
-        all_match = all(
-            _evaluate_clause(clause, classifications) for clause in all_clauses
-        )
-
-    return any_match and all_match
+    return _condition_evaluation(condition, classifications)[0] is True
 
 
 def _missing_required_classifications(
@@ -802,7 +1226,32 @@ def evaluate_findings_validator_runtime(
             )
         else:
             for occurrence_index, occurrence in enumerate(matched_occurrences):
-                if not _condition_matches(condition, occurrence["classifications"]):
+                condition_result, missing_condition_data = _condition_evaluation(
+                    condition, occurrence["classifications"]
+                )
+                if condition_result is None:
+                    ok = False
+                    issues.append(
+                        _build_issue(
+                            code="missing_data_requirement",
+                            message=(
+                                f"Validator '{validator.name}' cannot evaluate its "
+                                "condition because required source data is missing: "
+                                f"{', '.join(missing_condition_data)}."
+                            ),
+                            validator_name=validator.name,
+                            validator_kind="findings_validator",
+                            level="warning",
+                            details={
+                                "occurrence_index": occurrence_index,
+                                "missing_condition_classifications": (
+                                    missing_condition_data
+                                ),
+                            },
+                        )
+                    )
+                    continue
+                if condition_result is False:
                     continue
                 triggered_occurrences += 1
                 missing = _missing_required_classifications(
@@ -978,9 +1427,32 @@ def evaluate_classification_validator_runtime(
             else:
                 ok = True
                 for occurrence_index, occurrence in enumerate(matched_occurrences):
-                    if not _classification_condition_matches(
+                    condition_result, missing_condition_data = _condition_evaluation(
                         condition, occurrence["classifications"]
-                    ):
+                    )
+                    if condition_result is None:
+                        ok = False
+                        issues.append(
+                            _build_issue(
+                                code="missing_data_requirement",
+                                message=(
+                                    f"Validator '{validator.name}' cannot evaluate its "
+                                    "condition because required source data is missing: "
+                                    f"{', '.join(missing_condition_data)}."
+                                ),
+                                validator_name=validator.name,
+                                validator_kind="classification_validator",
+                                level="warning",
+                                details={
+                                    "occurrence_index": occurrence_index,
+                                    "missing_condition_classifications": (
+                                        missing_condition_data
+                                    ),
+                                },
+                            )
+                        )
+                        continue
+                    if condition_result is False:
                         continue
                     triggered_occurrences += 1
                     missing_requirements = _missing_requirement_references(
@@ -1116,9 +1588,32 @@ def evaluate_intervention_validator_runtime(
             )
         else:
             for occurrence_index, occurrence in enumerate(matched_occurrences):
-                if not _classification_condition_matches(
+                condition_result, missing_condition_data = _condition_evaluation(
                     condition, occurrence["classifications"]
-                ):
+                )
+                if condition_result is None:
+                    ok = False
+                    issues.append(
+                        _build_issue(
+                            code="missing_data_requirement",
+                            message=(
+                                f"Validator '{validator.name}' cannot evaluate its "
+                                "condition because required source data is missing: "
+                                f"{', '.join(missing_condition_data)}."
+                            ),
+                            validator_name=validator.name,
+                            validator_kind="intervention_validator",
+                            level="warning",
+                            details={
+                                "occurrence_index": occurrence_index,
+                                "missing_condition_classifications": (
+                                    missing_condition_data
+                                ),
+                            },
+                        )
+                    )
+                    continue
+                if condition_result is False:
                     continue
                 triggered_occurrences += 1
                 missing_requirements = _missing_requirement_references(
@@ -1244,9 +1739,32 @@ def evaluate_unit_validator_runtime(
             )
         else:
             for occurrence_index, occurrence in enumerate(matched_occurrences):
-                if not _classification_condition_matches(
+                condition_result, missing_condition_data = _condition_evaluation(
                     condition, occurrence["classifications"]
-                ):
+                )
+                if condition_result is None:
+                    ok = False
+                    issues.append(
+                        _build_issue(
+                            code="missing_data_requirement",
+                            message=(
+                                f"Validator '{validator.name}' cannot evaluate its "
+                                "condition because required source data is missing: "
+                                f"{', '.join(missing_condition_data)}."
+                            ),
+                            validator_name=validator.name,
+                            validator_kind="unit_validator",
+                            level="warning",
+                            details={
+                                "occurrence_index": occurrence_index,
+                                "missing_condition_classifications": (
+                                    missing_condition_data
+                                ),
+                            },
+                        )
+                    )
+                    continue
+                if condition_result is False:
                     continue
                 triggered_occurrences += 1
                 missing_requirements = _missing_requirement_references(
@@ -1685,9 +2203,15 @@ __all__ = [
     "ExaminationValidatorExecutionDataDict",
     "UnitValidatorExecutionDataDict",
     "ReportTemplateRuntimeValidationResultDataDict",
+    "FhirTerminologyValidatedFindingResultDataDict",
     "evaluate_classification_validator_runtime",
     "evaluate_findings_validator_runtime",
     "evaluate_intervention_validator_runtime",
     "evaluate_report_template_validators_runtime",
     "evaluate_unit_validator_runtime",
+    "export_reported_findings_to_fhir_observations",
+    "export_terminology_validated_fhir_observations",
+    "import_fhir_observations_to_reported_findings",
+    "import_terminology_validated_fhir_observations",
+    "validate_reported_findings_against_terminology",
 ]
