@@ -8,6 +8,55 @@ from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.utils.dataloader import resolve_kb_module_load_order
 
 
+def _write_module_config(
+    module_dir: Path,
+    *,
+    name: str,
+    version: str = "0.1.0",
+    modules: list[str] | None = None,
+    depends_on: list[str] | None = None,
+    data_dirs: list[str] | None = None,
+) -> None:
+    module_dir.mkdir(parents=True, exist_ok=True)
+    lines = [
+        f"name: {name}",
+        'description: ""',
+        f"version: {version}",
+    ]
+    if modules:
+        lines.extend(["modules:", *[f"  - {module}" for module in modules]])
+    else:
+        lines.append("modules: []")
+    if depends_on:
+        lines.extend(
+            ["depends_on:", *[f"  - {dependency}" for dependency in depends_on]]
+        )
+    else:
+        lines.append("depends_on: []")
+    if data_dirs is not None:
+        lines.append("data:")
+        if data_dirs:
+            lines.extend(["  dirs:", *[f"    - {data_dir}" for data_dir in data_dirs]])
+        else:
+            lines.append("  dirs: []")
+    (module_dir / "config.yaml").write_text("\n".join(lines) + "\n")
+
+
+def _write_unit(module_dir: Path, *, name: str, abbreviation: str) -> None:
+    data_dir = module_dir / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    (data_dir / "units.yaml").write_text(
+        "\n".join(
+            [
+                "- model: unit",
+                f"  name: {name}",
+                f"  abbreviation: {abbreviation}",
+            ]
+        )
+        + "\n"
+    )
+
+
 class TestDataLoader:
     def test_data_loader_fetch_config_yamls(
         self,
@@ -135,3 +184,49 @@ class TestDataLoader:
         loader = DataLoader(input_dirs=[Path("./non_existing_dir/")])
         config_files = loader.fetch_config_yamls()
         assert config_files == []
+
+    def test_load_knowledge_base_prefers_bundle_scoped_module(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        canonical_units_dir = tmp_path / "terminology" / "lx_units"
+        _write_module_config(
+            canonical_units_dir,
+            name="lx_units",
+            modules=[],
+            depends_on=[],
+            data_dirs=["./data"],
+        )
+        _write_unit(
+            canonical_units_dir,
+            name="canonical_centimeter",
+            abbreviation="cm",
+        )
+
+        editor_bundle_dir = tmp_path / "editor_bundle"
+        _write_module_config(
+            editor_bundle_dir,
+            name="editor_bundle",
+            modules=["lx_units"],
+            depends_on=[],
+            data_dirs=[],
+        )
+        editor_units_dir = editor_bundle_dir / "lx_units"
+        _write_module_config(
+            editor_units_dir,
+            name="lx_units",
+            modules=[],
+            depends_on=[],
+            data_dirs=["./data"],
+        )
+        _write_unit(
+            editor_units_dir,
+            name="editor_millimeter",
+            abbreviation="mm",
+        )
+
+        loader = DataLoader(input_dirs=[tmp_path])
+        kb = loader.load_knowledge_base("editor_bundle")
+
+        assert "editor_millimeter" in kb.unit
+        assert "canonical_centimeter" not in kb.unit

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Set
+from typing import TYPE_CHECKING, Dict, List, Literal, Set
 
 from pydantic import Field
 
@@ -17,6 +17,9 @@ if TYPE_CHECKING:
 class DataLoader(AppBaseModel):
     input_dirs: List[Path] = Field(default_factory=_default_dataloader_dirs_factory)
     module_configs: Dict[str, "KnowledgeBaseConfig"] = Field(default_factory=dict)
+    module_config_candidates: Dict[str, List["KnowledgeBaseConfig"]] = Field(
+        default_factory=dict
+    )
 
     def load_knowledge_base(self, module_name: str) -> "KnowledgeBase":
         """
@@ -30,7 +33,7 @@ class DataLoader(AppBaseModel):
         if not self.module_configs:
             self.load_module_configs()
 
-        kb_config = self.get_initialized_config(module_name)
+        kb_config = self._get_initialized_config(module_name)
         # Load root module data from YAML so the base KB is populated even when
         # there are no submodules.
         kb = KnowledgeBase.create_from_config(kb_config)
@@ -38,7 +41,11 @@ class DataLoader(AppBaseModel):
         ordered_submodules = kb_config.modules
 
         for sm_name in ordered_submodules:
-            sm_config = self.get_initialized_config(sm_name)
+            sm_config = self._get_initialized_config(
+                sm_name,
+                context_config=kb_config,
+                relation="module",
+            )
             sm_kb = KnowledgeBase.create_from_config(sm_config)
             kb.import_knowledge_base(sm_kb)
         return kb
@@ -68,24 +75,42 @@ class DataLoader(AppBaseModel):
         Discovers all "config.yaml" files under the DataLoader's input_dirs, loads each file into a KnowledgeBaseConfig, sets the config's data.source_file to the file path, normalizes data paths relative to that file, and stores the config in self.module_configs keyed by the config's name.
         """
 
-        config_files = self.fetch_config_yamls()
+        config_files = sorted(
+            {config_file.resolve() for config_file in self.fetch_config_yamls()}
+        )
+        self.module_configs = {}
+        self.module_config_candidates = {}
         for config_file in config_files:
             kb_config = KnowledgeBaseConfig.from_yaml_file(config_file)
             kb_config.data.source_file = config_file
             kb_config.normalize_data_paths(config_file)
+            self.module_config_candidates.setdefault(kb_config.name, []).append(
+                kb_config
+            )
             self.module_configs[kb_config.name] = kb_config
 
     def get_initialized_config(self, module_name: str) -> "KnowledgeBaseConfig":
         """Return the configuration with modules ordered by dependency graph."""
 
+        return self._get_initialized_config(module_name)
+
+    def _get_initialized_config(
+        self,
+        module_name: str,
+        *,
+        context_config: "KnowledgeBaseConfig | None" = None,
+        relation: Literal["root", "module", "dependency"] = "root",
+    ) -> "KnowledgeBaseConfig":
+        """Return a config initialized with references resolved in context."""
+
         if not self.module_configs:
             self.load_module_configs()
 
-        stored_config = self.module_configs.get(module_name)
-        if stored_config is None:
-            raise ValueError(
-                f"Module '{module_name}' is not loaded. Call 'load_module_configs' first."
-            )
+        stored_config = self._resolve_module_config(
+            module_name,
+            context_config=context_config,
+            relation=relation,
+        )
 
         kb_config = stored_config.model_copy(deep=True)
 
@@ -96,46 +121,155 @@ class DataLoader(AppBaseModel):
         if not requested_modules:
             return kb_config
 
-        expanded_modules = self._expand_module_hierarchy(requested_modules)
+        expanded_modules = self._expand_module_hierarchy(
+            requested_modules,
+            context_config=kb_config,
+        )
 
-        temp_module_dict = self._collect_modules_with_dependencies(expanded_modules)
+        temp_module_dict = self._collect_modules_with_dependencies(
+            expanded_modules,
+            context_config=kb_config,
+        )
         load_order = resolve_kb_module_load_order(temp_module_dict, expanded_modules)
         kb_config.modules = load_order
         return kb_config
 
-    def _expand_module_hierarchy(self, module_names: List[str]) -> List[str]:
+    def _configs_for_name(self, module_name: str) -> List["KnowledgeBaseConfig"]:
+        candidates = self.module_config_candidates.get(module_name)
+        if candidates:
+            return candidates
+
+        legacy_config = self.module_configs.get(module_name)
+        return [legacy_config] if legacy_config is not None else []
+
+    def _resolve_module_config(
+        self,
+        module_name: str,
+        *,
+        context_config: "KnowledgeBaseConfig | None" = None,
+        relation: Literal["root", "module", "dependency"] = "root",
+    ) -> "KnowledgeBaseConfig":
+        candidates = self._configs_for_name(module_name)
+        if not candidates:
+            if relation == "dependency":
+                raise ValueError(
+                    f"Module '{module_name}' is referenced but no configuration was loaded for it."
+                )
+            raise ValueError(
+                f"Module '{module_name}' is not loaded. Call 'load_module_configs' first."
+            )
+
+        preferred_paths = self._preferred_config_paths(
+            module_name,
+            context_config=context_config,
+            relation=relation,
+        )
+        for preferred_path in preferred_paths:
+            matched = [
+                candidate
+                for candidate in candidates
+                if candidate.source_file is not None
+                and candidate.source_file.resolve() == preferred_path
+            ]
+            if len(matched) == 1:
+                return matched[0]
+
+        if len(candidates) == 1:
+            return candidates[0]
+
+        legacy_config = self.module_configs.get(module_name)
+        if legacy_config is not None:
+            return legacy_config
+
+        candidate_paths = ", ".join(
+            str(candidate.source_file or "<unknown>") for candidate in candidates
+        )
+        raise ValueError(
+            f"Module '{module_name}' is ambiguous; found multiple config.yaml "
+            f"candidates: {candidate_paths}."
+        )
+
+    def _preferred_config_paths(
+        self,
+        module_name: str,
+        *,
+        context_config: "KnowledgeBaseConfig | None",
+        relation: Literal["root", "module", "dependency"],
+    ) -> List[Path]:
+        if context_config is not None and context_config.source_file is not None:
+            context_dir = context_config.source_file.parent
+            if relation == "module":
+                return [
+                    (context_dir / module_name / "config.yaml").resolve(),
+                    (context_dir.parent / module_name / "config.yaml").resolve(),
+                ]
+            if relation == "dependency":
+                return [
+                    (context_dir.parent / module_name / "config.yaml").resolve(),
+                    (context_dir / module_name / "config.yaml").resolve(),
+                ]
+
+        if relation == "root":
+            root_matches = [
+                (input_dir / module_name / "config.yaml").resolve()
+                for input_dir in self.input_dirs
+            ]
+            candidate_paths = {
+                candidate.source_file.resolve()
+                for candidate in self._configs_for_name(module_name)
+                if candidate.source_file is not None
+            }
+            matches = [path for path in root_matches if path in candidate_paths]
+            if len(matches) == 1:
+                return [matches[0]]
+
+        return []
+
+    def _expand_module_hierarchy(
+        self,
+        module_names: List[str],
+        *,
+        context_config: "KnowledgeBaseConfig",
+    ) -> List[str]:
         """Return a flattened list of modules including nested declarations."""
 
         expanded: List[str] = []
         seen: Set[str] = set()
 
-        def visit(name: str) -> None:
+        def visit(name: str, parent_config: "KnowledgeBaseConfig") -> None:
             if name in seen:
                 return
             seen.add(name)
             expanded.append(name)
 
-            nested_config = self.module_configs.get(name)
-            if nested_config is None:
-                raise ValueError(f"Module '{name}' is referenced but not loaded.")
+            nested_config = self._resolve_module_config(
+                name,
+                context_config=parent_config,
+                relation="module"
+                if name in parent_config.modules
+                else "dependency",
+            )
 
             for child_name in nested_config.modules:
-                visit(child_name)
+                visit(child_name, nested_config)
 
         for module_name in module_names:
-            visit(module_name)
+            visit(module_name, context_config)
 
         return expanded
 
     def _collect_modules_with_dependencies(
-        self, module_names: List[str]
+        self,
+        module_names: List[str],
+        *,
+        context_config: "KnowledgeBaseConfig | None" = None,
     ) -> Dict[str, "KnowledgeBaseConfig"]:
         """Return all module configs reachable from ``module_names`` via depends_on graph."""
 
         resolved: Dict[str, KnowledgeBaseConfig] = {}
         visiting: Set[str] = set()
 
-        def visit(name: str) -> None:
+        def visit(name: str, parent_config: "KnowledgeBaseConfig | None") -> None:
             if name in resolved:
                 return
             if name in visiting:
@@ -143,19 +277,30 @@ class DataLoader(AppBaseModel):
                     f"Circular dependency detected while visiting '{name}'."
                 )
 
-            dependency_config = self.module_configs.get(name)
-            if dependency_config is None:
-                raise ValueError(
-                    f"Module '{name}' is referenced but no configuration was loaded for it."
-                )
+            dependency_config = self._resolve_module_config(
+                name,
+                context_config=parent_config,
+                relation=self._reference_relation(name, parent_config),
+            )
 
             visiting.add(name)
             for dependency in dependency_config.depends_on:
-                visit(dependency)
+                visit(dependency, dependency_config)
             visiting.remove(name)
             resolved[name] = dependency_config
 
         for module_name in module_names:
-            visit(module_name)
+            visit(module_name, context_config)
 
         return resolved
+
+    def _reference_relation(
+        self,
+        module_name: str,
+        context_config: "KnowledgeBaseConfig | None",
+    ) -> Literal["root", "module", "dependency"]:
+        if context_config is None:
+            return "root"
+        if module_name in context_config.modules:
+            return "module"
+        return "dependency"

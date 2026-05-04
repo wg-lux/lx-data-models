@@ -153,6 +153,7 @@ exclude = [
 packages = ["lx_dtypes"]
 
 [tool.hatch.build.targets.wheel.force-include]
+"lx_dtypes/data" = "lx_dtypes/data"
 "lx_dtypes/py.typed" = "lx_dtypes/py.typed"
 "lx_kb_lint.py" = "lx_kb_lint.py"
 

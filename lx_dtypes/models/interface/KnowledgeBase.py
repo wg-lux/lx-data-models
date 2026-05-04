@@ -675,6 +675,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         base_url: str = "https://wg-lux.de/fhir",
         publisher: str = "Working Group Lux",
         bundle: bool = False,
+        medical_field: str | None = None,
     ) -> Dict[str, Any]:
         """
         Export core KB terminology as FHIR CodeSystem and ValueSet resources.
@@ -689,11 +690,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 self,
                 base_url=base_url,
                 publisher=publisher,
+                medical_field=medical_field,
             )
         return export_fhir_terminology(
             self,
             base_url=base_url,
             publisher=publisher,
+            medical_field=medical_field,
         )
 
     @staticmethod

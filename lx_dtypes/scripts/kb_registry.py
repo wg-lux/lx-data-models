@@ -58,6 +58,24 @@ def get_current_knowledge_base_identity(module_name: str) -> tuple[str, str]:
     return resolved_module_name, version
 
 
+def get_current_knowledge_base_medical_field(module_name: str) -> str | None:
+    data_root = resolve_default_data_root()
+    if data_root is None:
+        raise SystemExit("Could not resolve a default lx-dtypes data root.")
+
+    config_path = data_root / module_name / "config.yaml"
+    if not config_path.exists():
+        raise SystemExit(
+            f"Could not find config.yaml for module '{module_name}' at {config_path}."
+        )
+
+    payload = yaml.safe_load(config_path.read_text())
+    if not isinstance(payload, dict):
+        raise SystemExit(f"Malformed module config at {config_path}.")
+    value = payload.get("medical_field")
+    return value.strip() if isinstance(value, str) and value.strip() else None
+
+
 def _registry_payload(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {"modules": {}}
@@ -83,13 +101,17 @@ def _add_entry(
     module_name: str,
     version: str,
     input_dirs: list[Path],
+    medical_field: str | None = None,
 ) -> None:
     payload = _registry_payload(registry_path)
     modules = payload.setdefault("modules", {})
     module_versions = modules.setdefault(module_name, {})
-    module_versions[version] = {
+    entry: dict[str, Any] = {
         "input_dirs": [str(path.expanduser().resolve()) for path in input_dirs]
     }
+    if medical_field:
+        entry["medical_field"] = medical_field
+    module_versions[version] = entry
     _write_registry(registry_path, payload)
 
 
@@ -108,6 +130,7 @@ def cmd_add(args: argparse.Namespace) -> int:
         module_name=args.module,
         version=args.version,
         input_dirs=input_dirs,
+        medical_field=getattr(args, "medical_field", None),
     )
     print(
         f"Registered {args.module}@{args.version} in {registry_path} "
@@ -119,6 +142,7 @@ def cmd_add(args: argparse.Namespace) -> int:
 def cmd_add_current(args: argparse.Namespace) -> int:
     registry_path = args.registry.expanduser().resolve()
     module_name, version = get_current_knowledge_base_identity(args.module)
+    medical_field = get_current_knowledge_base_medical_field(args.module)
     data_root = resolve_default_data_root()
     if data_root is None:
         raise SystemExit("Could not resolve a default lx-dtypes data root.")
@@ -128,6 +152,7 @@ def cmd_add_current(args: argparse.Namespace) -> int:
         module_name=module_name,
         version=version,
         input_dirs=[data_root],
+        medical_field=medical_field,
     )
     print(
         f"Registered current KB {module_name}@{version} in {registry_path} "
@@ -154,6 +179,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--module", required=True, help="Knowledge-base module name."
     )
     add_parser.add_argument("--version", required=True, help="Knowledge-base version.")
+    add_parser.add_argument(
+        "--medical-field",
+        default=None,
+        help="Optional medical field metadata, for example gastroenterology.",
+    )
     add_parser.add_argument(
         "--input-dir",
         action="append",

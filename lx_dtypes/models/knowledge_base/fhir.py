@@ -12,6 +12,7 @@ FHIRResource = dict[str, Any]
 
 DEFAULT_FHIR_BASE_URL = "https://wg-lux.de/fhir"
 DEFAULT_FHIR_PUBLISHER = "Working Group Lux"
+MEDICAL_FIELD_EXTENSION_PATH = "StructureDefinition/lx-medical-field"
 
 COMMON_PROPERTY_DEFINITIONS: list[dict[str, str]] = [
     {
@@ -89,6 +90,7 @@ def export_fhir_terminology(
     base_url: str = DEFAULT_FHIR_BASE_URL,
     publisher: str = DEFAULT_FHIR_PUBLISHER,
     status: str = "active",
+    medical_field: str | None = None,
 ) -> dict[str, list[FHIRResource]]:
     """
     Export the core LX terminology domains as FHIR CodeSystem and ValueSet dicts.
@@ -99,6 +101,7 @@ def export_fhir_terminology(
 
     base_url = base_url.rstrip("/")
     version = str(getattr(getattr(kb, "config", None), "version", "0.0.0"))
+    medical_field = medical_field or _kb_medical_field(kb)
     resources_by_domain = {
         domain: list(_collection_values(kb, domain)) for domain in FHIR_EXPORT_DOMAINS
     }
@@ -120,6 +123,7 @@ def export_fhir_terminology(
             version=version,
             publisher=publisher,
             status=status,
+            medical_field=medical_field,
         )
         for domain, records in resources_by_domain.items()
     ]
@@ -130,6 +134,7 @@ def export_fhir_terminology(
         version=version,
         publisher=publisher,
         status=status,
+        medical_field=medical_field,
     )
     return {"code_systems": code_systems, "value_sets": value_sets}
 
@@ -140,17 +145,21 @@ def export_fhir_terminology_bundle(
     base_url: str = DEFAULT_FHIR_BASE_URL,
     publisher: str = DEFAULT_FHIR_PUBLISHER,
     status: str = "active",
+    medical_field: str | None = None,
 ) -> FHIRResource:
     """Export terminology resources as a FHIR collection Bundle."""
 
+    base_url = base_url.rstrip("/")
+    medical_field = medical_field or _kb_medical_field(kb)
     exported = export_fhir_terminology(
         kb,
         base_url=base_url,
         publisher=publisher,
         status=status,
+        medical_field=medical_field,
     )
     resources = [*exported["code_systems"], *exported["value_sets"]]
-    return {
+    bundle = {
         "resourceType": "Bundle",
         "type": "collection",
         "entry": [
@@ -161,6 +170,12 @@ def export_fhir_terminology_bundle(
             for resource in resources
         ],
     }
+    _attach_medical_field_extension(
+        bundle,
+        base_url=base_url,
+        medical_field=medical_field,
+    )
+    return bundle
 
 
 def import_fhir_terminology(
@@ -183,9 +198,7 @@ def import_fhir_terminology(
         if resource.get("resourceType") == "CodeSystem"
     ]
     value_sets = [
-        resource
-        for resource in resources
-        if resource.get("resourceType") == "ValueSet"
+        resource for resource in resources if resource.get("resourceType") == "ValueSet"
     ]
 
     code_display_by_domain = _code_display_lookup_by_domain(code_systems)
@@ -222,6 +235,31 @@ def _collection_values(kb: "KnowledgeBase", domain: str) -> list[object]:
     if isinstance(collection, Mapping):
         return list(collection.values())
     return []
+
+
+def _kb_medical_field(kb: "KnowledgeBase") -> str | None:
+    value = getattr(getattr(kb, "config", None), "medical_field", None)
+    return value.strip() if isinstance(value, str) and value.strip() else None
+
+
+def _medical_field_extension_url(base_url: str) -> str:
+    return f"{base_url}/{MEDICAL_FIELD_EXTENSION_PATH}"
+
+
+def _attach_medical_field_extension(
+    resource: FHIRResource,
+    *,
+    base_url: str,
+    medical_field: str | None,
+) -> None:
+    if not medical_field:
+        return
+    resource.setdefault("extension", []).append(
+        {
+            "url": _medical_field_extension_url(base_url),
+            "valueCode": medical_field,
+        }
+    )
 
 
 def _extract_fhir_resources(
@@ -489,8 +527,7 @@ def _property_uri(base_url: str, code: str) -> str:
 
 def _code_lookup(records: list[object]) -> dict[str, str]:
     return {
-        str(_read(record, "name")): _slug(_read(record, "name"))
-        for record in records
+        str(_read(record, "name")): _slug(_read(record, "name")) for record in records
     }
 
 
@@ -748,9 +785,10 @@ def _build_code_system(
     version: str,
     publisher: str,
     status: str,
+    medical_field: str | None,
 ) -> FHIRResource:
     config = DOMAIN_CONFIG[domain]
-    return {
+    resource = {
         "resourceType": "CodeSystem",
         "id": config["id"],
         "url": _code_system_url(base_url, domain),
@@ -775,6 +813,12 @@ def _build_code_system(
             for record in records
         ],
     }
+    _attach_medical_field_extension(
+        resource,
+        base_url=base_url,
+        medical_field=medical_field,
+    )
+    return resource
 
 
 def _concept_includes(records: list[object]) -> list[dict[str, str]]:
@@ -796,11 +840,12 @@ def _base_value_set(
     version: str,
     publisher: str,
     status: str,
+    medical_field: str | None,
     title: str,
     name: str,
     description: str,
 ) -> FHIRResource:
-    return {
+    resource = {
         "resourceType": "ValueSet",
         "id": value_set_id,
         "url": _value_set_url(base_url, value_set_id),
@@ -821,6 +866,12 @@ def _base_value_set(
             ]
         },
     }
+    _attach_medical_field_extension(
+        resource,
+        base_url=base_url,
+        medical_field=medical_field,
+    )
+    return resource
 
 
 def _build_value_sets(
@@ -831,6 +882,7 @@ def _build_value_sets(
     version: str,
     publisher: str,
     status: str,
+    medical_field: str | None,
 ) -> list[FHIRResource]:
     value_sets: list[FHIRResource] = []
     for domain, records in resources_by_domain.items():
@@ -845,6 +897,7 @@ def _build_value_sets(
                 version=version,
                 publisher=publisher,
                 status=status,
+                medical_field=medical_field,
                 title=config["title"].replace("Terminology", "ValueSet"),
                 name=config["name"].replace("CodeSystem", "ValueSet"),
                 description=f"All concepts from {config['title']}.",
@@ -876,6 +929,7 @@ def _build_value_sets(
                 version=version,
                 publisher=publisher,
                 status=status,
+                medical_field=medical_field,
                 title=f"LX choices for {classification_name}",
                 name=f"LxClassificationChoiceFor{_pascal(classification_code)}ValueSet",
                 description=(

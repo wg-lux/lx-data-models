@@ -38,6 +38,10 @@ from .findings_routes import (
 from .request_types import BaseRequest
 from .report_template_routes import register_report_template_routes
 from .lookup_tracker import register_runtime_lookup_tracker
+from .terminology_routes import (
+    active_terminology_selection,
+    register_terminology_routes,
+)
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -129,15 +133,29 @@ def _kb_loader() -> DataLoader:
     return loader
 
 
-def _load_module_kb(module_name: str, version: str | None = None) -> Any:
+def _resolve_active_version(module_name: str, version: str | None) -> str | None:
     if version:
+        return version
+    active = active_terminology_selection()
+    if active is not None and active[0] == module_name:
+        return active[1]
+    active_module = os.getenv("LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE", "").strip()
+    active_version = os.getenv("LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION", "").strip()
+    if active_module == module_name and active_version:
+        return active_version
+    return None
+
+
+def _load_module_kb(module_name: str, version: str | None = None) -> Any:
+    resolved_version = _resolve_active_version(module_name, version)
+    if resolved_version:
         try:
-            kb = cast(Any, load_knowledge_base(module_name, version=version))
+            kb = cast(Any, load_knowledge_base(module_name, version=resolved_version))
         except KnowledgeBaseVersionNotFoundError as exc:
             raise HttpError(
                 409,
                 "Requested knowledge-base version is not provisioned locally for "
-                f"module '{module_name}' and version '{version}'.",
+                f"module '{module_name}' and version '{resolved_version}'.",
             ) from exc
         register_runtime_lookup_tracker(kb)
         return kb
@@ -540,4 +558,9 @@ register_findings_routes(
     load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
     orm_models=lambda: _orm_models(),
     api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
+)
+
+register_terminology_routes(
+    api,
+    clear_kb_caches=lambda: _clear_kb_caches(),
 )

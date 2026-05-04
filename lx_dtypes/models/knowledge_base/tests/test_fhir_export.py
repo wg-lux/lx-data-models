@@ -154,6 +154,7 @@ def test_knowledge_base_exports_fhir_terminology_bundle() -> None:
         config=KnowledgeBaseConfig(
             name="empty",
             version="1.0.0",
+            medical_field="gastroenterology",
         ),
     )
 
@@ -161,6 +162,14 @@ def test_knowledge_base_exports_fhir_terminology_bundle() -> None:
 
     assert bundle["resourceType"] == "Bundle"
     assert bundle["type"] == "collection"
+    assert {
+        "url": f"{DEFAULT_FHIR_BASE_URL}/StructureDefinition/lx-medical-field",
+        "valueCode": "gastroenterology",
+    } in bundle["extension"]
+    assert {
+        "url": f"{DEFAULT_FHIR_BASE_URL}/StructureDefinition/lx-medical-field",
+        "valueCode": "gastroenterology",
+    } in bundle["entry"][0]["resource"]["extension"]
     assert len(bundle["entry"]) == 12
 
 
@@ -235,9 +244,7 @@ def test_fhir_terminology_import_roundtrips_exported_concepts() -> None:
 
     assert imported["examination"][0]["findings"] == ["esophagitis"]
     assert imported["finding"][0]["classifications"] == ["la_classification"]
-    assert imported["classification"][0]["classification_types"] == [
-        "grading_system"
-    ]
+    assert imported["classification"][0]["classification_types"] == ["grading_system"]
     assert imported["classification"][0]["classification_choices"] == [
         "la_grade_a",
         "la_grade_b",

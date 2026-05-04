@@ -17,6 +17,48 @@ class TestKnowledgeBaseConfig:
         assert isinstance(kb_config.depends_on, list)
         assert isinstance(kb_config.modules, list)
 
+    def test_creation_from_yaml_preserves_medical_field(self, tmp_path: Path) -> None:
+        config_path = tmp_path / "config.yaml"
+        config_path.write_text(
+            "\n".join(
+                [
+                    "name: gastro_bundle",
+                    "description: ''",
+                    "version: 2026.04.30",
+                    "medical_field: gastroenterology",
+                    "modules: []",
+                    "depends_on: []",
+                ]
+            )
+            + "\n"
+        )
+
+        kb_config = KnowledgeBaseConfig.from_yaml_file(config_path)
+
+        assert kb_config.medical_field == "gastroenterology"
+
+    def test_creation_from_yaml_preserves_author(self, tmp_path: Path) -> None:
+        config_path = tmp_path / "config.yaml"
+        config_path.write_text(
+            "\n".join(
+                [
+                    "name: author_bundle",
+                    "description: ''",
+                    "version: 2026.05.04",
+                    "medical_field: cardiology",
+                    "author: Dr. Beispiel",
+                    "modules: []",
+                    "depends_on: []",
+                ]
+            )
+            + "\n"
+        )
+
+        kb_config = KnowledgeBaseConfig.from_yaml_file(config_path)
+
+        assert kb_config.medical_field == "cardiology"
+        assert kb_config.author == "Dr. Beispiel"
+
     def test_creation_from_dataloader(
         self,
         uninitialized_demo_kb_config: KnowledgeBaseConfig,
