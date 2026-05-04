@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900" viewBox="0 0 1500 900" fill="none">
+<defs>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+<feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.10"/>
+</filter>
+<marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+<polygon points="0 0, 10 4, 0 8" fill="#475569"/>
+</marker>
+</defs>
+<rect width="1500" height="900" fill="white"/>
+<text x="44" y="54" text-anchor="start" font-size="28" font-weight="700" fill="#0f172a" font-family="Inter, Arial, sans-serif">Report-Template: Builder und Veröffentlichung</text>
+<text x="44" y="88" text-anchor="start" font-size="14" fill="#475569" font-family="Inter, Arial, sans-serif">Der Lebenszyklus vom gespeicherten YAML-Entwurf über Readiness-Prüfung bis zur produktiven Veröffentlichung.</text>
+<rect x="50" y="150" width="300" height="165" rx="16" fill="#dbeafe" stroke="#60a5fa" stroke-width="2" filter="url(#shadow)"/>
+<text x="70" y="180" text-anchor="start" font-size="16" font-weight="700" fill="#0f172a" font-family="Inter, Arial, sans-serif">Builder: Speichern</text>
+<text x="70" y="212" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">Der Builder schreibt eine neue Template-</text>
+<text x="70" y="230" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">Definition als YAML in ein Knowledge-</text>
+<text x="70" y="248" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">Base-Modul.</text>
+<rect x="410" y="150" width="280" height="165" rx="16" fill="#ccfbf1" stroke="#14b8a6" stroke-width="2" filter="url(#shadow)"/>
+<text x="430" y="180" text-anchor="start" font-size="16" font-weight="700" fill="#0f172a" font-family="Inter, Arial, sans-serif">Datei + Cache</text>
+<text x="430" y="212" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">Nach dem Schreiben werden Caches</text>
+<text x="430" y="230" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">geleert und das Modul frisch geladen.</text>
+<rect x="750" y="150" width="280" height="165" rx="16" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
+<text x="770" y="180" text-anchor="start" font-size="16" font-weight="700" fill="#0f172a" font-family="Inter, Arial, sans-serif">Preview-Prüfung</text>
+<text x="770" y="212" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">validate_and_compile(mode='preview')</text>
+<text x="770" y="230" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">erzeugt Vorschau, Readiness und</text>
+<text x="770" y="248" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">Hinweise.</text>
+<rect x="1090" y="150" width="300" height="165" rx="16" fill="#ffe4e6" stroke="#fb7185" stroke-width="2" filter="url(#shadow)"/>
+<text x="1110" y="180" text-anchor="start" font-size="16" font-weight="700" fill="#0f172a" font-family="Inter, Arial, sans-serif">Entwurfsstatus</text>
+<text x="1110" y="212" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">Das Template bleibt Entwurf, bis es</text>
+<text x="1110" y="230" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">explizit veröffentlicht wird.</text>
+<rect x="230" y="515" width="310" height="175" rx="16" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+<text x="250" y="545" text-anchor="start" font-size="16" font-weight="700" fill="#0f172a" font-family="Inter, Arial, sans-serif">Publish-Endpoint</text>
+<text x="250" y="577" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">Kompiliert im Publish-Modus und verlangt</text>
+<text x="250" y="595" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">summary.can_publish == true.</text>
+<rect x="620" y="515" width="290" height="175" rx="16" fill="#dcfce7" stroke="#4ade80" stroke-width="2" filter="url(#shadow)"/>
+<text x="640" y="545" text-anchor="start" font-size="16" font-weight="700" fill="#0f172a" font-family="Inter, Arial, sans-serif">Lifecycle-Update</text>
+<text x="640" y="577" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">Setzt den gespeicherten Status auf</text>
+<text x="640" y="595" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">published und leert die KB-Caches</text>
+<text x="640" y="613" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">erneut.</text>
+<rect x="990" y="515" width="400" height="175" rx="16" fill="#dbeafe" stroke="#60a5fa" stroke-width="2" filter="url(#shadow)"/>
+<text x="1010" y="545" text-anchor="start" font-size="16" font-weight="700" fill="#0f172a" font-family="Inter, Arial, sans-serif">Produktionsfreigabe</text>
+<text x="1010" y="577" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">Produktions-Export ist nur für published Templates</text>
+<text x="1010" y="595" text-anchor="start" font-size="13" fill="#0f172a" font-family="Inter, Arial, sans-serif">ohne blockierende Issues möglich.</text>
+<line x1="350" y1="232" x2="410" y2="232" stroke="#475569" stroke-width="2.4" marker-end="url(#arrowhead)"/>
+<text x="380.0" y="222.0" text-anchor="middle" font-size="12" fill="#475569" font-family="Inter, Arial, sans-serif">schreiben</text>
+<line x1="690" y1="232" x2="750" y2="232" stroke="#475569" stroke-width="2.4" marker-end="url(#arrowhead)"/>
+<text x="720.0" y="222.0" text-anchor="middle" font-size="12" fill="#475569" font-family="Inter, Arial, sans-serif">neu laden</text>
+<line x1="1030" y1="232" x2="1090" y2="232" stroke="#475569" stroke-width="2.4" marker-end="url(#arrowhead)"/>
+<text x="1060.0" y="222.0" text-anchor="middle" font-size="12" fill="#475569" font-family="Inter, Arial, sans-serif">Vorschau</text>
+<line x1="1240" y1="315" x2="385" y2="515" stroke="#475569" stroke-width="2.4" marker-end="url(#arrowhead)"/>
+<text x="812.5" y="399.0" text-anchor="middle" font-size="12" fill="#475569" font-family="Inter, Arial, sans-serif">Veröffentlichung anstoßen</text>
+<line x1="540" y1="602" x2="620" y2="602" stroke="#475569" stroke-width="2.4" marker-end="url(#arrowhead)"/>
+<text x="580.0" y="592.0" text-anchor="middle" font-size="12" fill="#475569" font-family="Inter, Arial, sans-serif">freigeben</text>
+<line x1="910" y1="602" x2="990" y2="602" stroke="#475569" stroke-width="2.4" marker-end="url(#arrowhead)"/>
+<text x="950.0" y="592.0" text-anchor="middle" font-size="12" fill="#475569" font-family="Inter, Arial, sans-serif">exportierbar</text>
+<text x="750.0" y="820" text-anchor="middle" font-size="13" fill="#475569" font-family="Inter, Arial, sans-serif">Wenn can_publish false ist, antwortet die Publish-Route mit 409. Unpublish setzt den Lifecycle zurück auf Entwurf.</text>
+</svg>
