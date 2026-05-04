@@ -355,6 +355,27 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def export_lookup_tracker_dot(self) -> str:
         return self._lookup_tracker.export_dot_graph()
 
+    def export_terminology_graph(self) -> Dict[str, Any]:
+        from lx_dtypes.models.interface.TerminologyDiagram import (
+            build_terminology_graph,
+        )
+
+        return build_terminology_graph(self).as_ddict()
+
+    def export_terminology_mermaid(self) -> str:
+        from lx_dtypes.models.interface.TerminologyDiagram import (
+            export_terminology_mermaid,
+        )
+
+        return export_terminology_mermaid(self)
+
+    def export_terminology_dot(self) -> str:
+        from lx_dtypes.models.interface.TerminologyDiagram import (
+            export_terminology_dot,
+        )
+
+        return export_terminology_dot(self)
+
     def compare_lookup_performance_to_snomed(
         self,
         *,
