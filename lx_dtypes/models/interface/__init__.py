@@ -7,12 +7,6 @@ _INTERFACE_EXPORTS = {
     "KnowledgeBaseLookupTracker",
     "KnowledgeBaseRegistryError",
     "KnowledgeBaseVersionNotFoundError",
-    "TerminologyGraph",
-    "TerminologyGraphEdge",
-    "TerminologyGraphNode",
-    "build_terminology_graph",
-    "export_terminology_dot",
-    "export_terminology_mermaid",
     "get_knowledge_base_identity",
     "load_knowledge_base",
     "load_module_config",
@@ -26,17 +20,6 @@ def __getattr__(name: str) -> Any:
         module = import_module("lx_dtypes.models.interface.LookupTracker")
         return getattr(module, name)
 
-    if name in {
-        "TerminologyGraph",
-        "TerminologyGraphEdge",
-        "TerminologyGraphNode",
-        "build_terminology_graph",
-        "export_terminology_dot",
-        "export_terminology_mermaid",
-    }:
-        module = import_module("lx_dtypes.models.interface.TerminologyDiagram")
-        return getattr(module, name)
-
     if name in _INTERFACE_EXPORTS:
         module = import_module("lx_dtypes.models.interface.KnowledgeBaseResolver")
         return getattr(module, name)
@@ -48,12 +31,6 @@ __all__ = [
     "KnowledgeBaseLookupTracker",
     "KnowledgeBaseRegistryError",
     "KnowledgeBaseVersionNotFoundError",
-    "TerminologyGraph",
-    "TerminologyGraphEdge",
-    "TerminologyGraphNode",
-    "build_terminology_graph",
-    "export_terminology_dot",
-    "export_terminology_mermaid",
     "get_knowledge_base_identity",
     "load_knowledge_base",
     "load_module_config",
