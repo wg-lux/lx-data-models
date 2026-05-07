@@ -256,7 +256,3 @@ Best practices:
 | `@field_validator` | `before` | Pre-processing raw data (e.g., parsing a comma-separated string into a list). |
 | `@model_validator` | `after` | Multi-field logic (e.g., "start_date must be before end_date"). |
 | `@model_validator` | `before` | Reshaping the entire incoming JSON structure before Pydantic touches it. |
-
-## Next Step
-
-Would you like me to show you how to generate **Environment Configuration** (loading `.env` files) using `pydantic-settings`, which is the standard way to handle secrets like database URLs alongside these models?

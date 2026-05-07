@@ -27,6 +27,3 @@ guides/report-template-findings-validator-migration
 ## Quick Links
 - Project repository: https://github.com/wg-lux/lx-data-models
 - Issue tracker: https://github.com/wg-lux/lx-data-models/issues
-- Python Package Index (coming soon)
-
-Need another topic? Open a discussion or file an issue and we will expand the docs.
