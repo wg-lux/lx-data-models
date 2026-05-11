@@ -14,6 +14,9 @@ It explains how report-template YAML is:
 - validated at runtime against report payloads
 - exported to frontend JSON
 
+Visual summary / visuelle Übersicht:
+- `docs/guides/report-template-diagrams.md`
+
 Read the guides in this order:
 
 1. Beginner authoring guide: `lx_dtypes/data/report_template_examples/README.md`

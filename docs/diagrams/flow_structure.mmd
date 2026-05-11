@@ -2,10 +2,10 @@ flowchart TD
 
     %% Left side: patient workflow
     Start((Start))
-    CP[Create Patient]
-    PE[Patient Examination]
-    PF[Patient Finding]
-    PCC[Patient Classification Choice]
+    CP[Patient erstellen]
+    PE[Patientenuntersuchung]
+    PF[Patientenbefund]
+    PCC[patientenbezogene Klassifikationsauswahl]
 
     Start --> CP
     CP --> PE
@@ -13,11 +13,11 @@ flowchart TD
     PF --> PCC
 
     %% Right side: medical knowledge
-    KB[Knowledge Base]
-    EX[Examination]
-    FI[Finding]
-    CL[Classification]
-    CC[Classification Choice]
+    KB[Wissensbasis]
+    EX[Untersuchung]
+    FI[Befund]
+    CL[Klassifikation]
+    CC[Klassifikationsauswahl]
 
     KB --> EX
     KB --> FI
