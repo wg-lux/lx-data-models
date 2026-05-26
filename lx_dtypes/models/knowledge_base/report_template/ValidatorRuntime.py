@@ -574,6 +574,17 @@ def _missing_requirement_references(
                 continue
             missing.append(f"classification:{requirement.name}")
             continue
+        if requirement.kind == "classification_choice":
+            choice_names = list(dict.fromkeys([*requirement.names, requirement.name]))
+            reported_values = [
+                str(value)
+                for values in occurrence["classifications"].values()
+                for value in values
+            ]
+            if any(choice_name in reported_values for choice_name in choice_names):
+                continue
+            missing.append(f"classification_choice:{'|'.join(choice_names)}")
+            continue
         if requirement.kind == "finding":
             if any(item["finding"] == requirement.name for item in all_occurrences):
                 continue
