@@ -39,7 +39,7 @@ from .ValueTypes import (
 )
 
 
-class RuntimeValidationIssueDataDict(TypedDict, total=False):
+class RuntimeValidationIssueDataDict(TypedDict):
     code: str
     level: Literal["error", "warning"]
     message: str
@@ -1040,9 +1040,8 @@ def _build_issue(
         message=message,
         validator_name=validator_name,
         validator_kind=validator_kind,
+        details=details or {},
     )
-    if details is not None:
-        issue["details"] = details
     return issue
 
 

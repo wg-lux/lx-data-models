@@ -1,9 +1,17 @@
 from __future__ import annotations
 
 from datetime import date, time
+from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    field_validator,
+    model_validator,
+)
 
 
 FrameCleanerSource = Literal["frame_extraction"]
@@ -73,16 +81,18 @@ class FrameCleanerAccumulatedMeta(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     file_path: str
-    patient_first_name: str | None = None
-    patient_last_name: str | None = None
-    patient_dob: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    dob: date | str | None = None
     casenumber: str | None = None
-    patient_gender_name: str | None = None
-    examination_date: str | None = None
-    examination_time: str | None = None
+    gender: str | None = None
+    examination_date: date | str | None = None
+    examination_time: time | str | None = None
     examiner_first_name: str | None = None
     examiner_last_name: str | None = None
     center: str | None = None
+    endoscope_type: str | None = None
+    endoscope_sn: str | None = None
     text: str | None = None
     source: FrameCleanerSource = "frame_extraction"
 
@@ -158,6 +168,74 @@ class FrameAnalysisResult(BaseModel):
         return value
 
 
+class FrameProcessResult(BaseModel):
+    """Strict result returned by frame-level OCR and sensitivity processing."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    is_sensitive: bool
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    ocr_text: str = ""
+    ocr_confidence: float = Field(ge=0.0, le=1.0)
+
+    def as_legacy_tuple(self) -> tuple[bool, dict[str, Any], str, float]:
+        return (
+            self.is_sensitive,
+            self.metadata,
+            self.ocr_text,
+            self.ocr_confidence,
+        )
+
+
+class VideoFormatProbe(BaseModel):
+    """Subset of video_utils.detect_video_format consumed by FrameCleaner."""
+
+    model_config = ConfigDict(extra="allow")
+
+    has_audio: bool = True
+    video_codec: str | None = None
+    pixel_format: str | None = None
+    width: int | None = Field(default=None, ge=0)
+    height: int | None = Field(default=None, ge=0)
+    container: str | None = None
+    can_stream_copy: bool | None = None
+
+
+class FrameRemovalPlan(BaseModel):
+    """Validated frame-removal execution plan."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    original_video: Path
+    output_video: Path
+    frames_to_remove: list[int] = Field(default_factory=list)
+    total_frames: int | None = Field(default=None, ge=0)
+    use_named_pipe: bool = True
+    ffmpeg_timeout: int = Field(ge=1)
+
+    @field_validator("frames_to_remove")
+    @classmethod
+    def validate_frames_to_remove(cls, value: list[int]) -> list[int]:
+        if any(frame_idx < 0 for frame_idx in value):
+            raise ValueError("Frame indices must be non-negative.")
+        return sorted(set(value))
+
+    @property
+    def should_use_named_pipe(self) -> bool:
+        frame_count = self.total_frames or 1000
+        return self.use_named_pipe and len(self.frames_to_remove) < frame_count * 0.1
+
+
+class FrameRemovalFilterArgs(BaseModel):
+    """FFmpeg filter args and temporary filter scripts."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    vf_args: list[str] = Field(default_factory=list)
+    af_args: list[str] = Field(default_factory=list)
+    filter_script_paths: list[Path] = Field(default_factory=list)
+
+
 class VideoAnonymizerProvenance(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -202,9 +280,13 @@ __all__ = [
     "FrameCleanerAccumulatedMeta",
     "FrameCleanerSource",
     "FrameCollectionItem",
+    "FrameProcessResult",
+    "FrameRemovalFilterArgs",
+    "FrameRemovalPlan",
     "FrameObservation",
     "FrameObservationSourceTag",
     "VideoAnonymizerProvenance",
+    "VideoFormatProbe",
     "VideoMeta",
     "VideoOcrRoi",
     "VideoPhiRegion",

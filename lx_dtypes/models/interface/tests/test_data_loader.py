@@ -180,6 +180,29 @@ class TestDataLoader:
 
         assert kb_config.modules is not None
 
+    def test_default_loader_uses_packaged_data_root(self) -> None:
+        kb = DataLoader().load_knowledge_base("report_template_examples")
+
+        assert kb.config.name == "report_template_examples"
+
+    def test_demo_data_requires_explicit_input_dir(self) -> None:
+        default_loader = DataLoader()
+        default_loader.load_module_configs()
+        default_config = default_loader.get_initialized_config("star_upper_gi")
+        assert default_config.source_file is not None
+        assert default_config.source_file.as_posix().endswith(
+            "lx_dtypes/data/star_upper_gi/config.yaml"
+        )
+
+        demo_loader = DataLoader(input_dirs=[Path("demo-data")])
+        kb = demo_loader.load_knowledge_base("star_upper_gi")
+
+        assert kb.config.name == "star_upper_gi"
+        assert kb.config.source_file is not None
+        assert kb.config.source_file.as_posix().endswith(
+            "demo-data/star_upper_gi/config.yaml"
+        )
+
     def test_non_existing_input_dir_provided(self) -> None:
         loader = DataLoader(input_dirs=[Path("./non_existing_dir/")])
         config_files = loader.fetch_config_yamls()

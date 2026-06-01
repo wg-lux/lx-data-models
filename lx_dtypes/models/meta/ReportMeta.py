@@ -7,7 +7,14 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, ClassVar, Mapping
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictBool,
+    field_validator,
+    model_validator,
+)
 
 
 class ReportReaderFlags(BaseModel):
@@ -361,7 +368,122 @@ class ReportMeta(BaseModel):
     def to_report_reader_dict(self) -> dict[str, Any]:
         """Return a plain dict compatible with the existing ReportReader call sites."""
 
-        return self.model_dump(exclude_none=True)
+        payload = self.model_dump(mode="json", exclude_none=True)
+        explicit_nulls = {
+            field_name: None
+            for field_name in self.__pydantic_fields_set__
+            if getattr(self, field_name) is None
+        }
+        return payload | explicit_nulls
+
+
+class ReportProcessRequest(BaseModel):
+    """Typed inputs for ReportReader.process_report."""
+
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+
+    pdf_path: Path | None = None
+    image_path: Path | None = None
+    use_ensemble: StrictBool = False
+    verbose: StrictBool = True
+    use_llm: StrictBool | None = None
+    text: str | None = None
+    create_anonymized_pdf: StrictBool = False
+    anonymized_pdf_output_path: str | Path | None = None
+
+    @field_validator("pdf_path", "image_path", mode="before")
+    @classmethod
+    def normalize_optional_path(cls, value: Any) -> Path | None:
+        if value in (None, ""):
+            return None
+        return Path(value)
+
+    @field_validator("anonymized_pdf_output_path", mode="before")
+    @classmethod
+    def normalize_optional_output_path(cls, value: Any) -> str | Path | None:
+        if value in (None, ""):
+            return None
+        if isinstance(value, Path):
+            return value
+        return str(value)
+
+    @field_validator("text", mode="before")
+    @classmethod
+    def normalize_optional_text(cls, value: Any) -> str | None:
+        if value is None:
+            return None
+        return str(value)
+
+    @model_validator(mode="after")
+    def validate_source(self) -> "ReportProcessRequest":
+        if self.text is None and self.pdf_path is None and self.image_path is None:
+            raise ValueError("Either pdf_path, image_path, or text must be provided")
+        return self
+
+
+class ReportProcessResult(BaseModel):
+    """Typed output from ReportReader.process_report."""
+
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+
+    text: str
+    anonymized_text: str
+    report_meta: dict[str, Any]
+    anonymized_pdf_path: Path | None = None
+
+    def as_tuple(self) -> tuple[str, str, dict[str, Any], Path | None]:
+        return (
+            self.text,
+            self.anonymized_text,
+            self.report_meta,
+            self.anonymized_pdf_path,
+        )
+
+
+class ReportCroppingRequest(BaseModel):
+    """Typed inputs for ReportReader.process_report_with_cropping."""
+
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+
+    pdf_path: Path | None = None
+    image_path: Path | None = None
+    use_ensemble: StrictBool = False
+    verbose: StrictBool = True
+    use_llm: StrictBool | None = None
+    text: str | None = None
+    crop_output_dir: Path | None = None
+    crop_sensitive_regions: StrictBool = True
+    anonymization_output_dir: Path | None = None
+
+    @field_validator(
+        "pdf_path",
+        "image_path",
+        "crop_output_dir",
+        "anonymization_output_dir",
+        mode="before",
+    )
+    @classmethod
+    def normalize_optional_path(cls, value: Any) -> Path | None:
+        if value in (None, ""):
+            return None
+        return Path(value)
+
+    @field_validator("text", mode="before")
+    @classmethod
+    def normalize_optional_text(cls, value: Any) -> str | None:
+        if value is None:
+            return None
+        return str(value)
+
+    def process_request(self) -> ReportProcessRequest:
+        return ReportProcessRequest(
+            pdf_path=self.pdf_path,
+            image_path=self.image_path,
+            use_ensemble=self.use_ensemble,
+            verbose=self.verbose,
+            use_llm=self.use_llm,
+            text=self.text,
+        )
 
 
 _NULL_STRINGS = {"", "-", "n/a", "na", "none", "null", "undefined", "unknown"}
@@ -470,6 +592,9 @@ __all__ = [
     "ReportExaminationInfo",
     "ReportMeta",
     "ReportPatientInfo",
+    "ReportProcessRequest",
+    "ReportProcessResult",
+    "ReportCroppingRequest",
     "ReportReaderFlags",
     "ReportRedactionSummary",
 ]

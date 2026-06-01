@@ -10,30 +10,7 @@ from typing import Any
 
 import yaml
 
-
-def resolve_default_data_root() -> Path | None:
-    configured_path = ""
-    try:
-        from django.conf import settings
-
-        configured_path = str(getattr(settings, "LOOKUP_DTYPES_DATA_ROOT", "")).strip()
-    except Exception:
-        configured_path = ""
-
-    if configured_path:
-        configured_root = Path(configured_path).expanduser().resolve()
-        if configured_root.exists():
-            return configured_root
-
-    package_data_dir = Path(__file__).resolve().parents[1] / "data"
-    if package_data_dir.exists():
-        return package_data_dir
-
-    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
-    if legacy_cwd_data_dir.exists():
-        return legacy_cwd_data_dir
-
-    return None
+from lx_dtypes.models.interface.data_roots import resolve_default_data_root
 
 
 def get_current_knowledge_base_identity(module_name: str) -> tuple[str, str]:

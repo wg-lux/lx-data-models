@@ -7,6 +7,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.data_roots import (
+    default_data_roots,
+    resolve_default_data_root,
+)
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
@@ -25,38 +29,7 @@ class KnowledgeBaseRegistryError(ValueError):
 
 
 def _default_input_dirs() -> tuple[Path, ...]:
-    package_data_dir = Path(__file__).resolve().parents[2] / "data"
-    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
-    return tuple(
-        data_dir
-        for data_dir in (package_data_dir, legacy_cwd_data_dir)
-        if data_dir.exists()
-    ) or (package_data_dir,)
-
-
-def resolve_default_data_root() -> Path | None:
-    configured_path = ""
-    try:
-        from django.conf import settings
-
-        configured_path = str(getattr(settings, "LOOKUP_DTYPES_DATA_ROOT", "")).strip()
-    except Exception:
-        configured_path = ""
-
-    if configured_path:
-        configured_root = Path(configured_path).expanduser().resolve()
-        if configured_root.exists():
-            return configured_root
-
-    package_data_dir = Path(__file__).resolve().parents[2] / "data"
-    if package_data_dir.exists():
-        return package_data_dir
-
-    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
-    if legacy_cwd_data_dir.exists():
-        return legacy_cwd_data_dir
-
-    return None
+    return default_data_roots()
 
 
 def _get_registry_path() -> Path | None:

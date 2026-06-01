@@ -9,7 +9,7 @@ import zipfile
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Protocol, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Protocol, TypeVar, cast
 
 from django.conf import settings
 from ninja.errors import HttpError  # type: ignore[import-untyped]
@@ -32,7 +32,7 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 if TYPE_CHECKING:
     Schema = BaseModel
-    from ninja import File
+    File = cast(Any, object())
     from ninja.files import UploadedFile
 else:
     from ninja import File

@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 from functools import lru_cache
 from importlib import import_module
-from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -16,12 +15,14 @@ from typing import (
     Set,
     TypeVar,
     cast,
+    runtime_checkable,
 )
 
 from django.conf import settings
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.data_roots import default_data_roots
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseVersionNotFoundError,
     clear_knowledge_base_resolver_caches,
@@ -121,14 +122,7 @@ def handle_structured_api_error(request: Any, exc: StructuredApiError) -> Any:
 
 @lru_cache(maxsize=1)
 def _kb_loader() -> DataLoader:
-    package_data_dir = Path(__file__).resolve().parents[2] / "data"
-    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
-    input_dirs = [
-        data_dir
-        for data_dir in (package_data_dir, legacy_cwd_data_dir)
-        if data_dir.exists()
-    ]
-    loader = DataLoader(input_dirs=input_dirs or [package_data_dir])
+    loader = DataLoader(input_dirs=list(default_data_roots()))
     loader.load_module_configs()
     return loader
 
@@ -198,10 +192,15 @@ def _api_error(status: int, code: str, message: str) -> NoReturn:
     raise StructuredApiError(status, code, message)
 
 
+@runtime_checkable
+class _RelatedManagerLike(Protocol):
+    def all(self) -> Any: ...
+
+
 def _as_str_list_from_relation(relation: object) -> list[str]:
     if relation is None:
         return []
-    if hasattr(relation, "all"):
+    if isinstance(relation, _RelatedManagerLike):
         return [str(getattr(item, "pk", item)) for item in relation.all()]
     if isinstance(relation, list):
         return [str(item) for item in relation]
