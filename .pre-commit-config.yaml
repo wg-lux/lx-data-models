@@ -15,11 +15,6 @@ repos:
         entry: .devenv/state/venv/bin/python lx_dtypes/scripts/lint_kb_yaml.py
         language: system
         pass_filenames: false
-      - id: mypy
-        name: mypy type check
-        entry: .devenv/state/venv/bin/mypy --config-file pyproject.toml
-        language: system
-        types: [python]
       - id: pyright
         name: pyright type check
         entry: pyright lx_dtypes
