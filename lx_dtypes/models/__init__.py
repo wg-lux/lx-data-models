@@ -35,6 +35,13 @@ _MAIN_EXPORTS = {
     "MODELS_DJANGO",
 }
 
+_META_EXPORTS = {
+    "SensitiveMeta",
+    "SensitiveMetaDataDict",
+    "SensitiveMetaState",
+    "SensitiveMetaStateDataDict",
+}
+
 
 def __getattr__(name: str) -> Any:
     if name in _KNOWLEDGE_BASE_EXPORTS:
@@ -47,6 +54,10 @@ def __getattr__(name: str) -> Any:
 
     if name in _MAIN_EXPORTS:
         module = import_module("lx_dtypes.models.main")
+        return getattr(module, name)
+
+    if name in _META_EXPORTS:
+        module = import_module("lx_dtypes.models.meta.SensitiveMeta")
         return getattr(module, name)
 
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
@@ -76,4 +87,8 @@ __all__ = [
     "LedgerModelsDjangoLookupType",
     "ledger_models_lookup",
     "ledger_models_django_lookup",
+    "SensitiveMeta",
+    "SensitiveMetaDataDict",
+    "SensitiveMetaState",
+    "SensitiveMetaStateDataDict",
 ]

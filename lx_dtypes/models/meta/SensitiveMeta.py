@@ -1,7 +1,17 @@
-from datetime import date, time
-from typing import List, Optional, Union
+import math
+import re
+from datetime import date, datetime, time
+from functools import lru_cache
+from typing import Any, ClassVar, List, Mapping, Optional, Union
 
-from pydantic import Field, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationError,
+    field_validator,
+    model_validator,
+)
 
 from lx_dtypes.factories.literals import str_unknown_factory
 from lx_dtypes.factories.typed_lists import list_of_str_factory
@@ -47,6 +57,7 @@ class SensitiveMetaState(StateBaseModel[SensitiveMetaStateDataDict]):
 
 
 class SensitiveMetaDataDict(MetaBaseModelDataDict):
+    file_path: Optional[str]
     examination_date: Optional[date]
     examination_time: Optional[time]
     casenumber: Optional[str]
@@ -63,6 +74,9 @@ class SensitiveMetaDataDict(MetaBaseModelDataDict):
 
     endoscope_type: Optional[str]
     endoscope_sn: Optional[str]
+    examiner_first_name: Optional[str]
+    examiner_last_name: Optional[str]
+    center: Optional[str]
 
     text: Optional[str]
     anonymized_text: Optional[str]
@@ -71,6 +85,40 @@ class SensitiveMetaDataDict(MetaBaseModelDataDict):
 
 
 class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
+    model_config = ConfigDict(validate_assignment=True)
+
+    _LEGACY_FIELD_ALIASES: ClassVar[dict[str, str]] = {
+        "patient_first_name": "first_name",
+        "patient_last_name": "last_name",
+        "patient_dob": "dob",
+        "patient_gender_name": "gender",
+        "birth_date": "dob",
+        "doctor_first_name": "examiner_first_name",
+        "doctor_last_name": "examiner_last_name",
+        "hospital": "center",
+    }
+    _NULL_STRINGS: ClassVar[set[str]] = {
+        "",
+        "-",
+        "n/a",
+        "na",
+        "none",
+        "null",
+        "undefined",
+        "unknown",
+    }
+    _UNKNOWN_DEFAULT_FIELDS: ClassVar[set[str]] = {"first_name", "last_name", "gender"}
+    _LIST_DEFAULT_FIELDS: ClassVar[set[str]] = {"tags", "pseudo_examiners"}
+    _DATE_PATTERNS: ClassVar[tuple[tuple[re.Pattern[str], str], ...]] = (
+        (re.compile(r"^\d{4}-\d{2}-\d{2}$"), "%Y-%m-%d"),
+        (re.compile(r"^\d{2}\.\d{2}\.\d{4}$"), "%d.%m.%Y"),
+        (re.compile(r"^\d{2}\.\d{2}\.\d{2}$"), "%d.%m.%y"),
+        (re.compile(r"^\d{2}/\d{2}/\d{4}$"), "%d/%m/%Y"),
+        (re.compile(r"^\d{2}-\d{2}-\d{4}$"), "%d-%m-%Y"),
+        (re.compile(r"^\d{4}/\d{2}/\d{2}$"), "%Y/%m/%d"),
+    )
+
+    file_path: Optional[str] = None
     examination_date: Optional[date] = None
     examination_time: Optional[time] = None
     casenumber: Optional[str] = None
@@ -86,6 +134,9 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
 
     endoscope_type: Optional[str] = None
     endoscope_sn: Optional[str] = None
+    examiner_first_name: Optional[str] = None
+    examiner_last_name: Optional[str] = None
+    center: Optional[str] = None
 
     text: Optional[str] = None
     anonymized_text: Optional[str] = None
@@ -93,6 +144,92 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
     external_id: Optional[str] = (
         None  # TODO was previously a model with fields like origin
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_input_payload(cls, data: Any) -> Any:
+        if not isinstance(data, Mapping):
+            return data
+
+        normalized: dict[str, Any] = {}
+        for raw_key, raw_value in dict(data).items():
+            key = cls._LEGACY_FIELD_ALIASES.get(str(raw_key), str(raw_key))
+            if key not in cls.model_fields:
+                continue
+            if key in normalized and cls._is_nonblank(normalized[key]):
+                continue
+            normalized[key] = cls._normalize_value(raw_value, key)
+        return normalized
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def normalize_field_value(cls, value: Any, info: Any) -> Any:
+        return cls._normalize_value(value, getattr(info, "field_name", None))
+
+    @staticmethod
+    def _parse_date_like(value: Any) -> Optional[date]:
+        if isinstance(value, date) and not isinstance(value, datetime):
+            return value
+        if not isinstance(value, str):
+            return None
+        s = value.strip()
+        if not s:
+            return None
+        return SensitiveMeta._parse_date_like_cached(s)
+
+    @staticmethod
+    @lru_cache(maxsize=4096)
+    def _parse_date_like_cached(value: str) -> Optional[date]:
+        for pattern, date_format in SensitiveMeta._DATE_PATTERNS:
+            if not pattern.match(value):
+                continue
+            if date_format == "%Y-%m-%d":
+                try:
+                    return date.fromisoformat(value)
+                except ValueError:
+                    return None
+            try:
+                return datetime.strptime(value, date_format).date()
+            except ValueError:
+                return None
+        return None
+
+    @classmethod
+    def _normalize_value(cls, value: Any, field_name: str | None = None) -> Any:
+        if value is None:
+            return cls._unknown_or_none(field_name)
+        if isinstance(value, float) and math.isnan(value):
+            return cls._unknown_or_none(field_name)
+        if (
+            isinstance(value, (list, dict, set, tuple))
+            and len(value) == 0
+            and field_name not in cls._LIST_DEFAULT_FIELDS
+        ):
+            return cls._unknown_or_none(field_name)
+        if isinstance(value, str):
+            stripped = value.strip()
+            if stripped.casefold() in cls._NULL_STRINGS:
+                return cls._unknown_or_none(field_name)
+            if field_name in {"dob", "examination_date"}:
+                return cls._parse_date_like(stripped) or stripped
+            return stripped
+        return value
+
+    @classmethod
+    def _unknown_or_none(cls, field_name: str | None) -> Any:
+        if field_name in cls._UNKNOWN_DEFAULT_FIELDS:
+            return str_unknown_factory()
+        return None
+
+    @classmethod
+    def _is_nonblank(cls, value: Any) -> bool:
+        if value is None:
+            return False
+        if isinstance(value, str):
+            return value.strip().casefold() not in cls._NULL_STRINGS
+        if isinstance(value, (list, dict, set, tuple)):
+            return len(value) > 0
+        return True
 
     @property
     def state(self) -> "SensitiveMetaState":
@@ -115,8 +252,82 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
                 "sensitive_meta_state's sensitive_meta field must reference the UUID of the meta"
             )
 
-        self.sensitive_meta_state = state
+        object.__setattr__(self, "sensitive_meta_state", state)
         return self
+
+    @model_validator(mode="after")
+    def validate_date_order(self) -> "SensitiveMeta":
+        if self.dob and self.examination_date and self.examination_date < self.dob:
+            dob, examination_date = self.examination_date, self.dob
+            object.__setattr__(self, "dob", dob)
+            object.__setattr__(self, "examination_date", examination_date)
+        return self
+
+    def __getitem__(self, key: str) -> Any:
+        normalized_key = self._LEGACY_FIELD_ALIASES.get(key, key)
+        if normalized_key in type(self).model_fields:
+            return getattr(self, normalized_key)
+        raise KeyError(f"Invalid key '{key}' for SensitiveMeta")
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        normalized_key = self._LEGACY_FIELD_ALIASES.get(key, key)
+        if normalized_key in type(self).model_fields:
+            setattr(self, normalized_key, value)
+            return
+        raise KeyError(f"Invalid key '{key}' for SensitiveMeta")
+
+    def to_dict(self) -> dict[str, Any]:
+        return self.model_dump(mode="json")
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any] | None) -> "SensitiveMeta":
+        return cls.model_validate(dict(data or {}))
+
+    def safe_update(
+        self,
+        data: "SensitiveMeta | BaseModel | Mapping[str, Any] | None" = None,
+        **kwargs: Any,
+    ) -> None:
+        payload: dict[str, Any] = {}
+
+        if isinstance(data, BaseModel):
+            payload.update(data.model_dump())
+        elif isinstance(data, Mapping):
+            payload.update(dict(data))
+        elif data is not None:
+            return
+
+        if kwargs:
+            payload.update(kwargs)
+        if not payload:
+            return
+
+        try:
+            validated_updates = SensitiveMeta.model_validate(payload)
+        except ValidationError:
+            return
+
+        current_payload = self.model_dump()
+        fill_updates = {
+            field: new_value
+            for field, new_value in validated_updates.model_dump().items()
+            if field in type(self).model_fields
+            and field not in {"uuid", "created_at", "sensitive_meta_state"}
+            and self._is_nonblank(new_value)
+            and not self._is_nonblank(getattr(self, field))
+        }
+        if not fill_updates:
+            return
+
+        merged_payload = current_payload | fill_updates
+        try:
+            merged = SensitiveMeta.model_validate(merged_payload)
+        except ValidationError:
+            return
+
+        for field, value in merged.model_dump().items():
+            object.__setattr__(self, field, value)
+        self.__pydantic_fields_set__.update(fill_updates.keys())
 
     @property
     def ddict_class(self) -> type[SensitiveMetaDataDict]:

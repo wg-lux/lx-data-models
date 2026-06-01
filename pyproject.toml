@@ -91,7 +91,7 @@ Homepage = "https://info.coloreg.de"
 Repository = "https://github.com/wg-lux/lx-data-models"
 
 [tool.pyright]
-extraPaths = ["lx_dtypes"]
+include = ["lx_dtypes", "scripts", "tests"]
 stubPath = "typings"
 # These settings help fix the "Unknown" errors specifically
 # reportMissingTypeStubs = false
@@ -99,11 +99,20 @@ stubPath = "typings"
 # reportUnknownVariableType = false
 
 exclude = [
+  "**/__pycache__",
+  ".devenv",
+  ".direnv",
+  ".mypy_cache",
+  ".pytest_cache",
+  ".ruff_cache",
+  "dist",
+  "docs/_build",
+  "lx-terminology-editor",
   "**/migrations/**",
   "**/manage.py",
   "**/settings.py",
 ]
-useLibraryCodeForTypes = true
+useLibraryCodeForTypes = false
 
 [tool.mypy]
 exclude = '^(typings/|\.venv/|venv/|env/)'
