@@ -42,6 +42,8 @@ from .document_type import DocumentType
 from .media_streaming import (
     ByteRange,
     FfmpegActiveStreamThrottleState,
+    FfmpegStreamInfo,
+    FfmpegStreamProbeEntry,
     FfmpegStreamThrottleState,
     FfmpegStreamThrottleStatePayload,
     MediaOperationLeaseSummary,
@@ -51,6 +53,7 @@ from .media_streaming import (
     StreamThrottleMode,
     dump_ffmpeg_stream_throttle_state,
     dump_media_operation_lease_summary,
+    validate_ffmpeg_stream_info,
 )
 from .pdf_redaction import (
     PdfRedactionBox,

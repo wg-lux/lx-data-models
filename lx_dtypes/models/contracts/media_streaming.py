@@ -5,6 +5,8 @@ from typing import Literal, NotRequired, Self, TypeAlias, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt, model_validator
 
+from .json_types import JsonObject
+
 
 MediaStreamDisposition: TypeAlias = Literal["attachment", "inline"]
 MediaStreamFileKind: TypeAlias = Literal["processed", "raw"]
@@ -66,6 +68,26 @@ class FfmpegActiveStreamThrottleState(FfmpegStreamThrottleState):
     next_stream_lease_expiry: datetime
 
 
+class FfmpegStreamProbeEntry(BaseModel):
+    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+
+    codec_type: str = Field(min_length=1)
+
+
+class FfmpegStreamInfo(BaseModel):
+    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+
+    streams: list[FfmpegStreamProbeEntry] = Field(min_length=1)
+
+    @property
+    def has_video_stream(self) -> bool:
+        return any(stream.codec_type == "video" for stream in self.streams)
+
+
+def validate_ffmpeg_stream_info(payload: JsonObject) -> FfmpegStreamInfo:
+    return FfmpegStreamInfo.model_validate(payload)
+
+
 def dump_media_operation_lease_summary(
     payload: MediaOperationLeaseSummary,
 ) -> MediaOperationLeaseSummaryPayload:
@@ -81,6 +103,8 @@ def dump_ffmpeg_stream_throttle_state(
 __all__ = [
     "ByteRange",
     "FfmpegActiveStreamThrottleState",
+    "FfmpegStreamInfo",
+    "FfmpegStreamProbeEntry",
     "FfmpegStreamThrottleState",
     "FfmpegStreamThrottleStatePayload",
     "MediaOperationLeaseSummary",
@@ -90,4 +114,5 @@ __all__ = [
     "StreamThrottleMode",
     "dump_ffmpeg_stream_throttle_state",
     "dump_media_operation_lease_summary",
+    "validate_ffmpeg_stream_info",
 ]
