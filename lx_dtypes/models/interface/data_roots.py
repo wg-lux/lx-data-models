@@ -37,9 +37,7 @@ def default_data_roots() -> tuple[Path, ...]:
     package_root = package_data_root()
     legacy_root = repo_data_root()
     existing_roots = tuple(
-        data_root
-        for data_root in (package_root, legacy_root)
-        if data_root.exists()
+        data_root for data_root in (package_root, legacy_root) if data_root.exists()
     )
     return existing_roots or (package_root,)
 

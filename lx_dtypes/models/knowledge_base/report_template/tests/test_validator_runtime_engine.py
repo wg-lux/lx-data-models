@@ -617,7 +617,9 @@ def test_runtime_engine_simulates_medical_template_execution() -> None:
         if issue["code"] == "missing_data_requirement"
     )
 
-    incomplete_issue_codes = {issue["code"] for issue in incomplete_large_polyp["issues"]}
+    incomplete_issue_codes = {
+        issue["code"] for issue in incomplete_large_polyp["issues"]
+    }
     assert incomplete_large_polyp["ok"] is False
     assert "missing_required_classification" in incomplete_issue_codes
     assert "missing_required_intervention" in incomplete_issue_codes

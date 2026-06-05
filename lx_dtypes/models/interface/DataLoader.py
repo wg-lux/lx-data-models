@@ -245,9 +245,7 @@ class DataLoader(AppBaseModel):
             nested_config = self._resolve_module_config(
                 name,
                 context_config=parent_config,
-                relation="module"
-                if name in parent_config.modules
-                else "dependency",
+                relation="module" if name in parent_config.modules else "dependency",
             )
 
             for child_name in nested_config.modules:

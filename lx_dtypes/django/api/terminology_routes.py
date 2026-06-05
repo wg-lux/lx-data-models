@@ -9,7 +9,17 @@ import zipfile
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Protocol, TypeVar, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Protocol,
+    TypeVar,
+    cast,
+)
 
 from django.conf import settings
 from ninja.errors import HttpError  # type: ignore[import-untyped]
@@ -425,7 +435,9 @@ def _load_registry_payload_for_write(registry_path: Path) -> dict[str, Any]:
         raise HttpError(500, "Terminology registry must be a JSON object.")
     modules = payload.setdefault("modules", {})
     if not isinstance(modules, dict):
-        raise HttpError(500, "Terminology registry `modules` entry must be a JSON object.")
+        raise HttpError(
+            500, "Terminology registry `modules` entry must be a JSON object."
+        )
     return payload
 
 
@@ -441,7 +453,9 @@ def _register_imported_bundle(
     modules = payload.setdefault("modules", {})
     module_versions = modules.setdefault(module_name, {})
     if not isinstance(module_versions, dict):
-        raise HttpError(500, "Terminology registry module version map must be a JSON object.")
+        raise HttpError(
+            500, "Terminology registry module version map must be a JSON object."
+        )
 
     entry: dict[str, Any] = {"input_dirs": [str(input_dir.resolve())]}
     if medical_field:
@@ -484,8 +498,12 @@ def _install_terminology_zip(
 
     import_root = _terminology_import_root(registry_path)
     import_root.mkdir(parents=True, exist_ok=True)
-    target_root = import_root / _storage_segment(module_name) / _storage_segment(version)
-    tmp_root = import_root / ".tmp" / f"{_storage_segment(module_name)}-{uuid.uuid4().hex}"
+    target_root = (
+        import_root / _storage_segment(module_name) / _storage_segment(version)
+    )
+    tmp_root = (
+        import_root / ".tmp" / f"{_storage_segment(module_name)}-{uuid.uuid4().hex}"
+    )
     package_dir = tmp_root / module_name
 
     try:
@@ -497,7 +515,9 @@ def _install_terminology_zip(
         elif target_root.exists():
             target_root.unlink()
         tmp_root.replace(target_root)
-        counts = _validate_imported_bundle(module_name=module_name, input_dir=target_root)
+        counts = _validate_imported_bundle(
+            module_name=module_name, input_dir=target_root
+        )
     finally:
         if tmp_root.exists():
             shutil.rmtree(tmp_root, ignore_errors=True)
@@ -685,9 +705,11 @@ def register_terminology_routes(
     ) -> ImportTerminologyBundleResponse:
         del request
         registry_path = _terminology_registry_path_for_write()
-        module_name, version, medical_field, input_dir, counts = _install_terminology_zip(
-            upload=file,
-            registry_path=registry_path,
+        module_name, version, medical_field, input_dir, counts = (
+            _install_terminology_zip(
+                upload=file,
+                registry_path=registry_path,
+            )
         )
         entry = _register_imported_bundle(
             registry_path=registry_path,
