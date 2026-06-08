@@ -126,6 +126,45 @@ class VideoFrameBoxAnnotationMutationResponsePayload(BaseModel):
         )
 
 
+class VideoPhiRegionPayload(BaseModel):
+    model_config = ConfigDict(extra="ignore", strict=True, str_strip_whitespace=True)
+
+    x: float = Field(ge=0)
+    y: float = Field(ge=0)
+    width: float = Field(gt=0)
+    height: float = Field(gt=0)
+    source: str = "phi_detector"
+    confidence: float | None = None
+
+
+class VideoPhiFrameObservationPayload(BaseModel):
+    model_config = ConfigDict(extra="ignore", strict=True)
+
+    frame_number: int | None = Field(default=None, ge=0)
+    frame_id: int | None = Field(default=None, ge=0)
+    image_width: int = Field(ge=1)
+    image_height: int = Field(ge=1)
+    phi_regions: list[VideoPhiRegionPayload] = Field(default_factory=list)
+
+    @property
+    def resolved_frame_number(self) -> int | None:
+        return self.frame_number if self.frame_number is not None else self.frame_id
+
+
+def validate_video_phi_frame_observations(
+    payload: object,
+) -> list[VideoPhiFrameObservationPayload]:
+    if not isinstance(payload, list):
+        return []
+    observations: list[VideoPhiFrameObservationPayload] = []
+    for item in payload:
+        try:
+            observations.append(VideoPhiFrameObservationPayload.model_validate(item))
+        except ValueError:
+            continue
+    return observations
+
+
 def video_frame_box_json_safe_dict(payload: object) -> VideoFrameBoxJsonObject:
     if not isinstance(payload, Mapping):
         return {}
@@ -149,6 +188,9 @@ __all__ = [
     "VideoFrameBoxAnnotationMutationResponsePayload",
     "VideoFrameBoxAnnotationRequestPayload",
     "VideoFrameBoxJsonObject",
+    "VideoPhiFrameObservationPayload",
+    "VideoPhiRegionPayload",
+    "validate_video_phi_frame_observations",
     "validate_video_frame_box_annotation_request",
     "video_frame_box_json_safe_dict",
 ]

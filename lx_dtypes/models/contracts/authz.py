@@ -42,14 +42,29 @@ class KeycloakClaimsPayload(BaseModel):
         return {role for role in roles if role}
 
 
+class KeycloakTokenResponsePayload(BaseModel):
+    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+
+    access_token: str = Field(min_length=1)
+    refresh_token: str = ""
+
+
 def validate_keycloak_claims(
     payload: Mapping[str, JsonValue],
 ) -> KeycloakClaimsPayload:
     return KeycloakClaimsPayload.model_validate(dict(payload))
 
 
+def validate_keycloak_token_response(
+    payload: Mapping[str, JsonValue],
+) -> KeycloakTokenResponsePayload:
+    return KeycloakTokenResponsePayload.model_validate(dict(payload))
+
+
 __all__ = [
     "KeycloakClaimsPayload",
     "KeycloakRoleContainerPayload",
+    "KeycloakTokenResponsePayload",
     "validate_keycloak_claims",
+    "validate_keycloak_token_response",
 ]

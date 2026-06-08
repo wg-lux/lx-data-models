@@ -60,6 +60,10 @@ def register_report_template_routes(
     resolve_payload_kb_identity: Callable[[str, PExamination], tuple[str, str | None]],
     orm_models: Callable[[], Dict[str, Any]],
     build_p_examination_payload_from_host_ledger: Callable[..., PExamination],
+    persist_patient_examination_dtypes_record: Callable[
+        [object, PExamination], dict[str, Any]
+    ]
+    | None = None,
 ) -> None:
     @api.post("/report-templates/builder/templates")
     def save_report_template(
@@ -230,6 +234,52 @@ def register_report_template_routes(
                 404,
                 f"Published report template '{template_name}' not found in module '{module_name}'.",
             ) from exc
+
+    @api.get("/patient-examinations/{patient_examination_id}/dtypes-record/")
+    def get_patient_examination_dtypes_record(
+        request: BaseRequest,
+        patient_examination_id: int,
+    ) -> Dict[str, Any]:
+        del request
+        patient_examination_model = orm_models()["PatientExamination"]
+        patient_examination = patient_examination_model.objects.filter(
+            id=patient_examination_id
+        ).first()
+        if not patient_examination:
+            raise HttpError(
+                404,
+                f"PatientExamination '{patient_examination_id}' not found.",
+            )
+        record = getattr(patient_examination, "dtypes_record", None)
+        if not isinstance(record, dict):
+            return {}
+        return cast(Dict[str, Any], record)
+
+    @api.post("/patient-examinations/{patient_examination_id}/dtypes-record/")
+    def persist_patient_examination_dtypes_record_route(
+        request: BaseRequest,
+        patient_examination_id: int,
+        payload: PExamination,
+    ) -> Dict[str, Any]:
+        del request
+        patient_examination_model = orm_models()["PatientExamination"]
+        patient_examination = patient_examination_model.objects.filter(
+            id=patient_examination_id
+        ).first()
+        if not patient_examination:
+            raise HttpError(
+                404,
+                f"PatientExamination '{patient_examination_id}' not found.",
+            )
+        if persist_patient_examination_dtypes_record is None:
+            raise HttpError(501, "dtypes record persistence is not configured.")
+        try:
+            return persist_patient_examination_dtypes_record(
+                patient_examination,
+                payload,
+            )
+        except ValueError as exc:
+            raise HttpError(422, str(exc)) from exc
 
     @api.post(
         "/report-templates/{module_name}/{template_name}/validate-from-ledger/{patient_examination_id}"

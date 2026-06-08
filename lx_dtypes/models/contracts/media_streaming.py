@@ -72,6 +72,11 @@ class FfmpegStreamProbeEntry(BaseModel):
     model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
 
     codec_type: str = Field(min_length=1)
+    codec_name: str = ""
+    pix_fmt: str = ""
+    color_range: str = "tv"
+    width: int | None = Field(default=None, ge=1)
+    height: int | None = Field(default=None, ge=1)
 
 
 class FfmpegStreamInfo(BaseModel):
@@ -82,6 +87,10 @@ class FfmpegStreamInfo(BaseModel):
     @property
     def has_video_stream(self) -> bool:
         return any(stream.codec_type == "video" for stream in self.streams)
+
+    @property
+    def video_streams(self) -> list[FfmpegStreamProbeEntry]:
+        return [stream for stream in self.streams if stream.codec_type == "video"]
 
 
 def validate_ffmpeg_stream_info(payload: JsonObject) -> FfmpegStreamInfo:
