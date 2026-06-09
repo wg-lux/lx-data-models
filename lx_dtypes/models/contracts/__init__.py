@@ -46,7 +46,10 @@ from .requirement_evaluation import (
     RequirementEvaluationResponse,
     RequirementEvaluationResult,
 )
+from .text_detection import TesseractOCRData, TesseractWordConfidence
 from .report_context import ReportContext
+from .video_processing import VideoEncoderConfig, VideoMaskConfig
+from .video_format import VideoFormatInfo
 
 __all__ = [
     "CoreConceptBase",
@@ -87,5 +90,10 @@ __all__ = [
     "RequirementEvaluationRequest",
     "RequirementEvaluationResponse",
     "RequirementEvaluationResult",
+    "TesseractOCRData",
+    "TesseractWordConfidence",
     "ReportContext",
+    "VideoEncoderConfig",
+    "VideoMaskConfig",
+    "VideoFormatInfo",
 ]
