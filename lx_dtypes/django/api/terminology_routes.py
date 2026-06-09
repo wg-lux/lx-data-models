@@ -29,9 +29,11 @@ import yaml
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseRegistryError,
     clear_knowledge_base_resolver_caches,
+    get_knowledge_base_identity,
     load_knowledge_base,
 )
 from lx_dtypes.models.knowledge_base import KB_MODEL_NAMES_ORDERED
+from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.utils.parser import camel_to_snake
 
 from .lookup_tracker import register_runtime_lookup_tracker
@@ -291,13 +293,31 @@ def _set_active_selection(
     clear_knowledge_base_resolver_caches()
 
 
-def _record_counts(kb: Any) -> Dict[str, int]:
-    record_lists = kb.export_record_lists()
-    counts = {
-        key: len(value)
-        for key, value in record_lists.items()
-        if isinstance(value, list)
-    }
+def _record_counts(kb: KnowledgeBase) -> Dict[str, int]:
+    counts: Dict[str, int] = {}
+    export_record_lists = getattr(kb, "export_record_lists", None)
+    if callable(export_record_lists):
+        record_lists = export_record_lists()
+        if isinstance(record_lists, Mapping):
+            counts.update(
+                {
+                    str(key): len(value)
+                    for key, value in record_lists.items()
+                    if isinstance(value, list)
+                }
+            )
+    else:
+        export_core_concepts = getattr(kb, "export_core_concepts", None)
+        if callable(export_core_concepts):
+            core_concepts = export_core_concepts()
+            if isinstance(core_concepts, Mapping):
+                counts.update(
+                    {
+                        str(key): len(value)
+                        for key, value in core_concepts.items()
+                        if isinstance(value, list)
+                    }
+                )
     for model_name in KB_MODEL_NAMES_ORDERED:
         attr_name = camel_to_snake(model_name)
         value = getattr(kb, attr_name, None)
@@ -479,7 +499,12 @@ def _validate_imported_bundle(
 ) -> Dict[str, int]:
     clear_knowledge_base_resolver_caches()
     try:
-        kb = load_knowledge_base(module_name, input_dirs=[input_dir])
+        _, version = get_knowledge_base_identity(module_name, input_dirs=[input_dir])
+        kb = load_knowledge_base(
+            module_name,
+            version=version,
+            input_dirs=[input_dir],
+        )
     except Exception as exc:
         raise HttpError(
             409,

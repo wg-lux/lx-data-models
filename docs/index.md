@@ -21,6 +21,7 @@ guides/dates-and-times
 guides/konzept-verknuepfungen
 guides/knowledge-base-authoring
 guides/kb-yaml-linting
+guides/knowledge-base-contract-migration
 guides/report-template-infrastructure
 guides/report-template-findings-validator-migration
 ```

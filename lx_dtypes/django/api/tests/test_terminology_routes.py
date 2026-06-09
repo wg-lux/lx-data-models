@@ -348,3 +348,52 @@ def test_select_terminology_bundle_rejects_unregistered_version(
     )
 
     assert response.status_code == 404
+
+
+def test_validate_imported_bundle_uses_resolved_version(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    captured: dict[str, str | None] = {}
+
+    monkeypatch.setattr(
+        terminology_routes,
+        "get_knowledge_base_identity",
+        lambda module_name, *, version=None, input_dirs=None: (
+            module_name,
+            "2026.05.04",
+        ),
+    )
+
+    def _fake_load_knowledge_base(
+        module_name: str,
+        *,
+        version: str | None = None,
+        input_dirs: list[Path] | None = None,
+    ) -> object:
+        del input_dirs
+        captured["module_name"] = module_name
+        captured["version"] = version
+
+        class _Kb:
+            def export_core_concepts(self) -> dict[str, list[dict[str, str]]]:
+                return {"unit": [{"name": "demo"}]}
+
+        return _Kb()
+
+    monkeypatch.setattr(
+        terminology_routes,
+        "load_knowledge_base",
+        _fake_load_knowledge_base,
+    )
+
+    counts = terminology_routes._validate_imported_bundle(
+        module_name="published_terminology",
+        input_dir=tmp_path,
+    )
+
+    assert counts == {"unit": 1}
+    assert captured == {
+        "module_name": "published_terminology",
+        "version": "2026.05.04",
+    }

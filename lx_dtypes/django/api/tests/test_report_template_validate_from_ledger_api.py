@@ -156,3 +156,5 @@ def test_validate_report_template_runtime_from_ledger_success(
     payload = response.json()
     assert payload["template_name"] == "star_upper_gi_main"
     assert payload["ok"] is True
+    assert payload["knowledge_base_module"] == "report_template_examples"
+    assert payload["knowledge_base_version"] == "0.1.0"

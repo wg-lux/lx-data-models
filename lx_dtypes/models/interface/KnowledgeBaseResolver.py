@@ -131,6 +131,43 @@ def resolve_versioned_input_dirs(
     return tuple(Path(path) for path in resolved)
 
 
+def _resolve_input_dirs_for_identity(
+    module_name: str,
+    *,
+    version: str | None,
+    input_dirs: Sequence[Path] | None,
+) -> tuple[Path, ...]:
+    if version is None:
+        return tuple(input_dirs or _default_input_dirs())
+
+    if input_dirs is not None:
+        resolved_input_dirs = tuple(input_dirs)
+        module_config = _load_module_config_cached(
+            module_name,
+            tuple(str(path) for path in resolved_input_dirs),
+        )
+        if module_config.version != version:
+            raise KnowledgeBaseVersionNotFoundError(
+                "Knowledge-base version not provisioned locally for "
+                f"module '{module_name}' and version '{version}'."
+            )
+        return resolved_input_dirs
+
+    try:
+        return resolve_versioned_input_dirs(module_name, version)
+    except KnowledgeBaseVersionNotFoundError:
+        if any(key_module == module_name for key_module, _ in _load_registry()):
+            raise
+        default_input_dirs = _default_input_dirs()
+        module_config = _load_module_config_cached(
+            module_name,
+            tuple(str(path) for path in default_input_dirs),
+        )
+        if module_config.version != version:
+            raise
+        return default_input_dirs
+
+
 @lru_cache(maxsize=64)
 def _load_module_config_cached(
     module_name: str,
@@ -157,10 +194,10 @@ def load_module_config(
     version: str | None = None,
     input_dirs: Sequence[Path] | None = None,
 ) -> "KnowledgeBaseConfig":
-    resolved_input_dirs = (
-        resolve_versioned_input_dirs(module_name, version)
-        if version
-        else tuple(input_dirs or _default_input_dirs())
+    resolved_input_dirs = _resolve_input_dirs_for_identity(
+        module_name,
+        version=version,
+        input_dirs=input_dirs,
     )
     return _load_module_config_cached(
         module_name,
@@ -191,10 +228,10 @@ def load_knowledge_base(
     version: str | None = None,
     input_dirs: Sequence[Path] | None = None,
 ) -> Any:
-    resolved_input_dirs = (
-        resolve_versioned_input_dirs(module_name, version)
-        if version
-        else tuple(input_dirs or _default_input_dirs())
+    resolved_input_dirs = _resolve_input_dirs_for_identity(
+        module_name,
+        version=version,
+        input_dirs=input_dirs,
     )
     return _load_knowledge_base_cached(
         module_name,

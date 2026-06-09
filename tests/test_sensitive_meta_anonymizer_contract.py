@@ -1,4 +1,5 @@
 import math
+from typing import Any, cast
 
 import pytest
 from pydantic import BaseModel, ValidationError
@@ -82,8 +83,8 @@ def test_null_equivalent_values_are_normalized() -> None:
         first_name="unknown",
         last_name=" ",
         casenumber="n/a",
-        examination_time=math.nan,
-        text=[],
+        examination_time=cast(Any, math.nan),
+        text=cast(Any, []),
     )
 
     assert meta.first_name == "unknown"
