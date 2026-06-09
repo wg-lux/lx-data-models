@@ -36,6 +36,7 @@ def patient_video_file_data_dict_fixture(
     sensitive_meta: SensitiveMetaDataDict = {
         "uuid": "423e4567-e89b-12d3-a456-426614174333",
         "tags": [],
+        "file_path": str(raw_video_file_path),
         "examination_date": None,
         "examination_time": None,
         "casenumber": None,
@@ -49,6 +50,9 @@ def patient_video_file_data_dict_fixture(
         "dob": None,
         "endoscope_type": None,
         "endoscope_sn": None,
+        "examiner_first_name": None,
+        "examiner_last_name": None,
+        "center": None,
         "text": None,
         "anonymized_text": None,
         "external_id": None,

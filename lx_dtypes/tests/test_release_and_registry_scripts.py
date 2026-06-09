@@ -22,6 +22,7 @@ def test_add_entry_writes_expected_registry_shape(tmp_path: Path) -> None:
         module_name="report_template_examples",
         version="0.1.0",
         input_dirs=[data_root],
+        medical_field="gastroenterology",
     )
 
     payload = json.loads(registry_path.read_text())
@@ -30,6 +31,7 @@ def test_add_entry_writes_expected_registry_shape(tmp_path: Path) -> None:
             "report_template_examples": {
                 "0.1.0": {
                     "input_dirs": [str(data_root.resolve())],
+                    "medical_field": "gastroenterology",
                 }
             }
         }

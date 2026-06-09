@@ -123,7 +123,7 @@ class SaveReportTemplateRequest(BaseModel):
     template_name: str = Field(min_length=1)
     examination: str = Field(min_length=1)
     description: str = ""
-    sections: list[ReportTemplateBuilderSection] = Field(min_length=1)
+    sections: list[ReportTemplateBuilderSection] = Field(default_factory=list)
 
 
 class SaveReportTemplateResponse(BaseModel):

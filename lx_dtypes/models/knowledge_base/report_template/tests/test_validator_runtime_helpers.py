@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import Any, cast
 
 from lx_dtypes.models.knowledge_base.classification.Classification import (
     Classification,
@@ -11,6 +11,7 @@ from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice 
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
     ClassificationChoiceDescriptor,
 )
+from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
 from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
     ClassificationValidator,
@@ -81,6 +82,110 @@ def test_runtime_normalizers_cover_mapping_and_sequence_shapes() -> None:
     assert len(findings) == 1
     assert findings[0]["finding"] == "colon_polyp"
     assert findings[0]["classification_units"]["size_mm"] == ["mm"]
+
+
+def test_fhir_observation_export_import_validates_against_yaml_terminology() -> None:
+    reported_findings = [
+        {
+            "finding": "colon_polyp",
+            "classifications": [
+                {"classification": "size_mm", "value": 12, "unit": "mm"},
+                {"classification": "morphology", "value": "sessile"},
+            ],
+        }
+    ]
+    findings = {
+        "colon_polyp": Finding(
+            name="colon_polyp",
+            classifications=["size_mm", "morphology"],
+        )
+    }
+    classifications = {
+        "size_mm": Classification(name="size_mm"),
+        "morphology": Classification(
+            name="morphology",
+            classification_choices=["sessile", "flat"],
+        ),
+    }
+    choices = {
+        "sessile": ClassificationChoice(name="sessile"),
+        "flat": ClassificationChoice(name="flat"),
+    }
+    units = {"mm": Unit(name="mm", abbreviation="mm")}
+
+    exported = runtime.export_terminology_validated_fhir_observations(
+        reported_findings,
+        findings=findings,
+        classifications=classifications,
+        classification_choices=choices,
+        units=units,
+    )
+
+    assert exported["ok"] is True
+    assert exported["issues"] == []
+    observation = exported["observations"][0]
+    assert observation["resourceType"] == "Observation"
+    observation_code = cast(dict[str, Any], observation["code"])
+    observation_coding = cast(list[dict[str, Any]], observation_code["coding"])
+    observation_components = cast(list[dict[str, Any]], observation["component"])
+    assert observation_coding[0]["display"] == "colon_polyp"
+    assert observation_components[0]["valueQuantity"] == {
+        "value": 12,
+        "unit": "mm",
+        "system": "http://unitsofmeasure.org",
+        "code": "mm",
+    }
+
+    imported = runtime.import_terminology_validated_fhir_observations(
+        exported["observations"],
+        findings=findings,
+        classifications=classifications,
+        classification_choices=choices,
+        units=units,
+    )
+
+    assert imported["ok"] is True
+    assert imported["reported_findings"][0]["finding"] == "colon_polyp"
+    imported_classifications = cast(
+        list[dict[str, object]],
+        imported["reported_findings"][0]["classifications"],
+    )
+    assert {"classification": "size_mm", "value": 12, "unit": "mm"} in (
+        imported_classifications
+    )
+    assert {"classification": "morphology", "value": "sessile"} in (
+        imported_classifications
+    )
+
+
+def test_fhir_observation_export_reports_yaml_terminology_mismatch() -> None:
+    result = runtime.export_terminology_validated_fhir_observations(
+        [
+            {
+                "finding": "colon_polyp",
+                "classifications": [
+                    {"classification": "morphology", "value": "unknown_shape"},
+                ],
+            }
+        ],
+        findings={
+            "colon_polyp": Finding(
+                name="colon_polyp",
+                classifications=["morphology"],
+            )
+        },
+        classifications={
+            "morphology": Classification(
+                name="morphology",
+                classification_choices=["sessile"],
+            )
+        },
+        classification_choices={"sessile": ClassificationChoice(name="sessile")},
+        units={},
+    )
+
+    assert result["ok"] is False
+    assert result["issues"][0]["code"] == "classification_choice_not_allowed"
 
 
 def test_runtime_clause_evaluation_covers_all_comparators() -> None:

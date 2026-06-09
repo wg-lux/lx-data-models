@@ -1,4 +1,4 @@
-from typing import List, Literal, TypedDict
+from typing import List, Literal, NotRequired, TypedDict
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
@@ -45,13 +45,13 @@ class ClassificationValidatorQueryDataDict(TypedDict, total=False):
     condition: ClassificationValidatorConditionDataDict
 
 
-class ClassificationValidatorHintDataDict(TypedDict, total=False):
+class ClassificationValidatorHintDataDict(TypedDict):
     classification_name: str
     precedence: ClassificationValidatorPrecedenceLiteral
     data_type_hint: ClassificationValidatorHintDataTypeLiteral
-    choice_names: List[str]
-    descriptor_types: List[str]
-    allows_multiple: bool
+    choice_names: NotRequired[List[str]]
+    descriptor_types: NotRequired[List[str]]
+    allows_multiple: NotRequired[bool]
 
 
 class ClassificationValidatorDataDict(KnowledgebaseBaseModelDataDict):

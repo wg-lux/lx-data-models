@@ -7,6 +7,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.data_roots import (
+    default_data_roots,
+    resolve_default_data_root,
+)
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
@@ -25,38 +29,7 @@ class KnowledgeBaseRegistryError(ValueError):
 
 
 def _default_input_dirs() -> tuple[Path, ...]:
-    package_data_dir = Path(__file__).resolve().parents[2] / "data"
-    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
-    return tuple(
-        data_dir
-        for data_dir in (package_data_dir, legacy_cwd_data_dir)
-        if data_dir.exists()
-    ) or (package_data_dir,)
-
-
-def resolve_default_data_root() -> Path | None:
-    configured_path = ""
-    try:
-        from django.conf import settings
-
-        configured_path = str(getattr(settings, "LOOKUP_DTYPES_DATA_ROOT", "")).strip()
-    except Exception:
-        configured_path = ""
-
-    if configured_path:
-        configured_root = Path(configured_path).expanduser().resolve()
-        if configured_root.exists():
-            return configured_root
-
-    package_data_dir = Path(__file__).resolve().parents[2] / "data"
-    if package_data_dir.exists():
-        return package_data_dir
-
-    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
-    if legacy_cwd_data_dir.exists():
-        return legacy_cwd_data_dir
-
-    return None
+    return default_data_roots()
 
 
 def _get_registry_path() -> Path | None:
@@ -158,6 +131,43 @@ def resolve_versioned_input_dirs(
     return tuple(Path(path) for path in resolved)
 
 
+def _resolve_input_dirs_for_identity(
+    module_name: str,
+    *,
+    version: str | None,
+    input_dirs: Sequence[Path] | None,
+) -> tuple[Path, ...]:
+    if version is None:
+        return tuple(input_dirs or _default_input_dirs())
+
+    if input_dirs is not None:
+        resolved_input_dirs = tuple(input_dirs)
+        module_config = _load_module_config_cached(
+            module_name,
+            tuple(str(path) for path in resolved_input_dirs),
+        )
+        if module_config.version != version:
+            raise KnowledgeBaseVersionNotFoundError(
+                "Knowledge-base version not provisioned locally for "
+                f"module '{module_name}' and version '{version}'."
+            )
+        return resolved_input_dirs
+
+    try:
+        return resolve_versioned_input_dirs(module_name, version)
+    except KnowledgeBaseVersionNotFoundError:
+        if any(key_module == module_name for key_module, _ in _load_registry()):
+            raise
+        default_input_dirs = _default_input_dirs()
+        module_config = _load_module_config_cached(
+            module_name,
+            tuple(str(path) for path in default_input_dirs),
+        )
+        if module_config.version != version:
+            raise
+        return default_input_dirs
+
+
 @lru_cache(maxsize=64)
 def _load_module_config_cached(
     module_name: str,
@@ -184,10 +194,10 @@ def load_module_config(
     version: str | None = None,
     input_dirs: Sequence[Path] | None = None,
 ) -> "KnowledgeBaseConfig":
-    resolved_input_dirs = (
-        resolve_versioned_input_dirs(module_name, version)
-        if version
-        else tuple(input_dirs or _default_input_dirs())
+    resolved_input_dirs = _resolve_input_dirs_for_identity(
+        module_name,
+        version=version,
+        input_dirs=input_dirs,
     )
     return _load_module_config_cached(
         module_name,
@@ -218,10 +228,10 @@ def load_knowledge_base(
     version: str | None = None,
     input_dirs: Sequence[Path] | None = None,
 ) -> Any:
-    resolved_input_dirs = (
-        resolve_versioned_input_dirs(module_name, version)
-        if version
-        else tuple(input_dirs or _default_input_dirs())
+    resolved_input_dirs = _resolve_input_dirs_for_identity(
+        module_name,
+        version=version,
+        input_dirs=input_dirs,
     )
     return _load_knowledge_base_cached(
         module_name,

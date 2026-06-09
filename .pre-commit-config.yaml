@@ -15,17 +15,16 @@ repos:
         entry: .devenv/state/venv/bin/python lx_dtypes/scripts/lint_kb_yaml.py
         language: system
         pass_filenames: false
-      - id: mypy
-        name: mypy type check
-        entry: .devenv/state/venv/bin/mypy --config-file pyproject.toml
+      - id: pyright
+        name: pyright type check
+        entry: pyright lx_dtypes
         language: system
-        types: [python]
+        pass_filenames: false
       - id: pytest-suite
         name: pytest suite
         entry: .devenv/state/venv/bin/pytest
         language: system
         pass_filenames: false
-        stages: [manual]
       - id: findings-validator-operator-guard
         name: findings validator operator guard
         entry: .devenv/state/venv/bin/pytest -q lx_dtypes/models/interface/tests/test_findings_validator_operator_guard.py

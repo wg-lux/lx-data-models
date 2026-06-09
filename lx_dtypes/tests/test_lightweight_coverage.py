@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,19 @@ def test_serialize_path_handles_values_and_none(tmp_path: Path) -> None:
     path = tmp_path / "nested" / "file.txt"
     assert serialize_path(path) == path.as_posix()
     assert serialize_path(None) is None
+
+
+def test_wheel_build_includes_knowledge_base_data() -> None:
+    payload = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+    wheel_force_include = payload["tool"]["hatch"]["build"]["targets"]["wheel"][
+        "force-include"
+    ]
+    sdist_force_include = payload["tool"]["hatch"]["build"]["targets"]["sdist"][
+        "force-include"
+    ]
+
+    assert "demo-data" not in wheel_force_include
+    assert sdist_force_include["lx_dtypes/data"] == "lx_dtypes/data"
 
 
 def test_release_helpers_cover_validation_and_main(
@@ -132,6 +146,21 @@ def test_kb_registry_payload_and_commands(
     assert payload["modules"]["report_template_examples"]["0.1.0"]["input_dirs"] == [
         str(data_root.resolve())
     ]
+
+    args_with_medical_field = argparse.Namespace(
+        registry=registry_path,
+        module="report_template_examples",
+        version="0.2.0",
+        input_dir=[data_root],
+        medical_field="cardiology",
+    )
+    assert kb_registry.cmd_add(args_with_medical_field) == 0
+
+    payload = json.loads(registry_path.read_text())
+    assert (
+        payload["modules"]["report_template_examples"]["0.2.0"]["medical_field"]
+        == "cardiology"
+    )
 
     show_args = argparse.Namespace(registry=registry_path)
     assert kb_registry.cmd_show(show_args) == 0

@@ -54,6 +54,14 @@ from .finding import (
     kb_finding_lookup,
     kb_finding_models,
 )
+from .fhir import (
+    DEFAULT_FHIR_BASE_URL,
+    DEFAULT_FHIR_PUBLISHER,
+    FHIR_EXPORT_DOMAINS,
+    export_fhir_terminology,
+    export_fhir_terminology_bundle,
+    import_fhir_terminology,
+)
 from .indication import (
     KbIndicationDjangoLookupType,
     KbIndicationLookupType,
@@ -267,4 +275,10 @@ __all__ = [
     "KnowledgeBaseModelsDjangoLookupType",
     "knowledge_base_models_lookup",
     "knowledge_base_models_django_lookup",
+    "DEFAULT_FHIR_BASE_URL",
+    "DEFAULT_FHIR_PUBLISHER",
+    "FHIR_EXPORT_DOMAINS",
+    "export_fhir_terminology",
+    "export_fhir_terminology_bundle",
+    "import_fhir_terminology",
 ]

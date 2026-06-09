@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 from functools import lru_cache
 from importlib import import_module
-from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -16,15 +15,17 @@ from typing import (
     Set,
     TypeVar,
     cast,
+    runtime_checkable,
 )
 
 from django.conf import settings
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
-from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.contracts import KnowledgeBaseContract
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseVersionNotFoundError,
     clear_knowledge_base_resolver_caches,
+    get_knowledge_base_identity,
     load_knowledge_base,
 )
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
@@ -38,6 +39,10 @@ from .findings_routes import (
 from .request_types import BaseRequest
 from .report_template_routes import register_report_template_routes
 from .lookup_tracker import register_runtime_lookup_tracker
+from .terminology_routes import (
+    active_terminology_selection,
+    register_terminology_routes,
+)
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -115,46 +120,45 @@ def handle_structured_api_error(request: Any, exc: StructuredApiError) -> Any:
     )
 
 
-@lru_cache(maxsize=1)
-def _kb_loader() -> DataLoader:
-    package_data_dir = Path(__file__).resolve().parents[2] / "data"
-    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
-    input_dirs = [
-        data_dir
-        for data_dir in (package_data_dir, legacy_cwd_data_dir)
-        if data_dir.exists()
-    ]
-    loader = DataLoader(input_dirs=input_dirs or [package_data_dir])
-    loader.load_module_configs()
-    return loader
-
-
-def _load_module_kb(module_name: str, version: str | None = None) -> Any:
+def _resolve_active_version(module_name: str, version: str | None) -> str | None:
     if version:
-        try:
-            kb = cast(Any, load_knowledge_base(module_name, version=version))
-        except KnowledgeBaseVersionNotFoundError as exc:
-            raise HttpError(
-                409,
-                "Requested knowledge-base version is not provisioned locally for "
-                f"module '{module_name}' and version '{version}'.",
-            ) from exc
-        register_runtime_lookup_tracker(kb)
-        return kb
-
-    loader = _kb_loader()
+        return version
+    active = active_terminology_selection()
+    if active is not None and active[0] == module_name:
+        return active[1]
+    active_module = os.getenv("LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE", "").strip()
+    active_version = os.getenv("LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION", "").strip()
+    if active_module == module_name and active_version:
+        return active_version
     try:
-        kb = cast(Any, loader.load_knowledge_base(module_name))
+        _, current_version = get_knowledge_base_identity(module_name)
     except ValueError as exc:
         raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
-    register_runtime_lookup_tracker(kb)
+    return current_version
+
+
+def _load_module_kb(
+    module_name: str, version: str | None = None
+) -> KnowledgeBaseContract:
+    resolved_version = _resolve_active_version(module_name, version)
+    try:
+        kb = cast(
+            KnowledgeBaseContract,
+            load_knowledge_base(module_name, version=resolved_version),
+        )
+    except KnowledgeBaseVersionNotFoundError as exc:
+        raise HttpError(
+            409,
+            "Requested knowledge-base version is not provisioned locally for "
+            f"module '{module_name}' and version '{resolved_version}'.",
+        ) from exc
+    except ValueError as exc:
+        raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
+    register_runtime_lookup_tracker(cast(Any, kb))
     return kb
 
 
 def _clear_kb_caches() -> None:
-    cache_clear = getattr(_kb_loader, "cache_clear", None)
-    if callable(cache_clear):
-        cache_clear()
     clear_findings_route_caches()
     clear_knowledge_base_resolver_caches()
 
@@ -180,10 +184,15 @@ def _api_error(status: int, code: str, message: str) -> NoReturn:
     raise StructuredApiError(status, code, message)
 
 
+@runtime_checkable
+class _RelatedManagerLike(Protocol):
+    def all(self) -> Any: ...
+
+
 def _as_str_list_from_relation(relation: object) -> list[str]:
     if relation is None:
         return []
-    if hasattr(relation, "all"):
+    if isinstance(relation, _RelatedManagerLike):
         return [str(getattr(item, "pk", item)) for item in relation.all()]
     if isinstance(relation, list):
         return [str(item) for item in relation]
@@ -217,7 +226,7 @@ def _norm_name(value: Optional[str]) -> str:
 
 @lru_cache(maxsize=8)
 def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
-    return cast(Dict[str, Any], _load_module_kb(module_name).export_core_concepts())
+    return _load_module_kb(module_name).export_core_concepts()
 
 
 @lru_cache(maxsize=8)
@@ -540,4 +549,9 @@ register_findings_routes(
     load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
     orm_models=lambda: _orm_models(),
     api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
+)
+
+register_terminology_routes(
+    api,
+    clear_kb_caches=lambda: _clear_kb_caches(),
 )

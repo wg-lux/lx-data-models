@@ -208,6 +208,8 @@ def test_base_api_report_template_endpoints_shape() -> None:
     core_concepts_payload = core_concepts_res.json()
     assert "examination" in core_concepts_payload
     assert "finding" in core_concepts_payload
+    assert core_concepts_payload["knowledge_base_module"] == "report_template_examples"
+    assert core_concepts_payload["knowledge_base_version"] is not None
 
 
 def test_base_api_report_template_runtime_validation() -> None:

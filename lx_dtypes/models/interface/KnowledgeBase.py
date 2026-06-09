@@ -4,6 +4,8 @@ from typing import (
     Any,
     Dict,
     List,
+    Mapping,
+    Sequence,
     Self,
     Tuple,
     TypedDict,
@@ -149,6 +151,7 @@ from lx_dtypes.models.knowledge_base.report_template.UnitValidatorDataDict impor
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     ClassificationValidatorExecutionDataDict,
     ExaminationValidatorExecutionDataDict,
+    FhirTerminologyValidatedFindingResultDataDict,
     FindingsValidatorExecutionDataDict,
     InterventionValidatorExecutionDataDict,
     ReportTemplateRuntimeValidationResultDataDict,
@@ -158,6 +161,8 @@ from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     evaluate_intervention_validator_runtime,
     evaluate_report_template_validators_runtime,
     evaluate_unit_validator_runtime,
+    export_terminology_validated_fhir_observations,
+    import_terminology_validated_fhir_observations,
 )
 from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
     ReportTemplateClassificationRequirement,
@@ -663,6 +668,49 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         """
         payload = kb_to_core_concepts_payload(self)
         return payload.model_dump(mode="json")
+
+    def export_fhir_terminology(
+        self,
+        *,
+        base_url: str = "https://wg-lux.de/fhir",
+        publisher: str = "Working Group Lux",
+        bundle: bool = False,
+        medical_field: str | None = None,
+    ) -> Dict[str, Any]:
+        """
+        Export core KB terminology as FHIR CodeSystem and ValueSet resources.
+        """
+        from lx_dtypes.models.knowledge_base.fhir import (
+            export_fhir_terminology,
+            export_fhir_terminology_bundle,
+        )
+
+        if bundle:
+            return export_fhir_terminology_bundle(
+                self,
+                base_url=base_url,
+                publisher=publisher,
+                medical_field=medical_field,
+            )
+        return export_fhir_terminology(
+            self,
+            base_url=base_url,
+            publisher=publisher,
+            medical_field=medical_field,
+        )
+
+    @staticmethod
+    def import_fhir_terminology(
+        payload: Mapping[str, Any] | List[Mapping[str, Any]],
+        *,
+        module_name: str = "fhir_import",
+    ) -> Dict[str, Any]:
+        """
+        Import FHIR CodeSystem resources into KB storage-compatible concepts.
+        """
+        from lx_dtypes.models.knowledge_base.fhir import import_fhir_terminology
+
+        return import_fhir_terminology(payload, module_name=module_name)
 
     def reported_findings_from_p_examination(
         self, p_examination: "PExamination"
@@ -1358,6 +1406,33 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             reported_findings=normalized_reported_findings,
         )
         return result["examination_validators"][0]
+
+    def export_terminology_validated_fhir_observations(
+        self,
+        reported_findings: Sequence[Mapping[str, object]],
+        *,
+        base_url: str = "https://wg-lux.de/fhir",
+    ) -> FhirTerminologyValidatedFindingResultDataDict:
+        return export_terminology_validated_fhir_observations(
+            reported_findings,
+            findings=self.finding,
+            classifications=self.classification,
+            classification_choices=self.classification_choice,
+            units=self.unit,
+            base_url=base_url,
+        )
+
+    def import_terminology_validated_fhir_observations(
+        self,
+        observations: Sequence[Mapping[str, object]],
+    ) -> FhirTerminologyValidatedFindingResultDataDict:
+        return import_terminology_validated_fhir_observations(
+            observations,
+            findings=self.finding,
+            classifications=self.classification,
+            classification_choices=self.classification_choice,
+            units=self.unit,
+        )
 
     def get_report_template_classification_validators(
         self, name: str

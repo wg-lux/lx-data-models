@@ -15,6 +15,8 @@ class KnowledgeBaseConfig(AppBaseModelNamesUUIDTags):
     modules: List[str] = Field(default_factory=list)
     data: FilesAndDirsModel = Field(default_factory=default_data_model_factory)
     version: str
+    medical_field: Optional[str] = None
+    author: Optional[str] = None
 
     def normalize_data_paths(self, config_file: Optional[Path]) -> None:
         """

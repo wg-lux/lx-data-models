@@ -78,8 +78,8 @@ _LOAD_MODULE_KB: Callable[..., Any] | None = None
 
 
 def clear_findings_route_caches() -> None:
-    _kb_core_concepts.cache_clear()
-    _kb_lookup.cache_clear()
+    _kb_core_concepts_by_identity.cache_clear()
+    _kb_lookup_by_identity.cache_clear()
 
 
 def _set_load_module_kb(load_module_kb: Callable[..., Any]) -> None:
@@ -135,14 +135,18 @@ def _norm_name(value: Optional[str]) -> str:
 
 
 @lru_cache(maxsize=8)
-def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
+def _kb_core_concepts_by_identity(
+    module_name: str,
+    version: str,
+) -> Dict[str, Any]:
     loader = _require_load_module_kb()
-    return cast(Dict[str, Any], loader(module_name).export_core_concepts())
+    return cast(
+        Dict[str, Any],
+        loader(module_name, version=version).export_core_concepts(),
+    )
 
 
-@lru_cache(maxsize=8)
-def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
-    core = _kb_core_concepts(module_name)
+def _build_kb_lookup(core: Dict[str, Any]) -> Dict[str, Dict[str, Dict[str, Any]]]:
     examination_by_name = {
         _norm_name(item.get("name")): item for item in core.get("examination", [])
     }
@@ -162,6 +166,33 @@ def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
         "classification": classification_by_name,
         "classification_choice": choice_by_name,
     }
+
+
+def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
+    loader = _require_load_module_kb()
+    kb = loader(module_name)
+    version = str(getattr(getattr(kb, "config", None), "version", "") or "").strip()
+    if not version:
+        return cast(Dict[str, Any], kb.export_core_concepts())
+    return _kb_core_concepts_by_identity(module_name, version)
+
+
+@lru_cache(maxsize=8)
+def _kb_lookup_by_identity(
+    module_name: str,
+    version: str,
+) -> Dict[str, Dict[str, Dict[str, Any]]]:
+    core = _kb_core_concepts_by_identity(module_name, version)
+    return _build_kb_lookup(core)
+
+
+def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
+    loader = _require_load_module_kb()
+    kb = loader(module_name)
+    version = str(getattr(getattr(kb, "config", None), "version", "") or "").strip()
+    if not version:
+        return _build_kb_lookup(cast(Dict[str, Any], kb.export_core_concepts()))
+    return _kb_lookup_by_identity(module_name, version)
 
 
 def _active_patient_findings_queryset(
@@ -587,7 +618,15 @@ def register_findings_routes(
         """
         del request
         kb = load_module_kb(module_name)
-        return cast(Dict[str, Any], kb.export_core_concepts())
+        payload = cast(Dict[str, Any], kb.export_core_concepts())
+        config = getattr(kb, "config", None)
+        payload["knowledge_base_module"] = str(
+            getattr(config, "name", module_name) or module_name
+        ).strip()
+        payload["knowledge_base_version"] = (
+            str(getattr(config, "version", "") or "").strip() or None
+        )
+        return payload
 
     @api.get("/examinations/{examination_id}/findings/")
     def findings_by_examination(

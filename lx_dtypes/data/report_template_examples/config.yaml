@@ -3,6 +3,7 @@ version: 0.1.0
 modules: []
 depends_on:
   - example_terminology
+  - star_upper_gi
 
 data:
   files:

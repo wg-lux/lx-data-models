@@ -35,6 +35,70 @@ def _write_kb_root(root: Path, *, module_name: str, version: str) -> None:
     )
 
 
+def _write_scoped_unit_bundle(root: Path) -> None:
+    canonical_units_dir = root / "terminology" / "lx_units"
+    canonical_units_dir.mkdir(parents=True, exist_ok=True)
+    (canonical_units_dir / "config.yaml").write_text(
+        "\n".join(
+            [
+                "name: lx_units",
+                'description: ""',
+                "version: 0.1.0",
+                "modules: []",
+                "depends_on: []",
+                "data:",
+                "  dirs:",
+                "    - ./data",
+            ]
+        )
+        + "\n"
+    )
+    (canonical_units_dir / "data").mkdir(parents=True, exist_ok=True)
+    (canonical_units_dir / "data" / "units.yaml").write_text(
+        "- model: unit\n  name: canonical_centimeter\n  abbreviation: cm\n"
+    )
+
+    editor_bundle_dir = root / "editor_bundle"
+    editor_bundle_dir.mkdir(parents=True, exist_ok=True)
+    (editor_bundle_dir / "config.yaml").write_text(
+        "\n".join(
+            [
+                "name: editor_bundle",
+                'description: ""',
+                "version: 0.1.0",
+                "modules:",
+                "  - lx_units",
+                "depends_on: []",
+                "data:",
+                "  dirs: []",
+            ]
+        )
+        + "\n"
+    )
+
+    editor_units_dir = editor_bundle_dir / "lx_units"
+    editor_units_dir.mkdir(parents=True, exist_ok=True)
+    (editor_units_dir / "config.yaml").write_text(
+        "\n".join(
+            [
+                "name: lx_units",
+                'description: ""',
+                "version: 0.1.0",
+                "modules: []",
+                "depends_on: []",
+                "data:",
+                "  dirs:",
+                "    - ./data",
+            ]
+        )
+        + "\n"
+    )
+    (editor_units_dir / "data").mkdir(parents=True, exist_ok=True)
+    (editor_units_dir / "data" / "units.yaml").write_text(
+        "- model: unit\n  name: editor_millimeter\n  abbreviation: mm\n"
+    )
+
+
 def test_load_knowledge_base_uses_versioned_registry(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -70,6 +134,17 @@ def test_load_knowledge_base_uses_versioned_registry(
     assert kb_v1.config.version == "0.1.0"
     assert kb_v2.config.name == module_name
     assert kb_v2.config.version == "0.2.0"
+
+
+def test_load_knowledge_base_uses_bundle_scoped_duplicate_modules(
+    tmp_path: Path,
+) -> None:
+    _write_scoped_unit_bundle(tmp_path)
+
+    kb = load_knowledge_base("editor_bundle", input_dirs=[tmp_path])
+
+    assert "editor_millimeter" in kb.unit
+    assert "canonical_centimeter" not in kb.unit
 
 
 def test_load_knowledge_base_raises_for_unprovisioned_version(

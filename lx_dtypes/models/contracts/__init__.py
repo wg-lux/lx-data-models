@@ -33,6 +33,15 @@ from .core_concepts import (
     UnitTypeCore,
 )
 from .document_type import DocumentType
+from .lab_value import (
+    LabValueNormalRangeData,
+    LabValueNormalRangeGenderData,
+    LabValueNormalRangePayload,
+)
+from .knowledge_base import KnowledgeBaseContract
+from .nginx_accel import NginxAccelResponseHeadersPayload
+from .video_frame import VideoFrameDimensions
+from .video_stream_info import FfprobeStreamInfoPayload, VideoStreamInfoPayload
 from .pdf_redaction import (
     PdfRedactionBox,
     PdfRedactionManifest,
@@ -40,6 +49,8 @@ from .pdf_redaction import (
     PdfRedactionRequest,
     PdfRedactionResponse,
 )
+from .endoscopy_processor import EndoscopeImageRoiCore, RoiBoxCore
+from .upload import UploadApiRequestPayload, validate_upload_api_request_payload
 from .requirement_evaluation import (
     RequirementEvaluationMeta,
     RequirementEvaluationRequest,
@@ -81,11 +92,23 @@ __all__ = [
     "CaseResolutionResponse",
     "ValidationError",
     "DocumentType",
+    "LabValueNormalRangeData",
+    "LabValueNormalRangeGenderData",
+    "LabValueNormalRangePayload",
+    "KnowledgeBaseContract",
+    "NginxAccelResponseHeadersPayload",
+    "VideoFrameDimensions",
+    "FfprobeStreamInfoPayload",
+    "VideoStreamInfoPayload",
+    "UploadApiRequestPayload",
+    "validate_upload_api_request_payload",
     "PdfRedactionBox",
     "PdfRedactionManifest",
     "PdfRedactionPage",
     "PdfRedactionRequest",
     "PdfRedactionResponse",
+    "EndoscopeImageRoiCore",
+    "RoiBoxCore",
     "RequirementEvaluationMeta",
     "RequirementEvaluationRequest",
     "RequirementEvaluationResponse",

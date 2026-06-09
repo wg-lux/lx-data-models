@@ -108,6 +108,41 @@ lx-dtypes-prototype-kb-smoke --module my_module --version 0.1.0-dev.1
 This keeps prototype loading deterministic because resolution happens through
 the same versioned registry path used by `KnowledgeBaseResolver`.
 
+## Terminology Editor Publish Workflow
+
+Terminology bundles published from `lx-terminology-editor` can be committed into
+this package under `lx_dtypes/data/<sanitized_bundle_name>/`. The published
+directory is a normal knowledge-base module: it contains a root `config.yaml`
+and child module directories such as `lx_units`, `lx_findings`, and
+`lx_classifications`.
+
+Once the published directory exists in the package data root, consumers can load
+it through the default resolver without passing explicit paths:
+
+```python
+from lx_dtypes.models.interface import load_knowledge_base
+
+kb = load_knowledge_base("<sanitized_bundle_name>")
+```
+
+The loader resolves child modules relative to the selected bundle first. This
+allows an editor-published `lx_units` module to coexist with the canonical
+`lx_dtypes/data/terminology/lx_units` module without being mixed into the wrong
+bundle. For pinned deployments, register the same bundle directory with
+`LX_DTYPES_KB_REGISTRY` and load it with an explicit `version`.
+
+Top-level `demo-data/` is intentionally not part of the default Python package
+data resolution path. Use it explicitly with `DataLoader(input_dirs=[...])`, Nix
+KB packaging, or a `LX_DTYPES_KB_REGISTRY` entry. Normal unversioned loads use
+the configured `LOOKUP_DTYPES_DATA_ROOT` when present, then packaged
+`lx_dtypes/data`.
+
+`lx-annotate` can also import the editor ZIP directly through
+`POST /base_api/terminology/bundles/import`. The endpoint extracts the ZIP into
+`LX_DTYPES_TERMINOLOGY_IMPORT_ROOT` (or a `terminology-packages/` directory next
+to the configured registry), validates it with the normal knowledge-base loader,
+updates the registry, and activates the imported version.
+
 ## Migrations
 
 The following command shortcuts are available for managing migratons, see line below for what they do:
