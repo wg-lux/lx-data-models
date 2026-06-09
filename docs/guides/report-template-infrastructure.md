@@ -433,9 +433,11 @@ The validator model layer no longer uses open-ended `Any` for condition values o
 - If the condition matches, `then_requires` is enforced
 - `then_requires` can require:
   - classifications on the same finding occurrence
+  - classification choices on the same finding occurrence
   - other findings anywhere in the normalized report
   - interventions on the same finding occurrence
   - units attached to a named classification on the same occurrence
+  - one of several classification choices when a `classification_choice` requirement includes a `names` list
 
 `classification_validator`
 

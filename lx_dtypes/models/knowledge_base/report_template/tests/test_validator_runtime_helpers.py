@@ -379,13 +379,18 @@ def test_normalize_condition_clause_returns_none_for_blank_classification() -> N
 def test_missing_requirement_references_cover_all_reference_kinds() -> None:
     occurrence = runtime._RuntimeFindingOccurrence(
         finding="colon_polyp",
-        classifications={"size_mm": [12]},
+        classifications={"size_mm": [12], "retrieval": ["snare"]},
         classification_units={"size_mm": ["mm"]},
         interventions=["resection"],
     )
 
     requirements = [
         ValidatorRequirementReference(kind="classification", name="morphology"),
+        ValidatorRequirementReference(
+            kind="classification_choice",
+            name="net",
+            names=["net", "basket"],
+        ),
         ValidatorRequirementReference(kind="finding", name="ulcer"),
         ValidatorRequirementReference(kind="intervention", name="biopsy"),
         ValidatorRequirementReference(
@@ -401,10 +406,35 @@ def test_missing_requirement_references_cover_all_reference_kinds() -> None:
         all_occurrences=[occurrence],
     ) == [
         "classification:morphology",
+        "classification_choice:net|basket",
         "finding:ulcer",
         "intervention:biopsy",
         "unit:cm",
     ]
+
+
+def test_missing_requirement_references_accepts_any_classification_choice() -> None:
+    occurrence = runtime._RuntimeFindingOccurrence(
+        finding="colon_polyp",
+        classifications={"retrieval": ["snare"]},
+        classification_units={},
+        interventions=[],
+    )
+
+    assert (
+        runtime._missing_requirement_references(
+            [
+                ValidatorRequirementReference(
+                    kind="classification_choice",
+                    name="net",
+                    names=["net", "snare"],
+                )
+            ],
+            occurrence=occurrence,
+            all_occurrences=[occurrence],
+        )
+        == []
+    )
 
 
 def test_classification_data_type_hint_covers_binary_and_non_categorical() -> None:
