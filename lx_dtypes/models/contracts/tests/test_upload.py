@@ -43,6 +43,23 @@ def test_upload_api_request_payload_defaults_blank_source_system() -> None:
     assert payload.source_system == "api"
 
 
+@pytest.mark.parametrize(
+    ("field_name", "field_value"),
+    [
+        ("center_key", {"name": "site-a"}),
+        ("center_name", ["University Hospital"]),
+        ("source_system", {"system": "lx-annotate"}),
+        ("idempotency_key", ["request-1"]),
+    ],
+)
+def test_upload_api_request_payload_rejects_non_string_values(
+    field_name: str,
+    field_value: object,
+) -> None:
+    with pytest.raises(ValueError, match=f"{field_name} must be a string"):
+        validate_upload_api_request_payload({field_name: field_value})
+
+
 def test_upload_api_request_data_excludes_multipart_file_field() -> None:
     data = upload_api_request_data_from_mapping(
         {

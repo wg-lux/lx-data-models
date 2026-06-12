@@ -1,20 +1,17 @@
 - model: findings_validator
   name: polyp_has_lst_if_large
-  finding: esophagus_polyp
+  finding: star_upper_gi_polyp
   operator: condition
   query:
-    finding: esophagus_polyp
+    finding: star_upper_gi_polyp
     operator: condition
     condition:
       any:
-        - classification: size_mm
+        - classification: size_oval_mm
           comparator: gt
           value: 10
-        - classification: size_cat
-          comparator: eq
-          value: large
       then_requires:
-        - classification: lst
+        - classification: additional_text_info
 
 - model: report_finding
   name: star_upper_gi_mucosa_esophagus_abnormal
@@ -28,11 +25,11 @@
   position: 0
   types: []
   findings:
-    - finding: esophagus_polyp
+    - finding: star_upper_gi_polyp
       required: false
       multiple_allowed: true
       classifications:
-        - classification: size_mm
+        - classification: size_oval_mm
           required: true
 
 - model: report_template_section

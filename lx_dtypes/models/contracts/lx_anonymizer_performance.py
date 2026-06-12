@@ -8,9 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 JsonNull: TypeAlias = NoneType
 LxAnonymizerPerformanceMediaType: TypeAlias = Literal["video", "report"]
 LxAnonymizerPerformanceCsvCell: TypeAlias = str | int | float | bool | JsonNull
-LxAnonymizerPerformanceCsvRow: TypeAlias = dict[
-    str, LxAnonymizerPerformanceCsvCell
-]
+LxAnonymizerPerformanceCsvRow: TypeAlias = dict[str, LxAnonymizerPerformanceCsvCell]
 
 
 class LxAnonymizerDurationStatsPayload(BaseModel):

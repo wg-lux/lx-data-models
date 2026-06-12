@@ -14,6 +14,42 @@ from .case_resolution import (
     ValidationError,
 )
 from .codemod_rename import CodemodRenameMapPayload, validate_codemod_rename_map
+from .django_settings import (
+    DjangoBeatScheduleEntryPayload,
+    DjangoBeatScheduleOptionsPayload,
+    DjangoCacheConfigPayload,
+    DjangoCacheSettingsPayload,
+    DjangoRestFrameworkSettingsPayload,
+    DjangoTemplateConfigPayload,
+    DjangoTemplateOptionsPayload,
+)
+from .contraindication import ContraindicationCore
+from .event import (
+    EventClassificationChoiceCore,
+    EventClassificationCore,
+    EventCore,
+)
+from .finding_classification import (
+    FindingClassificationChoiceCore,
+    FindingClassificationCore,
+    FindingClassificationTypeCore,
+)
+from .finding_intervention import (
+    FindingInterventionCore,
+    FindingInterventionTypeCore,
+)
+from .examination_indication import (
+    ExaminationIndicationClassificationChoiceCore,
+    ExaminationIndicationClassificationCore,
+    ExaminationIndicationCore,
+)
+from .examination_time import ExaminationTimeCore, ExaminationTimeTypeCore
+from .examination_type import ExaminationTypeCore
+from .endoscopy_processor import (
+    EndoscopeImageRoiCore,
+    EndoscopyProcessorCore,
+    RoiBoxCore,
+)
 from .authz import (
     KeycloakClaimsPayload,
     KeycloakRoleContainerPayload,
@@ -34,20 +70,6 @@ from .anonymization_quality import (
     AnonymizationQualitySummary,
     QualityEvaluationStatus,
     SensitiveMetaHandlingPolicy,
-)
-from .aidataset_export import (
-    AIDataSetExportPayload,
-    AIDataSetExportSummary,
-    AIDataSetFrameAnnotationExport,
-    AIDataSetFrameLabelExport,
-)
-from .aidataset_frame_buckets import (
-    AIDataSetFrameBucketCount,
-    AIDataSetFrameBucketDistribution,
-    AIDataSetFrameBucketSummary,
-    AIDataSetLabelDistributionEntry,
-    AIDataSetLabelFrameBucketCount,
-    AIDataSetTargetFrameBucket,
 )
 from .aidataset_frame_buckets import (
     AIDataSetFrameBucketCount,
@@ -77,6 +99,12 @@ from .core_concepts import (
     UnitTypeCore,
 )
 from .document_type import DocumentType
+from .lab_value import (
+    LabValueNormalRangeData,
+    LabValueNormalRangePayload,
+)
+from .knowledge_base import KnowledgeBaseContract
+from .nginx_accel import NginxAccelResponseHeadersPayload
 from .huggingface_model_meta import (
     HuggingFaceModelMetaCommandData,
     HuggingFaceModelMetaCommandPayload,
@@ -197,6 +225,14 @@ from .patient_finding_classification import (
     dump_patient_finding_classification_create_payload,
     validate_patient_finding_classification_create_payload,
 )
+from .patient_finding_classification_runtime import (
+    PatientFindingClassificationNumericalDescriptorPayload,
+    PatientFindingClassificationNumericalDescriptorsData,
+    PatientFindingClassificationNumericalDescriptorsPayload,
+    PatientFindingClassificationSubcategoryPayload,
+    PatientFindingClassificationSubcategoriesData,
+    PatientFindingClassificationSubcategoriesPayload,
+)
 from .patient_examination_report import (
     PatientExaminationReportMakeReportData,
     PatientExaminationReportMakeReportPayload,
@@ -233,6 +269,14 @@ from .patient_examination_report import (
     report_json_safe,
     report_json_safe_dict,
     validate_segment_selection_map,
+)
+from .patient_examination import PatientExaminationPatientDataPayload
+from .pdf_meta import PdfMetaPayload, PdfTypeSummaryPayload
+from .transfer_validation import (
+    TransferValidationFailureLogPayload,
+    TransferValidationLogScalar,
+    TransferValidationLogValue,
+    dump_transfer_validation_failure_log_payload,
 )
 from .requirement_evaluation import (
     RequirementEvaluationMeta,
@@ -363,6 +407,8 @@ from .video_frame_annotations import (
     dump_frame_annotation_bulk_item,
     dump_frame_box_annotation_bulk_item,
 )
+from .video_text_metadata import VideoTextMetaPayload, VideoTextMetaValue
+from .video_meta import FfmpegMetaPayload
 from .video_reimport import (
     JsonObject,
     JsonValue,
@@ -391,6 +437,13 @@ from .video_reimport import (
 )
 
 __all__ = [
+    "DjangoBeatScheduleEntryPayload",
+    "DjangoBeatScheduleOptionsPayload",
+    "DjangoCacheConfigPayload",
+    "DjangoCacheSettingsPayload",
+    "DjangoRestFrameworkSettingsPayload",
+    "DjangoTemplateConfigPayload",
+    "DjangoTemplateOptionsPayload",
     "CoreConceptBase",
     "ClassificationCore",
     "ClassificationChoiceCore",
@@ -408,6 +461,24 @@ __all__ = [
     "InformationSourceTypeCore",
     "CitationCore",
     "CoreConceptCollection",
+    "ContraindicationCore",
+    "EventCore",
+    "EventClassificationCore",
+    "EventClassificationChoiceCore",
+    "FindingClassificationTypeCore",
+    "FindingClassificationCore",
+    "FindingClassificationChoiceCore",
+    "FindingInterventionCore",
+    "FindingInterventionTypeCore",
+    "ExaminationIndicationCore",
+    "ExaminationIndicationClassificationCore",
+    "ExaminationIndicationClassificationChoiceCore",
+    "ExaminationTimeCore",
+    "ExaminationTimeTypeCore",
+    "ExaminationTypeCore",
+    "RoiBoxCore",
+    "EndoscopeImageRoiCore",
+    "EndoscopyProcessorCore",
     "CoreConceptName",
     "CoreConceptModel",
     "record_to_core_concept",
@@ -421,6 +492,28 @@ __all__ = [
     "ValidationError",
     "CodemodRenameMapPayload",
     "validate_codemod_rename_map",
+    "AnonymizationFieldQualityPayload",
+    "AnonymizationMetricsFiltersPayload",
+    "AnonymizationMetricsPayload",
+    "AnonymizationMetricsQueryBoundsPayload",
+    "AnonymizationPhiRegionMetricsPayload",
+    "AnonymizationQualityMetricsPayload",
+    "AnonymizationWorkflowMetricsPayload",
+    "AnonymizationQualityPayload",
+    "AnonymizationQualityResult",
+    "AnonymizationQualitySummary",
+    "QualityEvaluationStatus",
+    "SensitiveMetaHandlingPolicy",
+    "AIDataSetFrameBucketCount",
+    "AIDataSetFrameBucketDistribution",
+    "AIDataSetFrameBucketSummary",
+    "AIDataSetLabelDistributionEntry",
+    "AIDataSetLabelFrameBucketCount",
+    "AIDataSetTargetFrameBucket",
+    "LabValueNormalRangeData",
+    "LabValueNormalRangePayload",
+    "KnowledgeBaseContract",
+    "NginxAccelResponseHeadersPayload",
     "KeycloakClaimsPayload",
     "KeycloakRoleContainerPayload",
     "validate_keycloak_claims",
@@ -464,6 +557,34 @@ __all__ = [
     "MigrateDataDirManifestPayload",
     "MigrateDataDirManifestValue",
     "MigrateDataDirNull",
+    "FrameSegmentReconciliationTrack",
+    "ModelInputCommandOptionsPayload",
+    "ModelTrainingResultPayload",
+    "ReconcileFrameSegmentAnnotationsCommandOptionsPayload",
+    "ReconcileMediaIntegrityCommandOptionsPayload",
+    "ReconcileSegmentValidationStateCommandOptionsPayload",
+    "ReconcileVideoFormatsCommandOptionsPayload",
+    "RefreshAuditLedgerIntegrityCommandOptionsPayload",
+    "RegisterAiModelCommandOptionsPayload",
+    "RegisterAiModelMetaPayload",
+    "ReapQuarantineCommandOptionsPayload",
+    "ReapUploadJobSourcesCommandOptionsPayload",
+    "SetupEndoregDbCommandOptionsPayload",
+    "ShowUrlsCommandOptionsPayload",
+    "ShowUrlsRoutePayload",
+    "ShowUrlsRoutesPayload",
+    "StorageManagementCommandOptionsPayload",
+    "StorageManagementInfoPayload",
+    "TrainImageMultilabelModelCommandOptionsPayload",
+    "TrainPhiRegionDetectorCommandOptionsPayload",
+    "TranscodeVideoCommandOptionsPayload",
+    "TranscodeVideoQualityMode",
+    "RuntimeStorageContractPayload",
+    "ValidateRuntimeStorageContractCommandOptionsPayload",
+    "ValidateVideoFileStatus",
+    "ValidateVideoFileStatusPayload",
+    "ValidateVideoFilesCommandOptionsPayload",
+    "validate_model_training_result",
     "ByteRange",
     "FfmpegActiveStreamThrottleState",
     "FfmpegStreamInfo",
@@ -494,11 +615,26 @@ __all__ = [
     "PatientFindingClassificationCreateData",
     "PatientFindingClassificationCreatePayload",
     "dump_patient_finding_classification_create_payload",
+    "PatientFindingClassificationNumericalDescriptorPayload",
+    "PatientFindingClassificationNumericalDescriptorsData",
+    "PatientFindingClassificationNumericalDescriptorsPayload",
+    "PatientFindingClassificationSubcategoryPayload",
+    "PatientFindingClassificationSubcategoriesData",
+    "PatientFindingClassificationSubcategoriesPayload",
+    "PdfMetaPayload",
+    "PdfTypeSummaryPayload",
     "validate_patient_finding_classification_create_payload",
     "PatientExaminationReportMakeReportData",
     "PatientExaminationReportMakeReportPayload",
     "PatientExaminationReportSubmissionData",
     "PatientExaminationReportSubmissionPayload",
+    "PatientExaminationPatientDataPayload",
+    "PdfMetaPayload",
+    "PdfTypeSummaryPayload",
+    "TransferValidationFailureLogPayload",
+    "TransferValidationLogScalar",
+    "TransferValidationLogValue",
+    "dump_transfer_validation_failure_log_payload",
     "PatientReportIdentityData",
     "PatientReportIdentityPayload",
     "ReportExportFrameDetailData",
@@ -639,6 +775,9 @@ __all__ = [
     "FrameBoxAnnotationBulkItemPayload",
     "dump_frame_annotation_bulk_item",
     "dump_frame_box_annotation_bulk_item",
+    "VideoTextMetaPayload",
+    "VideoTextMetaValue",
+    "FfmpegMetaPayload",
     "JsonObject",
     "JsonValue",
     "VIDEO_REIMPORT_HISTORY_KIND",

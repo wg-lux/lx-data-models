@@ -5,6 +5,8 @@ from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
+from .json_types import JsonValue
+
 
 class UploadApiRequestData(TypedDict, total=False):
     center_key: str
@@ -33,24 +35,32 @@ class UploadApiRequestPayload(BaseModel):
 
 
 def upload_api_request_data_from_mapping(
-    payload: Mapping[str, str],
+    payload: Mapping[str, JsonValue],
 ) -> UploadApiRequestData:
     data: UploadApiRequestData = {}
     for field_name in ("center_key", "center_name", "source_system", "idempotency_key"):
-        value = payload.get(field_name, "").strip()
+        if field_name not in payload:
+            continue
+        raw_value = payload[field_name]
+        if not isinstance(raw_value, str):
+            raise ValueError(f"{field_name} must be a string")
+        value = raw_value.strip()
         if value:
             data[field_name] = value
     return data
 
 
 def validate_upload_api_request_payload(
-    value: Mapping[str, str],
+    value: Mapping[str, JsonValue],
 ) -> UploadApiRequestPayload:
     try:
         return UploadApiRequestPayload.model_validate(
             upload_api_request_data_from_mapping(value)
         )
-    except ValidationError as exc:  # pragma: no cover - thin validation wrapper
+    except (
+        ValidationError,
+        ValueError,
+    ) as exc:  # pragma: no cover - thin validation wrapper
         raise ValueError(str(exc)) from exc
 
 

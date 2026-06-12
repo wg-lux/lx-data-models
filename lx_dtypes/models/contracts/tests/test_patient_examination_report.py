@@ -9,6 +9,7 @@ from lx_dtypes.models.contracts.patient_examination_report import (
     PatientExaminationReportMakeReportPayload,
     PatientExaminationReportSubmissionPayload,
     ReportSegmentFrameSelectionPayload,
+    report_json_safe_dict,
     dump_make_report_payload,
     dump_report_submission_payload,
     validate_segment_selection_map,
@@ -74,8 +75,7 @@ def test_segment_selection_map_normalizes_json_safe_selection_values() -> None:
                 "relative_path": "frames/42.jpg",
                 "updated_at": "2026-06-03T12:00:00+00:00",
                 "selection_source": "set",
-            },
-            "ignored": "not a mapping",
+            }
         }
     )
 
@@ -95,3 +95,20 @@ def test_segment_selection_map_normalizes_json_safe_selection_values() -> None:
 def test_segment_selection_payload_rejects_invalid_ids() -> None:
     with pytest.raises(ValidationError):
         ReportSegmentFrameSelectionPayload.model_validate({"segment_id": 0})
+
+
+def test_segment_selection_map_rejects_non_mapping_payload() -> None:
+    with pytest.raises(ValueError):
+        validate_segment_selection_map([])
+
+
+def test_segment_selection_map_rejects_non_mapping_entry() -> None:
+    with pytest.raises(ValueError):
+        validate_segment_selection_map({"ignored": "not a mapping"})
+
+
+def test_report_json_safe_dict_preserves_null_values() -> None:
+    assert report_json_safe_dict({"nullable": None, "nested": {"inner": None}}) == {
+        "nullable": None,
+        "nested": {"inner": None},
+    }

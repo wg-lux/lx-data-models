@@ -38,6 +38,11 @@ def test_keycloak_claims_fall_back_to_subject() -> None:
     assert claims.role_names == set()
 
 
+def test_keycloak_claims_reject_blank_subject_identifier() -> None:
+    with pytest.raises(ValidationError):
+        validate_keycloak_claims({"preferred_username": "  ", "sub": ""})
+
+
 def test_keycloak_claims_reject_non_string_roles() -> None:
     with pytest.raises(ValidationError):
         validate_keycloak_claims({"roles": [1]})

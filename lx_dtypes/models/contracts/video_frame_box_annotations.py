@@ -154,14 +154,13 @@ class VideoPhiFrameObservationPayload(BaseModel):
 def validate_video_phi_frame_observations(
     payload: object,
 ) -> list[VideoPhiFrameObservationPayload]:
-    if not isinstance(payload, list):
+    if payload is None:
         return []
+    if not isinstance(payload, list):
+        raise ValueError("frame_observations must be a list")
     observations: list[VideoPhiFrameObservationPayload] = []
     for item in payload:
-        try:
-            observations.append(VideoPhiFrameObservationPayload.model_validate(item))
-        except ValueError:
-            continue
+        observations.append(VideoPhiFrameObservationPayload.model_validate(item))
     return observations
 
 

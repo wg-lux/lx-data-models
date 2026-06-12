@@ -111,7 +111,9 @@ def _persist_patient_examination_dtypes_record(
     patient_examination: object,
     payload: PExamination,
 ) -> dict[str, Any]:
-    persist = getattr(_host_models_module(), "persist_patient_examination_dtypes_record")
+    persist = getattr(
+        _host_models_module(), "persist_patient_examination_dtypes_record"
+    )
     return cast(dict[str, Any], persist(patient_examination, payload))
 
 

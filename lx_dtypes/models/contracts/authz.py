@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .json_types import JsonValue
 
@@ -28,6 +28,17 @@ class KeycloakClaimsPayload(BaseModel):
     resource_access: dict[str, KeycloakRoleContainerPayload] = Field(
         default_factory=dict
     )
+
+    @field_validator("preferred_username", "sub", "email", "given_name", "family_name")
+    @classmethod
+    def strip_claim_text(cls, value: str) -> str:
+        return value.strip()
+
+    @model_validator(mode="after")
+    def require_subject_identifier(self) -> "KeycloakClaimsPayload":
+        if not self.preferred_username and not self.sub:
+            raise ValueError("preferred_username or sub is required")
+        return self
 
     @property
     def username(self) -> str:

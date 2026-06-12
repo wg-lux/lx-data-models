@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from types import NoneType
-from typing import TypeAlias, TypedDict
+from typing import Literal, TypeAlias, TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
-VideoSegmentValidationNull: TypeAlias = NoneType
+VideoSegmentValidationNull: TypeAlias = Literal[None]
 VideoSegmentValidationText: TypeAlias = str | VideoSegmentValidationNull
+
+OutsideFrameBlackeningKind: TypeAlias = Literal["outside_frame_blackening"]
 
 
 class OutsideFrameBlackeningHistoryConfigData(TypedDict):
@@ -18,7 +19,7 @@ class OutsideFrameBlackeningHistoryConfigData(TypedDict):
 class OutsideFrameBlackeningHistoryConfigPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
-    kind: str = Field(min_length=1)
+    kind: OutsideFrameBlackeningKind = Field(default="outside_frame_blackening")
     only_validated: bool
     queue: str = Field(min_length=1)
 
@@ -66,6 +67,7 @@ class PostValidationRebuildSummaryPayload(BaseModel):
 __all__ = [
     "OutsideFrameBlackeningHistoryConfigData",
     "OutsideFrameBlackeningHistoryConfigPayload",
+    "OutsideFrameBlackeningKind",
     "PostValidationRebuildSummaryData",
     "PostValidationRebuildSummaryPayload",
     "VideoSegmentValidationNull",

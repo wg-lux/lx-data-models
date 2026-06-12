@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import pytest
+from pydantic import ValidationError
+
 from lx_dtypes.models.contracts.video_frame_box_annotations import (
     VideoFrameBoxAnnotationListResponsePayload,
     VideoFrameBoxAnnotationMutationResponsePayload,
+    validate_video_phi_frame_observations,
     validate_video_frame_box_annotation_request,
 )
 
@@ -65,3 +69,26 @@ def test_frame_box_mutation_response_omits_absent_delete_count() -> None:
         "upserted_count": 1,
         "annotations": [{"id": 3}],
     }
+
+
+def test_phi_frame_observations_accept_missing_payload_as_empty() -> None:
+    assert validate_video_phi_frame_observations(None) == []
+
+
+def test_phi_frame_observations_reject_non_list_payload() -> None:
+    with pytest.raises(ValueError, match="frame_observations must be a list"):
+        validate_video_phi_frame_observations({"frame_number": 1})
+
+
+def test_phi_frame_observations_reject_malformed_entries() -> None:
+    with pytest.raises(ValidationError):
+        validate_video_phi_frame_observations(
+            [
+                {
+                    "frame_number": 1,
+                    "image_width": 1280,
+                    "image_height": 720,
+                    "phi_regions": [{"x": 0.0, "y": 0.0, "width": -1.0, "height": 2.0}],
+                }
+            ]
+        )

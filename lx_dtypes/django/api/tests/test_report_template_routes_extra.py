@@ -4,6 +4,7 @@ import json
 from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import Any
+from pathlib import Path
 
 import pytest
 from django.test import Client
@@ -103,6 +104,80 @@ def test_save_report_template_returns_400_for_unknown_module(client: Client) -> 
 
     assert response.status_code == 400
     assert "Unknown report-template module" in response.content.decode()
+
+
+def test_save_report_template_uses_resolver_input_dirs(
+    client: Client, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    captured: dict[str, Any] = {}
+    module_dir = tmp_path / "builder_module"
+    module_dir.mkdir(parents=True)
+    (module_dir / "config.yaml").write_text(
+        "\n".join(
+            [
+                "name: builder_module",
+                "version: 1.0.0",
+                "modules: []",
+                "depends_on: []",
+                "data:",
+                "  files: []",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    def _fake_load_knowledge_base(
+        module_name: str,
+        *,
+        version: str | None = None,
+        input_dirs: list[Path] | None = None,
+    ) -> _FakeKb:
+        captured["module_name"] = module_name
+        captured["version"] = version
+        captured["input_dirs"] = input_dirs
+        return _FakeKb()
+
+    monkeypatch.setattr(
+        report_template_routes, "load_knowledge_base", _fake_load_knowledge_base
+    )
+    monkeypatch.setattr(
+        report_template_routes.report_template_builder,
+        "MODULES_ROOT",
+        tmp_path,
+    )
+    monkeypatch.setattr(
+        report_template_routes,
+        "register_runtime_lookup_tracker",
+        lambda kb: None,
+    )
+    monkeypatch.setattr(
+        report_template_routes,
+        "_compile_report_template",
+        lambda *args, **kwargs: {"summary": _CompiledSummary(can_publish=True)},
+    )
+
+    response = client.post(
+        "/base_api/report-templates/builder/templates",
+        data=json.dumps(
+            {
+                "module_name": "builder_module",
+                "file_name": "custom_template",
+                "template_name": "custom_template",
+                "examination": "star_upper_gi_endoscopy",
+                "sections": [{"section_type": "patient_info", "name": "patient"}],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+
+    assert response.status_code == 200
+    assert captured == {
+        "module_name": "builder_module",
+        "version": None,
+        "input_dirs": [tmp_path],
+    }
 
 
 def test_publish_report_template_returns_409_when_summary_blocks_publish(

@@ -4,10 +4,14 @@ from typing import Any, Callable, Dict, List, Literal, Protocol, TypeVar, cast
 
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
+from lx_dtypes.models.contracts import KnowledgeBaseContract
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
-from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
+from lx_dtypes.models.interface.KnowledgeBaseResolver import load_knowledge_base
+from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    get_knowledge_base_identity,
+)
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 from . import report_template_builder
@@ -44,10 +48,29 @@ def _compile_report_template(
     return validator.validate_and_compile(template_name, mode=mode)
 
 
-def _load_builder_module_kb(module_name: str) -> Any:
-    loader = DataLoader(input_dirs=[report_template_builder.MODULES_ROOT])
-    loader.load_module_configs()
-    kb = loader.load_knowledge_base(module_name)
+def _attach_resolved_kb_identity(
+    validation: Dict[str, Any],
+    *,
+    module_name: str,
+    version: str | None,
+) -> Dict[str, Any]:
+    validation["knowledge_base_module"] = module_name
+    validation["knowledge_base_version"] = version
+    return validation
+
+
+def _load_builder_module_kb(module_name: str) -> KnowledgeBaseContract:
+    get_knowledge_base_identity(
+        module_name,
+        input_dirs=[report_template_builder.MODULES_ROOT],
+    )
+    kb = cast(
+        KnowledgeBaseContract,
+        load_knowledge_base(
+            module_name,
+            input_dirs=[report_template_builder.MODULES_ROOT],
+        ),
+    )
     register_runtime_lookup_tracker(kb)
     return kb
 
@@ -55,7 +78,7 @@ def _load_builder_module_kb(module_name: str) -> Any:
 def register_report_template_routes(
     api: _TypedApi,
     *,
-    load_module_kb: Callable[..., Any],
+    load_module_kb: Callable[..., KnowledgeBaseContract],
     clear_kb_caches: Callable[[], None],
     resolve_payload_kb_identity: Callable[[str, PExamination], tuple[str, str | None]],
     orm_models: Callable[[], Dict[str, Any]],
@@ -97,7 +120,7 @@ def register_report_template_routes(
         del request
         kb = load_module_kb(module_name)
         try:
-            return cast(Dict[str, Any], kb.export_report_template(template_name))
+            return kb.export_report_template(template_name)
         except KeyError as exc:
             raise HttpError(
                 404,
@@ -132,9 +155,7 @@ def register_report_template_routes(
         del request
         kb = load_module_kb(module_name)
         try:
-            return cast(
-                Dict[str, Any], kb.export_report_template_preview(template_name)
-            )
+            return kb.export_report_template_preview(template_name)
         except KeyError as exc:
             raise HttpError(
                 404,
@@ -221,11 +242,13 @@ def register_report_template_routes(
         kb = load_module_kb(resolved_module_name, version=resolved_version)
         try:
             kb.export_report_template(template_name)
-            return cast(
-                Dict[str, Any],
-                kb.evaluate_report_template_validators(
-                    template_name, p_examination=payload
-                ),
+            validation = kb.evaluate_report_template_validators(
+                template_name, p_examination=payload
+            )
+            return _attach_resolved_kb_identity(
+                validation,
+                module_name=resolved_module_name,
+                version=resolved_version,
             )
         except SemanticAdmissibilityError as exc:
             raise HttpError(422, str(exc)) from exc
@@ -314,11 +337,13 @@ def register_report_template_routes(
         kb = load_module_kb(resolved_module_name, version=resolved_version)
         try:
             kb.export_report_template(template_name)
-            return cast(
-                Dict[str, Any],
-                kb.evaluate_report_template_validators(
-                    template_name, p_examination=payload
-                ),
+            validation = kb.evaluate_report_template_validators(
+                template_name, p_examination=payload
+            )
+            return _attach_resolved_kb_identity(
+                validation,
+                module_name=resolved_module_name,
+                version=resolved_version,
             )
         except SemanticAdmissibilityError as exc:
             raise HttpError(422, str(exc)) from exc
@@ -361,11 +386,13 @@ def register_report_template_routes(
             if validator_name not in kb.findings_validator:
                 raise HttpError(404, f"Unknown findings validator '{validator_name}'.")
             try:
-                return cast(
-                    Dict[str, Any],
-                    kb.evaluate_findings_validator(
-                        validator_name, p_examination=payload
-                    ),
+                validation = kb.evaluate_findings_validator(
+                    validator_name, p_examination=payload
+                )
+                return _attach_resolved_kb_identity(
+                    validation,
+                    module_name=resolved_module_name,
+                    version=resolved_version,
                 )
             except SemanticAdmissibilityError as exc:
                 raise HttpError(422, str(exc)) from exc
@@ -376,12 +403,14 @@ def register_report_template_routes(
                     404, f"Unknown classification validator '{validator_name}'."
                 )
             try:
-                return cast(
-                    Dict[str, Any],
-                    kb.evaluate_classification_validator(
-                        validator_name,
-                        p_examination=payload,
-                    ),
+                validation = kb.evaluate_classification_validator(
+                    validator_name,
+                    p_examination=payload,
+                )
+                return _attach_resolved_kb_identity(
+                    validation,
+                    module_name=resolved_module_name,
+                    version=resolved_version,
                 )
             except SemanticAdmissibilityError as exc:
                 raise HttpError(422, str(exc)) from exc
@@ -392,11 +421,13 @@ def register_report_template_routes(
                     404, f"Unknown intervention validator '{validator_name}'."
                 )
             try:
-                return cast(
-                    Dict[str, Any],
-                    kb.evaluate_intervention_validator(
-                        validator_name, p_examination=payload
-                    ),
+                validation = kb.evaluate_intervention_validator(
+                    validator_name, p_examination=payload
+                )
+                return _attach_resolved_kb_identity(
+                    validation,
+                    module_name=resolved_module_name,
+                    version=resolved_version,
                 )
             except SemanticAdmissibilityError as exc:
                 raise HttpError(422, str(exc)) from exc
@@ -405,9 +436,13 @@ def register_report_template_routes(
             if validator_name not in kb.unit_validator:
                 raise HttpError(404, f"Unknown unit validator '{validator_name}'.")
             try:
-                return cast(
-                    Dict[str, Any],
-                    kb.evaluate_unit_validator(validator_name, p_examination=payload),
+                validation = kb.evaluate_unit_validator(
+                    validator_name, p_examination=payload
+                )
+                return _attach_resolved_kb_identity(
+                    validation,
+                    module_name=resolved_module_name,
+                    version=resolved_version,
                 )
             except SemanticAdmissibilityError as exc:
                 raise HttpError(422, str(exc)) from exc
@@ -418,12 +453,14 @@ def register_report_template_routes(
                     404, f"Unknown examination validator '{validator_name}'."
                 )
             try:
-                return cast(
-                    Dict[str, Any],
-                    kb.evaluate_examination_validator(
-                        validator_name,
-                        p_examination=payload,
-                    ),
+                validation = kb.evaluate_examination_validator(
+                    validator_name,
+                    p_examination=payload,
+                )
+                return _attach_resolved_kb_identity(
+                    validation,
+                    module_name=resolved_module_name,
+                    version=resolved_version,
                 )
             except SemanticAdmissibilityError as exc:
                 raise HttpError(422, str(exc)) from exc

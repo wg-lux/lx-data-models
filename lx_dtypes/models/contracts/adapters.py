@@ -116,6 +116,7 @@ class SupportsKnowledgeBaseListFields(Protocol):
     @classmethod
     def list_type_fields(cls) -> list[str]: ...
 
+
 _CONCEPT_MODEL_LOOKUP: dict[CoreConceptName, type[CoreConceptModel]] = {
     "classification": ClassificationCore,
     "classification_choice": ClassificationChoiceCore,

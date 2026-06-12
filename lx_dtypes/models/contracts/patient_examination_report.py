@@ -6,10 +6,12 @@ from typing import Literal, NotRequired, TypeAlias, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .json_types import JsonObject, JsonValue
+from .json_types import JsonNull, JsonScalar
 
-ReportJsonValue: TypeAlias = JsonValue
-ReportJsonObject: TypeAlias = JsonObject
+ReportJsonValue: TypeAlias = (
+    JsonScalar | JsonNull | list["ReportJsonValue"] | dict[str, "ReportJsonValue"]
+)
+ReportJsonObject: TypeAlias = dict[str, ReportJsonValue]
 ReportStatus: TypeAlias = Literal["draft", "final"]
 SegmentFrameSelectionAction: TypeAlias = Literal["set", "clear", "random", "step"]
 
@@ -304,12 +306,12 @@ def dump_segment_frame_selection_payload(
 
 def validate_segment_selection_map(payload: object) -> ReportSegmentSelectionMap:
     if not isinstance(payload, Mapping):
-        return {}
+        raise ValueError("segment selection map must be a JSON object")
     result: ReportSegmentSelectionMap = {}
     selection_map = cast(Mapping[object, object], payload)
     for key, value in selection_map.items():
         if not isinstance(value, Mapping):
-            continue
+            raise ValueError(f"segment selection entry {key!s} must be a JSON object")
         selection = cast(Mapping[str, object], value)
         result[str(key)] = dump_segment_frame_selection_payload(
             ReportSegmentFrameSelectionPayload.model_validate(dict(selection))
