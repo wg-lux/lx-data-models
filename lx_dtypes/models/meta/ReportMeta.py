@@ -30,7 +30,6 @@ class ReportReaderFlags(BaseModel):
 
     @field_validator(
         "patient_info_line",
-        "endoscope_info_line",
         "examiner_info_line",
         mode="before",
     )
@@ -38,6 +37,13 @@ class ReportReaderFlags(BaseModel):
     def normalize_optional_string(cls, value: Any) -> str | None:
         if value is None:
             return None
+        return str(value).strip()
+
+    @field_validator("endoscope_info_line", mode="before")
+    @classmethod
+    def normalize_required_string(cls, value: Any) -> str:
+        if value is None:
+            return ""
         return str(value).strip()
 
     @field_validator("cut_off_below", "cut_off_above", mode="before")

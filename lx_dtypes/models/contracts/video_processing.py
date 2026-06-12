@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from .endoscopy_processor import RoiBoxCore
+
 
 class VideoEncoderConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -67,4 +69,36 @@ class VideoMaskConfig(BaseModel):
         return self
 
 
-__all__ = ["VideoEncoderConfig", "VideoMaskConfig"]
+class VideoMaskRegionCore(RoiBoxCore):
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    image_width: int
+    image_height: int
+    configured_x: int
+    configured_y: int
+    configured_width: int
+    configured_height: int
+
+    @field_validator("image_width", "image_height")
+    @classmethod
+    def validate_image_dimension(cls, value: int) -> int:
+        if value <= 0:
+            raise ValueError("image dimensions must be > 0")
+        return value
+
+    @field_validator("configured_x", "configured_y")
+    @classmethod
+    def validate_config_origin(cls, value: int) -> int:
+        if value < 0:
+            raise ValueError("configured x and y must be >= 0")
+        return value
+
+    @field_validator("configured_width", "configured_height")
+    @classmethod
+    def validate_config_size(cls, value: int) -> int:
+        if value <= 0:
+            raise ValueError("configured width and height must be > 0")
+        return value
+
+
+__all__ = ["VideoEncoderConfig", "VideoMaskConfig", "VideoMaskRegionCore"]

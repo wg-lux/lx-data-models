@@ -57,10 +57,48 @@ from .requirement_evaluation import (
     RequirementEvaluationResponse,
     RequirementEvaluationResult,
 )
-from .text_detection import TesseractOCRData, TesseractWordConfidence
+from .text_detection import (
+    EastDetectionConfidenceCore,
+    OcrTextBoxCore,
+    PixelBoundingBoxCore,
+    TesseractOCRData,
+    TesseractWordConfidence,
+)
+from .text_anonymization import LLMMetadataPayload, TextAnonymizationMeta
+from .text_anonymization import (
+    DateOfBirthCore,
+    GenderDisplayLabel,
+    GenderGuess,
+    PersonNameMetadata,
+)
+from .image_processing import ImageProcessingResultPayload
+from .llm_service import (
+    LLMChatMessagePayload,
+    LLMChatOllamaPayload,
+    LLMChatOllamaOptionsPayload,
+    LLMChatOpenAIPayload,
+    LLMChatResponseChoicePayload,
+    LLMChatResponseMessagePayload,
+    LLMChatResponsePayload,
+)
+from .assessment import AssessmentRecord
 from .report_context import ReportContext
-from .video_processing import VideoEncoderConfig, VideoMaskConfig
+from .video_processing import VideoEncoderConfig, VideoMaskConfig, VideoMaskRegionCore
 from .video_format import VideoFormatInfo
+from .llm_extractor import (
+    LLMFrameContextPayload,
+    LLMEvaluationResultPayload,
+    LLMFrameDataPayload,
+    LLMModelCatalogEntryPayload,
+    LLMMetadataCacheStatsPayload,
+    LLMModelEntryPayload,
+    LLMModelInfoPayload,
+    LLMOllamaModelsPayload,
+    LLMTemporalAnalysisPayload,
+    LLMTextTimelineEntryPayload,
+    LLMVllmModelsPayload,
+    LLMEnrichedMetadataPayload,
+)
 
 __all__ = [
     "CoreConceptBase",
@@ -115,8 +153,39 @@ __all__ = [
     "RequirementEvaluationResult",
     "TesseractOCRData",
     "TesseractWordConfidence",
+    "EastDetectionConfidenceCore",
+    "OcrTextBoxCore",
+    "PixelBoundingBoxCore",
+    "TextAnonymizationMeta",
+    "LLMMetadataPayload",
+    "GenderGuess",
+    "GenderDisplayLabel",
+    "DateOfBirthCore",
+    "PersonNameMetadata",
+    "ImageProcessingResultPayload",
+    "LLMChatMessagePayload",
+    "LLMChatOllamaPayload",
+    "LLMChatOllamaOptionsPayload",
+    "LLMChatOpenAIPayload",
+    "LLMChatResponseChoicePayload",
+    "LLMChatResponseMessagePayload",
+    "LLMChatResponsePayload",
+    "AssessmentRecord",
     "ReportContext",
     "VideoEncoderConfig",
     "VideoMaskConfig",
+    "VideoMaskRegionCore",
     "VideoFormatInfo",
+    "LLMFrameContextPayload",
+    "LLMEvaluationResultPayload",
+    "LLMFrameDataPayload",
+    "LLMModelCatalogEntryPayload",
+    "LLMMetadataCacheStatsPayload",
+    "LLMModelEntryPayload",
+    "LLMModelInfoPayload",
+    "LLMOllamaModelsPayload",
+    "LLMTemporalAnalysisPayload",
+    "LLMTextTimelineEntryPayload",
+    "LLMVllmModelsPayload",
+    "LLMEnrichedMetadataPayload",
 ]
