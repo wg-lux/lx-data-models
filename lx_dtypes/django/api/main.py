@@ -36,6 +36,7 @@ from .findings_routes import (
     clear_findings_route_caches,
     register_findings_routes,
 )
+from .examinations_routes import register_examinations_routes
 from .request_types import BaseRequest
 from .report_template_routes import register_report_template_routes
 from .lookup_tracker import register_runtime_lookup_tracker
@@ -77,7 +78,7 @@ else:
 
 
 @lru_cache(maxsize=1)
-def _orm_models() -> Dict[str, Any]:
+def _host_models_module() -> Any:
     module_path = getattr(settings, "LX_DTYPES_HOST_MODELS_MODULE", None) or os.getenv(
         "LX_DTYPES_HOST_MODELS_MODULE"
     )
@@ -85,9 +86,12 @@ def _orm_models() -> Dict[str, Any]:
         raise RuntimeError(
             "LX_DTYPES_HOST_MODELS_MODULE must be configured to use lx_dtypes.django.api."
         )
+    return import_module(module_path)
 
-    host_models = import_module(module_path)
 
+@lru_cache(maxsize=1)
+def _orm_models() -> Dict[str, Any]:
+    host_models = _host_models_module()
     return {
         "Examination": getattr(host_models, "Examination"),
         "Finding": getattr(host_models, "Finding"),
@@ -101,6 +105,16 @@ def _orm_models() -> Dict[str, Any]:
             host_models, "PatientFindingClassification"
         ),
     }
+
+
+def _persist_patient_examination_dtypes_record(
+    patient_examination: object,
+    payload: PExamination,
+) -> dict[str, Any]:
+    persist = getattr(
+        _host_models_module(), "persist_patient_examination_dtypes_record"
+    )
+    return cast(dict[str, Any], persist(patient_examination, payload))
 
 
 class StructuredApiError(Exception):
@@ -542,11 +556,26 @@ register_report_template_routes(
     build_p_examination_payload_from_host_ledger=lambda *args, **kwargs: (
         _build_p_examination_payload_from_host_ledger(*args, **kwargs)
     ),
+    persist_patient_examination_dtypes_record=lambda *args, **kwargs: (
+        _persist_patient_examination_dtypes_record(*args, **kwargs)
+    ),
 )
 
 register_findings_routes(
     api,
     load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
+    orm_models=lambda: _orm_models(),
+    api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
+    build_p_examination_payload_from_host_ledger=lambda *args, **kwargs: (
+        _build_p_examination_payload_from_host_ledger(*args, **kwargs)
+    ),
+    persist_patient_examination_dtypes_record=lambda *args, **kwargs: (
+        _persist_patient_examination_dtypes_record(*args, **kwargs)
+    ),
+)
+
+register_examinations_routes(
+    api,
     orm_models=lambda: _orm_models(),
     api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
 )

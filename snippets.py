@@ -1,7 +1,6 @@
 import uuid as uuid_module
 from typing import List, Union
-
-############
+from lx_dtypes.factories.typed_lists import list_of_str_factory
 from pydantic import Field, field_serializer, field_validator
 
 from lx_dtypes.factories import list_of_str_factory, str_uuid_factory
@@ -31,7 +30,3 @@ class AppBaseModelUUIDTags(AppBaseModel):
         return serialize_str_list(tags)
 
 
-#####
-from typing import Any, Dict, Union, List
-from pydantic import Field
-from lx_dtypes.factories.typed_lists import list_of_str_factory

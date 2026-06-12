@@ -63,7 +63,9 @@ def _rewrite_findings_validator(
     _maybe_rewrite_operator(node, key="operator", path=path, rewrites=rewrites)
     query = node.get("query")
     if isinstance(query, dict):
-        _maybe_rewrite_operator(query, key="operator", path=path + ("query",), rewrites=rewrites)
+        _maybe_rewrite_operator(
+            query, key="operator", path=path + ("query",), rewrites=rewrites
+        )
 
 
 def rewrite_document(document: Any) -> tuple[Any, list[Rewrite]]:
@@ -145,5 +147,7 @@ def main() -> int:
     if args.check and rewritten_any:
         return 1
     return 0
+
+
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -1,49 +1,72 @@
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Mapping
+from typing import TypedDict
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+
+from .json_types import JsonValue
+
+
+class UploadApiRequestData(TypedDict, total=False):
+    center_key: str
+    center_name: str
+    source_system: str
+    idempotency_key: str
 
 
 class UploadApiRequestPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        str_strip_whitespace=True,
+        strict=True,
+    )
 
-    file_name: str
-    content_type: str | None = None
-    size_bytes: int | None = None
+    center_key: str = Field(default="", max_length=255)
+    center_name: str = Field(default="", max_length=255)
+    source_system: str = Field(default="api", min_length=1, max_length=255)
+    idempotency_key: str = Field(default="", max_length=255)
 
-    @field_validator("file_name", mode="before")
+    @field_validator("source_system", mode="after")
     @classmethod
-    def normalize_file_name(cls, value: Any) -> str:
-        normalized = str(value or "").strip()
-        if not normalized:
-            raise ValueError("file_name must not be empty")
-        return normalized
-
-    @field_validator("content_type", mode="before")
-    @classmethod
-    def normalize_content_type(cls, value: Any) -> str | None:
-        if value in (None, ""):
-            return None
-        normalized = str(value).strip()
-        return normalized or None
-
-    @field_validator("size_bytes", mode="before")
-    @classmethod
-    def normalize_size_bytes(cls, value: Any) -> int | None:
-        if value in (None, ""):
-            return None
-        normalized = int(value)
-        if normalized < 0:
-            raise ValueError("size_bytes must be >= 0")
-        return normalized
+    def normalize_source_system(cls, value: str) -> str:
+        return value or "api"
 
 
-def validate_upload_api_request_payload(value: Any) -> UploadApiRequestPayload:
-    return UploadApiRequestPayload.model_validate(value)
+def upload_api_request_data_from_mapping(
+    payload: Mapping[str, JsonValue],
+) -> UploadApiRequestData:
+    data: UploadApiRequestData = {}
+    for field_name in ("center_key", "center_name", "source_system", "idempotency_key"):
+        if field_name not in payload:
+            continue
+        raw_value = payload[field_name]
+        if not isinstance(raw_value, str):
+            raise ValueError(f"{field_name} must be a string")
+        value = raw_value.strip()
+        if value:
+            data[field_name] = value
+    return data
+
+
+def validate_upload_api_request_payload(
+    value: Mapping[str, JsonValue],
+) -> UploadApiRequestPayload:
+    try:
+        return UploadApiRequestPayload.model_validate(
+            upload_api_request_data_from_mapping(value)
+        )
+    except (
+        ValidationError,
+        ValueError,
+    ) as exc:  # pragma: no cover - thin validation wrapper
+        raise ValueError(str(exc)) from exc
 
 
 __all__ = [
+    "UploadApiRequestData",
     "UploadApiRequestPayload",
+    "upload_api_request_data_from_mapping",
     "validate_upload_api_request_payload",
 ]

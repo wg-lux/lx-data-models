@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
-from typing import Any, Literal, TypeAlias
+from typing import TYPE_CHECKING, Any, Literal, Protocol, TypeAlias, cast
 
 from lx_dtypes.serialization import parse_str_list, serialize_str_list
 
@@ -23,6 +23,55 @@ from .core_concepts import (
     UnitCore,
     UnitTypeCore,
 )
+
+if TYPE_CHECKING:
+    from lx_dtypes.models.knowledge_base.citation.Citation import Citation
+    from lx_dtypes.models.knowledge_base.classification.Classification import (
+        Classification,
+    )
+    from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice import (
+        ClassificationChoice,
+    )
+    from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
+        ClassificationChoiceDescriptor,
+    )
+    from lx_dtypes.models.knowledge_base.examination.Examination import Examination
+    from lx_dtypes.models.knowledge_base.finding._Finding import Finding
+    from lx_dtypes.models.knowledge_base.finding._FindingType import FindingType
+    from lx_dtypes.models.knowledge_base.indication.Indication import Indication
+    from lx_dtypes.models.knowledge_base.indication.IndicationType import IndicationType
+    from lx_dtypes.models.knowledge_base.information_source.InformationSource import (
+        InformationSource,
+    )
+    from lx_dtypes.models.knowledge_base.information_source.InformationSourceType import (
+        InformationSourceType,
+    )
+    from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
+    from lx_dtypes.models.knowledge_base.intervention.InterventionType import (
+        InterventionType,
+    )
+    from lx_dtypes.models.knowledge_base.unit.Unit import Unit
+    from lx_dtypes.models.knowledge_base.unit.UnitType import UnitType
+
+    KnowledgeBaseCoreConceptModel: TypeAlias = (
+        Classification
+        | ClassificationChoice
+        | ClassificationChoiceDescriptor
+        | Examination
+        | Finding
+        | FindingType
+        | Indication
+        | IndicationType
+        | Intervention
+        | InterventionType
+        | Unit
+        | UnitType
+        | InformationSource
+        | InformationSourceType
+        | Citation
+    )
+else:
+    KnowledgeBaseCoreConceptModel: TypeAlias = object
 
 CoreConceptName: TypeAlias = Literal[
     "classification",
@@ -59,6 +108,14 @@ CoreConceptModel: TypeAlias = (
     | InformationSourceTypeCore
     | CitationCore
 )
+
+CoreConceptStorageRecord: TypeAlias = Mapping[str, Any] | KnowledgeBaseCoreConceptModel
+
+
+class SupportsKnowledgeBaseListFields(Protocol):
+    @classmethod
+    def list_type_fields(cls) -> list[str]: ...
+
 
 _CONCEPT_MODEL_LOOKUP: dict[CoreConceptName, type[CoreConceptModel]] = {
     "classification": ClassificationCore,
@@ -182,13 +239,13 @@ _KB_FIELDS: dict[CoreConceptName, str] = {
 }
 
 
-def _read_value(record: Mapping[str, Any] | Any, field: str) -> Any:
+def _read_value(record: CoreConceptStorageRecord, field: str) -> Any:
     if isinstance(record, Mapping):
         return record.get(field)
     return getattr(record, field, None)
 
 
-def _base_payload(record: Mapping[str, Any] | Any) -> dict[str, Any]:
+def _base_payload(record: CoreConceptStorageRecord) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "id": _read_value(record, "id"),
         "name": _read_value(record, "name"),
@@ -205,16 +262,31 @@ def _base_payload(record: Mapping[str, Any] | Any) -> dict[str, Any]:
     return payload
 
 
+def _record_list_fields(
+    concept: CoreConceptName,
+    record: CoreConceptStorageRecord,
+) -> list[str]:
+    if isinstance(record, Mapping):
+        return _LIST_FIELDS[concept]
+
+    list_field_provider = cast(SupportsKnowledgeBaseListFields, record.__class__)
+    fields = list_field_provider.list_type_fields()
+    if not fields:
+        return _LIST_FIELDS[concept]
+
+    return [field for field in _LIST_FIELDS[concept] if field in fields]
+
+
 def record_to_core_concept(
     concept: CoreConceptName,
-    record: Mapping[str, Any] | Any,
+    record: CoreConceptStorageRecord,
 ) -> CoreConceptModel:
     """Convert KB model instance or dict-like storage record into canonical shape."""
 
     model_cls = _CONCEPT_MODEL_LOOKUP[concept]
     payload = _base_payload(record)
 
-    for field in _LIST_FIELDS[concept]:
+    for field in _record_list_fields(concept, record):
         payload[field] = parse_str_list(_read_value(record, field))
 
     for field in _DICT_FIELDS[concept]:
@@ -250,7 +322,7 @@ def core_concept_to_storage(
 
 def records_to_core_concepts(
     concept: CoreConceptName,
-    records: Iterable[Mapping[str, Any] | Any],
+    records: Iterable[CoreConceptStorageRecord],
 ) -> list[CoreConceptModel]:
     return [record_to_core_concept(concept, record) for record in records]
 

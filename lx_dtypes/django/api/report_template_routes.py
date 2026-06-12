@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Literal, Protocol, TypeVar, cast
+from typing import Any, Callable, Dict, List, Literal, Mapping, Protocol, TypeVar, cast
 
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
 from lx_dtypes.models.contracts import KnowledgeBaseContract
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
+from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
 from lx_dtypes.models.interface.KnowledgeBaseResolver import load_knowledge_base
@@ -49,41 +50,45 @@ def _compile_report_template(
 
 
 def _attach_resolved_kb_identity(
-    validation: Dict[str, Any],
+    validation: Mapping[str, Any],
     *,
     module_name: str,
     version: str | None,
 ) -> Dict[str, Any]:
-    validation["knowledge_base_module"] = module_name
-    validation["knowledge_base_version"] = version
-    return validation
+    response = dict(validation)
+    response["knowledge_base_module"] = module_name
+    response["knowledge_base_version"] = version
+    return response
 
 
-def _load_builder_module_kb(module_name: str) -> KnowledgeBaseContract:
-    _, resolved_version = get_knowledge_base_identity(
+def _load_builder_module_kb(module_name: str) -> KnowledgeBase:
+    get_knowledge_base_identity(
         module_name,
         input_dirs=[report_template_builder.MODULES_ROOT],
     )
     kb = cast(
-        KnowledgeBaseContract,
+        KnowledgeBase,
         load_knowledge_base(
             module_name,
-            version=resolved_version,
             input_dirs=[report_template_builder.MODULES_ROOT],
         ),
     )
-    register_runtime_lookup_tracker(cast(Any, kb))
+    register_runtime_lookup_tracker(kb)
     return kb
 
 
 def register_report_template_routes(
     api: _TypedApi,
     *,
-    load_module_kb: Callable[..., KnowledgeBaseContract],
+    load_module_kb: Callable[..., KnowledgeBase],
     clear_kb_caches: Callable[[], None],
     resolve_payload_kb_identity: Callable[[str, PExamination], tuple[str, str | None]],
     orm_models: Callable[[], Dict[str, Any]],
     build_p_examination_payload_from_host_ledger: Callable[..., PExamination],
+    persist_patient_examination_dtypes_record: Callable[
+        [object, PExamination], dict[str, Any]
+    ]
+    | None = None,
 ) -> None:
     @api.post("/report-templates/builder/templates")
     def save_report_template(
@@ -266,6 +271,52 @@ def register_report_template_routes(
                 404,
                 f"Published report template '{template_name}' not found in module '{module_name}'.",
             ) from exc
+
+    @api.get("/patient-examinations/{patient_examination_id}/dtypes-record/")
+    def get_patient_examination_dtypes_record(
+        request: BaseRequest,
+        patient_examination_id: int,
+    ) -> Dict[str, Any]:
+        del request
+        patient_examination_model = orm_models()["PatientExamination"]
+        patient_examination = patient_examination_model.objects.filter(
+            id=patient_examination_id
+        ).first()
+        if not patient_examination:
+            raise HttpError(
+                404,
+                f"PatientExamination '{patient_examination_id}' not found.",
+            )
+        record = getattr(patient_examination, "dtypes_record", None)
+        if not isinstance(record, dict):
+            return {}
+        return cast(Dict[str, Any], record)
+
+    @api.post("/patient-examinations/{patient_examination_id}/dtypes-record/")
+    def persist_patient_examination_dtypes_record_route(
+        request: BaseRequest,
+        patient_examination_id: int,
+        payload: PExamination,
+    ) -> Dict[str, Any]:
+        del request
+        patient_examination_model = orm_models()["PatientExamination"]
+        patient_examination = patient_examination_model.objects.filter(
+            id=patient_examination_id
+        ).first()
+        if not patient_examination:
+            raise HttpError(
+                404,
+                f"PatientExamination '{patient_examination_id}' not found.",
+            )
+        if persist_patient_examination_dtypes_record is None:
+            raise HttpError(501, "dtypes record persistence is not configured.")
+        try:
+            return persist_patient_examination_dtypes_record(
+                patient_examination,
+                payload,
+            )
+        except ValueError as exc:
+            raise HttpError(422, str(exc)) from exc
 
     @api.post(
         "/report-templates/{module_name}/{template_name}/validate-from-ledger/{patient_examination_id}"

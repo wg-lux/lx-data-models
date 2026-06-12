@@ -289,6 +289,25 @@ def build_p_examination_payload_from_host_ledger(
                 }
             )
 
+        interventions_payload: list[dict[str, object]] = []
+        active_interventions = (
+            patient_finding.interventions.filter(is_active=True)
+            .select_related("intervention")
+            .all()
+        )
+        for item in active_interventions:
+            intervention_name = str(
+                getattr(item.intervention, "name", "") or ""
+            ).strip()
+            if not intervention_name:
+                continue
+            interventions_payload.append(
+                {
+                    "patient_finding_interventions": str(item.id),
+                    "intervention": intervention_name,
+                }
+            )
+
         patient_findings_payload.append(
             {
                 "finding": finding_name,
@@ -301,7 +320,14 @@ def build_p_examination_payload_from_host_ledger(
                 ]
                 if classifications_payload
                 else [],
-                "patient_finding_interventions": [],
+                "patient_finding_interventions": [
+                    {
+                        "patient_finding": str(patient_finding.id),
+                        "patient_finding_interventions": interventions_payload,
+                    }
+                ]
+                if interventions_payload
+                else [],
             }
         )
 
@@ -600,14 +626,56 @@ def _replace_patient_finding_classifications(
         )
 
 
+def _get_or_create_active_patient_finding_classification(
+    patient_finding: Any,
+    *,
+    classification: Any,
+    choice: Any,
+    orm_models: Callable[[], Dict[str, Any]],
+) -> Any:
+    existing = patient_finding.classifications.filter(
+        classification=classification,
+        classification_choice=choice,
+        is_active=True,
+    ).first()
+    if existing is not None:
+        return existing
+    patient_finding_classification_model = orm_models()["PatientFindingClassification"]
+    return patient_finding_classification_model.objects.create(
+        finding=patient_finding,
+        classification=classification,
+        classification_choice=choice,
+        is_active=True,
+    )
+
+
 def register_findings_routes(
     api: _TypedApi,
     *,
     load_module_kb: Callable[..., Any],
     orm_models: Callable[[], Dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
+    build_p_examination_payload_from_host_ledger: Callable[..., PExamination]
+    | None = None,
+    persist_patient_examination_dtypes_record: Callable[
+        [object, PExamination], dict[str, Any]
+    ]
+    | None = None,
 ) -> None:
     _set_load_module_kb(load_module_kb)
+
+    def refresh_patient_examination_dtypes_record(patient_examination: object) -> None:
+        if (
+            build_p_examination_payload_from_host_ledger is None
+            or persist_patient_examination_dtypes_record is None
+        ):
+            return
+        module_name = _findings_module_name()
+        payload = build_p_examination_payload_from_host_ledger(
+            patient_examination,
+            route_module_name=module_name,
+        )
+        persist_patient_examination_dtypes_record(patient_examination, payload)
 
     @api.get("/core-concepts/{module_name}")
     def core_concepts_by_module(
@@ -770,6 +838,7 @@ def register_findings_routes(
                         orm_models=orm_models,
                         api_error=api_error,
                     )
+                refresh_patient_examination_dtypes_record(patient_examination)
                 return _serialize_patient_finding(patient_finding)
         except IntegrityError as exc:
             if "unique_active_finding_per_examination" in str(exc):
@@ -852,6 +921,9 @@ def register_findings_routes(
                     orm_models=orm_models,
                     api_error=api_error,
                 )
+            refresh_patient_examination_dtypes_record(
+                patient_finding.patient_examination
+            )
 
         return _serialize_patient_finding(patient_finding)
 
@@ -877,6 +949,7 @@ def register_findings_routes(
         patient_finding.save(
             update_fields=["is_active", "deactivated_at", "deactivated_by"]
         )
+        refresh_patient_examination_dtypes_record(patient_finding.patient_examination)
         return {"success": True, "id": patient_finding_id}
 
     @api.post("/patient-findings/{patient_finding_id}/classifications/")
@@ -902,9 +975,6 @@ def register_findings_routes(
             finding_classification_model = orm_models()["FindingClassification"]
             finding_classification_choice_model = orm_models()[
                 "FindingClassificationChoice"
-            ]
-            patient_finding_classification_model = orm_models()[
-                "PatientFindingClassification"
             ]
             if payload.replace:
                 patient_finding.classifications.all().delete()
@@ -936,11 +1006,14 @@ def register_findings_routes(
                     module_name=module_name,
                     api_error=api_error,
                 )
-                patient_finding_classification_model.objects.create(
-                    finding=patient_finding,
+                _get_or_create_active_patient_finding_classification(
+                    patient_finding,
                     classification=classification,
-                    classification_choice=choice,
-                    is_active=True,
+                    choice=choice,
+                    orm_models=orm_models,
                 )
+            refresh_patient_examination_dtypes_record(
+                patient_finding.patient_examination
+            )
 
         return _serialize_patient_finding(patient_finding)

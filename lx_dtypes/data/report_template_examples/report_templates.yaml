@@ -1,3 +1,31 @@
+- model: classification_choice
+  name: large
+
+- model: classification_choice
+  name: present
+
+- model: classification
+  name: size_mm
+  classification_choices:
+    - size_mm
+
+- model: classification
+  name: size_cat
+  classification_choices:
+    - large
+
+- model: classification
+  name: lst
+  classification_choices:
+    - present
+
+- model: finding
+  name: esophagus_polyp
+  classifications:
+    - size_mm
+    - size_cat
+    - lst
+
 - model: findings_validator
   name: polyp_has_lst_if_large
   finding: esophagus_polyp
@@ -34,12 +62,10 @@
       classifications:
         - classification: size_mm
           required: true
-
-- model: report_template_section
-  name: xx
-  position: 1
-  types: []
-  findings: []
+        - classification: size_cat
+          required: false
+        - classification: lst
+          required: false
 
 - model: findings_validator
   name: star_upper_gi_mucosa_esophagus_abnormal_reported
@@ -66,7 +92,6 @@
   examination: star_upper_gi_endoscopy
   report_sections:
     - examination_baseline
-    - xx
   validators:
     examination_validators:
       - gastroscopy_has_baseline_info

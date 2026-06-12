@@ -1,4 +1,4 @@
-from typing import List, Literal, NotRequired, TypedDict
+from typing import List, Literal, Optional
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
@@ -8,7 +8,7 @@ from lx_dtypes.models.knowledge_base.report_template.ReportFindingDataDict impor
 )
 
 
-class ReportTemplateSectionFieldDataDict(TypedDict, total=False):
+class ReportTemplateSectionFieldDataDict(KnowledgebaseBaseModelDataDict):
     key: str
     required: bool
     label: str
@@ -19,5 +19,5 @@ class ReportTemplateSectionDataDict(KnowledgebaseBaseModelDataDict):
     position: int
     types: List[str]
     findings: List[ReportTemplateFindingRequirementDataDict | str]
-    section_kind: NotRequired[Literal["findings", "patient_data", "history"]]
-    fields: NotRequired[List[ReportTemplateSectionFieldDataDict]]
+    section_kind: Optional[Literal["findings", "patient_data", "history"]]
+    fields: Optional[List[ReportTemplateSectionFieldDataDict]]

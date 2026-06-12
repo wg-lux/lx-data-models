@@ -2547,7 +2547,9 @@ class Subdiv2D:
     def getEdgeList(self) -> _typing.Sequence[cv2.typing.Vec4f]: ...
     def getLeadingEdgeList(self) -> _typing.Sequence[int]: ...
     def getTriangleList(self) -> _typing.Sequence[cv2.typing.Vec6f]: ...
-    def getVoronoiFacetList(self, idx: _typing.Sequence[int]) -> tuple[
+    def getVoronoiFacetList(
+        self, idx: _typing.Sequence[int]
+    ) -> tuple[
         _typing.Sequence[_typing.Sequence[cv2.typing.Point2f]],
         _typing.Sequence[cv2.typing.Point2f],
     ]: ...
@@ -3092,12 +3094,16 @@ class MSER(Feature2D):
         edge_blur_size: int = ...,
     ) -> MSER: ...
     @_typing.overload
-    def detectRegions(self, image: cv2.typing.MatLike) -> tuple[
+    def detectRegions(
+        self, image: cv2.typing.MatLike
+    ) -> tuple[
         _typing.Sequence[_typing.Sequence[cv2.typing.Point]],
         _typing.Sequence[cv2.typing.Rect],
     ]: ...
     @_typing.overload
-    def detectRegions(self, image: UMat) -> tuple[
+    def detectRegions(
+        self, image: UMat
+    ) -> tuple[
         _typing.Sequence[_typing.Sequence[cv2.typing.Point]],
         _typing.Sequence[cv2.typing.Rect],
     ]: ...
@@ -6543,7 +6549,9 @@ def createCLAHE(
     clipLimit: float = ..., tileGridSize: cv2.typing.Size = ...
 ) -> CLAHE: ...
 def createCalibrateDebevec(
-    samples: int = ..., lambda_: float = ..., random: bool = ...  # noqa: F811
+    samples: int = ...,
+    lambda_: float = ...,
+    random: bool = ...,  # noqa: F811
 ) -> CalibrateDebevec: ...
 def createCalibrateRobertson(
     max_iter: int = ..., threshold: float = ...
