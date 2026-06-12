@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Literal, Protocol, TypeVar, cast
+from typing import Any, Callable, Dict, List, Literal, Mapping, Protocol, TypeVar, cast
 
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
@@ -49,14 +49,15 @@ def _compile_report_template(
 
 
 def _attach_resolved_kb_identity(
-    validation: Dict[str, Any],
+    validation: Mapping[str, Any],
     *,
     module_name: str,
     version: str | None,
 ) -> Dict[str, Any]:
-    validation["knowledge_base_module"] = module_name
-    validation["knowledge_base_version"] = version
-    return validation
+    response = dict(validation)
+    response["knowledge_base_module"] = module_name
+    response["knowledge_base_version"] = version
+    return response
 
 
 def _load_builder_module_kb(module_name: str) -> KnowledgeBase:

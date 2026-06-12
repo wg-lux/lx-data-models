@@ -37,7 +37,8 @@ def _serialize_examination(examination: Any, *, module_name: str) -> Dict[str, A
     examination_types_relation = getattr(examination, "examination_types", None)
     examination_types_items = (
         examination_types_relation.all()
-        if hasattr(examination_types_relation, "all")
+        if examination_types_relation is not None
+        and hasattr(examination_types_relation, "all")
         else examination_types_relation or []
     )
 
