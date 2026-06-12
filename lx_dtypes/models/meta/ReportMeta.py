@@ -346,14 +346,14 @@ class ReportCropInfo(BaseModel):
 
 
 class ReportMetaDataDict(SensitiveMetaDataDict):
-    pdf_hash: str | None = None
-    anonymized_pdf_path: str | Path | None = None
-    redaction_summary: ReportRedactionSummary | None = None
-    anonymizer_provenance: ReportAnonymizerProvenance | None = None
-    cropped_regions: dict[str, list[Any]] = Field(default_factory=dict)
-    cropping_enabled: bool = False
-    total_cropped_regions: int = 0
-    anonymized_pdf_error: str | None = None
+    pdf_hash: str | None
+    anonymized_pdf_path: str | Path | None
+    redaction_summary: ReportRedactionSummary | None
+    anonymizer_provenance: ReportAnonymizerProvenance | None
+    cropped_regions: dict[str, list[Any]]
+    cropping_enabled: bool
+    total_cropped_regions: int
+    anonymized_pdf_error: str | None
 
 
 class ReportProcessRequest(BaseModel):

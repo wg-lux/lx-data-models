@@ -6,7 +6,6 @@ from ninja.errors import HttpError  # type: ignore[import-untyped]
 
 from lx_dtypes.models.contracts import KnowledgeBaseContract
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
-from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
 from lx_dtypes.models.interface.KnowledgeBaseResolver import load_knowledge_base
@@ -61,26 +60,26 @@ def _attach_resolved_kb_identity(
     return response
 
 
-def _load_builder_module_kb(module_name: str) -> KnowledgeBase:
+def _load_builder_module_kb(module_name: str) -> KnowledgeBaseContract:
     get_knowledge_base_identity(
         module_name,
         input_dirs=[report_template_builder.MODULES_ROOT],
     )
     kb = cast(
-        KnowledgeBase,
+        KnowledgeBaseContract,
         load_knowledge_base(
             module_name,
             input_dirs=[report_template_builder.MODULES_ROOT],
         ),
     )
-    register_runtime_lookup_tracker(kb)
+    register_runtime_lookup_tracker(cast(Any, kb))
     return kb
 
 
 def register_report_template_routes(
     api: _TypedApi,
     *,
-    load_module_kb: Callable[..., KnowledgeBase],
+    load_module_kb: Callable[..., KnowledgeBaseContract],
     clear_kb_caches: Callable[[], None],
     resolve_payload_kb_identity: Callable[[str, PExamination], tuple[str, str | None]],
     orm_models: Callable[[], Dict[str, Any]],
@@ -107,31 +106,10 @@ def register_report_template_routes(
             raise HttpError(400, str(exc)) from exc
 
         clear_kb_caches()
-        _, resolved_version = get_knowledge_base_identity(
-            saved.module_name,
-            input_dirs=[report_template_builder.MODULES_ROOT],
-        )
-        kb = load_module_kb(saved.module_name, version=resolved_version)
+        kb = _load_builder_module_kb(saved.module_name)
         compiled = _compile_report_template(kb, saved.template_name, mode="preview")
         saved.readiness = compiled["summary"].model_dump(mode="json")
         return saved
-
-    @api.get("/report-templates/{module_name}/{template_name}")
-    def report_template_by_name(
-        request: BaseRequest, module_name: str, template_name: str
-    ) -> Dict[str, Any]:
-        """
-        Return a resolved report template JSON payload by module/template name.
-        """
-        del request
-        kb = load_module_kb(module_name)
-        try:
-            return kb.export_report_template(template_name)
-        except KeyError as exc:
-            raise HttpError(
-                404,
-                f"Published report template '{template_name}' not found in module '{module_name}'.",
-            ) from exc
 
     @api.get("/report-templates/by-examination/{module_name}/{examination_name}")
     def report_templates_by_examination(
@@ -153,6 +131,23 @@ def register_report_template_routes(
                 continue
             matches.append(kb.export_report_template(template_name))
         return matches
+
+    @api.get("/report-templates/{module_name}/{template_name}")
+    def report_template_by_name(
+        request: BaseRequest, module_name: str, template_name: str
+    ) -> Dict[str, Any]:
+        """
+        Return a resolved report template JSON payload by module/template name.
+        """
+        del request
+        kb = load_module_kb(module_name)
+        try:
+            return kb.export_report_template(template_name)
+        except KeyError as exc:
+            raise HttpError(
+                404,
+                f"Published report template '{template_name}' not found in module '{module_name}'.",
+            ) from exc
 
     @api.get("/report-templates/{module_name}/{template_name}/preview")
     def preview_report_template_by_name(

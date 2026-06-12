@@ -28,6 +28,7 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     get_knowledge_base_identity,
     load_knowledge_base,
 )
+from lx_dtypes.models.interface import KnowledgeBaseResolver as _knowledge_base_resolver
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 from .findings_routes import (
@@ -154,11 +155,25 @@ def _resolve_active_version(module_name: str, version: str | None) -> str | None
 def _load_module_kb(
     module_name: str, version: str | None = None
 ) -> KnowledgeBaseContract:
-    resolved_version = _resolve_active_version(module_name, version)
+    loader = _kb_loader()
+    resolved_version = (
+        _resolve_active_version(module_name, version)
+        if loader is _knowledge_base_resolver
+        else version
+    )
     try:
+        if loader is _knowledge_base_resolver:
+            loaded_kb = load_knowledge_base(module_name, version=resolved_version)
+        else:
+            try:
+                loaded_kb = loader.load_knowledge_base(
+                    module_name, version=resolved_version
+                )
+            except TypeError:
+                loaded_kb = loader.load_knowledge_base(module_name)
         kb = cast(
             KnowledgeBaseContract,
-            load_knowledge_base(module_name, version=resolved_version),
+            loaded_kb,
         )
     except KnowledgeBaseVersionNotFoundError as exc:
         raise HttpError(
@@ -170,6 +185,10 @@ def _load_module_kb(
         raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
     register_runtime_lookup_tracker(cast(Any, kb))
     return kb
+
+
+def _kb_loader() -> Any:
+    return _knowledge_base_resolver
 
 
 def _clear_kb_caches() -> None:

@@ -115,6 +115,7 @@ def test_rerun_response_preserves_nullable_job_fields() -> None:
 
     data = response.to_response_dict()
 
+    assert isinstance(data["job"], dict)
     assert data["job"]["history_id"] is None
     assert data["deleted_prediction_segments"] is None
     assert "reason" not in data

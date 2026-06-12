@@ -36,6 +36,8 @@ class VideoMeta(SensitiveMeta):
     """
 
     model_config = ConfigDict(extra="allow")
+    _LIST_DEFAULT_FIELDS = SensitiveMeta._LIST_DEFAULT_FIELDS | {"frame_observations"}
+
     frame_observations: list[FrameObservation] = Field(default_factory=list)
     anonymizer_provenance: VideoAnonymizerProvenance | None = None
 

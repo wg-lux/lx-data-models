@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 type JsonNull = NoneType
 type JsonScalar = str | int | float | bool
-type JsonValue = JsonScalar | list[JsonValue] | dict[str, JsonValue]
+type JsonValue = JsonNull | JsonScalar | list[JsonValue] | dict[str, JsonValue]
 type JsonObject = dict[str, JsonValue]
 type JsonStringObject = dict[str, str]
 type JsonNumericObject = dict[str, JsonScalar]
