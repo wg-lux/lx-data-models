@@ -8,6 +8,8 @@ from typing import Any, Literal, cast
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from lx_dtypes.models.contracts.video_frame_export import export_config
+
 
 class ExportAnnotatedConfigContract(BaseModel):
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
@@ -169,8 +171,6 @@ class ExportAnnotatedConfigContract(BaseModel):
         return cast(dict[str, Any], loaded)
 
     def to_export_config(self) -> export_config:
-        from endoreg_db.export.frames.export_frames_with_labels import export_config
-
         return export_config(
             output_path=self.output_path,
             output_dir=self.output_dir,

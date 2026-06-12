@@ -10,6 +10,7 @@ type FfmpegProbeJsonValue = (
 )
 type FfmpegProbeJsonObject = dict[str, FfmpegProbeJsonValue]
 
+
 class FfmpegProbeStreamPayload(BaseModel):
     """Validated subset of a single ffprobe stream entry."""
 
@@ -27,6 +28,7 @@ class FfmpegProbeStreamPayload(BaseModel):
     bit_rate: str | None = None
     nb_frames: str | None = None
 
+
 class FfmpegMetaPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
@@ -39,6 +41,7 @@ class FfmpegMetaPayload(BaseModel):
     pixel_format: str | None = None
     bit_rate: int | None = Field(default=None, ge=0)
     raw_probe_data: FfmpegProbeJsonObject | None = None
+
 
 class FfmpegProbeFormatPayload(BaseModel):
     """Validated subset of the ffprobe format block."""

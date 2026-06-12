@@ -4,7 +4,6 @@ from collections.abc import Mapping
 from typing import Literal, TypedDict, TypeAlias, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
-from lx_dtypes.models.contracts.endoscopy_processor import RoiBoxCore
 from .json_types import JsonObject, JsonValue
 
 VideoCorrectionMaskType: TypeAlias = Literal["device", "custom"]
@@ -135,16 +134,15 @@ class VideoCorrectionApplyMaskPayload(VideoCorrectionProcessingMethodMixin):
 
     def history_config(self) -> JsonObject:
         roi = self.resolved_roi
-        return {
+        config: JsonObject = {
             "mask_type": self.mask_type,
-            "device_name": self.device_name,
-            "roi": (
-                cast(JsonValue, dump_video_correction_roi_payload(roi))
-                if roi is not None
-                else None
-            ),
             "processing_method": self.resolved_processing_method,
         }
+        if self.device_name is not None:
+            config["device_name"] = self.device_name
+        if roi is not None:
+            config["roi"] = cast(JsonValue, dump_video_correction_roi_payload(roi))
+        return config
 
 
 class VideoCorrectionFrameRemovalPayload(VideoCorrectionProcessingMethodMixin):

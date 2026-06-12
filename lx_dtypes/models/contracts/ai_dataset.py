@@ -473,14 +473,3 @@ AIDataSetActiveLearningConfigContract = AIDataSetActiveLearningConfigContractCon
 AIDataSetActiveLearningCandidateContract = (
     AIDataSetActiveLearningCandidateContractContract
 )
-
-if "AIDataSetScoredActiveLearningCandidateContractContract" in globals():
-    AIDataSetScoredActiveLearningCandidateContract = (
-        AIDataSetScoredActiveLearningCandidateContractContract
-    )
-
-if (
-    "AIDataSetStandardExportScopeContract" not in globals()
-    and "AIDataSetStandardExportScopeContractContract" in globals()
-):
-    AIDataSetStandardExportScopeContract = AIDataSetStandardExportScopeContractContract

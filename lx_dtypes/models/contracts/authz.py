@@ -91,7 +91,6 @@ def validate_keycloak_claims(
     return KeycloakClaimsPayload.model_validate(dict(payload))
 
 
-
 def validate_authz_route_lookup(
     payload: Mapping[str, JsonValue],
 ) -> AuthzRouteLookupPayload:

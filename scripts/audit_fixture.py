@@ -15,7 +15,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
+from typing import Any, Iterable, Mapping, Sequence
 from textwrap import dedent
 
 import yaml

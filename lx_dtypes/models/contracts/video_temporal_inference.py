@@ -1,10 +1,30 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import asdict, dataclass
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from .json_types import JsonObject
+
+
+@dataclass(frozen=True)
+class TemporalInferenceDispatchResult:
+    task_id: str
+    mode: str
+    status: str
+    video_id: int
+    model_meta_id: int
+    queue: str
+    history_id: int | None = None
+    deleted_prediction_segments: int | None = None
+    prediction_segments_count: int | None = None
+    reason: str | None = None
+    message: str | None = None
+    blocked_by_history_id: int | None = None
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
 
 
 class TemporalInferenceHistoryResultPayload(BaseModel):
@@ -64,6 +84,7 @@ def parse_temporal_inference_history_result_payload(
 
 
 __all__ = [
+    "TemporalInferenceDispatchResult",
     "TemporalInferenceHistoryConfigPayload",
     "TemporalInferenceHistoryResultPayload",
     "parse_temporal_inference_history_config_payload",

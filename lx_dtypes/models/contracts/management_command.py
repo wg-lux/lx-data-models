@@ -141,7 +141,9 @@ type TranscodeVideoQualityMode = Literal["fast", "balanced", "quality"]
 
 
 class TranscodeVideoCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(
+        extra="ignore", frozen=True, strict=True, populate_by_name=True
+    )
 
     input_dir: str
     output_dir: str
@@ -154,7 +156,7 @@ class TranscodeVideoCommandOptionsPayload(BaseModel):
     quality_mode: TranscodeVideoQualityMode
     extension: tuple[str, ...] = Field(default_factory=tuple)
     fail_on_skipped: bool
-    json: bool
+    json_output: bool = Field(validation_alias="json", serialization_alias="json")
 
     @field_validator("input_dir", "output_dir", mode="before")
     @classmethod
@@ -191,9 +193,11 @@ class TranscodeVideoCommandOptionsPayload(BaseModel):
 
 
 class ValidateRuntimeStorageContractCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(
+        extra="ignore", frozen=True, strict=True, populate_by_name=True
+    )
 
-    json: bool
+    json_output: bool = Field(validation_alias="json", serialization_alias="json")
 
 
 class RuntimeStorageContractPayload(BaseModel):
@@ -239,12 +243,14 @@ class ValidateVideoFileStatusPayload(BaseModel):
 
 
 class ReapQuarantineCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(
+        extra="ignore", frozen=True, strict=True, populate_by_name=True
+    )
 
     older_than_days: int = Field(ge=0)
     dry_run: bool
     confirm: bool
-    json: bool
+    json_output: bool = Field(validation_alias="json", serialization_alias="json")
 
 
 class ReapUploadJobSourcesCommandOptionsPayload(BaseModel):
@@ -264,14 +270,16 @@ class ReapUploadJobSourcesCommandOptionsPayload(BaseModel):
 
 
 class ReconcileFrameSegmentAnnotationsCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(
+        extra="ignore", frozen=True, strict=True, populate_by_name=True
+    )
 
     video_ids: tuple[int, ...] = Field(default_factory=tuple)
     segment_ids: tuple[int, ...] = Field(default_factory=tuple)
     annotator: str = ""
     track: FrameSegmentReconciliationTrack
     apply_changes: bool
-    json: bool
+    json_output: bool = Field(validation_alias="json", serialization_alias="json")
 
     @field_validator("video_ids", "segment_ids", mode="before")
     @classmethod
@@ -295,10 +303,12 @@ class ReconcileFrameSegmentAnnotationsCommandOptionsPayload(BaseModel):
 
 
 class ReconcileMediaIntegrityCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(
+        extra="ignore", frozen=True, strict=True, populate_by_name=True
+    )
 
     dry_run: bool
-    json: bool
+    json_output: bool = Field(validation_alias="json", serialization_alias="json")
     video_id: list[int] = Field(default_factory=list)
     check_frames: bool
     repair_frames: bool
@@ -335,7 +345,9 @@ class ReconcileSegmentValidationStateCommandOptionsPayload(BaseModel):
 
 
 class ReconcileVideoFormatsCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(
+        extra="ignore", frozen=True, strict=True, populate_by_name=True
+    )
 
     root: list[str] = Field(default_factory=list)
     include_default_roots: bool
@@ -351,7 +363,7 @@ class ReconcileVideoFormatsCommandOptionsPayload(BaseModel):
     min_free_bytes: int = Field(ge=0)
     force_cpu: bool
     fail_on_non_compliant: bool
-    json: bool
+    json_output: bool = Field(validation_alias="json", serialization_alias="json")
 
     @field_validator("root", "extension", mode="before")
     @classmethod
@@ -513,12 +525,14 @@ class MigrateDataDirCommandOptionsPayload(BaseModel):
 
 
 class MigrateMediaStorageCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(
+        extra="ignore", frozen=True, strict=True, populate_by_name=True
+    )
 
     apply: bool
     limit: int | None = None
     repeat_until_empty: bool
-    json: bool
+    json_output: bool = Field(validation_alias="json", serialization_alias="json")
     fail_fast: bool
     include_raw: bool
     include_processed: bool
@@ -566,11 +580,13 @@ class MigrateVideoStreamableStorageCommandOptionsPayload(BaseModel):
 
 
 class MigrationMarkEligibleCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(
+        extra="ignore", frozen=True, strict=True, populate_by_name=True
+    )
 
     apply: bool
     limit: int = Field(default=0, ge=0)
-    json: bool
+    json_output: bool = Field(validation_alias="json", serialization_alias="json")
 
 
 __all__ = [

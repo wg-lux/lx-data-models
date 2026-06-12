@@ -22,7 +22,8 @@ class EndoscopyProcessorCore(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     name: str
-    
+
+
 class MaskCallPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
@@ -30,6 +31,7 @@ class MaskCallPayload(BaseModel):
     mask_config: RoiBoxCore
     output_video: Path
     mode: str
+
 
 def roi_box_to_crop_template(
     roi: RoiBoxCore,
@@ -74,7 +76,6 @@ def roi_box_from_object(value: object) -> RoiBoxCore:
     if isinstance(value, RoiBoxCore):
         return value
     return RoiBoxCore.model_validate(value)
-
 
 
 def roi_box_or_none_from_object(value: object | None) -> RoiBoxCore | None:

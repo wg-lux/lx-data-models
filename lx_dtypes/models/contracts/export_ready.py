@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import dataclass
 from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -27,6 +28,24 @@ class VideoReadyForExportPayload(BaseModel):
         return value
 
 
+@dataclass(frozen=True, slots=True)
+class ReadyForExportResult:
+    video_id: int
+    ready_for_export: bool
+    ready_for_export_at: str | None
+    ready_for_export_by: str
+    processed_file_sha256: str
+
+    def to_dict(self) -> dict[str, object | None]:
+        return {
+            "video_id": self.video_id,
+            "ready_for_export": self.ready_for_export,
+            "ready_for_export_at": self.ready_for_export_at,
+            "ready_for_export_by": self.ready_for_export_by,
+            "processed_file_sha256": self.processed_file_sha256,
+        }
+
+
 def validate_video_ready_for_export_payload(
     payload: Mapping[str, object],
 ) -> VideoReadyForExportPayload:
@@ -43,6 +62,7 @@ def dump_video_ready_for_export_payload(
 
 
 __all__ = [
+    "ReadyForExportResult",
     "VideoReadyForExportData",
     "VideoReadyForExportPayload",
     "dump_video_ready_for_export_payload",
