@@ -53,6 +53,31 @@ class KeycloakClaimsPayload(BaseModel):
         return {role for role in roles if role}
 
 
+class AuthzRouteLookupPayload(BaseModel):
+    """
+    Normalized route/method lookup payload for authz policy checks.
+
+    This deliberately allows empty strings so callers can preserve the
+    existing secure-deny fallback behavior when route or method data is
+    unavailable.
+    """
+
+    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+
+    route_name: str = ""
+    method: str = ""
+
+    @field_validator("route_name")
+    @classmethod
+    def normalize_route_name(cls, value: str) -> str:
+        return value.strip().split(":")[-1]
+
+    @field_validator("method")
+    @classmethod
+    def normalize_method(cls, value: str) -> str:
+        return value.strip().upper()
+
+
 class KeycloakTokenResponsePayload(BaseModel):
     model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
 
@@ -66,6 +91,13 @@ def validate_keycloak_claims(
     return KeycloakClaimsPayload.model_validate(dict(payload))
 
 
+
+def validate_authz_route_lookup(
+    payload: Mapping[str, JsonValue],
+) -> AuthzRouteLookupPayload:
+    return AuthzRouteLookupPayload.model_validate(dict(payload))
+
+
 def validate_keycloak_token_response(
     payload: Mapping[str, JsonValue],
 ) -> KeycloakTokenResponsePayload:
@@ -73,9 +105,11 @@ def validate_keycloak_token_response(
 
 
 __all__ = [
+    "AuthzRouteLookupPayload",
     "KeycloakClaimsPayload",
     "KeycloakRoleContainerPayload",
     "KeycloakTokenResponsePayload",
     "validate_keycloak_claims",
+    "validate_authz_route_lookup",
     "validate_keycloak_token_response",
 ]

@@ -55,6 +55,12 @@ from .authz import (
     KeycloakRoleContainerPayload,
     validate_keycloak_claims,
 )
+from .ai_model import (
+    AiModelSerializerInputPayload,
+    AiModelSerializerOutputPayload,
+    validate_ai_model_serializer_input_payload,
+    validate_ai_model_serializer_output_payload,
+)
 from .anonymization_metrics import (
     AnonymizationFieldQualityPayload,
     AnonymizationMetricsFiltersPayload,
@@ -97,6 +103,13 @@ from .core_concepts import (
     InterventionTypeCore,
     UnitCore,
     UnitTypeCore,
+)
+from .ai_dataset import (
+    AIDataSetActiveLearningCandidateContract,
+    AIDataSetActiveLearningConfigContract,
+    AIDataSetActiveLearningSelectionContract,
+    AIDataSetScoredActiveLearningCandidateContract,
+    AIDataSetStandardExportScopeContract,
 )
 from .document_type import DocumentType
 from .lab_value import (
@@ -305,6 +318,8 @@ from .video_ai_labels import (
     video_ai_json_safe_dict,
 )
 from .video_segments import (
+    VideoSegmentsPayload,
+    VideoSegmentsPayloadDict,
     SegmentAnnotationEnsurePayload,
     SegmentAnnotationInput,
     SegmentAnnotationMetadataInput,
@@ -324,6 +339,7 @@ from .video_segments import (
     validate_segment_crud_payload,
     validate_segment_list_query,
     validate_segment_prediction_import_payload,
+    validate_video_segments_payload,
     validate_segment_validation_payload,
     validate_segment_validation_status_payload,
 )
@@ -393,6 +409,10 @@ from .video_frame_export import (
     YamlValue,
     validate_video_frame_annotation_export_config,
 )
+from .frame_annotation import (
+    FrameAnnotationRandomTaskResponsePayload,
+    FrameAnnotationSkipResponsePayload,
+)
 from .video_frame_annotations import (
     FrameAnnotationBulkEnvelopeData,
     FrameAnnotationBulkEnvelopePayload,
@@ -408,7 +428,6 @@ from .video_frame_annotations import (
     dump_frame_box_annotation_bulk_item,
 )
 from .video_text_metadata import VideoTextMetaPayload, VideoTextMetaValue
-from .video_meta import FfmpegMetaPayload
 from .video_reimport import (
     JsonObject,
     JsonValue,
@@ -437,6 +456,11 @@ from .video_reimport import (
 )
 
 __all__ = [
+    "AIDataSetActiveLearningCandidateContract",
+    "AIDataSetActiveLearningConfigContract",
+    "AIDataSetActiveLearningSelectionContract",
+    "AIDataSetScoredActiveLearningCandidateContract",
+    "AIDataSetStandardExportScopeContract",
     "DjangoBeatScheduleEntryPayload",
     "DjangoBeatScheduleOptionsPayload",
     "DjangoCacheConfigPayload",
@@ -515,6 +539,10 @@ __all__ = [
     "KnowledgeBaseContract",
     "NginxAccelResponseHeadersPayload",
     "KeycloakClaimsPayload",
+    "AiModelSerializerInputPayload",
+    "AiModelSerializerOutputPayload",
+    "validate_ai_model_serializer_input_payload",
+    "validate_ai_model_serializer_output_payload",
     "KeycloakRoleContainerPayload",
     "validate_keycloak_claims",
     "DocumentType",
@@ -763,6 +791,8 @@ __all__ = [
     "YamlScalar",
     "YamlValue",
     "validate_video_frame_annotation_export_config",
+    "FrameAnnotationRandomTaskResponsePayload",
+    "FrameAnnotationSkipResponsePayload",
     "FrameAnnotationBulkEnvelopeData",
     "FrameAnnotationBulkEnvelopePayload",
     "FrameAnnotationBulkItemData",

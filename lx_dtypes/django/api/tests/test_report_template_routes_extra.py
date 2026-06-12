@@ -11,6 +11,7 @@ from django.test import Client
 
 from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api import report_template_routes
+from lx_dtypes.django.api import report_template_builder
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 
@@ -142,7 +143,7 @@ def test_save_report_template_uses_resolver_input_dirs(
         report_template_routes, "load_knowledge_base", _fake_load_knowledge_base
     )
     monkeypatch.setattr(
-        report_template_routes.report_template_builder,
+        report_template_builder,
         "MODULES_ROOT",
         tmp_path,
     )

@@ -4,8 +4,8 @@ from typing import Any, Callable, Dict, List, Literal, Protocol, TypeVar, cast
 
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
-from lx_dtypes.models.contracts import KnowledgeBaseContract
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
+from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
 from lx_dtypes.models.interface.KnowledgeBaseResolver import load_knowledge_base
@@ -59,13 +59,13 @@ def _attach_resolved_kb_identity(
     return validation
 
 
-def _load_builder_module_kb(module_name: str) -> KnowledgeBaseContract:
+def _load_builder_module_kb(module_name: str) -> KnowledgeBase:
     get_knowledge_base_identity(
         module_name,
         input_dirs=[report_template_builder.MODULES_ROOT],
     )
     kb = cast(
-        KnowledgeBaseContract,
+        KnowledgeBase,
         load_knowledge_base(
             module_name,
             input_dirs=[report_template_builder.MODULES_ROOT],
@@ -78,7 +78,7 @@ def _load_builder_module_kb(module_name: str) -> KnowledgeBaseContract:
 def register_report_template_routes(
     api: _TypedApi,
     *,
-    load_module_kb: Callable[..., KnowledgeBaseContract],
+    load_module_kb: Callable[..., KnowledgeBase],
     clear_kb_caches: Callable[[], None],
     resolve_payload_kb_identity: Callable[[str, PExamination], tuple[str, str | None]],
     orm_models: Callable[[], Dict[str, Any]],

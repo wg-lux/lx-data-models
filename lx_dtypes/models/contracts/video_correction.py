@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from typing import Literal, TypedDict, TypeAlias, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
-
+from lx_dtypes.models.contracts.endoscopy_processor import RoiBoxCore
 from .json_types import JsonObject, JsonValue
 
 VideoCorrectionMaskType: TypeAlias = Literal["device", "custom"]

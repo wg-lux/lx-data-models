@@ -5,7 +5,7 @@ from typing import TypeAlias, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .json_types import JsonNumericObject, JsonValue
+from .json_types import JsonNumericObject, JsonScalar
 
 VideoFrameBoxJsonObject: TypeAlias = JsonNumericObject
 
@@ -23,7 +23,7 @@ def _blank_to_none(value: object) -> object:
 
 
 def _normalize_mapping(value: Mapping[object, object]) -> VideoFrameBoxJsonObject:
-    return {str(key): cast(JsonValue, item) for key, item in value.items()}
+    return {str(key): cast(JsonScalar, item) for key, item in value.items()}
 
 
 class VideoFrameBoxAnnotationRequestPayload(BaseModel):

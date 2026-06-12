@@ -1,8 +1,12 @@
+# /lx-data-models/lx_dtypes/models/contracts/frame_annotation.py
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal, cast
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from lx_dtypes.models.contracts.information_source import normalize_name_reference
+from lx_dtypes.models.contracts.json_types import JsonObject
 
 
 class FrameAnnotationLabelOptionPayload(BaseModel):
@@ -10,6 +14,45 @@ class FrameAnnotationLabelOptionPayload(BaseModel):
 
     id: int
     name: str
+
+
+class FrameAnnotationQueueSpecPayload(BaseModel):
+    """
+    Validated transport contract for frame annotation queue requests.
+
+    This payload intentionally contains only JSON/task-safe values:
+    primitive IDs, strings, booleans, and sets of IDs. Django ORM objects are
+    resolved by the endoreg_db adapter layer.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        arbitrary_types_allowed=True,
+    )
+
+    limit: int
+    task_mode: str = "random"
+    video_id: int | None = None
+    label_set_id: int | None = None
+    target_label_id: int | None = None
+    filter_label_id: int | None = None
+    information_source_name: str = "manual_annotation"
+    annotator: str = ""
+    exclude_annotated: bool = True
+    ai_dataset_id: int | None = None
+    sampling_strategy: str = "balanced"
+    prediction_segments_only: bool = True
+    exclude_frame_ids: set[int] = Field(default_factory=set)
+    require_extracted_frames: bool = True
+    require_raw_video: bool = False
+    require_processed_video: bool = False
+    require_streamable_video_artifact: bool = False
+
+    @field_validator("information_source_name", mode="before")
+    @classmethod
+    def normalize_information_source_name(cls, value: object) -> str:
+        return normalize_name_reference(value, default="manual_annotation")
 
 
 class FrameAnnotationAnnotationPayload(BaseModel):
@@ -49,6 +92,8 @@ class FrameAnnotationTaskPayload(BaseModel):
     dataset_selection_label_name: str | None = None
     dataset_selection_source: str | None = None
     dataset_bucket: str | None = None
+    frame_file_type: str | None = None
+    decoded_frame_stream_path: str | None = None
 
 
 class FrameAnnotationQueueResultPayload(BaseModel):
@@ -63,9 +108,55 @@ class FrameAnnotationQueueResultPayload(BaseModel):
     bucket_counts: dict[str, int] = Field(default_factory=dict)
 
 
+class FrameAnnotationRandomTaskResponsePayload(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    status: Literal["success"] = "success"
+    task: FrameAnnotationTaskPayload
+    tasks: list[FrameAnnotationTaskPayload]
+    count: int
+    task_mode: str
+    selection_strategy: str
+    dataset_frame_filter: str
+    prediction_segments_only: bool
+    frame_file_type: str | None = None
+    label_group_id: int | None = None
+    target_label: str | None = None
+    filter_label: str | None = None
+    ai_dataset_id: int | None = None
+    ai_dataset_name: str | None = None
+    ai_dataset_type: str | None = None
+    label_distribution: list[dict[str, int]] = Field(default_factory=list)
+    selected_label_counts: dict[str, int] = Field(default_factory=dict)
+    segment_bucket_counts: dict[str, int] = Field(default_factory=dict)
+    annotation_bucket_counts: dict[str, int] = Field(default_factory=dict)
+    bucket_counts: dict[str, int] = Field(default_factory=dict)
+
+    def to_response_dict(self) -> JsonObject:
+        return cast(JsonObject, self.model_dump(mode="json", exclude_none=True))
+
+
+class FrameAnnotationSkipResponsePayload(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    status: Literal["success"] = "success"
+    skipped_frame_id: int
+    video_id: int
+    annotator: str
+    reason: str
+    pruned_unused_frames: int
+    next_task: FrameAnnotationTaskPayload | None = None
+
+    def to_response_dict(self) -> JsonObject:
+        return cast(JsonObject, self.model_dump(mode="json", exclude_none=True))
+
+
 __all__ = [
     "FrameAnnotationAnnotationPayload",
     "FrameAnnotationLabelOptionPayload",
     "FrameAnnotationQueueResultPayload",
+    "FrameAnnotationQueueSpecPayload",
+    "FrameAnnotationRandomTaskResponsePayload",
+    "FrameAnnotationSkipResponsePayload",
     "FrameAnnotationTaskPayload",
 ]

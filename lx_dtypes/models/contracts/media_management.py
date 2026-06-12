@@ -21,7 +21,16 @@ class MediaManagementCleanupQueryPayload(BaseModel):
     def normalize_file_id(cls, value: object) -> int | None:
         if value is None or value == "":
             return None
-        return int(value)
+        if isinstance(value, bool):
+            raise ValueError("file_id must be an integer")
+        if isinstance(value, int):
+            return value
+        if isinstance(value, str):
+            normalized = value.strip()
+            if not normalized:
+                return None
+            return int(normalized)
+        raise ValueError("file_id must be an integer")
 
 
 class MediaManagementItemPayload(BaseModel):

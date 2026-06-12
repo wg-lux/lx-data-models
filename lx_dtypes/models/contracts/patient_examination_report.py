@@ -6,11 +6,9 @@ from typing import Literal, NotRequired, TypeAlias, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .json_types import JsonNull, JsonScalar
+from .json_types import JsonNull, JsonValue
 
-ReportJsonValue: TypeAlias = (
-    JsonScalar | JsonNull | list["ReportJsonValue"] | dict[str, "ReportJsonValue"]
-)
+ReportJsonValue: TypeAlias = JsonValue | JsonNull
 ReportJsonObject: TypeAlias = dict[str, ReportJsonValue]
 ReportStatus: TypeAlias = Literal["draft", "final"]
 SegmentFrameSelectionAction: TypeAlias = Literal["set", "clear", "random", "step"]
@@ -130,6 +128,68 @@ class ReportExportFrameDetailData(TypedDict):
     finding_name: str | None
     stream_url: str
     caption: str
+
+
+class PatientFindingClassificationHistoryData(TypedDict):
+    id: int
+    classification_id: int | None
+    classification_choice_id: int | None
+    classification_name: str | None
+    classification_choice_name: str | None
+    subcategories: object
+    numerical_descriptors: object
+
+
+class PatientFindingInterventionHistoryData(TypedDict):
+    id: int
+    intervention_id: int | None
+    intervention_name: str | None
+    state: object
+    date: object
+    time_start: object
+    time_end: object
+
+
+class PatientFindingHistoryData(TypedDict):
+    patient_finding_id: int
+    finding_id: int | None
+    finding_name: str | None
+    classifications: list[PatientFindingClassificationHistoryData]
+    interventions: list[PatientFindingInterventionHistoryData]
+
+
+class PreviousPatientExaminationHistoryData(TypedDict):
+    patient_examination_id: int
+    examination_id: int | None
+    examination_name: str | None
+    date_start: object
+    date_end: object
+    findings: list[PatientFindingHistoryData]
+
+
+class PatientExaminationHistoryContextData(TypedDict):
+    patient_id: int
+    patient_examination_id: int
+    history_depth: int
+    previous_examinations: list[PreviousPatientExaminationHistoryData]
+
+
+class PatientFindingClassificationSyncData(TypedDict, total=False):
+    classification_id: object
+    classification: object
+    classification_choice_id: object
+    classification_choice: object
+    subcategories: object
+    numerical_descriptors: object
+
+
+class PatientFindingInterventionSyncData(TypedDict, total=False):
+    intervention_id: object
+    intervention: object
+    state: object
+    date: object
+    time_start: object
+    time_end: object
 
 
 class SegmentFrameSelectorQueryData(TypedDict, total=False):
@@ -252,16 +312,19 @@ class SegmentFrameSelectorPatchPayload(SegmentFrameSelectorQueryPayload):
 
 def report_json_safe(value: object) -> ReportJsonValue:
     if value is None or isinstance(value, (str, int, float, bool)):
-        return value
+        return cast(ReportJsonValue, value)
     if isinstance(value, Mapping):
         mapping = cast(Mapping[object, object], value)
-        return {str(key): report_json_safe(item) for key, item in mapping.items()}
+        return cast(
+            ReportJsonValue,
+            {str(key): report_json_safe(item) for key, item in mapping.items()},
+        )
     if isinstance(value, (list, tuple)):
         items = cast(list[object] | tuple[object, ...], value)
-        return [report_json_safe(item) for item in items]
+        return cast(ReportJsonValue, [report_json_safe(item) for item in items])
     if isinstance(value, (date, datetime)):
-        return value.isoformat()
-    return str(value)
+        return cast(ReportJsonValue, value.isoformat())
+    return cast(ReportJsonValue, str(value))
 
 
 def report_json_safe_dict(payload: object) -> ReportJsonObject:
@@ -339,6 +402,13 @@ def dump_selector_patch_payload(
 
 __all__ = [
     "PatientExaminationReportMakeReportData",
+    "PreviousPatientExaminationHistoryData",
+    "PatientFindingInterventionSyncData",
+    "PatientFindingInterventionHistoryData",
+    "PatientFindingHistoryData",
+    "PatientFindingClassificationSyncData",
+    "PatientFindingClassificationHistoryData",
+    "PatientExaminationHistoryContextData",
     "PatientExaminationReportMakeReportPayload",
     "PatientExaminationReportSubmissionData",
     "PatientExaminationReportSubmissionPayload",

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from types import NoneType
 from typing import Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field
 
-JsonNull: TypeAlias = NoneType
+JsonNull: TypeAlias = None
 LxAnonymizerPerformanceMediaType: TypeAlias = Literal["video", "report"]
 LxAnonymizerPerformanceCsvCell: TypeAlias = str | int | float | bool | JsonNull
 LxAnonymizerPerformanceCsvRow: TypeAlias = dict[str, LxAnonymizerPerformanceCsvCell]

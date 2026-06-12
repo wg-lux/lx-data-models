@@ -1,18 +1,30 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import cast
+from typing import TypeAlias, cast
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    RootModel,
     ValidationError,
     field_validator,
     model_validator,
 )
 
 from .json_types import JsonObject
+
+
+VideoSegmentsPayloadDict: TypeAlias = dict[str, list[tuple[int, int]]]
+
+
+class VideoSegmentsPayload(RootModel[VideoSegmentsPayloadDict]):
+    model_config = ConfigDict(strict=True)
+
+    @property
+    def as_dict(self) -> VideoSegmentsPayloadDict:
+        return self.root
 
 
 class SegmentAnnotationMetadataInput(BaseModel):
@@ -47,6 +59,10 @@ class SegmentAnnotationInput(BaseModel):
             int(round(self.start_time * fps)),
             int(round(self.end_time * fps)),
         )
+
+
+def validate_video_segments_payload(value: object) -> VideoSegmentsPayload:
+    return VideoSegmentsPayload.model_validate(value)
 
 
 def parse_segment_annotation_input(
@@ -441,6 +457,8 @@ def validate_segment_validation_status_payload(
 
 
 __all__ = [
+    "VideoSegmentsPayload",
+    "VideoSegmentsPayloadDict",
     "SegmentAnnotationEnsurePayload",
     "SegmentAnnotationInput",
     "SegmentAnnotationMetadataInput",
@@ -461,5 +479,6 @@ __all__ = [
     "validate_segment_list_query",
     "validate_segment_prediction_import_payload",
     "validate_segment_validation_payload",
+    "validate_video_segments_payload",
     "validate_segment_validation_status_payload",
 ]

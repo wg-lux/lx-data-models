@@ -77,6 +77,8 @@ class FfmpegStreamProbeEntry(BaseModel):
     color_range: str = "tv"
     width: int | None = Field(default=None, ge=1)
     height: int | None = Field(default=None, ge=1)
+    avg_frame_rate: str | None = None
+    r_frame_rate: str | None = None
 
 
 class FfmpegStreamInfo(BaseModel):
