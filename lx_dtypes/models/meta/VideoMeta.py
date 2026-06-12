@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from enum import Enum
 from datetime import date, time
 from pathlib import Path
-from typing import Any, Literal
-
+from typing import Any, Literal, TypeAlias
+from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta, SensitiveMetaDataDict
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -21,6 +22,26 @@ FrameObservationSourceTag = Literal[
     "metadata_signal",
     "phi_detector",
 ]
+
+
+class VideoMetaDataDict(SensitiveMetaDataDict):
+    frame_observations: list[dict[str, Any]]
+    anonymizer_provenance: dict[str, Any] | None
+
+
+class VideoMeta(SensitiveMeta):
+    """
+    This model extends sensitive meta with anonymization training info frame cleaner.
+
+    """
+
+    model_config = ConfigDict(extra="allow")
+    frame_observations: list[FrameObservation] = Field(default_factory=list)
+    anonymizer_provenance: VideoAnonymizerProvenance | None = None
+
+    @property
+    def ddict_class(self) -> type[VideoMetaDataDict]:
+        return VideoMetaDataDict
 
 
 class VideoRoiBox(BaseModel):
@@ -247,35 +268,82 @@ class VideoAnonymizerProvenance(BaseModel):
     proposal_counts: dict[str, int] = Field(default_factory=dict)
 
 
-class VideoMeta(BaseModel):
-    """Final video metadata payload produced by FrameCleaner.clean_video."""
+class VideoMetadataAnonymizationState(str, Enum):
+    """Transport-safe anonymization states for video metadata responses."""
 
-    model_config = ConfigDict(extra="allow")
+    NOT_STARTED = "not_started"
+    EXTRACTING_FRAMES = "extracting_frames"
+    PROCESSING_ANONYMIZING = "processing_anonymization"
+    DONE_PROCESSING_ANONYMIZATION = "done_processing_anonymization"
+    VALIDATED = "validated"
+    FAILED = "failed"
+    STARTED = "started"
+    ANONYMIZED = "anonymized"
 
-    file_path: str | None = None
-    examination_date: date | str | None = None
-    examination_time: time | str | None = None
-    casenumber: str | None = None
-    pseudo_patient: str | None = None
-    pseudo_examination: str | None = None
-    gender: str | None = None
-    pseudo_examiners: str | list[str] | None = None
-    first_name: str | None = None
-    last_name: str | None = None
-    dob: date | str | None = None
-    endoscope_type: str | None = None
-    endoscope_sn: str | None = None
-    examiner_first_name: str | None = None
-    examiner_last_name: str | None = None
-    center: str | None = None
-    text: str | None = None
-    anonymized_text: str | None = None
-    external_id: str | None = None
-    frame_observations: list[FrameObservation] = Field(default_factory=list)
-    anonymizer_provenance: VideoAnonymizerProvenance | None = None
+
+VideoMetadataStatus: TypeAlias = VideoMetadataAnonymizationState | Literal["BLANK"]
+
+
+class VideoFpsDetailsPayload(BaseModel):
+    """Validated details payload for an FPS lookup failure."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    video_id: int = Field(ge=1)
+    reason: str = Field(min_length=1)
+
+
+class VideoFpsErrorPayload(BaseModel):
+    """Validated error payload for the video FPS endpoint."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    error: str = Field(min_length=1)
+    details: VideoFpsDetailsPayload
+
+
+class VideoFpsStatsPayload(BaseModel):
+    """Validated success payload for the video FPS endpoint."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    video_id: int = Field(ge=1)
+    fps: float = Field(gt=0.0)
+
+
+VideoFpsPayload: TypeAlias = VideoFpsStatsPayload | VideoFpsErrorPayload
+
+
+class VideoMetadataStatsPayload(BaseModel):
+    """Validated response payload for the video metadata statistics endpoint."""
+
+    model_config = ConfigDict(extra="forbid", use_enum_values=True)
+
+    id: int = Field(ge=1)
+    original_file_name: str = Field(min_length=1)
+    status: VideoMetadataStatus
+    assigned_user: str
+    anonymized: bool
+    duration: float = Field(ge=0.0)
+    fps: float = Field(gt=0.0)
+    has_roi: bool
+    outside_frame_count: int = Field(ge=0)
+    center_name: str = Field(min_length=1)
+    processor_name: str = Field(min_length=1)
+    sensitive_frame_count: int | None = Field(default=None, ge=0)
+    total_frames: int | None = Field(default=None, ge=0)
+    sensitive_ratio: float | None = Field(default=None, ge=0.0, le=1.0)
+    resolution: str = Field(min_length=1)
 
 
 __all__ = [
+    "VideoFpsDetailsPayload",
+    "VideoFpsErrorPayload",
+    "VideoFpsPayload",
+    "VideoFpsStatsPayload",
+    "VideoMetadataAnonymizationState",
+    "VideoMetadataStatsPayload",
+    "VideoMetadataStatus",
     "FrameAnalysisResult",
     "FrameCleanerAccumulatedMeta",
     "FrameCleanerSource",

@@ -5,7 +5,7 @@ import re
 from datetime import date, datetime, time
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, ClassVar, Mapping
+from typing import Any, Mapping
 
 from pydantic import (
     BaseModel,
@@ -15,6 +15,97 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta, SensitiveMetaDataDict
+
+
+class ReportMeta(SensitiveMeta):
+    """Strong model for string-keyed report metadata produced by ReportReader."""
+
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+    pdf_hash: str | None = None
+    anonymized_pdf_path: str | Path | None = None
+    redaction_summary: ReportRedactionSummary | None = None
+    anonymizer_provenance: ReportAnonymizerProvenance | None = None
+    cropped_regions: dict[str, list[Any]] = Field(default_factory=dict)
+    cropping_enabled: bool = False
+    total_cropped_regions: int = 0
+    anonymized_pdf_error: str | None = None
+
+    @property
+    def ddict_class(self) -> type[ReportMetaDataDict]:
+        return ReportMetaDataDict
+
+    @field_validator(
+        "file_path",
+        "first_name",
+        "last_name",
+        "casenumber",
+        "gender",
+        "examiner_first_name",
+        "examiner_last_name",
+        "center",
+        "endoscope_type",
+        "endoscope_sn",
+        "pdf_hash",
+        "text",
+        "anonymized_text",
+        "anonymized_pdf_error",
+        mode="before",
+    )
+    @classmethod
+    def normalize_optional_strings(cls, value: Any) -> str | None:
+        return _normalize_optional_string(value)
+
+    @field_validator("dob", "examination_date", mode="before")
+    @classmethod
+    def normalize_dates(cls, value: Any) -> date | None:
+        return _parse_date_like(value)
+
+    @field_validator("examination_time", mode="before")
+    @classmethod
+    def normalize_time(cls, value: Any) -> time | None:
+        return _parse_time_like(value)
+
+    @field_validator("pdf_hash")
+    @classmethod
+    def validate_pdf_hash(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        if len(value) != 64 or any(
+            ch not in "0123456789abcdef" for ch in value.lower()
+        ):
+            raise ValueError("pdf_hash must contain 64 hex chars")
+        return value.lower()
+
+    @field_validator("anonymized_pdf_path", mode="before")
+    @classmethod
+    def normalize_anonymized_pdf_path(cls, value: Any) -> str | Path | None:
+        if value in (None, ""):
+            return None
+        if isinstance(value, Path):
+            return value
+        return str(value).strip() or None
+
+    @field_validator("cropped_regions", mode="before")
+    @classmethod
+    def normalize_cropped_regions(cls, value: Any) -> dict[str, list[Any]]:
+        return ReportCropInfo(cropped_regions=value).cropped_regions
+
+    @field_validator("total_cropped_regions", mode="before")
+    @classmethod
+    def normalize_total_cropped_regions(cls, value: Any) -> int:
+        return ReportCropInfo(total_cropped_regions=value).total_cropped_regions
+
+    def to_report_reader_dict(self) -> dict[str, Any]:
+        """Return a plain dict compatible with the existing ReportReader call sites."""
+
+        payload = self.model_dump(mode="json", exclude_none=True)
+        explicit_nulls = {
+            field_name: None
+            for field_name in self.__pydantic_fields_set__
+            if getattr(self, field_name) is None
+        }
+        return payload | explicit_nulls
 
 
 class ReportReaderFlags(BaseModel):
@@ -248,133 +339,15 @@ class ReportCropInfo(BaseModel):
         return _normalize_optional_string(value)
 
 
-class ReportMeta(BaseModel):
-    """Strong model for string-keyed report metadata produced by ReportReader."""
-
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
-
-    _LEGACY_FIELD_ALIASES: ClassVar[dict[str, str]] = {
-        "birth_date": "dob",
-        "doctor_first_name": "examiner_first_name",
-        "doctor_last_name": "examiner_last_name",
-        "hospital": "center",
-        "patient_first_name": "first_name",
-        "patient_last_name": "last_name",
-        "patient_dob": "dob",
-        "patient_gender_name": "gender",
-    }
-
-    file_path: str | None = None
-    first_name: str | None = None
-    last_name: str | None = None
-    dob: date | None = None
-    casenumber: str | None = None
-    gender: str | None = None
-    examination_date: date | None = None
-    examination_time: time | None = None
-    examiner_first_name: str | None = None
-    examiner_last_name: str | None = None
-    center: str | None = None
-    endoscope_type: str | None = None
-    endoscope_sn: str | None = None
+class ReportMetaDataDict(SensitiveMetaDataDict):
     pdf_hash: str | None = None
     anonymized_pdf_path: str | Path | None = None
     redaction_summary: ReportRedactionSummary | None = None
     anonymizer_provenance: ReportAnonymizerProvenance | None = None
-    text: str | None = None
-    anonymized_text: str | None = None
     cropped_regions: dict[str, list[Any]] = Field(default_factory=dict)
     cropping_enabled: bool = False
     total_cropped_regions: int = 0
     anonymized_pdf_error: str | None = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def normalize_aliases(cls, data: Any) -> Any:
-        if not isinstance(data, Mapping):
-            return data
-
-        normalized: dict[str, Any] = {}
-        for raw_key, raw_value in data.items():
-            key = cls._LEGACY_FIELD_ALIASES.get(str(raw_key), str(raw_key))
-            if key not in cls.model_fields:
-                raise ValueError(f"unknown ReportMeta key: {raw_key}")
-            if key in normalized and _has_signal(normalized[key]):
-                continue
-            normalized[key] = raw_value
-        return normalized
-
-    @field_validator(
-        "file_path",
-        "first_name",
-        "last_name",
-        "casenumber",
-        "gender",
-        "examiner_first_name",
-        "examiner_last_name",
-        "center",
-        "endoscope_type",
-        "endoscope_sn",
-        "pdf_hash",
-        "text",
-        "anonymized_text",
-        "anonymized_pdf_error",
-        mode="before",
-    )
-    @classmethod
-    def normalize_optional_strings(cls, value: Any) -> str | None:
-        return _normalize_optional_string(value)
-
-    @field_validator("dob", "examination_date", mode="before")
-    @classmethod
-    def normalize_dates(cls, value: Any) -> date | None:
-        return _parse_date_like(value)
-
-    @field_validator("examination_time", mode="before")
-    @classmethod
-    def normalize_time(cls, value: Any) -> time | None:
-        return _parse_time_like(value)
-
-    @field_validator("pdf_hash")
-    @classmethod
-    def validate_pdf_hash(cls, value: str | None) -> str | None:
-        if value is None:
-            return None
-        if len(value) != 64 or any(
-            ch not in "0123456789abcdef" for ch in value.lower()
-        ):
-            raise ValueError("pdf_hash must contain 64 hex chars")
-        return value.lower()
-
-    @field_validator("anonymized_pdf_path", mode="before")
-    @classmethod
-    def normalize_anonymized_pdf_path(cls, value: Any) -> str | Path | None:
-        if value in (None, ""):
-            return None
-        if isinstance(value, Path):
-            return value
-        return str(value).strip() or None
-
-    @field_validator("cropped_regions", mode="before")
-    @classmethod
-    def normalize_cropped_regions(cls, value: Any) -> dict[str, list[Any]]:
-        return ReportCropInfo(cropped_regions=value).cropped_regions
-
-    @field_validator("total_cropped_regions", mode="before")
-    @classmethod
-    def normalize_total_cropped_regions(cls, value: Any) -> int:
-        return ReportCropInfo(total_cropped_regions=value).total_cropped_regions
-
-    def to_report_reader_dict(self) -> dict[str, Any]:
-        """Return a plain dict compatible with the existing ReportReader call sites."""
-
-        payload = self.model_dump(mode="json", exclude_none=True)
-        explicit_nulls = {
-            field_name: None
-            for field_name in self.__pydantic_fields_set__
-            if getattr(self, field_name) is None
-        }
-        return payload | explicit_nulls
 
 
 class ReportProcessRequest(BaseModel):
