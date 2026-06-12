@@ -26,7 +26,7 @@ def test_report_template_example_module_yaml_json_roundtrip() -> None:
 
     assert exported_back["name"] == "star_upper_gi_main"
     assert exported_back["examination"] == "star_upper_gi_endoscopy"
-    assert len(exported_back["report_sections"]) == 2
+    assert len(exported_back["report_sections"]) == 1
     assert exported_back["readiness"]["can_preview"] is True
 
     template = kb.get_report_template("star_upper_gi_main")

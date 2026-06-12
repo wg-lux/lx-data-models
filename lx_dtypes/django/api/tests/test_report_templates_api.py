@@ -51,14 +51,14 @@ def test_report_template_runtime_validation_api() -> None:
                         "patient_finding_interventions": [],
                     },
                     {
-                        "finding": "star_upper_gi_polyp",
+                        "finding": "esophagus_polyp",
                         "patient_examination": "test_exam",
                         "patient_finding_classifications": [
                             {
                                 "patient_finding": "test_finding",
                                 "patient_finding_classification_choices": [
                                     {
-                                        "classification": "size_oval_mm",
+                                        "classification": "size_mm",
                                         "classification_choice": "size_mm",
                                         "patient_finding_classifications": "test_classifications",
                                         "patient_finding_classification_choice_descriptors": [
@@ -162,14 +162,14 @@ def test_single_validator_runtime_validation_api() -> None:
                 "examination": "star_upper_gi_endoscopy",
                 "patient_findings": [
                     {
-                        "finding": "star_upper_gi_polyp",
+                        "finding": "esophagus_polyp",
                         "patient_examination": "test_exam",
                         "patient_finding_classifications": [
                             {
                                 "patient_finding": "test_finding",
                                 "patient_finding_classification_choices": [
                                     {
-                                        "classification": "size_oval_mm",
+                                        "classification": "size_mm",
                                         "classification_choice": "size_mm",
                                         "patient_finding_classifications": "test_classifications",
                                         "patient_finding_classification_choice_descriptors": [
@@ -209,7 +209,7 @@ def test_report_template_runtime_validation_api_rejects_semantically_forbidden_p
                 "examination": "colonoscopy",
                 "patient_findings": [
                     {
-                        "finding": "star_upper_gi_polyp",
+                        "finding": "esophagus_polyp",
                         "patient_examination": "test_exam",
                         "patient_finding_classifications": [],
                         "patient_finding_interventions": [],
