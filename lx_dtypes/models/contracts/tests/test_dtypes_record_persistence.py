@@ -70,6 +70,17 @@ def _complete_record() -> dict[str, JsonValue]:
     }
 
 
+def _json_object(value: JsonValue) -> dict[str, JsonValue]:
+    assert isinstance(value, dict)
+    return value
+
+
+def _json_list(payload: dict[str, JsonValue], key: str) -> list[JsonValue]:
+    value = payload[key]
+    assert isinstance(value, list)
+    return value
+
+
 def test_complete_record_round_trips_through_public_contract() -> None:
     record = parse_dtypes_record_persistence_payload(_complete_record())
 
@@ -103,20 +114,14 @@ def test_record_contract_rejects_unknown_fields_at_every_level(path: str) -> Non
     if path == "root":
         payload["unexpected"] = True
     elif path == "finding":
-        finding = payload["patient_findings"][0]
-        assert isinstance(finding, dict)
+        finding = _json_object(_json_list(payload, "patient_findings")[0])
         finding["unexpected"] = True
     else:
-        finding = payload["patient_findings"][0]
-        assert isinstance(finding, dict)
-        groups = finding["patient_finding_classifications"]
-        assert isinstance(groups, list)
-        group = groups[0]
-        assert isinstance(group, dict)
-        choices = group["patient_finding_classification_choices"]
-        assert isinstance(choices, list)
-        choice = choices[0]
-        assert isinstance(choice, dict)
+        finding = _json_object(_json_list(payload, "patient_findings")[0])
+        group = _json_object(_json_list(finding, "patient_finding_classifications")[0])
+        choice = _json_object(
+            _json_list(group, "patient_finding_classification_choices")[0]
+        )
         choice["unexpected"] = True
 
     with pytest.raises(ValidationError, match="Extra inputs are not permitted"):

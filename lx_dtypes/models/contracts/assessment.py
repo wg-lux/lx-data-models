@@ -20,4 +20,3 @@ class AssessmentRecord(BaseModel):
 
 
 __all__ = ["AssessmentRecord"]
-

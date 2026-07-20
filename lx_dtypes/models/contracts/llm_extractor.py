@@ -94,7 +94,9 @@ class LLMTemporalAnalysisPayload(BaseModel):
     model_config = ConfigDict(extra="ignore", strict=True)
 
     duration_analysis: dict[str, float] = Field(default_factory=dict)
-    text_appearance_timeline: list[LLMTextTimelineEntryPayload] = Field(default_factory=list)
+    text_appearance_timeline: list[LLMTextTimelineEntryPayload] = Field(
+        default_factory=list
+    )
     stability_scores: dict[str, float] = Field(default_factory=dict)
     change_points: list[int] = Field(default_factory=list)
 
@@ -103,8 +105,12 @@ class LLMEnrichedMetadataPayload(BaseModel):
     model_config = ConfigDict(extra="ignore", strict=True)
 
     llm_extracted: LLMMetadataPayload = Field(default_factory=LLMMetadataPayload)
-    frame_context: LLMFrameContextPayload = Field(default_factory=LLMFrameContextPayload)
-    temporal_analysis: LLMTemporalAnalysisPayload = Field(default_factory=LLMTemporalAnalysisPayload)
+    frame_context: LLMFrameContextPayload = Field(
+        default_factory=LLMFrameContextPayload
+    )
+    temporal_analysis: LLMTemporalAnalysisPayload = Field(
+        default_factory=LLMTemporalAnalysisPayload
+    )
     confidence_scores: dict[str, float] = Field(default_factory=dict)
     source_frames: list[LLMFrameDataPayload] = Field(default_factory=list)
 

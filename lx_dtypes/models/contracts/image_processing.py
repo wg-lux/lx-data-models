@@ -36,4 +36,5 @@ class ImageProcessingResultPayload(BaseModel):
     gender_pars: list[str] = Field(default_factory=list)
     llm_results: dict[str, object] = Field(default_factory=dict)
 
+
 __all__ = ["ImageProcessingResultPayload"]

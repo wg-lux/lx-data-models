@@ -29,9 +29,7 @@ class _DtypesRecordLedgerPayload(BaseModel):
     external_ids: dict[str, str] = Field(default_factory=dict)
 
 
-class DtypesRecordClassificationChoiceDescriptorPayload(
-    _DtypesRecordLedgerPayload
-):
+class DtypesRecordClassificationChoiceDescriptorPayload(_DtypesRecordLedgerPayload):
     descriptor_value: DescriptorValue
     classification_choice_descriptor: str
     patient_finding_classification_choice: str
@@ -76,9 +74,7 @@ class DtypesRecordFindingPayload(_DtypesRecordLedgerPayload):
     )
 
 
-class DtypesRecordIndicationClassificationDescriptorPayload(
-    _DtypesRecordLedgerPayload
-):
+class DtypesRecordIndicationClassificationDescriptorPayload(_DtypesRecordLedgerPayload):
     descriptor_value: DescriptorValue
     classification_choice_descriptor: str
     patient_indication_classification: str
