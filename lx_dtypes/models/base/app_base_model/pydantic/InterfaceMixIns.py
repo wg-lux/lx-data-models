@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, Mapping, TypeVar, cast, Iterable, Set
+from collections.abc import Iterable, Mapping
+from typing import Any, Dict, Generic, List, TypeVar, cast
 
 
 from pydantic import model_validator, field_serializer, SerializationInfo
@@ -38,18 +39,26 @@ class ListFieldSerializationMixIn(ABC):
         return []
 
     @classmethod
-    def _get_all_list_fields(cls) -> Set[str]:
-        """Safely aggregates fields from the MRO."""
-        all_fields: Set[str] = set()
+    def _get_all_list_fields(cls) -> set[str]:
+        """Aggregate declared list fields across the MRO, failing on bad declarations."""
+        all_fields: set[str] = set()
         for base in cls.__mro__:
             func = getattr(base, "list_type_fields", None)
-            if func and callable(func):
-                try:
-                    fields = func()
-                    if isinstance(fields, Iterable):
-                        all_fields.update(cast(Iterable[str], fields))
-                except Exception:
-                    continue
+            if func is None or not callable(func):
+                continue
+            fields = func()
+            if isinstance(fields, (str, bytes)) or not isinstance(fields, Iterable):
+                raise TypeError(
+                    f"{base.__module__}.{base.__qualname__}.list_type_fields() "
+                    "must return an iterable of field names."
+                )
+            normalized_fields = list(fields)
+            if not all(isinstance(field, str) for field in normalized_fields):
+                raise TypeError(
+                    f"{base.__module__}.{base.__qualname__}.list_type_fields() "
+                    "must contain only strings."
+                )
+            all_fields.update(cast(list[str], normalized_fields))
         return all_fields
 
     @model_validator(mode="before")

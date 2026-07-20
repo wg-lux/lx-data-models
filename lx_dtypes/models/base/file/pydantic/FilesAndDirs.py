@@ -1,13 +1,12 @@
 from pathlib import Path
 from typing import List, Optional
 
-from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModel import AppBaseModel
 from lx_dtypes.utils.paths import get_files_from_dir_recursive
 
 from .PathMixIn import PathMixin
 
 
-class FilesAndDirsModel(PathMixin, AppBaseModel):
+class FilesAndDirsModel(PathMixin):
     def resolve_paths(self, base_dir: Path) -> None:
         """
         Normalize and replace the model's path attributes with absolute Path objects resolved relative to base_dir.
