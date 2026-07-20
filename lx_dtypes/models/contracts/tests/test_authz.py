@@ -5,7 +5,7 @@ import pytest
 from lx_dtypes.models.contracts import ValidationError, validate_keycloak_claims
 
 
-def test_keycloak_claims_merge_flat_realm_and_resource_roles() -> None:
+def test_keycloak_claims_default_roles_exclude_client_resources() -> None:
     claims = validate_keycloak_claims(
         {
             "preferred_username": "alice",
@@ -25,10 +25,36 @@ def test_keycloak_claims_merge_flat_realm_and_resource_roles() -> None:
     assert claims.role_names == {
         "flat-role",
         "realm-role",
-        "manage-account",
+    }
+
+
+def test_keycloak_claims_include_only_explicit_resource_roles() -> None:
+    claims = validate_keycloak_claims(
+        {
+            "preferred_username": "alice",
+            "roles": [" flat-role ", "flat-role", ""],
+            "realm_access": {"roles": [" realm-role ", "realm-role"]},
+            "resource_access": {
+                "account": {"roles": ["manage-account"]},
+                "endoregdb-api": {"roles": [" api-read ", "api-write"]},
+            },
+        }
+    )
+
+    assert claims.role_names_for_resource("endoregdb-api") == {
+        "flat-role",
+        "realm-role",
         "api-read",
         "api-write",
     }
+    assert "manage-account" not in claims.role_names_for_resource("endoregdb-api")
+
+
+def test_keycloak_claims_reject_blank_explicit_resource_name() -> None:
+    claims = validate_keycloak_claims({"sub": "subject-id"})
+
+    with pytest.raises(ValueError, match="resource_name"):
+        claims.role_names_for_resource("  ")
 
 
 def test_keycloak_claims_fall_back_to_subject() -> None:

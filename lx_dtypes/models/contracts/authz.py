@@ -7,10 +7,26 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from .json_types import JsonValue
 
 
+def _normalize_role_names(role_names: list[str]) -> list[str]:
+    normalized_roles: list[str] = []
+    seen: set[str] = set()
+    for role_name in role_names:
+        normalized_role = role_name.strip()
+        if normalized_role and normalized_role not in seen:
+            normalized_roles.append(normalized_role)
+            seen.add(normalized_role)
+    return normalized_roles
+
+
 class KeycloakRoleContainerPayload(BaseModel):
     model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
 
     roles: list[str] = Field(default_factory=list)
+
+    @field_validator("roles")
+    @classmethod
+    def normalize_roles(cls, value: list[str]) -> list[str]:
+        return _normalize_role_names(value)
 
 
 class KeycloakClaimsPayload(BaseModel):
@@ -34,6 +50,11 @@ class KeycloakClaimsPayload(BaseModel):
     def strip_claim_text(cls, value: str) -> str:
         return value.strip()
 
+    @field_validator("roles")
+    @classmethod
+    def normalize_roles(cls, value: list[str]) -> list[str]:
+        return _normalize_role_names(value)
+
     @model_validator(mode="after")
     def require_subject_identifier(self) -> "KeycloakClaimsPayload":
         if not self.preferred_username and not self.sub:
@@ -46,11 +67,22 @@ class KeycloakClaimsPayload(BaseModel):
 
     @property
     def role_names(self) -> set[str]:
+        """Return flat and realm roles that are safe for application authorization."""
         roles = set(self.roles)
         roles.update(self.realm_access.roles)
-        for resource_entry in self.resource_access.values():
+        return roles
+
+    def role_names_for_resource(self, resource_name: str) -> set[str]:
+        """Add roles for one explicitly trusted Keycloak resource/client."""
+        normalized_resource_name = resource_name.strip()
+        if not normalized_resource_name:
+            raise ValueError("resource_name must not be blank")
+
+        roles = self.role_names
+        resource_entry = self.resource_access.get(normalized_resource_name)
+        if resource_entry is not None:
             roles.update(resource_entry.roles)
-        return {role for role in roles if role}
+        return roles
 
 
 class AuthzRouteLookupPayload(BaseModel):
