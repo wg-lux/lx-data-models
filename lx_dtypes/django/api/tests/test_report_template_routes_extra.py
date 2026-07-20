@@ -176,7 +176,7 @@ def test_save_report_template_uses_resolver_input_dirs(
     assert response.status_code == 200
     assert captured == {
         "module_name": "builder_module",
-        "version": None,
+        "version": "1.0.0",
         "input_dirs": [tmp_path],
     }
 

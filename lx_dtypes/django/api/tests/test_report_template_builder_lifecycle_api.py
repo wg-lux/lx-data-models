@@ -1,17 +1,51 @@
 import json
 import yaml
+from collections.abc import Iterator
 from pathlib import Path
+import pytest
 from pytest import MonkeyPatch
-
+from typing import Any
 from django.test import Client
-from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api import report_template_builder
-from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.django.api import report_template_routes
+from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    clear_knowledge_base_resolver_caches,
+    load_knowledge_base,
+)
+
+
+@pytest.fixture
+def builder_terminology_registry(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> Iterator[None]:
+    registry_path = tmp_path / "kb_registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "modules": {
+                    "builder_module": {
+                        "1.0.0": {"input_dirs": [str(tmp_path)]},
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE", "builder_module")
+    monkeypatch.setenv("LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION", "1.0.0")
+    clear_knowledge_base_resolver_caches()
+    yield
+    clear_knowledge_base_resolver_caches()
 
 
 def test_builder_save_publish_and_unpublish_flow(
-    tmp_path: Path, monkeypatch: MonkeyPatch
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+    builder_terminology_registry: None,
 ) -> None:
+    del builder_terminology_registry
     module_dir = tmp_path / "builder_module"
     module_dir.mkdir(parents=True)
     (module_dir / "config.yaml").write_text(
@@ -43,13 +77,6 @@ def test_builder_save_publish_and_unpublish_flow(
     )
 
     monkeypatch.setattr(report_template_builder, "MODULES_ROOT", tmp_path)
-
-    def _fresh_loader() -> DataLoader:
-        loader = DataLoader(input_dirs=[tmp_path])
-        loader.load_module_configs()
-        return loader
-
-    monkeypatch.setattr(api_main, "_kb_loader", _fresh_loader)
 
     client = Client()
     save_response = client.post(
@@ -125,3 +152,85 @@ def test_builder_save_publish_and_unpublish_flow(
         secure=True,
     )
     assert after_unpublish.status_code == 404
+
+
+def test_builder_module_kb_loader_uses_resolved_version(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
+    module_dir = tmp_path / "builder_module"
+    module_dir.mkdir(parents=True)
+    (module_dir / "config.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "name": "builder_module",
+                "version": "1.0.0",
+                "modules": [],
+                "depends_on": [],
+                "data": {"files": ["./kb.yaml"]},
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    (module_dir / "kb.yaml").write_text(
+        yaml.safe_dump(
+            [
+                {"model": "finding", "name": "esophagus_polyp", "classifications": []},
+                {
+                    "model": "examination",
+                    "name": "star_upper_gi_endoscopy",
+                    "findings": ["esophagus_polyp"],
+                },
+            ],
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+    captured: dict[str, str | None] = {}
+
+    monkeypatch.setattr(report_template_builder, "MODULES_ROOT", tmp_path)
+    monkeypatch.setattr(
+        report_template_routes,
+        "get_knowledge_base_identity",
+        lambda module_name, *, version=None, input_dirs=None: (
+            module_name,
+            "1.0.0",
+        ),
+    )
+
+    def _fake_load_knowledge_base(
+        module_name: str,
+        *,
+        version: str | None = None,
+        input_dirs: list[Path] | None = None,
+    ) -> Any:
+        del input_dirs
+        captured["module_name"] = module_name
+        captured["version"] = version
+        return load_knowledge_base(module_name, version=version, input_dirs=[tmp_path])
+
+    monkeypatch.setattr(
+        report_template_routes,
+        "load_knowledge_base",
+        _fake_load_knowledge_base,
+    )
+
+    client = Client()
+    response = client.post(
+        "/base_api/report-templates/builder/templates",
+        data=json.dumps(
+            {
+                "module_name": "builder_module",
+                "file_name": "resolved_version_template",
+                "template_name": "resolved_version_template",
+                "examination": "star_upper_gi_endoscopy",
+                "sections": [],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+
+    assert response.status_code == 200
+    assert captured == {"module_name": "builder_module", "version": "1.0.0"}

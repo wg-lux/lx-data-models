@@ -61,7 +61,7 @@ def _attach_resolved_kb_identity(
 
 
 def _load_builder_module_kb(module_name: str) -> KnowledgeBaseContract:
-    get_knowledge_base_identity(
+    _, resolved_version = get_knowledge_base_identity(
         module_name,
         input_dirs=[report_template_builder.MODULES_ROOT],
     )
@@ -69,6 +69,7 @@ def _load_builder_module_kb(module_name: str) -> KnowledgeBaseContract:
         KnowledgeBaseContract,
         load_knowledge_base(
             module_name,
+            version=resolved_version,
             input_dirs=[report_template_builder.MODULES_ROOT],
         ),
     )
