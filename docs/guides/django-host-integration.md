@@ -58,7 +58,59 @@ The module referenced by `LX_DTYPES_HOST_MODELS_MODULE` must export these names:
 - `PatientFinding`
 - `PatientFindingClassification`
 
-If any are missing, API import or runtime requests will fail.
+If any required model export is missing, API import or runtime requests fail.
+
+For state-changing patient-finding routes it must also export:
+
+- `authenticate_request_user(request)`
+  Resolves an authenticated Django session principal or validates a Bearer token.
+  It must return `None` for missing or invalid credentials.
+- `patient_finding_access_allowed(request, patient_finding)`
+  Performs object-level authorization. It must return `False` for users without
+  a center assignment and for findings outside the user's center. Staff or
+  superusers may be granted cross-center access by the host policy.
+- `patient_examination_access_allowed(request, patient_examination)`
+  Applies the same object-level policy before a finding can be created for an
+  examination.
+- `patient_findings_queryset_for_request(request)`
+  Returns only active findings visible to the authenticated principal. It must
+  return an empty queryset for anonymous or unscoped users.
+
+Patient-finding list, create, patch, classification and delete routes require an
+authenticated principal and fail closed when the corresponding authorization
+callback is absent. Foreign-center objects return 404, while list responses are
+filtered to the caller's center. Deactivation records the authenticated actor
+and server timestamp. Each mutation refreshes the persisted LXDM record in the
+same database transaction.
+
+## Persisted LXDM Record Contract
+
+Hosts must treat
+`lx_dtypes.models.contracts.DtypesRecordPersistencePayload` as the canonical
+type for the JSON record attached to an examination. Import
+`parse_dtypes_record_persistence_payload` at input and storage boundaries and
+`dump_dtypes_record_persistence_payload` when writing a JSON field. Do not copy
+the schema into a host serializer or maintain a reduced dictionary shape.
+
+The contract is the complete `PExamination` ledger graph: patient and examiner
+references, examination identity, knowledge-base module/version, findings,
+classifications, choices and descriptors, interventions, and indications.
+Unknown fields are rejected at every nested level. Host-only database IDs and
+authorization data are not accepted from this payload; the host resolves those
+from the authenticated request and URL-scoped examination.
+
+Before persistence, the host must additionally verify that:
+
+- `payload.examination` equals the host examination name;
+- every finding's `patient_examination` equals the URL/model examination ID;
+- knowledge-base module/version are installed and supported by the deployment.
+
+The persistence contract is public starting with `lx-dtypes` 0.2.1. A host
+using the strict contract must require `lx-dtypes>=0.2.1,<0.3`. Patch releases
+may add helpers but do not add required JSON fields. A new required field,
+changed field meaning, or incompatible nested shape requires a minor release;
+hosts must reject unsupported versions until their adapter and backfill have
+been tested.
 
 ## Required Model Contract
 
@@ -198,6 +250,7 @@ The API assumes the host application owns persistence and business rules.
 Specifically:
 
 - `PatientFinding` lifecycle is implemented by the host model.
+- every patient-finding read or mutation is authenticated and host-scoped
 - uniqueness of active findings per examination is enforced by the host DB/model
 - `examination_safe` is preferred when present, then `examination`
 - active classifications are identified with `is_active=True`
