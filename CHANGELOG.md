@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Project metadata reshaped for eventual PyPI publication.
 - Development dependency group separated from runtime requirements.
+- A public, complete `DtypesRecordPersistencePayload` contract and JSON
+  parse/dump helpers for Django host persistence boundaries.
+
+### Changed
+- LXDM record persistence now covers the complete `PExamination` ledger graph;
+  unknown root and nested fields are rejected instead of being silently kept.
+- Patient-finding deletion requires host authentication and object authorization,
+  records actor/time provenance, and refreshes the persisted LXDM record atomically.
 
 ## [0.1.0] - 2025-12-10
 
