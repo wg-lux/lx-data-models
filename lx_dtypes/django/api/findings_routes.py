@@ -344,13 +344,6 @@ def build_p_examination_payload_from_host_ledger(
     return PExamination.model_validate(payload)
 
 
-def _request_user_if_authenticated(request: BaseRequest) -> Optional[Any]:
-    user = getattr(request, "user", None)
-    if getattr(user, "is_authenticated", False):
-        return user
-    return None
-
-
 def _serialize_choice(choice: Any) -> Dict[str, Any]:
     return {
         "id": choice.id,
@@ -655,6 +648,10 @@ def register_findings_routes(
     load_module_kb: Callable[..., Any],
     orm_models: Callable[[], Dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
+    authenticate_request_user: Callable[[BaseRequest], Any | None],
+    patient_examination_access_allowed: Callable[[BaseRequest, object], bool],
+    patient_finding_access_allowed: Callable[[BaseRequest, object], bool],
+    patient_findings_queryset_for_request: Callable[[BaseRequest], Any],
     build_p_examination_payload_from_host_ledger: Callable[..., PExamination]
     | None = None,
     persist_patient_examination_dtypes_record: Callable[
@@ -663,6 +660,22 @@ def register_findings_routes(
     | None = None,
 ) -> None:
     _set_load_module_kb(load_module_kb)
+
+    def require_authenticated_actor(request: BaseRequest) -> Any:
+        actor = authenticate_request_user(request)
+        if actor is None:
+            api_error(401, "authentication-required", "Authentication is required.")
+        return actor
+
+    def require_patient_finding_access(
+        request: BaseRequest, patient_finding: object, patient_finding_id: int
+    ) -> None:
+        if not patient_finding_access_allowed(request, patient_finding):
+            api_error(
+                404,
+                "not-found",
+                f"Patient finding '{patient_finding_id}' not found.",
+            )
 
     def refresh_patient_examination_dtypes_record(patient_examination: object) -> None:
         if (
@@ -787,8 +800,8 @@ def register_findings_routes(
     def list_patient_findings(
         request: BaseRequest, patient_examination: Optional[int] = None
     ) -> List[Dict[str, Any]]:
-        del request
-        queryset = _active_patient_findings_queryset(orm_models)
+        require_authenticated_actor(request)
+        queryset = patient_findings_queryset_for_request(request)
         if patient_examination is not None:
             queryset = queryset.filter(patient_examination_id=patient_examination)
         return [_serialize_patient_finding(item) for item in queryset]
@@ -797,7 +810,7 @@ def register_findings_routes(
     def create_patient_finding(
         request: BaseRequest, payload: PatientFindingCreateRequest
     ) -> Dict[str, Any]:
-        del request
+        require_authenticated_actor(request)
         module_name = _findings_module_name()
         patient_examination_model = orm_models()["PatientExamination"]
         finding_model = orm_models()["Finding"]
@@ -811,10 +824,17 @@ def register_findings_routes(
                 "not-found",
                 f"PatientExamination '{payload.patient_examination}' not found.",
             )
+        assert patient_examination is not None
+        if not patient_examination_access_allowed(request, patient_examination):
+            api_error(
+                404,
+                "not-found",
+                f"PatientExamination '{payload.patient_examination}' not found.",
+            )
+
         finding = finding_model.objects.filter(id=payload.finding).first()
         if not finding:
             api_error(404, "not-found", f"Finding '{payload.finding}' not found.")
-        assert patient_examination is not None
         assert finding is not None
 
         _validate_finding_for_examination(
@@ -869,9 +889,10 @@ def register_findings_routes(
         patient_finding_id: int,
         payload: PatientFindingUpdateRequest,
     ) -> Dict[str, Any]:
+        actor = require_authenticated_actor(request)
         module_name = _findings_module_name()
         patient_finding = (
-            _active_patient_findings_queryset(orm_models)
+            patient_findings_queryset_for_request(request)
             .filter(id=patient_finding_id)
             .first()
         )
@@ -880,6 +901,7 @@ def register_findings_routes(
                 404, "not-found", f"Patient finding '{patient_finding_id}' not found."
             )
         assert patient_finding is not None
+        require_patient_finding_access(request, patient_finding, patient_finding_id)
 
         with transaction.atomic():
             if payload.finding is not None:
@@ -905,11 +927,8 @@ def register_findings_routes(
                     patient_finding.deactivated_by = None
                 else:
                     patient_finding.is_active = False
-                    actor = _request_user_if_authenticated(request)
                     patient_finding.deactivated_by = actor
-                    patient_finding.deactivated_at = (
-                        timezone.now() if actor is not None else None
-                    )
+                    patient_finding.deactivated_at = timezone.now()
 
             patient_finding.save()
 
@@ -931,8 +950,10 @@ def register_findings_routes(
     def delete_patient_finding(
         request: BaseRequest, patient_finding_id: int
     ) -> Dict[str, Any]:
+        actor = require_authenticated_actor(request)
+
         patient_finding = (
-            _active_patient_findings_queryset(orm_models)
+            patient_findings_queryset_for_request(request)
             .filter(id=patient_finding_id)
             .first()
         )
@@ -941,15 +962,18 @@ def register_findings_routes(
                 404, "not-found", f"Patient finding '{patient_finding_id}' not found."
             )
         assert patient_finding is not None
+        require_patient_finding_access(request, patient_finding, patient_finding_id)
 
-        actor = _request_user_if_authenticated(request)
-        patient_finding.is_active = False
-        patient_finding.deactivated_by = actor
-        patient_finding.deactivated_at = timezone.now() if actor is not None else None
-        patient_finding.save(
-            update_fields=["is_active", "deactivated_at", "deactivated_by"]
-        )
-        refresh_patient_examination_dtypes_record(patient_finding.patient_examination)
+        with transaction.atomic():
+            patient_finding.is_active = False
+            patient_finding.deactivated_by = actor
+            patient_finding.deactivated_at = timezone.now()
+            patient_finding.save(
+                update_fields=["is_active", "deactivated_at", "deactivated_by"]
+            )
+            refresh_patient_examination_dtypes_record(
+                patient_finding.patient_examination
+            )
         return {"success": True, "id": patient_finding_id}
 
     @api.post("/patient-findings/{patient_finding_id}/classifications/")
@@ -958,10 +982,10 @@ def register_findings_routes(
         patient_finding_id: int,
         payload: PatientFindingClassificationsRequest,
     ) -> Dict[str, Any]:
-        del request
+        require_authenticated_actor(request)
         module_name = _findings_module_name()
         patient_finding = (
-            _active_patient_findings_queryset(orm_models)
+            patient_findings_queryset_for_request(request)
             .filter(id=patient_finding_id)
             .first()
         )
@@ -970,6 +994,7 @@ def register_findings_routes(
                 404, "not-found", f"Patient finding '{patient_finding_id}' not found."
             )
         assert patient_finding is not None
+        require_patient_finding_access(request, patient_finding, patient_finding_id)
 
         with transaction.atomic():
             finding_classification_model = orm_models()["FindingClassification"]

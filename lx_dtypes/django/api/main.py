@@ -118,6 +118,42 @@ def _persist_patient_examination_dtypes_record(
     return cast(dict[str, Any], persist(patient_examination, payload))
 
 
+def _authenticate_request_user(request: BaseRequest) -> Any | None:
+    authenticate = getattr(_host_models_module(), "authenticate_request_user", None)
+    if callable(authenticate):
+        return authenticate(request)
+    return _request_user_if_authenticated(request)
+
+
+def _patient_finding_access_allowed(
+    request: BaseRequest, patient_finding: object
+) -> bool:
+    authorize = getattr(_host_models_module(), "patient_finding_access_allowed", None)
+    if not callable(authorize):
+        return False
+    return bool(authorize(request, patient_finding))
+
+
+def _patient_examination_access_allowed(
+    request: BaseRequest, patient_examination: object
+) -> bool:
+    authorize = getattr(
+        _host_models_module(), "patient_examination_access_allowed", None
+    )
+    if not callable(authorize):
+        return False
+    return bool(authorize(request, patient_examination))
+
+
+def _patient_findings_queryset_for_request(request: BaseRequest) -> Any:
+    scope_queryset = getattr(
+        _host_models_module(), "patient_findings_queryset_for_request", None
+    )
+    if not callable(scope_queryset):
+        return _active_patient_findings_queryset().none()
+    return scope_queryset(request)
+
+
 class StructuredApiError(Exception):
     def __init__(self, status_code: int, code: str, message: str) -> None:
         self.status_code = status_code
@@ -585,6 +621,10 @@ register_findings_routes(
     load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
     orm_models=lambda: _orm_models(),
     api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
+    authenticate_request_user=_authenticate_request_user,
+    patient_examination_access_allowed=_patient_examination_access_allowed,
+    patient_finding_access_allowed=_patient_finding_access_allowed,
+    patient_findings_queryset_for_request=_patient_findings_queryset_for_request,
     build_p_examination_payload_from_host_ledger=lambda *args, **kwargs: (
         _build_p_examination_payload_from_host_ledger(*args, **kwargs)
     ),

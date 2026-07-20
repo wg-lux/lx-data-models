@@ -4,6 +4,7 @@ from importlib import import_module
 from typing import Any
 
 import pytest
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.test import Client
 
@@ -103,6 +104,12 @@ def test_base_api_findings_read_endpoints_shape() -> None:
 
 def test_base_api_patient_findings_crud_and_classifications() -> None:
     client = Client()
+    user_model = get_user_model()
+    user = user_model.objects.create(
+        username="dtypes-findings-admin",
+        is_staff=True,
+    )
+    client.force_login(user)
     examination, finding, classification, choice = _create_exam_graph()
     patient_examination = _create_patient_examination(examination)
 
