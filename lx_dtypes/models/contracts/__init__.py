@@ -77,6 +77,14 @@ from .anonymization_quality import (
     QualityEvaluationStatus,
     SensitiveMetaHandlingPolicy,
 )
+from .application_settings import (
+    ApplicationSettingsBackupSourcePayload,
+    ApplicationSettingsBackupStatusPayload,
+    ApplicationSettingsDataSetEntryPayload,
+    ApplicationSettingsDeploymentProfilePayload,
+    ApplicationSettingsDeploymentRole,
+    ApplicationSettingsPayload,
+)
 from .aidataset_frame_buckets import (
     AIDataSetFrameBucketCount,
     AIDataSetFrameBucketDistribution,
@@ -112,6 +120,21 @@ from .ai_dataset import (
     AIDataSetStandardExportScopeContract,
 )
 from .document_type import DocumentType
+from .dtypes_record_persistence import (
+    DescriptorValue,
+    DtypesRecordClassificationChoiceDescriptorPayload,
+    DtypesRecordClassificationChoicePayload,
+    DtypesRecordClassificationGroupPayload,
+    DtypesRecordFindingPayload,
+    DtypesRecordIndicationClassificationDescriptorPayload,
+    DtypesRecordIndicationClassificationPayload,
+    DtypesRecordIndicationPayload,
+    DtypesRecordInterventionGroupPayload,
+    DtypesRecordInterventionPayload,
+    DtypesRecordPersistencePayload,
+    dump_dtypes_record_persistence_payload,
+    parse_dtypes_record_persistence_payload,
+)
 from .lab_value import (
     LabValueNormalRangeData,
     LabValueNormalRangePayload,
@@ -291,12 +314,6 @@ from .transfer_validation import (
     TransferValidationLogValue,
     dump_transfer_validation_failure_log_payload,
 )
-from .requirement_evaluation import (
-    RequirementEvaluationMeta,
-    RequirementEvaluationRequest,
-    RequirementEvaluationResponse,
-    RequirementEvaluationResult,
-)
 from .report_anonymization import ReportAnonymizationResult
 from .report_context import ReportContext
 from .video_ai_labels import (
@@ -445,6 +462,14 @@ from .video_frame_annotations import (
     dump_frame_box_annotation_bulk_item,
 )
 from .video_text_metadata import VideoTextMetaPayload, VideoTextMetaValue
+from .hub_transfer import (
+    HubTransferReportTransferPayload,
+    HubTransferSegmentProvenancePayload,
+    HubTransferVideoSegmentPayload,
+    HubTransferVideoTransferPayload,
+    validate_hub_transfer_report_payload,
+    validate_hub_transfer_video_payload,
+)
 from .video_reimport import (
     JsonObject,
     JsonValue,
@@ -473,6 +498,12 @@ from .video_reimport import (
 )
 
 __all__ = [
+    "ApplicationSettingsBackupSourcePayload",
+    "ApplicationSettingsBackupStatusPayload",
+    "ApplicationSettingsDataSetEntryPayload",
+    "ApplicationSettingsDeploymentProfilePayload",
+    "ApplicationSettingsDeploymentRole",
+    "ApplicationSettingsPayload",
     "AIDataSetActiveLearningCandidateContract",
     "AIDataSetActiveLearningConfigContract",
     "AIDataSetActiveLearningSelectionContract",
@@ -485,6 +516,25 @@ __all__ = [
     "DjangoRestFrameworkSettingsPayload",
     "DjangoTemplateConfigPayload",
     "DjangoTemplateOptionsPayload",
+    "DtypesRecordClassificationChoicePayload",
+    "DtypesRecordClassificationChoiceDescriptorPayload",
+    "DtypesRecordClassificationGroupPayload",
+    "DtypesRecordFindingPayload",
+    "DtypesRecordIndicationClassificationDescriptorPayload",
+    "DtypesRecordIndicationClassificationPayload",
+    "DtypesRecordIndicationPayload",
+    "DtypesRecordInterventionGroupPayload",
+    "DtypesRecordInterventionPayload",
+    "DtypesRecordPersistencePayload",
+    "dump_dtypes_record_persistence_payload",
+    "parse_dtypes_record_persistence_payload",
+    "DescriptorValue",
+    "HubTransferReportTransferPayload",
+    "HubTransferSegmentProvenancePayload",
+    "HubTransferVideoSegmentPayload",
+    "HubTransferVideoTransferPayload",
+    "validate_hub_transfer_report_payload",
+    "validate_hub_transfer_video_payload",
     "CoreConceptBase",
     "ClassificationCore",
     "ClassificationChoiceCore",
@@ -713,10 +763,6 @@ __all__ = [
     "report_json_safe",
     "report_json_safe_dict",
     "validate_segment_selection_map",
-    "RequirementEvaluationMeta",
-    "RequirementEvaluationRequest",
-    "RequirementEvaluationResponse",
-    "RequirementEvaluationResult",
     "ReportAnonymizationResult",
     "ReportContext",
     "VideoAiHuggingFaceModelPayload",
