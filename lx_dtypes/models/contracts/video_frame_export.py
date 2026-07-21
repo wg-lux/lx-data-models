@@ -15,6 +15,10 @@ type YamlValue = YamlScalar | list[YamlValue] | dict[str, YamlValue]
 
 PositiveInt = Annotated[int, Field(ge=1)]
 VideoFrameAnnotationExportFormat: TypeAlias = Literal["csv", "json"]
+VideoFrameAnnotationExportProfile: TypeAlias = Literal[
+    "legacy_table_v1",
+    "pts_dataset_v1",
+]
 
 _TRUE_VALUES = {"1", "true", "yes", "on"}
 _FALSE_VALUES = {"0", "false", "no", "off", ""}
@@ -32,6 +36,7 @@ class VideoFrameAnnotationExportConfigPayload(BaseModel):
     output_path: str = Field(min_length=1)
     output_dir: str | JsonNull = None
     output_format: VideoFrameAnnotationExportFormat = "csv"
+    export_profile: VideoFrameAnnotationExportProfile = "legacy_table_v1"
     video_id: PositiveInt | JsonNull = None
     label_id: PositiveInt | JsonNull = None
     information_source_name: str | JsonNull = None
@@ -110,6 +115,7 @@ class export_config:
     output_path: Path | str
     output_dir: Path | str | None = None
     output_format: VideoFrameAnnotationExportFormat = "csv"
+    export_profile: VideoFrameAnnotationExportProfile = "legacy_table_v1"
     video_id: int | None = None
     label_id: int | None = None
     information_source_name: str | None = None
@@ -144,6 +150,7 @@ class export_config:
             output_path=config_data.output_path,
             output_dir=config_data.output_dir,
             output_format=config_data.output_format,
+            export_profile=config_data.export_profile,
             video_id=config_data.video_id,
             label_id=config_data.label_id,
             information_source_name=config_data.information_source_name,
@@ -191,6 +198,7 @@ def load_video_frame_annotation_export_config(
 __all__ = [
     "VideoFrameAnnotationExportConfigPayload",
     "VideoFrameAnnotationExportFormat",
+    "VideoFrameAnnotationExportProfile",
     "YamlScalar",
     "YamlValue",
     "export_config",

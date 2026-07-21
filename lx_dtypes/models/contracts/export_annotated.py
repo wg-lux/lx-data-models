@@ -17,12 +17,13 @@ class ExportAnnotatedConfigContract(BaseModel):
     output_path: Path = Path("frames.csv")
     output_dir: Path
     output_format: Literal["csv", "json"] = "csv"
+    export_profile: Literal["legacy_table_v1", "pts_dataset_v1"] = "pts_dataset_v1"
 
     video_id: int
-    label_id: int
-    information_source_name: str
-    only_true: bool
-    limit: int
+    label_id: int | None = None
+    information_source_name: str | None = None
+    only_true: bool | None = None
+    limit: int | None = None
 
     load_base_data: bool = False
     export_videos: bool = False
@@ -114,13 +115,10 @@ class ExportAnnotatedConfigContract(BaseModel):
         if self.video_id <= 0:
             raise ValueError("video_id must be a positive integer")
 
-        if self.label_id <= 0:
+        if self.label_id is not None and self.label_id <= 0:
             raise ValueError("label_id must be a positive integer")
 
-        if not self.information_source_name:
-            raise ValueError("information_source_name is required")
-
-        if self.limit <= 0:
+        if self.limit is not None and self.limit <= 0:
             raise ValueError("limit must be a positive integer")
 
         if not self.transcode_ext:
@@ -175,6 +173,7 @@ class ExportAnnotatedConfigContract(BaseModel):
             output_path=self.output_path,
             output_dir=self.output_dir,
             output_format=self.output_format,
+            export_profile=self.export_profile,
             video_id=self.video_id,
             label_id=self.label_id,
             information_source_name=self.information_source_name,

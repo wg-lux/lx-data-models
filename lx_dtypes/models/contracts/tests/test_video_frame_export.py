@@ -30,6 +30,19 @@ def test_video_frame_annotation_export_config_normalizes_defaults() -> None:
         center_key=None,
         transcode_ext="png",
     )
+    assert config.export_profile == "legacy_table_v1"
+
+
+def test_video_frame_annotation_export_config_accepts_pts_profile() -> None:
+    config = validate_video_frame_annotation_export_config(
+        {
+            "output_path": "frames.json",
+            "output_format": "json",
+            "export_profile": "pts_dataset_v1",
+        }
+    )
+
+    assert config.export_profile == "pts_dataset_v1"
 
 
 def test_video_frame_annotation_export_config_rejects_missing_output_path() -> None:
