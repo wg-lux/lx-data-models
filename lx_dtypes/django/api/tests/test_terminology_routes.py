@@ -316,6 +316,44 @@ def test_import_terminology_bundle_zip_registers_and_activates_bundle(
     ).exists()
 
 
+def test_import_rejects_overwriting_an_existing_bundle_version(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    import_root = tmp_path / "imported-packages"
+    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", str(import_root))
+    upload = SimpleUploadedFile(
+        "published_terminology.zip",
+        _editor_bundle_zip(),
+        content_type="application/zip",
+    )
+    first_response = Client().post(
+        "/base_api/terminology/bundles/import",
+        data={"file": upload},
+        secure=True,
+    )
+    original_registry = registry_path.read_bytes()
+
+    second_response = Client().post(
+        "/base_api/terminology/bundles/import",
+        data={
+            "file": SimpleUploadedFile(
+                "published_terminology.zip",
+                _editor_bundle_zip(),
+                content_type="application/zip",
+            )
+        },
+        secure=True,
+    )
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 409
+    assert registry_path.read_bytes() == original_registry
+    assert not list(registry_path.parent.glob(".*.tmp"))
+
+
 def test_export_active_terminology_fhir_requires_active_selection(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

@@ -18,6 +18,17 @@ def _normalize_role_names(role_names: list[str]) -> list[str]:
     return normalized_roles
 
 
+def _normalize_group_paths(group_paths: list[str]) -> list[str]:
+    normalized_groups: list[str] = []
+    seen: set[str] = set()
+    for group_path in group_paths:
+        normalized_path = "/" + group_path.strip().strip("/")
+        if normalized_path != "/" and normalized_path not in seen:
+            normalized_groups.append(normalized_path)
+            seen.add(normalized_path)
+    return normalized_groups
+
+
 class KeycloakRoleContainerPayload(BaseModel):
     model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
 
@@ -38,6 +49,7 @@ class KeycloakClaimsPayload(BaseModel):
     given_name: str = ""
     family_name: str = ""
     roles: list[str] = Field(default_factory=list)
+    groups: list[str] = Field(default_factory=list)
     realm_access: KeycloakRoleContainerPayload = Field(
         default_factory=KeycloakRoleContainerPayload
     )
@@ -54,6 +66,11 @@ class KeycloakClaimsPayload(BaseModel):
     @classmethod
     def normalize_roles(cls, value: list[str]) -> list[str]:
         return _normalize_role_names(value)
+
+    @field_validator("groups")
+    @classmethod
+    def normalize_groups(cls, value: list[str]) -> list[str]:
+        return _normalize_group_paths(value)
 
     @model_validator(mode="after")
     def require_subject_identifier(self) -> "KeycloakClaimsPayload":
