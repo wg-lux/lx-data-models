@@ -11,6 +11,12 @@ from lx_dtypes.models.interface.data_roots import (
     default_data_roots,
     resolve_default_data_root,
 )
+from lx_dtypes.models.interface.remote_data_roots import (
+    is_remote_data_root,
+    normalize_registry_input as normalize_data_root_input,
+    RemoteDataRootError,
+    resolve_remote_data_root,
+)
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
@@ -26,6 +32,13 @@ class KnowledgeBaseRegistryError(ValueError):
     """
     Raised when the configured knowledge-base registry is malformed.
     """
+
+
+def _normalize_registry_input(value: str) -> str:
+    try:
+        return normalize_data_root_input(value)
+    except RemoteDataRootError as exc:
+        raise KnowledgeBaseRegistryError(str(exc)) from exc
 
 
 def _default_input_dirs() -> tuple[Path, ...]:
@@ -50,7 +63,7 @@ def _get_registry_path() -> Path | None:
 
 def _coerce_input_dirs(raw_entry: Any) -> tuple[str, ...]:
     if isinstance(raw_entry, str):
-        return (str(Path(raw_entry).expanduser().resolve()),)
+        return (_normalize_registry_input(raw_entry),)
     if isinstance(raw_entry, Sequence) and not isinstance(raw_entry, (str, bytes)):
         resolved_paths: list[str] = []
         for item in raw_entry:
@@ -58,7 +71,7 @@ def _coerce_input_dirs(raw_entry: Any) -> tuple[str, ...]:
                 raise KnowledgeBaseRegistryError(
                     "Registry input_dirs entries must be strings."
                 )
-            resolved_paths.append(str(Path(item).expanduser().resolve()))
+            resolved_paths.append(_normalize_registry_input(item))
         if not resolved_paths:
             raise KnowledgeBaseRegistryError(
                 "Registry input_dirs entries must not be empty."
@@ -128,7 +141,12 @@ def resolve_versioned_input_dirs(
             "Knowledge-base version not provisioned locally for "
             f"module '{module_name}' and version '{version}'."
         )
-    return tuple(Path(path) for path in resolved)
+    return tuple(
+        resolve_remote_data_root(path, module_name=module_name)
+        if is_remote_data_root(path)
+        else Path(path)
+        for path in resolved
+    )
 
 
 def _resolve_input_dirs_for_identity(

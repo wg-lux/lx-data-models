@@ -177,6 +177,27 @@ def test_list_terminology_bundles_from_registry(
     ]
 
 
+def test_list_terminology_bundles_preserves_github_tree_source(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_url = (
+        "https://github.com/wg-lux/lx-data-models/tree/main/demo-data/star_upper_gi"
+    )
+    registry_path = tmp_path / "registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {"modules": {"star_upper_gi": {"0.1.1": {"input_dirs": [source_url]}}}}
+        )
+    )
+    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+
+    response = Client().get("/base_api/terminology/bundles", secure=True)
+
+    assert response.status_code == 200
+    assert response.json()["bundles"][0]["input_dirs"] == [source_url]
+
+
 def test_select_terminology_bundle_sets_active_runtime_selection(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

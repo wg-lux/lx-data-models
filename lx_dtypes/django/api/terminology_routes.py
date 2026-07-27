@@ -33,6 +33,10 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     get_knowledge_base_identity,
     load_knowledge_base,
 )
+from lx_dtypes.models.interface.remote_data_roots import (
+    normalize_registry_input,
+    RemoteDataRootError,
+)
 from lx_dtypes.models.knowledge_base import KB_MODEL_NAMES_ORDERED
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.utils.parser import camel_to_snake
@@ -148,7 +152,10 @@ def _terminology_import_root(registry_path: Path) -> Path:
 
 def _coerce_input_dirs(raw_entry: object) -> tuple[str, ...]:
     if isinstance(raw_entry, str):
-        return (str(Path(raw_entry).expanduser().resolve()),)
+        try:
+            return (normalize_registry_input(raw_entry),)
+        except RemoteDataRootError as exc:
+            raise KnowledgeBaseRegistryError(str(exc)) from exc
     if isinstance(raw_entry, list):
         resolved: list[str] = []
         for item in raw_entry:
@@ -156,7 +163,10 @@ def _coerce_input_dirs(raw_entry: object) -> tuple[str, ...]:
                 raise KnowledgeBaseRegistryError(
                     "Registry input_dirs entries must be strings."
                 )
-            resolved.append(str(Path(item).expanduser().resolve()))
+            try:
+                resolved.append(normalize_registry_input(item))
+            except RemoteDataRootError as exc:
+                raise KnowledgeBaseRegistryError(str(exc)) from exc
         if not resolved:
             raise KnowledgeBaseRegistryError(
                 "Registry input_dirs entries must not be empty."
