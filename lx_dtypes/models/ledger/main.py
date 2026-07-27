@@ -1,5 +1,12 @@
 from typing import List, Literal, Union
 
+from .case import (
+    LCaseLookupType,
+    l_case_ddicts,
+    l_case_lookup,
+    l_case_models,
+)
+
 from .center import (
     LCenterDjangoLookupType,
     LCenterLookupType,
@@ -131,6 +138,7 @@ from .patient import (
 class LedgerModelsLookupType(
     LCenterLookupType,
     LPExaminationLookupType,
+    LCaseLookupType,
     LExaminerLookupType,
     LPFindingLookupType,
     LPIndicationLookupType,
@@ -150,6 +158,7 @@ class LedgerModelsLookupType(
 ledger_models_lookup = LedgerModelsLookupType(
     **l_center_lookup,
     **l_p_examination_lookup,
+    **l_case_lookup,
     **l_examiner_lookup,
     **l_p_finding_lookup,
     **l_p_indication_lookup,
@@ -206,6 +215,7 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
 L_MODELS = Union[
     l_center_models,
     l_p_examination_models,
+    l_case_models,
     l_examiner_models,
     l_p_finding_models,
     l_p_indication_models,
@@ -240,6 +250,7 @@ L_MODELS_DJANGO = Union[
 L_DDICTS = Union[
     l_center_ddicts,
     l_p_examination_ddicts,
+    l_case_ddicts,
     l_examiner_ddicts,
     l_p_finding_ddicts,
     l_p_indication_ddicts,
@@ -258,6 +269,7 @@ L_MODEL_NAMES_LITERAL = Literal[
     "Examiner",
     "Patient",
     "PExamination",
+    "Case",
     "PFinding",
     "PIndication",
     "PIndicationClassification",
@@ -275,6 +287,7 @@ L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "Examiner",
     "Patient",
     "PExamination",
+    "Case",
     "PFinding",
     "PIndication",
     "PIndicationClassification",

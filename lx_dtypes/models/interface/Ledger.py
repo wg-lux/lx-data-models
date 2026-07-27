@@ -9,6 +9,7 @@ from lx_dtypes.models.base.app_base_model.ddict.AppBaseModelUUIDTagsDataDict imp
 from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelUUIDTags import (
     AppBaseModelUUIDTags,
 )
+from lx_dtypes.models.ledger.case import Case, CaseDataDict
 from lx_dtypes.models.ledger.center import Center, CenterDataDict
 from lx_dtypes.models.ledger.examiner.DataDict import ExaminerDataDict
 from lx_dtypes.models.ledger.examiner.Pydantic import Examiner
@@ -73,6 +74,7 @@ class LedgerRecordList(TypedDict):
 
 
 class LedgerDataDict(AppBaseModelUUIDTagsDataDict):
+    cases: Dict[str, CaseDataDict]
     patient_examinations: Dict[str, PExaminationDataDict]
     patients: Dict[str, PatientDataDict]
     centers: Dict[str, CenterDataDict]
@@ -81,6 +83,7 @@ class LedgerDataDict(AppBaseModelUUIDTagsDataDict):
 
 
 class Ledger(AppBaseModelUUIDTags):
+    cases: Dict[str, Case] = Field(default_factory=dict)
     patient_examinations: Dict[str, PExamination] = Field(default_factory=dict)
     patients: Dict[str, Patient] = Field(default_factory=dict)
     centers: Dict[str, Center] = Field(default_factory=dict)
@@ -100,6 +103,10 @@ class Ledger(AppBaseModelUUIDTags):
             `true` if a patient with the given UUID exists, `false` otherwise.
         """
         return patient_uuid in self.patients
+
+    def case_exists(self, case_uuid: str) -> bool:
+        """Return whether a transient case with this UUID is present."""
+        return case_uuid in self.cases
 
     def p_examination_exists(self, examination_uuid: str) -> bool:
         """
