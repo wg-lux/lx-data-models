@@ -18,6 +18,7 @@ api/index
 
 guides/pydantic-cheatsheet
 guides/dates-and-times
+guides/fhir-clinical-testing
 guides/konzept-verknuepfungen
 guides/knowledge-base-authoring
 guides/kb-yaml-linting

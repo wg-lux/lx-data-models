@@ -24,7 +24,7 @@ from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelUUIDTags import (
 )
 from lx_dtypes.models.contracts import kb_to_core_concepts_payload
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
-from lx_dtypes.models.knowledge_base import (
+from lx_dtypes.models.knowledge_base.pydantic_main import (
     KB_MODEL_NAMES_LITERAL,
     KB_MODEL_NAMES_ORDERED,
     KB_MODELS,
@@ -704,13 +704,48 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         payload: Mapping[str, Any] | List[Mapping[str, Any]],
         *,
         module_name: str = "fhir_import",
+        language: str | None = None,
     ) -> Dict[str, Any]:
         """
         Import FHIR CodeSystem resources into KB storage-compatible concepts.
         """
         from lx_dtypes.models.knowledge_base.fhir import import_fhir_terminology
 
-        return import_fhir_terminology(payload, module_name=module_name)
+        return import_fhir_terminology(
+            payload,
+            module_name=module_name,
+            language=language,
+        )
+
+    @classmethod
+    def from_fhir(
+        cls,
+        payload: Mapping[str, Any] | List[Mapping[str, Any]],
+        *,
+        module_name: str = "fhir_import",
+        version: str | None = None,
+        medical_field: str | None = None,
+        author: str | None = None,
+        language: str | None = None,
+        strict: bool = True,
+    ) -> Self:
+        """Create a validated knowledge base from FHIR terminology resources."""
+        from lx_dtypes.models.knowledge_base.fhir_yaml import (
+            knowledge_base_from_fhir,
+        )
+
+        return cast(
+            Self,
+            knowledge_base_from_fhir(
+                payload,
+                module_name=module_name,
+                version=version,
+                medical_field=medical_field,
+                author=author,
+                language=language,
+                strict=strict,
+            ),
+        )
 
     def reported_findings_from_p_examination(
         self, p_examination: "PExamination"

@@ -29,6 +29,21 @@ from .event import (
     EventClassificationCore,
     EventCore,
 )
+from .fhir_clinical import (
+    ClinicalFhirResource,
+    FhirClinicalBundle,
+    FhirClinicalBundleEntry,
+    FhirCodeableConcept,
+    FhirCoding,
+    FhirCondition,
+    FhirDiagnosticReport,
+    FhirObservation,
+    FhirObservationComponent,
+    FhirPatient,
+    FhirQuantity,
+    FhirReference,
+    ResolvedDiagnosticReport,
+)
 from .finding_classification import (
     FindingClassificationChoiceCore,
     FindingClassificationCore,
@@ -498,6 +513,19 @@ from .video_reimport import (
 )
 
 __all__ = [
+    "ClinicalFhirResource",
+    "FhirClinicalBundle",
+    "FhirClinicalBundleEntry",
+    "FhirCodeableConcept",
+    "FhirCoding",
+    "FhirCondition",
+    "FhirDiagnosticReport",
+    "FhirObservation",
+    "FhirObservationComponent",
+    "FhirPatient",
+    "FhirQuantity",
+    "FhirReference",
+    "ResolvedDiagnosticReport",
     "ApplicationSettingsBackupSourcePayload",
     "ApplicationSettingsBackupStatusPayload",
     "ApplicationSettingsDataSetEntryPayload",

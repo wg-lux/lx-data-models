@@ -61,6 +61,7 @@ dev = [
   "pytest-mypy-plugins>=3.2.0",
   "pytest-xdist>=3.8.0",
   "pytest-django>=4.11.1",
+  "radon>=6.0.1",
   "sphinx-autodoc-typehints>=3.5.2",
   "sphinx-copybutton>=0.5.2",
   "sphinx>=8.2.3,<9.0",

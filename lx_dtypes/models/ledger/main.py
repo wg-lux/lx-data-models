@@ -18,6 +18,12 @@ from .examiner import (
     l_examiner_lookup,
     l_examiner_models,
 )
+from .medical import (
+    LMedicalLookupType,
+    l_medical_ddicts,
+    l_medical_lookup,
+    l_medical_models,
+)
 from .p_examination import (
     LPExaminationDjangoLookupType,
     LPExaminationLookupType,
@@ -143,6 +149,7 @@ class LedgerModelsLookupType(
     LPFindingInterventionLookupType,
     LPatientLookupType,
     LPVideoLookupType,
+    LMedicalLookupType,
 ):
     pass
 
@@ -162,6 +169,7 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_p_finding_intervention_lookup,
     **l_patient_lookup,
     **l_p_video_lookup,
+    **l_medical_lookup,
 )
 
 
@@ -218,6 +226,7 @@ L_MODELS = Union[
     l_p_finding_intervention_models,
     l_patient_models,
     l_p_video_models,
+    l_medical_models,
 ]
 
 L_MODELS_DJANGO = Union[
@@ -252,6 +261,7 @@ L_DDICTS = Union[
     l_p_finding_intervention_ddicts,
     l_patient_ddicts,
     l_p_video_ddicts,
+    l_medical_ddicts,
 ]
 L_MODEL_NAMES_LITERAL = Literal[
     "Center",
@@ -268,6 +278,13 @@ L_MODEL_NAMES_LITERAL = Literal[
     "PFindingIntervention",
     "PatientVideoFile",
     "RawPatientVideoFile",
+    "PatientDisease",
+    "PatientEvent",
+    "PatientLabSample",
+    "PatientLabValue",
+    "PatientMedication",
+    "PatientMedicationSchedule",
+    "PatientMedicalLedger",
 ]
 
 L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
@@ -285,6 +302,13 @@ L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "PFindingIntervention",
     "PatientVideoFile",
     "RawPatientVideoFile",
+    "PatientDisease",
+    "PatientEvent",
+    "PatientLabSample",
+    "PatientLabValue",
+    "PatientMedication",
+    "PatientMedicationSchedule",
+    "PatientMedicalLedger",
 ]
 
 __all__ = [

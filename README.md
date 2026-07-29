@@ -72,6 +72,58 @@ pip install -e ".[dev]"
 - Do not import from `lx_dtypes...tests` or `...test_fixtures` in consuming
   applications.
 
+## FHIR And YAML
+
+FHIR terminology can be converted directly into a validated knowledge base:
+
+```python
+from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
+
+kb = KnowledgeBase.from_fhir(
+    fhir_bundle,
+    module_name="imported_gastroenterology",
+)
+```
+
+To generate a single YAML file that can be loaded again with
+`KnowledgeBase.create_from_yaml`:
+
+```python
+from lx_dtypes.models.knowledge_base.fhir_yaml import write_fhir_yaml
+
+path = write_fhir_yaml(
+    fhir_bundle,
+    "generated/imported_gastroenterology.yaml",
+    module_name="imported_gastroenterology",
+    language="en",
+)
+```
+
+Use `fhir_to_yaml(...)` when YAML text is needed without writing a file, or
+`knowledge_base_from_fhir(...)` for the equivalent standalone conversion API.
+The high-level APIs use FHIR concept codes as stable internal identifiers and
+retain displays and language designations in `name_en` and `name_de`. Repeated
+conversion of the same input is deterministic.
+
+Set `language` to the IETF language tag of the FHIR `concept.display` values
+(for example `"en"`, `"de-DE"`, or `"pt-BR"`). For mixed-language bundles, set
+`CodeSystem.language` on each resource instead; the explicit API argument takes
+precedence. English and German displays are assigned to the corresponding LXDM
+translation field. Other source languages remain available as the stable concept
+code while explicit English or German FHIR designations are retained. Omitting
+both language declarations preserves the legacy behavior of using an
+undesignated display for both LXDM translation fields.
+
+By default, high-level conversion rejects payloads without mappable terminology
+`CodeSystem` resources and duplicate codes. Exact LX resource IDs take precedence;
+unknown CodeSystems are conservatively mapped from their declared properties,
+metadata, and concept text to the most likely LXDM domain. Resources without
+positive structural or textual evidence remain unmapped. Pass `strict=False` to
+allow an empty knowledge base. The currently supported domains are examination,
+finding, classification type, classification, classification choice, and unit.
+Nested FHIR concepts are imported recursively and flattened into the selected
+LXDM collection because LXDM concept collections are keyed rather than hierarchical.
+
 ## Django Integration
 
 If you want to use the packaged Django API in another project, do not infer the

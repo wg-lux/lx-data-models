@@ -1,27 +1,19 @@
-from typing import TypedDict, Union
+from __future__ import annotations
 
-from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
-    InterventionDjango,
-)
-from lx_dtypes.models.knowledge_base.intervention.InterventionTypeDjango import (
-    InterventionTypeDjango,
-)
+from typing import TYPE_CHECKING, Any, TypedDict, Union
+
+if TYPE_CHECKING:
+    from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
+        InterventionDjango,
+    )
+    from lx_dtypes.models.knowledge_base.intervention.InterventionTypeDjango import (
+        InterventionTypeDjango,
+    )
 
 from .Intervention import Intervention
 from .InterventionDataDict import InterventionDataDict
 from .InterventionType import InterventionType
 from .InterventionTypeDataDict import InterventionTypeDataDict
-
-
-class KbInterventionDjangoLookupType(TypedDict):
-    Intervention: type[InterventionDjango]
-    InterventionType: type[InterventionTypeDjango]
-
-
-kb_intervention_django_lookup = KbInterventionDjangoLookupType(
-    Intervention=InterventionDjango,
-    InterventionType=InterventionTypeDjango,
-)
 
 
 class KbInterventionLookupType(TypedDict):
@@ -37,10 +29,16 @@ kb_intervention_lookup = KbInterventionLookupType(
     InterventionTypeDataDict=InterventionTypeDataDict,
     InterventionType=InterventionType,
 )
-kb_intervention_django_models = Union[
-    InterventionDjango,
-    InterventionTypeDjango,
-]
+if TYPE_CHECKING:
+    class KbInterventionDjangoLookupType(TypedDict):
+        Intervention: type[InterventionDjango]
+        InterventionType: type[InterventionTypeDjango]
+
+    kb_intervention_django_lookup: KbInterventionDjangoLookupType
+    kb_intervention_django_models = Union[
+        InterventionDjango,
+        InterventionTypeDjango,
+    ]
 kb_intervention_models = Union[
     Intervention,
     InterventionType,
@@ -64,3 +62,35 @@ __all__ = [
     "kb_intervention_django_lookup",
     "KbInterventionDjangoLookupType",
 ]
+
+
+def __getattr__(name: str) -> Any:
+    if name not in {
+        "InterventionDjango",
+        "InterventionTypeDjango",
+        "KbInterventionDjangoLookupType",
+        "kb_intervention_django_lookup",
+        "kb_intervention_django_models",
+    }:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    from .InterventionDjango import InterventionDjango
+    from .InterventionTypeDjango import InterventionTypeDjango
+
+    class KbInterventionDjangoLookupType(TypedDict):
+        Intervention: type[InterventionDjango]
+        InterventionType: type[InterventionTypeDjango]
+
+    exports = {
+        "InterventionDjango": InterventionDjango,
+        "InterventionTypeDjango": InterventionTypeDjango,
+        "KbInterventionDjangoLookupType": KbInterventionDjangoLookupType,
+        "kb_intervention_django_lookup": KbInterventionDjangoLookupType(
+            Intervention=InterventionDjango,
+            InterventionType=InterventionTypeDjango,
+        ),
+        "kb_intervention_django_models": Union[
+            InterventionDjango, InterventionTypeDjango
+        ],
+    }
+    globals().update(exports)
+    return exports[name]
