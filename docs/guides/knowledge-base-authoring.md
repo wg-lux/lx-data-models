@@ -26,6 +26,31 @@ Use these documents in this order:
 - packaged kb: the Nix derivation that installs a module and emits a registry JSON
 - app bundle: the Python package plus packaged KB, wrapped with `LX_DTYPES_KB_REGISTRY`
 
+Registry `input_dirs` may also contain an HTTPS GitHub tree URL ending in the
+module directory, for example:
+
+```json
+{
+  "modules": {
+    "star_upper_gi": {
+      "0.1.1": {
+        "input_dirs": [
+          "https://github.com/wg-lux/lx-data-models/tree/main/demo-data/star_upper_gi"
+        ]
+      }
+    }
+  }
+}
+```
+
+`lx-dtypes` downloads the repository archive into
+`LX_DTYPES_REMOTE_CACHE_ROOT` (or the user cache directory), validates the
+archive paths and size, and passes the materialized parent directory to the
+existing YAML loader. Cache writes use the audited `endoreg_db` filesystem
+adapter supplied by the `lx-annotate` host. Only HTTPS `github.com` tree URLs
+are accepted. For reproducible deployments, use a commit SHA as the tree ref
+rather than a mutable branch name.
+
 ## Recommended Workflow
 
 ### 1. Author the Bundle in `lx-terminology-editor`

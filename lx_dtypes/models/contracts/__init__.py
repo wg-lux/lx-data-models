@@ -329,7 +329,21 @@ from .transfer_validation import (
     TransferValidationLogValue,
     dump_transfer_validation_failure_log_payload,
 )
-from .report_anonymization import ReportAnonymizationResult
+from .report_anonymization import (
+    REPORT_ANONYMIZATION_CONTRACT_VERSION,
+    ReportAnonymizationContractVersion,
+    ReportAnonymizationErrorCode,
+    ReportAnonymizationFailureV2,
+    ReportAnonymizationOptions,
+    ReportAnonymizationPhase,
+    ReportAnonymizationProvenanceV2,
+    ReportAnonymizationRequestV2,
+    ReportAnonymizationResult,
+    ReportAnonymizationResultV2,
+    ReportAnonymizationWarningCode,
+    ReportAnonymizationWarningV2,
+    ReportArtifactValidationV2,
+)
 from .report_context import ReportContext
 from .video_ai_labels import (
     VideoAiHuggingFaceModelPayload,
@@ -792,6 +806,18 @@ __all__ = [
     "report_json_safe_dict",
     "validate_segment_selection_map",
     "ReportAnonymizationResult",
+    "REPORT_ANONYMIZATION_CONTRACT_VERSION",
+    "ReportAnonymizationContractVersion",
+    "ReportAnonymizationErrorCode",
+    "ReportAnonymizationFailureV2",
+    "ReportAnonymizationOptions",
+    "ReportAnonymizationPhase",
+    "ReportAnonymizationProvenanceV2",
+    "ReportAnonymizationRequestV2",
+    "ReportAnonymizationResultV2",
+    "ReportAnonymizationWarningCode",
+    "ReportAnonymizationWarningV2",
+    "ReportArtifactValidationV2",
     "ReportContext",
     "VideoAiHuggingFaceModelPayload",
     "VideoAiJsonObject",

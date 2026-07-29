@@ -177,6 +177,27 @@ def test_list_terminology_bundles_from_registry(
     ]
 
 
+def test_list_terminology_bundles_preserves_github_tree_source(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_url = (
+        "https://github.com/wg-lux/lx-data-models/tree/main/demo-data/star_upper_gi"
+    )
+    registry_path = tmp_path / "registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {"modules": {"star_upper_gi": {"0.1.1": {"input_dirs": [source_url]}}}}
+        )
+    )
+    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+
+    response = Client().get("/base_api/terminology/bundles", secure=True)
+
+    assert response.status_code == 200
+    assert response.json()["bundles"][0]["input_dirs"] == [source_url]
+
+
 def test_select_terminology_bundle_sets_active_runtime_selection(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -314,6 +335,44 @@ def test_import_terminology_bundle_zip_registers_and_activates_bundle(
         / "published_terminology"
         / "config.yaml"
     ).exists()
+
+
+def test_import_rejects_overwriting_an_existing_bundle_version(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    import_root = tmp_path / "imported-packages"
+    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", str(import_root))
+    upload = SimpleUploadedFile(
+        "published_terminology.zip",
+        _editor_bundle_zip(),
+        content_type="application/zip",
+    )
+    first_response = Client().post(
+        "/base_api/terminology/bundles/import",
+        data={"file": upload},
+        secure=True,
+    )
+    original_registry = registry_path.read_bytes()
+
+    second_response = Client().post(
+        "/base_api/terminology/bundles/import",
+        data={
+            "file": SimpleUploadedFile(
+                "published_terminology.zip",
+                _editor_bundle_zip(),
+                content_type="application/zip",
+            )
+        },
+        secure=True,
+    )
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 409
+    assert registry_path.read_bytes() == original_registry
+    assert not list(registry_path.parent.glob(".*.tmp"))
 
 
 def test_export_active_terminology_fhir_requires_active_selection(

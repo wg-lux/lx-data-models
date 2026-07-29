@@ -90,6 +90,13 @@ def _host_models_module() -> Any:
     return import_module(module_path)
 
 
+def _host_integration_is_configured() -> bool:
+    return bool(
+        getattr(settings, "LX_DTYPES_HOST_MODELS_MODULE", None)
+        or os.getenv("LX_DTYPES_HOST_MODELS_MODULE")
+    )
+
+
 @lru_cache(maxsize=1)
 def _orm_models() -> Dict[str, Any]:
     host_models = _host_models_module()
@@ -152,6 +159,11 @@ def _patient_findings_queryset_for_request(request: BaseRequest) -> Any:
     if not callable(scope_queryset):
         return _active_patient_findings_queryset().none()
     return scope_queryset(request)
+
+
+def _terminology_write_access_allowed(actor: object) -> bool:
+    authorize = getattr(_host_models_module(), "terminology_write_access_allowed", None)
+    return bool(callable(authorize) and authorize(actor))
 
 
 class StructuredApiError(Exception):
@@ -642,4 +654,10 @@ register_examinations_routes(
 register_terminology_routes(
     api,
     clear_kb_caches=lambda: _clear_kb_caches(),
+    authenticate_request_user=(
+        _authenticate_request_user if _host_integration_is_configured() else None
+    ),
+    terminology_write_access_allowed=(
+        _terminology_write_access_allowed if _host_integration_is_configured() else None
+    ),
 )

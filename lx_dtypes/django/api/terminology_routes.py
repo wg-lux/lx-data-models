@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import posixpath
 import shutil
@@ -32,6 +33,10 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     get_knowledge_base_identity,
     load_knowledge_base,
 )
+from lx_dtypes.models.interface.remote_data_roots import (
+    normalize_registry_input,
+    RemoteDataRootError,
+)
 from lx_dtypes.models.knowledge_base import KB_MODEL_NAMES_ORDERED
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.utils.parser import camel_to_snake
@@ -40,6 +45,7 @@ from .lookup_tracker import register_runtime_lookup_tracker
 from .request_types import BaseRequest
 
 F = TypeVar("F", bound=Callable[..., Any])
+logger = logging.getLogger(__name__)
 
 
 if TYPE_CHECKING:
@@ -146,7 +152,10 @@ def _terminology_import_root(registry_path: Path) -> Path:
 
 def _coerce_input_dirs(raw_entry: object) -> tuple[str, ...]:
     if isinstance(raw_entry, str):
-        return (str(Path(raw_entry).expanduser().resolve()),)
+        try:
+            return (normalize_registry_input(raw_entry),)
+        except RemoteDataRootError as exc:
+            raise KnowledgeBaseRegistryError(str(exc)) from exc
     if isinstance(raw_entry, list):
         resolved: list[str] = []
         for item in raw_entry:
@@ -154,7 +163,10 @@ def _coerce_input_dirs(raw_entry: object) -> tuple[str, ...]:
                 raise KnowledgeBaseRegistryError(
                     "Registry input_dirs entries must be strings."
                 )
-            resolved.append(str(Path(item).expanduser().resolve()))
+            try:
+                resolved.append(normalize_registry_input(item))
+            except RemoteDataRootError as exc:
+                raise KnowledgeBaseRegistryError(str(exc)) from exc
         if not resolved:
             raise KnowledgeBaseRegistryError(
                 "Registry input_dirs entries must not be empty."
@@ -481,9 +493,25 @@ def _register_imported_bundle(
     if medical_field:
         entry["medical_field"] = medical_field
     module_versions[version] = entry
-    registry_path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    serialized = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    temporary_registry = registry_path.with_name(
+        f".{registry_path.name}.{uuid.uuid4().hex}.tmp"
+    )
+    try:
+        with temporary_registry.open("w", encoding="utf-8") as registry_file:
+            registry_file.write(serialized)
+            registry_file.flush()
+            os.fsync(registry_file.fileno())
+        os.replace(temporary_registry, registry_path)
+    finally:
+        temporary_registry.unlink(missing_ok=True)
+    logger.info(
+        "Terminology registry updated",
+        extra={
+            "event": "terminology_registry_updated",
+            "module_name": module_name,
+            "version": version,
+        },
     )
     clear_knowledge_base_resolver_caches()
     return TerminologyRegistryEntry(
@@ -535,10 +563,11 @@ def _install_terminology_zip(
         _write_imported_files(package_dir, file_map)
         _validate_imported_bundle(module_name=module_name, input_dir=tmp_root)
         target_root.parent.mkdir(parents=True, exist_ok=True)
-        if target_root.is_dir():
-            shutil.rmtree(target_root)
-        elif target_root.exists():
-            target_root.unlink()
+        if target_root.exists():
+            raise HttpError(
+                409,
+                f"Terminology bundle '{module_name}' version '{version}' is already installed.",
+            )
         tmp_root.replace(target_root)
         counts = _validate_imported_bundle(
             module_name=module_name, input_dir=target_root
@@ -628,7 +657,21 @@ def register_terminology_routes(
     api: _TypedApi,
     *,
     clear_kb_caches: Callable[[], None],
+    authenticate_request_user: Callable[[BaseRequest], Any | None] | None = None,
+    terminology_write_access_allowed: Callable[[object], bool] | None = None,
 ) -> None:
+    def require_write_access(request: BaseRequest) -> None:
+        if (
+            authenticate_request_user is None
+            or terminology_write_access_allowed is None
+        ):
+            return
+        actor = authenticate_request_user(request)
+        if actor is None:
+            raise HttpError(401, "Authentication is required.")
+        if not terminology_write_access_allowed(actor):
+            raise HttpError(403, "Terminology write access is required.")
+
     @api.get("/terminology/bundles")
     def list_terminology_bundles(
         request: BaseRequest,
@@ -728,7 +771,7 @@ def register_terminology_routes(
         request: BaseRequest,
         file: UploadedFile = File(...),
     ) -> ImportTerminologyBundleResponse:
-        del request
+        require_write_access(request)
         registry_path = _terminology_registry_path_for_write()
         module_name, version, medical_field, input_dir, counts = (
             _install_terminology_zip(
@@ -768,7 +811,7 @@ def register_terminology_routes(
         request: BaseRequest,
         payload: SelectTerminologyBundleRequest,
     ) -> SelectTerminologyBundleResponse:
-        del request
+        require_write_access(request)
         module_name = payload.module_name.strip()
         version = payload.version.strip()
         try:
