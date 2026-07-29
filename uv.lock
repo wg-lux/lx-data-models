@@ -593,7 +593,7 @@ wheels = [
 
 [[package]]
 name = "lx-dtypes"
-version = "0.2.7"
+version = "0.2.8"
 source = { editable = "." }
 dependencies = [
     { name = "bibtexparser", marker = "sys_platform == 'darwin' or sys_platform == 'linux' or sys_platform == 'win32'" },
