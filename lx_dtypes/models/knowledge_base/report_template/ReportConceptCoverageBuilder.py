@@ -13,7 +13,10 @@ from .ReportConceptCoverage import (
     ReportConceptCoverageItem,
     ReportConceptCoverageProvenance,
 )
-from .ReportTemplateCoverage import ReportTemplateCoverageConcept
+from .ReportTemplateCoverage import (
+    ReportTemplateCoverageConcept,
+    ReportTemplateCoverageFindingSelector,
+)
 
 if TYPE_CHECKING:
     from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
@@ -28,6 +31,7 @@ class _CoverageKnowledgeBase(Protocol):
     def config(self) -> _KnowledgeBaseConfig: ...
 
     def model_dump(self, *, mode: str) -> Mapping[str, Any]: ...
+
 
 RESOLVER_NAME = "lx_dtypes.report_concept_coverage"
 RESOLVER_VERSION = "1.0.0"
@@ -133,6 +137,78 @@ def _value_matches_allowed(value: Any, allowed_values: Sequence[Any]) -> bool | 
     return any(_strict_equal(value, allowed) for allowed in allowed_values)
 
 
+def _selected_finding_values(
+    payload: Mapping[str, Any],
+    selector: ReportTemplateCoverageFindingSelector,
+    value_path: Sequence[str] | None,
+) -> list[tuple[tuple[str, ...], bool, Any]]:
+    """Resolve all selector matches in stable payload order.
+
+    ``value_path`` is relative to a selected finding. When a classification is
+    selected, the value is the selected classification choice unless an
+    explicit relative path is supplied.
+    """
+    raw_findings = payload.get("patient_findings")
+    if not isinstance(raw_findings, Sequence) or isinstance(raw_findings, (str, bytes)):
+        return []
+
+    selected: list[tuple[tuple[str, ...], bool, Any]] = []
+    for finding_index, raw_finding in enumerate(raw_findings):
+        if not isinstance(raw_finding, Mapping):
+            continue
+        if raw_finding.get("finding") != selector.finding_name:
+            continue
+        finding_path = ("patient_findings", str(finding_index))
+        if not selector.classification_name:
+            exists, value = _path_value(raw_finding, value_path or ())
+            selected.append((finding_path, exists, value))
+            continue
+
+        classifications = raw_finding.get("patient_finding_classifications")
+        if not isinstance(classifications, Sequence) or isinstance(
+            classifications, (str, bytes)
+        ):
+            selected.append(
+                (finding_path + ("patient_finding_classifications",), False, None)
+            )
+            continue
+        matched_classification = False
+        for classification_index, classification in enumerate(classifications):
+            if not isinstance(classification, Mapping):
+                continue
+            choices = classification.get("patient_finding_classification_choices")
+            if not isinstance(choices, Sequence) or isinstance(choices, (str, bytes)):
+                continue
+            for choice_index, choice in enumerate(choices):
+                if not isinstance(choice, Mapping):
+                    continue
+                if choice.get("classification") != selector.classification_name:
+                    continue
+                if (
+                    selector.classification_choice is not None
+                    and choice.get("classification_choice")
+                    != selector.classification_choice
+                ):
+                    continue
+                matched_classification = True
+                choice_path = finding_path + (
+                    "patient_finding_classifications",
+                    str(classification_index),
+                    "patient_finding_classification_choices",
+                    str(choice_index),
+                )
+                if value_path:
+                    exists, value = _path_value(choice, value_path)
+                else:
+                    exists, value = _path_value(choice, ("classification_choice",))
+                selected.append((choice_path, exists, value))
+        if not matched_classification:
+            selected.append(
+                (finding_path + ("patient_finding_classifications",), False, None)
+            )
+    return selected
+
+
 def _validator_results(validation: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
     results: dict[str, Mapping[str, Any]] = {}
     for key in (
@@ -151,12 +227,16 @@ def _validator_results(validation: Mapping[str, Any]) -> dict[str, Mapping[str, 
             result = _mapping(raw_result, field=f"{key} entries")
             name = _require_text(result.get("name"), field=f"{key} validator name")
             if name in results:
-                raise ValueError(f"Validator response contains duplicate validator '{name}'.")
+                raise ValueError(
+                    f"Validator response contains duplicate validator '{name}'."
+                )
             results[name] = result
     return results
 
 
-def _coerce_coverage_concepts(template_export: Mapping[str, Any]) -> tuple[ReportTemplateCoverageConcept, ...]:
+def _coerce_coverage_concepts(
+    template_export: Mapping[str, Any],
+) -> tuple[ReportTemplateCoverageConcept, ...]:
     raw_version = _require_text(
         template_export.get("coverage_version"), field="coverage_version"
     )
@@ -206,12 +286,39 @@ def build_report_concept_coverage(
     coverage_items: list[ReportConceptCoverageItem] = []
 
     for concept in concepts:
+        evidence_paths: tuple[tuple[str, ...], ...] = (tuple(concept.evidence_path),)
         if concept.applicability_status == "not_applicable":
             validation_status = "undetermined"
         else:
-            validator_states = [validators.get(name) for name in concept.validator_names]
+            validator_states = [
+                validators.get(name) for name in concept.validator_names
+            ]
             if any(result is None for result in validator_states):
                 validation_status = "unknown"
+            elif concept.finding_selector is not None:
+                selected_values = _selected_finding_values(
+                    payload,
+                    concept.finding_selector,
+                    concept.concept_value_path,
+                )
+                evidence_paths = tuple(path for path, _, _ in selected_values)
+                if not selected_values:
+                    validation_status = "missing"
+                elif any(
+                    not exists or value is None for _, exists, value in selected_values
+                ):
+                    validation_status = "unknown"
+                else:
+                    matches = [
+                        _value_matches_allowed(value, concept.allowed_values or ())
+                        for _, _, value in selected_values
+                    ]
+                    if any(match is None for match in matches):
+                        validation_status = "unknown"
+                    elif any(match is False for match in matches):
+                        validation_status = "invalid"
+                    else:
+                        validation_status = "present"
             elif not _path_exists(payload, concept.evidence_path):
                 validation_status = "missing"
             elif any(
@@ -247,7 +354,10 @@ def build_report_concept_coverage(
                     reason=concept.applicability_reason,
                 ),
                 validation_status=cast(Any, validation_status),
-                evidence_path=tuple(concept.evidence_path),
+                evidence_path=evidence_paths[0]
+                if evidence_paths
+                else tuple(concept.evidence_path),
+                evidence_paths=evidence_paths,
             )
         )
 
