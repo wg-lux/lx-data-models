@@ -26,7 +26,7 @@ about patient examinations, knowledge-base entries, and related clinical data.
 - Ready-to-run pytest suite with coverage and optional type-checking.
 
 ## Installation
-Install the latest release from PyPI (coming soon):
+Install the latest release from PyPI:
 
 ```bash
 pip install lx-dtypes
