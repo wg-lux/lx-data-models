@@ -119,6 +119,16 @@ def test_builder_save_publish_and_unpublish_flow(
     assert list_response.status_code == 200
     assert list_response.json() == []
 
+    builder_list_response = client.get(
+        "/base_api/report-templates/builder/by-examination/builder_module/star_upper_gi_endoscopy",
+        secure=True,
+    )
+    assert builder_list_response.status_code == 200
+    assert [item["name"] for item in builder_list_response.json()] == [
+        "custom_template"
+    ]
+    assert builder_list_response.json()[0]["lifecycle_status"] == "draft"
+
     preview_response = client.get(
         "/base_api/report-templates/builder_module/custom_template/preview",
         secure=True,

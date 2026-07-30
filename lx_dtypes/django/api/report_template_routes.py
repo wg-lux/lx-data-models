@@ -133,6 +133,20 @@ def register_report_template_routes(
             matches.append(kb.export_report_template(template_name))
         return matches
 
+    @api.get("/report-templates/builder/by-examination/{module_name}/{examination_name}")
+    def builder_report_templates_by_examination(
+        request: BaseRequest, module_name: str, examination_name: str
+    ) -> List[Dict[str, Any]]:
+        """Return preview exports for all builder templates, including drafts."""
+        del request
+        kb = load_module_kb(module_name)
+        matches: list[Dict[str, Any]] = []
+        for template_name, template in kb.report_template.items():
+            if template.examination != examination_name:
+                continue
+            matches.append(kb.export_report_template_preview(template_name))
+        return matches
+
     @api.get("/report-templates/{module_name}/{template_name}")
     def report_template_by_name(
         request: BaseRequest, module_name: str, template_name: str
