@@ -22,11 +22,35 @@ class _RuntimeValidationKb:
     unit_validator: dict[str, object] = {}
     examination_validator: dict[str, object] = {}
 
+    class _Config:
+        def model_dump(self, mode: str) -> dict[str, str]:
+            assert mode == "json"
+            return {"name": "report_template_examples", "version": "0.1.0"}
+
+    config = _Config()
+
+    def model_dump(self, mode: str) -> dict[str, object]:
+        assert mode == "json"
+        return {"config": self.config.model_dump(mode=mode)}
+
     def export_core_concepts(self) -> dict[str, object]:
         return {}
 
     def export_report_template(self, name: str) -> dict[str, object]:
-        return {"name": name}
+        return {
+            "name": name,
+            "version": "1.0.0",
+            "coverage_version": "report_concept_coverage_v1",
+            "coverage_concepts": [
+                {
+                    "concept_id": "report.template",
+                    "label": "Report template",
+                    "applicability_status": "required",
+                    "validator_names": ["polyp_has_lst_if_large"],
+                    "evidence_path": ["patient_findings"],
+                }
+            ],
+        }
 
     def export_report_template_preview(self, name: str) -> dict[str, object]:
         return {"name": name}
@@ -132,6 +156,8 @@ def test_report_template_runtime_validation_api(
     payload = response.json()
     assert payload["template_name"] == "star_upper_gi_main"
     assert payload["ok"] is False
+    assert payload["concept_coverage"]["contract_version"] == "report_concept_coverage_v1"
+    assert payload["concept_coverage"]["identity"]["template_name"] == "star_upper_gi_main"
     assert any(
         issue["code"] == "missing_required_classification"
         for issue in payload["issues"]

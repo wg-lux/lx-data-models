@@ -134,6 +134,8 @@ from .ReportConceptCoverage import (
     ReportConceptCoverageProvenance,
     ReportConceptValidationStatus,
 )
+from .ReportTemplateCoverage import ReportTemplateCoverageConcept
+from .ReportConceptCoverageBuilder import build_report_concept_coverage
 from .ValidatorRuntime import (
     ClassificationValidatorExecutionDataDict,
     InterventionValidatorExecutionDataDict,
@@ -249,6 +251,8 @@ __all__ = [
     "ReportConceptCoverageIdentity",
     "ReportConceptCoverageItem",
     "ReportConceptCoverageProvenance",
+    "ReportTemplateCoverageConcept",
+    "build_report_concept_coverage",
     "ReportConceptValidationStatus",
     "ReportFinding",
     "ReportFindingDataDict",

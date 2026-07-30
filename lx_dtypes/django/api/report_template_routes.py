@@ -13,6 +13,9 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     get_knowledge_base_identity,
 )
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+from lx_dtypes.models.knowledge_base.report_template.ReportConceptCoverageBuilder import (
+    build_report_concept_coverage,
+)
 
 from . import report_template_builder
 from .report_template_builder import (
@@ -282,16 +285,26 @@ def register_report_template_routes(
         )
         kb = load_module_kb(resolved_module_name, version=resolved_version)
         try:
-            kb.export_report_template(template_name)
+            template_export = kb.export_report_template(template_name)
             validation = kb.evaluate_report_template_validators(
                 template_name, p_examination=payload
             )
-            return _attach_resolved_kb_identity(
+            response = _attach_resolved_kb_identity(
                 validation,
                 module_name=resolved_module_name,
                 version=resolved_version,
             )
+            response["concept_coverage"] = build_report_concept_coverage(
+                kb=cast(Any, kb),
+                requested_template_name=template_name,
+                template_export=template_export,
+                p_examination=payload,
+                validation=validation,
+            ).model_dump(mode="json")
+            return response
         except SemanticAdmissibilityError as exc:
+            raise HttpError(422, str(exc)) from exc
+        except ValueError as exc:
             raise HttpError(422, str(exc)) from exc
         except KeyError as exc:
             raise HttpError(
@@ -377,16 +390,26 @@ def register_report_template_routes(
         )
         kb = load_module_kb(resolved_module_name, version=resolved_version)
         try:
-            kb.export_report_template(template_name)
+            template_export = kb.export_report_template(template_name)
             validation = kb.evaluate_report_template_validators(
                 template_name, p_examination=payload
             )
-            return _attach_resolved_kb_identity(
+            response = _attach_resolved_kb_identity(
                 validation,
                 module_name=resolved_module_name,
                 version=resolved_version,
             )
+            response["concept_coverage"] = build_report_concept_coverage(
+                kb=cast(Any, kb),
+                requested_template_name=template_name,
+                template_export=template_export,
+                p_examination=payload,
+                validation=validation,
+            ).model_dump(mode="json")
+            return response
         except SemanticAdmissibilityError as exc:
+            raise HttpError(422, str(exc)) from exc
+        except ValueError as exc:
             raise HttpError(422, str(exc)) from exc
         except KeyError as exc:
             raise HttpError(

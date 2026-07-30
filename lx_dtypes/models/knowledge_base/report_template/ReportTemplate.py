@@ -9,6 +9,9 @@ from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict import (
     ReportTemplateDataDict,
 )
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplateCoverage import (
+    ReportTemplateCoverageConcept,
+)
 
 
 class ReportTemplateValidators(BaseModel):
@@ -21,6 +24,9 @@ class ReportTemplateValidators(BaseModel):
 
 class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):
     examination: str
+    version: str | None = None
+    coverage_version: str | None = None
+    coverage_concepts: List[ReportTemplateCoverageConcept] = Field(default_factory=list)
     report_sections: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
     validators: ReportTemplateValidators = Field(
         default_factory=ReportTemplateValidators
