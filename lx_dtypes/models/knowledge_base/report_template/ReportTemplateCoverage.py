@@ -17,6 +17,8 @@ class ReportTemplateCoverageConcept(BaseModel):
     applicability_reason: str | None = None
     validator_names: List[str] = Field(min_length=1)
     evidence_path: List[str] = Field(min_length=1)
+    concept_value_path: List[str] | None = None
+    allowed_values: List[str | int | float | bool] | None = None
 
     @model_validator(mode="after")
     def validate_applicability(self) -> "ReportTemplateCoverageConcept":
@@ -24,4 +26,13 @@ class ReportTemplateCoverageConcept(BaseModel):
             raise ValueError("conditional coverage requires applicability_rule")
         if self.applicability_status == "not_applicable" and not self.applicability_reason:
             raise ValueError("not_applicable coverage requires applicability_reason")
+        if self.applicability_status != "not_applicable":
+            if not self.concept_value_path:
+                raise ValueError(
+                    "applicable coverage requires concept_value_path for semantic value checking"
+                )
+            if not self.allowed_values:
+                raise ValueError(
+                    "applicable coverage requires non-empty allowed_values for semantic value checking"
+                )
         return self

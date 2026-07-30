@@ -48,6 +48,8 @@ class _RuntimeValidationKb:
                     "applicability_status": "required",
                     "validator_names": ["polyp_has_lst_if_large"],
                     "evidence_path": ["patient_findings"],
+                    "concept_value_path": ["examination"],
+                    "allowed_values": ["star_upper_gi_endoscopy"],
                 }
             ],
         }

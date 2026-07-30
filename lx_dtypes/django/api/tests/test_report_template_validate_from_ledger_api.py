@@ -133,6 +133,8 @@ def test_validate_report_template_runtime_from_ledger_success(
                         "applicability_status": "required",
                         "validator_names": ["findings_validator"],
                         "evidence_path": ["patient_findings"],
+                        "concept_value_path": ["examination"],
+                        "allowed_values": ["star_upper_gi_endoscopy"],
                     }
                 ],
             }

@@ -5,6 +5,16 @@ import json
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
+from .ReportConceptCoverage import (
+    REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION,
+    ReportConceptApplicability,
+    ReportConceptCoverage,
+    ReportConceptCoverageIdentity,
+    ReportConceptCoverageItem,
+    ReportConceptCoverageProvenance,
+)
+from .ReportTemplateCoverage import ReportTemplateCoverageConcept
+
 if TYPE_CHECKING:
     from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
@@ -18,17 +28,6 @@ class _CoverageKnowledgeBase(Protocol):
     def config(self) -> _KnowledgeBaseConfig: ...
 
     def model_dump(self, *, mode: str) -> Mapping[str, Any]: ...
-
-from .ReportConceptCoverage import (
-    REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION,
-    ReportConceptApplicability,
-    ReportConceptCoverage,
-    ReportConceptCoverageIdentity,
-    ReportConceptCoverageItem,
-    ReportConceptCoverageProvenance,
-)
-from .ReportTemplateCoverage import ReportTemplateCoverageConcept
-
 
 RESOLVER_NAME = "lx_dtypes.report_concept_coverage"
 RESOLVER_VERSION = "1.0.0"
@@ -88,6 +87,50 @@ def _path_exists(payload: Any, path: Sequence[str]) -> bool:
             continue
         return False
     return True
+
+
+def _path_value(payload: Any, path: Sequence[str]) -> tuple[bool, Any]:
+    current = payload
+    for segment in path:
+        if isinstance(current, Mapping):
+            if segment not in current:
+                return False, None
+            current = current[segment]
+            continue
+        if isinstance(current, Sequence) and not isinstance(current, (str, bytes)):
+            try:
+                current = current[int(segment)]
+            except (IndexError, TypeError, ValueError):
+                return False, None
+            continue
+        return False, None
+    return True, current
+
+
+def _strict_equal(left: Any, right: Any) -> bool:
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, list) and isinstance(right, list):
+        return len(left) == len(right) and all(
+            _strict_equal(left_item, right_item)
+            for left_item, right_item in zip(left, right, strict=True)
+        )
+    return left == right
+
+
+def _value_matches_allowed(value: Any, allowed_values: Sequence[Any]) -> bool | None:
+    if value is None:
+        return None
+    if isinstance(value, list):
+        if not value:
+            return False
+        return all(
+            any(_strict_equal(item, allowed) for allowed in allowed_values)
+            for item in value
+        )
+    if isinstance(value, (Mapping, tuple, set)):
+        return None
+    return any(_strict_equal(value, allowed) for allowed in allowed_values)
 
 
 def _validator_results(validation: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
@@ -178,7 +221,21 @@ def build_report_concept_coverage(
             ):
                 validation_status = "invalid"
             else:
-                validation_status = "present"
+                value_exists, value = _path_value(
+                    payload, concept.concept_value_path or ()
+                )
+                if not value_exists or value is None:
+                    validation_status = "unknown"
+                else:
+                    value_matches = _value_matches_allowed(
+                        value, concept.allowed_values or ()
+                    )
+                    if value_matches is None:
+                        validation_status = "unknown"
+                    elif value_matches:
+                        validation_status = "present"
+                    else:
+                        validation_status = "invalid"
 
         coverage_items.append(
             ReportConceptCoverageItem(
