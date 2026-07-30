@@ -240,7 +240,17 @@ def test_report_template_runtime_validation_api_resolves_current_kb_version(
     }
 
 
-def test_report_template_definition_validation_api() -> None:
+def test_report_template_definition_validation_api(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        api_main, "_authenticate_request_user", lambda request: object()
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_report_template_access_allowed",
+        lambda actor, capability: True,
+    )
     client = Client()
     response = client.get(
         "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate-definition",

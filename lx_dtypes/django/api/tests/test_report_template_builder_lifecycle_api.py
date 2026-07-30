@@ -6,12 +6,26 @@ import pytest
 from pytest import MonkeyPatch
 from typing import Any
 from django.test import Client
+from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api import report_template_builder
 from lx_dtypes.django.api import report_template_routes
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,
     load_knowledge_base,
 )
+
+
+@pytest.fixture(autouse=True)
+def builder_route_authorization(monkeypatch: MonkeyPatch) -> None:
+    """Keep lifecycle tests focused on builder behavior after route auth."""
+    monkeypatch.setattr(
+        api_main, "_authenticate_request_user", lambda request: object()
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_report_template_access_allowed",
+        lambda actor, capability: True,
+    )
 
 
 @pytest.fixture

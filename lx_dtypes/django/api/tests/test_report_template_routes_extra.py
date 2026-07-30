@@ -87,6 +87,79 @@ def client() -> Client:
     return Client()
 
 
+@pytest.fixture(autouse=True)
+def builder_route_authorization(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Allow existing route behavior tests to reach their intended assertions."""
+    monkeypatch.setattr(
+        api_main, "_authenticate_request_user", lambda request: object()
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_report_template_access_allowed",
+        lambda actor, capability: True,
+    )
+
+
+def test_builder_routes_fail_closed_and_separate_read_from_write(
+    client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def authenticate(request: Any) -> str | None:
+        return request.headers.get("X-Test-Actor")
+
+    def authorize(actor: object, capability: str) -> bool:
+        return actor == "writer" or (actor == "reader" and capability.endswith(":read"))
+
+    monkeypatch.setattr(api_main, "_authenticate_request_user", authenticate)
+    monkeypatch.setattr(api_main, "_report_template_access_allowed", authorize)
+
+    anonymous = client.get(
+        "/base_api/report-templates/builder/by-examination/example/colonoscopy",
+        secure=True,
+    )
+    assert anonymous.status_code == 401
+
+    reader_write = client.post(
+        "/base_api/report-templates/builder/templates",
+        data=json.dumps(
+            {
+                "module_name": "missing_module",
+                "file_name": "template",
+                "template_name": "template",
+                "examination": "colonoscopy",
+                "sections": [],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+        headers={"X-Test-Actor": "reader"},
+    )
+    assert reader_write.status_code == 403
+
+    reader_read = client.get(
+        "/base_api/report-templates/example/missing/preview",
+        secure=True,
+        headers={"X-Test-Actor": "reader"},
+    )
+    assert reader_read.status_code == 404
+
+    writer_write = client.post(
+        "/base_api/report-templates/builder/templates",
+        data=json.dumps(
+            {
+                "module_name": "missing_module",
+                "file_name": "template",
+                "template_name": "template",
+                "examination": "colonoscopy",
+                "sections": [],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+        headers={"X-Test-Actor": "writer"},
+    )
+    assert writer_write.status_code == 400
+
+
 def test_save_report_template_returns_400_for_unknown_module(client: Client) -> None:
     response = client.post(
         "/base_api/report-templates/builder/templates",

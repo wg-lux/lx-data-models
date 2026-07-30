@@ -15,6 +15,7 @@ from typing import (
     Set,
     TypeVar,
     cast,
+    Literal,
     runtime_checkable,
 )
 
@@ -126,6 +127,8 @@ def _persist_patient_examination_dtypes_record(
 
 
 def _authenticate_request_user(request: BaseRequest) -> Any | None:
+    if not _host_integration_is_configured():
+        return None
     authenticate = getattr(_host_models_module(), "authenticate_request_user", None)
     if callable(authenticate):
         return authenticate(request)
@@ -164,6 +167,16 @@ def _patient_findings_queryset_for_request(request: BaseRequest) -> Any:
 def _terminology_write_access_allowed(actor: object) -> bool:
     authorize = getattr(_host_models_module(), "terminology_write_access_allowed", None)
     return bool(callable(authorize) and authorize(actor))
+
+
+def _report_template_access_allowed(
+    actor: object,
+    capability: Literal["report_template:read", "report_template:write"],
+) -> bool:
+    if not _host_integration_is_configured():
+        return False
+    authorize = getattr(_host_models_module(), "report_template_access_allowed", None)
+    return bool(callable(authorize) and authorize(actor, capability))
 
 
 class StructuredApiError(Exception):
@@ -625,6 +638,10 @@ register_report_template_routes(
     ),
     persist_patient_examination_dtypes_record=lambda *args, **kwargs: (
         _persist_patient_examination_dtypes_record(*args, **kwargs)
+    ),
+    authenticate_request_user=lambda request: _authenticate_request_user(request),
+    report_template_access_allowed=lambda actor, capability: (
+        _report_template_access_allowed(actor, capability)
     ),
 )
 
