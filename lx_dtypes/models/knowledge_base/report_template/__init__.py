@@ -123,6 +123,17 @@ from .ReportTemplateSectionDataDict import (
     ReportTemplateSectionDataDict,
     ReportTemplateSectionFieldDataDict,
 )
+from .ReportConceptCoverage import (
+    REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION,
+    ReportConceptApplicability,
+    ReportConceptApplicabilityStatus,
+    ReportConceptCoverage,
+    ReportConceptCoverageContractVersion,
+    ReportConceptCoverageIdentity,
+    ReportConceptCoverageItem,
+    ReportConceptCoverageProvenance,
+    ReportConceptValidationStatus,
+)
 from .ValidatorRuntime import (
     ClassificationValidatorExecutionDataDict,
     InterventionValidatorExecutionDataDict,
@@ -230,6 +241,15 @@ __all__ = [
     "ReportTemplateSectionDataDict",
     "ReportTemplateSectionField",
     "ReportTemplateSectionFieldDataDict",
+    "REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION",
+    "ReportConceptApplicability",
+    "ReportConceptApplicabilityStatus",
+    "ReportConceptCoverage",
+    "ReportConceptCoverageContractVersion",
+    "ReportConceptCoverageIdentity",
+    "ReportConceptCoverageItem",
+    "ReportConceptCoverageProvenance",
+    "ReportConceptValidationStatus",
     "ReportFinding",
     "ReportFindingDataDict",
     "ReportTemplateClassificationRequirement",
