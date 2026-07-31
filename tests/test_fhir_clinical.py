@@ -85,7 +85,11 @@ def test_clinical_fixture_observation_components_roundtrip_through_lxdm() -> Non
             "interventions": [],
         }
     ]
-    assert exported[0]["component"][0]["valueQuantity"] == {
+    components = exported[0].get("component")
+    assert isinstance(components, list)
+    first_component = components[0]
+    assert isinstance(first_component, dict)
+    assert first_component["valueQuantity"] == {
         "value": 13.4,
         "unit": "g/dL",
         "system": "http://unitsofmeasure.org",

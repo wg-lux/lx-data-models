@@ -1685,9 +1685,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 f"Unknown model type: {field_model_name}"
             )
             field_model_name = cast(KB_MODEL_NAMES_LITERAL, field_model_name)
-            TargetModel: type[KB_MODELS] = knowledge_base_models_lookup[
-                field_model_name
-            ]
+            TargetModel = cast(
+                type[KB_MODELS], knowledge_base_models_lookup[field_model_name]
+            )
 
             current_models = dict(getattr(self, field_name))
             other_models = getattr(other, field_name)
