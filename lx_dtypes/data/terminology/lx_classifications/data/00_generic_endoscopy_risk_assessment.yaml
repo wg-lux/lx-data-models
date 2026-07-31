@@ -1,0 +1,234 @@
+- model: classification
+  name: "endoscopy_risk_assessment_time"
+  name_de: "Zeitpunkt des Risikoassessments"
+  name_en: "Risk-assessment time"
+  classification_types: []
+  classification_choices: [endoscopy_risk_assessment_time_recorded]
+- model: classification
+  name: "risk_assessment_protocol_version"
+  name_de: "Checkliste oder Verfahrensversion"
+  name_en: "Risk-assessment checklist or protocol version"
+  classification_types: []
+  classification_choices: [risk_assessment_protocol_version_recorded]
+
+- model: classification
+  name: "patient_record_and_required_documents_review_status"
+  name_de: "Prüfstatus von Patientenakte und Dokumenten"
+  name_en: "Patient-record and required-documents review status"
+  classification_types: []
+  classification_choices: &complete_choices
+    - assessment_confirmed_complete
+    - assessment_incomplete
+    - assessment_not_assessed
+    - unknown
+- model: classification
+  name: "required_laboratory_and_prior_result_review_status"
+  name_de: "Prüfstatus erforderlicher Laborwerte und Vorbefunde"
+  name_en: "Required laboratory and prior-result review status"
+  classification_types: []
+  classification_choices:
+    - assessment_no_items_required
+    - assessment_required_items_available
+    - assessment_required_items_missing
+    - assessment_not_assessed
+    - unknown
+- model: classification
+  name: "procedure_preparation_review_status"
+  name_de: "Prüfstatus der Patientenvorbereitung"
+  name_en: "Procedure-preparation review status"
+  classification_types: []
+  classification_choices: *complete_choices
+- model: classification
+  name: "fasting_requirement_review_status"
+  name_de: "Prüfstatus der Nüchternheitsanforderung"
+  name_en: "Fasting-requirement review status"
+  classification_types: []
+  classification_choices:
+    - fasting_requirement_confirmed_met
+    - fasting_requirement_not_met
+    - assessment_not_applicable
+    - assessment_not_assessed
+    - unknown
+- model: classification
+  name: "asa_review_status"
+  name_de: "Prüfstatus der ASA-Klassifikation"
+  name_en: "ASA review status"
+  classification_types: []
+  classification_choices:
+    - asa_current_class_reviewed
+    - assessment_not_assessed
+    - assessment_not_applicable
+    - unknown
+- model: classification
+  name: "airway_risk_review_status"
+  name_de: "Prüfstatus des Atemwegsrisikos"
+  name_en: "Airway-risk review status"
+  classification_types: []
+  classification_choices: &review_choices
+    - assessment_reviewed_none_identified
+    - assessment_reviewed_present
+    - assessment_not_assessed
+    - unknown
+- model: classification
+  name: "mallampati_review_status"
+  name_de: "Prüfstatus der Mallampati-Beurteilung"
+  name_en: "Mallampati review status"
+  classification_types: []
+  classification_choices:
+    - mallampati_assessment_reviewed
+    - assessment_not_assessed
+    - assessment_not_applicable
+    - unknown
+- model: classification
+  name: "cardiopulmonary_risk_review_status"
+  name_de: "Prüfstatus kardiopulmonaler Risiken"
+  name_en: "Cardiopulmonary-risk review status"
+  classification_types: []
+  classification_choices: *review_choices
+- model: classification
+  name: "medication_review_status"
+  name_de: "Prüfstatus der aktuellen Medikation"
+  name_en: "Medication-review status"
+  classification_types: []
+  classification_choices:
+    - medication_reviewed_none_relevant
+    - medication_reviewed_relevant_present
+    - assessment_not_assessed
+    - unknown
+- model: classification
+  name: "antithrombotic_management_review_status"
+  name_de: "Prüfstatus des Managements gerinnungshemmender Medikation"
+  name_en: "Antithrombotic-management review status"
+  classification_types: []
+  classification_choices:
+    - anticoagulant_management_not_applicable
+    - anticoagulant_management_plan_documented
+    - antithrombotic_management_plan_missing
+    - assessment_not_assessed
+    - unknown
+- model: classification
+  name: "antibiotic_prophylaxis_assessment_status"
+  name_de: "Prüfstatus der Antibiotikaprophylaxe"
+  name_en: "Antibiotic-prophylaxis assessment status"
+  classification_types: []
+  classification_choices:
+    - antibiotic_prophylaxis_not_indicated
+    - antibiotic_prophylaxis_plan_documented
+    - antibiotic_prophylaxis_plan_missing
+    - assessment_not_assessed
+    - unknown
+- model: classification
+  name: "allergy_review_status"
+  name_de: "Prüfstatus von Allergien"
+  name_en: "Allergy-review status"
+  classification_types: []
+  classification_choices: *review_choices
+- model: classification
+  name: "infection_review_status"
+  name_de: "Prüfstatus von Infektionen"
+  name_en: "Infection-review status"
+  classification_types: []
+  classification_choices: *review_choices
+- model: classification
+  name: "dental_status_review_status"
+  name_de: "Prüfstatus des Zahnstatus"
+  name_en: "Dental-status review status"
+  classification_types: []
+  classification_choices:
+    - dental_status_assessed_no_relevant_issue
+    - dental_status_assessed_issue_present
+    - assessment_not_applicable
+    - assessment_not_assessed
+    - unknown
+- model: classification
+  name: "glaucoma_review_status"
+  name_de: "Prüfstatus eines Glaukoms"
+  name_en: "Glaucoma-review status"
+  classification_types: []
+  classification_choices: *review_choices
+
+- model: classification
+  name: "asa_physical_status_classification"
+  name_de: "ASA-Klassifikation"
+  name_en: "ASA physical status classification"
+  classification_types: []
+  classification_choices:
+    - asa_class_i
+    - asa_class_ii
+    - asa_class_iii
+    - asa_class_iv
+    - asa_class_v
+    - asa_class_vi
+    - asa_class_not_assessed
+    - unknown
+- model: classification
+  name: "mallampati_airway_classification"
+  name_de: "Mallampati-Klassifikation"
+  name_en: "Mallampati airway classification"
+  classification_types: []
+  classification_choices:
+    - mallampati_class_i
+    - mallampati_class_ii
+    - mallampati_class_iii
+    - mallampati_class_iv
+    - mallampati_class_not_assessed
+    - unknown
+
+- model: classification
+  name: "preprocedure_physical_assessment_time"
+  name_de: "Zeitpunkt der körperlichen Untersuchung"
+  name_en: "Pre-procedure physical-assessment time"
+  classification_types: []
+  classification_choices: [preprocedure_physical_assessment_time_recorded]
+- model: classification
+  name: "preprocedure_heart_rate"
+  name_de: "Präprozedurale Herzfrequenz"
+  name_en: "Pre-procedure heart rate"
+  classification_types: []
+  classification_choices: [preprocedure_heart_rate_recorded]
+- model: classification
+  name: "preprocedure_systolic_blood_pressure"
+  name_de: "Präprozeduraler systolischer Blutdruck"
+  name_en: "Pre-procedure systolic blood pressure"
+  classification_types: []
+  classification_choices: [preprocedure_systolic_blood_pressure_recorded]
+- model: classification
+  name: "preprocedure_diastolic_blood_pressure"
+  name_de: "Präprozeduraler diastolischer Blutdruck"
+  name_en: "Pre-procedure diastolic blood pressure"
+  classification_types: []
+  classification_choices: [preprocedure_diastolic_blood_pressure_recorded]
+- model: classification
+  name: "preprocedure_oxygen_saturation"
+  name_de: "Präprozedurale Sauerstoffsättigung"
+  name_en: "Pre-procedure oxygen saturation"
+  classification_types: []
+  classification_choices: [preprocedure_oxygen_saturation_recorded]
+- model: classification
+  name: "preprocedure_cardiac_auscultation_status"
+  name_de: "Status der Herzauskultation"
+  name_en: "Pre-procedure cardiac-auscultation status"
+  classification_types: []
+  classification_choices: &auscultation_choices
+    - auscultation_no_relevant_abnormality
+    - auscultation_abnormality_documented
+    - auscultation_not_assessed
+    - unknown
+- model: classification
+  name: "preprocedure_pulmonary_auscultation_status"
+  name_de: "Status der Lungenauskultation"
+  name_en: "Pre-procedure pulmonary-auscultation status"
+  classification_types: []
+  classification_choices: *auscultation_choices
+- model: classification
+  name: "last_oral_intake_time"
+  name_de: "Zeitpunkt der letzten Nahrungs- oder Flüssigkeitsaufnahme"
+  name_en: "Last oral-intake time"
+  classification_types: []
+  classification_choices: [last_oral_intake_time_recorded]
+- model: classification
+  name: "last_oral_intake_type"
+  name_de: "Art der letzten Nahrungs- oder Flüssigkeitsaufnahme"
+  name_en: "Last oral-intake type"
+  classification_types: []
+  classification_choices: [last_oral_intake_type_recorded]

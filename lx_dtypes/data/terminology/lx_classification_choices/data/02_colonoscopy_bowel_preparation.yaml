@@ -1,23 +1,63 @@
 # Boston
 - model: classification_choice
   name: "bowel_prep_boston_0"
-  # name_de: "0"
+  name_de: "0 – nicht beurteilbar"
   # name_en: "bowel_prep_boston_0"
 
 - model: classification_choice
   name: "bowel_prep_boston_1"
-  # name_de: "1"
+  name_de: "1 – teilweise einsehbar"
   # name_en: "bowel_prep_boston_1"
 
 - model: classification_choice
   name: "bowel_prep_boston_2"
-  # name_de: "2"
+  name_de: "2 – gut einsehbar"
   # name_en: "bowel_prep_boston_2"
 
 - model: classification_choice
   name: "bowel_prep_boston_3"
-  # name_de: "3"
+  name_de: "3 – vollständig einsehbar"
   # name_en: "bowel_prep_boston_3"
+
+- model: classification_choice
+  name: "bbps_total_0"
+  name_de: "BBPS-Gesamtwert 0"
+
+- model: classification_choice
+  name: "bbps_total_1"
+  name_de: "BBPS-Gesamtwert 1"
+
+- model: classification_choice
+  name: "bbps_total_2"
+  name_de: "BBPS-Gesamtwert 2"
+
+- model: classification_choice
+  name: "bbps_total_3"
+  name_de: "BBPS-Gesamtwert 3"
+
+- model: classification_choice
+  name: "bbps_total_4"
+  name_de: "BBPS-Gesamtwert 4"
+
+- model: classification_choice
+  name: "bbps_total_5"
+  name_de: "BBPS-Gesamtwert 5"
+
+- model: classification_choice
+  name: "bbps_total_6"
+  name_de: "BBPS-Gesamtwert 6"
+
+- model: classification_choice
+  name: "bbps_total_7"
+  name_de: "BBPS-Gesamtwert 7"
+
+- model: classification_choice
+  name: "bbps_total_8"
+  name_de: "BBPS-Gesamtwert 8"
+
+- model: classification_choice
+  name: "bbps_total_9"
+  name_de: "BBPS-Gesamtwert 9"
 
 # Aronchick
 - model: classification_choice

@@ -1,0 +1,75 @@
+- model: finding
+  name: "endoscopy_sedation_monitoring_measurement"
+  name_de: "Vitalparametermessung während der Sedierung"
+  name_en: "Vital-sign measurement during sedation"
+  description: "Ein zeitlich zugeordneter Satz aus Herzfrequenz, Blutdruck und Sauerstoffsättigung gemäß AWMF 021-014, Empfehlung 5.10; für weitere Messzeitpunkte wird der Befund wiederholt."
+  finding_types:
+    - baseline
+  classifications:
+    - sedation_monitoring_time
+    - sedation_heart_rate
+    - sedation_systolic_blood_pressure
+    - sedation_diastolic_blood_pressure
+    - sedation_oxygen_saturation
+
+- model: finding
+  name: "endoscopy_supplemental_oxygen_administration"
+  name_de: "Sauerstoffgabe während der Endoskopie"
+  name_en: "Supplemental oxygen administration during endoscopy"
+  description: "Applikationsform und Flussrate der Sauerstoffgabe; bei sedierten Patienten empfiehlt AWMF 021-014 prophylaktischen Sauerstoff über eine Nasensonde."
+  finding_types:
+    - baseline
+  classifications:
+    - supplemental_oxygen_delivery_and_flow
+
+- model: finding
+  name: "endoscopy_intravenous_fluid_status"
+  name_de: "Status intravenöser Flüssigkeitsgabe"
+  name_en: "Intravenous fluid administration status"
+  description: "Explizite Dokumentation, ob während der Sedierung intravenöse Flüssigkeit verabreicht wurde."
+  finding_types:
+    - baseline
+  classifications:
+    - intravenous_fluid_documentation_status
+
+- model: finding
+  name: "endoscopy_intravenous_fluid_administration"
+  name_de: "Intravenöse Flüssigkeitsgabe während der Endoskopie"
+  name_en: "Intravenous fluid administration during endoscopy"
+  description: "Eine einzelne zeitabhängige intravenöse Flüssigkeitsgabe mit Art und Volumen; für weitere Gaben wird der Befund wiederholt."
+  finding_types:
+    - baseline
+  classifications:
+    - intravenous_fluid_type_and_volume
+    - intravenous_fluid_administration_time
+
+- model: finding
+  name: "endoscopy_post_sedation_recovery_assessment"
+  name_de: "Erholungsbeurteilung nach Sedierung"
+  name_en: "Post-sedation recovery assessment"
+  description: "Ein zeitlich zugeordneter Satz aus Vitalzeichen und Orientierungsstatus während der postinterventionellen Überwachung; für weitere Beurteilungen wird der Befund wiederholt."
+  finding_types:
+    - baseline
+  classifications:
+    - sedation_monitoring_time
+    - sedation_heart_rate
+    - sedation_systolic_blood_pressure
+    - sedation_diastolic_blood_pressure
+    - sedation_oxygen_saturation
+    - post_sedation_orientation_status
+
+- model: finding
+  name: "endoscopy_post_sedation_discharge_or_transfer_assessment"
+  name_de: "Abschlussbeurteilung vor Entlassung oder Übergabe nach Sedierung"
+  name_en: "Final post-sedation discharge or transfer assessment"
+  description: "Abschließende, zeitlich zugeordnete Dokumentation von Vitalzeichen, Orientierungsstatus und Disposition vor Entlassung oder Übergabe aus dem Aufwachbereich."
+  finding_types:
+    - baseline
+  classifications:
+    - sedation_monitoring_time
+    - sedation_heart_rate
+    - sedation_systolic_blood_pressure
+    - sedation_diastolic_blood_pressure
+    - sedation_oxygen_saturation
+    - post_sedation_orientation_status
+    - post_sedation_disposition

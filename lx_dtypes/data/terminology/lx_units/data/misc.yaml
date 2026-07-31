@@ -1,5 +1,16 @@
 - model: unit
 
+  name: "unknown"
+  abbreviation: ""
+  name_de: "Keine Einheit angegeben"
+  name_en: "No unit specified"
+  description: >-
+    Sentinel for descriptors to which no physical unit applies or whose unit
+    has not been specified. Numeric descriptors should reference a concrete
+    unit instead.
+
+- model: unit
+
   name: "percent"
   abbreviation: "%"
   name_de: "Prozent"

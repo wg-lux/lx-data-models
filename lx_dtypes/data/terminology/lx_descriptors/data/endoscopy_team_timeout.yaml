@@ -1,0 +1,11 @@
+- model: classification_choice_descriptor
+  name: "endoscopy_team_timeout_time_value"
+  description: "Uhrzeitgenauer Zeitpunkt des Team-Time-outs unmittelbar vor dem endoskopischen Eingriff."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "endoscopy_sign_out_time_value"
+  description: "Uhrzeitgenauer Zeitpunkt des Sign-outs unmittelbar nach dem endoskopischen Eingriff."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32

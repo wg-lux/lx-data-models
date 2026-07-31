@@ -1,5 +1,7 @@
 - model: classification_choice_descriptor
   name: "minutes_numeric_value"
-  description: "Numeric value representing minutes."
+  description: "Numerischer Zeitwert in Minuten."
   unit: "minutes"
   classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 180

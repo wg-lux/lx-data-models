@@ -8,7 +8,9 @@
 
 - model: finding
   name: "sedation_endoscopy"
-  description: "Sedation during an examination"
+  name_de: "Sedierung bei der Endoskopie"
+  name_en: "Sedation during endoscopy"
+  description: "Zusammenfassende Dokumentation, ob eine Sedierung durchgeführt wurde und welches Sedierungsverfahren verwendet wurde."
   finding_types:
     - baseline
   classifications:

@@ -1,0 +1,110 @@
+- model: classification
+  name: "medication_administration_time"
+  name_de: "Zeitpunkt der Medikamentengabe"
+  name_en: "Medication administration time"
+  description: "Zeitpunkt der einzelnen Medikamentengabe für eine zeitabhängige Dokumentation."
+  classification_types: []
+  classification_choices:
+    - medication_administration_time_recorded
+
+- model: classification
+  name: "sedation_monitoring_time"
+  name_de: "Zeitpunkt der Vitalparametermessung"
+  name_en: "Sedation monitoring time"
+  classification_types: []
+  classification_choices:
+    - sedation_monitoring_time_recorded
+
+- model: classification
+  name: "sedation_heart_rate"
+  name_de: "Herzfrequenz"
+  name_en: "Heart rate"
+  classification_types: []
+  classification_choices:
+    - sedation_heart_rate_recorded
+
+- model: classification
+  name: "sedation_systolic_blood_pressure"
+  name_de: "Systolischer Blutdruck"
+  name_en: "Systolic blood pressure"
+  classification_types: []
+  classification_choices:
+    - sedation_systolic_blood_pressure_recorded
+
+- model: classification
+  name: "sedation_diastolic_blood_pressure"
+  name_de: "Diastolischer Blutdruck"
+  name_en: "Diastolic blood pressure"
+  classification_types: []
+  classification_choices:
+    - sedation_diastolic_blood_pressure_recorded
+
+- model: classification
+  name: "sedation_oxygen_saturation"
+  name_de: "Sauerstoffsättigung"
+  name_en: "Oxygen saturation"
+  classification_types: []
+  classification_choices:
+    - sedation_oxygen_saturation_recorded
+
+- model: classification
+  name: "supplemental_oxygen_delivery_and_flow"
+  name_de: "Sauerstoffapplikation und Flussrate"
+  name_en: "Supplemental oxygen delivery and flow rate"
+  description: "Applikationsform und dokumentierte Flussrate der Sauerstoffgabe."
+  classification_types: []
+  classification_choices:
+    - oxygen_delivery_nasal_cannula
+    - oxygen_delivery_face_mask
+    - oxygen_delivery_other
+
+- model: classification
+  name: "intravenous_fluid_documentation_status"
+  name_de: "Dokumentationsstatus intravenöser Flüssigkeit"
+  name_en: "Intravenous fluid documentation status"
+  classification_types: []
+  classification_choices:
+    - documented_none
+    - documented_present
+    - documented_unknown
+
+- model: classification
+  name: "intravenous_fluid_type_and_volume"
+  name_de: "Intravenöse Flüssigkeit und Volumen"
+  name_en: "Intravenous fluid type and volume"
+  classification_types: []
+  classification_choices:
+    - intravenous_fluid_balanced_crystalloid
+    - intravenous_fluid_sodium_chloride_0_9_percent
+    - intravenous_fluid_glucose_solution
+    - intravenous_fluid_other
+
+- model: classification
+  name: "intravenous_fluid_administration_time"
+  name_de: "Zeitpunkt der intravenösen Flüssigkeitsgabe"
+  name_en: "Intravenous fluid administration time"
+  classification_types: []
+  classification_choices:
+    - intravenous_fluid_administration_time_recorded
+
+- model: classification
+  name: "post_sedation_orientation_status"
+  name_de: "Orientierungsstatus nach Sedierung"
+  name_en: "Post-sedation orientation status"
+  description: "Dokumentierter Wachheits- und Orientierungsstatus bei einer postinterventionellen Erholungsbeurteilung."
+  classification_types: []
+  classification_choices:
+    - post_sedation_fully_oriented
+    - post_sedation_not_fully_oriented
+    - post_sedation_orientation_not_assessed
+
+- model: classification
+  name: "post_sedation_disposition"
+  name_de: "Disposition nach Sedierung"
+  name_en: "Post-sedation disposition"
+  description: "Dokumentierter Status der Entlassung, Übergabe oder fortgesetzten Überwachung nach Sedierung."
+  classification_types: []
+  classification_choices:
+    - post_sedation_outpatient_discharge
+    - post_sedation_inpatient_transfer
+    - post_sedation_continued_recovery_monitoring

@@ -6,12 +6,16 @@
 
 - model: classification_choice
   name: "sedation_propofol"
+  name_de: "Propofol"
 
 - model: classification_choice
   name: "sedation_midazolam"
+  name_de: "Midazolam"
 
 - model: classification_choice
   name: "sedation_propofol_midazolam"
+  name_de: "Propofol und Midazolam"
 
 - model: classification_choice
   name: "sedation_other"
+  name_de: "Anderes Sedierungsverfahren"

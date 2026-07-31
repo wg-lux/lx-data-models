@@ -7,6 +7,7 @@
     [
       "terminal_ileum",
       "cecum",
+      "ileocolonic_anastomosis",
       "ascending_colon",
       "right_flexure",
       "transverse_colon",
@@ -67,6 +68,8 @@
 
 - model: classification
   name: "colonoscopy_not_complete_reason"
+  name_de: "Grund der inkompletten Koloskopie"
+  name_en: "Reason for incomplete colonoscopy"
   classification_types: []
   classification_choices:
     [
@@ -76,3 +79,173 @@
       "colonoscopy_incomplete_stenosis",
       "colonoscopy_incomplete_other",
     ]
+
+- model: classification
+  name: "appendiceal_orifice_photodocumented"
+  name_de: "Appendixostium fotodokumentiert"
+  name_en: "Appendiceal orifice photo documented"
+  classification_types: []
+  classification_choices: ["yes", "no", "unknown"]
+
+- model: classification
+  name: "ileocecal_valve_photodocumented"
+  name_de: "Ileozökalklappe fotodokumentiert"
+  name_en: "Ileocecal valve photo documented"
+  classification_types: []
+  classification_choices: ["yes", "no", "unknown"]
+
+- model: classification
+  name: "hd_videoendoscope_used"
+  name_de: "Hochauflösendes Videoendoskop verwendet"
+  name_en: "High-definition video endoscope used"
+  classification_types: []
+  classification_choices: ["yes", "no", "unknown"]
+
+- model: classification
+  name: "co2_insufflation_used"
+  name_de: "CO₂-Insufflation verwendet"
+  name_en: "Carbon dioxide insufflation used"
+  classification_types: []
+  classification_choices: ["yes", "no", "unknown"]
+
+- model: classification
+  name: "colonoscopy_complication_occurred"
+  name_de: "Komplikation aufgetreten"
+  name_en: "Colonoscopy complication occurred"
+  classification_types: []
+  classification_choices:
+    - documented_none
+    - documented_present
+    - documented_unknown
+
+- model: classification
+  name: "bowel_prep_boston_total"
+  name_de: "BBPS-Gesamtwert"
+  name_en: "BBPS total score"
+  classification_types: ["bowel_prep"]
+  classification_choices:
+    - bbps_total_0
+    - bbps_total_1
+    - bbps_total_2
+    - bbps_total_3
+    - bbps_total_4
+    - bbps_total_5
+    - bbps_total_6
+    - bbps_total_7
+    - bbps_total_8
+    - bbps_total_9
+
+- model: classification
+  name: "withdrawal_time_quality_exception"
+  name_de: "Begründung bei Rückzugszeit unter sechs Minuten"
+  name_en: "Reason for withdrawal time below six minutes"
+  classification_types: []
+  classification_choices:
+    - withdrawal_time_exception_documented
+
+- model: classification
+  name: "appendiceal_orifice_image_reference"
+  name_de: "Bildreferenz Appendixostium"
+  name_en: "Appendiceal orifice image reference"
+  classification_types: []
+  classification_choices:
+    - image_reference_documented
+
+- model: classification
+  name: "ileocecal_valve_image_reference"
+  name_de: "Bildreferenz Ileozökalklappe"
+  name_en: "Ileocecal valve image reference"
+  classification_types: []
+  classification_choices:
+    - image_reference_documented
+
+- model: classification
+  name: "colonoscopy_pathology_status"
+  name_de: "Pathologischer Befund"
+  name_en: "Pathological finding status"
+  classification_types: []
+  classification_choices:
+    - documented_none
+    - documented_present
+    - documented_unknown
+
+- model: classification
+  name: "colonoscopy_follow_up_recommendation"
+  name_de: "Weiterbehandlung und Verlaufskontrolle"
+  name_en: "Follow-up recommendation"
+  classification_types: []
+  classification_choices:
+    - recommendation_no_follow_up
+    - recommendation_follow_up
+    - recommendation_clinical_follow_up
+    - recommendation_pending_histology
+
+- model: classification
+  name: "colonoscopy_early_repeat_plan"
+  name_de: "Frühe Wiederholung bei inadäquater Vorbereitung"
+  name_en: "Early repeat plan after inadequate preparation"
+  classification_types: []
+  classification_choices:
+    - repeat_within_one_year
+    - repeat_exception_documented
+
+- model: classification
+  name: "colonoscopy_specimen_retrieval_status"
+  name_de: "Präparatebergung"
+  name_en: "Specimen retrieval status"
+  classification_types: []
+  classification_choices:
+    - specimen_retrieved
+    - specimen_not_retrieved_reason_documented
+
+- model: classification
+  name: "colonoscopy_histology_submission_status"
+  name_de: "Histologieeinsendung"
+  name_en: "Histology submission status"
+  classification_types: []
+  classification_choices:
+    - histology_submitted
+    - histology_not_applicable
+
+- model: classification
+  name: "colonoscopy_resection_technique_status"
+  name_de: "Resektionstechnik"
+  name_en: "Resection technique status"
+  classification_types: []
+  classification_choices:
+    - resection_technique_documented
+
+- model: classification
+  name: "colonoscopy_complication_phase"
+  name_de: "Zeitpunkt der Komplikation"
+  name_en: "Complication phase"
+  classification_types: []
+  classification_choices:
+    - complication_phase_intraprocedural
+    - complication_phase_postprocedural
+
+- model: classification
+  name: "colonoscopy_complication_severity"
+  name_de: "Schweregrad der Komplikation"
+  name_en: "Complication severity"
+  classification_types: []
+  classification_choices:
+    - complication_severity_mild
+    - complication_severity_moderate
+    - complication_severity_severe
+
+- model: classification
+  name: "colonoscopy_complication_management"
+  name_de: "Maßnahmen bei Komplikation"
+  name_en: "Complication management"
+  classification_types: []
+  classification_choices:
+    - complication_management_documented
+
+- model: classification
+  name: "colonoscopy_complication_outcome"
+  name_de: "Ausgang der Komplikation"
+  name_en: "Complication outcome"
+  classification_types: []
+  classification_choices:
+    - complication_outcome_documented

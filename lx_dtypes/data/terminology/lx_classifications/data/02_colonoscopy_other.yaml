@@ -1,5 +1,7 @@
 - model: classification
   name: "hemorrhoids_grade"
+  name_de: "Hämorrhoidengrad"
+  name_en: "Hemorrhoid grade"
   classification_types: []
   classification_choices:
     [

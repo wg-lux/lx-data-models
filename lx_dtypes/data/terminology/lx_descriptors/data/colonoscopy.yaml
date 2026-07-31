@@ -1,0 +1,7 @@
+- model: classification_choice_descriptor
+  name: "lesion_size_mm_value"
+  description: "Größter Durchmesser der Läsion in Millimetern."
+  classification_choice_descriptor_type: "numeric"
+  unit: "milimeter"
+  numeric_min: 0
+  numeric_max: 200

@@ -1,0 +1,52 @@
+- model: classification_choice_descriptor
+  name: "endoscopy_risk_assessment_time_value"
+  description: "Uhrzeitgenauer Zeitpunkt des standardisierten Risikoassessments vor dem endoskopischen Eingriff."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "risk_assessment_protocol_version_value"
+  description: "Bezeichnung und Version der für das standardisierte Risikoassessment verwendeten Checkliste oder Verfahrensanweisung."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 128
+
+- model: classification_choice_descriptor
+  name: "preprocedure_physical_assessment_time_value"
+  description: "Uhrzeitgenauer Zeitpunkt der körperlichen Untersuchung vor der Sedierung."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+- model: classification_choice_descriptor
+  name: "preprocedure_heart_rate_value"
+  description: "Herzfrequenz bei der präprozeduralen körperlichen Untersuchung."
+  unit: "beats_per_minute"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+- model: classification_choice_descriptor
+  name: "preprocedure_systolic_blood_pressure_value"
+  description: "Systolischer Blutdruck bei der präprozeduralen körperlichen Untersuchung."
+  unit: "millimeter_mercury"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+- model: classification_choice_descriptor
+  name: "preprocedure_diastolic_blood_pressure_value"
+  description: "Diastolischer Blutdruck bei der präprozeduralen körperlichen Untersuchung."
+  unit: "millimeter_mercury"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+- model: classification_choice_descriptor
+  name: "preprocedure_oxygen_saturation_value"
+  description: "Pulsoxymetrische Sauerstoffsättigung bei der präprozeduralen körperlichen Untersuchung."
+  unit: "percent"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 100
+- model: classification_choice_descriptor
+  name: "last_oral_intake_time_value"
+  description: "Dokumentierter Zeitpunkt der letzten Nahrungs- oder Flüssigkeitsaufnahme."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+- model: classification_choice_descriptor
+  name: "last_oral_intake_type_value"
+  description: "Dokumentierte Art der letzten Nahrungs- oder Flüssigkeitsaufnahme."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 128

@@ -43,13 +43,13 @@
 # Circularity of lesions
 - model: classification_choice
   name: "lesion_circularity_false"
-  # name_de: "Zirkularität"
+  name_de: "Nicht zirkulär"
   # name_en: "Circularity"
   description: "Category for non-circular lesions"
 
 - model: classification_choice
   name: "lesion_circularity_true"
-  # name_de: "Zirkularität"
+  name_de: "Zirkulär"
   # name_en: "Circularity"
 #   description: "Category for circular lesions"
 #   numerical_descriptors:
@@ -75,9 +75,11 @@
 # # Size of oval lesions
 - model: classification_choice
   name: "lesion_size_oval_mm"
-  # name_de: "Größe Ovaler Läsionen (mm)"
+  name_de: "Größter Durchmesser in Millimetern"
   # name_en: "Size of Oval Lesions (mm)"
   description: "oval lesions"
+  classification_choice_descriptors:
+    - lesion_size_mm_value
 #   numerical_descriptors:
 #     largest_diameter_mm:
 #       unit: "mm"
@@ -113,13 +115,13 @@
 # Surface of lesions
 - model: classification_choice
   name: "lesion_surface_intact"
-  # name_de: "Oberfläche intakt"
+  name_de: "Oberfläche intakt"
   # name_en: "surface intact"
   description: "Category for intact lesion surfaces"
 # eroded
 - model: classification_choice
   name: "lesion_surface_eroded"
-  # name_de: "Oberfläche erodiert"
+  name_de: "Oberfläche erodiert"
   # name_en: "surface eroded"
   description: "Category for eroded lesion surfaces"
   # subcategories:
@@ -132,7 +134,7 @@
 # ulcerated
 - model: classification_choice
   name: "lesion_surface_ulcerated"
-  # name_de: "Oberfläche ulzeriert"
+  name_de: "Oberfläche ulzeriert"
   # name_en: "surface ulcerated"
   description: "Category for ulcerated lesion surfaces"
   # subcategories:

@@ -1,0 +1,212 @@
+- model: classification_choice
+  name: "endoscopy_risk_assessment_time_recorded"
+  name_de: "Zeitpunkt des Risikoassessments dokumentiert"
+  name_en: "Risk-assessment time recorded"
+  classification_choice_descriptors:
+    - endoscopy_risk_assessment_time_value
+
+- model: classification_choice
+  name: "asa_class_i"
+  name_de: "ASA I"
+  name_en: "ASA I"
+- model: classification_choice
+  name: "asa_class_ii"
+  name_de: "ASA II"
+  name_en: "ASA II"
+- model: classification_choice
+  name: "asa_class_iii"
+  name_de: "ASA III"
+  name_en: "ASA III"
+- model: classification_choice
+  name: "asa_class_iv"
+  name_de: "ASA IV"
+  name_en: "ASA IV"
+- model: classification_choice
+  name: "asa_class_v"
+  name_de: "ASA V"
+  name_en: "ASA V"
+- model: classification_choice
+  name: "asa_class_vi"
+  name_de: "ASA VI"
+  name_en: "ASA VI"
+- model: classification_choice
+  name: "asa_class_not_assessed"
+  name_de: "ASA-Klasse nicht erhoben"
+  name_en: "ASA class not assessed"
+
+- model: classification_choice
+  name: "mallampati_class_i"
+  name_de: "Mallampati I"
+  name_en: "Mallampati I"
+- model: classification_choice
+  name: "mallampati_class_ii"
+  name_de: "Mallampati II"
+  name_en: "Mallampati II"
+- model: classification_choice
+  name: "mallampati_class_iii"
+  name_de: "Mallampati III"
+  name_en: "Mallampati III"
+- model: classification_choice
+  name: "mallampati_class_iv"
+  name_de: "Mallampati IV"
+  name_en: "Mallampati IV"
+- model: classification_choice
+  name: "mallampati_class_not_assessed"
+  name_de: "Mallampati-Klasse nicht erhoben"
+  name_en: "Mallampati class not assessed"
+
+- model: classification_choice
+  name: "anticoagulant_management_not_applicable"
+  name_de: "Nicht zutreffend – keine gerinnungshemmende Medikation"
+  name_en: "Not applicable — no anticoagulant medication"
+- model: classification_choice
+  name: "anticoagulant_management_plan_documented"
+  name_de: "Management gerinnungshemmender Medikation dokumentiert"
+  name_en: "Anticoagulant-management plan documented"
+- model: classification_choice
+  name: "risk_assessment_protocol_version_recorded"
+  name_de: "Checkliste oder Verfahrensversion dokumentiert"
+  name_en: "Checklist or protocol version recorded"
+  classification_choice_descriptors:
+    - risk_assessment_protocol_version_value
+
+- model: classification_choice
+  name: "assessment_confirmed_complete"
+  name_de: "Vollständig geprüft und bestätigt"
+  name_en: "Reviewed and confirmed complete"
+- model: classification_choice
+  name: "assessment_incomplete"
+  name_de: "Prüfung unvollständig"
+  name_en: "Assessment incomplete"
+- model: classification_choice
+  name: "assessment_not_assessed"
+  name_de: "Nicht geprüft"
+  name_en: "Not assessed"
+- model: classification_choice
+  name: "assessment_not_applicable"
+  name_de: "Nicht zutreffend"
+  name_en: "Not applicable"
+
+- model: classification_choice
+  name: "assessment_required_items_available"
+  name_de: "Erforderliche Befunde oder Laborwerte verfügbar"
+  name_en: "Required results or laboratory values available"
+- model: classification_choice
+  name: "assessment_required_items_missing"
+  name_de: "Erforderliche Befunde oder Laborwerte fehlen"
+  name_en: "Required results or laboratory values missing"
+- model: classification_choice
+  name: "assessment_no_items_required"
+  name_de: "Keine Befunde oder Laborwerte erforderlich"
+  name_en: "No results or laboratory values required"
+
+- model: classification_choice
+  name: "assessment_reviewed_none_identified"
+  name_de: "Geprüft – kein relevanter Befund bekannt"
+  name_en: "Reviewed — no relevant finding identified"
+- model: classification_choice
+  name: "assessment_reviewed_present"
+  name_de: "Geprüft – relevanter Befund vorhanden"
+  name_en: "Reviewed — relevant finding present"
+
+- model: classification_choice
+  name: "fasting_requirement_confirmed_met"
+  name_de: "Nüchternheitsanforderung erfüllt"
+  name_en: "Fasting requirement confirmed met"
+- model: classification_choice
+  name: "fasting_requirement_not_met"
+  name_de: "Nüchternheitsanforderung nicht erfüllt"
+  name_en: "Fasting requirement not met"
+
+- model: classification_choice
+  name: "asa_current_class_reviewed"
+  name_de: "Aktuelle ASA-Klasse geprüft"
+  name_en: "Current ASA class reviewed"
+- model: classification_choice
+  name: "mallampati_assessment_reviewed"
+  name_de: "Mallampati-Beurteilung geprüft"
+  name_en: "Mallampati assessment reviewed"
+
+- model: classification_choice
+  name: "medication_reviewed_none_relevant"
+  name_de: "Medikation geprüft – keine relevante Medikation"
+  name_en: "Medication reviewed — none relevant"
+- model: classification_choice
+  name: "medication_reviewed_relevant_present"
+  name_de: "Medikation geprüft – relevante Medikation vorhanden"
+  name_en: "Medication reviewed — relevant medication present"
+
+- model: classification_choice
+  name: "antithrombotic_management_plan_missing"
+  name_de: "Managementplan für gerinnungshemmende Medikation fehlt"
+  name_en: "Antithrombotic-management plan missing"
+
+- model: classification_choice
+  name: "antibiotic_prophylaxis_not_indicated"
+  name_de: "Antibiotikaprophylaxe nicht indiziert"
+  name_en: "Antibiotic prophylaxis not indicated"
+- model: classification_choice
+  name: "antibiotic_prophylaxis_plan_documented"
+  name_de: "Antibiotikaprophylaxe indiziert und Plan dokumentiert"
+  name_en: "Antibiotic prophylaxis indicated and plan documented"
+- model: classification_choice
+  name: "antibiotic_prophylaxis_plan_missing"
+  name_de: "Antibiotikaprophylaxe indiziert, Plan fehlt"
+  name_en: "Antibiotic prophylaxis indicated, plan missing"
+
+- model: classification_choice
+  name: "dental_status_assessed_no_relevant_issue"
+  name_de: "Zahnstatus geprüft – kein relevanter Befund"
+  name_en: "Dental status assessed — no relevant issue"
+- model: classification_choice
+  name: "dental_status_assessed_issue_present"
+  name_de: "Zahnstatus geprüft – relevanter Befund vorhanden"
+  name_en: "Dental status assessed — relevant issue present"
+
+- model: classification_choice
+  name: "preprocedure_physical_assessment_time_recorded"
+  name_de: "Zeitpunkt der körperlichen Untersuchung dokumentiert"
+  name_en: "Physical-assessment time recorded"
+  classification_choice_descriptors: [preprocedure_physical_assessment_time_value]
+- model: classification_choice
+  name: "preprocedure_heart_rate_recorded"
+  name_de: "Präprozedurale Herzfrequenz dokumentiert"
+  name_en: "Pre-procedure heart rate recorded"
+  classification_choice_descriptors: [preprocedure_heart_rate_value]
+- model: classification_choice
+  name: "preprocedure_systolic_blood_pressure_recorded"
+  name_de: "Präprozeduraler systolischer Blutdruck dokumentiert"
+  name_en: "Pre-procedure systolic blood pressure recorded"
+  classification_choice_descriptors: [preprocedure_systolic_blood_pressure_value]
+- model: classification_choice
+  name: "preprocedure_diastolic_blood_pressure_recorded"
+  name_de: "Präprozeduraler diastolischer Blutdruck dokumentiert"
+  name_en: "Pre-procedure diastolic blood pressure recorded"
+  classification_choice_descriptors: [preprocedure_diastolic_blood_pressure_value]
+- model: classification_choice
+  name: "preprocedure_oxygen_saturation_recorded"
+  name_de: "Präprozedurale Sauerstoffsättigung dokumentiert"
+  name_en: "Pre-procedure oxygen saturation recorded"
+  classification_choice_descriptors: [preprocedure_oxygen_saturation_value]
+- model: classification_choice
+  name: "auscultation_no_relevant_abnormality"
+  name_de: "Auskultation ohne relevanten pathologischen Befund"
+  name_en: "Auscultation without relevant abnormality"
+- model: classification_choice
+  name: "auscultation_abnormality_documented"
+  name_de: "Auskultatorischer Befund vorhanden und dokumentiert"
+  name_en: "Auscultation abnormality present and documented"
+- model: classification_choice
+  name: "auscultation_not_assessed"
+  name_de: "Auskultation nicht durchgeführt"
+  name_en: "Auscultation not assessed"
+- model: classification_choice
+  name: "last_oral_intake_time_recorded"
+  name_de: "Zeitpunkt der letzten Aufnahme dokumentiert"
+  name_en: "Last oral-intake time recorded"
+  classification_choice_descriptors: [last_oral_intake_time_value]
+- model: classification_choice
+  name: "last_oral_intake_type_recorded"
+  name_de: "Art der letzten Aufnahme dokumentiert"
+  name_en: "Last oral-intake type recorded"
+  classification_choice_descriptors: [last_oral_intake_type_value]

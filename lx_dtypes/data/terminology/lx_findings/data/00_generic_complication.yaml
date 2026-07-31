@@ -1,8 +1,15 @@
 - model: finding
   name: "complication_generic"
+  name_de: "Komplikation"
+  name_en: "Complication"
+  description: "Strukturierte Komplikation mit Phase, Art, Schweregrad, Maßnahmen und Ausgang."
   name_de: "Komplikation (generisch)"
   name_en: "Complication (generic)"
   finding_types:
     - complication
   classifications:
     - complication_generic_type
+    - colonoscopy_complication_phase
+    - colonoscopy_complication_severity
+    - colonoscopy_complication_management
+    - colonoscopy_complication_outcome

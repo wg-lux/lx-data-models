@@ -1,14 +1,47 @@
 - model: classification_choice
   name: "colonoscopy_incomplete_insufficient_preparation"
+  name_de: "Unzureichende Darmvorbereitung"
 
 - model: classification_choice
   name: "colonoscopy_incomplete_complication"
+  name_de: "Komplikation"
 
 - model: classification_choice
   name: "colonoscopy_incomplete_pain"
+  name_de: "Schmerzen"
 
 - model: classification_choice
   name: "colonoscopy_incomplete_stenosis"
+  name_de: "Stenose"
 
 - model: classification_choice
   name: "colonoscopy_incomplete_other"
+  name_de: "Anderer Grund"
+
+- model: classification_choice
+  name: "complication_phase_intraprocedural"
+  name_de: "Intraprozedural"
+
+- model: classification_choice
+  name: "complication_phase_postprocedural"
+  name_de: "Postprozedural"
+
+- model: classification_choice
+  name: "complication_severity_mild"
+  name_de: "Leicht"
+
+- model: classification_choice
+  name: "complication_severity_moderate"
+  name_de: "Mittelgradig"
+
+- model: classification_choice
+  name: "complication_severity_severe"
+  name_de: "Schwer"
+
+- model: classification_choice
+  name: "complication_management_documented"
+  name_de: "Maßnahmen dokumentiert"
+
+- model: classification_choice
+  name: "complication_outcome_documented"
+  name_de: "Ausgang dokumentiert"

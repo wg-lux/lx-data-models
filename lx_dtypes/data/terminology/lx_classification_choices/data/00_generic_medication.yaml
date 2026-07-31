@@ -1,0 +1,83 @@
+- model: classification_choice
+  name: "medication_propofol"
+  name_de: "Propofol"
+  name_en: "Propofol"
+  description: "Verabreichung von Propofol; die tatsächlich verabreichte Dosis ist anzugeben."
+  classification_choice_descriptors:
+    - propofol_dose_mg_value
+
+- model: classification_choice
+  name: "medication_midazolam"
+  name_de: "Midazolam"
+  name_en: "Midazolam"
+  description: "Verabreichung von Midazolam; die tatsächlich verabreichte Dosis ist anzugeben."
+  classification_choice_descriptors:
+    - midazolam_dose_mg_value
+
+- model: classification_choice
+  name: "medication_fentanyl"
+  name_de: "Fentanyl"
+  name_en: "Fentanyl"
+  description: "Verabreichung von Fentanyl; die tatsächlich verabreichte Dosis ist anzugeben."
+  classification_choice_descriptors:
+    - fentanyl_dose_microgram_value
+
+- model: classification_choice
+  name: "medication_pethidine"
+  name_de: "Pethidin"
+  name_en: "Pethidine"
+  description: "Verabreichung von Pethidin; die tatsächlich verabreichte Dosis ist anzugeben."
+  classification_choice_descriptors:
+    - pethidine_dose_mg_value
+
+- model: classification_choice
+  name: "medication_butylscopolamine"
+  name_de: "Butylscopolamin"
+  name_en: "Butylscopolamine"
+  description: "Verabreichung von Butylscopolamin; die tatsächlich verabreichte Dosis ist anzugeben."
+  classification_choice_descriptors:
+    - butylscopolamine_dose_mg_value
+
+- model: classification_choice
+  name: "medication_route_intravenous"
+  name_de: "Intravenös"
+  name_en: "Intravenous"
+  description: "Intravenöse Verabreichung."
+
+- model: classification_choice
+  name: "medication_route_oral"
+  name_de: "Oral"
+  name_en: "Oral"
+  description: "Orale Verabreichung."
+
+- model: classification_choice
+  name: "medication_route_rectal"
+  name_de: "Rektal"
+  name_en: "Rectal"
+  description: "Rektale Verabreichung."
+
+- model: classification_choice
+  name: "medication_route_other"
+  name_de: "Andere Applikationsart"
+  name_en: "Other route"
+  description: "Andere dokumentierte Applikationsart."
+
+- model: classification_choice
+  name: "medication_method_bolus"
+  name_de: "Bolus"
+  name_en: "Bolus"
+  description: "Verabreichung als Bolus."
+
+- model: classification_choice
+  name: "medication_method_infusion"
+  name_de: "Infusion"
+  name_en: "Infusion"
+  description: "Verabreichung als Infusion; die tatsächlich eingestellte Flussrate ist anzugeben."
+  classification_choice_descriptors:
+    - medication_infusion_volumetric_flow_rate_value
+
+- model: classification_choice
+  name: "medication_method_other"
+  name_de: "Andere Verabreichungsform"
+  name_en: "Other administration method"
+  description: "Andere dokumentierte Verabreichungsform."

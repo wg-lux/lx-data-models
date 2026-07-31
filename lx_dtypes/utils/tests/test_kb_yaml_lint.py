@@ -85,6 +85,184 @@ def test_linter_flags_alias_and_mixed_style(tmp_path: Path) -> None:
     assert alias_issue.severity == "error"
 
 
+def test_linter_flags_descriptor_backed_coverage_without_value_path(
+    tmp_path: Path,
+) -> None:
+    data_file = tmp_path / "descriptor_rule.yaml"
+    data_file.write_text(
+        (
+            "- model: classification_choice_descriptor\n"
+            "  name: minutes_value\n"
+            "  classification_choice_descriptor_type: numeric\n"
+            "- model: classification_choice\n"
+            "  name: minutes_choice\n"
+            "  classification_choice_descriptors:\n"
+            "    - minutes_value\n"
+            "- model: classification\n"
+            "  name: time_minutes\n"
+            "  classification_choices:\n"
+            "    - minutes_choice\n"
+            "- model: report_template\n"
+            "  name: colonoscopy_report\n"
+            "  examination: colonoscopy\n"
+            "  coverage_concepts:\n"
+            "    - concept_id: colonoscopy.withdrawal_time\n"
+            "      label: Withdrawal time\n"
+            "      applicability_status: required\n"
+            "      validator_names:\n"
+            "        - withdrawal_time_recorded\n"
+            "      evidence_path:\n"
+            "        - patient_findings\n"
+            "      finding_selector:\n"
+            "        finding_name: withdrawal_time\n"
+            "        classification_name: time_minutes\n"
+            "      allowed_values:\n"
+            "        - minutes_choice\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+    issue = next(
+        issue for issue in issues if issue.code == "incomplete_descriptor_value_rule"
+    )
+    assert issue.severity == "warning"
+    assert "minutes_value" in issue.message
+    assert "descriptor_value" in issue.message
+
+
+def test_linter_accepts_coverage_that_targets_descriptor_value(tmp_path: Path) -> None:
+    data_file = tmp_path / "complete_descriptor_rule.yaml"
+    data_file.write_text(
+        (
+            "- model: classification_choice_descriptor\n"
+            "  name: minutes_value\n"
+            "  classification_choice_descriptor_type: numeric\n"
+            "- model: classification_choice\n"
+            "  name: minutes_choice\n"
+            "  classification_choice_descriptors:\n"
+            "    - minutes_value\n"
+            "- model: classification\n"
+            "  name: time_minutes\n"
+            "  classification_choices:\n"
+            "    - minutes_choice\n"
+            "- model: report_template\n"
+            "  name: colonoscopy_report\n"
+            "  examination: colonoscopy\n"
+            "  coverage_concepts:\n"
+            "    - concept_id: colonoscopy.withdrawal_time\n"
+            "      label: Withdrawal time\n"
+            "      applicability_status: required\n"
+            "      validator_names:\n"
+            "        - withdrawal_time_recorded\n"
+            "      evidence_path:\n"
+            "        - patient_findings\n"
+            "      concept_value_path:\n"
+            "        - patient_finding_classification_choice_descriptors\n"
+            '        - "0"\n'
+            "        - descriptor_value\n"
+            "      finding_selector:\n"
+            "        finding_name: withdrawal_time\n"
+            "        classification_name: time_minutes\n"
+            "      allowed_values:\n"
+            "        - 6\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+    assert not any(issue.code == "incomplete_descriptor_value_rule" for issue in issues)
+
+
+def test_linter_flags_broken_classification_input_chain(tmp_path: Path) -> None:
+    data_file = tmp_path / "broken_input_chain.yaml"
+    data_file.write_text(
+        (
+            "- model: classification\n"
+            "  name: empty_classification\n"
+            "  classification_choices: []\n"
+            "- model: classification\n"
+            "  name: missing_choice_classification\n"
+            "  classification_choices:\n"
+            "    - missing_choice\n"
+            "- model: classification_choice\n"
+            "  name: broken_descriptor_choice\n"
+            "  classification_choice_descriptors:\n"
+            "    - missing_descriptor\n"
+            "- model: classification\n"
+            "  name: broken_descriptor_classification\n"
+            "  classification_choices:\n"
+            "    - broken_descriptor_choice\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+    codes = {issue.code for issue in issues}
+    assert "classification_has_no_enterable_values" in codes
+    assert "missing_classification_choice_reference" in codes
+    assert "missing_choice_descriptor_reference" in codes
+
+
+def test_linter_flags_template_finding_without_description(tmp_path: Path) -> None:
+    data_file = tmp_path / "missing_finding_description.yaml"
+    data_file.write_text(
+        (
+            "- model: finding\n"
+            "  name: withdrawal_time\n"
+            "- model: report_finding\n"
+            "  name: report_withdrawal_time\n"
+            "  finding: withdrawal_time\n"
+            "- model: report_template_section\n"
+            "  name: quality\n"
+            "  findings:\n"
+            "    - report_withdrawal_time\n"
+            "- model: report_template\n"
+            "  name: colonoscopy_report\n"
+            "  examination: colonoscopy\n"
+            "  report_sections:\n"
+            "    - quality\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+    issue = next(
+        issue
+        for issue in issues
+        if issue.code == "template_finding_missing_description"
+    )
+    assert issue.severity == "warning"
+    assert "withdrawal_time" in issue.message
+
+
+def test_linter_accepts_described_template_finding(tmp_path: Path) -> None:
+    data_file = tmp_path / "described_finding.yaml"
+    data_file.write_text(
+        (
+            "- model: finding\n"
+            "  name: withdrawal_time\n"
+            "  description: Inspection withdrawal time in minutes.\n"
+            "- model: report_template_section\n"
+            "  name: quality\n"
+            "  findings:\n"
+            "    - finding: withdrawal_time\n"
+            "      required: true\n"
+            "- model: report_template\n"
+            "  name: colonoscopy_report\n"
+            "  examination: colonoscopy\n"
+            "  report_sections:\n"
+            "    - quality\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+    assert not any(
+        issue.code == "template_finding_missing_description" for issue in issues
+    )
+
+
 def test_discover_yaml_files_expands_module_config(tmp_path: Path) -> None:
     module_dir = tmp_path / "module"
     data_dir = module_dir / "data"

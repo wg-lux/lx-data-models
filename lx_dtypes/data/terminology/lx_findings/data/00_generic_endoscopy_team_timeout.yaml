@@ -1,0 +1,32 @@
+- model: finding
+  name: "endoscopy_preprocedure_team_timeout"
+  name_de: "Team-Time-out vor der Endoskopie"
+  name_en: "Pre-procedure endoscopy team time-out"
+  description: "Strukturierte Dokumentation des Team-Time-outs unmittelbar vor dem Eingriff gemäß DGVS-S2k-Leitlinie 021-022, Empfehlung 4.32."
+  finding_types:
+    - baseline
+  classifications:
+    - endoscopy_team_timeout_time
+    - team_introduction_status
+    - patient_identity_confirmation_status
+    - patient_preparation_confirmation_status
+    - planned_procedure_and_special_features_review_status
+    - patient_specific_risk_and_special_medication_review_status
+    - required_documents_confirmation_status
+    - required_equipment_readiness_status
+    - required_personnel_readiness_status
+
+- model: finding
+  name: "endoscopy_postprocedure_sign_out"
+  name_de: "Sign-out nach der Endoskopie"
+  name_en: "Post-procedure endoscopy sign-out"
+  description: "Strukturierte Dokumentation des Sign-outs unmittelbar nach dem Eingriff gemäß DGVS-S2k-Leitlinie 021-022, Empfehlung 4.33."
+  finding_types:
+    - baseline
+  classifications:
+    - endoscopy_sign_out_time
+    - postprocedure_patient_condition_documentation_status
+    - follow_up_measures_confirmation_status
+    - specimen_handling_reconciliation_status
+    - procedure_problem_review_status
+    - report_documentation_completeness_status

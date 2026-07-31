@@ -1,6 +1,6 @@
 - model: classification_choice
   name: "terminal_ileum"
-  # name_de: "terminales Ileum"
+  name_de: "Terminales Ileum"
   # name_en: "Terminal Ileum"
   # subcategories:
   #   description: { choices: ["unspecified"], required: false }
@@ -15,7 +15,7 @@
 - model: classification_choice
 
   name: "cecum"
-  # name_de: "Caecum"
+  name_de: "Zökum"
   # name_en: "Cecum"
   # subcategories:
   #   description:
@@ -35,9 +35,14 @@
   #     required: false
 
 - model: classification_choice
+  name: "ileocolonic_anastomosis"
+  name_de: "Ileokolonische Anastomose bei postoperativer Anatomie"
+  name_en: "Ileocolonic anastomosis in postoperative anatomy"
+
+- model: classification_choice
 
   name: "ascending_colon"
-  # name_de: "Colon ascendens"
+  name_de: "Colon ascendens"
   # name_en: "Ascending Colon"
   # subcategories:
   #   description:
@@ -56,7 +61,7 @@
 
 - model: classification_choice
   name: "right_flexure"
-  # name_de: "Rechte Flexur"
+  name_de: "Rechte Flexur"
   # name_en: "Right Flexure"
   # subcategories:
   #   description:
@@ -77,7 +82,7 @@
 
 - model: classification_choice
   name: "left_flexure"
-  # name_de: "Linke Flexur"
+  name_de: "Linke Flexur"
   # name_en: "Left Flexure"
 #   subcategories:
 #     description:
@@ -97,7 +102,7 @@
 #       required: false
 - model: classification_choice
   name: "transverse_colon"
-  # name_de: "Colon transversum"
+  name_de: "Colon transversum"
   # name_en: "Transverse Colon"
 #   subcategories:
 #     description:
@@ -117,7 +122,7 @@
 #       required: false
 - model: classification_choice
   name: "descending_colon"
-  # name_de: "Colon descendens"
+  name_de: "Colon descendens"
   # name_en: "Descending Colon"
 #   subcategories:
 #     description:
@@ -137,7 +142,7 @@
 #       required: false
 - model: classification_choice
   name: "sigmoid_colon"
-  # name_de: "Colon sigmoideum"
+  name_de: "Colon sigmoideum"
   # name_en: "Sigmoid Colon"
 #   subcategories:
 #     description:
@@ -154,7 +159,7 @@
 #       required: true
 - model: classification_choice
   name: "rectum"
-  # name_de: "Rektum"
+  name_de: "Rektum"
   # name_en: "Rectum"
 #   subcategories:
 #     description:
@@ -171,7 +176,7 @@
 #       required: true
 - model: classification_choice
   name: "anal_canal"
-  # name_de: "Analkanal"
+  name_de: "Analkanal"
   # name_en: "Anal Canal"
 #   subcategories:
 #     description:

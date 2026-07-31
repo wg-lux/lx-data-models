@@ -1,0 +1,46 @@
+- model: classification_choice_descriptor
+  name: "propofol_dose_mg_value"
+  description: "Tatsächlich verabreichte Propofol-Dosis in Milligramm."
+  unit: "milligram"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 2000
+
+- model: classification_choice_descriptor
+  name: "midazolam_dose_mg_value"
+  description: "Tatsächlich verabreichte Midazolam-Dosis in Milligramm."
+  unit: "milligram"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 100
+
+- model: classification_choice_descriptor
+  name: "fentanyl_dose_microgram_value"
+  description: "Tatsächlich verabreichte Fentanyl-Dosis in Mikrogramm."
+  unit: "microgram"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 2000
+
+- model: classification_choice_descriptor
+  name: "pethidine_dose_mg_value"
+  description: "Tatsächlich verabreichte Pethidin-Dosis in Milligramm."
+  unit: "milligram"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 500
+
+- model: classification_choice_descriptor
+  name: "butylscopolamine_dose_mg_value"
+  description: "Tatsächlich verabreichte Butylscopolamin-Dosis in Milligramm."
+  unit: "milligram"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 200
+
+- model: classification_choice_descriptor
+  name: "medication_infusion_volumetric_flow_rate_value"
+  description: "Tatsächlich eingestellte volumetrische Flussrate einer Medikamenteninfusion gemäß der DGVS-Anforderung zur Dokumentation von Dosierung und Flussrate bzw. Einzelboli."
+  unit: "milliliter_per_hour"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0

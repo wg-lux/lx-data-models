@@ -1,0 +1,14 @@
+- model: finding
+  name: "endoscopy_process_timestamps"
+  name_de: "Zeitstempel des Untersuchungs- und Eingriffsprozesses"
+  name_en: "Endoscopy process timestamps"
+  description: "Uhrzeitgenaue Zeitstempel für Raumbelegung, Beginn und Ende der Endoskopie, koloskopischen Rückzugsbeginn und Verlassen der Endoskopieabteilung gemäß DGVS-S2k-Leitlinie 021-022; bei inkompletter Koloskopie beginnt der Rückzug an der maximal erreichten Einführtiefe."
+  finding_types:
+    - baseline
+  classifications:
+    - endoscopy_room_entry_time
+    - endoscope_insertion_time
+    - colonoscopy_withdrawal_start_time
+    - endoscope_removal_time
+    - endoscopy_room_exit_time
+    - endoscopy_department_exit_time
