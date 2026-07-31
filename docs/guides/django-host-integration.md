@@ -17,16 +17,17 @@ The host project must configure:
 
 - `LX_DTYPES_HOST_MODELS_MODULE`
   Python import path to a module that exports the required Django ORM models.
-- `LX_DTYPES_FINDINGS_MODULE`
-  Optional knowledge-base module name used by the findings/classification API.
-  Defaults to `lx_knowledge_base`.
+- `LX_DTYPES_KB_REGISTRY`
+  Path to the versioned registry containing an explicit active module and
+  version. Findings, classifications, templates, and validation all resolve
+  through this identity.
 
 Example:
 
 ```python
 # settings.py
 LX_DTYPES_HOST_MODELS_MODULE = "endoreg_db.models"
-LX_DTYPES_FINDINGS_MODULE = "report_template_examples"
+LX_DTYPES_KB_REGISTRY = "/var/lib/host/terminology/registry.json"
 ```
 
 ## URL Mounting
@@ -357,7 +358,7 @@ __all__ = [
 ## Integration Checklist
 
 - Set `LX_DTYPES_HOST_MODELS_MODULE`.
-- Optionally set `LX_DTYPES_FINDINGS_MODULE`.
+- Set `LX_DTYPES_KB_REGISTRY` and provision a loadable active identity.
 - Export the seven required ORM model names from that module.
 - Ensure `Examination.get_available_findings()` returns host `Finding` instances.
 - Ensure `PatientFinding.classifications` exposes active classification rows.

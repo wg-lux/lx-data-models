@@ -184,13 +184,14 @@ bundle. For pinned deployments, register the same bundle directory with
 `LX_DTYPES_KB_REGISTRY` and load it with an explicit `version`.
 
 Top-level `demo-data/` is intentionally not part of the default Python package
-data resolution path. Use it explicitly with `DataLoader(input_dirs=[...])`, Nix
-KB packaging, or a `LX_DTYPES_KB_REGISTRY` entry. Normal unversioned loads use
-the configured `LOOKUP_DTYPES_DATA_ROOT` when present, then packaged
-`lx_dtypes/data`.
+data resolution path. Use it explicitly with `DataLoader(input_dirs=[...])` in
+authoring or tests, or publish it as a versioned `LX_DTYPES_KB_REGISTRY` entry.
+Normal unversioned loads use only the immutable `lx_dtypes/data` content shipped
+in the installed package. Runtime checkout and `LOOKUP_DTYPES_DATA_ROOT`
+overlays are not supported.
 
 `lx-annotate` can also import the editor ZIP directly through
-`POST /base_api/terminology/bundles/import`. The endpoint extracts the ZIP into
+`POST /dtypes-api/terminology/bundles/import`. The endpoint extracts the ZIP into
 `LX_DTYPES_TERMINOLOGY_IMPORT_ROOT` (or a `terminology-packages/` directory next
 to the configured registry), validates it with the normal knowledge-base loader,
 updates the registry, and activates the imported version.
