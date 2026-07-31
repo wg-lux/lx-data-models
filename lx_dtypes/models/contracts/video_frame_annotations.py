@@ -53,7 +53,7 @@ class FrameBoxAnnotationBulkEnvelopeData(TypedDict, total=False):
 
 
 class FrameAnnotationBulkItemPayload(BaseModel):
-    model_config = ConfigDict(extra="allow", str_strip_whitespace=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     frame_id: int = Field(ge=1)
     label_id: int | None = Field(default=None, ge=1)
@@ -82,7 +82,7 @@ class FrameAnnotationBulkItemPayload(BaseModel):
 
 
 class FrameAnnotationBulkEnvelopePayload(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+    model_config = ConfigDict(extra="forbid")
 
     video_id: int | None = Field(default=None, ge=1)
     ai_dataset_id: int | None = Field(default=None, ge=1)
@@ -90,7 +90,7 @@ class FrameAnnotationBulkEnvelopePayload(BaseModel):
 
 
 class FrameAnnotationSkipPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     frame_id: int = Field(ge=1)
     video_id: int | None = Field(default=None, ge=1)
@@ -129,7 +129,7 @@ class FrameBoxAnnotationBulkItemPayload(FrameAnnotationBulkItemPayload):
 
 
 class FrameBoxAnnotationBulkEnvelopePayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     frame_id: int | None = Field(default=None, ge=1)
     video_id: int | None = Field(default=None, ge=1)
@@ -139,6 +139,56 @@ class FrameBoxAnnotationBulkEnvelopePayload(BaseModel):
     information_source: str | None = None
     annotations: list[FrameBoxAnnotationBulkItemPayload]
 
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_item_frame_ids(cls, value: object) -> object:
+        if not isinstance(value, Mapping):
+            return value
+
+        mapping = cast(Mapping[object, object], value)
+        outer_frame_id = mapping.get("frame_id")
+        wrapper_source = mapping.get("information_source_name")
+        if isinstance(wrapper_source, str):
+            wrapper_source = wrapper_source.strip() or None
+        if wrapper_source is None:
+            wrapper_source = mapping.get("information_source")
+            if isinstance(wrapper_source, str):
+                wrapper_source = wrapper_source.strip() or None
+        if wrapper_source is None:
+            wrapper_source = "manual_annotation"
+        wrapper_annotator = mapping.get("annotator")
+        if isinstance(wrapper_annotator, str):
+            wrapper_annotator = wrapper_annotator.strip() or None
+        annotations = mapping.get("annotations")
+        if not isinstance(annotations, list):
+            return value
+
+        normalized_annotations: list[object] = []
+        for item in annotations:
+            if not isinstance(item, Mapping):
+                normalized_annotations.append(item)
+                continue
+            item_mapping = dict(item)
+            if outer_frame_id is not None and "frame_id" not in item_mapping:
+                item_mapping["frame_id"] = outer_frame_id
+            if "information_source_name" not in item_mapping:
+                item_mapping["information_source_name"] = wrapper_source
+            if wrapper_annotator is not None and "annotator" not in item_mapping:
+                item_mapping["annotator"] = wrapper_annotator
+            normalized_annotations.append(item_mapping)
+
+        normalized_envelope = dict(mapping)
+        normalized_envelope["annotations"] = normalized_annotations
+        return normalized_envelope
+
+    @model_validator(mode="after")
+    def validate_item_frame_ids(self) -> FrameBoxAnnotationBulkEnvelopePayload:
+        if self.frame_id is None:
+            return self
+        if any(item.frame_id != self.frame_id for item in self.annotations):
+            raise ValueError("annotation frame_id must match the envelope frame_id")
+        return self
+
     @field_validator(
         "annotator", "information_source_name", "information_source", mode="before"
     )
@@ -147,6 +197,10 @@ class FrameBoxAnnotationBulkEnvelopePayload(BaseModel):
         if isinstance(value, str):
             return value.strip() or None
         return value
+
+    @property
+    def resolved_information_source_name(self) -> str | None:
+        return self.information_source_name or self.information_source
 
 
 class FrameAnnotationPayloadMapping(RootModel[JsonObject]):

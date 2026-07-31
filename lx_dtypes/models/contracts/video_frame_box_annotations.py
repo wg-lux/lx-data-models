@@ -3,9 +3,10 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TypeAlias, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 from .json_types import JsonNumericObject, JsonScalar
+from .video_frame_annotations import FrameBoxAnnotationBulkEnvelopePayload
 
 VideoFrameBoxJsonObject: TypeAlias = JsonNumericObject
 
@@ -14,79 +15,11 @@ def _empty_annotation_list() -> list[VideoFrameBoxJsonObject]:
     return []
 
 
-def _blank_to_none(value: object) -> object:
-    if value is None:
-        return None
-    if isinstance(value, str):
-        return value.strip() or None
-    return str(value).strip() or None
-
-
 def _normalize_mapping(value: Mapping[object, object]) -> VideoFrameBoxJsonObject:
     return {str(key): cast(JsonScalar, item) for key, item in value.items()}
 
 
-class VideoFrameBoxAnnotationRequestPayload(BaseModel):
-    """Top-level request wrapper for frame box annotation upserts."""
-
-    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
-
-    annotations: list[VideoFrameBoxJsonObject] = Field(
-        default_factory=_empty_annotation_list
-    )
-    replace: bool = False
-    video_id: int | None = Field(default=None, ge=1)
-    frame_id: int | None = Field(default=None, ge=1)
-    annotator: str | None = None
-    information_source_name: str | None = None
-    information_source: str | None = None
-
-    @field_validator("replace", mode="before")
-    @classmethod
-    def _normalize_bool(cls, value: object) -> object:
-        if value is None or isinstance(value, bool):
-            return value
-        if isinstance(value, str):
-            normalized = value.strip().lower()
-            if normalized in {"1", "true", "yes", "y", "on"}:
-                return True
-            if normalized in {"0", "false", "no", "n", "off"}:
-                return False
-        return value
-
-    @field_validator("video_id", "frame_id", mode="before")
-    @classmethod
-    def _normalize_optional_int(cls, value: object) -> object:
-        if value == "":
-            return None
-        return value
-
-    @field_validator(
-        "annotator",
-        "information_source_name",
-        "information_source",
-        mode="before",
-    )
-    @classmethod
-    def _normalize_optional_text(cls, value: object) -> object:
-        return _blank_to_none(value)
-
-    @field_validator("annotations", mode="before")
-    @classmethod
-    def _normalize_annotations(cls, value: object) -> object:
-        if not isinstance(value, list):
-            return value
-
-        normalized: list[VideoFrameBoxJsonObject] = []
-        for item in value:
-            if not isinstance(item, Mapping):
-                return value
-            normalized.append(_normalize_mapping(item))
-        return normalized
-
-    @property
-    def resolved_information_source_name(self) -> str | None:
-        return self.information_source_name or self.information_source
+VideoFrameBoxAnnotationRequestPayload = FrameBoxAnnotationBulkEnvelopePayload
 
 
 class VideoFrameBoxAnnotationListResponsePayload(BaseModel):
@@ -177,9 +110,7 @@ def validate_video_frame_box_annotation_request(
         return VideoFrameBoxAnnotationRequestPayload.model_validate(
             {"annotations": payload}
         )
-    return VideoFrameBoxAnnotationRequestPayload.model_validate(
-        video_frame_box_json_safe_dict(payload)
-    )
+    return VideoFrameBoxAnnotationRequestPayload.model_validate(payload)
 
 
 __all__ = [
