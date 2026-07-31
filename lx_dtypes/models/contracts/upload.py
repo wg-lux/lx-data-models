@@ -8,6 +8,12 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 from .json_types import JsonValue
 
 
+_UPLOAD_API_REQUEST_FIELD_NAMES = frozenset(
+    {"center_key", "center_name", "source_system", "idempotency_key"}
+)
+_UPLOAD_API_TRANSPORT_FIELD_NAMES = frozenset({"file"})
+
+
 class UploadApiRequestData(TypedDict, total=False):
     center_key: str
     center_name: str
@@ -37,8 +43,17 @@ class UploadApiRequestPayload(BaseModel):
 def upload_api_request_data_from_mapping(
     payload: Mapping[str, JsonValue],
 ) -> UploadApiRequestData:
+    unknown_field_names = (
+        set(payload)
+        - _UPLOAD_API_REQUEST_FIELD_NAMES
+        - _UPLOAD_API_TRANSPORT_FIELD_NAMES
+    )
+    if unknown_field_names:
+        formatted_names = ", ".join(sorted(unknown_field_names))
+        raise ValueError(f"Unknown upload request field(s): {formatted_names}")
+
     data: UploadApiRequestData = {}
-    for field_name in ("center_key", "center_name", "source_system", "idempotency_key"):
+    for field_name in _UPLOAD_API_REQUEST_FIELD_NAMES:
         if field_name not in payload:
             continue
         raw_value = payload[field_name]

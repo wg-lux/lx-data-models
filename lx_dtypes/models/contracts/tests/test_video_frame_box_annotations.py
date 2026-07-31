@@ -13,10 +13,23 @@ from lx_dtypes.models.contracts.video_frame_box_annotations import (
 
 def test_frame_box_request_accepts_top_level_annotation_list() -> None:
     payload = validate_video_frame_box_annotation_request(
-        [{"frame_id": "3", "label_id": 7}]
+        [
+            {
+                "frame_id": 3,
+                "label_id": 7,
+                "information_source_name": "manual_annotation",
+                "x": 1,
+                "y": 2,
+                "width": 3,
+                "height": 4,
+                "image_width": 100,
+                "image_height": 100,
+            }
+        ]
     )
 
-    assert payload.annotations == [{"frame_id": "3", "label_id": 7}]
+    assert payload.annotations[0].frame_id == 3
+    assert payload.annotations[0].label_id == 7
     assert payload.replace is False
 
 
@@ -28,7 +41,18 @@ def test_frame_box_request_normalizes_object_wrapper_aliases() -> None:
             "replace": "true",
             "information_source": " source ",
             "annotator": " alice ",
-            "annotations": [{"label_id": 4}],
+            "annotations": [
+                {
+                    "label_id": 4,
+                    "information_source_name": "manual_annotation",
+                    "x": 1,
+                    "y": 2,
+                    "width": 3,
+                    "height": 4,
+                    "image_width": 100,
+                    "image_height": 100,
+                }
+            ],
         }
     )
 
@@ -37,6 +61,32 @@ def test_frame_box_request_normalizes_object_wrapper_aliases() -> None:
     assert payload.replace is True
     assert payload.resolved_information_source_name == "source"
     assert payload.annotator == "alice"
+    assert payload.annotations[0].frame_id == 8
+
+
+def test_frame_box_request_forbids_unknown_wrapper_and_item_fields() -> None:
+    with pytest.raises(ValidationError, match="extra_forbidden"):
+        validate_video_frame_box_annotation_request(
+            {"annotations": [], "unexpected": True}
+        )
+
+    with pytest.raises(ValidationError, match="extra_forbidden"):
+        validate_video_frame_box_annotation_request(
+            [
+                {
+                    "frame_id": 3,
+                    "label_id": 7,
+                    "information_source_name": "manual_annotation",
+                    "x": 1,
+                    "y": 2,
+                    "width": 3,
+                    "height": 4,
+                    "image_width": 100,
+                    "image_height": 100,
+                    "unexpected": True,
+                }
+            ]
+        )
 
 
 def test_frame_box_list_response_uses_counted_annotations() -> None:
