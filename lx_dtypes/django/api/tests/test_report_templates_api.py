@@ -222,16 +222,6 @@ def test_report_template_runtime_validation_api_resolves_current_kb_version(
     captured: dict[str, str | None] = {}
     fallback_kb = _RuntimeValidationKb()
 
-    def _fake_get_knowledge_base_identity(
-        module_name: str,
-        *,
-        version: str | None = None,
-        input_dirs: list[Path] | None = None,
-    ) -> tuple[str, str]:
-        del version, input_dirs
-        assert module_name == "report_template_examples"
-        return module_name, "0.1.0"
-
     def _fake_load_knowledge_base(
         module_name: str,
         *,
@@ -243,9 +233,6 @@ def test_report_template_runtime_validation_api_resolves_current_kb_version(
         captured["version"] = version
         return fallback_kb
 
-    monkeypatch.setattr(
-        api_main, "get_knowledge_base_identity", _fake_get_knowledge_base_identity
-    )
     monkeypatch.setattr(api_main, "load_knowledge_base", _fake_load_knowledge_base)
 
     response = client.post(

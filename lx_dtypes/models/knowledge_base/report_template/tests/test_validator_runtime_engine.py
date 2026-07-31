@@ -197,6 +197,15 @@ def test_evaluate_classification_validator_exists_and_condition() -> None:
             "operator": "exists",
         }
     )
+    optional_exists_validator = ClassificationValidator.model_validate(
+        {
+            "name": "optional_size_if_polyp_present",
+            "finding": "esophagus_polyp",
+            "classification": "size_mm",
+            "operator": "exists",
+            "precedence": "optional",
+        }
+    )
     condition_validator = ClassificationValidator.model_validate(
         {
             "name": "lst_required_when_large",
@@ -227,6 +236,42 @@ def test_evaluate_classification_validator_exists_and_condition() -> None:
         classification_choice_descriptors={"size_mm_descriptor": descriptor},
         reported_findings=[{"finding": "esophagus_polyp", "classifications": []}],
     )
+    absent_optional_exists = evaluate_classification_validator_runtime(
+        optional_exists_validator,
+        classifications={"size_mm": classification},
+        classification_choices={"size_mm_choice": choice},
+        classification_choice_descriptors={"size_mm_descriptor": descriptor},
+        reported_findings=[],
+    )
+    choice_only_exists = evaluate_classification_validator_runtime(
+        exists_validator,
+        classifications={"size_mm": classification},
+        classification_choices={"size_mm_choice": choice},
+        classification_choice_descriptors={"size_mm_descriptor": descriptor},
+        reported_findings=[
+            {
+                "finding": "esophagus_polyp",
+                "classifications": [
+                    {"classification": "size_mm", "value": "size_mm_choice"}
+                ],
+            }
+        ],
+    )
+    valued_exists = evaluate_classification_validator_runtime(
+        exists_validator,
+        classifications={"size_mm": classification},
+        classification_choices={"size_mm_choice": choice},
+        classification_choice_descriptors={"size_mm_descriptor": descriptor},
+        reported_findings=[
+            {
+                "finding": "esophagus_polyp",
+                "classifications": [
+                    {"classification": "size_mm", "value": "size_mm_choice"},
+                    {"classification": "size_mm", "value": 12},
+                ],
+            }
+        ],
+    )
     failing_condition = evaluate_classification_validator_runtime(
         condition_validator,
         classifications={"size_mm": classification},
@@ -241,7 +286,13 @@ def test_evaluate_classification_validator_exists_and_condition() -> None:
     )
 
     assert failing_exists["ok"] is False
+    assert absent_optional_exists["ok"] is True
     assert failing_exists["hint"]["data_type_hint"] == "non_categorical"
+    assert choice_only_exists["ok"] is False
+    assert choice_only_exists["issues"][0]["code"] == (
+        "classification_value_not_present"
+    )
+    assert valued_exists["ok"] is True
     assert failing_condition["ok"] is False
     assert failing_condition["triggered_occurrences"] == 1
 

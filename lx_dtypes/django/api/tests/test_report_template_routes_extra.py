@@ -140,7 +140,7 @@ def test_builder_routes_fail_closed_and_separate_read_from_write(
         secure=True,
         headers={"X-Test-Actor": "reader"},
     )
-    assert reader_read.status_code == 404
+    assert reader_read.status_code == 409
 
     writer_write = client.post(
         "/base_api/report-templates/builder/templates",

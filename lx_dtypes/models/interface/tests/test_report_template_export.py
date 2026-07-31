@@ -31,8 +31,16 @@ def test_report_template_export(tmp_path: Path) -> None:
         yaml.safe_dump(
             [
                 {
+                    "model": "classification_choice_descriptor",
+                    "name": "size_mm_value",
+                    "classification_choice_descriptor_type": "numeric",
+                    "numeric_min": 0,
+                    "numeric_max": 200,
+                },
+                {
                     "model": "classification_choice",
                     "name": "size_mm",
+                    "classification_choice_descriptors": ["size_mm_value"],
                 },
                 {
                     "model": "classification",
@@ -101,6 +109,22 @@ def test_report_template_export(tmp_path: Path) -> None:
                 {
                     "model": "report_template",
                     "name": "star_upper_gi_main",
+                    "version": "1.0.0",
+                    "coverage_version": "report_concept_coverage_v1",
+                    "coverage_concepts": [
+                        {
+                            "concept_id": "upper_gi.polyp",
+                            "label": "Polyp",
+                            "applicability_status": "required",
+                            "validator_names": ["polyp_has_lst_if_large"],
+                            "evidence_path": ["patient_findings"],
+                            "finding_selector": {
+                                "finding_name": "esophagus_polyp",
+                            },
+                            "concept_value_path": ["finding"],
+                            "allowed_values": ["esophagus_polyp"],
+                        }
+                    ],
                     "examination": "star_upper_gi_endoscopy",
                     "report_sections": ["examination_baseline"],
                     "validators": {
@@ -121,6 +145,9 @@ def test_report_template_export(tmp_path: Path) -> None:
     exported = kb.export_report_template("star_upper_gi_main")
 
     assert exported["name"] == "star_upper_gi_main"
+    assert exported["version"] == "1.0.0"
+    assert exported["coverage_version"] == "report_concept_coverage_v1"
+    assert exported["coverage_concepts"][0]["concept_id"] == "upper_gi.polyp"
     assert exported["examination"] == "star_upper_gi_endoscopy"
     assert len(exported["report_sections"]) == 1
 
@@ -130,6 +157,13 @@ def test_report_template_export(tmp_path: Path) -> None:
 
     assert section["findings"][0]["finding"] == "esophagus_polyp"
     assert section["findings"][1]["finding"] == "esophagus_polyp"
+    descriptor_input = section["findings"][1]["classifications"][0]["input"][
+        "choices"
+    ][0]["descriptors"][0]
+    assert descriptor_input["name"] == "size_mm_value"
+    assert descriptor_input["type"] == "numeric"
+    assert descriptor_input["numeric_min"] == 0
+    assert descriptor_input["numeric_max"] == 200
 
     resolved_exam_validators = exported["validators"]["examination_validators"]
     resolved_classification_validators = exported["validators"][

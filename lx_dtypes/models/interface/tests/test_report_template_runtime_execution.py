@@ -2,6 +2,13 @@ from pathlib import Path
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
+from lx_dtypes.models.knowledge_base.report_template import (
+    build_report_concept_coverage,
+)
+from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+    evaluate_classification_validator_runtime,
+    evaluate_findings_validator_runtime,
+)
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
 from lx_dtypes.models.ledger.p_finding_classification_choice.Pydantic import (
@@ -82,12 +89,22 @@ def _build_p_examination(
                         "patient_finding_classification_choice_descriptors": [],
                     }
                 )
-                if not isinstance(raw_value, str):
+                descriptor_value = classification_payload.get("descriptor_value")
+                if descriptor_value is not None or not isinstance(raw_value, str):
                     p_choice.patient_finding_classification_choice_descriptors.append(
                         PFindingClassificationChoiceDescriptor.model_validate(
                             {
-                                "descriptor_value": raw_value,
-                                "classification_choice_descriptor": "length_mm_descriptor",
+                                "descriptor_value": (
+                                    descriptor_value
+                                    if descriptor_value is not None
+                                    else raw_value
+                                ),
+                                "classification_choice_descriptor": (
+                                    classification_payload.get(
+                                        "descriptor",
+                                        "length_mm_descriptor",
+                                    )
+                                ),
                                 "patient_finding_classification_choice": str(
                                     p_choice.uuid
                                 ),
@@ -201,6 +218,1091 @@ def test_knowledge_base_runtime_execution_for_example_template() -> None:
     assert failing["classification_validators"]
     assert failing["classification_validators"][0]["hint"]["precedence"] == "required"
     assert passing["ok"] is True
+
+
+def test_colonoscopy_template_emits_authoritative_concept_coverage() -> None:
+    loader = DataLoader(input_dirs=[DATA_ROOT])
+    loader.load_module_configs()
+    kb = loader.load_knowledge_base("report_template_examples")
+    p_examination = _build_p_examination(
+        [
+            {
+                "finding": "sedation_endoscopy",
+                "classifications": [
+                    {"classification": "sedation_performed", "value": "yes"},
+                    {
+                        "classification": "examination_setting_generic_sedation",
+                        "value": "sedation_propofol",
+                    },
+                ],
+            },
+            {
+                "finding": "endoscopy_preprocedure_risk_assessment_checklist",
+                "classifications": [
+                    {
+                        "classification": "endoscopy_risk_assessment_time",
+                        "classification_choice": "endoscopy_risk_assessment_time_recorded",
+                        "descriptor": "endoscopy_risk_assessment_time_value",
+                        "descriptor_value": "09:50",
+                    },
+                    {
+                        "classification": "risk_assessment_protocol_version",
+                        "classification_choice": "risk_assessment_protocol_version_recorded",
+                        "descriptor": "risk_assessment_protocol_version_value",
+                        "descriptor_value": "DGVS Sign-in 2025",
+                    },
+                    {
+                        "classification": "patient_record_and_required_documents_review_status",
+                        "value": "assessment_confirmed_complete",
+                    },
+                    {
+                        "classification": "required_laboratory_and_prior_result_review_status",
+                        "value": "assessment_no_items_required",
+                    },
+                    {
+                        "classification": "procedure_preparation_review_status",
+                        "value": "assessment_confirmed_complete",
+                    },
+                    {
+                        "classification": "fasting_requirement_review_status",
+                        "value": "fasting_requirement_confirmed_met",
+                    },
+                    {
+                        "classification": "asa_review_status",
+                        "value": "asa_current_class_reviewed",
+                    },
+                    {
+                        "classification": "airway_risk_review_status",
+                        "value": "assessment_reviewed_none_identified",
+                    },
+                    {
+                        "classification": "mallampati_review_status",
+                        "value": "mallampati_assessment_reviewed",
+                    },
+                    {
+                        "classification": "cardiopulmonary_risk_review_status",
+                        "value": "assessment_reviewed_none_identified",
+                    },
+                    {
+                        "classification": "medication_review_status",
+                        "value": "medication_reviewed_none_relevant",
+                    },
+                    {
+                        "classification": "antithrombotic_management_review_status",
+                        "value": "anticoagulant_management_not_applicable",
+                    },
+                    {
+                        "classification": "antibiotic_prophylaxis_assessment_status",
+                        "value": "antibiotic_prophylaxis_not_indicated",
+                    },
+                    {
+                        "classification": "allergy_review_status",
+                        "value": "assessment_reviewed_none_identified",
+                    },
+                    {
+                        "classification": "infection_review_status",
+                        "value": "assessment_reviewed_none_identified",
+                    },
+                    {
+                        "classification": "dental_status_review_status",
+                        "value": "dental_status_assessed_no_relevant_issue",
+                    },
+                    {
+                        "classification": "glaucoma_review_status",
+                        "value": "assessment_reviewed_none_identified",
+                    },
+                ],
+            },
+            {
+                "finding": "endoscopy_preprocedure_asa_assessment",
+                "classifications": [
+                    {
+                        "classification": "asa_physical_status_classification",
+                        "value": "asa_class_ii",
+                    }
+                ],
+            },
+            {
+                "finding": "endoscopy_preprocedure_physical_assessment",
+                "classifications": [
+                    {
+                        "classification": "preprocedure_physical_assessment_time",
+                        "classification_choice": "preprocedure_physical_assessment_time_recorded",
+                        "descriptor": "preprocedure_physical_assessment_time_value",
+                        "descriptor_value": "09:52",
+                    },
+                    {
+                        "classification": "preprocedure_heart_rate",
+                        "classification_choice": "preprocedure_heart_rate_recorded",
+                        "descriptor": "preprocedure_heart_rate_value",
+                        "value": 72,
+                    },
+                    {
+                        "classification": "preprocedure_systolic_blood_pressure",
+                        "classification_choice": "preprocedure_systolic_blood_pressure_recorded",
+                        "descriptor": "preprocedure_systolic_blood_pressure_value",
+                        "value": 125,
+                    },
+                    {
+                        "classification": "preprocedure_diastolic_blood_pressure",
+                        "classification_choice": "preprocedure_diastolic_blood_pressure_recorded",
+                        "descriptor": "preprocedure_diastolic_blood_pressure_value",
+                        "value": 78,
+                    },
+                    {
+                        "classification": "preprocedure_oxygen_saturation",
+                        "classification_choice": "preprocedure_oxygen_saturation_recorded",
+                        "descriptor": "preprocedure_oxygen_saturation_value",
+                        "value": 98,
+                    },
+                    {
+                        "classification": "preprocedure_cardiac_auscultation_status",
+                        "value": "auscultation_no_relevant_abnormality",
+                    },
+                    {
+                        "classification": "preprocedure_pulmonary_auscultation_status",
+                        "value": "auscultation_no_relevant_abnormality",
+                    },
+                ],
+            },
+            {
+                "finding": "endoscopy_preprocedure_last_oral_intake",
+                "classifications": [
+                    {
+                        "classification": "last_oral_intake_time",
+                        "classification_choice": "last_oral_intake_time_recorded",
+                        "descriptor": "last_oral_intake_time_value",
+                        "descriptor_value": "06:00",
+                    },
+                    {
+                        "classification": "last_oral_intake_type",
+                        "classification_choice": "last_oral_intake_type_recorded",
+                        "descriptor": "last_oral_intake_type_value",
+                        "descriptor_value": "Klare Flüssigkeit",
+                    },
+                ],
+            },
+            {
+                "finding": "endoscopy_medication_status",
+                "classifications": [
+                    {
+                        "classification": ("endoscopy_medication_documentation_status"),
+                        "value": "documented_none",
+                    }
+                ],
+            },
+            {
+                "finding": "endoscopy_process_timestamps",
+                "classifications": [
+                    {
+                        "classification": "endoscopy_room_entry_time",
+                        "classification_choice": "endoscopy_room_entry_time_recorded",
+                        "descriptor": "endoscopy_room_entry_time_value",
+                        "descriptor_value": "10:00",
+                    },
+                    {
+                        "classification": "endoscope_insertion_time",
+                        "classification_choice": "endoscope_insertion_time_recorded",
+                        "descriptor": "endoscope_insertion_time_value",
+                        "descriptor_value": "10:10",
+                    },
+                    {
+                        "classification": "colonoscopy_withdrawal_start_time",
+                        "classification_choice": (
+                            "colonoscopy_withdrawal_start_time_recorded"
+                        ),
+                        "descriptor": "colonoscopy_withdrawal_start_time_value",
+                        "descriptor_value": "10:25",
+                    },
+                    {
+                        "classification": "endoscope_removal_time",
+                        "classification_choice": "endoscope_removal_time_recorded",
+                        "descriptor": "endoscope_removal_time_value",
+                        "descriptor_value": "10:35",
+                    },
+                    {
+                        "classification": "endoscopy_room_exit_time",
+                        "classification_choice": "endoscopy_room_exit_time_recorded",
+                        "descriptor": "endoscopy_room_exit_time_value",
+                        "descriptor_value": "10:40",
+                    },
+                    {
+                        "classification": "endoscopy_department_exit_time",
+                        "classification_choice": (
+                            "endoscopy_department_exit_time_recorded"
+                        ),
+                        "descriptor": "endoscopy_department_exit_time_value",
+                        "descriptor_value": "11:00",
+                    },
+                ],
+            },
+            {
+                "finding": "endoscopy_preprocedure_team_timeout",
+                "classifications": [
+                    {
+                        "classification": "endoscopy_team_timeout_time",
+                        "classification_choice": (
+                            "endoscopy_team_timeout_time_recorded"
+                        ),
+                        "descriptor": "endoscopy_team_timeout_time_value",
+                        "descriptor_value": "10:05",
+                    },
+                    {
+                        "classification": "team_introduction_status",
+                        "value": "team_introduction_not_applicable",
+                    },
+                    {
+                        "classification": ("patient_identity_confirmation_status"),
+                        "value": "patient_identity_confirmed_against_identifiers",
+                    },
+                    {
+                        "classification": ("patient_preparation_confirmation_status"),
+                        "value": "patient_preparation_confirmed",
+                    },
+                    {
+                        "classification": (
+                            "planned_procedure_and_special_features_review_status"
+                        ),
+                        "value": "procedure_confirmed_no_special_features",
+                    },
+                    {
+                        "classification": (
+                            "patient_specific_risk_and_special_medication_review_status"
+                        ),
+                        "value": "risks_reviewed_none_identified",
+                    },
+                    {
+                        "classification": ("required_documents_confirmation_status"),
+                        "value": "required_documents_confirmed_complete",
+                    },
+                    {
+                        "classification": "required_equipment_readiness_status",
+                        "value": "required_equipment_confirmed_ready",
+                    },
+                    {
+                        "classification": "required_personnel_readiness_status",
+                        "value": "required_personnel_confirmed_ready",
+                    },
+                ],
+            },
+            {
+                "finding": "endoscopy_postprocedure_sign_out",
+                "classifications": [
+                    {
+                        "classification": "endoscopy_sign_out_time",
+                        "classification_choice": "endoscopy_sign_out_time_recorded",
+                        "descriptor": "endoscopy_sign_out_time_value",
+                        "descriptor_value": "10:38",
+                    },
+                    {
+                        "classification": (
+                            "postprocedure_patient_condition_documentation_status"
+                        ),
+                        "value": "postprocedure_patient_condition_documented",
+                    },
+                    {
+                        "classification": "follow_up_measures_confirmation_status",
+                        "value": "follow_up_confirmed_no_special_measures",
+                    },
+                    {
+                        "classification": ("specimen_handling_reconciliation_status"),
+                        "value": "specimen_handling_not_applicable",
+                    },
+                    {
+                        "classification": "procedure_problem_review_status",
+                        "value": "procedure_problems_reviewed_none",
+                    },
+                    {
+                        "classification": "report_documentation_completeness_status",
+                        "value": "report_documentation_confirmed_complete",
+                    },
+                ],
+            },
+            {
+                "finding": "endoscopy_sedation_monitoring_measurement",
+                "classifications": [
+                    {
+                        "classification": "sedation_monitoring_time",
+                        "classification_choice": "sedation_monitoring_time_recorded",
+                        "descriptor": "sedation_monitoring_time_value",
+                        "descriptor_value": "10:30",
+                    },
+                    {
+                        "classification": "sedation_heart_rate",
+                        "classification_choice": "sedation_heart_rate_recorded",
+                        "descriptor": "sedation_heart_rate_value",
+                        "value": 72,
+                    },
+                    {
+                        "classification": "sedation_systolic_blood_pressure",
+                        "classification_choice": (
+                            "sedation_systolic_blood_pressure_recorded"
+                        ),
+                        "descriptor": "sedation_systolic_blood_pressure_value",
+                        "value": 125,
+                    },
+                    {
+                        "classification": "sedation_diastolic_blood_pressure",
+                        "classification_choice": (
+                            "sedation_diastolic_blood_pressure_recorded"
+                        ),
+                        "descriptor": "sedation_diastolic_blood_pressure_value",
+                        "value": 78,
+                    },
+                    {
+                        "classification": "sedation_oxygen_saturation",
+                        "classification_choice": (
+                            "sedation_oxygen_saturation_recorded"
+                        ),
+                        "descriptor": "sedation_oxygen_saturation_value",
+                        "value": 98,
+                    },
+                ],
+            },
+            {
+                "finding": "endoscopy_supplemental_oxygen_administration",
+                "classifications": [
+                    {
+                        "classification": "supplemental_oxygen_delivery_and_flow",
+                        "classification_choice": "oxygen_delivery_nasal_cannula",
+                        "descriptor": "supplemental_oxygen_flow_rate_value",
+                        "value": 2,
+                    }
+                ],
+            },
+            {
+                "finding": "endoscopy_intravenous_fluid_status",
+                "classifications": [
+                    {
+                        "classification": "intravenous_fluid_documentation_status",
+                        "value": "documented_none",
+                    }
+                ],
+            },
+            {
+                "finding": "endoscopy_post_sedation_recovery_assessment",
+                "classifications": [
+                    {
+                        "classification": "sedation_monitoring_time",
+                        "classification_choice": "sedation_monitoring_time_recorded",
+                        "descriptor": "sedation_monitoring_time_value",
+                        "descriptor_value": "10:50",
+                    },
+                    {
+                        "classification": "sedation_heart_rate",
+                        "classification_choice": "sedation_heart_rate_recorded",
+                        "descriptor": "sedation_heart_rate_value",
+                        "value": 70,
+                    },
+                    {
+                        "classification": "sedation_systolic_blood_pressure",
+                        "classification_choice": (
+                            "sedation_systolic_blood_pressure_recorded"
+                        ),
+                        "descriptor": "sedation_systolic_blood_pressure_value",
+                        "value": 122,
+                    },
+                    {
+                        "classification": "sedation_diastolic_blood_pressure",
+                        "classification_choice": (
+                            "sedation_diastolic_blood_pressure_recorded"
+                        ),
+                        "descriptor": "sedation_diastolic_blood_pressure_value",
+                        "value": 76,
+                    },
+                    {
+                        "classification": "sedation_oxygen_saturation",
+                        "classification_choice": (
+                            "sedation_oxygen_saturation_recorded"
+                        ),
+                        "descriptor": "sedation_oxygen_saturation_value",
+                        "value": 99,
+                    },
+                    {
+                        "classification": "post_sedation_orientation_status",
+                        "value": "post_sedation_fully_oriented",
+                    },
+                ],
+            },
+            {
+                "finding": ("endoscopy_post_sedation_discharge_or_transfer_assessment"),
+                "classifications": [
+                    {
+                        "classification": "sedation_monitoring_time",
+                        "classification_choice": "sedation_monitoring_time_recorded",
+                        "descriptor": "sedation_monitoring_time_value",
+                        "descriptor_value": "11:00",
+                    },
+                    {
+                        "classification": "sedation_heart_rate",
+                        "classification_choice": "sedation_heart_rate_recorded",
+                        "descriptor": "sedation_heart_rate_value",
+                        "value": 68,
+                    },
+                    {
+                        "classification": "sedation_systolic_blood_pressure",
+                        "classification_choice": (
+                            "sedation_systolic_blood_pressure_recorded"
+                        ),
+                        "descriptor": "sedation_systolic_blood_pressure_value",
+                        "value": 120,
+                    },
+                    {
+                        "classification": "sedation_diastolic_blood_pressure",
+                        "classification_choice": (
+                            "sedation_diastolic_blood_pressure_recorded"
+                        ),
+                        "descriptor": "sedation_diastolic_blood_pressure_value",
+                        "value": 75,
+                    },
+                    {
+                        "classification": "sedation_oxygen_saturation",
+                        "classification_choice": (
+                            "sedation_oxygen_saturation_recorded"
+                        ),
+                        "descriptor": "sedation_oxygen_saturation_value",
+                        "value": 99,
+                    },
+                    {
+                        "classification": "post_sedation_orientation_status",
+                        "value": "post_sedation_fully_oriented",
+                    },
+                    {
+                        "classification": "post_sedation_disposition",
+                        "value": "post_sedation_outpatient_discharge",
+                    },
+                ],
+            },
+            {
+                "finding": "bowel_preparation_lc",
+                "classifications": [
+                    {
+                        "classification": "bowel_prep_boston",
+                        "value": "bowel_prep_boston_3",
+                    }
+                ],
+            },
+            {
+                "finding": "bowel_preparation_tc",
+                "classifications": [
+                    {
+                        "classification": "bowel_prep_boston",
+                        "value": "bowel_prep_boston_3",
+                    }
+                ],
+            },
+            {
+                "finding": "bowel_preparation_rc",
+                "classifications": [
+                    {
+                        "classification": "bowel_prep_boston",
+                        "value": "bowel_prep_boston_3",
+                    }
+                ],
+            },
+            {
+                "finding": "bowel_preparation_bbps_total",
+                "classifications": [
+                    {
+                        "classification": "bowel_prep_boston_total",
+                        "value": "bbps_total_9",
+                    }
+                ],
+            },
+            {
+                "finding": "colonoscopy_deepest_viewed_location",
+                "classifications": [
+                    {
+                        "classification": "colonoscopy_location_default",
+                        "value": "cecum",
+                    }
+                ],
+            },
+            {
+                "finding": "colonoscopy_withdrawal_time_minutes",
+                "classifications": [
+                    {
+                        "classification": "time_minutes_generic",
+                        "classification_choice": "minutes_numeric_value",
+                        "descriptor": "minutes_numeric_value",
+                        "value": 9,
+                    }
+                ],
+            },
+            {
+                "finding": "colonoscopy_cecal_landmarks_photodocumented",
+                "classifications": [
+                    {
+                        "classification": "appendiceal_orifice_photodocumented",
+                        "value": "yes",
+                    },
+                    {
+                        "classification": "ileocecal_valve_photodocumented",
+                        "value": "yes",
+                    },
+                    {
+                        "classification": "appendiceal_orifice_image_reference",
+                        "value": "image_reference_documented",
+                    },
+                    {
+                        "classification": "ileocecal_valve_image_reference",
+                        "value": "image_reference_documented",
+                    },
+                ],
+            },
+            {
+                "finding": "colonoscopy_technical_quality",
+                "classifications": [
+                    {
+                        "classification": "hd_videoendoscope_used",
+                        "value": "yes",
+                    },
+                    {
+                        "classification": "co2_insufflation_used",
+                        "value": "yes",
+                    },
+                ],
+            },
+            {
+                "finding": "colonoscopy_complication_status",
+                "classifications": [
+                    {
+                        "classification": "colonoscopy_complication_occurred",
+                        "value": "documented_none",
+                    }
+                ],
+            },
+            {
+                "finding": "colonoscopy_pathology_summary",
+                "classifications": [
+                    {
+                        "classification": "colonoscopy_pathology_status",
+                        "value": "documented_none",
+                    }
+                ],
+            },
+            {
+                "finding": "colonoscopy_follow_up_plan",
+                "classifications": [
+                    {
+                        "classification": "colonoscopy_follow_up_recommendation",
+                        "value": "recommendation_no_follow_up",
+                    }
+                ],
+            },
+        ],
+        examination="colonoscopy",
+    )
+
+    validation = kb.evaluate_report_template_validators(
+        "colonoscopy_training_basic",
+        p_examination=p_examination,
+    )
+    coverage = build_report_concept_coverage(
+        kb=kb,
+        requested_template_name="colonoscopy_training_basic",
+        template_export=kb.export_report_template("colonoscopy_training_basic"),
+        p_examination=p_examination,
+        validation=validation,
+    )
+
+    assert validation["ok"] is True, {
+        key: [
+            (result["name"], result.get("issues"))
+            for result in validation[key]
+            if result.get("ok") is False
+        ]
+        for key in (
+            "findings_validators",
+            "examination_validators",
+            "classification_validators",
+        )
+    }
+    assert {item.validation_status for item in coverage.concepts} == {"present"}
+
+
+def test_colonoscopy_conditional_quality_rules() -> None:
+    loader = DataLoader(input_dirs=[DATA_ROOT])
+    loader.load_module_configs()
+    kb = loader.load_knowledge_base("report_template_examples")
+
+    incomplete_rule = kb.findings_validator[
+        "koloskopie_inkomplettheitsgrund_erforderlich"
+    ]
+    incomplete_without_reason = evaluate_findings_validator_runtime(
+        incomplete_rule,
+        reported_findings=[
+            {
+                "finding": "colonoscopy_deepest_viewed_location",
+                "classifications": {
+                    "colonoscopy_location_default": "sigmoid_colon",
+                },
+            }
+        ],
+    )
+    complete_without_reason = evaluate_findings_validator_runtime(
+        incomplete_rule,
+        reported_findings=[
+            {
+                "finding": "colonoscopy_deepest_viewed_location",
+                "classifications": {
+                    "colonoscopy_location_default": "cecum",
+                },
+            }
+        ],
+    )
+    incomplete_with_reason = evaluate_findings_validator_runtime(
+        incomplete_rule,
+        reported_findings=[
+            {
+                "finding": "colonoscopy_deepest_viewed_location",
+                "classifications": {
+                    "colonoscopy_location_default": "sigmoid_colon",
+                    "colonoscopy_not_complete_reason": (
+                        "colonoscopy_incomplete_stenosis"
+                    ),
+                },
+            }
+        ],
+    )
+
+    assert incomplete_without_reason["ok"] is False
+    assert complete_without_reason["ok"] is True
+    assert incomplete_with_reason["ok"] is True
+
+    withdrawal_rule = kb.findings_validator[
+        "koloskopie_rueckzugszeit_mindestens_sechs_minuten_oder_begruendet"
+    ]
+    too_short = evaluate_findings_validator_runtime(
+        withdrawal_rule,
+        reported_findings=[
+            {
+                "finding": "colonoscopy_withdrawal_time_minutes",
+                "classifications": {"time_minutes_generic": 5},
+            }
+        ],
+    )
+    threshold_met = evaluate_findings_validator_runtime(
+        withdrawal_rule,
+        reported_findings=[
+            {
+                "finding": "colonoscopy_withdrawal_time_minutes",
+                "classifications": {"time_minutes_generic": 6},
+            }
+        ],
+    )
+
+    assert too_short["ok"] is False
+    assert threshold_met["ok"] is True
+
+    repeat_rule = kb.findings_validator[
+        "koloskopie_inadaequate_vorbereitung_fruehe_wiederholung"
+    ]
+    inadequate_without_plan = evaluate_findings_validator_runtime(
+        repeat_rule,
+        reported_findings=[
+            {
+                "finding": "bowel_preparation_bbps_total",
+                "classifications": {
+                    "bowel_prep_boston_total": "bbps_total_5",
+                },
+            }
+        ],
+    )
+    inadequate_with_plan = evaluate_findings_validator_runtime(
+        repeat_rule,
+        reported_findings=[
+            {
+                "finding": "bowel_preparation_bbps_total",
+                "classifications": {
+                    "bowel_prep_boston_total": "bbps_total_5",
+                },
+            },
+            {
+                "finding": "colonoscopy_early_repeat_plan",
+                "classifications": {
+                    "colonoscopy_early_repeat_plan": "repeat_within_one_year",
+                },
+            },
+        ],
+    )
+
+    assert inadequate_without_plan["ok"] is False
+    assert inadequate_with_plan["ok"] is True
+
+    medication_rule = kb.findings_validator[
+        "koloskopie_medikationsgabe_wenn_verabreicht"
+    ]
+    medication_without_administration = evaluate_findings_validator_runtime(
+        medication_rule,
+        reported_findings=[
+            {
+                "finding": "endoscopy_medication_status",
+                "classifications": {
+                    "endoscopy_medication_documentation_status": ("documented_present"),
+                },
+            }
+        ],
+    )
+    medication_with_administration = evaluate_findings_validator_runtime(
+        medication_rule,
+        reported_findings=[
+            {
+                "finding": "endoscopy_medication_status",
+                "classifications": {
+                    "endoscopy_medication_documentation_status": ("documented_present"),
+                },
+            },
+            {
+                "finding": "endoscopy_medication_administration",
+                "classifications": {
+                    "endoscopy_medication_product_and_dose": [
+                        "medication_propofol",
+                        120,
+                    ],
+                    "medication_administration_route": ("medication_route_intravenous"),
+                    "medication_administration_method": "medication_method_bolus",
+                },
+            },
+        ],
+    )
+
+    assert medication_without_administration["ok"] is False
+    assert medication_with_administration["ok"] is True
+
+    sedation_documentation_rule = kb.findings_validator[
+        "koloskopie_sedierungsdokumentation_wenn_sediert"
+    ]
+    sedation_without_monitoring = evaluate_findings_validator_runtime(
+        sedation_documentation_rule,
+        reported_findings=[
+            {
+                "finding": "sedation_endoscopy",
+                "classifications": {"sedation_performed": "yes"},
+            }
+        ],
+    )
+    sedation_with_documentation = evaluate_findings_validator_runtime(
+        sedation_documentation_rule,
+        reported_findings=[
+            {
+                "finding": "sedation_endoscopy",
+                "classifications": {"sedation_performed": "yes"},
+            },
+            {"finding": "endoscopy_sedation_monitoring_measurement"},
+            {"finding": "endoscopy_supplemental_oxygen_administration"},
+            {"finding": "endoscopy_intravenous_fluid_status"},
+            {"finding": "endoscopy_post_sedation_recovery_assessment"},
+            {"finding": ("endoscopy_post_sedation_discharge_or_transfer_assessment")},
+        ],
+    )
+
+    assert sedation_without_monitoring["ok"] is False
+    assert sedation_with_documentation["ok"] is True
+
+    asa_when_sedated_rule = kb.findings_validator["koloskopie_asa_wenn_sediert"]
+    sedated_without_asa = evaluate_findings_validator_runtime(
+        asa_when_sedated_rule,
+        reported_findings=[
+            {
+                "finding": "sedation_endoscopy",
+                "classifications": {"sedation_performed": "yes"},
+            }
+        ],
+    )
+    sedated_with_asa = evaluate_findings_validator_runtime(
+        asa_when_sedated_rule,
+        reported_findings=[
+            {
+                "finding": "sedation_endoscopy",
+                "classifications": {"sedation_performed": "yes"},
+            },
+            {"finding": "endoscopy_preprocedure_asa_assessment"},
+            {"finding": "endoscopy_preprocedure_physical_assessment"},
+            {"finding": "endoscopy_preprocedure_last_oral_intake"},
+        ],
+    )
+
+    assert sedated_without_asa["ok"] is False
+    assert sedated_with_asa["ok"] is True
+
+    fluid_rule = kb.findings_validator[
+        "koloskopie_intravenoese_fluessigkeitsgabe_wenn_verabreicht"
+    ]
+    fluid_without_administration = evaluate_findings_validator_runtime(
+        fluid_rule,
+        reported_findings=[
+            {
+                "finding": "endoscopy_intravenous_fluid_status",
+                "classifications": {
+                    "intravenous_fluid_documentation_status": "documented_present"
+                },
+            }
+        ],
+    )
+    fluid_with_administration = evaluate_findings_validator_runtime(
+        fluid_rule,
+        reported_findings=[
+            {
+                "finding": "endoscopy_intravenous_fluid_status",
+                "classifications": {
+                    "intravenous_fluid_documentation_status": "documented_present"
+                },
+            },
+            {"finding": "endoscopy_intravenous_fluid_administration"},
+        ],
+    )
+
+    assert fluid_without_administration["ok"] is False
+    assert fluid_with_administration["ok"] is True
+
+    dose_rule = kb.classification_validator[
+        "koloskopie_medikament_und_dosis_vollstaendig"
+    ]
+    dose_rule_kwargs = {
+        "classifications": kb.classification,
+        "classification_choices": kb.classification_choice,
+        "classification_choice_descriptors": kb.classification_choice_descriptor,
+    }
+    absent_administration = evaluate_classification_validator_runtime(
+        dose_rule,
+        **dose_rule_kwargs,
+        reported_findings=[],
+    )
+    product_without_dose = evaluate_classification_validator_runtime(
+        dose_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_medication_administration",
+                "classifications": {
+                    "endoscopy_medication_product_and_dose": "medication_propofol"
+                },
+            }
+        ],
+    )
+    product_with_dose = evaluate_classification_validator_runtime(
+        dose_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_medication_administration",
+                "classifications": {
+                    "endoscopy_medication_product_and_dose": [
+                        "medication_propofol",
+                        120,
+                    ]
+                },
+            }
+        ],
+    )
+
+    assert absent_administration["ok"] is True
+    assert product_without_dose["ok"] is False
+    assert product_without_dose["issues"][0]["code"] == (
+        "classification_value_not_present"
+    )
+    assert product_with_dose["ok"] is True
+
+    administration_time_rule = kb.classification_validator[
+        "koloskopie_medikament_zeitpunkt_vollstaendig"
+    ]
+    time_without_value = evaluate_classification_validator_runtime(
+        administration_time_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_medication_administration",
+                "classifications": {
+                    "medication_administration_time": (
+                        "medication_administration_time_recorded"
+                    )
+                },
+            }
+        ],
+    )
+    time_with_value = evaluate_classification_validator_runtime(
+        administration_time_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_medication_administration",
+                "classifications": {
+                    "medication_administration_time": [
+                        "medication_administration_time_recorded",
+                        "10:30",
+                    ]
+                },
+            }
+        ],
+    )
+
+    assert time_without_value["ok"] is False
+    assert time_with_value["ok"] is True
+
+    administration_method_rule = kb.classification_validator[
+        "koloskopie_medikament_verabreichungsform_vollstaendig"
+    ]
+    infusion_without_flow_rate = evaluate_classification_validator_runtime(
+        administration_method_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_medication_administration",
+                "classifications": {
+                    "medication_administration_method": "medication_method_infusion"
+                },
+            }
+        ],
+    )
+    infusion_with_flow_rate = evaluate_classification_validator_runtime(
+        administration_method_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_medication_administration",
+                "classifications": {
+                    "medication_administration_method": [
+                        "medication_method_infusion",
+                        25,
+                    ]
+                },
+            }
+        ],
+    )
+
+    assert infusion_without_flow_rate["ok"] is False
+    assert infusion_with_flow_rate["ok"] is True
+
+    room_entry_rule = kb.classification_validator[
+        "koloskopie_prozesszeit_raum_betreten_vollstaendig"
+    ]
+    room_entry_without_timestamp = evaluate_classification_validator_runtime(
+        room_entry_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_process_timestamps",
+                "classifications": {
+                    "endoscopy_room_entry_time": ("endoscopy_room_entry_time_recorded")
+                },
+            }
+        ],
+    )
+    room_entry_with_timestamp = evaluate_classification_validator_runtime(
+        room_entry_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_process_timestamps",
+                "classifications": {
+                    "endoscopy_room_entry_time": [
+                        "endoscopy_room_entry_time_recorded",
+                        "10:00",
+                    ]
+                },
+            }
+        ],
+    )
+
+    assert room_entry_without_timestamp["ok"] is False
+    assert room_entry_with_timestamp["ok"] is True
+
+    team_timeout_time_rule = kb.classification_validator[
+        "koloskopie_team_timeout_zeitpunkt_vollstaendig"
+    ]
+    team_timeout_without_timestamp = evaluate_classification_validator_runtime(
+        team_timeout_time_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_preprocedure_team_timeout",
+                "classifications": {
+                    "endoscopy_team_timeout_time": (
+                        "endoscopy_team_timeout_time_recorded"
+                    )
+                },
+            }
+        ],
+    )
+    team_timeout_with_timestamp = evaluate_classification_validator_runtime(
+        team_timeout_time_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_preprocedure_team_timeout",
+                "classifications": {
+                    "endoscopy_team_timeout_time": [
+                        "endoscopy_team_timeout_time_recorded",
+                        "10:05",
+                    ]
+                },
+            }
+        ],
+    )
+
+    assert team_timeout_without_timestamp["ok"] is False
+    assert team_timeout_with_timestamp["ok"] is True
+
+    identity_documentation_rule = kb.classification_validator[
+        "koloskopie_team_timeout_patientenidentitaet_vollstaendig"
+    ]
+    documented_negative_identity_check = evaluate_classification_validator_runtime(
+        identity_documentation_rule,
+        **dose_rule_kwargs,
+        reported_findings=[
+            {
+                "finding": "endoscopy_preprocedure_team_timeout",
+                "classifications": {
+                    "patient_identity_confirmation_status": (
+                        "patient_identity_not_confirmed"
+                    )
+                },
+            }
+        ],
+    )
+
+    assert documented_negative_identity_check["ok"] is True
+
+
+def test_large_polyp_requires_resection_retrieval_and_histology_status() -> None:
+    loader = DataLoader(input_dirs=[DATA_ROOT])
+    loader.load_module_configs()
+    kb = loader.load_knowledge_base("report_template_examples")
+    rule = kb.findings_validator["koloskopie_polyp_groesser_fuenf_mm_qualitaetsdaten"]
+
+    incomplete = evaluate_findings_validator_runtime(
+        rule,
+        reported_findings=[
+            {
+                "finding": "colon_polyp",
+                "classifications": {
+                    "lesion_size_mm": 8,
+                    "colon_lesion_paris": "colon_lesion_paris_0_is",
+                },
+            }
+        ],
+    )
+    complete = evaluate_findings_validator_runtime(
+        rule,
+        reported_findings=[
+            {
+                "finding": "colon_polyp",
+                "classifications": {
+                    "lesion_size_mm": 8,
+                    "colon_lesion_paris": "colon_lesion_paris_0_is",
+                    "colonoscopy_specimen_retrieval_status": "specimen_retrieved",
+                    "colonoscopy_histology_submission_status": "histology_submitted",
+                    "colonoscopy_resection_technique_status": (
+                        "resection_technique_documented"
+                    ),
+                },
+            }
+        ],
+    )
+
+    assert incomplete["ok"] is False
+    assert complete["ok"] is True
 
 
 def test_knowledge_base_runtime_execution_flags_missing_exam_requirement() -> None:

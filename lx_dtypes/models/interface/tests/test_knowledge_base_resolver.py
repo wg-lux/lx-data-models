@@ -18,6 +18,7 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     resolve_default_data_root,
 )
 from lx_dtypes.models.interface import remote_data_roots
+from lx_dtypes.models.interface.data_roots import package_data_root
 
 
 def _write_kb_root(root: Path, *, module_name: str, version: str) -> None:
@@ -323,8 +324,7 @@ def test_get_knowledge_base_identity_prefers_explicit_version(tmp_path: Path) ->
     assert identity == (module_name, "9.9.9")
 
 
-def test_resolve_default_data_root_prefers_configured_lookup_root(
-    monkeypatch: pytest.MonkeyPatch,
+def test_resolve_default_data_root_ignores_runtime_overlays(
     settings: Any,
     tmp_path: Path,
 ) -> None:
@@ -334,4 +334,4 @@ def test_resolve_default_data_root_prefers_configured_lookup_root(
 
     resolved_root = resolve_default_data_root()
 
-    assert resolved_root == configured_root.resolve()
+    assert resolved_root == package_data_root()

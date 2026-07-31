@@ -7,6 +7,7 @@ into pytest runs.
 
 from __future__ import annotations
 
+import json
 import os
 import tempfile
 from importlib.util import find_spec
@@ -64,6 +65,28 @@ if "lx_dtypes.django.apps.LxDtypesDjangoConfig" not in INSTALLED_APPS:
 
 ROOT_URLCONF = "lx_dtypes.django.urls"
 
-# Keep dtypes-backed findings API tests deterministic in CI by using a
-# guaranteed module from lx_dtypes/data, unless explicitly overridden.
-os.environ.setdefault("LX_DTYPES_FINDINGS_MODULE", "report_template_examples")
+# API tests exercise the same explicit, versioned registry contract as a
+# deployment. They do not use checkout-relative or process-local KB overrides.
+_test_registry_dir = Path(tempfile.mkdtemp(prefix="lx_dtypes_test_registry_"))
+_test_registry_path = _test_registry_dir / "registry.json"
+_test_registry_path.write_text(
+    json.dumps(
+        {
+            "active": {
+                "module_name": "report_template_examples",
+                "version": "0.1.0",
+            },
+            "modules": {
+                "report_template_examples": {
+                    "0.1.0": {
+                        "input_dirs": [
+                            str(Path(__file__).resolve().parent / "data")
+                        ]
+                    }
+                }
+            },
+        }
+    ),
+    encoding="utf-8",
+)
+os.environ.setdefault("LX_DTYPES_KB_REGISTRY", str(_test_registry_path))
