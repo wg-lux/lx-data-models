@@ -18,18 +18,25 @@ api/index
 
 guides/pydantic-cheatsheet
 guides/dates-and-times
+guides/typing_conventions
+guides/package_boundary
+guides/django-host-integration
 guides/fhir-clinical-testing
+guides/fhir-lxdm-mapping-diagrams
 guides/konzept-verknuepfungen
 guides/knowledge-base-authoring
 guides/kb-yaml-linting
 guides/knowledge-base-contract-migration
+guides/runtime-output-vs-canonical-ddict
+guides/report-concept-coverage
 guides/report-template-infrastructure
+guides/report-template-graph-validation
 guides/report-template-findings-validator-migration
 ```
 
 ## Quick Links
 - Project repository: https://github.com/wg-lux/lx-data-models
 - Issue tracker: https://github.com/wg-lux/lx-data-models/issues
-- Python Package Index (coming soon)
+- Python Package Index: https://pypi.org/project/lx-dtypes/
 
 Need another topic? Open a discussion or file an issue and we will expand the docs.
