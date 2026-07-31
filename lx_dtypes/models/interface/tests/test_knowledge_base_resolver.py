@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import builtins
 import json
-import shutil
 import zipfile
 from io import BytesIO
 from pathlib import Path
@@ -170,41 +170,11 @@ def test_load_module_config_materializes_github_tree_registry_source(
             del chunk_size
             yield archive_buffer.getvalue()
 
-    def _atomic_write_file(*, destination: Path, content, **kwargs: Any) -> Path:
-        del kwargs
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes(b"".join(content))
-        return destination
-
-    def _atomic_move_path(*, source: Path, destination: Path, **kwargs: Any) -> Path:
-        del kwargs
-        source.rename(destination)
-        return destination
-
-    def _ensure_directory(path: Path, **kwargs: Any) -> Path:
-        del kwargs
-        path.mkdir(parents=True, exist_ok=True)
-        return path
-
-    def _safe_rmtree(path: Path, **kwargs: Any) -> None:
-        del kwargs
-        shutil.rmtree(path, ignore_errors=True)
-
     monkeypatch.setenv("LX_DTYPES_REMOTE_CACHE_ROOT", str(tmp_path / "cache"))
     monkeypatch.setattr(
         remote_data_roots.requests,
         "get",
         lambda *args, **kwargs: _ArchiveResponse(),
-    )
-    monkeypatch.setattr(
-        remote_data_roots,
-        "_filesystem_operations",
-        lambda: remote_data_roots.FilesystemOperations(
-            atomic_move_path=_atomic_move_path,
-            atomic_write_file=_atomic_write_file,
-            ensure_directory=_ensure_directory,
-            safe_rmtree=_safe_rmtree,
-        ),
     )
     registry_path = tmp_path / "kb_registry.json"
     registry_path.write_text(
@@ -233,6 +203,48 @@ def test_load_module_config_materializes_github_tree_registry_source(
     assert config.name == module_name
     assert config.version == "0.1.0"
     assert (tmp_path / "cache").is_dir()
+
+
+def test_remote_data_root_filesystem_operations_do_not_import_endoreg_db(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    real_import = builtins.__import__
+
+    def _reject_endoreg_import(name: str, *args: Any, **kwargs: Any) -> Any:
+        if name == "endoreg_db" or name.startswith("endoreg_db."):
+            raise AssertionError(f"unexpected reverse runtime dependency: {name}")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", _reject_endoreg_import)
+
+    operations = remote_data_roots._filesystem_operations()
+
+    assert operations.atomic_write_file is remote_data_roots._atomic_write_file
+    assert operations.atomic_move_path is remote_data_roots._atomic_move_path
+
+
+def test_atomic_remote_cache_write_preserves_existing_file_on_failure(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "cache" / "config.yaml"
+    destination.parent.mkdir()
+    destination.write_bytes(b"existing")
+
+    def _failing_content():
+        yield b"replacement"
+        raise RuntimeError("interrupted write")
+
+    with pytest.raises(RuntimeError, match="interrupted write"):
+        remote_data_roots._atomic_write_file(
+            destination=destination,
+            content=_failing_content(),
+            required_bytes=len(b"replacement"),
+            file_mode=0o640,
+            dir_mode=0o750,
+        )
+
+    assert destination.read_bytes() == b"existing"
+    assert list(destination.parent.glob(f".{destination.name}.*.tmp")) == []
 
 
 def test_load_knowledge_base_uses_bundle_scoped_duplicate_modules(
