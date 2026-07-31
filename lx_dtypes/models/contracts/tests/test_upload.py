@@ -75,6 +75,36 @@ def test_upload_api_request_data_excludes_multipart_file_field() -> None:
     assert data == {"center_key": "site-a"}
 
 
+@pytest.mark.parametrize(
+    "unknown_field_name",
+    ["unexpected", "files", "upload"],
+)
+def test_upload_api_request_data_rejects_unknown_multipart_fields(
+    unknown_field_name: str,
+) -> None:
+    with pytest.raises(
+        ValueError,
+        match=rf"Unknown upload request field\(s\): {unknown_field_name}",
+    ):
+        upload_api_request_data_from_mapping(
+            {
+                "center_key": "site-a",
+                "file": "transport-only",
+                unknown_field_name: "not-part-of-the-contract",
+            }
+        )
+
+
+def test_upload_api_request_payload_rejects_unknown_field_before_projection() -> None:
+    with pytest.raises(ValueError, match="Unknown upload request field"):
+        validate_upload_api_request_payload(
+            {
+                "center_name": "University Hospital",
+                "unexpected": "field",
+            }
+        )
+
+
 def test_upload_api_request_payload_rejects_unknown_contract_fields() -> None:
     with pytest.raises(ValidationError):
         UploadApiRequestPayload.model_validate({"unexpected": "field"})
