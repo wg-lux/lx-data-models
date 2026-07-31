@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import zipfile
 from io import BytesIO
 from pathlib import Path
@@ -15,10 +14,7 @@ from lx_dtypes.django.api import terminology_routes
 
 @pytest.fixture(autouse=True)
 def reset_active_terminology_selection(monkeypatch: pytest.MonkeyPatch) -> None:
-    terminology_routes._ACTIVE_TERMINOLOGY_SELECTION = None
-    monkeypatch.delenv("LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE", raising=False)
-    monkeypatch.delenv("LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION", raising=False)
-    monkeypatch.delenv("LX_DTYPES_ACTIVE_MEDICAL_FIELD", raising=False)
+    monkeypatch.delenv("LX_DTYPES_KB_REGISTRY", raising=False)
 
 
 def _write_module_config(
@@ -115,7 +111,7 @@ def _editor_bundle_zip() -> bytes:
     return buffer.getvalue()
 
 
-def _write_registry(tmp_path: Path) -> Path:
+def _write_registry(tmp_path: Path, *, active: bool = False) -> Path:
     kb_root = tmp_path / "knowledge-bases"
     bundle_dir = kb_root / "published_terminology"
     _write_module_config(
@@ -136,21 +132,23 @@ def _write_registry(tmp_path: Path) -> Path:
     _write_unit(units_dir, name="published_unit")
 
     registry_path = tmp_path / "kb_registry.json"
-    registry_path.write_text(
-        json.dumps(
-            {
-                "modules": {
-                    "published_terminology": {
-                        "2026.04.30": {
-                            "input_dirs": [
-                                str(kb_root),
-                            ]
-                        }
-                    }
+    payload: dict[str, object] = {
+        "modules": {
+            "published_terminology": {
+                "2026.04.30": {
+                    "input_dirs": [
+                        str(kb_root),
+                    ]
                 }
             }
-        )
-    )
+        }
+    }
+    if active:
+        payload["active"] = {
+            "module_name": "published_terminology",
+            "version": "2026.04.30",
+        }
+    registry_path.write_text(json.dumps(payload))
     return registry_path
 
 
@@ -159,25 +157,23 @@ def test_list_terminology_bundles_from_registry(
     tmp_path: Path,
 ) -> None:
     registry_path = _write_registry(tmp_path)
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
 
     response = Client().get("/base_api/terminology/bundles", secure=True)
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["registry_path"] == str(registry_path.resolve())
     assert payload["bundles"] == [
         {
             "module_name": "published_terminology",
             "version": "2026.04.30",
             "medical_field": "gastroenterology",
-            "input_dirs": [str((tmp_path / "knowledge-bases").resolve())],
             "is_active": False,
         }
     ]
 
 
-def test_list_terminology_bundles_preserves_github_tree_source(
+def test_list_terminology_bundles_does_not_expose_storage_source(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -190,12 +186,12 @@ def test_list_terminology_bundles_preserves_github_tree_source(
             {"modules": {"star_upper_gi": {"0.1.1": {"input_dirs": [source_url]}}}}
         )
     )
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
 
     response = Client().get("/base_api/terminology/bundles", secure=True)
 
     assert response.status_code == 200
-    assert response.json()["bundles"][0]["input_dirs"] == [source_url]
+    assert "input_dirs" not in response.json()["bundles"][0]
 
 
 def test_select_terminology_bundle_sets_active_runtime_selection(
@@ -203,10 +199,7 @@ def test_select_terminology_bundle_sets_active_runtime_selection(
     tmp_path: Path,
 ) -> None:
     registry_path = _write_registry(tmp_path)
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
-    monkeypatch.delenv("LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE", raising=False)
-    monkeypatch.delenv("LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION", raising=False)
-    terminology_routes._ACTIVE_TERMINOLOGY_SELECTION = None
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
 
     response = Client().post(
         "/base_api/terminology/bundles/select",
@@ -228,7 +221,6 @@ def test_select_terminology_bundle_sets_active_runtime_selection(
     assert payload["active"]["medical_field"] == "gastroenterology"
     assert payload["active"]["is_active"] is True
     assert payload["counts"]["unit"] == 1
-    assert os.environ["LX_DTYPES_ACTIVE_MEDICAL_FIELD"] == "gastroenterology"
     assert terminology_routes.active_terminology_selection() == (
         "published_terminology",
         "2026.04.30",
@@ -239,12 +231,8 @@ def test_export_active_terminology_bundle_as_fhir(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    registry_path = _write_registry(tmp_path)
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
-    terminology_routes._ACTIVE_TERMINOLOGY_SELECTION = (
-        "published_terminology",
-        "2026.04.30",
-    )
+    registry_path = _write_registry(tmp_path, active=True)
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
 
     response = Client().get("/base_api/terminology/active/fhir", secure=True)
 
@@ -275,7 +263,7 @@ def test_export_registered_terminology_bundle_as_fhir_without_selecting(
     tmp_path: Path,
 ) -> None:
     registry_path = _write_registry(tmp_path)
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
 
     response = Client().get(
         "/base_api/terminology/bundles/published_terminology/2026.04.30/fhir",
@@ -294,7 +282,7 @@ def test_import_terminology_bundle_zip_registers_and_activates_bundle(
 ) -> None:
     registry_path = tmp_path / "kb_registry.json"
     import_root = tmp_path / "imported-packages"
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
     monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", str(import_root))
 
     response = Client().post(
@@ -324,6 +312,10 @@ def test_import_terminology_bundle_zip_registers_and_activates_bundle(
 
     registry = json.loads(registry_path.read_text(encoding="utf-8"))
     entry = registry["modules"]["published_terminology"]["2026.05.04"]
+    assert registry["active"] == {
+        "module_name": "published_terminology",
+        "version": "2026.05.04",
+    }
     assert entry["medical_field"] == "gastroenterology"
     assert entry["input_dirs"] == [
         str((import_root / "published_terminology" / "2026.05.04").resolve())
@@ -343,7 +335,7 @@ def test_import_rejects_overwriting_an_existing_bundle_version(
 ) -> None:
     registry_path = tmp_path / "kb_registry.json"
     import_root = tmp_path / "imported-packages"
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
     monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", str(import_root))
     upload = SimpleUploadedFile(
         "published_terminology.zip",
@@ -375,12 +367,25 @@ def test_import_rejects_overwriting_an_existing_bundle_version(
     assert not list(registry_path.parent.glob(".*.tmp"))
 
 
+def test_missing_registry_error_does_not_expose_server_path(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "private" / "registry.json"
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+
+    response = Client().get("/base_api/terminology/bundles", secure=True)
+
+    assert response.status_code == 404
+    assert str(registry_path) not in response.content.decode()
+
+
 def test_export_active_terminology_fhir_requires_active_selection(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
     registry_path = _write_registry(tmp_path)
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
 
     response = Client().get("/base_api/terminology/active/fhir", secure=True)
 
@@ -392,7 +397,7 @@ def test_select_terminology_bundle_rejects_unregistered_version(
     tmp_path: Path,
 ) -> None:
     registry_path = _write_registry(tmp_path)
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
 
     response = Client().post(
         "/base_api/terminology/bundles/select",

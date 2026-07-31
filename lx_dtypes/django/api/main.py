@@ -13,6 +13,7 @@ from typing import (
     Optional,
     Protocol,
     Set,
+    TypedDict,
     TypeVar,
     cast,
     Literal,
@@ -26,7 +27,6 @@ from lx_dtypes.models.contracts import KnowledgeBaseContract
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseVersionNotFoundError,
     clear_knowledge_base_resolver_caches,
-    get_knowledge_base_identity,
     load_knowledge_base,
 )
 from lx_dtypes.models.interface import KnowledgeBaseResolver as _knowledge_base_resolver
@@ -48,6 +48,17 @@ from .terminology_routes import (
 )
 
 F = TypeVar("F", bound=Callable[..., Any])
+ReportLanguageCode = Literal["de", "en"]
+
+
+class ReportLanguageOption(TypedDict):
+    code: ReportLanguageCode
+    label: str
+
+
+class ReportLanguagesResponse(TypedDict):
+    default_language: ReportLanguageCode
+    languages: List[ReportLanguageOption]
 
 
 class _RouteDecorator(Protocol):
@@ -77,6 +88,19 @@ else:
     from ninja import NinjaAPI
 
     api = cast(_TypedApi, NinjaAPI(urls_namespace="lx_dtypes_base_api"))
+
+
+@api.get("/reporting/languages")
+def reporting_languages(request: BaseRequest) -> ReportLanguagesResponse:
+    """Return the report languages supported by LXDM concept labels."""
+    del request
+    return {
+        "default_language": "de",
+        "languages": [
+            {"code": "de", "label": "Deutsch"},
+            {"code": "en", "label": "English"},
+        ],
+    }
 
 
 @lru_cache(maxsize=1)
@@ -202,15 +226,12 @@ def _resolve_active_version(module_name: str, version: str | None) -> str | None
     active = active_terminology_selection()
     if active is not None and active[0] == module_name:
         return active[1]
-    active_module = os.getenv("LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE", "").strip()
-    active_version = os.getenv("LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION", "").strip()
-    if active_module == module_name and active_version:
-        return active_version
-    try:
-        _, current_version = get_knowledge_base_identity(module_name)
-    except ValueError as exc:
-        raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
-    return current_version
+    if active is None:
+        raise HttpError(409, "No active knowledge-base bundle is selected.")
+    raise HttpError(
+        409,
+        f"Knowledge-base module '{module_name}' is not the active registered bundle.",
+    )
 
 
 def _load_module_kb(
@@ -308,10 +329,6 @@ def _build_p_examination_payload_from_host_ledger(
         orm_models=lambda: _orm_models(),
         active_patient_findings_queryset=lambda: _active_patient_findings_queryset(),
     )
-
-
-def _findings_module_name() -> str:
-    return os.getenv("LX_DTYPES_FINDINGS_MODULE", "lx_knowledge_base")
 
 
 def _norm_name(value: Optional[str]) -> str:

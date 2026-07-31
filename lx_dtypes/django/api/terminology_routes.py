@@ -72,12 +72,10 @@ class TerminologyBundleVersion(Schema):
     module_name: str
     version: str
     medical_field: str | None = None
-    input_dirs: List[str]
     is_active: bool = False
 
 
 class TerminologyBundleListResponse(Schema):
-    registry_path: str
     active: TerminologyBundleVersion | None
     bundles: List[TerminologyBundleVersion]
 
@@ -96,11 +94,7 @@ class SelectTerminologyBundleResponse(Schema):
 class ImportTerminologyBundleResponse(Schema):
     ok: bool
     imported: TerminologyBundleVersion
-    registry_path: str
     counts: Dict[str, int]
-
-
-_ACTIVE_TERMINOLOGY_SELECTION: tuple[str, str] | None = None
 
 
 @dataclass(frozen=True)
@@ -110,7 +104,8 @@ class TerminologyRegistryEntry:
 
 
 def active_terminology_selection() -> tuple[str, str] | None:
-    return _ACTIVE_TERMINOLOGY_SELECTION
+    registry_path = terminology_registry_path()
+    return _active_selection_from_registry(registry_path)
 
 
 def _settings_or_env(name: str) -> str:
@@ -118,14 +113,11 @@ def _settings_or_env(name: str) -> str:
 
 
 def _configured_terminology_registry_path() -> Path:
-    configured = _settings_or_env("LX_DTYPES_TERMINOLOGY_REGISTRY")
-    if not configured:
-        configured = _settings_or_env("LX_DTYPES_KB_REGISTRY")
+    configured = _settings_or_env("LX_DTYPES_KB_REGISTRY")
     if not configured:
         raise HttpError(
             404,
-            "No terminology registry configured. Set LX_DTYPES_TERMINOLOGY_REGISTRY "
-            "or LX_DTYPES_KB_REGISTRY.",
+            "No knowledge-base registry configured. Set LX_DTYPES_KB_REGISTRY.",
         )
     return Path(configured).expanduser().resolve()
 
@@ -133,7 +125,7 @@ def _configured_terminology_registry_path() -> Path:
 def terminology_registry_path() -> Path:
     registry_path = _configured_terminology_registry_path()
     if not registry_path.exists():
-        raise HttpError(404, f"Terminology registry does not exist: {registry_path}")
+        raise HttpError(404, "The configured terminology registry does not exist.")
     return registry_path
 
 
@@ -257,12 +249,28 @@ def load_terminology_registry(
     return registry
 
 
-def _active_selection_from_env() -> tuple[str, str] | None:
-    module_name = _settings_or_env("LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE")
-    version = _settings_or_env("LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION")
-    if module_name and version:
-        return module_name, version
-    return _ACTIVE_TERMINOLOGY_SELECTION
+def _active_selection_from_registry(registry_path: Path) -> tuple[str, str] | None:
+    raw_payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    if not isinstance(raw_payload, Mapping):
+        raise KnowledgeBaseRegistryError("Terminology registry must be a JSON object.")
+    raw_active = raw_payload.get("active")
+    if raw_active is None:
+        return None
+    if not isinstance(raw_active, Mapping):
+        raise KnowledgeBaseRegistryError(
+            "Terminology registry `active` entry must be a JSON object."
+        )
+    module_name = raw_active.get("module_name")
+    version = raw_active.get("version")
+    if not isinstance(module_name, str) or not module_name.strip():
+        raise KnowledgeBaseRegistryError(
+            "Terminology registry active module_name must be a non-empty string."
+        )
+    if not isinstance(version, str) or not version.strip():
+        raise KnowledgeBaseRegistryError(
+            "Terminology registry active version must be a non-empty string."
+        )
+    return module_name.strip(), version.strip()
 
 
 def _bundle_payload(
@@ -280,7 +288,6 @@ def _bundle_payload(
         module_name=module_name,
         version=version,
         medical_field=medical_field,
-        input_dirs=list(entry.input_dirs),
         is_active=active == (module_name, version),
     )
 
@@ -292,16 +299,17 @@ def _set_active_selection(
     version: str,
     medical_field: str | None,
 ) -> None:
-    global _ACTIVE_TERMINOLOGY_SELECTION
-    _ACTIVE_TERMINOLOGY_SELECTION = (module_name, version)
-    os.environ["LX_DTYPES_KB_REGISTRY"] = str(registry_path)
-    os.environ["LX_DTYPES_FINDINGS_MODULE"] = module_name
-    os.environ["LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE"] = module_name
-    os.environ["LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION"] = version
-    if medical_field:
-        os.environ["LX_DTYPES_ACTIVE_MEDICAL_FIELD"] = medical_field
-    else:
-        os.environ.pop("LX_DTYPES_ACTIVE_MEDICAL_FIELD", None)
+    del medical_field
+    payload = _load_registry_payload_for_write(registry_path)
+    modules = payload.get("modules", {})
+    versions = modules.get(module_name, {}) if isinstance(modules, Mapping) else {}
+    if not isinstance(versions, Mapping) or version not in versions:
+        raise HttpError(
+            404,
+            f"Terminology bundle '{module_name}' version '{version}' is not registered.",
+        )
+    payload["active"] = {"module_name": module_name, "version": version}
+    _write_registry_payload_atomic(registry_path, payload)
     clear_knowledge_base_resolver_caches()
 
 
@@ -462,7 +470,7 @@ def _load_registry_payload_for_write(registry_path: Path) -> dict[str, Any]:
     try:
         payload = json.loads(registry_path.read_text(encoding="utf-8"))
     except Exception as exc:
-        raise HttpError(500, f"Terminology registry could not be read: {exc}") from exc
+        raise HttpError(500, "Terminology registry could not be read.") from exc
     if not isinstance(payload, dict):
         raise HttpError(500, "Terminology registry must be a JSON object.")
     modules = payload.setdefault("modules", {})
@@ -473,6 +481,23 @@ def _load_registry_payload_for_write(registry_path: Path) -> dict[str, Any]:
     return payload
 
 
+def _write_registry_payload_atomic(
+    registry_path: Path, payload: Mapping[str, Any]
+) -> None:
+    serialized = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    temporary_registry = registry_path.with_name(
+        f".{registry_path.name}.{uuid.uuid4().hex}.tmp"
+    )
+    try:
+        with temporary_registry.open("w", encoding="utf-8") as registry_file:
+            registry_file.write(serialized)
+            registry_file.flush()
+            os.fsync(registry_file.fileno())
+        os.replace(temporary_registry, registry_path)
+    finally:
+        temporary_registry.unlink(missing_ok=True)
+
+
 def _register_imported_bundle(
     *,
     registry_path: Path,
@@ -480,6 +505,7 @@ def _register_imported_bundle(
     version: str,
     input_dir: Path,
     medical_field: str | None,
+    activate: bool = False,
 ) -> TerminologyRegistryEntry:
     payload = _load_registry_payload_for_write(registry_path)
     modules = payload.setdefault("modules", {})
@@ -493,18 +519,9 @@ def _register_imported_bundle(
     if medical_field:
         entry["medical_field"] = medical_field
     module_versions[version] = entry
-    serialized = json.dumps(payload, indent=2, sort_keys=True) + "\n"
-    temporary_registry = registry_path.with_name(
-        f".{registry_path.name}.{uuid.uuid4().hex}.tmp"
-    )
-    try:
-        with temporary_registry.open("w", encoding="utf-8") as registry_file:
-            registry_file.write(serialized)
-            registry_file.flush()
-            os.fsync(registry_file.fileno())
-        os.replace(temporary_registry, registry_path)
-    finally:
-        temporary_registry.unlink(missing_ok=True)
+    if activate:
+        payload["active"] = {"module_name": module_name, "version": version}
+    _write_registry_payload_atomic(registry_path, payload)
     logger.info(
         "Terminology registry updated",
         extra={
@@ -638,8 +655,10 @@ def _fhir_bundle_payload(
 
 def _active_payload(
     registry: dict[tuple[str, str], TerminologyRegistryEntry],
+    *,
+    registry_path: Path,
 ) -> TerminologyBundleVersion | None:
-    active = _active_selection_from_env()
+    active = _active_selection_from_registry(registry_path)
     if active is None:
         return None
     entry = registry.get(active)
@@ -681,9 +700,9 @@ def register_terminology_routes(
             registry_path = terminology_registry_path()
             registry = load_terminology_registry(registry_path)
         except KnowledgeBaseRegistryError as exc:
-            raise HttpError(500, str(exc)) from exc
+            raise HttpError(500, "Terminology registry is invalid.") from exc
 
-        active = _active_selection_from_env()
+        active = _active_selection_from_registry(registry_path)
         bundles = [
             _bundle_payload(
                 module_name=module_name,
@@ -694,8 +713,7 @@ def register_terminology_routes(
             for (module_name, version), entry in sorted(registry.items())
         ]
         return TerminologyBundleListResponse(
-            registry_path=str(registry_path),
-            active=_active_payload(registry),
+            active=_active_payload(registry, registry_path=registry_path),
             bundles=bundles,
         )
 
@@ -708,9 +726,9 @@ def register_terminology_routes(
             registry_path = terminology_registry_path()
             registry = load_terminology_registry(registry_path)
         except KnowledgeBaseRegistryError as exc:
-            raise HttpError(500, str(exc)) from exc
+            raise HttpError(500, "Terminology registry is invalid.") from exc
 
-        active = _active_payload(registry)
+        active = _active_payload(registry, registry_path=registry_path)
         if active is None:
             raise HttpError(404, "No active terminology bundle is selected.")
 
@@ -723,7 +741,7 @@ def register_terminology_routes(
             raise HttpError(
                 409,
                 f"Active terminology bundle '{active.module_name}' version "
-                f"'{active.version}' could not be exported as FHIR: {exc}",
+                f"'{active.version}' could not be exported as FHIR.",
             ) from exc
 
     @api.get("/terminology/bundles/{module_name}/{version}/fhir")
@@ -739,7 +757,7 @@ def register_terminology_routes(
             registry_path = terminology_registry_path()
             registry = load_terminology_registry(registry_path)
         except KnowledgeBaseRegistryError as exc:
-            raise HttpError(500, str(exc)) from exc
+            raise HttpError(500, "Terminology registry is invalid.") from exc
 
         entry = registry.get((module_name, version))
         if entry is None:
@@ -752,7 +770,7 @@ def register_terminology_routes(
             module_name=module_name,
             version=version,
             entry=entry,
-            active=_active_selection_from_env(),
+            active=_active_selection_from_registry(registry_path),
         )
         try:
             return _fhir_bundle_payload(
@@ -763,7 +781,7 @@ def register_terminology_routes(
             raise HttpError(
                 409,
                 f"Terminology bundle '{module_name}' version '{version}' could not "
-                f"be exported as FHIR: {exc}",
+                "be exported as FHIR.",
             ) from exc
 
     @api.post("/terminology/bundles/import")
@@ -785,6 +803,7 @@ def register_terminology_routes(
             version=version,
             input_dir=input_dir,
             medical_field=medical_field,
+            activate=True,
         )
         imported = _bundle_payload(
             module_name=module_name,
@@ -792,17 +811,10 @@ def register_terminology_routes(
             entry=entry,
             active=(module_name, version),
         )
-        _set_active_selection(
-            registry_path=registry_path,
-            module_name=module_name,
-            version=version,
-            medical_field=imported.medical_field,
-        )
         clear_kb_caches()
         return ImportTerminologyBundleResponse(
             ok=True,
             imported=imported,
-            registry_path=str(registry_path),
             counts=counts,
         )
 
@@ -818,7 +830,7 @@ def register_terminology_routes(
             registry_path = terminology_registry_path()
             registry = load_terminology_registry(registry_path)
         except KnowledgeBaseRegistryError as exc:
-            raise HttpError(500, str(exc)) from exc
+            raise HttpError(500, "Terminology registry is invalid.") from exc
 
         entry = registry.get((module_name, version))
         if entry is None:
@@ -836,7 +848,7 @@ def register_terminology_routes(
         except Exception as exc:
             raise HttpError(
                 409,
-                f"Terminology bundle '{module_name}' version '{version}' could not be loaded: {exc}",
+                f"Terminology bundle '{module_name}' version '{version}' could not be loaded.",
             ) from exc
 
         active_payload = _bundle_payload(
