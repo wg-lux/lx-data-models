@@ -285,7 +285,9 @@ git tag v0.1.2 && git push origin v0.1.2
 Register the current installed knowledge base version and data root:
 
 ```bash
-lx-dtypes-kb-registry add-current /path/to/kb_registry.json --module report_template_examples
+lx-dtypes-kb-registry add-current /path/to/kb_registry.json \
+  --module report_template_examples \
+  --activate
 ```
 
 Register an explicit historical version from a provisioned path:
@@ -294,8 +296,13 @@ Register an explicit historical version from a provisioned path:
 lx-dtypes-kb-registry add /path/to/kb_registry.json \
   --module report_template_examples \
   --version 0.1.0 \
-  --input-dir /nix/store/.../site-packages/lx_dtypes/data
+  --input-dir /nix/store/.../site-packages/lx_dtypes/data \
+  --activate
 ```
+
+`--activate` first verifies the declared identity against `config.yaml`, loads
+the complete knowledge base, and then atomically records it as runtime-active.
+Omit the flag when provisioning a historical version that must remain inactive.
 
 Smoke-test an explicit prototype module/version through the configured registry:
 

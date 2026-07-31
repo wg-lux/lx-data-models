@@ -5,12 +5,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
+import tempfile
 from typing import Any
 
 import yaml
 
 from lx_dtypes.models.interface.data_roots import resolve_default_data_root
+from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    load_knowledge_base,
+    load_module_config,
+)
 
 
 def get_current_knowledge_base_identity(module_name: str) -> tuple[str, str]:
@@ -69,7 +75,40 @@ def _registry_payload(path: Path) -> dict[str, Any]:
 
 def _write_registry(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    serialized = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    file_descriptor, temporary_name = tempfile.mkstemp(
+        dir=path.parent,
+        prefix=f".{path.name}.",
+        suffix=".tmp",
+        text=True,
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with os.fdopen(file_descriptor, "w", encoding="utf-8") as registry_file:
+            registry_file.write(serialized)
+            registry_file.flush()
+            os.fsync(registry_file.fileno())
+        os.replace(temporary_path, path)
+        directory_descriptor = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory_descriptor)
+        finally:
+            os.close(directory_descriptor)
+    finally:
+        temporary_path.unlink(missing_ok=True)
+
+
+def _validate_activated_entry(
+    *, module_name: str, version: str, input_dirs: list[Path]
+) -> None:
+    module_config = load_module_config(module_name, input_dirs=input_dirs)
+    if module_config.name != module_name or module_config.version != version:
+        raise SystemExit(
+            "The activated knowledge-base identity does not match its config.yaml: "
+            f"expected {module_name}@{version}, got "
+            f"{module_config.name}@{module_config.version}."
+        )
+    load_knowledge_base(module_name, input_dirs=input_dirs)
 
 
 def _add_entry(
@@ -79,7 +118,18 @@ def _add_entry(
     version: str,
     input_dirs: list[Path],
     medical_field: str | None = None,
+    activate: bool = False,
 ) -> None:
+    module_name = module_name.strip()
+    version = version.strip()
+    if not module_name or not version:
+        raise SystemExit("Knowledge-base module name and version must not be empty.")
+    if activate:
+        _validate_activated_entry(
+            module_name=module_name,
+            version=version,
+            input_dirs=input_dirs,
+        )
     payload = _registry_payload(registry_path)
     modules = payload.setdefault("modules", {})
     module_versions = modules.setdefault(module_name, {})
@@ -89,6 +139,8 @@ def _add_entry(
     if medical_field:
         entry["medical_field"] = medical_field
     module_versions[version] = entry
+    if activate:
+        payload["active"] = {"module_name": module_name, "version": version}
     _write_registry(registry_path, payload)
 
 
@@ -108,10 +160,12 @@ def cmd_add(args: argparse.Namespace) -> int:
         version=args.version,
         input_dirs=input_dirs,
         medical_field=getattr(args, "medical_field", None),
+        activate=bool(getattr(args, "activate", False)),
     )
+    activation_message = " and activated" if getattr(args, "activate", False) else ""
     print(
         f"Registered {args.module}@{args.version} in {registry_path} "
-        f"with {len(input_dirs)} input dir(s)."
+        f"with {len(input_dirs)} input dir(s){activation_message}."
     )
     return 0
 
@@ -130,10 +184,12 @@ def cmd_add_current(args: argparse.Namespace) -> int:
         version=version,
         input_dirs=[data_root],
         medical_field=medical_field,
+        activate=bool(getattr(args, "activate", False)),
     )
+    activation_message = " and activated" if getattr(args, "activate", False) else ""
     print(
         f"Registered current KB {module_name}@{version} in {registry_path} "
-        f"from {data_root}."
+        f"from {data_root}{activation_message}."
     )
     return 0
 
@@ -168,6 +224,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="One input directory to provision for this module/version. Repeatable.",
     )
+    add_parser.add_argument(
+        "--activate",
+        action="store_true",
+        help="Set the registered module/version as the active knowledge base.",
+    )
     add_parser.set_defaults(func=cmd_add)
 
     add_current_parser = subparsers.add_parser(
@@ -179,6 +240,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--module",
         default="report_template_examples",
         help="Knowledge-base module name to resolve. Defaults to report_template_examples.",
+    )
+    add_current_parser.add_argument(
+        "--activate",
+        action="store_true",
+        help="Set the registered current module/version as the active knowledge base.",
     )
     add_current_parser.set_defaults(func=cmd_add_current)
 

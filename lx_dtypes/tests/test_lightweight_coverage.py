@@ -4,6 +4,7 @@ import argparse
 import json
 import tomllib
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -133,6 +134,19 @@ def test_kb_registry_payload_and_commands(
     )
 
     monkeypatch.setattr(kb_registry, "resolve_default_data_root", lambda: data_root)
+    monkeypatch.setattr(
+        kb_registry,
+        "load_module_config",
+        lambda module_name, *, input_dirs: SimpleNamespace(
+            name=module_name,
+            version="0.1.0",
+        ),
+    )
+    monkeypatch.setattr(
+        kb_registry,
+        "load_knowledge_base",
+        lambda module_name, *, input_dirs: object(),
+    )
 
     args = argparse.Namespace(
         registry=registry_path,
@@ -169,8 +183,14 @@ def test_kb_registry_payload_and_commands(
     add_current_args = argparse.Namespace(
         registry=registry_path,
         module="report_template_examples",
+        activate=True,
     )
     assert kb_registry.cmd_add_current(add_current_args) == 0
+    payload = json.loads(registry_path.read_text())
+    assert payload["active"] == {
+        "module_name": "report_template_examples",
+        "version": "0.1.0",
+    }
 
 
 def test_kb_registry_handles_invalid_registry_payload(tmp_path: Path) -> None:
