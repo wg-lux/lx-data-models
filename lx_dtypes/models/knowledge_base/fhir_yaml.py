@@ -52,11 +52,12 @@ def knowledge_base_from_fhir(
         author=author,
         uuid=_stable_uuid(module_name, "config", module_name),
     )
-    return KnowledgeBase(
-        config=config,
-        uuid=_stable_uuid(module_name, "knowledge_base", module_name),
-        **collections,
-    )
+    knowledge_base_data: dict[str, object] = {
+        "config": config,
+        "uuid": _stable_uuid(module_name, "knowledge_base", module_name),
+    }
+    knowledge_base_data.update(collections)
+    return KnowledgeBase.model_validate(knowledge_base_data)
 
 
 def fhir_to_yaml(

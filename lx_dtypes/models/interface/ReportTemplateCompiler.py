@@ -1,3 +1,4 @@
+from math import isfinite
 from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Union, cast
 
 if TYPE_CHECKING:
@@ -19,6 +20,12 @@ class ReportTemplateCompiler:
 
         return {
             "name": template.name,
+            "version": template.version,
+            "coverage_version": template.coverage_version,
+            "coverage_concepts": [
+                concept.model_dump(mode="json")
+                for concept in template.coverage_concepts
+            ],
             "examination": template.examination,
             "report_sections": [
                 self._resolve_section(s) for s in template.report_sections
@@ -48,9 +55,82 @@ class ReportTemplateCompiler:
         # Handle the polymorphism: is it a string ID or a Requirement object?
         if isinstance(ref, str):
             if ref in self.kb.report_finding:
-                return self.kb.report_finding[ref].as_requirement().model_dump()
+                requirement = self.kb.report_finding[ref].as_requirement().model_dump()
+                return self._hydrate_finding_inputs(requirement)
             return {"finding": ref}  # Bare finding reference
-        return cast(Dict[str, Any], ref.model_dump())
+        requirement = cast(Dict[str, Any], ref.model_dump())
+        return self._hydrate_finding_inputs(requirement)
+
+    def _hydrate_finding_inputs(
+        self, requirement: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Expose the KB-defined input contract for every requested classification."""
+
+        hydrated = dict(requirement)
+        raw_requirements = hydrated.get("classifications", [])
+        classification_requirements: List[Dict[str, Any]] = []
+        for raw_requirement in raw_requirements:
+            item = dict(raw_requirement)
+            classification_name = str(item.get("classification", "")).strip()
+            classification = self.kb.classification.get(classification_name)
+            if classification is None:
+                classification_requirements.append(item)
+                continue
+
+            choices: List[Dict[str, Any]] = []
+            raw_choice_names = classification.classification_choices
+            choice_names = (
+                [raw_choice_names]
+                if isinstance(raw_choice_names, str)
+                else raw_choice_names
+            )
+            for choice_name in choice_names:
+                choice = self.kb.classification_choice.get(choice_name)
+                if choice is None:
+                    continue
+                descriptors: List[Dict[str, Any]] = []
+                raw_descriptor_names = choice.classification_choice_descriptors
+                descriptor_names = (
+                    [raw_descriptor_names]
+                    if isinstance(raw_descriptor_names, str)
+                    else raw_descriptor_names
+                )
+                for descriptor_name in descriptor_names:
+                    descriptor = self.kb.classification_choice_descriptor.get(
+                        descriptor_name
+                    )
+                    if descriptor is None:
+                        continue
+                    unit_name = descriptor.unit
+                    unit = self.kb.unit.get(unit_name)
+                    descriptor_type = descriptor.classification_choice_descriptor_type
+                    numeric_min = descriptor.numeric_min
+                    numeric_max = descriptor.numeric_max
+                    descriptors.append(
+                        {
+                            "name": descriptor.name,
+                            "type": getattr(
+                                descriptor_type, "value", descriptor_type
+                            ),
+                            "unit": unit_name,
+                            "unit_abbreviation": (
+                                unit.abbreviation if unit is not None else None
+                            ),
+                            "numeric_min": (
+                                numeric_min if isfinite(numeric_min) else None
+                            ),
+                            "numeric_max": (
+                                numeric_max if isfinite(numeric_max) else None
+                            ),
+                        }
+                    )
+                choices.append({"name": choice.name, "descriptors": descriptors})
+
+            item["input"] = {"choices": choices}
+            classification_requirements.append(item)
+
+        hydrated["classifications"] = classification_requirements
+        return hydrated
 
     def _resolve_all_validators(self, template: Any) -> Dict[str, List[Any]]:
         v = template.validators

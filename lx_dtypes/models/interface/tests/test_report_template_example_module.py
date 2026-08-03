@@ -43,6 +43,152 @@ def test_report_template_example_module_yaml_json_roundtrip() -> None:
     )
 
 
+def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
+    loader = DataLoader(input_dirs=[Path("./lx_dtypes/data/")])
+    loader.load_module_configs()
+    kb = loader.load_knowledge_base("report_template_examples")
+
+    exported = kb.export_report_template("colonoscopy_training_basic")
+    sections = {section["name"]: section for section in exported["report_sections"]}
+
+    assert exported["readiness"]["can_publish"] is True
+    assert exported["coverage_version"] == "report_concept_coverage_v1"
+    assert {concept["concept_id"] for concept in exported["coverage_concepts"]} == {
+        "koloskopie.sedierungsstatus",
+        "koloskopie.medikationsstatus",
+        "koloskopie.bbps.linkes_kolon",
+        "koloskopie.bbps.transversum",
+        "koloskopie.bbps.rechtes_kolon",
+        "koloskopie.maximale_reichweite",
+        "koloskopie.rueckzugszeit_feld",
+        "koloskopie.zoekum_landmarken.appendixostium",
+        "koloskopie.zoekum_landmarken.ileozoekalklappe",
+        "koloskopie.technik.hd_videoendoskop",
+        "koloskopie.technik.co2_insufflation",
+        "koloskopie.komplikationsstatus",
+    }
+    assert list(sections) == [
+        "patienten_und_untersuchungskontext",
+        "indikation_und_sedierung",
+        "darmvorbereitung_nach_bbps",
+        "untersuchungsqualitaet_und_reichweite",
+        "pathologische_befunde_und_interventionen",
+        "komplikationen_und_empfehlungen",
+    ]
+
+    required_findings = {
+        finding["finding"]
+        for section in exported["report_sections"]
+        for finding in section["findings"]
+        if finding["required"]
+    }
+    assert required_findings == {
+        "sedation_endoscopy",
+        "endoscopy_medication_status",
+        "endoscopy_process_timestamps",
+        "endoscopy_preprocedure_team_timeout",
+        "endoscopy_postprocedure_sign_out",
+        "endoscopy_preprocedure_risk_assessment_checklist",
+        "bowel_preparation_lc",
+        "bowel_preparation_tc",
+        "bowel_preparation_rc",
+        "bowel_preparation_bbps_total",
+        "colonoscopy_deepest_viewed_location",
+        "colonoscopy_withdrawal_time_minutes",
+        "colonoscopy_cecal_landmarks_photodocumented",
+        "colonoscopy_technical_quality",
+        "colonoscopy_complication_status",
+        "colonoscopy_pathology_summary",
+        "colonoscopy_follow_up_plan",
+    }
+    context_fields = sections["patienten_und_untersuchungskontext"]["fields"]
+    assert {field["key"] for field in context_fields} >= {
+        "indication",
+        "examiner",
+        "assisting_personnel",
+        "device_identification",
+        "relevant_images",
+    }
+
+    process_timing = next(
+        finding
+        for finding in sections["untersuchungsqualitaet_und_reichweite"]["findings"]
+        if finding["finding"] == "endoscopy_process_timestamps"
+    )
+    assert process_timing["required"] is True
+    assert {
+        classification["classification"]
+        for classification in process_timing["classifications"]
+    } == {
+        "endoscopy_room_entry_time",
+        "endoscope_insertion_time",
+        "colonoscopy_withdrawal_start_time",
+        "endoscope_removal_time",
+        "endoscopy_room_exit_time",
+        "endoscopy_department_exit_time",
+    }
+
+    sedation_findings = {
+        finding["finding"]
+        for finding in sections["indikation_und_sedierung"]["findings"]
+    }
+    assert {
+        "endoscopy_sedation_monitoring_measurement",
+        "endoscopy_supplemental_oxygen_administration",
+        "endoscopy_intravenous_fluid_status",
+        "endoscopy_intravenous_fluid_administration",
+        "endoscopy_post_sedation_recovery_assessment",
+        "endoscopy_post_sedation_discharge_or_transfer_assessment",
+    } <= sedation_findings
+    medication_finding = next(
+        finding
+        for finding in sections["indikation_und_sedierung"]["findings"]
+        if finding["finding"] == "endoscopy_medication_administration"
+    )
+    assert medication_finding["multiple_allowed"] is True
+    product_requirement = next(
+        classification
+        for classification in medication_finding["classifications"]
+        if classification["classification"]
+        == "endoscopy_medication_product_and_dose"
+    )
+    propofol_input = next(
+        choice
+        for choice in product_requirement["input"]["choices"]
+        if choice["name"] == "medication_propofol"
+    )
+    assert propofol_input["descriptors"][0]["name"] == "propofol_dose_mg_value"
+    assert propofol_input["descriptors"][0]["unit_abbreviation"] == "mg"
+    method_requirement = next(
+        classification
+        for classification in medication_finding["classifications"]
+        if classification["classification"] == "medication_administration_method"
+    )
+    infusion_input = next(
+        choice
+        for choice in method_requirement["input"]["choices"]
+        if choice["name"] == "medication_method_infusion"
+    )
+    assert infusion_input["descriptors"][0]["name"] == (
+        "medication_infusion_volumetric_flow_rate_value"
+    )
+    assert infusion_input["descriptors"][0]["unit_abbreviation"] == "ml/h"
+
+    validators = exported["validators"]["examination_validators"]
+    assert validators[0]["name"] == "koloskopie_mindestdokumentation"
+    assert (
+        "koloskopie_rueckzugszeit_dokumentiert" in validators[0]["finding_validators"]
+    )
+    assert (
+        "koloskopie_inkomplettheitsgrund_erforderlich"
+        in validators[0]["finding_validators"]
+    )
+    assert (
+        "koloskopie_inadaequate_vorbereitung_fruehe_wiederholung"
+        in validators[0]["finding_validators"]
+    )
+
+
 @pytest.fixture(params=["kb_alias", "inline"])
 def report_template_module(tmp_path: Path, request: pytest.FixtureRequest) -> Path:
     mode = request.param

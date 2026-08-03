@@ -37,6 +37,10 @@ def builder_terminology_registry(
     registry_path.write_text(
         json.dumps(
             {
+                "active": {
+                    "module_name": "builder_module",
+                    "version": "1.0.0",
+                },
                 "modules": {
                     "builder_module": {
                         "1.0.0": {"input_dirs": [str(tmp_path)]},
@@ -47,8 +51,6 @@ def builder_terminology_registry(
         encoding="utf-8",
     )
     monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
-    monkeypatch.setenv("LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE", "builder_module")
-    monkeypatch.setenv("LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION", "1.0.0")
     clear_knowledge_base_resolver_caches()
     yield
     clear_knowledge_base_resolver_caches()

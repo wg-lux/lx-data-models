@@ -1137,6 +1137,36 @@ def _build_classification_hint(
     return hint
 
 
+def _classification_has_evaluable_value(
+    values: Sequence[ValidationScalar],
+    hint: ClassificationValidatorHintDataDict,
+) -> bool:
+    """Require a descriptor value when the KB declares descriptor-backed input."""
+
+    descriptor_types = set(hint.get("descriptor_types", []))
+    if not descriptor_types:
+        return bool(values)
+
+    choice_names = set(hint.get("choice_names", []))
+    if "numeric" in descriptor_types and any(
+        isinstance(value, (int, float)) and not isinstance(value, bool)
+        for value in values
+    ):
+        return True
+    if "boolean" in descriptor_types and any(
+        isinstance(value, bool) for value in values
+    ):
+        return True
+    if descriptor_types.intersection({"text", "selection"}):
+        return any(
+            isinstance(value, str)
+            and bool(value.strip())
+            and value.strip() not in choice_names
+            for value in values
+        )
+    return False
+
+
 def _build_intervention_hint(
     *,
     validator: InterventionValidator,
@@ -1359,30 +1389,40 @@ def evaluate_classification_validator_runtime(
 
     if validator.operator == "exists":
         if not matched_occurrences:
-            ok = False
-            issues.append(
-                _build_issue(
-                    code="finding_not_present_for_classification_validator",
-                    message=(
-                        f"Finding '{target_finding}' is not present for classification "
-                        f"validator '{validator.name}'."
-                    ),
-                    validator_name=validator.name,
-                    validator_kind="classification_validator",
-                )
-            )
-        else:
-            ok = any(
-                occurrence["classifications"].get(target_classification)
-                for occurrence in matched_occurrences
-            )
+            ok = validator.precedence == "optional"
             if not ok:
                 issues.append(
                     _build_issue(
-                        code="classification_not_present",
+                        code="finding_not_present_for_classification_validator",
+                        message=(
+                            f"Finding '{target_finding}' is not present for classification "
+                            f"validator '{validator.name}'."
+                        ),
+                        validator_name=validator.name,
+                        validator_kind="classification_validator",
+                    )
+                )
+        else:
+            ok = any(
+                _classification_has_evaluable_value(
+                    occurrence["classifications"].get(target_classification, []),
+                    hint,
+                )
+                for occurrence in matched_occurrences
+            )
+            if not ok:
+                requires_descriptor = bool(hint.get("descriptor_types"))
+                issues.append(
+                    _build_issue(
+                        code=(
+                            "classification_value_not_present"
+                            if requires_descriptor
+                            else "classification_not_present"
+                        ),
                         message=(
                             f"Classification '{target_classification}' is required by "
-                            f"validator '{validator.name}' but is not present."
+                            f"validator '{validator.name}' but "
+                            f"{'has no evaluable descriptor value' if requires_descriptor else 'is not present'}."
                         ),
                         validator_name=validator.name,
                         validator_kind="classification_validator",
