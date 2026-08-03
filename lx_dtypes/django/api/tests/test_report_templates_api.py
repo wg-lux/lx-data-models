@@ -100,6 +100,78 @@ def test_report_template_api_by_examination() -> None:
     payload = response.json()
     assert isinstance(payload, list)
     assert any(t["name"] == "star_upper_gi_main" for t in payload)
+    quality_template = next(
+        template for template in payload if template["name"] == "upper_gi_quality_2025"
+    )
+    assert quality_template["name_de"].startswith("ÖGD")
+    assert quality_template["readiness"]["can_publish"] is True
+    assert len(quality_template["coverage_concepts"]) == 7
+
+
+def test_colonoscopy_template_api_exposes_localized_guideline_provenance() -> None:
+    client = Client()
+    response = client.get(
+        "/base_api/report-templates/by-examination/report_template_examples/colonoscopy",
+        secure=True,
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    template = next(
+        item for item in payload if item["name"] == "colonoscopy_training_basic"
+    )
+    assert template["name_de"] == (
+        "Koloskopie – leitlinienbasierte Qualitätsdokumentation"
+    )
+    assert template["name_en"] == (
+        "Colonoscopy – guideline-based quality documentation"
+    )
+    assert template["readiness"]["can_publish"] is True
+    assert [
+        reference["guideline_id"]
+        for reference in template["guideline_references"]
+    ] == ["AWMF-021-022", "AWMF-021-014"]
+    assert all(
+        reference["canonical_url"].startswith("https://")
+        for reference in template["guideline_references"]
+    )
+    assert len(template["coverage_concepts"]) == 34
+    assert all(
+        concept["guideline_citations"]
+        for concept in template["coverage_concepts"]
+    )
+
+
+@pytest.mark.parametrize(
+    ("examination", "template_name", "guideline_id"),
+    [
+        ("ercp", "ercp_quality_2018", "ESGE-ERCP-EUS-PM-2018"),
+        (
+            "endoscopic_ultrasound",
+            "eus_quality_2025",
+            "ESGE-EUS-PM-2025",
+        ),
+    ],
+)
+def test_advanced_endoscopy_template_api_exposes_production_template(
+    examination: str,
+    template_name: str,
+    guideline_id: str,
+) -> None:
+    response = Client().get(
+        "/base_api/report-templates/by-examination/"
+        f"report_template_examples/{examination}",
+        secure=True,
+    )
+
+    assert response.status_code == 200
+    template = next(
+        item for item in response.json() if item["name"] == template_name
+    )
+    assert template["readiness"]["can_publish"] is True
+    assert guideline_id in {
+        reference["guideline_id"] for reference in template["guideline_references"]
+    }
 
 
 def test_report_template_runtime_validation_api(

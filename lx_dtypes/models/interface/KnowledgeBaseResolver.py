@@ -6,7 +6,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
-from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.DataLoader import (
+    AmbiguousModuleConfigError,
+    DataLoader,
+    ModuleConfigNotFoundError,
+)
 from lx_dtypes.models.interface.data_roots import (
     default_data_roots,
     resolve_default_data_root,
@@ -32,6 +36,14 @@ class KnowledgeBaseRegistryError(ValueError):
     """
     Raised when the configured knowledge-base registry is malformed.
     """
+
+
+class KnowledgeBaseIdentityRequiredError(KnowledgeBaseRegistryError):
+    """Raised when registry-backed loading omits the required module version."""
+
+
+class KnowledgeBaseVersionConflictError(KnowledgeBaseRegistryError):
+    """Raised when registry identity and the resolved artifact disagree."""
 
 
 def _normalize_registry_input(value: str) -> str:
@@ -156,34 +168,43 @@ def _resolve_input_dirs_for_identity(
     input_dirs: Sequence[Path] | None,
 ) -> tuple[Path, ...]:
     if version is None:
-        return tuple(input_dirs or _default_input_dirs())
+        if input_dirs is not None:
+            return tuple(input_dirs)
+        if _get_registry_path() is not None:
+            raise KnowledgeBaseIdentityRequiredError(
+                "A configured knowledge-base registry requires an explicit "
+                f"module@version identity for module '{module_name}'."
+            )
+        return _default_input_dirs()
 
     if input_dirs is not None:
         resolved_input_dirs = tuple(input_dirs)
-        module_config = _load_module_config_cached(
-            module_name,
-            tuple(str(path) for path in resolved_input_dirs),
-        )
-        if module_config.version != version:
-            raise KnowledgeBaseVersionNotFoundError(
-                "Knowledge-base version not provisioned locally for "
-                f"module '{module_name}' and version '{version}'."
-            )
+        _validate_resolved_identity(module_name, version, resolved_input_dirs)
         return resolved_input_dirs
 
-    try:
-        return resolve_versioned_input_dirs(module_name, version)
-    except KnowledgeBaseVersionNotFoundError:
-        if any(key_module == module_name for key_module, _ in _load_registry()):
-            raise
-        default_input_dirs = _default_input_dirs()
-        module_config = _load_module_config_cached(
-            module_name,
-            tuple(str(path) for path in default_input_dirs),
+    if _get_registry_path() is not None:
+        resolved_input_dirs = resolve_versioned_input_dirs(module_name, version)
+    else:
+        resolved_input_dirs = _default_input_dirs()
+    _validate_resolved_identity(module_name, version, resolved_input_dirs)
+    return resolved_input_dirs
+
+
+def _validate_resolved_identity(
+    module_name: str,
+    version: str,
+    input_dirs: Sequence[Path],
+) -> None:
+    module_config = _load_module_config_cached(
+        module_name,
+        tuple(str(path) for path in input_dirs),
+    )
+    if module_config.name != module_name or module_config.version != version:
+        raise KnowledgeBaseVersionConflictError(
+            "Resolved knowledge-base artifact identity "
+            f"'{module_config.name}@{module_config.version}' conflicts with "
+            f"requested identity '{module_name}@{version}'."
         )
-        if module_config.version != version:
-            raise
-        return default_input_dirs
 
 
 @lru_cache(maxsize=64)
@@ -229,9 +250,6 @@ def get_knowledge_base_identity(
     version: str | None = None,
     input_dirs: Sequence[Path] | None = None,
 ) -> tuple[str, str]:
-    if version is not None:
-        return module_name, version
-
     module_config = load_module_config(
         module_name,
         version=version,
@@ -266,10 +284,14 @@ def clear_knowledge_base_resolver_caches() -> None:
 __all__ = [
     "clear_knowledge_base_resolver_caches",
     "get_knowledge_base_identity",
+    "AmbiguousModuleConfigError",
+    "KnowledgeBaseIdentityRequiredError",
     "KnowledgeBaseRegistryError",
+    "KnowledgeBaseVersionConflictError",
     "KnowledgeBaseVersionNotFoundError",
     "load_knowledge_base",
     "load_module_config",
     "resolve_default_data_root",
     "resolve_versioned_input_dirs",
+    "ModuleConfigNotFoundError",
 ]

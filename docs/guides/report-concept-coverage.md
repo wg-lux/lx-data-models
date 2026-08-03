@@ -59,6 +59,26 @@ behaupten.
 
 ## Konzeptmetadaten in einer Vorlage
 
+Jede leitlinienbasierte Vorlage veröffentlicht außerdem ihre versionierte
+fachliche Provenienz unter `guideline_references`. Eine Referenz enthält eine
+stabile Leitlinien-ID, Herausgeber, Version, Publikationsdatum, kanonische
+HTTPS-Adresse und die tatsächlich verwendeten Statements, Tabellen oder
+Kapitel. Ein bloßer Kommentar im YAML ist keine ausreichende, für Consumer
+prüfbare Provenienz.
+
+```yaml
+guideline_references:
+  - guideline_id: AWMF-021-022
+    title: S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie
+    issuing_organization: DGVS
+    version: "2.1"
+    publication_date: 2025-07-01
+    canonical_url: https://www.dgvs.de/.../S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1.pdf
+    cited_sections:
+      - Statement 2.36
+      - Kapitel 6.1 Koloskopie
+```
+
 Eine anwendbare Coverage-Konzeptdefinition benötigt mindestens:
 
 ```yaml
@@ -82,10 +102,23 @@ coverage_concepts:
     allowed_values:
       - "10"
       - "12"
+    guideline_citations:
+      - "AWMF-021-022 Kapitel 6.1.4: Polypenklassifikation"
 ```
 
 Die fachliche Vorlage muss die tatsächliche Wertsemantik festlegen. Beispiel-
 werte dürfen nicht ungeprüft als klinische Wertemenge übernommen werden.
+`guideline_citations` wird in das Runtime-Coverage-Element übernommen, damit
+Consumer die Fundstelle unmittelbar am Konzept anzeigen können.
+
+Offene, nicht enumerierbare Identifikatoren dürfen nicht als künstliche
+`allowed_values`-Liste modelliert werden. Dafür stehen die geschlossenen
+Prüfungen `value_constraint: non_empty_string` und
+`value_constraint: non_empty_string_list` zur Verfügung. Sie prüfen Typ und
+Nicht-Leere strikt; eine Werteliste darf dann nicht zusätzlich angegeben sein.
+Numerische Descriptorwerte verwenden `value_constraint: number_range` zusammen
+mit `numeric_min` und `numeric_max`; boolesche und nicht-endliche Werte werden
+dabei ausdrücklich abgelehnt.
 
 Für wiederholte Befunde wird ein `finding_selector` verwendet. Der Builder
 prüft alle passenden Instanzen in stabiler Payload-Reihenfolge und liefert
@@ -128,7 +161,7 @@ Die Runtime weist eine Vorlage mit `422` zurück, wenn unter anderem:
 - `coverage_version` fehlt oder nicht unterstützt wird,
 - stabile Konzept-IDs fehlen,
 - eine anwendbare Regel keinen Wertpfad oder Selector besitzt,
-- erlaubte Werte fehlen,
+- weder erlaubte Werte noch eine passende typisierte Wertprüfung vorhanden ist,
 - ein referenzierter Validator nicht geliefert wird,
 - die Template-Identität nicht mit der Route übereinstimmt.
 

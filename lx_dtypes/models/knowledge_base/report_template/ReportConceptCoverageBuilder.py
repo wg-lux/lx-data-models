@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
@@ -135,6 +136,31 @@ def _value_matches_allowed(value: Any, allowed_values: Sequence[Any]) -> bool | 
     if isinstance(value, (Mapping, tuple, set)):
         return None
     return any(_strict_equal(value, allowed) for allowed in allowed_values)
+
+
+def _value_matches_constraint(
+    value: Any,
+    concept: ReportTemplateCoverageConcept,
+) -> bool | None:
+    if concept.value_constraint == "non_empty_string":
+        return isinstance(value, str) and bool(value.strip())
+    if concept.value_constraint == "non_empty_string_list":
+        return (
+            isinstance(value, list)
+            and bool(value)
+            and all(isinstance(item, str) and bool(item.strip()) for item in value)
+        )
+    if concept.value_constraint == "number_range":
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return False
+        if not math.isfinite(value):
+            return False
+        return bool(
+            concept.numeric_min is not None
+            and concept.numeric_max is not None
+            and concept.numeric_min <= value <= concept.numeric_max
+        )
+    return _value_matches_allowed(value, concept.allowed_values or ())
 
 
 def _selected_finding_values(
@@ -310,7 +336,7 @@ def build_report_concept_coverage(
                     validation_status = "unknown"
                 else:
                     matches = [
-                        _value_matches_allowed(value, concept.allowed_values or ())
+                        _value_matches_constraint(value, concept)
                         for _, _, value in selected_values
                     ]
                     if any(match is None for match in matches):
@@ -334,9 +360,7 @@ def build_report_concept_coverage(
                 if not value_exists or value is None:
                     validation_status = "unknown"
                 else:
-                    value_matches = _value_matches_allowed(
-                        value, concept.allowed_values or ()
-                    )
+                    value_matches = _value_matches_constraint(value, concept)
                     if value_matches is None:
                         validation_status = "unknown"
                     elif value_matches:
@@ -358,6 +382,7 @@ def build_report_concept_coverage(
                 if evidence_paths
                 else tuple(concept.evidence_path),
                 evidence_paths=evidence_paths,
+                guideline_citations=tuple(concept.guideline_citations),
             )
         )
 

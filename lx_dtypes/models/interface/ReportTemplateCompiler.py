@@ -20,7 +20,14 @@ class ReportTemplateCompiler:
 
         return {
             "name": template.name,
+            "name_de": template.name_de,
+            "name_en": template.name_en,
+            "description": template.description,
             "version": template.version,
+            "guideline_references": [
+                reference.model_dump(mode="json")
+                for reference in template.guideline_references
+            ],
             "coverage_version": template.coverage_version,
             "coverage_concepts": [
                 concept.model_dump(mode="json")

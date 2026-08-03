@@ -8,5 +8,3 @@ depends_on:
 data:
   files:
     - "./report_templates.yaml"
-  dirs:
-    - "./generated_templates"

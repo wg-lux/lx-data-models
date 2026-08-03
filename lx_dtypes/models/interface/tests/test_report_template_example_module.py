@@ -1,13 +1,16 @@
+import datetime
 import json
 from pathlib import Path
 from typing import Any
 
 import pytest
 import yaml
+from pydantic import ValidationError
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
     ReportTemplate,
+    ReportTemplateGuidelineReference,
 )
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateGraph import (
     validate_report_template_structure,
@@ -43,6 +46,69 @@ def test_report_template_example_module_yaml_json_roundtrip() -> None:
     )
 
 
+def test_report_template_guideline_reference_rejects_non_https_source() -> None:
+    with pytest.raises(ValidationError, match="must use HTTPS"):
+        ReportTemplateGuidelineReference(
+            guideline_id="AWMF-021-022",
+            title="Quality guideline",
+            issuing_organization="DGVS",
+            version="2.1",
+            publication_date=datetime.date(2025, 7, 1),
+            canonical_url="http://example.test/guideline.pdf",
+            cited_sections=["Statement 2.36"],
+        )
+
+
+def test_upper_gi_quality_2025_is_localized_guideline_backed_and_publishable() -> None:
+    loader = DataLoader(input_dirs=[Path("./lx_dtypes/data/")])
+    loader.load_module_configs()
+    kb = loader.load_knowledge_base("report_template_examples")
+
+    exported = kb.export_report_template("upper_gi_quality_2025")
+
+    assert exported["readiness"]["can_publish"] is True
+    assert exported["examination"] == "star_upper_gi_endoscopy"
+    assert exported["name_de"].startswith("ÖGD")
+    assert exported["version"] == "ESGE-upper-GI-2025"
+    assert {
+        reference["guideline_id"] for reference in exported["guideline_references"]
+    } == {"ESGE-UGI-PM-2025", "ESGE-STAR-UGI-2025", "AWMF-021-022"}
+    assert len(exported["coverage_concepts"]) == 7
+
+
+@pytest.mark.parametrize(
+    ("template_name", "examination", "concept_count", "guideline_id"),
+    [
+        ("ercp_quality_2018", "ercp", 5, "ESGE-ERCP-EUS-PM-2018"),
+        (
+            "eus_quality_2025",
+            "endoscopic_ultrasound",
+            5,
+            "ESGE-EUS-PM-2025",
+        ),
+    ],
+)
+def test_advanced_endoscopy_templates_are_guideline_backed_and_publishable(
+    template_name: str,
+    examination: str,
+    concept_count: int,
+    guideline_id: str,
+) -> None:
+    loader = DataLoader(input_dirs=[Path("./lx_dtypes/data/")])
+    loader.load_module_configs()
+    kb = loader.load_knowledge_base("report_template_examples")
+
+    exported = kb.export_report_template(template_name)
+
+    assert exported["readiness"]["can_publish"] is True
+    assert exported["examination"] == examination
+    assert len(exported["coverage_concepts"]) == concept_count
+    assert guideline_id in {
+        reference["guideline_id"] for reference in exported["guideline_references"]
+    }
+    assert all(concept["guideline_citations"] for concept in exported["coverage_concepts"])
+
+
 def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
     loader = DataLoader(input_dirs=[Path("./lx_dtypes/data/")])
     loader.load_module_configs()
@@ -52,8 +118,47 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
     sections = {section["name"]: section for section in exported["report_sections"]}
 
     assert exported["readiness"]["can_publish"] is True
+    assert exported["name_de"] == (
+        "Koloskopie – leitlinienbasierte Qualitätsdokumentation"
+    )
+    assert exported["name_en"] == (
+        "Colonoscopy – guideline-based quality documentation"
+    )
+    assert exported["version"] == "DGVS-AWMF-021-022-v2.1-2025-07"
+    assert {
+        reference["guideline_id"] for reference in exported["guideline_references"]
+    } == {"AWMF-021-022", "AWMF-021-014"}
+    assert all(
+        reference["canonical_url"].startswith("https://")
+        for reference in exported["guideline_references"]
+    )
+    assert "Statement 2.36" in exported["guideline_references"][0][
+        "cited_sections"
+    ]
     assert exported["coverage_version"] == "report_concept_coverage_v1"
     assert {concept["concept_id"] for concept in exported["coverage_concepts"]} == {
+        "koloskopie.patientenidentitaet",
+        "koloskopie.indikation",
+        "koloskopie.untersuchende",
+        "koloskopie.assistenzbereitschaft",
+        "koloskopie.geraet.modell",
+        "koloskopie.geraet.seriennummer",
+        "koloskopie.prozesszeit.raum_betreten",
+        "koloskopie.prozesszeit.endoskop_eingefuehrt",
+        "koloskopie.prozesszeit.rueckzug_begonnen",
+        "koloskopie.prozesszeit.endoskop_entfernt",
+        "koloskopie.prozesszeit.raum_verlassen",
+        "koloskopie.prozesszeit.abteilung_verlassen",
+        "koloskopie.monitoring.zeitpunkt",
+        "koloskopie.monitoring.herzfrequenz",
+        "koloskopie.monitoring.blutdruck_systolisch",
+        "koloskopie.monitoring.blutdruck_diastolisch",
+        "koloskopie.monitoring.sauerstoffsaettigung",
+        "koloskopie.bbps.gesamtwert",
+        "koloskopie.zoekum_landmarken.appendixostium_bildreferenz",
+        "koloskopie.zoekum_landmarken.ileozoekalklappe_bildreferenz",
+        "koloskopie.pathologiestatus",
+        "koloskopie.nachsorgeempfehlung",
         "koloskopie.sedierungsstatus",
         "koloskopie.medikationsstatus",
         "koloskopie.bbps.linkes_kolon",
@@ -67,6 +172,10 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
         "koloskopie.technik.co2_insufflation",
         "koloskopie.komplikationsstatus",
     }
+    assert all(
+        concept["guideline_citations"]
+        for concept in exported["coverage_concepts"]
+    )
     assert list(sections) == [
         "patienten_und_untersuchungskontext",
         "indikation_und_sedierung",
@@ -83,6 +192,7 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
         if finding["required"]
     }
     assert required_findings == {
+        "endoscopy_hardware_used",
         "sedation_endoscopy",
         "endoscopy_medication_status",
         "endoscopy_process_timestamps",

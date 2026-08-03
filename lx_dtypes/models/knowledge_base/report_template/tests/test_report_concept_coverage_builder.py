@@ -415,3 +415,53 @@ def test_finding_selector_rejects_choice_without_classification_name() -> None:
                 "allowed_values": ["confirmed"],
             }
         )
+
+
+@pytest.mark.parametrize(
+    ("examiners", "expected_status"),
+    [(["examiner-1"], "present"), ([], "invalid"), ([""], "invalid")],
+)
+def test_typed_open_identifier_list_constraint(
+    examiners: list[str],
+    expected_status: str,
+) -> None:
+    payload = PExamination.model_validate(
+        {
+            "patient": "p",
+            "examination": "exam",
+            "examiners": examiners,
+        }
+    )
+    template = {
+        "name": "template",
+        "version": "2.0.0",
+        "coverage_version": "report_concept_coverage_v1",
+        "coverage_concepts": [
+            {
+                "concept_id": "examination.examiners",
+                "label": "Examiners",
+                "applicability_status": "required",
+                "evidence_path": ["examiners"],
+                "concept_value_path": ["examiners"],
+                "value_constraint": "non_empty_string_list",
+                "guideline_citations": ["AWMF-021-022 Statement 2.36"],
+            }
+        ],
+    }
+    validation = {
+        "findings_validators": [],
+        "classification_validators": [],
+        "intervention_validators": [],
+        "examination_validators": [],
+        "unit_validators": [],
+    }
+
+    coverage = build_report_concept_coverage(
+        kb=_KnowledgeBase(),
+        requested_template_name="template",
+        template_export=template,
+        p_examination=payload,
+        validation=validation,
+    )
+
+    assert coverage.concepts[0].validation_status == expected_status

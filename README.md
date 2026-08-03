@@ -177,6 +177,10 @@ from lx_dtypes.models.interface import load_knowledge_base
 kb = load_knowledge_base("<sanitized_bundle_name>")
 ```
 
+This unversioned convenience applies only when no registry is configured. With
+`LX_DTYPES_KB_REGISTRY`, callers must pass the exact registered version and the
+resolver does not fall back to packaged or checkout data.
+
 The loader resolves child modules relative to the selected bundle first. This
 allows an editor-published `lx_units` module to coexist with the canonical
 `lx_dtypes/data/terminology/lx_units` module without being mixed into the wrong

@@ -1,0 +1,50 @@
+# ESGE 2018 ERCP/EUS and ESGE EUS Update 2025 per-procedure quality fields.
+- model: classification
+  name: ercp_antibiotic_prophylaxis_status
+  description: "Angemessenheit der Antibiotikaprophylaxe vor ERCP."
+  classification_choices: [quality_adequate, quality_inadequate, quality_not_indicated, quality_unknown]
+
+- model: classification
+  name: ercp_bile_duct_cannulation_outcome
+  description: "Ergebnis des Versuchs der selektiven Gallengangskanülierung."
+  classification_choices: [quality_successful, quality_unsuccessful, quality_not_attempted]
+
+- model: classification
+  name: ercp_biliary_stent_placement_outcome
+  description: "Angemessenheit einer Stentimplantation bei biliärer Obstruktion unterhalb des Hilus."
+  classification_choices: [quality_appropriate, quality_not_appropriate, quality_not_applicable]
+
+- model: classification
+  name: ercp_bile_duct_stone_extraction_outcome
+  description: "Vollständigkeit der intendierten Gallengangssteinextraktion."
+  classification_choices: [quality_complete, quality_incomplete, quality_not_applicable]
+
+- model: classification
+  name: ercp_post_ercp_pancreatitis_status
+  description: "Dokumentierter Status einer Post-ERCP-Pankreatitis."
+  classification_choices: [quality_absent, quality_present, quality_unknown]
+
+- model: classification
+  name: eus_informed_consent_status
+  description: "Status der informierten Einwilligung für die EUS."
+  classification_choices: [quality_obtained, quality_not_obtained]
+
+- model: classification
+  name: eus_landmark_documentation_status
+  description: "Vollständigkeit der standardisierten EUS-Landmarkendokumentation."
+  classification_choices: [quality_complete, quality_incomplete]
+
+- model: classification
+  name: eus_pancreatic_cyst_description_status
+  description: "Vollständigkeit der standardisierten Beschreibung pankreatischer Zysten."
+  classification_choices: [quality_complete, quality_incomplete, quality_not_applicable]
+
+- model: classification
+  name: eus_tissue_acquisition_result
+  description: "Diagnostische Verwertbarkeit einer EUS-gestützten Gewebegewinnung."
+  classification_choices: [quality_diagnostic, quality_nondiagnostic, quality_not_applicable]
+
+- model: classification
+  name: eus_adverse_event_status
+  description: "Dokumentierter Status EUS-assoziierter unerwünschter Ereignisse."
+  classification_choices: [quality_absent, quality_present, quality_unknown]

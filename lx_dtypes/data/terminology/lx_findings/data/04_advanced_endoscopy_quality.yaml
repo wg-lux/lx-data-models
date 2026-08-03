@@ -1,0 +1,52 @@
+# Sources:
+# - ESGE ERCP/EUS performance measures 2018: https://www.esge.com/ercp-and-eus
+# - ESGE EUS performance measures update 2025, DOI 10.1055/a-2716-7763.
+- model: finding
+  name: ercp_antibiotic_prophylaxis
+  description: "Per-procedure documentation of antibiotic prophylaxis before ERCP."
+  classifications: [ercp_antibiotic_prophylaxis_status]
+
+- model: finding
+  name: ercp_bile_duct_cannulation
+  description: "Per-procedure documentation of selective bile duct cannulation."
+  classifications: [ercp_bile_duct_cannulation_outcome]
+
+- model: finding
+  name: ercp_biliary_stent_placement
+  description: "Per-procedure documentation of biliary stent placement appropriateness."
+  classifications: [ercp_biliary_stent_placement_outcome]
+
+- model: finding
+  name: ercp_bile_duct_stone_extraction
+  description: "Per-procedure documentation of intended bile duct stone extraction."
+  classifications: [ercp_bile_duct_stone_extraction_outcome]
+
+- model: finding
+  name: ercp_post_ercp_pancreatitis
+  description: "Per-procedure capture of post-ERCP pancreatitis status."
+  classifications: [ercp_post_ercp_pancreatitis_status]
+
+- model: finding
+  name: eus_informed_consent
+  description: "Per-procedure documentation of informed consent for EUS."
+  classifications: [eus_informed_consent_status]
+
+- model: finding
+  name: eus_landmark_documentation
+  description: "Per-procedure documentation of standard EUS landmarks."
+  classifications: [eus_landmark_documentation_status]
+
+- model: finding
+  name: eus_pancreatic_cyst_description
+  description: "Standardized description status for pancreatic cystic lesions."
+  classifications: [eus_pancreatic_cyst_description_status]
+
+- model: finding
+  name: eus_tissue_acquisition
+  description: "Diagnostic result status for EUS-guided tissue acquisition."
+  classifications: [eus_tissue_acquisition_result]
+
+- model: finding
+  name: eus_adverse_events
+  description: "Per-procedure capture of EUS-associated adverse events."
+  classifications: [eus_adverse_event_status]

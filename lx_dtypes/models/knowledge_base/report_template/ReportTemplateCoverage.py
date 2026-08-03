@@ -33,11 +33,20 @@ class ReportTemplateCoverageConcept(BaseModel):
     applicability_status: Literal["required", "conditional", "not_applicable"]
     applicability_rule: str | None = None
     applicability_reason: str | None = None
-    validator_names: List[str] = Field(min_length=1)
+    validator_names: List[str] = Field(default_factory=list)
     evidence_path: List[str] = Field(min_length=1)
     concept_value_path: List[str] | None = None
     finding_selector: ReportTemplateCoverageFindingSelector | None = None
+    value_constraint: Literal[
+        "allowed_values",
+        "non_empty_string",
+        "non_empty_string_list",
+        "number_range",
+    ] = "allowed_values"
     allowed_values: List[str | int | float | bool] | None = None
+    numeric_min: float | None = None
+    numeric_max: float | None = None
+    guideline_citations: List[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_applicability(self) -> "ReportTemplateCoverageConcept":
@@ -53,8 +62,23 @@ class ReportTemplateCoverageConcept(BaseModel):
                 raise ValueError(
                     "applicable coverage requires concept_value_path or finding_selector"
                 )
-            if not self.allowed_values:
+            if self.value_constraint == "allowed_values" and not self.allowed_values:
                 raise ValueError(
                     "applicable coverage requires non-empty allowed_values for semantic value checking"
+                )
+            if self.value_constraint != "allowed_values" and self.allowed_values:
+                raise ValueError(
+                    "typed value constraints must not also define allowed_values"
+                )
+            if self.value_constraint == "number_range":
+                if self.numeric_min is None or self.numeric_max is None:
+                    raise ValueError(
+                        "number_range requires numeric_min and numeric_max"
+                    )
+                if self.numeric_min > self.numeric_max:
+                    raise ValueError("numeric_min must not exceed numeric_max")
+            elif self.numeric_min is not None or self.numeric_max is not None:
+                raise ValueError(
+                    "numeric_min and numeric_max require value_constraint number_range"
                 )
         return self

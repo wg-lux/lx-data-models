@@ -29,9 +29,13 @@ if TYPE_CHECKING:
         records_to_core_concepts,
     )
     from lx_dtypes.models.interface import (
+        AmbiguousModuleConfigError,
+        KnowledgeBaseIdentityRequiredError,
         KnowledgeBaseLookupTracker,
         KnowledgeBaseRegistryError,
+        KnowledgeBaseVersionConflictError,
         KnowledgeBaseVersionNotFoundError,
+        ModuleConfigNotFoundError,
         get_knowledge_base_identity,
         load_knowledge_base,
         load_module_config,
@@ -170,9 +174,13 @@ _CONTRACT_EXPORTS = {
 }
 
 _INTERFACE_EXPORTS = {
+    "AmbiguousModuleConfigError",
+    "KnowledgeBaseIdentityRequiredError",
     "KnowledgeBaseLookupTracker",
     "KnowledgeBaseRegistryError",
+    "KnowledgeBaseVersionConflictError",
     "KnowledgeBaseVersionNotFoundError",
+    "ModuleConfigNotFoundError",
     "get_knowledge_base_identity",
     "load_knowledge_base",
     "load_module_config",
@@ -198,6 +206,8 @@ def __getattr__(name: str) -> Any:
 
 
 __all__ = [
+    "AmbiguousModuleConfigError",
+    "KnowledgeBaseIdentityRequiredError",
     "ReportTemplate",
     "ReportTemplateDataDict",
     "ReportTemplateGraph",
@@ -271,7 +281,9 @@ __all__ = [
     "kb_to_core_concepts_payload",
     "canonical_payload_to_storage",
     "KnowledgeBaseRegistryError",
+    "KnowledgeBaseVersionConflictError",
     "KnowledgeBaseVersionNotFoundError",
+    "ModuleConfigNotFoundError",
     "KnowledgeBaseLookupTracker",
     "get_knowledge_base_identity",
     "load_knowledge_base",

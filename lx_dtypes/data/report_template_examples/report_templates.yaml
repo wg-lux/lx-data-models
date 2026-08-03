@@ -21,6 +21,7 @@
 
 - model: finding
   name: esophagus_polyp
+  description: Esophageal polyp used by the legacy report-template example.
   classifications:
     - size_mm
     - size_cat
@@ -98,6 +99,288 @@
     findings_validators:
       - polyp_has_lst_if_large
 
+- model: findings_validator
+  name: upper_gi_stomach_mucosa_documented
+  finding: star_upper_gi_mucosa_stomach_abnormal
+  operator: exists
+  query:
+    finding: star_upper_gi_mucosa_stomach_abnormal
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_duodenum_mucosa_documented
+  finding: star_upper_gi_mucosa_duodenum_abnormal
+  operator: exists
+  query:
+    finding: star_upper_gi_mucosa_duodenum_abnormal
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_esophagogastric_junction_documented
+  finding: star_upper_gi_location_esophagogastric_junction
+  operator: exists
+  query:
+    finding: star_upper_gi_location_esophagogastric_junction
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_hiatus_documented
+  finding: star_upper_gi_location_hiatus
+  operator: exists
+  query:
+    finding: star_upper_gi_location_hiatus
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_squamocolumnar_junction_documented
+  finding: star_upper_gi_location_squamocolumnar_junction
+  operator: exists
+  query:
+    finding: star_upper_gi_location_squamocolumnar_junction
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_esophagus_imaging_modality_documented
+  finding: star_upper_gi_imaging_modality_esophagus
+  operator: exists
+  query:
+    finding: star_upper_gi_imaging_modality_esophagus
+    operator: exists
+
+- model: examination_validator
+  name: upper_gi_quality_2025_minimum_documentation
+  finding_validators:
+    - star_upper_gi_mucosa_esophagus_abnormal_reported
+    - upper_gi_stomach_mucosa_documented
+    - upper_gi_duodenum_mucosa_documented
+    - upper_gi_esophagogastric_junction_documented
+    - upper_gi_hiatus_documented
+    - upper_gi_squamocolumnar_junction_documented
+    - upper_gi_esophagus_imaging_modality_documented
+  examination_validators: []
+
+- model: report_finding
+  name: upper_gi_esophagus_mucosa_status
+  finding: star_upper_gi_mucosa_esophagus_abnormal
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: yes_no_unknown_classification
+      required: true
+
+- model: report_finding
+  name: upper_gi_stomach_mucosa_status
+  finding: star_upper_gi_mucosa_stomach_abnormal
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: yes_no_unknown_classification
+      required: true
+
+- model: report_finding
+  name: upper_gi_duodenum_mucosa_status
+  finding: star_upper_gi_mucosa_duodenum_abnormal
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: yes_no_unknown_classification
+      required: true
+
+- model: report_finding
+  name: upper_gi_esophagogastric_junction
+  finding: star_upper_gi_location_esophagogastric_junction
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: distance_cm
+      required: true
+
+- model: report_finding
+  name: upper_gi_hiatus
+  finding: star_upper_gi_location_hiatus
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: distance_cm
+      required: true
+
+- model: report_finding
+  name: upper_gi_squamocolumnar_junction
+  finding: star_upper_gi_location_squamocolumnar_junction
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: distance_cm
+      required: true
+
+- model: report_finding
+  name: upper_gi_esophagus_imaging_modality
+  finding: star_upper_gi_imaging_modality_esophagus
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: upper_gi_esophagus_imaging_modality_classification
+      required: true
+
+- model: report_template_section
+  name: upper_gi_quality_2025_landmarks_and_completeness
+  position: 0
+  types: [baseline]
+  findings:
+    - upper_gi_esophagus_mucosa_status
+    - upper_gi_stomach_mucosa_status
+    - upper_gi_duodenum_mucosa_status
+    - upper_gi_esophagogastric_junction
+    - upper_gi_hiatus
+    - upper_gi_squamocolumnar_junction
+    - upper_gi_esophagus_imaging_modality
+
+- model: report_template
+  name: upper_gi_quality_2025
+  name_de: "ÖGD – leitlinienbasierte Qualitätsdokumentation 2025"
+  name_en: "Upper GI endoscopy – guideline-based quality documentation 2025"
+  description: "Strukturierte ÖGD-Basisdokumentation mit vollständiger Inspektion von Ösophagus, Magen und Duodenum sowie standardisierten Landmarken nach der ESGE Quality Improvement Initiative 2025 und der DGVS-S2k-Leitlinie Version 2.1."
+  version: "ESGE-upper-GI-2025"
+  guideline_references:
+    - guideline_id: "ESGE-UGI-PM-2025"
+      title: "Performance measures for upper gastrointestinal endoscopy: ESGE Quality Improvement Initiative update 2025"
+      issuing_organization: "European Society of Gastrointestinal Endoscopy (ESGE)"
+      version: "2025 update"
+      publication_date: 2025-09-11
+      canonical_url: "https://www.esge.com/performance-measures-for-upper-gi-endoscopy-esge-quality-improvement-initiative-update-2025/"
+      cited_sections:
+        - "Complete examination of the esophagus, stomach, and duodenum"
+        - "Photodocumentation of anatomical landmarks and abnormal findings"
+        - "Use of standardized terminology and validated classifications"
+    - guideline_id: "ESGE-STAR-UGI-2025"
+      title: "STAndardization of Reports (STAR project) Upper gastrointestinal endoscopy"
+      issuing_organization: "European Society of Gastrointestinal Endoscopy (ESGE)"
+      version: "2025 position statement"
+      publication_date: 2025-08-20
+      canonical_url: "https://www.esge.com/assets/downloads/pdfs/guidelines/2025_a-2652-8941.pdf"
+      cited_sections:
+        - "Preprocedure report information"
+        - "Endoscopic findings: report structure, esophagus, stomach, and duodenum"
+        - "Postprocedure report information"
+    - guideline_id: "AWMF-021-022"
+      title: "S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie"
+      issuing_organization: "Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
+      version: "2.1"
+      publication_date: 2025-07-01
+      canonical_url: "https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf"
+      cited_sections:
+        - "Statement 2.36"
+        - "Kapitel 5.1 Ösophagogastroduodenoskopie"
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - concept_id: upper_gi.mucosa.esophagus_status
+      label: Mukosastatus Ösophagus
+      applicability_status: required
+      validator_names: [star_upper_gi_mucosa_esophagus_abnormal_reported]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_mucosa_esophagus_abnormal
+        classification_name: yes_no_unknown_classification
+      allowed_values: ["yes", "no", unknown]
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: complete examination of the esophagus"
+        - "ESGE-STAR-UGI-2025: endoscopic findings – esophagus"
+    - concept_id: upper_gi.mucosa.stomach_status
+      label: Mukosastatus Magen
+      applicability_status: required
+      validator_names: [upper_gi_stomach_mucosa_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_mucosa_stomach_abnormal
+        classification_name: yes_no_unknown_classification
+      allowed_values: ["yes", "no", unknown]
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: complete examination of the stomach"
+        - "ESGE-STAR-UGI-2025: endoscopic findings – stomach"
+    - concept_id: upper_gi.mucosa.duodenum_status
+      label: Mukosastatus Duodenum
+      applicability_status: required
+      validator_names: [upper_gi_duodenum_mucosa_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_mucosa_duodenum_abnormal
+        classification_name: yes_no_unknown_classification
+      allowed_values: ["yes", "no", unknown]
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: complete examination of the duodenum"
+        - "ESGE-STAR-UGI-2025: endoscopic findings – duodenum"
+    - concept_id: upper_gi.landmark.esophagogastric_junction_cm
+      label: Distanz des gastroösophagealen Übergangs
+      applicability_status: required
+      validator_names: [upper_gi_esophagogastric_junction_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_location_esophagogastric_junction
+        classification_name: distance_cm
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 100
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: anatomical landmark documentation"
+    - concept_id: upper_gi.landmark.hiatus_cm
+      label: Distanz des Hiatus
+      applicability_status: required
+      validator_names: [upper_gi_hiatus_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_location_hiatus
+        classification_name: distance_cm
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 100
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: anatomical landmark documentation"
+    - concept_id: upper_gi.landmark.squamocolumnar_junction_cm
+      label: Distanz der Z-Linie
+      applicability_status: required
+      validator_names: [upper_gi_squamocolumnar_junction_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_location_squamocolumnar_junction
+        classification_name: distance_cm
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 100
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: anatomical landmark documentation"
+    - concept_id: upper_gi.imaging.esophagus_modality
+      label: Bildgebungsmodalität im Ösophagus
+      applicability_status: required
+      validator_names: [upper_gi_esophagus_imaging_modality_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_imaging_modality_esophagus
+        classification_name: upper_gi_esophagus_imaging_modality_classification
+      allowed_values:
+        - star_upper_gi_imaging_modality_white_light
+        - star_upper_gi_imaging_modality_narrow_band_imaging
+        - star_upper_gi_imaging_modality_chromoendoscopy
+        - star_upper_gi_imaging_modality_acidic_staining
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: standardized imaging and photodocumentation"
+  examination: star_upper_gi_endoscopy
+  report_sections:
+    - upper_gi_quality_2025_landmarks_and_completeness
+  validators:
+    examination_validators:
+      - upper_gi_quality_2025_minimum_documentation
+    findings_validators:
+      - star_upper_gi_mucosa_esophagus_abnormal_reported
+      - upper_gi_stomach_mucosa_documented
+      - upper_gi_duodenum_mucosa_documented
+      - upper_gi_esophagogastric_junction_documented
+      - upper_gi_hiatus_documented
+      - upper_gi_squamocolumnar_junction_documented
+      - upper_gi_esophagus_imaging_modality_documented
+
 - model: report_template
   name: ukw_gastroscopy
   examination: star_upper_gi_endoscopy
@@ -151,6 +434,28 @@
   query:
     finding: endoscopy_medication_status
     operator: exists
+
+- model: findings_validator
+  name: koloskopie_hardware_dokumentiert
+  finding: endoscopy_hardware_used
+  operator: exists
+  query:
+    finding: endoscopy_hardware_used
+    operator: exists
+
+- model: classification_validator
+  name: koloskopie_hardware_modell_vollstaendig
+  finding: endoscopy_hardware_used
+  classification: endoscopy_hardware_endoscope_processor_model
+  operator: exists
+  precedence: required
+
+- model: classification_validator
+  name: koloskopie_hardware_seriennummer_vollstaendig
+  finding: endoscopy_hardware_used
+  classification: endoscopy_hardware_serial_number
+  operator: exists
+  precedence: required
 
 - model: findings_validator
   name: koloskopie_prozesszeitstempel_dokumentiert
@@ -817,6 +1122,7 @@
 - model: examination_validator
   name: koloskopie_mindestdokumentation
   finding_validators:
+    - koloskopie_hardware_dokumentiert
     - koloskopie_sedierung_dokumentiert
     - koloskopie_medikationsstatus_dokumentiert
     - koloskopie_prozesszeitstempel_dokumentiert
@@ -846,6 +1152,17 @@
     - koloskopie_intravenoese_fluessigkeitsgabe_wenn_verabreicht
     - koloskopie_komplikationsdetails_wenn_aufgetreten
   examination_validators: []
+
+- model: report_finding
+  name: koloskopie_hardware
+  finding: endoscopy_hardware_used
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: endoscopy_hardware_endoscope_processor_model
+      required: true
+    - classification: endoscopy_hardware_serial_number
+      required: true
 
 - model: report_finding
   name: koloskopie_sedierung
@@ -1396,6 +1713,7 @@
   types:
     - baseline
   findings:
+    - koloskopie_hardware
     - koloskopie_sedierung
     - koloskopie_risikoassessment_checkliste
     - koloskopie_asa_beurteilung
@@ -1465,11 +1783,327 @@
 
 - model: report_template
   name: colonoscopy_training_basic
-  name_de: "Koloskopie – Qualitätsdokumentation nach S2k-Konsultationsfassung"
-  description: "Patientenbezogene Dokumentationsvorlage auf Grundlage der S2k-Konsultationsfassung Qualitätsanforderungen in der gastrointestinalen Endoskopie, Stand Juli 2025, insbesondere Kapitel 4.5 und 6.1. Populationsbezogene Qualitätsindikatoren werden getrennt ausgewertet."
-  version: "S2k-Konsultationsfassung-2025-07"
+  name_de: "Koloskopie – leitlinienbasierte Qualitätsdokumentation"
+  name_en: "Colonoscopy – guideline-based quality documentation"
+  description: "Patientenbezogene Dokumentationsvorlage auf Grundlage der finalen DGVS-S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie, Version 2.1, und der DGVS-S3-Leitlinie Sedierung. Populationsbezogene Qualitätsindikatoren werden getrennt ausgewertet."
+  version: "DGVS-AWMF-021-022-v2.1-2025-07"
+  guideline_references:
+    - guideline_id: "AWMF-021-022"
+      title: "S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie"
+      issuing_organization: "Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
+      version: "2.1"
+      publication_date: 2025-07-01
+      canonical_url: "https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf"
+      cited_sections:
+        - "Statement 2.36"
+        - "Kapitel 4.5 Prozessqualität – Dokumentation von Befunden"
+        - "Tabelle 22 Allgemeine Qualitätsindikatoren in der Endoskopie"
+        - "Kapitel 6.1 Koloskopie"
+        - "Kapitel 6.1.4 Spezifische Qualitätsindikatoren Koloskopie"
+    - guideline_id: "AWMF-021-014"
+      title: "Aktualisierte S3-Leitlinie Sedierung in der gastrointestinalen Endoskopie"
+      issuing_organization: "Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
+      version: "2023"
+      publication_date: 2023-10-01
+      canonical_url: "https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf"
+      cited_sections:
+        - "Kapitel 3.4 Überwachung während und nach Sedierung"
+        - "Empfehlung 3.9"
+        - "Kapitel 5.4 Dokumentation"
+        - "Empfehlung 5.10"
   coverage_version: report_concept_coverage_v1
   coverage_concepts:
+    - concept_id: koloskopie.patientenidentitaet
+      label: Patientenidentität
+      applicability_status: required
+      validator_names: []
+      evidence_path: [patient]
+      concept_value_path: [patient]
+      value_constraint: non_empty_string
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36: Patientenidentifikation"
+    - concept_id: koloskopie.indikation
+      label: Untersuchungsindikation
+      applicability_status: required
+      validator_names: []
+      evidence_path: [patient_indications, "0", indication]
+      concept_value_path: [patient_indications, "0", indication]
+      allowed_values:
+        - colonoscopy_generic
+        - colonoscopy_screening
+        - colonoscopy_lesion_removal_small
+        - colonoscopy_lesion_removal_large
+        - colonoscopy_lesion_removal_emr
+        - colonoscopy_diagnostic_acute_symptomatic
+        - colonoscopy_diagnostic_chronic_symptomatic
+        - colonoscopy_surveillance_post_polypectomy
+        - colonoscopy_surveillance_ibd
+        - colonoscopy_surveillance_cancer_history
+        - colonoscopy_follow_up_post_emr
+        - colonoscopy_follow_up_post_esd
+        - colonoscopy_follow_up_post_eftr
+        - colonoscopy_follow_up_residual_or_recurrent_lesion
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36: Indikation"
+    - concept_id: koloskopie.untersuchende
+      label: Untersuchende Personen
+      applicability_status: required
+      validator_names: []
+      evidence_path: [examiners]
+      concept_value_path: [examiners]
+      value_constraint: non_empty_string_list
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36: Untersucher"
+    - concept_id: koloskopie.assistenzbereitschaft
+      label: Verfügbarkeit des erforderlichen Assistenzpersonals
+      applicability_status: required
+      validator_names:
+        - koloskopie_team_timeout_personal_vollstaendig
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_preprocedure_team_timeout
+        classification_name: required_personnel_readiness_status
+      allowed_values:
+        - required_personnel_confirmed_ready
+        - required_personnel_not_ready
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36: Assistenzpersonal"
+        - "AWMF-021-022 Tabelle 22: Team-Time-out"
+    - concept_id: koloskopie.geraet.modell
+      label: Modell des verwendeten Endoskops beziehungsweise Prozessors
+      applicability_status: required
+      validator_names: [koloskopie_hardware_modell_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_hardware_used
+        classification_name: endoscopy_hardware_endoscope_processor_model
+      allowed_values:
+        - storz_image_1s
+        - olympus_cv_170
+        - olympus_cv_180
+        - olympus_cv_190
+        - pentax_epk_i7000
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36: Gerätetyp"
+    - concept_id: koloskopie.geraet.seriennummer
+      label: Seriennummer des verwendeten Endoskops
+      applicability_status: required
+      validator_names: [koloskopie_hardware_seriennummer_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_hardware_used
+        classification_name: endoscopy_hardware_serial_number
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: non_empty_string
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36: Seriennummer"
+    - concept_id: koloskopie.prozesszeit.raum_betreten
+      label: Zeitpunkt Betreten des Untersuchungsraums
+      applicability_status: required
+      validator_names: [koloskopie_prozesszeit_raum_betreten_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_process_timestamps
+        classification_name: endoscopy_room_entry_time
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: non_empty_string
+      guideline_citations: ["AWMF-021-022 Statement 2.36: Prozesszeiten"]
+    - concept_id: koloskopie.prozesszeit.endoskop_eingefuehrt
+      label: Zeitpunkt Einführen des Endoskops
+      applicability_status: required
+      validator_names: [koloskopie_prozesszeit_endoskop_eingefuehrt_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_process_timestamps
+        classification_name: endoscope_insertion_time
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: non_empty_string
+      guideline_citations: ["AWMF-021-022 Statement 2.36: Prozesszeiten"]
+    - concept_id: koloskopie.prozesszeit.rueckzug_begonnen
+      label: Zeitpunkt Rückzugsbeginn am Zökalpol
+      applicability_status: required
+      validator_names: [koloskopie_prozesszeit_rueckzug_begonnen_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_process_timestamps
+        classification_name: colonoscopy_withdrawal_start_time
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: non_empty_string
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1: Rückzugs- und Inspektionszeit"
+    - concept_id: koloskopie.prozesszeit.endoskop_entfernt
+      label: Zeitpunkt Entfernen des Endoskops
+      applicability_status: required
+      validator_names: [koloskopie_prozesszeit_endoskop_entfernt_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_process_timestamps
+        classification_name: endoscope_removal_time
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: non_empty_string
+      guideline_citations: ["AWMF-021-022 Statement 2.36: Prozesszeiten"]
+    - concept_id: koloskopie.prozesszeit.raum_verlassen
+      label: Zeitpunkt Verlassen des Untersuchungsraums
+      applicability_status: required
+      validator_names: [koloskopie_prozesszeit_raum_verlassen_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_process_timestamps
+        classification_name: endoscopy_room_exit_time
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: non_empty_string
+      guideline_citations: ["AWMF-021-022 Statement 2.36: Prozesszeiten"]
+    - concept_id: koloskopie.prozesszeit.abteilung_verlassen
+      label: Zeitpunkt Verlassen der Endoskopieabteilung
+      applicability_status: required
+      validator_names: [koloskopie_prozesszeit_abteilung_verlassen_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_process_timestamps
+        classification_name: endoscopy_department_exit_time
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: non_empty_string
+      guideline_citations: ["AWMF-021-022 Statement 2.36: Prozesszeiten"]
+    - concept_id: koloskopie.monitoring.zeitpunkt
+      label: Zeitpunkt der Sedierungsüberwachung
+      applicability_status: required
+      validator_names: [koloskopie_sedierungsmonitoring_zeitpunkt_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_sedation_monitoring_measurement
+        classification_name: sedation_monitoring_time
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: non_empty_string
+      guideline_citations:
+        - "AWMF-021-014 Kapitel 5.4 und Empfehlung 5.10"
+    - concept_id: koloskopie.monitoring.herzfrequenz
+      label: Herzfrequenz während Sedierung
+      applicability_status: required
+      validator_names: [koloskopie_sedierungsmonitoring_herzfrequenz_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_sedation_monitoring_measurement
+        classification_name: sedation_heart_rate
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 300
+      guideline_citations:
+        - "AWMF-021-014 Kapitel 5.4 und Empfehlung 5.10"
+    - concept_id: koloskopie.monitoring.blutdruck_systolisch
+      label: Systolischer Blutdruck während Sedierung
+      applicability_status: required
+      validator_names: [koloskopie_sedierungsmonitoring_systolisch_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_sedation_monitoring_measurement
+        classification_name: sedation_systolic_blood_pressure
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 350
+      guideline_citations:
+        - "AWMF-021-014 Kapitel 5.4 und Empfehlung 5.10"
+    - concept_id: koloskopie.monitoring.blutdruck_diastolisch
+      label: Diastolischer Blutdruck während Sedierung
+      applicability_status: required
+      validator_names: [koloskopie_sedierungsmonitoring_diastolisch_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_sedation_monitoring_measurement
+        classification_name: sedation_diastolic_blood_pressure
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 250
+      guideline_citations:
+        - "AWMF-021-014 Kapitel 5.4 und Empfehlung 5.10"
+    - concept_id: koloskopie.monitoring.sauerstoffsaettigung
+      label: Sauerstoffsättigung während Sedierung
+      applicability_status: required
+      validator_names: [koloskopie_sedierungsmonitoring_sauerstoffsaettigung_vollstaendig]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: endoscopy_sedation_monitoring_measurement
+        classification_name: sedation_oxygen_saturation
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 100
+      guideline_citations:
+        - "AWMF-021-014 Kapitel 5.4 und Empfehlung 5.10"
+    - concept_id: koloskopie.bbps.gesamtwert
+      label: BBPS-Gesamtwert
+      applicability_status: required
+      validator_names: [koloskopie_bbps_gesamtwert_dokumentiert]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: bowel_preparation_bbps_total
+        classification_name: bowel_prep_boston_total
+      allowed_values:
+        - bbps_total_0
+        - bbps_total_1
+        - bbps_total_2
+        - bbps_total_3
+        - bbps_total_4
+        - bbps_total_5
+        - bbps_total_6
+        - bbps_total_7
+        - bbps_total_8
+        - bbps_total_9
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1.4: Darmvorbereitungsqualität"
+    - concept_id: koloskopie.zoekum_landmarken.appendixostium_bildreferenz
+      label: Bildreferenz Appendixostium
+      applicability_status: required
+      validator_names: [koloskopie_zoekum_landmarken_bildreferenzen]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: colonoscopy_cecal_landmarks_photodocumented
+        classification_name: appendiceal_orifice_image_reference
+      allowed_values: [image_reference_documented]
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36 und Kapitel 6.1: relevante Bilder"
+    - concept_id: koloskopie.zoekum_landmarken.ileozoekalklappe_bildreferenz
+      label: Bildreferenz Ileozökalklappe
+      applicability_status: required
+      validator_names: [koloskopie_zoekum_landmarken_bildreferenzen]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: colonoscopy_cecal_landmarks_photodocumented
+        classification_name: ileocecal_valve_image_reference
+      allowed_values: [image_reference_documented]
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36 und Kapitel 6.1: relevante Bilder"
+    - concept_id: koloskopie.pathologiestatus
+      label: Pathologiestatus und Probenzuordnung
+      applicability_status: required
+      validator_names: [koloskopie_pathologiestatus_dokumentiert]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: colonoscopy_pathology_summary
+        classification_name: colonoscopy_pathology_status
+      allowed_values:
+        - documented_none
+        - documented_present
+        - documented_unknown
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36: Proben und Histopathologie"
+    - concept_id: koloskopie.nachsorgeempfehlung
+      label: Nachsorgeempfehlung
+      applicability_status: required
+      validator_names: [koloskopie_verlaufsempfehlung_dokumentiert]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: colonoscopy_follow_up_plan
+        classification_name: colonoscopy_follow_up_recommendation
+      allowed_values:
+        - recommendation_no_follow_up
+        - recommendation_follow_up
+        - recommendation_clinical_follow_up
+        - recommendation_pending_histology
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36: Nachsorgeempfehlungen"
     - concept_id: koloskopie.sedierungsstatus
       label: Sedierungsstatus
       applicability_status: required
@@ -1484,6 +2118,8 @@
         - "yes"
         - "no"
         - "unknown"
+      guideline_citations:
+        - "AWMF-021-014 Kapitel 5.4 und Empfehlung 5.10"
     - concept_id: koloskopie.medikationsstatus
       label: Medikationsstatus der Untersuchung
       applicability_status: required
@@ -1499,6 +2135,8 @@
         - documented_none
         - documented_present
         - documented_unknown
+      guideline_citations:
+        - "AWMF-021-014 Kapitel 5.4 und Empfehlung 5.10"
     - concept_id: koloskopie.bbps.linkes_kolon
       label: BBPS linkes Kolon
       applicability_status: required
@@ -1514,6 +2152,8 @@
         - bowel_prep_boston_1
         - bowel_prep_boston_2
         - bowel_prep_boston_3
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1.4: Darmvorbereitungsqualität"
     - concept_id: koloskopie.bbps.transversum
       label: BBPS Colon transversum
       applicability_status: required
@@ -1529,6 +2169,8 @@
         - bowel_prep_boston_1
         - bowel_prep_boston_2
         - bowel_prep_boston_3
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1.4: Darmvorbereitungsqualität"
     - concept_id: koloskopie.bbps.rechtes_kolon
       label: BBPS rechtes Kolon
       applicability_status: required
@@ -1544,6 +2186,8 @@
         - bowel_prep_boston_1
         - bowel_prep_boston_2
         - bowel_prep_boston_3
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1.4: Darmvorbereitungsqualität"
     - concept_id: koloskopie.maximale_reichweite
       label: Maximale Reichweite
       applicability_status: required
@@ -1567,6 +2211,8 @@
         - rectum
         - anal_canal
         - unknown
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1: Vollständigkeit und Zökumintubation"
     - concept_id: koloskopie.rueckzugszeit_feld
       label: Mukosainspektionszeit beim Rückzug in Minuten
       applicability_status: required
@@ -1582,6 +2228,8 @@
         - "0"
         - descriptor_value
       allowed_values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180]
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1.4: Rückzugszeit"
     - concept_id: koloskopie.zoekum_landmarken.appendixostium
       label: Fotodokumentation Appendixostium
       applicability_status: required
@@ -1596,6 +2244,8 @@
         - "yes"
         - "no"
         - "unknown"
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1: Bilddokumentation Appendixostium"
     - concept_id: koloskopie.zoekum_landmarken.ileozoekalklappe
       label: Fotodokumentation Ileozökalklappe
       applicability_status: required
@@ -1610,6 +2260,8 @@
         - "yes"
         - "no"
         - "unknown"
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1: Bilddokumentation Ileozökalklappe"
     - concept_id: koloskopie.technik.hd_videoendoskop
       label: Hochauflösendes Videoendoskop
       applicability_status: required
@@ -1624,6 +2276,8 @@
         - "yes"
         - "no"
         - "unknown"
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1: technische Qualität"
     - concept_id: koloskopie.technik.co2_insufflation
       label: CO₂-Insufflation
       applicability_status: required
@@ -1638,6 +2292,8 @@
         - "yes"
         - "no"
         - "unknown"
+      guideline_citations:
+        - "AWMF-021-022 Kapitel 6.1: technische Qualität"
     - concept_id: koloskopie.komplikationsstatus
       label: Komplikationsstatus
       applicability_status: required
@@ -1652,6 +2308,8 @@
         - documented_none
         - documented_present
         - documented_unknown
+      guideline_citations:
+        - "AWMF-021-022 Statement 2.36: Komplikationen"
   examination: colonoscopy
   report_sections:
     - patienten_und_untersuchungskontext
@@ -1664,6 +2322,8 @@
     examination_validators:
       - koloskopie_mindestdokumentation
     classification_validators:
+      - koloskopie_hardware_modell_vollstaendig
+      - koloskopie_hardware_seriennummer_vollstaendig
       - koloskopie_medikament_und_dosis_vollstaendig
       - koloskopie_medikament_applikationsart_vollstaendig
       - koloskopie_medikament_verabreichungsform_vollstaendig
@@ -1714,6 +2374,7 @@
       - koloskopie_risikoassessment_zeitpunkt_vollstaendig
       - koloskopie_risikoassessment_protokoll_vollstaendig
     findings_validators:
+      - koloskopie_hardware_dokumentiert
       - koloskopie_sedierung_dokumentiert
       - koloskopie_medikationsstatus_dokumentiert
       - koloskopie_prozesszeitstempel_dokumentiert
@@ -1742,3 +2403,340 @@
       - koloskopie_sedierungsdokumentation_wenn_sediert
       - koloskopie_intravenoese_fluessigkeitsgabe_wenn_verabreicht
       - koloskopie_komplikationsdetails_wenn_aufgetreten
+
+# ERCP and EUS templates expose per-procedure documentation only. Population
+# performance rates and thresholds remain a separate aggregation contract.
+- model: findings_validator
+  name: ercp_antibiotic_prophylaxis_documented
+  finding: ercp_antibiotic_prophylaxis
+  operator: exists
+  query: {finding: ercp_antibiotic_prophylaxis, operator: exists}
+
+- model: findings_validator
+  name: ercp_bile_duct_cannulation_documented
+  finding: ercp_bile_duct_cannulation
+  operator: exists
+  query: {finding: ercp_bile_duct_cannulation, operator: exists}
+
+- model: findings_validator
+  name: ercp_biliary_stent_placement_documented
+  finding: ercp_biliary_stent_placement
+  operator: exists
+  query: {finding: ercp_biliary_stent_placement, operator: exists}
+
+- model: findings_validator
+  name: ercp_bile_duct_stone_extraction_documented
+  finding: ercp_bile_duct_stone_extraction
+  operator: exists
+  query: {finding: ercp_bile_duct_stone_extraction, operator: exists}
+
+- model: findings_validator
+  name: ercp_post_ercp_pancreatitis_documented
+  finding: ercp_post_ercp_pancreatitis
+  operator: exists
+  query: {finding: ercp_post_ercp_pancreatitis, operator: exists}
+
+- model: examination_validator
+  name: ercp_quality_documentation_minimum
+  finding_validators:
+    - ercp_antibiotic_prophylaxis_documented
+    - ercp_bile_duct_cannulation_documented
+    - ercp_biliary_stent_placement_documented
+    - ercp_bile_duct_stone_extraction_documented
+    - ercp_post_ercp_pancreatitis_documented
+  examination_validators: []
+
+- model: report_finding
+  name: ercp_quality_antibiotic_prophylaxis
+  finding: ercp_antibiotic_prophylaxis
+  required: true
+  multiple_allowed: false
+  classifications:
+    - {classification: ercp_antibiotic_prophylaxis_status, required: true}
+
+- model: report_finding
+  name: ercp_quality_bile_duct_cannulation
+  finding: ercp_bile_duct_cannulation
+  required: true
+  multiple_allowed: false
+  classifications:
+    - {classification: ercp_bile_duct_cannulation_outcome, required: true}
+
+- model: report_finding
+  name: ercp_quality_biliary_stent_placement
+  finding: ercp_biliary_stent_placement
+  required: true
+  multiple_allowed: false
+  classifications:
+    - {classification: ercp_biliary_stent_placement_outcome, required: true}
+
+- model: report_finding
+  name: ercp_quality_bile_duct_stone_extraction
+  finding: ercp_bile_duct_stone_extraction
+  required: true
+  multiple_allowed: false
+  classifications:
+    - {classification: ercp_bile_duct_stone_extraction_outcome, required: true}
+
+- model: report_finding
+  name: ercp_quality_post_ercp_pancreatitis
+  finding: ercp_post_ercp_pancreatitis
+  required: true
+  multiple_allowed: false
+  classifications:
+    - {classification: ercp_post_ercp_pancreatitis_status, required: true}
+
+- model: report_template_section
+  name: ercp_quality_documentation_2018
+  position: 0
+  types: [baseline]
+  findings:
+    - ercp_quality_antibiotic_prophylaxis
+    - ercp_quality_bile_duct_cannulation
+    - ercp_quality_biliary_stent_placement
+    - ercp_quality_bile_duct_stone_extraction
+    - ercp_quality_post_ercp_pancreatitis
+
+- model: report_template
+  name: ercp_quality_2018
+  name_de: "ERCP – leitlinienbasierte Qualitätsdokumentation"
+  name_en: "ERCP – guideline-based quality documentation"
+  description: "Patientenbezogene ERCP-Dokumentation der für die ESGE-Qualitätsindikatoren erforderlichen Kerndaten; populationsbezogene Raten werden getrennt aggregiert."
+  version: "ESGE-ERCP-PM-2018"
+  guideline_references:
+    - guideline_id: ESGE-ERCP-EUS-PM-2018
+      title: "Performance measures for ERCP and endoscopic ultrasound"
+      issuing_organization: "European Society of Gastrointestinal Endoscopy (ESGE)"
+      version: "2018"
+      publication_date: 2018-10-19
+      canonical_url: "https://www.esge.com/ercp-and-eus"
+      cited_sections:
+        - "Adequate antibiotic prophylaxis before ERCP"
+        - "Bile duct cannulation rate"
+        - "Appropriate biliary stent placement"
+        - "Bile duct stone extraction"
+        - "Post-ERCP pancreatitis"
+    - guideline_id: AWMF-021-022
+      title: "S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie"
+      issuing_organization: "Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
+      version: "2.1"
+      publication_date: 2025-07-01
+      canonical_url: "https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf"
+      cited_sections: ["Kapitel 7.1 ERCP", "Kapitel 7.1.5 Spezifische Qualitätsindikatoren"]
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - concept_id: ercp.antibiotic_prophylaxis
+      label: Antibiotikaprophylaxe
+      applicability_status: required
+      validator_names: [ercp_antibiotic_prophylaxis_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_antibiotic_prophylaxis, classification_name: ercp_antibiotic_prophylaxis_status}
+      allowed_values: [quality_adequate, quality_inadequate, quality_not_indicated, quality_unknown]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: adequate antibiotic prophylaxis before ERCP"]
+    - concept_id: ercp.bile_duct_cannulation
+      label: Selektive Gallengangskanülierung
+      applicability_status: required
+      validator_names: [ercp_bile_duct_cannulation_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_bile_duct_cannulation, classification_name: ercp_bile_duct_cannulation_outcome}
+      allowed_values: [quality_successful, quality_unsuccessful, quality_not_attempted]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: bile duct cannulation rate"]
+    - concept_id: ercp.biliary_stent_placement
+      label: Angemessenheit der biliären Stentimplantation
+      applicability_status: required
+      validator_names: [ercp_biliary_stent_placement_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_biliary_stent_placement, classification_name: ercp_biliary_stent_placement_outcome}
+      allowed_values: [quality_appropriate, quality_not_appropriate, quality_not_applicable]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: appropriate stent placement"]
+    - concept_id: ercp.bile_duct_stone_extraction
+      label: Vollständigkeit der Gallengangssteinextraktion
+      applicability_status: required
+      validator_names: [ercp_bile_duct_stone_extraction_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_bile_duct_stone_extraction, classification_name: ercp_bile_duct_stone_extraction_outcome}
+      allowed_values: [quality_complete, quality_incomplete, quality_not_applicable]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: bile duct stone extraction"]
+    - concept_id: ercp.post_ercp_pancreatitis
+      label: Post-ERCP-Pankreatitis
+      applicability_status: required
+      validator_names: [ercp_post_ercp_pancreatitis_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_post_ercp_pancreatitis, classification_name: ercp_post_ercp_pancreatitis_status}
+      allowed_values: [quality_absent, quality_present, quality_unknown]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: post-ERCP pancreatitis"]
+  examination: ercp
+  report_sections: [ercp_quality_documentation_2018]
+  validators:
+    examination_validators: [ercp_quality_documentation_minimum]
+    findings_validators:
+      - ercp_antibiotic_prophylaxis_documented
+      - ercp_bile_duct_cannulation_documented
+      - ercp_biliary_stent_placement_documented
+      - ercp_bile_duct_stone_extraction_documented
+      - ercp_post_ercp_pancreatitis_documented
+
+- model: findings_validator
+  name: eus_informed_consent_documented
+  finding: eus_informed_consent
+  operator: exists
+  query: {finding: eus_informed_consent, operator: exists}
+
+- model: findings_validator
+  name: eus_landmarks_documented
+  finding: eus_landmark_documentation
+  operator: exists
+  query: {finding: eus_landmark_documentation, operator: exists}
+
+- model: findings_validator
+  name: eus_pancreatic_cyst_description_documented
+  finding: eus_pancreatic_cyst_description
+  operator: exists
+  query: {finding: eus_pancreatic_cyst_description, operator: exists}
+
+- model: findings_validator
+  name: eus_tissue_acquisition_documented
+  finding: eus_tissue_acquisition
+  operator: exists
+  query: {finding: eus_tissue_acquisition, operator: exists}
+
+- model: findings_validator
+  name: eus_adverse_events_documented
+  finding: eus_adverse_events
+  operator: exists
+  query: {finding: eus_adverse_events, operator: exists}
+
+- model: examination_validator
+  name: eus_quality_2025_minimum_documentation
+  finding_validators:
+    - eus_informed_consent_documented
+    - eus_landmarks_documented
+    - eus_pancreatic_cyst_description_documented
+    - eus_tissue_acquisition_documented
+    - eus_adverse_events_documented
+  examination_validators: []
+
+- model: report_finding
+  name: eus_quality_informed_consent
+  finding: eus_informed_consent
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_informed_consent_status, required: true}]
+
+- model: report_finding
+  name: eus_quality_landmarks
+  finding: eus_landmark_documentation
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_landmark_documentation_status, required: true}]
+
+- model: report_finding
+  name: eus_quality_pancreatic_cyst_description
+  finding: eus_pancreatic_cyst_description
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_pancreatic_cyst_description_status, required: true}]
+
+- model: report_finding
+  name: eus_quality_tissue_acquisition
+  finding: eus_tissue_acquisition
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_tissue_acquisition_result, required: true}]
+
+- model: report_finding
+  name: eus_quality_adverse_events
+  finding: eus_adverse_events
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_adverse_event_status, required: true}]
+
+- model: report_template_section
+  name: eus_quality_documentation_2025
+  position: 0
+  types: [baseline]
+  findings:
+    - eus_quality_informed_consent
+    - eus_quality_landmarks
+    - eus_quality_pancreatic_cyst_description
+    - eus_quality_tissue_acquisition
+    - eus_quality_adverse_events
+
+- model: report_template
+  name: eus_quality_2025
+  name_de: "Endosonographie – leitlinienbasierte Qualitätsdokumentation 2025"
+  name_en: "Endoscopic ultrasound – guideline-based quality documentation 2025"
+  description: "Patientenbezogene EUS-Kerndokumentation zur späteren getrennten Berechnung der ESGE-Qualitätsindikatoren."
+  version: "ESGE-EUS-PM-update-2025"
+  guideline_references:
+    - guideline_id: ESGE-EUS-PM-2025
+      title: "Performance measures for endoscopic ultrasound: ESGE Quality Improvement Initiative – Update 2025"
+      issuing_organization: "European Society of Gastrointestinal Endoscopy (ESGE)"
+      version: "2025 update"
+      publication_date: 2025-11-12
+      canonical_url: "https://www.thieme-connect.com/products/ejournals/pdf/10.1055/a-2716-7763.pdf"
+      cited_sections:
+        - "Informed patient consent"
+        - "Adequate documentation of landmarks"
+        - "Standardized description of pancreatic cystic lesions"
+        - "Diagnostic tissue acquisition"
+        - "Adverse events"
+    - guideline_id: AWMF-021-022
+      title: "S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie"
+      issuing_organization: "Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
+      version: "2.1"
+      publication_date: 2025-07-01
+      canonical_url: "https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf"
+      cited_sections: ["Kapitel 7.4 Endosonographie"]
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - concept_id: eus.informed_consent
+      label: Informierte Einwilligung
+      applicability_status: required
+      validator_names: [eus_informed_consent_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_informed_consent, classification_name: eus_informed_consent_status}
+      allowed_values: [quality_obtained, quality_not_obtained]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 1: informed patient consent"]
+    - concept_id: eus.landmark_documentation
+      label: Standardisierte Landmarkendokumentation
+      applicability_status: required
+      validator_names: [eus_landmarks_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_landmark_documentation, classification_name: eus_landmark_documentation_status}
+      allowed_values: [quality_complete, quality_incomplete]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 2: adequate documentation of landmarks"]
+    - concept_id: eus.pancreatic_cyst_description
+      label: Standardisierte Beschreibung pankreatischer Zysten
+      applicability_status: required
+      validator_names: [eus_pancreatic_cyst_description_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_pancreatic_cyst_description, classification_name: eus_pancreatic_cyst_description_status}
+      allowed_values: [quality_complete, quality_incomplete, quality_not_applicable]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 4: standardized pancreatic cyst description"]
+    - concept_id: eus.tissue_acquisition
+      label: Diagnostische Gewebegewinnung
+      applicability_status: required
+      validator_names: [eus_tissue_acquisition_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_tissue_acquisition, classification_name: eus_tissue_acquisition_result}
+      allowed_values: [quality_diagnostic, quality_nondiagnostic, quality_not_applicable]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 5: diagnostic tissue acquisition"]
+    - concept_id: eus.adverse_events
+      label: Unerwünschte Ereignisse
+      applicability_status: required
+      validator_names: [eus_adverse_events_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_adverse_events, classification_name: eus_adverse_event_status}
+      allowed_values: [quality_absent, quality_present, quality_unknown]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 6: adverse events"]
+  examination: endoscopic_ultrasound
+  report_sections: [eus_quality_documentation_2025]
+  validators:
+    examination_validators: [eus_quality_2025_minimum_documentation]
+    findings_validators:
+      - eus_informed_consent_documented
+      - eus_landmarks_documented
+      - eus_pancreatic_cyst_description_documented
+      - eus_tissue_acquisition_documented
+      - eus_adverse_events_documented

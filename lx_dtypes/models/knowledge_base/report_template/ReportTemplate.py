@@ -1,6 +1,7 @@
+import datetime
 from typing import List, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
@@ -22,9 +23,33 @@ class ReportTemplateValidators(BaseModel):
     unit_validators: List[str] = Field(default_factory=list)
 
 
+class ReportTemplateGuidelineReference(BaseModel):
+    """Versioned guideline provenance exposed with a report template."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    guideline_id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    issuing_organization: str = Field(min_length=1)
+    version: str = Field(min_length=1)
+    publication_date: datetime.date
+    canonical_url: str = Field(min_length=1)
+    cited_sections: List[str] = Field(min_length=1)
+
+    @field_validator("canonical_url")
+    @classmethod
+    def require_https_url(cls, value: str) -> str:
+        if not value.startswith("https://"):
+            raise ValueError("guideline canonical_url must use HTTPS")
+        return value
+
+
 class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):
     examination: str
     version: str | None = None
+    guideline_references: List[ReportTemplateGuidelineReference] = Field(
+        default_factory=list
+    )
     coverage_version: str | None = None
     coverage_concepts: List[ReportTemplateCoverageConcept] = Field(default_factory=list)
     report_sections: Union[str, List[str]] = Field(default_factory=list_of_str_factory)

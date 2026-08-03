@@ -13,14 +13,14 @@
   name_de: "Z-Linie"
   name_en: "Z-line"
   classification_choice_descriptors:
-    - distance_cm
+    - length_cm_descriptor
 
 - model: classification_choice
   name: "star_upper_gi_location_gastroesophageal_junction"
   name_de: "Gastroösophagealer Übergang"
   name_en: "Gastroesophageal junction"
   classification_choice_descriptors:
-    - distance_cm
+    - length_cm_descriptor
 
 - model: classification_choice
   name: "star_upper_gi_location_stomach_fundus"

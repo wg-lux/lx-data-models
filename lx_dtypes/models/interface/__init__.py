@@ -5,8 +5,12 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+        AmbiguousModuleConfigError,
+        KnowledgeBaseIdentityRequiredError,
         KnowledgeBaseRegistryError,
+        KnowledgeBaseVersionConflictError,
         KnowledgeBaseVersionNotFoundError,
+        ModuleConfigNotFoundError,
         get_knowledge_base_identity,
         load_knowledge_base,
         load_module_config,
@@ -17,9 +21,13 @@ if TYPE_CHECKING:
     from lx_dtypes.models.interface.LookupTracker import KnowledgeBaseLookupTracker
 
 _INTERFACE_EXPORTS = {
+    "AmbiguousModuleConfigError",
+    "KnowledgeBaseIdentityRequiredError",
     "KnowledgeBaseLookupTracker",
     "KnowledgeBaseRegistryError",
+    "KnowledgeBaseVersionConflictError",
     "KnowledgeBaseVersionNotFoundError",
+    "ModuleConfigNotFoundError",
     "get_knowledge_base_identity",
     "load_knowledge_base",
     "load_module_config",
@@ -45,9 +53,13 @@ def __getattr__(name: str) -> Any:
 
 
 __all__ = [
+    "AmbiguousModuleConfigError",
+    "KnowledgeBaseIdentityRequiredError",
     "KnowledgeBaseLookupTracker",
     "KnowledgeBaseRegistryError",
+    "KnowledgeBaseVersionConflictError",
     "KnowledgeBaseVersionNotFoundError",
+    "ModuleConfigNotFoundError",
     "get_knowledge_base_identity",
     "load_knowledge_base",
     "load_module_config",

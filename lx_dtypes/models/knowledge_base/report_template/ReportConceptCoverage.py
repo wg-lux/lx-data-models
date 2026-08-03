@@ -61,6 +61,7 @@ class ReportConceptCoverageItem(BaseModel):
     validation_status: ReportConceptValidationStatus
     evidence_path: tuple[str, ...] = Field(min_length=1)
     evidence_paths: tuple[tuple[str, ...], ...] = ()
+    guideline_citations: tuple[str, ...] = ()
 
     @model_validator(mode="after")
     def validate_status(self) -> "ReportConceptCoverageItem":

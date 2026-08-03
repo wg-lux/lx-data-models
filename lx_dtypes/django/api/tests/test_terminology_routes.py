@@ -111,6 +111,40 @@ def _editor_bundle_zip() -> bytes:
     return buffer.getvalue()
 
 
+def _bundle_zip_with_missing_transitive_dependency() -> bytes:
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr(
+            "incomplete_bundle/config.yaml",
+            "\n".join(
+                [
+                    "name: incomplete_bundle",
+                    'description: ""',
+                    "version: 1.0.0",
+                    "modules:",
+                    "  - child_module",
+                    "depends_on: []",
+                ]
+            )
+            + "\n",
+        )
+        archive.writestr(
+            "incomplete_bundle/child_module/config.yaml",
+            "\n".join(
+                [
+                    "name: child_module",
+                    'description: ""',
+                    "version: 1.0.0",
+                    "modules: []",
+                    "depends_on:",
+                    "  - missing_dependency",
+                ]
+            )
+            + "\n",
+        )
+    return buffer.getvalue()
+
+
 def _write_registry(tmp_path: Path, *, active: bool = False) -> Path:
     kb_root = tmp_path / "knowledge-bases"
     bundle_dir = kb_root / "published_terminology"
@@ -365,6 +399,33 @@ def test_import_rejects_overwriting_an_existing_bundle_version(
     assert second_response.status_code == 409
     assert registry_path.read_bytes() == original_registry
     assert not list(registry_path.parent.glob(".*.tmp"))
+
+
+def test_import_validates_all_transitive_dependencies_before_registration(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    import_root = tmp_path / "imported-packages"
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", str(import_root))
+
+    response = Client().post(
+        "/base_api/terminology/bundles/import",
+        data={
+            "file": SimpleUploadedFile(
+                "incomplete_bundle.zip",
+                _bundle_zip_with_missing_transitive_dependency(),
+                content_type="application/zip",
+            )
+        },
+        secure=True,
+    )
+
+    assert response.status_code == 409
+    assert b"missing_dependency" in response.content
+    assert not registry_path.exists()
+    assert not (import_root / "incomplete_bundle" / "1.0.0").exists()
 
 
 def test_missing_registry_error_does_not_expose_server_path(

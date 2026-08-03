@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
 from lx_dtypes.models.knowledge_base.report_template import (
@@ -39,10 +41,12 @@ def _build_p_examination(
     *,
     examination: str = "star_upper_gi_endoscopy",
     indications_payload: list[dict[str, object]] | None = None,
+    examiners: list[str] | None = None,
 ) -> PExamination:
     p_examination = PExamination.model_validate(
         {
             "patient": "test_patient",
+            "examiners": examiners or [],
             "examination": examination,
             "patient_findings": [],
             "patient_indications": [],
@@ -226,6 +230,25 @@ def test_colonoscopy_template_emits_authoritative_concept_coverage() -> None:
     kb = loader.load_knowledge_base("report_template_examples")
     p_examination = _build_p_examination(
         [
+            {
+                "finding": "endoscopy_hardware_used",
+                "classifications": [
+                    {
+                        "classification": (
+                            "endoscopy_hardware_endoscope_processor_model"
+                        ),
+                        "value": "olympus_cv_190",
+                    },
+                    {
+                        "classification": "endoscopy_hardware_serial_number",
+                        "classification_choice": (
+                            "endoscopy_hardware_serial_number_recorded"
+                        ),
+                        "descriptor": "endoscopy_hardware_serial_number_value",
+                        "descriptor_value": "SN-TEST-190-001",
+                    },
+                ],
+            },
             {
                 "finding": "sedation_endoscopy",
                 "classifications": [
@@ -792,6 +815,8 @@ def test_colonoscopy_template_emits_authoritative_concept_coverage() -> None:
             },
         ],
         examination="colonoscopy",
+        indications_payload=[{"indication": "colonoscopy_screening"}],
+        examiners=["examiner-1"],
     )
 
     validation = kb.evaluate_report_template_validators(
@@ -819,6 +844,18 @@ def test_colonoscopy_template_emits_authoritative_concept_coverage() -> None:
         )
     }
     assert {item.validation_status for item in coverage.concepts} == {"present"}
+    assert len(coverage.concepts) == 34
+    cited_concepts = {
+        item.concept_id: item.guideline_citations
+        for item in coverage.concepts
+        if item.guideline_citations
+    }
+    assert cited_concepts["koloskopie.indikation"] == (
+        "AWMF-021-022 Statement 2.36: Indikation",
+    )
+    assert cited_concepts["koloskopie.monitoring.sauerstoffsaettigung"] == (
+        "AWMF-021-014 Kapitel 5.4 und Empfehlung 5.10",
+    )
 
 
 def test_colonoscopy_conditional_quality_rules() -> None:
@@ -1497,3 +1534,139 @@ def test_knowledge_base_admissibility_rejects_unknown_examination() -> None:
         assert "Unknown examination" in str(exc)
     else:
         raise AssertionError("Expected semantic admissibility failure")
+
+
+def test_upper_gi_quality_2025_emits_authoritative_concept_coverage() -> None:
+    loader = DataLoader(input_dirs=[DATA_ROOT])
+    loader.load_module_configs()
+    kb = loader.load_knowledge_base("report_template_examples")
+    p_examination = _build_p_examination(
+        [
+            {
+                "finding": finding_name,
+                "classifications": [
+                    {"classification": "yes_no_unknown_classification", "value": "no"}
+                ],
+            }
+            for finding_name in (
+                "star_upper_gi_mucosa_esophagus_abnormal",
+                "star_upper_gi_mucosa_stomach_abnormal",
+                "star_upper_gi_mucosa_duodenum_abnormal",
+            )
+        ]
+        + [
+            {
+                "finding": finding_name,
+                "classifications": [
+                    {
+                        "classification": "distance_cm",
+                        "classification_choice": "distance_cm",
+                        "descriptor": "length_cm_descriptor",
+                        "descriptor_value": distance,
+                    }
+                ],
+            }
+            for finding_name, distance in (
+                ("star_upper_gi_location_esophagogastric_junction", 40),
+                ("star_upper_gi_location_hiatus", 41),
+                ("star_upper_gi_location_squamocolumnar_junction", 40),
+            )
+        ]
+        + [
+            {
+                "finding": "star_upper_gi_imaging_modality_esophagus",
+                "classifications": [
+                    {
+                        "classification": (
+                            "upper_gi_esophagus_imaging_modality_classification"
+                        ),
+                        "value": "star_upper_gi_imaging_modality_white_light",
+                    }
+                ],
+            }
+        ],
+        examination="star_upper_gi_endoscopy",
+    )
+
+    validation = kb.evaluate_report_template_validators(
+        "upper_gi_quality_2025",
+        p_examination=p_examination,
+    )
+    coverage = build_report_concept_coverage(
+        kb=kb,
+        requested_template_name="upper_gi_quality_2025",
+        template_export=kb.export_report_template("upper_gi_quality_2025"),
+        p_examination=p_examination,
+        validation=validation,
+    )
+
+    assert validation["ok"] is True
+    assert len(coverage.concepts) == 7
+    assert {item.validation_status for item in coverage.concepts} == {"present"}
+    assert all(item.guideline_citations for item in coverage.concepts)
+
+
+@pytest.mark.parametrize(
+    ("template_name", "examination", "finding_values"),
+    [
+        (
+            "ercp_quality_2018",
+            "ercp",
+            [
+                ("ercp_antibiotic_prophylaxis", "ercp_antibiotic_prophylaxis_status", "quality_adequate"),
+                ("ercp_bile_duct_cannulation", "ercp_bile_duct_cannulation_outcome", "quality_successful"),
+                ("ercp_biliary_stent_placement", "ercp_biliary_stent_placement_outcome", "quality_not_applicable"),
+                ("ercp_bile_duct_stone_extraction", "ercp_bile_duct_stone_extraction_outcome", "quality_not_applicable"),
+                ("ercp_post_ercp_pancreatitis", "ercp_post_ercp_pancreatitis_status", "quality_absent"),
+            ],
+        ),
+        (
+            "eus_quality_2025",
+            "endoscopic_ultrasound",
+            [
+                ("eus_informed_consent", "eus_informed_consent_status", "quality_obtained"),
+                ("eus_landmark_documentation", "eus_landmark_documentation_status", "quality_complete"),
+                ("eus_pancreatic_cyst_description", "eus_pancreatic_cyst_description_status", "quality_not_applicable"),
+                ("eus_tissue_acquisition", "eus_tissue_acquisition_result", "quality_not_applicable"),
+                ("eus_adverse_events", "eus_adverse_event_status", "quality_absent"),
+            ],
+        ),
+    ],
+)
+def test_advanced_endoscopy_templates_emit_authoritative_concept_coverage(
+    template_name: str,
+    examination: str,
+    finding_values: list[tuple[str, str, str]],
+) -> None:
+    loader = DataLoader(input_dirs=[DATA_ROOT])
+    loader.load_module_configs()
+    kb = loader.load_knowledge_base("report_template_examples")
+    p_examination = _build_p_examination(
+        [
+            {
+                "finding": finding_name,
+                "classifications": [
+                    {"classification": classification_name, "value": value}
+                ],
+            }
+            for finding_name, classification_name, value in finding_values
+        ],
+        examination=examination,
+    )
+
+    validation = kb.evaluate_report_template_validators(
+        template_name,
+        p_examination=p_examination,
+    )
+    coverage = build_report_concept_coverage(
+        kb=kb,
+        requested_template_name=template_name,
+        template_export=kb.export_report_template(template_name),
+        p_examination=p_examination,
+        validation=validation,
+    )
+
+    assert validation["ok"] is True
+    assert len(coverage.concepts) == 5
+    assert {item.validation_status for item in coverage.concepts} == {"present"}
+    assert all(item.guideline_citations for item in coverage.concepts)

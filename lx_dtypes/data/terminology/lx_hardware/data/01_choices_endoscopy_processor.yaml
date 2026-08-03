@@ -12,3 +12,10 @@
 
 - model: classification_choice
   name: "pentax_epk_i7000"
+
+- model: classification_choice
+  name: "endoscopy_hardware_serial_number_recorded"
+  name_de: "Geräteseriennummer dokumentiert"
+  name_en: "Device serial number recorded"
+  classification_choice_descriptors:
+    - endoscopy_hardware_serial_number_value

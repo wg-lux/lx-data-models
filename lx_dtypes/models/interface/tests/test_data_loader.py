@@ -2,7 +2,11 @@ from pathlib import Path
 
 import pytest
 
-from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.DataLoader import (
+    AmbiguousModuleConfigError,
+    DataLoader,
+    ModuleConfigNotFoundError,
+)
 
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.utils.dataloader import resolve_kb_module_load_order
@@ -87,8 +91,27 @@ class TestDataLoader:
             mod_a.name: mod_a,
         }
 
-        with pytest.raises(ValueError, match="referenced but no configuration"):
+        with pytest.raises(
+            ModuleConfigNotFoundError,
+            match="referenced but no configuration",
+        ):
             empty_data_loader.get_initialized_config("root")
+
+    def test_root_module_with_multiple_config_candidates_is_ambiguous(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        first_root = tmp_path / "first"
+        second_root = tmp_path / "second"
+        _write_module_config(first_root / "duplicate", name="duplicate")
+        _write_module_config(second_root / "duplicate", name="duplicate")
+        loader = DataLoader(input_dirs=[first_root, second_root])
+
+        with pytest.raises(
+            AmbiguousModuleConfigError,
+            match="multiple config.yaml candidates",
+        ):
+            loader.get_initialized_config("duplicate")
 
     def test_get_initialized_config_circular_dependency(
         self, empty_data_loader: DataLoader
