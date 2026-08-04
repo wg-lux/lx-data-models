@@ -47,7 +47,7 @@ Berichte
 
 ## Mermaid-Diagramm
 
-```mermaid
+```text
 ---
 config:
   theme: 'base'
@@ -162,7 +162,7 @@ flowchart TD
 Dieses Diagramm zeigt nur die Terminologieebene. Es fasst technische
 Zwischenobjekte wie `*_type` zusammen und zeigt die fachlichen Hauptpfade.
 
-```mermaid
+```text
 ---
 config:
   theme: 'base'

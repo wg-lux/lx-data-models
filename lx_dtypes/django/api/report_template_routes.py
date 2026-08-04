@@ -13,6 +13,9 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     get_knowledge_base_identity,
 )
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+from lx_dtypes.models.knowledge_base.report_template.ReportConceptCoverageBuilder import (
+    build_report_concept_coverage,
+)
 
 from . import report_template_builder
 from .report_template_builder import (
@@ -26,6 +29,7 @@ from .lookup_tracker import register_runtime_lookup_tracker
 from .request_types import BaseRequest
 
 F = TypeVar("F", bound=Callable[..., Any])
+ReportTemplateCapability = Literal["report_template:read", "report_template:write"]
 
 
 class _RouteDecorator(Protocol):
@@ -89,7 +93,21 @@ def register_report_template_routes(
         [object, PExamination], dict[str, Any]
     ]
     | None = None,
+    authenticate_request_user: Callable[[BaseRequest], Any | None],
+    report_template_access_allowed: Callable[[object, ReportTemplateCapability], bool],
 ) -> None:
+    def require_builder_access(
+        request: BaseRequest, capability: ReportTemplateCapability
+    ) -> None:
+        actor = authenticate_request_user(request)
+        if actor is None:
+            raise HttpError(401, "Authentication is required.")
+        if not report_template_access_allowed(actor, capability):
+            raise HttpError(
+                403,
+                f"{capability} access is required for report-template builder routes.",
+            )
+
     @api.post("/report-templates/builder/templates")
     def save_report_template(
         request: BaseRequest,
@@ -98,7 +116,7 @@ def register_report_template_routes(
         """
         Persist a new report-template YAML file into one lx_dtypes knowledge-base module.
         """
-        del request
+        require_builder_access(request, "report_template:write")
         try:
             saved = save_report_template_definition(payload)
         except FileExistsError as exc:
@@ -133,6 +151,22 @@ def register_report_template_routes(
             matches.append(kb.export_report_template(template_name))
         return matches
 
+    @api.get(
+        "/report-templates/builder/by-examination/{module_name}/{examination_name}"
+    )
+    def builder_report_templates_by_examination(
+        request: BaseRequest, module_name: str, examination_name: str
+    ) -> List[Dict[str, Any]]:
+        """Return preview exports for all builder templates, including drafts."""
+        require_builder_access(request, "report_template:read")
+        kb = load_module_kb(module_name)
+        matches: list[Dict[str, Any]] = []
+        for template_name, template in kb.report_template.items():
+            if template.examination != examination_name:
+                continue
+            matches.append(kb.export_report_template_preview(template_name))
+        return matches
+
     @api.get("/report-templates/{module_name}/{template_name}")
     def report_template_by_name(
         request: BaseRequest, module_name: str, template_name: str
@@ -154,7 +188,7 @@ def register_report_template_routes(
     def preview_report_template_by_name(
         request: BaseRequest, module_name: str, template_name: str
     ) -> Dict[str, Any]:
-        del request
+        require_builder_access(request, "report_template:read")
         kb = load_module_kb(module_name)
         try:
             return kb.export_report_template_preview(template_name)
@@ -170,7 +204,7 @@ def register_report_template_routes(
     def publish_report_template(
         request: BaseRequest, module_name: str, template_name: str
     ) -> PublishReportTemplateResponse:
-        del request
+        require_builder_access(request, "report_template:write")
         _, resolved_version = get_knowledge_base_identity(
             module_name,
             input_dirs=[report_template_builder.MODULES_ROOT],
@@ -210,7 +244,7 @@ def register_report_template_routes(
     def unpublish_report_template(
         request: BaseRequest, module_name: str, template_name: str
     ) -> PublishReportTemplateResponse:
-        del request
+        require_builder_access(request, "report_template:write")
         _, resolved_version = get_knowledge_base_identity(
             module_name,
             input_dirs=[report_template_builder.MODULES_ROOT],
@@ -251,16 +285,26 @@ def register_report_template_routes(
         )
         kb = load_module_kb(resolved_module_name, version=resolved_version)
         try:
-            kb.export_report_template(template_name)
+            template_export = kb.export_report_template(template_name)
             validation = kb.evaluate_report_template_validators(
                 template_name, p_examination=payload
             )
-            return _attach_resolved_kb_identity(
+            response = _attach_resolved_kb_identity(
                 validation,
                 module_name=resolved_module_name,
                 version=resolved_version,
             )
+            response["concept_coverage"] = build_report_concept_coverage(
+                kb=cast(Any, kb),
+                requested_template_name=template_name,
+                template_export=template_export,
+                p_examination=payload,
+                validation=validation,
+            ).model_dump(mode="json")
+            return response
         except SemanticAdmissibilityError as exc:
+            raise HttpError(422, str(exc)) from exc
+        except ValueError as exc:
             raise HttpError(422, str(exc)) from exc
         except KeyError as exc:
             raise HttpError(
@@ -346,16 +390,26 @@ def register_report_template_routes(
         )
         kb = load_module_kb(resolved_module_name, version=resolved_version)
         try:
-            kb.export_report_template(template_name)
+            template_export = kb.export_report_template(template_name)
             validation = kb.evaluate_report_template_validators(
                 template_name, p_examination=payload
             )
-            return _attach_resolved_kb_identity(
+            response = _attach_resolved_kb_identity(
                 validation,
                 module_name=resolved_module_name,
                 version=resolved_version,
             )
+            response["concept_coverage"] = build_report_concept_coverage(
+                kb=cast(Any, kb),
+                requested_template_name=template_name,
+                template_export=template_export,
+                p_examination=payload,
+                validation=validation,
+            ).model_dump(mode="json")
+            return response
         except SemanticAdmissibilityError as exc:
+            raise HttpError(422, str(exc)) from exc
+        except ValueError as exc:
             raise HttpError(422, str(exc)) from exc
         except KeyError as exc:
             raise HttpError(
@@ -367,7 +421,7 @@ def register_report_template_routes(
     def validate_report_template_definition(
         request: BaseRequest, module_name: str, template_name: str
     ) -> Dict[str, Any]:
-        del request
+        require_builder_access(request, "report_template:read")
         _, resolved_version = get_knowledge_base_identity(
             module_name,
             input_dirs=[report_template_builder.MODULES_ROOT],

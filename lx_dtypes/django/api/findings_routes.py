@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from functools import lru_cache
 from typing import (
     TYPE_CHECKING,
@@ -127,7 +126,12 @@ def _as_str_list_from_relation(relation: object) -> list[str]:
 
 
 def _findings_module_name() -> str:
-    return os.getenv("LX_DTYPES_FINDINGS_MODULE", "lx_knowledge_base")
+    from .terminology_routes import active_terminology_selection
+
+    active = active_terminology_selection()
+    if active is None:
+        raise RuntimeError("No active knowledge-base bundle is selected.")
+    return active[0]
 
 
 def _norm_name(value: Optional[str]) -> str:

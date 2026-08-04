@@ -1,32 +1,38 @@
 # Esophagus
 - model: finding
   name: star_upper_gi_mucosa_esophagus_abnormal
+  description: "Dokumentierter Normalitäts- beziehungsweise Auffälligkeitsstatus der Ösophagusmukosa."
   classifications:
     - yes_no_unknown_classification
 
 - model: finding
   name: star_upper_gi_location_esophagogastric_junction
+  description: "Endoskopisch bestimmte Distanz des gastroösophagealen Übergangs ab Zahnreihe."
   classifications:
     - distance_cm
 
 - model: finding
   name: star_upper_gi_location_hiatus
+  description: "Endoskopisch bestimmte Distanz des Hiatus ab Zahnreihe."
   classifications:
     - distance_cm
 
 - model: finding
   name: star_upper_gi_location_squamocolumnar_junction
+  description: "Endoskopisch bestimmte Distanz der Z-Linie ab Zahnreihe."
   classifications:
     - distance_cm
 
 - model: finding
   name: star_upper_gi_imaging_modality_esophagus
+  description: "Für die standardisierte Inspektion des Ösophagus eingesetzte Bildgebungsmodalität."
   classifications:
     - upper_gi_esophagus_imaging_modality_classification
 
 # Stomach
 - model: finding
   name: star_upper_gi_mucosa_stomach_abnormal
+  description: "Dokumentierter Normalitäts- beziehungsweise Auffälligkeitsstatus der Magenmukosa."
   classifications:
     - yes_no_unknown_classification
 
@@ -38,6 +44,7 @@
 # Duodenum
 - model: finding
   name: star_upper_gi_mucosa_duodenum_abnormal
+  description: "Dokumentierter Normalitäts- beziehungsweise Auffälligkeitsstatus der Duodenalmukosa."
   classifications:
     - yes_no_unknown_classification
 

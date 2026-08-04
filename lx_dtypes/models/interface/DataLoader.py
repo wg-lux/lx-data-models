@@ -14,6 +14,14 @@ if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
 
+class ModuleConfigNotFoundError(ValueError):
+    """Raised when an explicitly referenced module has no configuration."""
+
+
+class AmbiguousModuleConfigError(ValueError):
+    """Raised when a module name resolves to more than one config candidate."""
+
+
 class DataLoader(AppBaseModel):
     input_dirs: List[Path] = Field(default_factory=_default_dataloader_dirs_factory)
     module_configs: Dict[str, "KnowledgeBaseConfig"] = Field(default_factory=dict)
@@ -152,10 +160,10 @@ class DataLoader(AppBaseModel):
         candidates = self._configs_for_name(module_name)
         if not candidates:
             if relation == "dependency":
-                raise ValueError(
+                raise ModuleConfigNotFoundError(
                     f"Module '{module_name}' is referenced but no configuration was loaded for it."
                 )
-            raise ValueError(
+            raise ModuleConfigNotFoundError(
                 f"Module '{module_name}' is not loaded. Call 'load_module_configs' first."
             )
 
@@ -177,14 +185,10 @@ class DataLoader(AppBaseModel):
         if len(candidates) == 1:
             return candidates[0]
 
-        legacy_config = self.module_configs.get(module_name)
-        if legacy_config is not None:
-            return legacy_config
-
         candidate_paths = ", ".join(
             str(candidate.source_file or "<unknown>") for candidate in candidates
         )
-        raise ValueError(
+        raise AmbiguousModuleConfigError(
             f"Module '{module_name}' is ambiguous; found multiple config.yaml "
             f"candidates: {candidate_paths}."
         )
@@ -199,15 +203,20 @@ class DataLoader(AppBaseModel):
         if context_config is not None and context_config.source_file is not None:
             context_dir = context_config.source_file.parent
             if relation == "module":
-                return [
+                contextual_paths = [
                     (context_dir / module_name / "config.yaml").resolve(),
                     (context_dir.parent / module_name / "config.yaml").resolve(),
                 ]
-            if relation == "dependency":
-                return [
+            else:
+                contextual_paths = [
                     (context_dir.parent / module_name / "config.yaml").resolve(),
                     (context_dir / module_name / "config.yaml").resolve(),
                 ]
+            canonical_paths = [
+                (input_dir / "terminology" / module_name / "config.yaml").resolve()
+                for input_dir in self.input_dirs
+            ]
+            return [*contextual_paths, *canonical_paths]
 
         if relation == "root":
             root_matches = [

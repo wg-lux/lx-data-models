@@ -26,6 +26,18 @@ Use these documents in this order:
 - packaged kb: the Nix derivation that installs a module and emits a registry JSON
 - app bundle: the Python package plus packaged KB, wrapped with `LX_DTYPES_KB_REGISTRY`
 
+When `LX_DTYPES_KB_REGISTRY` is configured, runtime resolution is fail-closed:
+callers must request an explicit `module@version`, and that exact identity must
+exist in the registry. The resolver validates the selected artifact's root
+`config.yaml` against the requested identity and never falls back to checkout,
+wheel, or example data. Explicit `input_dirs` remain available only for direct
+authoring/import validation before an artifact is registered.
+
+Every referenced `modules` and `depends_on` entry is resolved transitively from
+the selected artifact before it is accepted. Missing dependencies, conflicting
+versions, and ambiguous root `config.yaml` candidates are typed load errors;
+input-directory ordering is not a package-selection mechanism.
+
 Registry `input_dirs` may also contain an HTTPS GitHub tree URL ending in the
 module directory, for example:
 

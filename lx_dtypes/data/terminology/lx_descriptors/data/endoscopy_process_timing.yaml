@@ -1,0 +1,37 @@
+# Sources for every record in this file:
+# - DGVS S2k quality guideline (AWMF 021-022), findings documentation: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b200dfa8a/chapter_69f4b200e16c2/
+- model: classification_choice_descriptor
+  name: "endoscopy_room_entry_time_value"
+  description: "Uhrzeitgenauer Zeitpunkt, zu dem die untersuchte Person den Untersuchungsraum betritt."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "endoscope_insertion_time_value"
+  description: "Uhrzeitgenauer Beginn der Endoskopie, definiert als Zeitpunkt des Einführens des Endoskops."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "colonoscopy_withdrawal_start_time_value"
+  description: "Uhrzeitgenauer Beginn des Rückzuges des Endoskops; bei vollständiger Koloskopie vom Zökalpol, bei inkompletter Koloskopie von der maximal erreichten Einführtiefe."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "endoscope_removal_time_value"
+  description: "Uhrzeitgenaues Ende der Endoskopie, definiert als Zeitpunkt des Entfernens des Endoskops."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "endoscopy_room_exit_time_value"
+  description: "Uhrzeitgenauer Zeitpunkt, zu dem die untersuchte Person den Untersuchungsraum verlässt."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "endoscopy_department_exit_time_value"
+  description: "Uhrzeitgenauer Zeitpunkt, zu dem die untersuchte Person die Endoskopieabteilung beziehungsweise den Aufwachraum verlässt."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32

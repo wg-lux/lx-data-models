@@ -1,0 +1,171 @@
+{
+  "resourceType": "Bundle",
+  "id": "clinical-examination-fixture",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "Patient/example-patient",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "example-patient",
+        "identifier": [
+          {
+            "system": "https://example.org/patient-id",
+            "value": "EXAMPLE-001"
+          }
+        ],
+        "name": [
+          {
+            "use": "official",
+            "family": "Mustermann",
+            "given": [
+              "Erika"
+            ]
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1980-01-01"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Patient/example-patient"
+      }
+    },
+    {
+      "fullUrl": "Observation/example-hemoglobin",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "example-hemoglobin",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "718-7",
+              "display": "Hemoglobin [Mass/volume] in Blood"
+            }
+          ],
+          "text": "Hemoglobin"
+        },
+        "subject": {
+          "reference": "Patient/example-patient"
+        },
+        "effectiveDateTime": "2026-07-29T10:00:00Z",
+        "valueQuantity": {
+          "value": 13.4,
+          "unit": "g/dL",
+          "system": "http://unitsofmeasure.org",
+          "code": "g/dL"
+        },
+        "component": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://wg-lux.de/fhir/CodeSystem/lx-classification-cs",
+                  "code": "result",
+                  "display": "result"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 13.4,
+              "unit": "g/dL",
+              "system": "http://unitsofmeasure.org",
+              "code": "g/dL"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/example-hemoglobin"
+      }
+    },
+    {
+      "fullUrl": "Condition/example-anemia",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "example-anemia",
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "271737000",
+              "display": "Anemia"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/example-patient"
+        },
+        "recordedDate": "2026-07-29T10:05:00Z"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/example-anemia"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/example-cbc-report",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "example-cbc-report",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "58410-2",
+              "display": "Complete blood count panel"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/example-patient"
+        },
+        "effectiveDateTime": "2026-07-29T10:00:00Z",
+        "result": [
+          {
+            "reference": "Observation/example-hemoglobin"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DiagnosticReport/example-cbc-report"
+      }
+    }
+  ]
+}

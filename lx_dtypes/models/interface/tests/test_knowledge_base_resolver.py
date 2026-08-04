@@ -10,6 +10,8 @@ from typing import Any
 import pytest
 
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    KnowledgeBaseIdentityRequiredError,
+    KnowledgeBaseVersionConflictError,
     KnowledgeBaseVersionNotFoundError,
     clear_knowledge_base_resolver_caches,
     get_knowledge_base_identity,
@@ -18,6 +20,7 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     resolve_default_data_root,
 )
 from lx_dtypes.models.interface import remote_data_roots
+from lx_dtypes.models.interface.data_roots import package_data_root
 
 
 def _write_kb_root(root: Path, *, module_name: str, version: str) -> None:
@@ -291,6 +294,79 @@ def test_load_knowledge_base_raises_for_unprovisioned_version(
         clear_knowledge_base_resolver_caches()
 
 
+def test_configured_registry_never_falls_back_to_default_data_roots(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    module_name = "checkout_only_module"
+    default_root = tmp_path / "checkout"
+    _write_kb_root(default_root, module_name=module_name, version="0.1.0")
+    registry_path = tmp_path / "kb_registry.json"
+    registry_path.write_text(json.dumps({"modules": {}}))
+
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    monkeypatch.setattr(
+        "lx_dtypes.models.interface.KnowledgeBaseResolver._default_input_dirs",
+        lambda: (default_root,),
+    )
+    clear_knowledge_base_resolver_caches()
+    try:
+        with pytest.raises(KnowledgeBaseVersionNotFoundError):
+            load_knowledge_base(module_name, version="0.1.0")
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+
+def test_configured_registry_requires_explicit_module_version(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    module_name = "versioned_demo_module"
+    root = tmp_path / "bundle"
+    _write_kb_root(root, module_name=module_name, version="0.1.0")
+    registry_path = tmp_path / "kb_registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {"modules": {module_name: {"0.1.0": {"input_dirs": [str(root)]}}}}
+        )
+    )
+
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    clear_knowledge_base_resolver_caches()
+    try:
+        with pytest.raises(
+            KnowledgeBaseIdentityRequiredError,
+            match="module@version",
+        ):
+            load_module_config(module_name)
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+
+def test_registry_artifact_identity_conflict_is_typed_and_loud(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    module_name = "versioned_demo_module"
+    root = tmp_path / "bundle"
+    _write_kb_root(root, module_name=module_name, version="0.1.0")
+    registry_path = tmp_path / "kb_registry.json"
+    registry_path.write_text(
+        json.dumps({"modules": {module_name: {"0.2.0": str(root)}}})
+    )
+
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    clear_knowledge_base_resolver_caches()
+    try:
+        with pytest.raises(
+            KnowledgeBaseVersionConflictError,
+            match="0.1.0.*0.2.0",
+        ):
+            load_knowledge_base(module_name, version="0.2.0")
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+
 def test_load_module_config_returns_current_module_config(tmp_path: Path) -> None:
     module_name = "versioned_demo_module"
     _write_kb_root(tmp_path, module_name=module_name, version="0.1.0")
@@ -310,21 +386,19 @@ def test_get_knowledge_base_identity_uses_loaded_module_version(tmp_path: Path) 
     assert identity == (module_name, "0.1.0")
 
 
-def test_get_knowledge_base_identity_prefers_explicit_version(tmp_path: Path) -> None:
+def test_get_knowledge_base_identity_validates_explicit_version(tmp_path: Path) -> None:
     module_name = "versioned_demo_module"
     _write_kb_root(tmp_path, module_name=module_name, version="0.1.0")
 
-    identity = get_knowledge_base_identity(
-        module_name,
-        version="9.9.9",
-        input_dirs=[tmp_path],
-    )
+    with pytest.raises(KnowledgeBaseVersionConflictError):
+        get_knowledge_base_identity(
+            module_name,
+            version="9.9.9",
+            input_dirs=[tmp_path],
+        )
 
-    assert identity == (module_name, "9.9.9")
 
-
-def test_resolve_default_data_root_prefers_configured_lookup_root(
-    monkeypatch: pytest.MonkeyPatch,
+def test_resolve_default_data_root_ignores_runtime_overlays(
     settings: Any,
     tmp_path: Path,
 ) -> None:
@@ -334,4 +408,4 @@ def test_resolve_default_data_root_prefers_configured_lookup_root(
 
     resolved_root = resolve_default_data_root()
 
-    assert resolved_root == configured_root.resolve()
+    assert resolved_root == package_data_root()

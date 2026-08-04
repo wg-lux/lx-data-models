@@ -6,12 +6,26 @@ import pytest
 from pytest import MonkeyPatch
 from typing import Any
 from django.test import Client
+from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api import report_template_builder
 from lx_dtypes.django.api import report_template_routes
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,
     load_knowledge_base,
 )
+
+
+@pytest.fixture(autouse=True)
+def builder_route_authorization(monkeypatch: MonkeyPatch) -> None:
+    """Keep lifecycle tests focused on builder behavior after route auth."""
+    monkeypatch.setattr(
+        api_main, "_authenticate_request_user", lambda request: object()
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_report_template_access_allowed",
+        lambda actor, capability: True,
+    )
 
 
 @pytest.fixture
@@ -23,6 +37,10 @@ def builder_terminology_registry(
     registry_path.write_text(
         json.dumps(
             {
+                "active": {
+                    "module_name": "builder_module",
+                    "version": "1.0.0",
+                },
                 "modules": {
                     "builder_module": {
                         "1.0.0": {"input_dirs": [str(tmp_path)]},
@@ -33,8 +51,6 @@ def builder_terminology_registry(
         encoding="utf-8",
     )
     monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
-    monkeypatch.setenv("LX_DTYPES_ACTIVE_TERMINOLOGY_MODULE", "builder_module")
-    monkeypatch.setenv("LX_DTYPES_ACTIVE_TERMINOLOGY_VERSION", "1.0.0")
     clear_knowledge_base_resolver_caches()
     yield
     clear_knowledge_base_resolver_caches()
@@ -118,6 +134,16 @@ def test_builder_save_publish_and_unpublish_flow(
     )
     assert list_response.status_code == 200
     assert list_response.json() == []
+
+    builder_list_response = client.get(
+        "/base_api/report-templates/builder/by-examination/builder_module/star_upper_gi_endoscopy",
+        secure=True,
+    )
+    assert builder_list_response.status_code == 200
+    assert [item["name"] for item in builder_list_response.json()] == [
+        "custom_template"
+    ]
+    assert builder_list_response.json()[0]["lifecycle_status"] == "draft"
 
     preview_response = client.get(
         "/base_api/report-templates/builder_module/custom_template/preview",

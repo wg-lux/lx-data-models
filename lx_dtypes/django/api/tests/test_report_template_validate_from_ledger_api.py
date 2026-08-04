@@ -110,8 +110,34 @@ def test_validate_report_template_runtime_from_ledger_success(
         examiners: list[Any] = []
 
     class _FakeKnowledgeBase:
+        class _Config:
+            def model_dump(self, *, mode: str) -> dict[str, str]:
+                assert mode == "json"
+                return {"name": "report_template_examples", "version": "0.1.0"}
+
+        config = _Config()
+
+        def model_dump(self, *, mode: str) -> dict[str, object]:
+            assert mode == "json"
+            return {"config": {"name": "report_template_examples", "version": "0.1.0"}}
+
         def export_report_template(self, name: str) -> dict[str, Any]:
-            return {"name": name}
+            return {
+                "name": name,
+                "version": "1.0.0",
+                "coverage_version": "report_concept_coverage_v1",
+                "coverage_concepts": [
+                    {
+                        "concept_id": "examination.findings",
+                        "label": "Findings",
+                        "applicability_status": "required",
+                        "validator_names": ["findings_validator"],
+                        "evidence_path": ["patient_findings"],
+                        "concept_value_path": ["examination"],
+                        "allowed_values": ["star_upper_gi_endoscopy"],
+                    }
+                ],
+            }
 
         def evaluate_report_template_validators(
             self, name: str, p_examination: PExamination
@@ -123,6 +149,9 @@ def test_validate_report_template_runtime_from_ledger_success(
                 "ok": True,
                 "evaluated_findings_count": 0,
                 "findings_validators": [],
+                "classification_validators": [],
+                "intervention_validators": [],
+                "unit_validators": [],
                 "examination_validators": [],
                 "issues": [],
             }
@@ -158,3 +187,4 @@ def test_validate_report_template_runtime_from_ledger_success(
     assert payload["ok"] is True
     assert payload["knowledge_base_module"] == "report_template_examples"
     assert payload["knowledge_base_version"] == "0.1.0"
+    assert payload["concept_coverage"]["identity"]["template_name"] == "star_upper_gi_main"

@@ -1,0 +1,23 @@
+- model: examination
+  name: ercp
+  description: "Endoscopic retrograde cholangiopancreatography."
+  examination_types: [endoscopic_procedure]
+  findings:
+    - ercp_antibiotic_prophylaxis
+    - ercp_bile_duct_cannulation
+    - ercp_biliary_stent_placement
+    - ercp_bile_duct_stone_extraction
+    - ercp_post_ercp_pancreatitis
+  indications: []
+
+- model: examination
+  name: endoscopic_ultrasound
+  description: "Diagnostic or interventional endoscopic ultrasound examination."
+  examination_types: [endoscopic_procedure]
+  findings:
+    - eus_informed_consent
+    - eus_landmark_documentation
+    - eus_pancreatic_cyst_description
+    - eus_tissue_acquisition
+    - eus_adverse_events
+  indications: []

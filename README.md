@@ -72,6 +72,58 @@ pip install -e ".[dev]"
 - Do not import from `lx_dtypes...tests` or `...test_fixtures` in consuming
   applications.
 
+## FHIR And YAML
+
+FHIR terminology can be converted directly into a validated knowledge base:
+
+```python
+from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
+
+kb = KnowledgeBase.from_fhir(
+    fhir_bundle,
+    module_name="imported_gastroenterology",
+)
+```
+
+To generate a single YAML file that can be loaded again with
+`KnowledgeBase.create_from_yaml`:
+
+```python
+from lx_dtypes.models.knowledge_base.fhir_yaml import write_fhir_yaml
+
+path = write_fhir_yaml(
+    fhir_bundle,
+    "generated/imported_gastroenterology.yaml",
+    module_name="imported_gastroenterology",
+    language="en",
+)
+```
+
+Use `fhir_to_yaml(...)` when YAML text is needed without writing a file, or
+`knowledge_base_from_fhir(...)` for the equivalent standalone conversion API.
+The high-level APIs use FHIR concept codes as stable internal identifiers and
+retain displays and language designations in `name_en` and `name_de`. Repeated
+conversion of the same input is deterministic.
+
+Set `language` to the IETF language tag of the FHIR `concept.display` values
+(for example `"en"`, `"de-DE"`, or `"pt-BR"`). For mixed-language bundles, set
+`CodeSystem.language` on each resource instead; the explicit API argument takes
+precedence. English and German displays are assigned to the corresponding LXDM
+translation field. Other source languages remain available as the stable concept
+code while explicit English or German FHIR designations are retained. Omitting
+both language declarations preserves the legacy behavior of using an
+undesignated display for both LXDM translation fields.
+
+By default, high-level conversion rejects payloads without mappable terminology
+`CodeSystem` resources and duplicate codes. Exact LX resource IDs take precedence;
+unknown CodeSystems are conservatively mapped from their declared properties,
+metadata, and concept text to the most likely LXDM domain. Resources without
+positive structural or textual evidence remain unmapped. Pass `strict=False` to
+allow an empty knowledge base. The currently supported domains are examination,
+finding, classification type, classification, classification choice, and unit.
+Nested FHIR concepts are imported recursively and flattened into the selected
+LXDM collection because LXDM concept collections are keyed rather than hierarchical.
+
 ## Django Integration
 
 If you want to use the packaged Django API in another project, do not infer the
@@ -125,6 +177,10 @@ from lx_dtypes.models.interface import load_knowledge_base
 kb = load_knowledge_base("<sanitized_bundle_name>")
 ```
 
+This unversioned convenience applies only when no registry is configured. With
+`LX_DTYPES_KB_REGISTRY`, callers must pass the exact registered version and the
+resolver does not fall back to packaged or checkout data.
+
 The loader resolves child modules relative to the selected bundle first. This
 allows an editor-published `lx_units` module to coexist with the canonical
 `lx_dtypes/data/terminology/lx_units` module without being mixed into the wrong
@@ -132,13 +188,14 @@ bundle. For pinned deployments, register the same bundle directory with
 `LX_DTYPES_KB_REGISTRY` and load it with an explicit `version`.
 
 Top-level `demo-data/` is intentionally not part of the default Python package
-data resolution path. Use it explicitly with `DataLoader(input_dirs=[...])`, Nix
-KB packaging, or a `LX_DTYPES_KB_REGISTRY` entry. Normal unversioned loads use
-the configured `LOOKUP_DTYPES_DATA_ROOT` when present, then packaged
-`lx_dtypes/data`.
+data resolution path. Use it explicitly with `DataLoader(input_dirs=[...])` in
+authoring or tests, or publish it as a versioned `LX_DTYPES_KB_REGISTRY` entry.
+Normal unversioned loads use only the immutable `lx_dtypes/data` content shipped
+in the installed package. Runtime checkout and `LOOKUP_DTYPES_DATA_ROOT`
+overlays are not supported.
 
 `lx-annotate` can also import the editor ZIP directly through
-`POST /base_api/terminology/bundles/import`. The endpoint extracts the ZIP into
+`POST /dtypes-api/terminology/bundles/import`. The endpoint extracts the ZIP into
 `LX_DTYPES_TERMINOLOGY_IMPORT_ROOT` (or a `terminology-packages/` directory next
 to the configured registry), validates it with the normal knowledge-base loader,
 updates the registry, and activates the imported version.

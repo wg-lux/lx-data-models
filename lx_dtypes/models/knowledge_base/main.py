@@ -62,6 +62,11 @@ from .fhir import (
     export_fhir_terminology_bundle,
     import_fhir_terminology,
 )
+from .fhir_yaml import (
+    fhir_to_yaml,
+    knowledge_base_from_fhir,
+    write_fhir_yaml,
+)
 from .indication import (
     KbIndicationDjangoLookupType,
     KbIndicationLookupType,
@@ -280,5 +285,8 @@ __all__ = [
     "FHIR_EXPORT_DOMAINS",
     "export_fhir_terminology",
     "export_fhir_terminology_bundle",
+    "fhir_to_yaml",
     "import_fhir_terminology",
+    "knowledge_base_from_fhir",
+    "write_fhir_yaml",
 ]

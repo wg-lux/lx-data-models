@@ -17,16 +17,17 @@ The host project must configure:
 
 - `LX_DTYPES_HOST_MODELS_MODULE`
   Python import path to a module that exports the required Django ORM models.
-- `LX_DTYPES_FINDINGS_MODULE`
-  Optional knowledge-base module name used by the findings/classification API.
-  Defaults to `lx_knowledge_base`.
+- `LX_DTYPES_KB_REGISTRY`
+  Path to the versioned registry containing an explicit active module and
+  version. Findings, classifications, templates, and validation all resolve
+  through this identity.
 
 Example:
 
 ```python
 # settings.py
 LX_DTYPES_HOST_MODELS_MODULE = "endoreg_db.models"
-LX_DTYPES_FINDINGS_MODULE = "report_template_examples"
+LX_DTYPES_KB_REGISTRY = "/var/lib/host/terminology/registry.json"
 ```
 
 ## URL Mounting
@@ -273,6 +274,62 @@ The package does not validate:
 - your custom auditing fields
 - your admin integration
 
+## EndoReg Patient Medical Ledger
+
+`lx_dtypes.models.ledger.medical` provides typed, persistence-independent
+ledger records for the patient-owned medical models in
+`endoreg_db.models.medical.patient`:
+
+- `PatientDisease`
+- `PatientEvent`
+- `PatientLabSample` and its nested `PatientLabValue` records
+- `PatientMedication`
+- `PatientMedicationSchedule` and its nested medications
+- `PatientMedicalLedger`, the aggregate patient medical graph
+
+The adapter functions accept loaded EndoReg model instances but deliberately
+do not import `endoreg_db`. EndoReg remains the owner of database fields,
+constraints, query planning, and lifecycle behavior; `lx_dtypes` owns only the
+validated cross-repository representation.
+
+Build the aggregate at a service boundary after loading the required
+relationships:
+
+```python
+from lx_dtypes.models.ledger.medical import build_patient_medical_ledger
+
+ledger = build_patient_medical_ledger(
+    patient,
+    diseases=patient.diseases.prefetch_related("classification_choices"),
+    events=patient.events.select_related("event", "classification_choice"),
+    lab_samples=patient.lab_samples.select_related("sample_type").prefetch_related(
+        "values__lab_value",
+        "values__unit",
+    ),
+    lab_values=patient.lab_values.select_related("lab_value", "sample", "unit"),
+    medications=patient.patientmedication_set.select_related(
+        "medication",
+        "medication_indication",
+        "unit",
+    ).prefetch_related("intake_times"),
+    medication_schedules=patient.patientmedicationschedule_set.prefetch_related(
+        "medication__medication",
+        "medication__medication_indication",
+        "medication__unit",
+        "medication__intake_times",
+    ),
+)
+```
+
+Adapters fail loudly for missing required relations, invalid dates/timestamps,
+or non-JSON clinical payloads. EndoReg primary keys are retained in
+`external_ids["endoreg_db"]`, and the corresponding ledger UUID is derived
+deterministically from the model name and primary key. Callers must load
+relations before conversion; the adapters do not issue or hide database
+queries. Patient and sample links use primary keys only; patient names and
+other identifying demographics are never copied into this medical ledger
+graph.
+
 ## Minimal Host Module Sketch
 
 ```python
@@ -301,7 +358,7 @@ __all__ = [
 ## Integration Checklist
 
 - Set `LX_DTYPES_HOST_MODELS_MODULE`.
-- Optionally set `LX_DTYPES_FINDINGS_MODULE`.
+- Set `LX_DTYPES_KB_REGISTRY` and provision a loadable active identity.
 - Export the seven required ORM model names from that module.
 - Ensure `Examination.get_available_findings()` returns host `Finding` instances.
 - Ensure `PatientFinding.classifications` exposes active classification rows.

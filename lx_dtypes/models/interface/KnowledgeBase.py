@@ -14,7 +14,7 @@ from typing import (
 )
 
 import yaml
-from pydantic import Field, PrivateAttr
+from pydantic import BaseModel, Field, PrivateAttr
 
 from lx_dtypes.models.base.app_base_model.ddict.AppBaseModelUUIDTagsDataDict import (
     AppBaseModelUUIDTagsDataDict,
@@ -24,7 +24,7 @@ from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelUUIDTags import (
 )
 from lx_dtypes.models.contracts import kb_to_core_concepts_payload
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
-from lx_dtypes.models.knowledge_base import (
+from lx_dtypes.models.knowledge_base.pydantic_main import (
     KB_MODEL_NAMES_LITERAL,
     KB_MODEL_NAMES_ORDERED,
     KB_MODELS,
@@ -704,13 +704,48 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         payload: Mapping[str, Any] | List[Mapping[str, Any]],
         *,
         module_name: str = "fhir_import",
+        language: str | None = None,
     ) -> Dict[str, Any]:
         """
         Import FHIR CodeSystem resources into KB storage-compatible concepts.
         """
         from lx_dtypes.models.knowledge_base.fhir import import_fhir_terminology
 
-        return import_fhir_terminology(payload, module_name=module_name)
+        return import_fhir_terminology(
+            payload,
+            module_name=module_name,
+            language=language,
+        )
+
+    @classmethod
+    def from_fhir(
+        cls,
+        payload: Mapping[str, Any] | List[Mapping[str, Any]],
+        *,
+        module_name: str = "fhir_import",
+        version: str | None = None,
+        medical_field: str | None = None,
+        author: str | None = None,
+        language: str | None = None,
+        strict: bool = True,
+    ) -> Self:
+        """Create a validated knowledge base from FHIR terminology resources."""
+        from lx_dtypes.models.knowledge_base.fhir_yaml import (
+            knowledge_base_from_fhir,
+        )
+
+        return cast(
+            Self,
+            knowledge_base_from_fhir(
+                payload,
+                module_name=module_name,
+                version=version,
+                medical_field=medical_field,
+                author=author,
+                language=language,
+                strict=strict,
+            ),
+        )
 
     def reported_findings_from_p_examination(
         self, p_examination: "PExamination"
@@ -1236,6 +1271,23 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             ledger=ledger,
             patient_examination_uuid=patient_examination_uuid,
         )
+        reported_finding_names = {
+            str(finding.get("finding"))
+            for finding in normalized_reported_findings
+            if finding.get("finding")
+        }
+        explicit_classification_validators = set(
+            template.validators.classification_validators
+        )
+        classification_validator_names = [
+            validator_name
+            for validator_name in classification_validator_names
+            if (
+                validator_name in explicit_classification_validators
+                or classification_validators[validator_name].finding
+                in reported_finding_names
+            )
+        ]
         return evaluate_report_template_validators_runtime(
             template,
             classification_validators=classification_validators,
@@ -1650,9 +1702,15 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 f"Unknown model type: {field_model_name}"
             )
             field_model_name = cast(KB_MODEL_NAMES_LITERAL, field_model_name)
-            TargetModel: type[KB_MODELS] = knowledge_base_models_lookup[
-                field_model_name
-            ]
+            target_model_value = knowledge_base_models_lookup[field_model_name]
+            if not isinstance(target_model_value, type) or not issubclass(
+                target_model_value, BaseModel
+            ):
+                raise TypeError(
+                    f"Knowledge-base lookup {field_model_name} is not a "
+                    "Pydantic model class"
+                )
+            TargetModel = cast(type[KB_MODELS], target_model_value)
 
             current_models = dict(getattr(self, field_name))
             other_models = getattr(other, field_name)

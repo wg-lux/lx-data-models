@@ -22,11 +22,37 @@ class _RuntimeValidationKb:
     unit_validator: dict[str, object] = {}
     examination_validator: dict[str, object] = {}
 
+    class _Config:
+        def model_dump(self, mode: str) -> dict[str, str]:
+            assert mode == "json"
+            return {"name": "report_template_examples", "version": "0.1.0"}
+
+    config = _Config()
+
+    def model_dump(self, mode: str) -> dict[str, object]:
+        assert mode == "json"
+        return {"config": self.config.model_dump(mode=mode)}
+
     def export_core_concepts(self) -> dict[str, object]:
         return {}
 
     def export_report_template(self, name: str) -> dict[str, object]:
-        return {"name": name}
+        return {
+            "name": name,
+            "version": "1.0.0",
+            "coverage_version": "report_concept_coverage_v1",
+            "coverage_concepts": [
+                {
+                    "concept_id": "report.template",
+                    "label": "Report template",
+                    "applicability_status": "required",
+                    "validator_names": ["polyp_has_lst_if_large"],
+                    "evidence_path": ["patient_findings"],
+                    "concept_value_path": ["examination"],
+                    "allowed_values": ["star_upper_gi_endoscopy"],
+                }
+            ],
+        }
 
     def export_report_template_preview(self, name: str) -> dict[str, object]:
         return {"name": name}
@@ -74,6 +100,78 @@ def test_report_template_api_by_examination() -> None:
     payload = response.json()
     assert isinstance(payload, list)
     assert any(t["name"] == "star_upper_gi_main" for t in payload)
+    quality_template = next(
+        template for template in payload if template["name"] == "upper_gi_quality_2025"
+    )
+    assert quality_template["name_de"].startswith("ÖGD")
+    assert quality_template["readiness"]["can_publish"] is True
+    assert len(quality_template["coverage_concepts"]) == 7
+
+
+def test_colonoscopy_template_api_exposes_localized_guideline_provenance() -> None:
+    client = Client()
+    response = client.get(
+        "/base_api/report-templates/by-examination/report_template_examples/colonoscopy",
+        secure=True,
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    template = next(
+        item for item in payload if item["name"] == "colonoscopy_training_basic"
+    )
+    assert template["name_de"] == (
+        "Koloskopie – leitlinienbasierte Qualitätsdokumentation"
+    )
+    assert template["name_en"] == (
+        "Colonoscopy – guideline-based quality documentation"
+    )
+    assert template["readiness"]["can_publish"] is True
+    assert [
+        reference["guideline_id"]
+        for reference in template["guideline_references"]
+    ] == ["AWMF-021-022", "AWMF-021-014"]
+    assert all(
+        reference["canonical_url"].startswith("https://")
+        for reference in template["guideline_references"]
+    )
+    assert len(template["coverage_concepts"]) == 34
+    assert all(
+        concept["guideline_citations"]
+        for concept in template["coverage_concepts"]
+    )
+
+
+@pytest.mark.parametrize(
+    ("examination", "template_name", "guideline_id"),
+    [
+        ("ercp", "ercp_quality_2018", "ESGE-ERCP-EUS-PM-2018"),
+        (
+            "endoscopic_ultrasound",
+            "eus_quality_2025",
+            "ESGE-EUS-PM-2025",
+        ),
+    ],
+)
+def test_advanced_endoscopy_template_api_exposes_production_template(
+    examination: str,
+    template_name: str,
+    guideline_id: str,
+) -> None:
+    response = Client().get(
+        "/base_api/report-templates/by-examination/"
+        f"report_template_examples/{examination}",
+        secure=True,
+    )
+
+    assert response.status_code == 200
+    template = next(
+        item for item in response.json() if item["name"] == template_name
+    )
+    assert template["readiness"]["can_publish"] is True
+    assert guideline_id in {
+        reference["guideline_id"] for reference in template["guideline_references"]
+    }
 
 
 def test_report_template_runtime_validation_api(
@@ -132,6 +230,8 @@ def test_report_template_runtime_validation_api(
     payload = response.json()
     assert payload["template_name"] == "star_upper_gi_main"
     assert payload["ok"] is False
+    assert payload["concept_coverage"]["contract_version"] == "report_concept_coverage_v1"
+    assert payload["concept_coverage"]["identity"]["template_name"] == "star_upper_gi_main"
     assert any(
         issue["code"] == "missing_required_classification"
         for issue in payload["issues"]
@@ -194,16 +294,6 @@ def test_report_template_runtime_validation_api_resolves_current_kb_version(
     captured: dict[str, str | None] = {}
     fallback_kb = _RuntimeValidationKb()
 
-    def _fake_get_knowledge_base_identity(
-        module_name: str,
-        *,
-        version: str | None = None,
-        input_dirs: list[Path] | None = None,
-    ) -> tuple[str, str]:
-        del version, input_dirs
-        assert module_name == "report_template_examples"
-        return module_name, "0.1.0"
-
     def _fake_load_knowledge_base(
         module_name: str,
         *,
@@ -215,9 +305,6 @@ def test_report_template_runtime_validation_api_resolves_current_kb_version(
         captured["version"] = version
         return fallback_kb
 
-    monkeypatch.setattr(
-        api_main, "get_knowledge_base_identity", _fake_get_knowledge_base_identity
-    )
     monkeypatch.setattr(api_main, "load_knowledge_base", _fake_load_knowledge_base)
 
     response = client.post(
@@ -240,7 +327,17 @@ def test_report_template_runtime_validation_api_resolves_current_kb_version(
     }
 
 
-def test_report_template_definition_validation_api() -> None:
+def test_report_template_definition_validation_api(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        api_main, "_authenticate_request_user", lambda request: object()
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_report_template_access_allowed",
+        lambda actor, capability: True,
+    )
     client = Client()
     response = client.get(
         "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate-definition",

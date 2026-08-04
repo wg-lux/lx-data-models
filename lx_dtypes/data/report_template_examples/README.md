@@ -74,6 +74,20 @@ Recommended workflow:
 
 If you want a true non-technical workflow later, build a constrained editor on top of these models instead of asking users to edit YAML directly.
 
+## Autoritative Konzeptabdeckung
+
+Produktionsfähige Vorlagen benötigen zusätzlich eine explizite
+`coverage_version` und `coverage_concepts`-Matrix. Diese Matrix ist keine
+Beschreibung aus freiem Text: Jede anwendbare Regel benötigt eine stabile
+Konzept-ID, einen Wertpfad oder Befund-Selector, eine autorisierte Wertemenge
+und die zugehörigen Validatornamen.
+
+Die Runtime liefert technische Coverage serverseitig. Eine Vorlage ohne diese
+Metadaten wird absichtlich abgewiesen; das Frontend darf fehlende Coverage nur
+als nicht autoritativen Fallback anzeigen. Die vollständige Authoring- und
+Freigabereferenz steht in
+[`docs/guides/report-concept-coverage.md`](../../../docs/guides/report-concept-coverage.md).
+
 ## What You Edit
 
 Create or update two files:

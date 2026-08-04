@@ -195,7 +195,8 @@ def test_base_api_report_template_endpoints_shape() -> None:
     by_name_payload = by_name_res.json()
     assert by_name_payload["name"] == "colonoscopy_training_basic"
     assert by_name_payload["examination"] == "colonoscopy"
-    assert len(by_name_payload["report_sections"]) == 2
+    assert len(by_name_payload["report_sections"]) == 6
+    assert by_name_payload["coverage_version"] == "report_concept_coverage_v1"
 
     by_exam_res = client.get(
         "/base_api/report-templates/by-examination/report_template_examples/colonoscopy",
@@ -242,7 +243,7 @@ def test_base_api_report_template_runtime_validation() -> None:
     assert missing_findings_payload["ok"] is False
     assert any(
         issue["code"] == "finding_not_present"
-        and issue["validator_name"] == "colonoscopy_training_polyp_recorded"
+        and issue["validator_name"] == "koloskopie_sedierung_dokumentiert"
         for issue in missing_findings_payload["issues"]
     )
 
@@ -271,7 +272,7 @@ def test_base_api_report_template_runtime_validation() -> None:
     partial_findings_payload = partial_findings_res.json()
     assert partial_findings_payload["ok"] is False
     assert partial_findings_payload["evaluated_findings_count"] == 1
-    assert partial_findings_payload["examination_validators"][0]["ok"] is True
+    assert partial_findings_payload["examination_validators"][0]["ok"] is False
     assert partial_findings_payload["findings_validators"][0]["ok"] is False
 
 

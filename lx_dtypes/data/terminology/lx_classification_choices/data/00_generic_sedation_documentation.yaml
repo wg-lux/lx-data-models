@@ -1,0 +1,140 @@
+# Sources for every record in this file:
+# - DGVS S3 sedation guideline (AWMF 021-014), monitoring and documentation: https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
+- model: classification_choice
+  name: "medication_administration_time_recorded"
+  name_de: "Zeitpunkt dokumentiert"
+  name_en: "Administration time recorded"
+  description: "Zeitpunkt einer einzelnen Medikamentengabe."
+  classification_choice_descriptors:
+    - medication_administration_time_value
+
+- model: classification_choice
+  name: "sedation_monitoring_time_recorded"
+  name_de: "Messzeitpunkt dokumentiert"
+  name_en: "Monitoring time recorded"
+  description: "Zeitpunkt eines zusammengehörigen Vitalparametersatzes."
+  classification_choice_descriptors:
+    - sedation_monitoring_time_value
+
+- model: classification_choice
+  name: "sedation_heart_rate_recorded"
+  name_de: "Herzfrequenz dokumentiert"
+  name_en: "Heart rate recorded"
+  classification_choice_descriptors:
+    - sedation_heart_rate_value
+
+- model: classification_choice
+  name: "sedation_systolic_blood_pressure_recorded"
+  name_de: "Systolischer Blutdruck dokumentiert"
+  name_en: "Systolic blood pressure recorded"
+  classification_choice_descriptors:
+    - sedation_systolic_blood_pressure_value
+
+- model: classification_choice
+  name: "sedation_diastolic_blood_pressure_recorded"
+  name_de: "Diastolischer Blutdruck dokumentiert"
+  name_en: "Diastolic blood pressure recorded"
+  classification_choice_descriptors:
+    - sedation_diastolic_blood_pressure_value
+
+- model: classification_choice
+  name: "sedation_oxygen_saturation_recorded"
+  name_de: "Sauerstoffsättigung dokumentiert"
+  name_en: "Oxygen saturation recorded"
+  classification_choice_descriptors:
+    - sedation_oxygen_saturation_value
+
+- model: classification_choice
+  name: "oxygen_delivery_nasal_cannula"
+  name_de: "Nasensonde"
+  name_en: "Nasal cannula"
+  description: "Sauerstoffgabe über eine Nasensonde."
+  classification_choice_descriptors:
+    - supplemental_oxygen_flow_rate_value
+
+- model: classification_choice
+  name: "oxygen_delivery_face_mask"
+  name_de: "Sauerstoffmaske"
+  name_en: "Oxygen face mask"
+  description: "Sauerstoffgabe über eine Gesichtsmaske."
+  classification_choice_descriptors:
+    - supplemental_oxygen_flow_rate_value
+
+- model: classification_choice
+  name: "oxygen_delivery_other"
+  name_de: "Andere Sauerstoffapplikation"
+  name_en: "Other oxygen delivery"
+  description: "Andere dokumentierte Form der Sauerstoffgabe."
+  classification_choice_descriptors:
+    - supplemental_oxygen_flow_rate_value
+
+- model: classification_choice
+  name: "intravenous_fluid_balanced_crystalloid"
+  name_de: "Balancierte kristalloide Lösung"
+  name_en: "Balanced crystalloid solution"
+  classification_choice_descriptors:
+    - intravenous_fluid_volume_value
+
+- model: classification_choice
+  name: "intravenous_fluid_sodium_chloride_0_9_percent"
+  name_de: "Natriumchlorid 0,9 %"
+  name_en: "Sodium chloride 0.9%"
+  classification_choice_descriptors:
+    - intravenous_fluid_volume_value
+
+- model: classification_choice
+  name: "intravenous_fluid_glucose_solution"
+  name_de: "Glukoselösung"
+  name_en: "Glucose solution"
+  classification_choice_descriptors:
+    - intravenous_fluid_volume_value
+
+- model: classification_choice
+  name: "intravenous_fluid_other"
+  name_de: "Andere intravenöse Flüssigkeit"
+  name_en: "Other intravenous fluid"
+  classification_choice_descriptors:
+    - intravenous_fluid_volume_value
+
+- model: classification_choice
+  name: "intravenous_fluid_administration_time_recorded"
+  name_de: "Zeitpunkt der Flüssigkeitsgabe dokumentiert"
+  name_en: "Fluid administration time recorded"
+  classification_choice_descriptors:
+    - intravenous_fluid_administration_time_value
+
+- model: classification_choice
+  name: "post_sedation_fully_oriented"
+  name_de: "Vollständig orientiert"
+  name_en: "Fully oriented"
+  description: "Die untersuchte Person ist bei der dokumentierten Erholungsbeurteilung vollständig orientiert."
+
+- model: classification_choice
+  name: "post_sedation_not_fully_oriented"
+  name_de: "Nicht vollständig orientiert"
+  name_en: "Not fully oriented"
+  description: "Die untersuchte Person ist bei der dokumentierten Erholungsbeurteilung nicht vollständig orientiert."
+
+- model: classification_choice
+  name: "post_sedation_orientation_not_assessed"
+  name_de: "Orientierung nicht beurteilt"
+  name_en: "Orientation not assessed"
+  description: "Der Orientierungsstatus wurde bei der dokumentierten Beurteilung nicht erhoben."
+
+- model: classification_choice
+  name: "post_sedation_outpatient_discharge"
+  name_de: "Ambulante Entlassung"
+  name_en: "Outpatient discharge"
+  description: "Disposition nach der Sedierung: Entlassung aus der ambulanten Behandlung."
+
+- model: classification_choice
+  name: "post_sedation_inpatient_transfer"
+  name_de: "Stationäre Weiterbetreuung"
+  name_en: "Inpatient transfer"
+  description: "Disposition nach der Sedierung: Übergabe in die stationäre Weiterbetreuung."
+
+- model: classification_choice
+  name: "post_sedation_continued_recovery_monitoring"
+  name_de: "Weitere Überwachung im Aufwachbereich"
+  name_en: "Continued recovery monitoring"
+  description: "Eine Entlassung oder Übergabe ist noch nicht erfolgt; die postinterventionelle Überwachung wird fortgesetzt."

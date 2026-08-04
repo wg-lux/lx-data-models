@@ -1,0 +1,77 @@
+```mermaid
+flowchart LR
+  %% FHIR resource graphs to LXDM clinical reporting elements
+  subgraph FHIR["FHIR R4 resource graph"]
+    FHIR_Patient["Patient"]
+    FHIR_Encounter["Encounter"]
+    FHIR_Organization["Organization"]
+    FHIR_Procedure["Procedure"]
+    FHIR_DiagnosticReport["DiagnosticReport"]
+    FHIR_ServiceRequest["ServiceRequest"]
+    FHIR_Condition["Condition"]
+    FHIR_Observation["Observation"]
+    FHIR_MedicationAdministration["MedicationAdministration"]
+    FHIR_Device["Device"]
+    FHIR_Specimen["Specimen"]
+    FHIR_Practitioner["Practitioner"]
+    FHIR_PractitionerRole["PractitionerRole"]
+  end
+  subgraph ADAPTER["LXDM FHIR adapter"]
+    PATTERN_Patient_and_case_context["Patient and case context<br/><small>Patient.identifier/name/birthDate/gender/contact → Patient identity and demographics<br/>Encounter.subject/period → Case membership and dates<br/>Patient.managingOrganization + Encounter.serviceProvider → Center relationship (resolved by references)</small>"]
+    PATTERN_Examination_and_report_context["Examination and report context<br/><small>Procedure.code/subject/encounter/performed[x] → PExamination examination/patient/case/date<br/>DiagnosticReport.code/effective[x]/result → PExamination report context and finding links</small>"]
+    PATTERN_Clinical_indication["Clinical indication<br/><small>ServiceRequest.code/reasonCode/reasonReference → PIndication concept and classifications<br/>Referenced Condition or Observation → PIndication clinical reason (terminology and profile dependent)</small>"]
+    PATTERN_Clinical_finding["Clinical finding<br/><small>Observation.code/value[x]/component → PFinding and classifications<br/>Condition.code/clinicalStatus → PFinding and status classification<br/>DiagnosticReport.result → PExamination-to-finding links (reference resolution)</small>"]
+    PATTERN_Finding_related_intervention["Finding-related intervention<br/><small>Procedure.code/bodySite/reasonReference → Intervention concept and finding relation (primary performed-action context)<br/>MedicationAdministration.medication[x]/effective[x] → Medication detail (only when medication was administered)<br/>Procedure.focalDevice/usedReference + Device → Device detail (only when a device is clinically relevant)<br/>DiagnosticReport.specimen + Specimen → Specimen context (only for sampling interventions)</small>"]
+    PATTERN_Performer_and_center_context["Performer and center context<br/><small>Procedure.performer.actor → Examiner relation (reference resolution)<br/>Practitioner + PractitionerRole → Examiner identity and role<br/>PractitionerRole.organization + Organization → Center</small>"]
+  end
+  subgraph LXDM["LXDM clinical reporting model"]
+    LXDM_Patient["Patient"]
+    LXDM_Case["Case"]
+    LXDM_Center["Center"]
+    LXDM_PExamination["PExamination"]
+    LXDM_PIndication["PIndication"]
+    LXDM_PFinding["PFinding"]
+    LXDM_PFindingClassifications["PFindingClassifications"]
+    LXDM_PFindingIntervention["PFindingIntervention"]
+    LXDM_Examiner["Examiner"]
+  end
+
+  FHIR_Patient -->|contributes context| PATTERN_Patient_and_case_context
+  FHIR_Encounter -->|contributes context| PATTERN_Patient_and_case_context
+  FHIR_Organization -->|contributes context| PATTERN_Patient_and_case_context
+  PATTERN_Patient_and_case_context -->|constructs or decomposes| LXDM_Patient
+  PATTERN_Patient_and_case_context -->|constructs or decomposes| LXDM_Case
+  PATTERN_Patient_and_case_context -->|constructs or decomposes| LXDM_Center
+  FHIR_Procedure -->|contributes context| PATTERN_Examination_and_report_context
+  FHIR_DiagnosticReport -->|contributes context| PATTERN_Examination_and_report_context
+  FHIR_Encounter -->|contributes context| PATTERN_Examination_and_report_context
+  PATTERN_Examination_and_report_context -->|constructs or decomposes| LXDM_PExamination
+  FHIR_ServiceRequest -->|contributes context| PATTERN_Clinical_indication
+  FHIR_Condition -->|contributes context| PATTERN_Clinical_indication
+  FHIR_Observation -->|contributes context| PATTERN_Clinical_indication
+  PATTERN_Clinical_indication -->|constructs or decomposes| LXDM_PIndication
+  FHIR_Observation -->|contributes context| PATTERN_Clinical_finding
+  FHIR_Condition -->|contributes context| PATTERN_Clinical_finding
+  FHIR_DiagnosticReport -->|contributes context| PATTERN_Clinical_finding
+  PATTERN_Clinical_finding -->|constructs or decomposes| LXDM_PFinding
+  PATTERN_Clinical_finding -->|constructs or decomposes| LXDM_PFindingClassifications
+  FHIR_Procedure -->|contributes context| PATTERN_Finding_related_intervention
+  FHIR_MedicationAdministration -->|contributes context| PATTERN_Finding_related_intervention
+  FHIR_Device -->|contributes context| PATTERN_Finding_related_intervention
+  FHIR_DiagnosticReport -->|contributes context| PATTERN_Finding_related_intervention
+  FHIR_Specimen -->|contributes context| PATTERN_Finding_related_intervention
+  PATTERN_Finding_related_intervention -->|constructs or decomposes| LXDM_PFindingIntervention
+  FHIR_Practitioner -->|contributes context| PATTERN_Performer_and_center_context
+  FHIR_PractitionerRole -->|contributes context| PATTERN_Performer_and_center_context
+  FHIR_Organization -->|contributes context| PATTERN_Performer_and_center_context
+  FHIR_Procedure -->|contributes context| PATTERN_Performer_and_center_context
+  PATTERN_Performer_and_center_context -->|constructs or decomposes| LXDM_Examiner
+  PATTERN_Performer_and_center_context -->|constructs or decomposes| LXDM_Center
+
+  classDef fhir fill:#e8f1ff,stroke:#2f6fba,color:#172033
+  classDef adapter fill:#fff0c9,stroke:#a16207,color:#172033
+  classDef lxdm fill:#eaf8ed,stroke:#2d7a46,color:#172033
+  class FHIR_Patient,FHIR_Encounter,FHIR_Organization,FHIR_Procedure,FHIR_DiagnosticReport,FHIR_ServiceRequest,FHIR_Condition,FHIR_Observation,FHIR_MedicationAdministration,FHIR_Device,FHIR_Specimen,FHIR_Practitioner,FHIR_PractitionerRole fhir
+  class PATTERN_Patient_and_case_context,PATTERN_Examination_and_report_context,PATTERN_Clinical_indication,PATTERN_Clinical_finding,PATTERN_Finding_related_intervention,PATTERN_Performer_and_center_context adapter
+  class LXDM_Patient,LXDM_Case,LXDM_Center,LXDM_PExamination,LXDM_PIndication,LXDM_PFinding,LXDM_PFindingClassifications,LXDM_PFindingIntervention,LXDM_Examiner lxdm
+```

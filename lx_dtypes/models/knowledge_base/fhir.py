@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
 from datetime import date
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
@@ -82,6 +82,109 @@ FHIR_EXPORT_DOMAINS: tuple[str, ...] = tuple(DOMAIN_CONFIG)
 _DOMAIN_BY_CODE_SYSTEM_ID = {
     config["id"]: domain for domain, config in DOMAIN_CONFIG.items()
 }
+
+_STRUCTURAL_PROPERTY_DOMAINS: dict[str, str] = {
+    "finding": "examination",
+    "classification": "finding",
+    "classification-type": "classification",
+    "classification-choice-descriptor": "classification_choice",
+    "unit-abbreviation": "unit",
+}
+
+# Longer, more specific phrases deliberately score higher than broad terms. This
+# keeps, for example, "classification choice" in classification_choice instead of
+# classification while still allowing sparse public CodeSystems to be categorized.
+_DOMAIN_KEYWORD_PHRASES: dict[str, tuple[str, ...]] = {
+    "examination": (
+        "diagnostic procedure",
+        "diagnostic test",
+        "examinations",
+        "examination",
+        "procedures",
+        "procedure",
+        "endoscopy",
+        "imaging",
+        "modality",
+        "investigation",
+    ),
+    "finding": (
+        "clinical finding",
+        "observation finding",
+        "cholesterol",
+        "chol",
+        "diagnoses",
+        "diagnosis",
+        "conditions",
+        "condition",
+        "disorders",
+        "disorder",
+        "diseases",
+        "disease",
+        "lesions",
+        "lesion",
+        "symptoms",
+        "symptom",
+        "findings",
+        "finding",
+        "observations",
+        "observation",
+    ),
+    "classification_type": (
+        "classification type",
+        "grading type",
+        "staging type",
+        "score type",
+    ),
+    "classification": (
+        "classification system",
+        "grading system",
+        "staging system",
+        "scoring system",
+        "classification",
+        "assessment scale",
+        "score",
+        "scale",
+    ),
+    "classification_choice": (
+        "classification choice",
+        "allowed value",
+        "answer option",
+        "civil status",
+        "estado civil",
+        "marital status",
+        "severity grade",
+        "severity level",
+        "choice",
+        "option",
+        "answer",
+        "category",
+        "status",
+        "grade",
+        "stage",
+        "severity",
+        "female",
+        "male",
+        "not applicable",
+    ),
+    "unit": (
+        "units of measure",
+        "unit of measure",
+        "measurement unit",
+        "dose unit",
+        "ucum",
+        "units",
+        "unit",
+    ),
+}
+
+_DOMAIN_INFERENCE_TIE_BREAK: tuple[str, ...] = (
+    "unit",
+    "examination",
+    "finding",
+    "classification_type",
+    "classification",
+    "classification_choice",
+)
 
 
 def export_fhir_terminology(
@@ -182,6 +285,8 @@ def import_fhir_terminology(
     payload: Mapping[str, Any] | list[Mapping[str, Any]],
     *,
     module_name: str = "fhir_import",
+    identifier_mode: Literal["display", "code"] = "display",
+    language: str | None = None,
 ) -> dict[str, Any]:
     """
     Import FHIR CodeSystem resources into KB storage-compatible terminology dicts.
@@ -190,8 +295,11 @@ def import_fhir_terminology(
     adapters: keys such as ``examination`` and ``classification_choice`` contain
     lists of plain dictionaries that can be compared to YAML-derived concepts.
     """
+    if identifier_mode not in {"display", "code"}:
+        raise ValueError("identifier_mode must be 'display' or 'code'")
+    source_language = _normalize_language(language)
 
-    resources = _extract_fhir_resources(payload)
+    resources = extract_fhir_resources(payload)
     code_systems = [
         resource
         for resource in resources
@@ -216,17 +324,25 @@ def import_fhir_terminology(
         domain = _domain_from_code_system(code_system)
         if domain is None:
             continue
+        code_system_language = source_language or _resource_language(code_system)
         imported[domain].extend(
             _record_from_concept(
                 domain=domain,
                 concept=concept,
                 code_display_by_domain=code_display_by_domain,
                 fallback_module_name=module_name,
+                identifier_mode=identifier_mode,
+                language=code_system_language,
             )
-            for concept in code_system.get("concept", [])
+            for concept in _iter_fhir_concepts(code_system.get("concept", []))
         )
 
-    _apply_choice_value_sets(imported, value_sets, code_display_by_domain)
+    _apply_choice_value_sets(
+        imported,
+        value_sets,
+        code_display_by_domain,
+        identifier_mode=identifier_mode,
+    )
     return imported
 
 
@@ -262,7 +378,7 @@ def _attach_medical_field_extension(
     )
 
 
-def _extract_fhir_resources(
+def extract_fhir_resources(
     payload: Mapping[str, Any] | list[Mapping[str, Any]],
 ) -> list[Mapping[str, Any]]:
     if isinstance(payload, list):
@@ -289,6 +405,45 @@ def _read(record: object, field: str, default: object | None = None) -> object |
     return getattr(record, field, default)
 
 
+def infer_fhir_code_system_domain(
+    code_system: Mapping[str, Any],
+) -> str | None:
+    """
+    Infer the closest LXDM domain from a non-LX FHIR CodeSystem.
+
+    Declared/concept property structure is stronger evidence than human-readable
+    metadata. Text inference considers the resource identity and a bounded sample
+    of concepts. ``None`` is returned when there is no positive evidence rather
+    than silently treating arbitrary terminology as a medical finding.
+    """
+    scores = {domain: 0 for domain in FHIR_EXPORT_DOMAINS}
+    property_codes = _code_system_property_codes(code_system)
+    for property_code, domain in _STRUCTURAL_PROPERTY_DOMAINS.items():
+        if property_code in property_codes:
+            scores[domain] += 100
+    if code_system.get("hierarchyMeaning"):
+        scores["classification_choice"] += 50
+    if code_system.get("content") == "complete" and any(
+        _iter_fhir_concepts(code_system.get("concept", []))
+    ):
+        # A complete, otherwise opaque CodeSystem is structurally an enumeration.
+        # classification_choice is the least-assumptive LXDM representation.
+        scores["classification_choice"] += 1
+
+    searchable_text = _code_system_searchable_text(code_system)
+    for domain, phrases in _DOMAIN_KEYWORD_PHRASES.items():
+        for phrase in phrases:
+            if _contains_phrase(searchable_text, phrase):
+                scores[domain] += 10 + len(phrase.split())
+
+    best_score = max(scores.values(), default=0)
+    if best_score <= 0:
+        return None
+    return next(
+        domain for domain in _DOMAIN_INFERENCE_TIE_BREAK if scores[domain] == best_score
+    )
+
+
 def _domain_from_code_system(code_system: Mapping[str, Any]) -> str | None:
     resource_id = str(code_system.get("id", ""))
     if resource_id in _DOMAIN_BY_CODE_SYSTEM_ID:
@@ -298,7 +453,60 @@ def _domain_from_code_system(code_system: Mapping[str, Any]) -> str | None:
     for domain, config in DOMAIN_CONFIG.items():
         if url.endswith(f"/CodeSystem/{config['id']}"):
             return domain
-    return None
+    return infer_fhir_code_system_domain(code_system)
+
+
+def _code_system_property_codes(code_system: Mapping[str, Any]) -> set[str]:
+    codes = {
+        str(item.get("code", "")).strip().lower()
+        for item in code_system.get("property", [])
+        if isinstance(item, Mapping)
+    }
+    for concept in list(_iter_fhir_concepts(code_system.get("concept", [])))[:100]:
+        codes.update(
+            str(item.get("code", "")).strip().lower()
+            for item in concept.get("property", [])
+            if isinstance(item, Mapping)
+        )
+    return codes
+
+
+def _code_system_searchable_text(code_system: Mapping[str, Any]) -> str:
+    resource_values = (
+        code_system.get("id"),
+        code_system.get("url"),
+        code_system.get("name"),
+        code_system.get("title"),
+        code_system.get("description"),
+        code_system.get("purpose"),
+    )
+    concept_values: list[object] = []
+    for concept in list(_iter_fhir_concepts(code_system.get("concept", [])))[:100]:
+        concept_values.extend(
+            (
+                concept.get("code"),
+                concept.get("display"),
+                concept.get("definition"),
+            )
+        )
+    return " ".join(
+        str(value).lower() for value in (*resource_values, *concept_values) if value
+    )
+
+
+def _contains_phrase(text: str, phrase: str) -> bool:
+    pattern = rf"(?<![a-z0-9]){re.escape(phrase)}(?![a-z0-9])"
+    return re.search(pattern, text) is not None
+
+
+def _iter_fhir_concepts(concepts: object) -> Iterator[Mapping[str, Any]]:
+    if not isinstance(concepts, list):
+        return
+    for concept in concepts:
+        if not isinstance(concept, Mapping):
+            continue
+        yield concept
+        yield from _iter_fhir_concepts(concept.get("concept", []))
 
 
 def _code_display_lookup_by_domain(
@@ -311,7 +519,7 @@ def _code_display_lookup_by_domain(
             continue
         lookups[domain] = {
             str(concept.get("code")): str(concept.get("display") or concept.get("code"))
-            for concept in code_system.get("concept", [])
+            for concept in _iter_fhir_concepts(code_system.get("concept", []))
         }
     return lookups
 
@@ -330,8 +538,49 @@ def _designation_by_language(concept: Mapping[str, Any]) -> dict[str, str]:
     designations: dict[str, str] = {}
     for item in concept.get("designation", []):
         if isinstance(item, Mapping) and item.get("language") and item.get("value"):
-            designations[str(item["language"])] = str(item["value"])
+            language = _normalize_language(str(item["language"]), strict=False)
+            if language:
+                designations[language] = str(item["value"])
     return designations
+
+
+def _normalize_language(
+    language: str | None,
+    *,
+    strict: bool = True,
+) -> str | None:
+    if language is None:
+        return None
+    normalized = language.strip().lower().replace("_", "-")
+    if re.fullmatch(r"[a-z]{2,3}(?:-[a-z0-9]{2,8})*", normalized):
+        return normalized.split("-", 1)[0]
+    if strict:
+        raise ValueError(
+            "language must be an IETF language tag such as 'en', 'de', or 'pt-BR'"
+        )
+    return None
+
+
+def _resource_language(code_system: Mapping[str, Any]) -> str | None:
+    language = code_system.get("language")
+    if not isinstance(language, str):
+        return None
+    return _normalize_language(language, strict=False)
+
+
+def _translated_name(
+    *,
+    target_language: Literal["de", "en"],
+    designations: Mapping[str, str],
+    display: str,
+    source_language: str | None,
+) -> str:
+    designation = designations.get(target_language)
+    if designation:
+        return designation
+    if source_language is None or source_language == target_language:
+        return display
+    return "unknown"
 
 
 def _coding_display(
@@ -355,14 +604,27 @@ def _record_from_concept(
     concept: Mapping[str, Any],
     code_display_by_domain: dict[str, dict[str, str]],
     fallback_module_name: str,
+    identifier_mode: Literal["display", "code"],
+    language: str | None,
 ) -> dict[str, Any]:
     properties = _properties_by_code(concept)
     designations = _designation_by_language(concept)
-    name = str(concept.get("display") or concept.get("code"))
+    display = str(concept.get("display") or concept.get("code"))
+    name = str(concept.get("code") or display) if identifier_mode == "code" else display
     record: dict[str, Any] = {
         "name": name,
-        "name_de": designations.get("de", name),
-        "name_en": designations.get("en", name),
+        "name_de": _translated_name(
+            target_language="de",
+            designations=designations,
+            display=display,
+            source_language=language,
+        ),
+        "name_en": _translated_name(
+            target_language="en",
+            designations=designations,
+            display=display,
+            source_language=language,
+        ),
         "description": str(concept.get("definition") or "unknown"),
         "uuid": _first_property_value(properties, "internal-uuid", "valueString"),
         "tags": [
@@ -382,6 +644,7 @@ def _record_from_concept(
             property_code="finding",
             target_domain="finding",
             code_display_by_domain=code_display_by_domain,
+            identifier_mode=identifier_mode,
         )
         record["examination_types"] = []
         record["indications"] = []
@@ -392,6 +655,7 @@ def _record_from_concept(
             property_code="classification",
             target_domain="classification",
             code_display_by_domain=code_display_by_domain,
+            identifier_mode=identifier_mode,
         )
         record["interventions"] = []
         record["caused_by_interventions"] = []
@@ -401,6 +665,7 @@ def _record_from_concept(
             property_code="classification-type",
             target_domain="classification_type",
             code_display_by_domain=code_display_by_domain,
+            identifier_mode=identifier_mode,
         )
         record["classification_choices"] = []
     elif domain == "classification_choice":
@@ -433,9 +698,16 @@ def _relation_names(
     property_code: str,
     target_domain: str,
     code_display_by_domain: dict[str, dict[str, str]],
+    identifier_mode: Literal["display", "code"],
 ) -> list[str]:
     names: list[str] = []
     for item in properties.get(property_code, []):
+        coding = item.get("valueCoding")
+        if not isinstance(coding, Mapping):
+            continue
+        if identifier_mode == "code" and coding.get("code"):
+            names.append(str(coding["code"]))
+            continue
         display = _coding_display(
             item,
             target_domain=target_domain,
@@ -450,6 +722,8 @@ def _apply_choice_value_sets(
     imported: dict[str, Any],
     value_sets: list[Mapping[str, Any]],
     code_display_by_domain: dict[str, dict[str, str]],
+    *,
+    identifier_mode: Literal["display", "code"],
 ) -> None:
     classifications_by_name = {
         str(record["name"]): record for record in imported["classification"]
@@ -461,14 +735,22 @@ def _apply_choice_value_sets(
         if not value_set_id.startswith(prefix) or not value_set_id.endswith(suffix):
             continue
         classification_code = value_set_id[len(prefix) : -len(suffix)]
-        classification_name = code_display_by_domain.get("classification", {}).get(
-            classification_code,
-            classification_code,
+        classification_name = (
+            classification_code
+            if identifier_mode == "code"
+            else code_display_by_domain.get("classification", {}).get(
+                classification_code,
+                classification_code,
+            )
         )
         classification = classifications_by_name.get(classification_name)
         if classification is None:
             continue
-        choices = _value_set_concepts(value_set, target_domain="classification_choice")
+        choices = _value_set_concepts(
+            value_set,
+            target_domain="classification_choice",
+            identifier_mode=identifier_mode,
+        )
         if choices:
             classification["classification_choices"] = choices
 
@@ -477,6 +759,7 @@ def _value_set_concepts(
     value_set: Mapping[str, Any],
     *,
     target_domain: str,
+    identifier_mode: Literal["display", "code"],
 ) -> list[str]:
     names: list[str] = []
     for include in value_set.get("compose", {}).get("include", []):
@@ -488,7 +771,13 @@ def _value_set_concepts(
             continue
         for concept in include.get("concept", []):
             if isinstance(concept, Mapping):
-                names.append(str(concept.get("display") or concept.get("code")))
+                value = (
+                    concept.get("code")
+                    if identifier_mode == "code"
+                    else concept.get("display") or concept.get("code")
+                )
+                if value:
+                    names.append(str(value))
     return names
 
 
@@ -951,7 +1240,9 @@ __all__ = [
     "DEFAULT_FHIR_BASE_URL",
     "DEFAULT_FHIR_PUBLISHER",
     "FHIR_EXPORT_DOMAINS",
+    "extract_fhir_resources",
     "export_fhir_terminology",
     "export_fhir_terminology_bundle",
+    "infer_fhir_code_system_domain",
     "import_fhir_terminology",
 ]

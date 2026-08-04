@@ -21,6 +21,7 @@ Read the guides in this order:
 3. This infrastructure guide
 4. `docs/guides/report-template-graph-validation.md`
 5. `docs/guides/report-template-findings-validator-migration.md`
+6. `docs/guides/report-concept-coverage.md`
 
 Use that README specifically for:
 
@@ -69,6 +70,9 @@ These terms are easy to blur together. Keep them separate:
   Builds and checks a typed graph representation of template structure.
 - runtime validation
   Evaluates an actual reported examination payload against template validators.
+- concept coverage
+  A versioned, server-generated evidence contract for the applicable concepts,
+  values, validators, and payload paths of one report.
 
 ## Status Summary
 

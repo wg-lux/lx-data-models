@@ -44,7 +44,7 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.2.8"
+version = "0.2.11"
 
 [project.optional-dependencies]
 dev = [
@@ -61,6 +61,7 @@ dev = [
   "pytest-mypy-plugins>=3.2.0",
   "pytest-xdist>=3.8.0",
   "pytest-django>=4.11.1",
+  "radon>=6.0.1",
   "sphinx-autodoc-typehints>=3.5.2",
   "sphinx-copybutton>=0.5.2",
   "sphinx>=8.2.3,<9.0",
@@ -85,6 +86,7 @@ ok = "lx_dtypes.scripts.lint_kb_yaml:main"
 lx-dtypes-kb-registry = "lx_dtypes.scripts.kb_registry:main"
 lx-dtypes-prototype-kb-smoke = "lx_dtypes.scripts.prototype_kb_smoke:main"
 lx-dtypes-release = "lx_dtypes.scripts.release:main"
+lx-dtypes-fhir-lxdm-diagram = "lx_dtypes.scripts.fhir_lxdm_diagram:main"
 
 [project.urls]
 Homepage = "https://info.coloreg.de"
