@@ -18,9 +18,7 @@ from lx_dtypes.utils.fhir_lxdm_mapping import (
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "spec", nargs="?", type=Path, help="JSON or YAML mapping spec"
-    )
+    parser.add_argument("spec", nargs="?", type=Path, help="JSON or YAML mapping spec")
     parser.add_argument(
         "-o", "--output", type=Path, default=Path("fhir-lxdm-mapping.mmd")
     )

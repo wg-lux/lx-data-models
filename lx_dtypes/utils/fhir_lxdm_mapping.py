@@ -53,10 +53,14 @@ def render_mermaid(
         raise ValueError("At least one transformation pattern is required")
 
     sources = tuple(
-        dict.fromkeys(source for pattern in transformation_patterns for source in pattern.sources)
+        dict.fromkeys(
+            source for pattern in transformation_patterns for source in pattern.sources
+        )
     )
     targets = tuple(
-        dict.fromkeys(target for pattern in transformation_patterns for target in pattern.targets)
+        dict.fromkeys(
+            target for pattern in transformation_patterns for target in pattern.targets
+        )
     )
 
     lines = [
@@ -66,7 +70,9 @@ def render_mermaid(
         '  subgraph FHIR["FHIR R4 resource graph"]',
     ]
     for source in sources:
-        lines.append(f'    {_safe_id(source)}["{_label(source.removeprefix("FHIR."))}"]')
+        lines.append(
+            f'    {_safe_id(source)}["{_label(source.removeprefix("FHIR."))}"]'
+        )
     lines.extend(["  end", '  subgraph ADAPTER["LXDM FHIR adapter"]'])
     for pattern in transformation_patterns:
         pattern_id = f"PATTERN_{_safe_id(pattern.name)}"
@@ -81,7 +87,9 @@ def render_mermaid(
         lines.append(f'    {pattern_id}["{label}"]')
     lines.extend(["  end", '  subgraph LXDM["LXDM clinical reporting model"]'])
     for target in targets:
-        lines.append(f'    {_safe_id(target)}["{_label(target.removeprefix("LXDM."))}"]')
+        lines.append(
+            f'    {_safe_id(target)}["{_label(target.removeprefix("LXDM."))}"]'
+        )
     lines.append("  end")
     lines.append("")
 
@@ -90,7 +98,9 @@ def render_mermaid(
         for source in pattern.sources:
             lines.append(f"  {_safe_id(source)} -->|contributes context| {pattern_id}")
         for target in pattern.targets:
-            lines.append(f"  {pattern_id} -->|constructs or decomposes| {_safe_id(target)}")
+            lines.append(
+                f"  {pattern_id} -->|constructs or decomposes| {_safe_id(target)}"
+            )
     lines.extend(
         [
             "",

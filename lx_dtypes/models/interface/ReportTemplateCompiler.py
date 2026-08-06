@@ -68,9 +68,7 @@ class ReportTemplateCompiler:
         requirement = cast(Dict[str, Any], ref.model_dump())
         return self._hydrate_finding_inputs(requirement)
 
-    def _hydrate_finding_inputs(
-        self, requirement: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _hydrate_finding_inputs(self, requirement: Dict[str, Any]) -> Dict[str, Any]:
         """Expose the KB-defined input contract for every requested classification."""
 
         hydrated = dict(requirement)
@@ -116,9 +114,7 @@ class ReportTemplateCompiler:
                     descriptors.append(
                         {
                             "name": descriptor.name,
-                            "type": getattr(
-                                descriptor_type, "value", descriptor_type
-                            ),
+                            "type": getattr(descriptor_type, "value", descriptor_type),
                             "unit": unit_name,
                             "unit_abbreviation": (
                                 unit.abbreviation if unit is not None else None

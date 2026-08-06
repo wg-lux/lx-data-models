@@ -145,6 +145,29 @@ def _bundle_zip_with_missing_transitive_dependency() -> bytes:
     return buffer.getvalue()
 
 
+def _bundle_zip_with_traversal_data_dir() -> bytes:
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr(
+            "published_terminology/config.yaml",
+            "\n".join(
+                [
+                    "name: published_terminology",
+                    'description: ""',
+                    "version: 2026.05.04",
+                    "medical_field: gastroenterology",
+                    "modules: []",
+                    "depends_on: []",
+                    "data:",
+                    "  dirs:",
+                    "    - ../../../etc",
+                ]
+            )
+            + "\n",
+        )
+    return buffer.getvalue()
+
+
 def _write_registry(tmp_path: Path, *, active: bool = False) -> Path:
     kb_root = tmp_path / "knowledge-bases"
     bundle_dir = kb_root / "published_terminology"
@@ -197,12 +220,18 @@ def test_list_terminology_bundles_from_registry(
 
     assert response.status_code == 200
     payload = response.json()
+    assert payload["active"] == {
+        "module_name": "published_terminology",
+        "version": "2026.04.30",
+        "medical_field": "gastroenterology",
+        "is_active": True,
+    }
     assert payload["bundles"] == [
         {
             "module_name": "published_terminology",
             "version": "2026.04.30",
             "medical_field": "gastroenterology",
-            "is_active": False,
+            "is_active": True,
         }
     ]
 
@@ -401,6 +430,32 @@ def test_import_rejects_overwriting_an_existing_bundle_version(
     assert not list(registry_path.parent.glob(".*.tmp"))
 
 
+def test_import_rejects_data_dir_path_traversal_before_host_system_parsing(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    import_root = tmp_path / "imported-packages"
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", str(import_root))
+
+    response = Client().post(
+        "/base_api/terminology/bundles/import",
+        data={
+            "file": SimpleUploadedFile(
+                "published_terminology.zip",
+                _bundle_zip_with_traversal_data_dir(),
+                content_type="application/zip",
+            )
+        },
+        secure=True,
+    )
+
+    assert response.status_code == 409
+    assert b"could not be loaded after import" in response.content
+    assert not (import_root / "published_terminology" / "2026.05.04").exists()
+
+
 def test_import_validates_all_transitive_dependencies_before_registration(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -441,7 +496,7 @@ def test_missing_registry_error_does_not_expose_server_path(
     assert str(registry_path) not in response.content.decode()
 
 
-def test_export_active_terminology_fhir_requires_active_selection(
+def test_export_active_terminology_fhir_falls_back_to_first_registered_bundle(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -450,7 +505,14 @@ def test_export_active_terminology_fhir_requires_active_selection(
 
     response = Client().get("/base_api/terminology/active/fhir", secure=True)
 
-    assert response.status_code == 404
+    assert response.status_code == 200
+    payload = response.json()
+    extension = {
+        "url": "https://wg-lux.de/fhir/StructureDefinition/lx-medical-field",
+        "valueCode": "gastroenterology",
+    }
+    assert payload["resourceType"] == "Bundle"
+    assert extension in payload["extension"]
 
 
 def test_select_terminology_bundle_rejects_unregistered_version(
@@ -522,3 +584,136 @@ def test_validate_imported_bundle_uses_resolved_version(
         "module_name": "published_terminology",
         "version": "2026.05.04",
     }
+
+
+def test_ensure_default_terminology_registry_populates_empty_registry(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    data_root = tmp_path / "lx_dtypes_data"
+    default_module = terminology_routes._DEFAULT_KB_MODULE_NAME
+    module_root = data_root / default_module
+    module_root.mkdir(parents=True, exist_ok=True)
+    (module_root / "config.yaml").write_text(
+        "\n".join(
+            [
+                f"name: {default_module}",
+                'description: ""',
+                "version: 0.2.0",
+                "modules: []",
+                "depends_on: []",
+            ]
+        )
+        + "\n"
+    )
+
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    monkeypatch.setattr(
+        terminology_routes,
+        "package_data_root",
+        lambda: data_root,
+    )
+
+    terminology_routes.ensure_default_terminology_registry()
+
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    assert payload == {
+        "modules": {
+            default_module: {
+                "0.2.0": {"input_dirs": [str(data_root)]},
+            }
+        },
+        "active": {
+            "module_name": default_module,
+            "version": "0.2.0",
+        },
+    }
+
+
+def test_ensure_default_terminology_registry_preserves_existing_active_selection(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "modules": {
+                    "legacy": {
+                        "1.0.0": {"input_dirs": ["/legacy/path"]},
+                    },
+                },
+                "active": {"module_name": "legacy", "version": "1.0.0"},
+            }
+        )
+    )
+
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    monkeypatch.setattr(
+        terminology_routes, "package_data_root", lambda: tmp_path / "unused"
+    )
+
+    terminology_routes.ensure_default_terminology_registry()
+
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    assert payload == {
+        "modules": {
+            "legacy": {
+                "1.0.0": {"input_dirs": ["/legacy/path"]},
+            }
+        },
+        "active": {"module_name": "legacy", "version": "1.0.0"},
+    }
+
+
+def test_terminology_import_root_uses_env_or_registry_parent(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    registry_path.write_text("{}")
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+
+    assert terminology_routes._terminology_import_root(registry_path) == (
+        (registry_path.parent / "terminology-packages").resolve()
+    )
+
+    import_root = tmp_path / "configured-import-root"
+    monkeypatch.setenv(
+        "LX_DTYPES_TERMINOLOGY_IMPORT_ROOT",
+        str(import_root),
+    )
+    assert (
+        terminology_routes._terminology_import_root(registry_path)
+        == import_root.resolve()
+    )
+
+
+def test_ensure_default_terminology_registry_falls_back_to_first_registered_bundle(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "modules": {
+                    "bundle_b": {"0.2.0": {"input_dirs": ["b/path"]}},
+                    "bundle_a": {
+                        "0.3.0": {"input_dirs": ["a/upper/path"]},
+                        "0.1.0": {"input_dirs": ["a/lower/path"]},
+                    },
+                },
+            }
+        )
+    )
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    monkeypatch.setattr(
+        terminology_routes, "package_data_root", lambda: tmp_path / "unused"
+    )
+
+    terminology_routes.ensure_default_terminology_registry()
+
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    assert payload["active"] == {"module_name": "bundle_a", "version": "0.1.0"}

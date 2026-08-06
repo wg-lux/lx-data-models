@@ -79,9 +79,7 @@ _test_registry_path.write_text(
             "modules": {
                 "report_template_examples": {
                     "0.1.0": {
-                        "input_dirs": [
-                            str(Path(__file__).resolve().parent / "data")
-                        ]
+                        "input_dirs": [str(Path(__file__).resolve().parent / "data")]
                     }
                 }
             },

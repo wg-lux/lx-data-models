@@ -157,9 +157,9 @@ def test_report_template_export(tmp_path: Path) -> None:
 
     assert section["findings"][0]["finding"] == "esophagus_polyp"
     assert section["findings"][1]["finding"] == "esophagus_polyp"
-    descriptor_input = section["findings"][1]["classifications"][0]["input"][
-        "choices"
-    ][0]["descriptors"][0]
+    descriptor_input = section["findings"][1]["classifications"][0]["input"]["choices"][
+        0
+    ]["descriptors"][0]
     assert descriptor_input["name"] == "size_mm_value"
     assert descriptor_input["type"] == "numeric"
     assert descriptor_input["numeric_min"] == 0

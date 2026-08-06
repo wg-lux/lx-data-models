@@ -15,8 +15,7 @@ def test_standard_patterns_render_many_to_many_flowchart() -> None:
     assert 'subgraph ADAPTER["LXDM FHIR adapter"]' in diagram
     assert 'subgraph LXDM["LXDM clinical reporting model"]' in diagram
     assert (
-        "FHIR_Procedure -->|contributes context| "
-        "PATTERN_Finding_related_intervention"
+        "FHIR_Procedure -->|contributes context| PATTERN_Finding_related_intervention"
     ) in diagram
     assert (
         "FHIR_MedicationAdministration -->|contributes context| "
@@ -46,7 +45,9 @@ def test_standard_patterns_cover_clinical_ledger_concepts() -> None:
     } <= targets
 
     intervention = next(
-        pattern for pattern in patterns if pattern.name == "Finding-related intervention"
+        pattern
+        for pattern in patterns
+        if pattern.name == "Finding-related intervention"
     )
     assert {
         "FHIR.Procedure",

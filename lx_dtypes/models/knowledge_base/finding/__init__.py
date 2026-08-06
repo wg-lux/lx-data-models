@@ -38,6 +38,7 @@ kb_finding_ddicts = Union[
 ]
 
 if TYPE_CHECKING:
+
     class KbFindingDjangoLookupType(TypedDict):
         Finding: type[FindingDjango]
         FindingType: type[FindingTypeDjango]

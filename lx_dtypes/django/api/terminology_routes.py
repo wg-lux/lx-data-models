@@ -33,6 +33,7 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     get_knowledge_base_identity,
     load_knowledge_base,
 )
+from lx_dtypes.models.interface.data_roots import package_data_root
 from lx_dtypes.models.interface.remote_data_roots import (
     normalize_registry_input,
     RemoteDataRootError,
@@ -46,6 +47,10 @@ from .request_types import BaseRequest
 
 F = TypeVar("F", bound=Callable[..., Any])
 logger = logging.getLogger(__name__)
+
+
+_DEFAULT_KB_MODULE_NAME = "star_upper_gi"
+_DEFAULT_KB_VERSION = "0.1.1"
 
 
 if TYPE_CHECKING:
@@ -133,6 +138,122 @@ def _terminology_registry_path_for_write() -> Path:
     registry_path = _configured_terminology_registry_path()
     registry_path.parent.mkdir(parents=True, exist_ok=True)
     return registry_path
+
+
+def _packaged_default_kb_identity() -> tuple[str, str] | None:
+    module_root = package_data_root() / _DEFAULT_KB_MODULE_NAME
+    if not module_root.exists():
+        return None
+    config_path = module_root / "config.yaml"
+    default_version = _DEFAULT_KB_VERSION
+    if config_path.exists():
+        try:
+            config_payload = (
+                yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
+            )
+            if isinstance(config_payload, Mapping):
+                configured_version = config_payload.get("version")
+                if isinstance(configured_version, str):
+                    configured_version = configured_version.strip()
+                    if configured_version:
+                        default_version = configured_version
+        except Exception:
+            pass
+    return _DEFAULT_KB_MODULE_NAME, default_version
+
+
+def _first_registered_bundle(
+    modules: object,
+) -> tuple[str, str] | None:
+    if not isinstance(modules, Mapping):
+        return None
+    module_names = sorted(
+        module_name for module_name in modules if isinstance(module_name, str)
+    )
+    for module_name in module_names:
+        if not isinstance(module_name, str) or not module_name.strip():
+            continue
+        module_versions = modules.get(module_name, {})
+        if not isinstance(module_versions, Mapping):
+            continue
+        versions = sorted(
+            version for version in module_versions if isinstance(version, str)
+        )
+        for version in versions:
+            if isinstance(version, str) and version.strip():
+                return module_name.strip(), version.strip()
+    return None
+
+
+def _ensure_default_packaged_module(modules: dict[str, Any]) -> bool:
+    identity = _packaged_default_kb_identity()
+    if identity is None:
+        return False
+    module_name, version = identity
+    changed = False
+    module_versions = modules.get(module_name)
+    if not isinstance(module_versions, dict):
+        modules[module_name] = {}
+        module_versions = modules[module_name]
+        changed = True
+
+    if module_versions.get(version) is None:
+        module_versions[version] = {"input_dirs": [str(package_data_root())]}
+        changed = True
+
+    return changed
+
+
+def _default_active_selection_from_payload(
+    payload: Mapping[str, Any],
+) -> tuple[str, str] | None:
+    modules = payload.get("modules", {})
+    first_registered = _first_registered_bundle(modules)
+    if first_registered is not None:
+        return first_registered
+
+    identity = _packaged_default_kb_identity()
+    if identity is None:
+        return None
+    return identity
+
+
+def ensure_default_terminology_registry() -> None:
+    try:
+        registry_path = _terminology_registry_path_for_write()
+    except HttpError:
+        return
+
+    payload: dict[str, Any] = {}
+    changed = False
+    if registry_path.exists():
+        try:
+            loaded_payload = json.loads(registry_path.read_text(encoding="utf-8"))
+        except Exception:
+            loaded_payload = None
+        if isinstance(loaded_payload, dict):
+            payload = dict(loaded_payload)
+
+    modules = payload.get("modules")
+    if not isinstance(modules, dict):
+        payload["modules"] = {}
+        modules = payload["modules"]
+        changed = True
+
+    active = payload.get("active")
+    if active is None:
+        if not modules:
+            changed = _ensure_default_packaged_module(modules)
+        active_selection = _default_active_selection_from_payload(payload)
+        if active_selection is not None:
+            payload["active"] = {
+                "module_name": active_selection[0],
+                "version": active_selection[1],
+            }
+            changed = True
+
+    if changed:
+        _write_registry_payload_atomic(registry_path, payload)
 
 
 def _terminology_import_root(registry_path: Path) -> Path:
@@ -255,7 +376,7 @@ def _active_selection_from_registry(registry_path: Path) -> tuple[str, str] | No
         raise KnowledgeBaseRegistryError("Terminology registry must be a JSON object.")
     raw_active = raw_payload.get("active")
     if raw_active is None:
-        return None
+        return _default_active_selection_from_payload(raw_payload)
     if not isinstance(raw_active, Mapping):
         raise KnowledgeBaseRegistryError(
             "Terminology registry `active` entry must be a JSON object."

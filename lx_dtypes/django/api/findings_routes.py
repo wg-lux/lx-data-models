@@ -134,6 +134,57 @@ def _findings_module_name() -> str:
     return active[0]
 
 
+def _resolve_exam_kb_identity(patient_examination: Any) -> tuple[str, str | None]:
+    module_name = str(
+        getattr(patient_examination, "knowledge_base_module", "") or ""
+    ).strip()
+    version = str(
+        getattr(patient_examination, "knowledge_base_version", "") or ""
+    ).strip()
+    if module_name:
+        return module_name, version or None
+
+    from .terminology_routes import active_terminology_selection
+
+    active = active_terminology_selection()
+    if active is None:
+        raise RuntimeError("No active knowledge-base bundle is selected.")
+    return active[0], active[1]
+
+
+def _resolve_catalog_kb_identity(
+    module_name: str | None,
+    module_version: str | None,
+    orm_models: Callable[[], Dict[str, Any]],
+    patient_examination_id: int | None,
+    api_error: Callable[[int, str, str], NoReturn],
+) -> tuple[str, str | None]:
+    requested_module_name = str(module_name or "").strip()
+    if requested_module_name:
+        return requested_module_name, str(module_version or "").strip() or None
+
+    if patient_examination_id is not None:
+        patient_examination_model = orm_models()["PatientExamination"]
+        patient_examination = patient_examination_model.objects.filter(
+            id=patient_examination_id
+        ).first()
+        if not patient_examination:
+            api_error(
+                404,
+                "not-found",
+                f"PatientExamination '{patient_examination_id}' not found.",
+            )
+        assert patient_examination is not None
+        return _resolve_exam_kb_identity(patient_examination)
+
+    from .terminology_routes import active_terminology_selection
+
+    active = active_terminology_selection()
+    if active is None:
+        raise RuntimeError("No active knowledge-base bundle is selected.")
+    return active
+
+
 def _norm_name(value: Optional[str]) -> str:
     return str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
 
@@ -190,7 +241,12 @@ def _kb_lookup_by_identity(
     return _build_kb_lookup(core)
 
 
-def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
+def _kb_lookup(
+    module_name: str, version: str | None = None
+) -> Dict[str, Dict[str, Dict[str, Any]]]:
+    if version:
+        return _kb_lookup_by_identity(module_name, version)
+
     loader = _require_load_module_kb()
     kb = loader(module_name)
     version = str(getattr(getattr(kb, "config", None), "version", "") or "").strip()
@@ -463,9 +519,9 @@ def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
 
 
 def _resolve_exam_kb_finding_names(
-    examination: Any, *, module_name: str
+    examination: Any, *, module_name: str, version: str | None = None
 ) -> Optional[Set[str]]:
-    lookup = _kb_lookup(module_name)
+    lookup = _kb_lookup(module_name, version=version)
     exam_entry = lookup["examination"].get(_norm_name(examination.name))
     if not exam_entry:
         return None
@@ -476,9 +532,9 @@ def _resolve_exam_kb_finding_names(
 
 
 def _resolve_kb_finding_classification_names(
-    finding: Any, *, module_name: str
+    finding: Any, *, module_name: str, version: str | None = None
 ) -> Optional[Set[str]]:
-    lookup = _kb_lookup(module_name)
+    lookup = _kb_lookup(module_name, version=version)
     finding_entry = lookup["finding"].get(_norm_name(finding.name))
     if not finding_entry:
         return None
@@ -489,9 +545,9 @@ def _resolve_kb_finding_classification_names(
 
 
 def _resolve_kb_classification_choice_names(
-    classification: Any, *, module_name: str
+    classification: Any, *, module_name: str, version: str | None = None
 ) -> Optional[Set[str]]:
-    lookup = _kb_lookup(module_name)
+    lookup = _kb_lookup(module_name, version=version)
     classification_entry = lookup["classification"].get(_norm_name(classification.name))
     if not classification_entry:
         return None
@@ -506,6 +562,7 @@ def _validate_finding_for_examination(
     patient_examination: Any,
     *,
     module_name: str,
+    version: str | None = None,
     api_error: Callable[[int, str, str], NoReturn],
 ) -> None:
     available_findings = patient_examination.examination_safe.get_available_findings()
@@ -517,7 +574,7 @@ def _validate_finding_for_examination(
         )
 
     kb_allowed_names = _resolve_exam_kb_finding_names(
-        patient_examination.examination_safe, module_name=module_name
+        patient_examination.examination_safe, module_name=module_name, version=version
     )
     if (
         kb_allowed_names is not None
@@ -536,6 +593,7 @@ def _validate_classification_payload(
     classification: Any,
     choice: Any,
     module_name: str,
+    version: str | None = None,
     api_error: Callable[[int, str, str], NoReturn],
 ) -> None:
     if not finding.finding_classifications.filter(id=classification.id).exists():
@@ -552,7 +610,7 @@ def _validate_classification_payload(
         )
 
     kb_classifications = _resolve_kb_finding_classification_names(
-        finding, module_name=module_name
+        finding, module_name=module_name, version=version
     )
     if (
         kb_classifications is not None
@@ -565,7 +623,7 @@ def _validate_classification_payload(
         )
 
     kb_choices = _resolve_kb_classification_choice_names(
-        classification, module_name=module_name
+        classification, module_name=module_name, version=version
     )
     if kb_choices is not None and _norm_name(choice.name) not in kb_choices:
         api_error(
@@ -580,6 +638,7 @@ def _replace_patient_finding_classifications(
     entries: List[PatientFindingClassificationInput],
     *,
     module_name: str,
+    version: str | None = None,
     orm_models: Callable[[], Dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
 ) -> None:
@@ -613,6 +672,7 @@ def _replace_patient_finding_classifications(
             classification=classification,
             choice=choice,
             module_name=module_name,
+            version=version,
             api_error=api_error,
         )
         patient_finding_classification_model.objects.create(
@@ -681,16 +741,26 @@ def register_findings_routes(
                 f"Patient finding '{patient_finding_id}' not found.",
             )
 
+    def resolve_findings_module_name() -> str:
+        try:
+            return _findings_module_name()
+        except RuntimeError as exc:
+            api_error(409, "no-active-knowledge-base", str(exc))
+
     def refresh_patient_examination_dtypes_record(patient_examination: object) -> None:
         if (
             build_p_examination_payload_from_host_ledger is None
             or persist_patient_examination_dtypes_record is None
         ):
             return
-        module_name = _findings_module_name()
+        module_name = resolve_findings_module_name()
+        try:
+            module_name_for_record, _ = _resolve_exam_kb_identity(patient_examination)
+        except RuntimeError:
+            module_name_for_record = module_name
         payload = build_p_examination_payload_from_host_ledger(
             patient_examination,
-            route_module_name=module_name,
+            route_module_name=module_name_for_record,
         )
         persist_patient_examination_dtypes_record(patient_examination, payload)
 
@@ -715,19 +785,52 @@ def register_findings_routes(
 
     @api.get("/examinations/{examination_id}/findings/")
     def findings_by_examination(
-        request: BaseRequest, examination_id: int
+        request: BaseRequest,
+        examination_id: int,
+        module_name: Optional[str] = None,
+        module_version: Optional[str] = None,
+        patient_examination_id: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         del request
-        module_name = _findings_module_name()
+        try:
+            module_name, resolved_version = _resolve_catalog_kb_identity(
+                module_name=module_name,
+                module_version=module_version,
+                orm_models=orm_models,
+                patient_examination_id=patient_examination_id,
+                api_error=api_error,
+            )
+        except RuntimeError as exc:
+            api_error(409, "no-active-knowledge-base", str(exc))
         examination_model = orm_models()["Examination"]
         examination = examination_model.objects.filter(id=examination_id).first()
         if not examination:
             api_error(404, "not-found", f"Examination '{examination_id}' not found.")
 
         assert examination is not None
+        if patient_examination_id is not None:
+            patient_examination_model = orm_models()["PatientExamination"]
+            patient_examination = patient_examination_model.objects.filter(
+                id=patient_examination_id
+            ).first()
+            if not patient_examination:
+                api_error(
+                    404,
+                    "not-found",
+                    f"PatientExamination '{patient_examination_id}' not found.",
+                )
+            assert patient_examination is not None
+            if patient_examination.examination_id != examination.id:
+                api_error(
+                    404,
+                    "not-found",
+                    "Patient examination "
+                    f"'{patient_examination_id}' does not belong to "
+                    f"examination '{examination_id}'.",
+                )
         findings = list(examination.get_available_findings())
         kb_allowed_finding_names = _resolve_exam_kb_finding_names(
-            examination, module_name=module_name
+            examination, module_name=module_name, version=resolved_version
         )
         if kb_allowed_finding_names is not None:
             findings = [
@@ -739,7 +842,7 @@ def register_findings_routes(
         response = []
         for finding in findings:
             kb_allowed_classifications = _resolve_kb_finding_classification_names(
-                finding, module_name=module_name
+                finding, module_name=module_name, version=resolved_version
             )
             response.append(
                 _serialize_finding(
@@ -752,10 +855,23 @@ def register_findings_routes(
 
     @api.get("/findings/{finding_id}/classifications/")
     def classifications_by_finding(
-        request: BaseRequest, finding_id: int
+        request: BaseRequest,
+        finding_id: int,
+        module_name: Optional[str] = None,
+        module_version: Optional[str] = None,
+        patient_examination_id: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         del request
-        module_name = _findings_module_name()
+        try:
+            module_name, resolved_version = _resolve_catalog_kb_identity(
+                module_name=module_name,
+                module_version=module_version,
+                orm_models=orm_models,
+                patient_examination_id=patient_examination_id,
+                api_error=api_error,
+            )
+        except RuntimeError as exc:
+            api_error(409, "no-active-knowledge-base", str(exc))
         finding_model = orm_models()["Finding"]
         finding = finding_model.objects.filter(id=finding_id).first()
         if not finding:
@@ -763,7 +879,7 @@ def register_findings_routes(
         assert finding is not None
 
         kb_allowed_classifications = _resolve_kb_finding_classification_names(
-            finding, module_name=module_name
+            finding, module_name=module_name, version=resolved_version
         )
         serialized = _serialize_finding(
             finding,
@@ -774,10 +890,23 @@ def register_findings_routes(
 
     @api.get("/classifications/{classification_id}/choices/")
     def choices_by_classification(
-        request: BaseRequest, classification_id: int
+        request: BaseRequest,
+        classification_id: int,
+        module_name: Optional[str] = None,
+        module_version: Optional[str] = None,
+        patient_examination_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         del request
-        module_name = _findings_module_name()
+        try:
+            module_name, resolved_version = _resolve_catalog_kb_identity(
+                module_name=module_name,
+                module_version=module_version,
+                orm_models=orm_models,
+                patient_examination_id=patient_examination_id,
+                api_error=api_error,
+            )
+        except RuntimeError as exc:
+            api_error(409, "no-active-knowledge-base", str(exc))
         finding_classification_model = orm_models()["FindingClassification"]
         classification = finding_classification_model.objects.filter(
             id=classification_id
@@ -789,7 +918,7 @@ def register_findings_routes(
         assert classification is not None
 
         kb_allowed_choices = _resolve_kb_classification_choice_names(
-            classification, module_name=module_name
+            classification, module_name=module_name, version=resolved_version
         )
         all_choices = list(classification.choices.all())
         if kb_allowed_choices is not None:
@@ -815,7 +944,6 @@ def register_findings_routes(
         request: BaseRequest, payload: PatientFindingCreateRequest
     ) -> Dict[str, Any]:
         require_authenticated_actor(request)
-        module_name = _findings_module_name()
         patient_examination_model = orm_models()["PatientExamination"]
         finding_model = orm_models()["Finding"]
         patient_finding_model = orm_models()["PatientFinding"]
@@ -835,6 +963,7 @@ def register_findings_routes(
                 "not-found",
                 f"PatientExamination '{payload.patient_examination}' not found.",
             )
+        module_name, module_version = _resolve_exam_kb_identity(patient_examination)
 
         finding = finding_model.objects.filter(id=payload.finding).first()
         if not finding:
@@ -845,6 +974,7 @@ def register_findings_routes(
             finding=finding,
             patient_examination=patient_examination,
             module_name=module_name,
+            version=module_version,
             api_error=api_error,
         )
 
@@ -859,6 +989,7 @@ def register_findings_routes(
                         patient_finding,
                         payload.classifications,
                         module_name=module_name,
+                        version=module_version,
                         orm_models=orm_models,
                         api_error=api_error,
                     )
@@ -894,7 +1025,6 @@ def register_findings_routes(
         payload: PatientFindingUpdateRequest,
     ) -> Dict[str, Any]:
         actor = require_authenticated_actor(request)
-        module_name = _findings_module_name()
         patient_finding = (
             patient_findings_queryset_for_request(request)
             .filter(id=patient_finding_id)
@@ -906,6 +1036,9 @@ def register_findings_routes(
             )
         assert patient_finding is not None
         require_patient_finding_access(request, patient_finding, patient_finding_id)
+        module_name, module_version = _resolve_exam_kb_identity(
+            patient_finding.patient_examination
+        )
 
         with transaction.atomic():
             if payload.finding is not None:
@@ -920,6 +1053,7 @@ def register_findings_routes(
                     finding=finding,
                     patient_examination=patient_finding.patient_examination,
                     module_name=module_name,
+                    version=module_version,
                     api_error=api_error,
                 )
                 patient_finding.finding = finding
@@ -941,6 +1075,7 @@ def register_findings_routes(
                     patient_finding,
                     payload.classifications,
                     module_name=module_name,
+                    version=module_version,
                     orm_models=orm_models,
                     api_error=api_error,
                 )
@@ -987,7 +1122,6 @@ def register_findings_routes(
         payload: PatientFindingClassificationsRequest,
     ) -> Dict[str, Any]:
         require_authenticated_actor(request)
-        module_name = _findings_module_name()
         patient_finding = (
             patient_findings_queryset_for_request(request)
             .filter(id=patient_finding_id)
@@ -999,6 +1133,9 @@ def register_findings_routes(
             )
         assert patient_finding is not None
         require_patient_finding_access(request, patient_finding, patient_finding_id)
+        module_name, module_version = _resolve_exam_kb_identity(
+            patient_finding.patient_examination
+        )
 
         with transaction.atomic():
             finding_classification_model = orm_models()["FindingClassification"]
@@ -1033,6 +1170,7 @@ def register_findings_routes(
                     classification=classification,
                     choice=choice,
                     module_name=module_name,
+                    version=module_version,
                     api_error=api_error,
                 )
                 _get_or_create_active_patient_finding_classification(

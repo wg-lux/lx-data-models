@@ -92,4 +92,43 @@ class TestKnowledgeBaseConfig:
         else:
             assert False, "Expected ValueError was not raised"
 
+    def test_normalize_data_paths_uses_config_parent_as_base(
+        self, tmp_path: Path
+    ) -> None:
+        module_dir = tmp_path / "star_upper_gi"
+        (module_dir / "data").mkdir(parents=True)
+        (module_dir / "relative").mkdir(parents=True)
+        (module_dir / "data" / "units.yaml").write_text("- model: unit\n  name: demo\n")
+        (module_dir / "relative" / "manifest.yaml").write_text("name: demo-manifest\n")
+        (module_dir / "schema.yaml").write_text("schema: demo\n")
+
+        config_path = module_dir / "config.yaml"
+        config_path.write_text(
+            "\n".join(
+                [
+                    "name: star_upper_gi",
+                    'description: ""',
+                    "version: 0.1.0",
+                    "modules: []",
+                    "depends_on: []",
+                    "data:",
+                    "  file: ./schema.yaml",
+                    "  dirs:",
+                    "    - ./data",
+                    "  files:",
+                    "    - ./relative/manifest.yaml",
+                ]
+            )
+            + "\n"
+        )
+
+        kb_config = KnowledgeBaseConfig.from_yaml_file(config_path)
+        kb_config.normalize_data_paths(config_path)
+
+        assert kb_config.data.file == (module_dir / "schema.yaml").resolve()
+        assert kb_config.data.dirs == [(module_dir / "data").resolve()]
+        assert kb_config.data.files == [
+            (module_dir / "relative" / "manifest.yaml").resolve()
+        ]
+
     # def test_reimport_sample_kb(self, )

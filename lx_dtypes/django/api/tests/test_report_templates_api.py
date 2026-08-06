@@ -128,8 +128,7 @@ def test_colonoscopy_template_api_exposes_localized_guideline_provenance() -> No
     )
     assert template["readiness"]["can_publish"] is True
     assert [
-        reference["guideline_id"]
-        for reference in template["guideline_references"]
+        reference["guideline_id"] for reference in template["guideline_references"]
     ] == ["AWMF-021-022", "AWMF-021-014"]
     assert all(
         reference["canonical_url"].startswith("https://")
@@ -137,8 +136,7 @@ def test_colonoscopy_template_api_exposes_localized_guideline_provenance() -> No
     )
     assert len(template["coverage_concepts"]) == 34
     assert all(
-        concept["guideline_citations"]
-        for concept in template["coverage_concepts"]
+        concept["guideline_citations"] for concept in template["coverage_concepts"]
     )
 
 
@@ -165,9 +163,7 @@ def test_advanced_endoscopy_template_api_exposes_production_template(
     )
 
     assert response.status_code == 200
-    template = next(
-        item for item in response.json() if item["name"] == template_name
-    )
+    template = next(item for item in response.json() if item["name"] == template_name)
     assert template["readiness"]["can_publish"] is True
     assert guideline_id in {
         reference["guideline_id"] for reference in template["guideline_references"]
@@ -230,8 +226,12 @@ def test_report_template_runtime_validation_api(
     payload = response.json()
     assert payload["template_name"] == "star_upper_gi_main"
     assert payload["ok"] is False
-    assert payload["concept_coverage"]["contract_version"] == "report_concept_coverage_v1"
-    assert payload["concept_coverage"]["identity"]["template_name"] == "star_upper_gi_main"
+    assert (
+        payload["concept_coverage"]["contract_version"] == "report_concept_coverage_v1"
+    )
+    assert (
+        payload["concept_coverage"]["identity"]["template_name"] == "star_upper_gi_main"
+    )
     assert any(
         issue["code"] == "missing_required_classification"
         for issue in payload["issues"]

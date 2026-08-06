@@ -317,9 +317,7 @@ def _safe_archive_members(
     return archive_root, selected
 
 
-def _cached_module_root(
-    *, destination: Path, source: GitHubTreeSource
-) -> Path | None:
+def _cached_module_root(*, destination: Path, source: GitHubTreeSource) -> Path | None:
     """Return a complete cache root only when every cache component is symlink-free."""
     current = destination
     for part in source.tree_path.parts:

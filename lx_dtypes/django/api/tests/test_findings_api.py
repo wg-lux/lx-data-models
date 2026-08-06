@@ -27,6 +27,8 @@ except (ModuleNotFoundError, RuntimeError, AttributeError):  # pragma: no cover
         allow_module_level=True,
     )
 
+from lx_dtypes.django.api import findings_routes, terminology_routes
+
 pytestmark = pytest.mark.django_db
 
 
@@ -66,6 +68,59 @@ def _create_exam_graph() -> tuple[Any, Any, Any, Any]:
     return examination, finding, classification, choice_small
 
 
+def _mock_kb_lookup(module_name: str, version: str | None = None) -> dict[str, Any]:
+    if module_name != "catalog_module":
+        return {
+            "examination": {},
+            "finding": {},
+            "classification": {},
+            "classification_choice": {},
+        }
+    normalized_version = str(version or "").strip()
+    if normalized_version == "1.0.0":
+        return {
+            "examination": {
+                "colonoscopy": {
+                    "name": "colonoscopy",
+                    "findings": ["colon_polyp"],
+                }
+            },
+            "finding": {
+                "colon_polyp": {
+                    "name": "colon_polyp",
+                    "classifications": ["size_classification"],
+                }
+            },
+            "classification": {
+                "size_classification": {
+                    "name": "size_classification",
+                    "classification_choices": ["small_polyp"],
+                }
+            },
+            "classification_choice": {
+                "small_polyp": {"name": "small_polyp"},
+            },
+        }
+    if normalized_version == "2.0.0":
+        return {
+            "examination": {
+                "colonoscopy": {
+                    "name": "colonoscopy",
+                    "findings": [],
+                }
+            },
+            "finding": {},
+            "classification": {},
+            "classification_choice": {},
+        }
+    return {
+        "examination": {},
+        "finding": {},
+        "classification": {},
+        "classification_choice": {},
+    }
+
+
 def test_base_api_findings_read_endpoints_shape() -> None:
     client = Client()
     examination, finding, classification, choice = _create_exam_graph()
@@ -100,6 +155,307 @@ def test_base_api_findings_read_endpoints_shape() -> None:
     choices_payload = choices_res.json()
     assert "choices" in choices_payload
     assert choices_payload["choices"][0]["id"] == choice.id
+
+
+def test_base_api_findings_read_endpoints_support_module_version_overrides(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = Client()
+    examination, finding, classification, choice = _create_exam_graph()
+    monkeypatch.setattr(findings_routes, "_kb_lookup", _mock_kb_lookup)
+
+    legacy_findings = client.get(
+        f"/base_api/examinations/{examination.id}/findings/?module_name=catalog_module&module_version=1.0.0",
+        secure=True,
+    )
+    assert legacy_findings.status_code == 200
+    assert len(legacy_findings.json()) == 1
+    assert legacy_findings.json()[0]["id"] == finding.id
+
+    modern_findings = client.get(
+        f"/base_api/examinations/{examination.id}/findings/?module_name=catalog_module&module_version=2.0.0",
+        secure=True,
+    )
+    assert modern_findings.status_code == 200
+    assert modern_findings.json() == []
+
+    legacy_classifications = client.get(
+        f"/base_api/findings/{finding.id}/classifications/?module_name=catalog_module&module_version=1.0.0",
+        secure=True,
+    )
+    assert legacy_classifications.status_code == 200
+    assert any(
+        item["name"] == classification.name for item in legacy_classifications.json()
+    )
+
+    modern_classifications = client.get(
+        f"/base_api/findings/{finding.id}/classifications/?module_name=catalog_module&module_version=2.0.0",
+        secure=True,
+    )
+    assert modern_classifications.status_code == 200
+    assert modern_classifications.json() == []
+
+    legacy_choices = client.get(
+        f"/base_api/classifications/{classification.id}/choices/?module_name=catalog_module&module_version=1.0.0",
+        secure=True,
+    )
+    assert legacy_choices.status_code == 200
+    assert legacy_choices.json()["choices"][0]["id"] == choice.id
+
+    modern_choices = client.get(
+        f"/base_api/classifications/{classification.id}/choices/?module_name=catalog_module&module_version=2.0.0",
+        secure=True,
+    )
+    assert modern_choices.status_code == 200
+    assert modern_choices.json() == {"choices": []}
+
+
+def test_base_api_findings_read_routes_use_patient_examination_kb_when_requested(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = Client()
+    examination, _, _, _ = _create_exam_graph()
+    patient_examination = _create_patient_examination(examination)
+    patient_examination.knowledge_base_module = "catalog_module"
+    patient_examination.knowledge_base_version = "1.0.0"
+    patient_examination.save(
+        update_fields=["knowledge_base_module", "knowledge_base_version"]
+    )
+
+    monkeypatch.setattr(
+        terminology_routes,
+        "active_terminology_selection",
+        lambda: ("catalog_module", "2.0.0"),
+    )
+    monkeypatch.setattr(findings_routes, "_kb_lookup", _mock_kb_lookup)
+
+    response = client.get(
+        f"/base_api/examinations/{examination.id}/findings/?patient_examination_id={patient_examination.id}",
+        secure=True,
+    )
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+
+
+def test_base_api_findings_read_routes_fallback_to_active_for_unpinned_patient_examination(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = Client()
+    examination, _, _, _ = _create_exam_graph()
+    patient_examination = _create_patient_examination(examination)
+    patient_examination.knowledge_base_module = ""
+    patient_examination.knowledge_base_version = ""
+    patient_examination.save(
+        update_fields=["knowledge_base_module", "knowledge_base_version"]
+    )
+
+    monkeypatch.setattr(
+        terminology_routes,
+        "active_terminology_selection",
+        lambda: ("catalog_module", "2.0.0"),
+    )
+    monkeypatch.setattr(findings_routes, "_kb_lookup", _mock_kb_lookup)
+
+    response = client.get(
+        f"/base_api/examinations/{examination.id}/findings/?patient_examination_id={patient_examination.id}",
+        secure=True,
+    )
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_base_api_patient_examination_findings_read_uses_pinned_kb_when_examination_context_present(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = Client()
+    examination = Examination.objects.create(name="colonoscopy")
+    finding_v1 = Finding.objects.create(name="POLYP-V1")
+    finding_v2 = Finding.objects.create(name="POLYP-V2")
+    examination.findings.add(finding_v1, finding_v2)
+
+    patient_examination = _create_patient_examination(examination)
+    patient_examination.knowledge_base_module = "catalog_module"
+    patient_examination.knowledge_base_version = "1.0.0"
+    patient_examination.save(
+        update_fields=["knowledge_base_module", "knowledge_base_version"]
+    )
+
+    def _mock_catalog_kb_lookup(
+        module_name: str, version: str | None = None
+    ) -> dict[str, Any]:
+        if module_name != "catalog_module":
+            return {
+                "examination": {},
+                "finding": {},
+                "classification": {},
+                "classification_choice": {},
+            }
+        normalized_version = str(version or "").strip()
+        if normalized_version == "1.0.0":
+            return {
+                "examination": {
+                    "colonoscopy": {
+                        "name": "colonoscopy",
+                        "findings": ["POLYP-V1"],
+                    }
+                },
+                "finding": {
+                    "polyp-v1": {"name": "POLYP-V1", "classifications": []},
+                },
+                "classification": {},
+                "classification_choice": {},
+            }
+        if normalized_version == "2.0.0":
+            return {
+                "examination": {
+                    "colonoscopy": {
+                        "name": "colonoscopy",
+                        "findings": ["POLYP-V2"],
+                    }
+                },
+                "finding": {
+                    "polyp-v2": {"name": "POLYP-V2", "classifications": []},
+                },
+                "classification": {},
+                "classification_choice": {},
+            }
+        return {
+            "examination": {},
+            "finding": {},
+            "classification": {},
+            "classification_choice": {},
+        }
+
+    monkeypatch.setattr(
+        terminology_routes,
+        "active_terminology_selection",
+        lambda: ("catalog_module", "2.0.0"),
+    )
+    monkeypatch.setattr(findings_routes, "_kb_lookup", _mock_catalog_kb_lookup)
+
+    response = client.get(
+        f"/base_api/examinations/{examination.id}/findings/",
+        secure=True,
+    )
+
+    assert response.status_code == 200, response.content.decode()
+    payload = response.json()
+    assert any(item["id"] == finding_v1.id for item in payload)
+    assert not any(item["id"] == finding_v2.id for item in payload)
+
+
+def test_base_api_patient_findings_uses_examination_pinned_kb_for_create_and_rejects_other_version(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = Client()
+    user_model = get_user_model()
+    user = user_model.objects.create(
+        username="legacy-kb-create",
+        is_staff=True,
+    )
+    client.force_login(user)
+
+    examination = Examination.objects.create(name="colonoscopy")
+    finding_v1 = Finding.objects.create(name="POLYP-V1")
+    finding_v2 = Finding.objects.create(name="POLYP-V2")
+    examination.findings.add(finding_v1, finding_v2)
+    patient_examination = _create_patient_examination(examination)
+    patient_examination.knowledge_base_module = "catalog_module"
+    patient_examination.knowledge_base_version = "1.0.0"
+    patient_examination.save(
+        update_fields=["knowledge_base_module", "knowledge_base_version"]
+    )
+
+    monkeypatch.setattr(
+        findings_routes,
+        "_kb_lookup",
+        lambda _module_name, version=None: {
+            "examination": {
+                "colonoscopy": {
+                    "name": "colonoscopy",
+                    "findings": [
+                        "POLYP-V1" if str(version or "") == "1.0.0" else "POLYP-V2"
+                    ],
+                }
+            },
+            "finding": {
+                "polyp-v1": {"name": "POLYP-V1", "classifications": []},
+                "polyp-v2": {"name": "POLYP-V2", "classifications": []},
+            },
+            "classification": {},
+            "classification_choice": {},
+        },
+    )
+
+    # active catalog is v2.0.0, but the exam is pinned to v1.0.0.
+    monkeypatch.setattr(
+        terminology_routes,
+        "active_terminology_selection",
+        lambda: ("catalog_module", "2.0.0"),
+    )
+
+    allowed_response = client.post(
+        "/base_api/patient-findings/",
+        data=json.dumps(
+            {
+                "patient_examination": patient_examination.id,
+                "finding": finding_v1.id,
+                "classifications": [],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+    assert allowed_response.status_code == 200, allowed_response.content.decode()
+
+    blocked_response = client.post(
+        "/base_api/patient-findings/",
+        data=json.dumps(
+            {
+                "patient_examination": patient_examination.id,
+                "finding": finding_v2.id,
+                "classifications": [],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+    assert blocked_response.status_code == 400, blocked_response.content.decode()
+    assert blocked_response.json().get("code") == "invalid-finding"
+
+
+def test_base_api_patient_findings_create_fails_closed_when_access_check_callback_is_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = Client()
+    user_model = get_user_model()
+    user = user_model.objects.create(
+        username="missing-access-callback",
+        is_staff=True,
+    )
+    client.force_login(user)
+    examination, finding, _, _ = _create_exam_graph()
+    patient_examination = _create_patient_examination(examination)
+
+    monkeypatch.delattr(
+        host_models, "patient_examination_access_allowed", raising=False
+    )
+
+    response = client.post(
+        "/base_api/patient-findings/",
+        data=json.dumps(
+            {
+                "patient_examination": patient_examination.id,
+                "finding": finding.id,
+                "classifications": [],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+
+    assert response.status_code == 404, response.content.decode()
+    assert response.json().get("code") == "not-found"
 
 
 def test_base_api_patient_findings_crud_and_classifications() -> None:
@@ -332,6 +688,98 @@ def test_base_api_patient_findings_validation_invalid_choice() -> None:
                     {
                         "classification": classification.id,
                         "choice": invalid_choice.id,
+                    }
+                ],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+    assert create_res.status_code == 400, create_res.content.decode()
+    payload = create_res.json()
+    assert payload.get("code") == "invalid-choice"
+
+
+def test_base_api_patient_findings_validation_uses_examination_pinned_legacy_kb(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = Client()
+    user_model = get_user_model()
+    user = user_model.objects.create(
+        username="legacy-kb-user",
+        is_staff=True,
+    )
+    client.force_login(user)
+    examination, finding, classification, choice = _create_exam_graph()
+    patient_examination = _create_patient_examination(examination)
+    patient_examination.knowledge_base_module = "catalog_module"
+    patient_examination.knowledge_base_version = "1.0.0"
+    patient_examination.save(
+        update_fields=["knowledge_base_module", "knowledge_base_version"]
+    )
+
+    monkeypatch.setattr(findings_routes, "_kb_lookup", _mock_kb_lookup)
+
+    create_res = client.post(
+        "/base_api/patient-findings/",
+        data=json.dumps(
+            {
+                "patient_examination": patient_examination.id,
+                "finding": finding.id,
+                "classifications": [
+                    {"classification": classification.id, "choice": choice.id}
+                ],
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+    assert create_res.status_code == 200, create_res.content.decode()
+
+
+def test_base_api_patient_findings_rejects_kb_choice_not_in_pinned_legacy_kb(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = Client()
+    user_model = get_user_model()
+    user = user_model.objects.create(
+        username="legacy-kb-user-2",
+        is_staff=True,
+    )
+    client.force_login(user)
+    examination, finding, _classification, _choice = _create_exam_graph()
+    patient_examination = _create_patient_examination(examination)
+    patient_examination.knowledge_base_module = "catalog_module"
+    patient_examination.knowledge_base_version = "1.0.0"
+    patient_examination.save(
+        update_fields=["knowledge_base_module", "knowledge_base_version"]
+    )
+
+    forbidden_classification = FindingClassification.objects.create(
+        name="forbidden_classification",
+        description="Not in legacy KB",
+    )
+    forbidden_choice = FindingClassificationChoice.objects.create(
+        name="forbidden_choice",
+        description="Not in legacy KB",
+        subcategories={},
+        numerical_descriptors={},
+    )
+    forbidden_classification.choices.add(forbidden_choice)
+    finding.finding_classifications.add(forbidden_classification)
+
+    monkeypatch.setattr(findings_routes, "_kb_lookup", _mock_kb_lookup)
+
+    create_res = client.post(
+        "/base_api/patient-findings/",
+        data=json.dumps(
+            {
+                "patient_examination": patient_examination.id,
+                "finding": finding.id,
+                "classifications": [
+                    {
+                        "classification": forbidden_classification.id,
+                        "choice": forbidden_choice.id,
                     }
                 ],
             }

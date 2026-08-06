@@ -15,7 +15,7 @@ def _complete_record() -> dict[str, JsonValue]:
     return {
         "patient": "patient-7",
         "examiners": ["examiner-2"],
-        "examination": "colonoscopy",
+        "examination": "42",
         "knowledge_base_module": "report_template_examples",
         "knowledge_base_version": "0.1.0",
         "patient_findings": [
@@ -125,4 +125,18 @@ def test_record_contract_rejects_unknown_fields_at_every_level(path: str) -> Non
         choice["unexpected"] = True
 
     with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        parse_dtypes_record_persistence_payload(payload)
+
+
+def test_record_contract_rejects_patient_findings_from_a_different_patient_examination_id() -> (
+    None
+):
+    payload = _complete_record()
+    payload["patient"] = "patient-500"
+    finding = _json_object(_json_list(payload, "patient_findings")[0])
+    finding["patient_examination"] = "900"
+    indication = _json_object(_json_list(payload, "patient_indications")[0])
+    indication["patient_examination"] = "900"
+
+    with pytest.raises(ValidationError):
         parse_dtypes_record_persistence_payload(payload)

@@ -61,6 +61,22 @@ def _write_unit(module_dir: Path, *, name: str, abbreviation: str) -> None:
     )
 
 
+def _write_minimal_module_config(module_dir: Path, *, module_name: str) -> None:
+    module_dir.mkdir(parents=True, exist_ok=True)
+    (module_dir / "config.yaml").write_text(
+        "\n".join(
+            [
+                f"name: {module_name}",
+                'description: ""',
+                "version: 0.1.0",
+                "modules: []",
+                "depends_on: []",
+            ]
+        )
+        + "\n"
+    )
+
+
 class TestDataLoader:
     def test_data_loader_fetch_config_yamls(
         self,
@@ -208,7 +224,7 @@ class TestDataLoader:
 
         assert kb.config.name == "report_template_examples"
 
-    def test_demo_data_requires_explicit_input_dir(self) -> None:
+    def test_explicit_input_dir_uses_supplied_path(self, tmp_path: Path) -> None:
         default_loader = DataLoader()
         default_loader.load_module_configs()
         default_config = default_loader.get_initialized_config("star_upper_gi")
@@ -217,13 +233,18 @@ class TestDataLoader:
             "lx_dtypes/data/star_upper_gi/config.yaml"
         )
 
-        demo_loader = DataLoader(input_dirs=[Path("demo-data")])
-        kb = demo_loader.load_knowledge_base("star_upper_gi")
+        explicit_root = tmp_path / "custom-loader-root"
+        _write_minimal_module_config(
+            explicit_root / "star_upper_gi",
+            module_name="star_upper_gi",
+        )
+        explicit_loader = DataLoader(input_dirs=[explicit_root])
+        kb = explicit_loader.load_knowledge_base("star_upper_gi")
 
         assert kb.config.name == "star_upper_gi"
         assert kb.config.source_file is not None
         assert kb.config.source_file.as_posix().endswith(
-            "demo-data/star_upper_gi/config.yaml"
+            "custom-loader-root/star_upper_gi/config.yaml"
         )
 
     def test_non_existing_input_dir_provided(self) -> None:

@@ -1613,21 +1613,57 @@ def test_upper_gi_quality_2025_emits_authoritative_concept_coverage() -> None:
             "ercp_quality_2018",
             "ercp",
             [
-                ("ercp_antibiotic_prophylaxis", "ercp_antibiotic_prophylaxis_status", "quality_adequate"),
-                ("ercp_bile_duct_cannulation", "ercp_bile_duct_cannulation_outcome", "quality_successful"),
-                ("ercp_biliary_stent_placement", "ercp_biliary_stent_placement_outcome", "quality_not_applicable"),
-                ("ercp_bile_duct_stone_extraction", "ercp_bile_duct_stone_extraction_outcome", "quality_not_applicable"),
-                ("ercp_post_ercp_pancreatitis", "ercp_post_ercp_pancreatitis_status", "quality_absent"),
+                (
+                    "ercp_antibiotic_prophylaxis",
+                    "ercp_antibiotic_prophylaxis_status",
+                    "quality_adequate",
+                ),
+                (
+                    "ercp_bile_duct_cannulation",
+                    "ercp_bile_duct_cannulation_outcome",
+                    "quality_successful",
+                ),
+                (
+                    "ercp_biliary_stent_placement",
+                    "ercp_biliary_stent_placement_outcome",
+                    "quality_not_applicable",
+                ),
+                (
+                    "ercp_bile_duct_stone_extraction",
+                    "ercp_bile_duct_stone_extraction_outcome",
+                    "quality_not_applicable",
+                ),
+                (
+                    "ercp_post_ercp_pancreatitis",
+                    "ercp_post_ercp_pancreatitis_status",
+                    "quality_absent",
+                ),
             ],
         ),
         (
             "eus_quality_2025",
             "endoscopic_ultrasound",
             [
-                ("eus_informed_consent", "eus_informed_consent_status", "quality_obtained"),
-                ("eus_landmark_documentation", "eus_landmark_documentation_status", "quality_complete"),
-                ("eus_pancreatic_cyst_description", "eus_pancreatic_cyst_description_status", "quality_not_applicable"),
-                ("eus_tissue_acquisition", "eus_tissue_acquisition_result", "quality_not_applicable"),
+                (
+                    "eus_informed_consent",
+                    "eus_informed_consent_status",
+                    "quality_obtained",
+                ),
+                (
+                    "eus_landmark_documentation",
+                    "eus_landmark_documentation_status",
+                    "quality_complete",
+                ),
+                (
+                    "eus_pancreatic_cyst_description",
+                    "eus_pancreatic_cyst_description_status",
+                    "quality_not_applicable",
+                ),
+                (
+                    "eus_tissue_acquisition",
+                    "eus_tissue_acquisition_result",
+                    "quality_not_applicable",
+                ),
                 ("eus_adverse_events", "eus_adverse_event_status", "quality_absent"),
             ],
         ),

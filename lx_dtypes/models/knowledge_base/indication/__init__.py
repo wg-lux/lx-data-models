@@ -6,6 +6,7 @@ from .Indication import Indication
 from .IndicationDataDict import IndicationDataDict
 from .IndicationType import IndicationType
 from .IndicationTypeDataDict import IndicationTypeDataDict
+
 if TYPE_CHECKING:
     from .IndicationDjango import IndicationDjango
     from .IndicationTypeDjango import IndicationTypeDjango
@@ -26,6 +27,7 @@ kb_indication_lookup = KbIndicationLookupType(
 )
 
 if TYPE_CHECKING:
+
     class KbIndicationDjangoLookupType(TypedDict):
         Indication: type[IndicationDjango]
         IndicationType: type[IndicationTypeDjango]

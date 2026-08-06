@@ -6,6 +6,7 @@ from .Examination import Examination
 from .ExaminationDataDict import ExaminationDataDict
 from .ExaminationType import ExaminationType
 from .ExaminationTypeDataDict import ExaminationTypeDataDict
+
 if TYPE_CHECKING:
     from .ExaminationDjango import ExaminationDjango
     from .ExaminationTypeDjango import ExaminationTypeDjango
@@ -36,6 +37,7 @@ kb_examination_ddicts = Union[
 ]
 
 if TYPE_CHECKING:
+
     class KbExaminationDjangoLookupType(TypedDict):
         Examination: type[ExaminationDjango]
         ExaminationType: type[ExaminationTypeDjango]

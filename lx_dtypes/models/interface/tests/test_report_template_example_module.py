@@ -106,7 +106,9 @@ def test_advanced_endoscopy_templates_are_guideline_backed_and_publishable(
     assert guideline_id in {
         reference["guideline_id"] for reference in exported["guideline_references"]
     }
-    assert all(concept["guideline_citations"] for concept in exported["coverage_concepts"])
+    assert all(
+        concept["guideline_citations"] for concept in exported["coverage_concepts"]
+    )
 
 
 def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
@@ -132,9 +134,7 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
         reference["canonical_url"].startswith("https://")
         for reference in exported["guideline_references"]
     )
-    assert "Statement 2.36" in exported["guideline_references"][0][
-        "cited_sections"
-    ]
+    assert "Statement 2.36" in exported["guideline_references"][0]["cited_sections"]
     assert exported["coverage_version"] == "report_concept_coverage_v1"
     assert {concept["concept_id"] for concept in exported["coverage_concepts"]} == {
         "koloskopie.patientenidentitaet",
@@ -173,8 +173,7 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
         "koloskopie.komplikationsstatus",
     }
     assert all(
-        concept["guideline_citations"]
-        for concept in exported["coverage_concepts"]
+        concept["guideline_citations"] for concept in exported["coverage_concepts"]
     )
     assert list(sections) == [
         "patienten_und_untersuchungskontext",
@@ -259,8 +258,7 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
     product_requirement = next(
         classification
         for classification in medication_finding["classifications"]
-        if classification["classification"]
-        == "endoscopy_medication_product_and_dose"
+        if classification["classification"] == "endoscopy_medication_product_and_dose"
     )
     propofol_input = next(
         choice

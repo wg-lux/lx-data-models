@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, TypedDict, Union
 
 from lx_dtypes.models.knowledge_base.citation.Citation import Citation
 from lx_dtypes.models.knowledge_base.citation.CitationDataDict import CitationDataDict
+
 if TYPE_CHECKING:
     from lx_dtypes.models.knowledge_base.citation.CitationDjango import CitationDjango
 
@@ -22,6 +23,7 @@ kb_citation_models = Union[Citation,]
 kb_citation_ddicts = Union[CitationDataDict,]
 
 if TYPE_CHECKING:
+
     class KbCitationDjangoLookupType(TypedDict):
         Citation: type[CitationDjango]
 

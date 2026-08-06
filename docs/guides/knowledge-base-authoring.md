@@ -47,7 +47,7 @@ module directory, for example:
     "star_upper_gi": {
       "0.1.1": {
         "input_dirs": [
-          "https://github.com/wg-lux/lx-data-models/tree/main/demo-data/star_upper_gi"
+          "https://github.com/wg-lux/lx-data-models/tree/main/lx_dtypes/data/star_upper_gi"
         ]
       }
     }
@@ -62,6 +62,80 @@ existing YAML loader. Cache writes use the audited `endoreg_db` filesystem
 adapter supplied by the `lx-annotate` host. Only HTTPS `github.com` tree URLs
 are accepted. For reproducible deployments, use a commit SHA as the tree ref
 rather than a mutable branch name.
+
+## Storage Topology and Runtime Resolution
+
+`lx-dtypes` separates:
+
+- **Registry storage (`registry.json`)**: which module/version identities map to one or more physical roots.
+- **Module internals (`config.yaml` + `data/*`)**: what each KB version contains.
+
+The canonical package path is the repository-level root returned by
+`package_data_root()`, which is `lx_dtypes/data` in this project.
+A registry entry points to that root, not to a hardcoded absolute path inside
+`config.yaml`.
+
+```json
+{
+  "modules": {
+    "star_upper_gi": {
+      "0.1.1": {
+        "input_dirs": ["/home/admin/lx-data-models/lx_dtypes/data"]
+      }
+    }
+  },
+  "active": {
+    "module_name": "star_upper_gi",
+    "version": "0.1.1"
+  }
+}
+```
+
+### Startup auto-seed and fallback
+
+- At Django app startup `LxDtypesDjangoConfig.ready()` calls
+  `ensure_default_terminology_registry()`.
+- If `LX_DTYPES_KB_REGISTRY` does not exist, the seeding step writes nothing.
+- If the configured registry exists but has no usable `active` selection and no
+  modules, `_ensure_default_packaged_module()` seeds `star_upper_gi` from the
+  packaged data under `lx_dtypes/data` and sets the default active version.
+- If `active` is missing but modules exist, the loader picks the first available
+  registered bundle.
+
+This gives a deployed service a usable default while still preserving persistence
+for user selections because `active` is only rewritten when absent.
+
+### Import flow: from KB ZIP upload to `config.yaml`
+
+The backend import endpoint is `POST /terminology/bundles/import`.
+
+1. The API parses the ZIP (`_read_zip_file_map`) and normalizes a single-root ZIP
+   layout.
+2. It reads root `config.yaml` (`_read_bundle_identity`) to get
+   `module_name`, `version`, and optional `medical_field`.
+3. It resolves an import destination:
+   - `LX_DTYPES_TERMINOLOGY_IMPORT_ROOT` if set, otherwise
+     `<registry parent>/terminology-packages`.
+4. Files are written to
+   `<import root>/<module>/<version>/.tmp/<module>-<uuid>/...`, then atomically
+   moved to `<import root>/<module>/<version>`.
+5. `_register_imported_bundle()` stores the absolute `input_dirs` path for that version in
+   the registry and marks it active when imported through the endpoint.
+
+Because paths are now registry-driven, moving a KB version directory changes only
+registry state; `config.yaml` remains stable and local.
+
+### `config.yaml` path normalization model
+
+`DataLoader` discovers `config.yaml` from the resolved `input_dirs`, loads each
+candidate, then calls `KnowledgeBaseConfig.normalize_data_paths(config_file)`.
+
+- `data.dirs` and `data.files` are always resolved against
+  `config_file.parent`.
+- Internal paths therefore stay portable across absolute moves of the KB directory.
+
+In practice this means `registry.json` is the location layer, while `config.yaml`
+is the composition layer.
 
 ## Recommended Workflow
 
@@ -124,7 +198,7 @@ tree used by `lx-data-models`.
 The current Nix example package in `package.nix` packages:
 
 ```text
-demo-data/star_upper_gi/
+lx_dtypes/data/star_upper_gi/
 ```
 
 That means the module folder name is currently part of the packaging contract.
@@ -135,7 +209,7 @@ Important naming rule:
 
 In the current package definition:
 
-- `kbSource = ./demo-data/star_upper_gi;`
+- `kbSource = ./lx_dtypes/data/star_upper_gi;`
 - `kbModuleName = builtins.baseNameOf (toString kbSource);`
 - the Nix package name is derived from that folder name
 
@@ -146,20 +220,20 @@ If you change the published module name, update the packaged source folder to ma
 Run the KB linter against the module config or data directory:
 
 ```bash
-python scripts/lint_kb_yaml.py --config demo-data/star_upper_gi/config.yaml
+python scripts/lint_kb_yaml.py --config lx_dtypes/data/star_upper_gi/config.yaml
 ```
 
 or:
 
 ```bash
-python scripts/lint_kb_yaml.py demo-data/star_upper_gi
+python scripts/lint_kb_yaml.py lx_dtypes/data/star_upper_gi
 ```
 
 Use strict mode when you want authoring governance checks as part of CI:
 
 ```bash
 python scripts/lint_kb_yaml.py \
-  --config demo-data/star_upper_gi/config.yaml \
+  --config lx_dtypes/data/star_upper_gi/config.yaml \
   --strict-aliases \
   --strict-mixed-styles \
   --fail-on-warnings

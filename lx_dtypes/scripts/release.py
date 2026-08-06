@@ -33,10 +33,7 @@ def _init_path() -> Path:
 
 def _kb_config_paths() -> tuple[Path, ...]:
     root = _project_root()
-    return (
-        root / "lx_dtypes" / "data" / "star_upper_gi" / "config.yaml",
-        root / "demo-data" / "star_upper_gi" / "config.yaml",
-    )
+    return (root / "lx_dtypes" / "data" / "star_upper_gi" / "config.yaml",)
 
 
 def _kb_package_path() -> Path:

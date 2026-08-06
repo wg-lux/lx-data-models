@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, TypedDict, Union
 
 from .ClassificationChoice import ClassificationChoice
 from .ClassificationChoiceDataDict import ClassificationChoiceDataDict
+
 if TYPE_CHECKING:
     from .ClassificationChoiceDjango import ClassificationChoiceDjango
 
@@ -23,6 +24,7 @@ kb_classification_choice_models = Union[ClassificationChoice,]
 kb_classification_choice_ddicts = Union[ClassificationChoiceDataDict,]
 
 if TYPE_CHECKING:
+
     class KbClassificationChoiceDjangoLookupType(TypedDict):
         ClassificationChoice: type[ClassificationChoiceDjango]
 

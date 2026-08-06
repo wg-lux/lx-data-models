@@ -16,17 +16,38 @@ class FilesAndDirsModel(PathMixin):
         Parameters:
             base_dir (Path): Base directory used to resolve any relative paths.
         """
+        module_base_dir = base_dir.resolve()
 
         if self.file:
-            self.file = (base_dir / self.file).expanduser().resolve()
+            resolved = (module_base_dir / self.file).expanduser().resolve()
+            if not resolved.is_relative_to(module_base_dir):
+                raise ValueError(
+                    f"Unsafe file path for knowledge base data entry: {self.file}"
+                )
+            self.file = resolved
         if self.dir:
-            self.dir = (base_dir / self.dir).expanduser().resolve()
+            resolved = (module_base_dir / self.dir).expanduser().resolve()
+            if not resolved.is_relative_to(module_base_dir):
+                raise ValueError(
+                    f"Unsafe directory path for knowledge base data entry: {self.dir}"
+                )
+            self.dir = resolved
 
         for i, file_path in enumerate(self.files):
-            self.files[i] = (base_dir / file_path).expanduser().resolve()
+            resolved = (module_base_dir / file_path).expanduser().resolve()
+            if not resolved.is_relative_to(module_base_dir):
+                raise ValueError(
+                    f"Unsafe file path for knowledge base data entry: {file_path}"
+                )
+            self.files[i] = resolved
 
         for i, dir_path in enumerate(self.dirs):
-            self.dirs[i] = (base_dir / dir_path).expanduser().resolve()
+            resolved = (module_base_dir / dir_path).expanduser().resolve()
+            if not resolved.is_relative_to(module_base_dir):
+                raise ValueError(
+                    f"Unsafe directory path for knowledge base data entry: {dir_path}"
+                )
+            self.dirs[i] = resolved
 
     def get_files_with_suffix(self, suffix: Optional[str]) -> List[Path]:
         """

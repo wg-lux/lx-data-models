@@ -326,9 +326,7 @@ def test_configured_registry_requires_explicit_module_version(
     _write_kb_root(root, module_name=module_name, version="0.1.0")
     registry_path = tmp_path / "kb_registry.json"
     registry_path.write_text(
-        json.dumps(
-            {"modules": {module_name: {"0.1.0": {"input_dirs": [str(root)]}}}}
-        )
+        json.dumps({"modules": {module_name: {"0.1.0": {"input_dirs": [str(root)]}}}})
     )
 
     monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))

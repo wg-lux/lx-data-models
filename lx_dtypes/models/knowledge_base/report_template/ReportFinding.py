@@ -15,7 +15,9 @@ class ReportTemplateClassificationRequirement(BaseModel):
     required: bool = False
     concept_id: str | None = None
     applicability_rule: str | None = None
-    applicability_status: Literal["required", "conditional", "not_applicable"] | None = None
+    applicability_status: (
+        Literal["required", "conditional", "not_applicable"] | None
+    ) = None
     applicability_reason: str | None = None
 
 
@@ -25,7 +27,9 @@ class ReportTemplateFindingRequirement(BaseModel):
     multiple_allowed: bool = False
     concept_id: str | None = None
     applicability_rule: str | None = None
-    applicability_status: Literal["required", "conditional", "not_applicable"] | None = None
+    applicability_status: (
+        Literal["required", "conditional", "not_applicable"] | None
+    ) = None
     applicability_reason: str | None = None
     classifications: List[ReportTemplateClassificationRequirement] = Field(
         default_factory=list
@@ -38,7 +42,9 @@ class ReportFinding(KnowledgebaseBaseModel[ReportFindingDataDict]):
     multiple_allowed: bool = False
     concept_id: str | None = None
     applicability_rule: str | None = None
-    applicability_status: Literal["required", "conditional", "not_applicable"] | None = None
+    applicability_status: (
+        Literal["required", "conditional", "not_applicable"] | None
+    ) = None
     applicability_reason: str | None = None
     classifications: List[ReportTemplateClassificationRequirement] = Field(
         default_factory=list

@@ -45,7 +45,7 @@ def builder_terminology_registry(
                     "builder_module": {
                         "1.0.0": {"input_dirs": [str(tmp_path)]},
                     }
-                }
+                },
             }
         ),
         encoding="utf-8",

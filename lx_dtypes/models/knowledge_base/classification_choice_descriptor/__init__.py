@@ -8,6 +8,7 @@ from .ClassificationChoiceDescriptor import (
 from .ClassificationChoiceDescriptorDataDict import (
     ClassificationChoiceDescriptorDataDict,
 )
+
 if TYPE_CHECKING:
     from .ClassificationChoiceDescriptorDjango import (
         ClassificationChoiceDescriptorDjango,
@@ -31,6 +32,7 @@ kb_classification_choice_descriptor_ddicts = Union[
 ]
 
 if TYPE_CHECKING:
+
     class KbClassificationChoiceDescriptorDjangoLookupType(TypedDict):
         ClassificationChoiceDescriptor: type[ClassificationChoiceDescriptorDjango]
 

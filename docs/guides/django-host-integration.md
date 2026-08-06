@@ -21,6 +21,14 @@ The host project must configure:
   Path to the versioned registry containing an explicit active module and
   version. Findings, classifications, templates, and validation all resolve
   through this identity.
+- `LX_DTYPES_TERMINOLOGY_IMPORT_ROOT` (optional)
+  Base path for uploaded KB ZIP extraction.
+  Defaults to `<registry parent>/terminology-packages`.
+- `LX_DTYPES_KB_REGISTRY` seeding behavior
+  The Django app config calls `ensure_default_terminology_registry()` in startup.
+  If `active` is missing and no registered modules are present, it seeds the
+  packaged default from `lx_dtypes/data/star_upper_gi` and sets active
+  selection.
 
 Example:
 
@@ -28,6 +36,7 @@ Example:
 # settings.py
 LX_DTYPES_HOST_MODELS_MODULE = "endoreg_db.models"
 LX_DTYPES_KB_REGISTRY = "/var/lib/host/terminology/registry.json"
+LX_DTYPES_TERMINOLOGY_IMPORT_ROOT = "/var/lib/host/terminology/terminology-packages"
 ```
 
 ## URL Mounting

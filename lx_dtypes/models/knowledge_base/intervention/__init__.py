@@ -30,6 +30,7 @@ kb_intervention_lookup = KbInterventionLookupType(
     InterventionType=InterventionType,
 )
 if TYPE_CHECKING:
+
     class KbInterventionDjangoLookupType(TypedDict):
         Intervention: type[InterventionDjango]
         InterventionType: type[InterventionTypeDjango]

@@ -5,7 +5,13 @@ from datetime import datetime, timezone
 from typing import cast
 from uuid import UUID, uuid4
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    model_validator,
+)
 
 from .json_types import JsonValue
 
@@ -110,6 +116,22 @@ class DtypesRecordPersistencePayload(_DtypesRecordLedgerPayload):
     patient_indications: list[DtypesRecordIndicationPayload] = Field(
         default_factory=list
     )
+
+    @model_validator(mode="after")
+    def validate_patient_examination(self) -> "DtypesRecordPersistencePayload":
+        for finding in self.patient_findings:
+            if finding.patient_examination != self.examination:
+                raise ValueError(
+                    "Patient findings must reference the same patient_examination as the "
+                    "persistence payload."
+                )
+        for indication in self.patient_indications:
+            if indication.patient_examination != self.examination:
+                raise ValueError(
+                    "Patient indications must reference the same patient_examination as the "
+                    "persistence payload."
+                )
+        return self
 
 
 def parse_dtypes_record_persistence_payload(

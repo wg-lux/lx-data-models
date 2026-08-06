@@ -6,6 +6,7 @@ from .Unit import Unit
 from .UnitDataDict import UnitDataDict
 from .UnitType import UnitType
 from .UnitTypeDataDict import UnitTypeDataDict
+
 if TYPE_CHECKING:
     from .UnitDjango import UnitDjango
     from .UnitTypeDjango import UnitTypeDjango
@@ -36,6 +37,7 @@ kb_unit_ddicts = Union[
 ]
 
 if TYPE_CHECKING:
+
     class KbUnitDjangoLookupType(TypedDict):
         Unit: type[UnitDjango]
         UnitType: type[UnitTypeDjango]

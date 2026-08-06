@@ -39,6 +39,7 @@ kb_information_source_ddicts = Union[
     InformationSourceDataDict, InformationSourceTypeDataDict
 ]
 if TYPE_CHECKING:
+
     class KbInformationSourceDjangoLookupType(TypedDict):
         InformationSource: type[InformationSourceDjango]
         InformationSourceType: type[InformationSourceTypeDjango]

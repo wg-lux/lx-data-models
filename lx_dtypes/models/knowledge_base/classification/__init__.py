@@ -38,6 +38,7 @@ kb_classification_ddicts = Union[
 ]
 
 if TYPE_CHECKING:
+
     class KbClassificationDjangoLookupType(TypedDict):
         Classification: type[ClassificationDjango]
         ClassificationType: type[ClassificationTypeDjango]
