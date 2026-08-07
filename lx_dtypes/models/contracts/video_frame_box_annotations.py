@@ -5,7 +5,7 @@ from typing import TypeAlias, cast
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .json_types import JsonNumericObject, JsonScalar
+from .json_types import JsonNumericObject, JsonObject, JsonScalar, JsonValue
 from .video_frame_annotations import FrameBoxAnnotationBulkEnvelopePayload
 
 VideoFrameBoxJsonObject: TypeAlias = JsonNumericObject
@@ -15,8 +15,16 @@ def _empty_annotation_list() -> list[VideoFrameBoxJsonObject]:
     return []
 
 
-def _normalize_mapping(value: Mapping[object, object]) -> VideoFrameBoxJsonObject:
-    return {str(key): cast(JsonScalar, item) for key, item in value.items()}
+def _normalize_mapping(
+    value: Mapping[object, JsonValue],
+) -> VideoFrameBoxJsonObject:
+    return {str(key): _normalize_scalar(item) for key, item in value.items()}
+
+
+def _normalize_scalar(value: JsonValue) -> JsonScalar:
+    if isinstance(value, (str, int, float, bool)):
+        return value
+    return ""
 
 
 VideoFrameBoxAnnotationRequestPayload = FrameBoxAnnotationBulkEnvelopePayload
@@ -97,14 +105,16 @@ def validate_video_phi_frame_observations(
     return observations
 
 
-def video_frame_box_json_safe_dict(payload: object) -> VideoFrameBoxJsonObject:
+def video_frame_box_json_safe_dict(
+    payload: JsonObject,
+) -> VideoFrameBoxJsonObject:
     if not isinstance(payload, Mapping):
         return {}
-    return _normalize_mapping(payload)
+    return _normalize_mapping(cast(Mapping[object, JsonValue], payload))
 
 
 def validate_video_frame_box_annotation_request(
-    payload: object,
+    payload: JsonObject | list[JsonObject],
 ) -> VideoFrameBoxAnnotationRequestPayload:
     if isinstance(payload, list):
         return VideoFrameBoxAnnotationRequestPayload.model_validate(

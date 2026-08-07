@@ -11,6 +11,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from lx_dtypes.models.contracts.json_types import JsonObject
 
 
 class PatientFindingClassificationSubcategoryPayload(BaseModel):
@@ -96,10 +97,8 @@ class PatientFindingClassificationNumericalDescriptorsPayload(
     model_config = ConfigDict(frozen=True, strict=True)
 
 
-PatientFindingClassificationSubcategoriesData: TypeAlias = dict[str, dict[str, object]]
-PatientFindingClassificationNumericalDescriptorsData: TypeAlias = dict[
-    str, dict[str, object]
-]
+PatientFindingClassificationSubcategoriesData: TypeAlias = dict[str, JsonObject]
+PatientFindingClassificationNumericalDescriptorsData: TypeAlias = dict[str, JsonObject]
 
 
 __all__ = [

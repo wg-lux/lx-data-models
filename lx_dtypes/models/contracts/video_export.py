@@ -77,7 +77,9 @@ class VideoAnnotationExportRequestPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def _coerce_payload_bool(cls, value: object) -> object:
+    def _coerce_payload_bool(
+        cls, value: bool | str | int | None
+    ) -> bool | str | int | None:
         if value is None or isinstance(value, bool):
             return value
         if isinstance(value, str):

@@ -18,10 +18,12 @@ class VideoTextMetaPayload(RootModel[dict[str, VideoTextMetaValue]]):
 
     @field_validator("root", mode="before")
     @classmethod
-    def normalize_root(cls, value: object) -> dict[str, VideoTextMetaValue]:
+    def normalize_root(
+        cls, value: Mapping[str, VideoTextMetaValue]
+    ) -> dict[str, VideoTextMetaValue]:
         if not isinstance(value, Mapping):
             raise ValueError("video text metadata must be a JSON object")
-        mapping = cast(Mapping[object, object], value)
+        mapping = cast(Mapping[object, VideoTextMetaValue], value)
         return {
             str(key): cast(VideoTextMetaValue, item) for key, item in mapping.items()
         }

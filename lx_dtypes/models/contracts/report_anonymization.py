@@ -204,22 +204,23 @@ class ReportAnonymizationResult(BaseModel):
 
     @field_validator("original_text", "anonymized_text", mode="before")
     @classmethod
-    def normalize_text(cls, value: object) -> str:
+    def normalize_text(cls, value: str | int | float | bool | None) -> str:
         if value is None:
             return ""
         return str(value)
 
     @field_validator("extracted_metadata", mode="before")
     @classmethod
-    def normalize_extracted_metadata(cls, value: object) -> SensitiveMeta:
+    def normalize_extracted_metadata(
+        cls, value: SensitiveMeta | dict | None
+    ) -> SensitiveMeta:
         if isinstance(value, SensitiveMeta):
             return value
         return SensitiveMeta.from_dict(value if isinstance(value, dict) else None)
 
     @classmethod
     def from_process_report_result(
-        cls,
-        value: Sequence[object],
+        cls, value: Sequence[str | Path | dict | None]
     ) -> "ReportAnonymizationResult":
         if len(value) != 4:
             raise ValueError("process_report result must contain exactly four values")

@@ -140,7 +140,10 @@ def register_report_template_routes(
         del request
         kb = load_module_kb(module_name)
         matches: list[Dict[str, Any]] = []
-        for template_name, template in kb.report_template.items():
+        for template_name, template in cast(
+            Mapping[str, Any], kb.report_template
+        ).items():
+            template = cast(Any, template)
             if template.examination != examination_name:
                 continue
             if kb.get_report_template_lifecycle_status(template_name) != "published":
@@ -161,7 +164,10 @@ def register_report_template_routes(
         require_builder_access(request, "report_template:read")
         kb = load_module_kb(module_name)
         matches: list[Dict[str, Any]] = []
-        for template_name, template in kb.report_template.items():
+        for template_name, template in cast(
+            Mapping[str, Any], kb.report_template
+        ).items():
+            template = cast(Any, template)
             if template.examination != examination_name:
                 continue
             matches.append(kb.export_report_template_preview(template_name))

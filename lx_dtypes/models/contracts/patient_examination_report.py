@@ -136,18 +136,18 @@ class PatientFindingClassificationHistoryData(TypedDict):
     classification_choice_id: int | None
     classification_name: str | None
     classification_choice_name: str | None
-    subcategories: object
-    numerical_descriptors: object
+    subcategories: ReportJsonObject
+    numerical_descriptors: ReportJsonObject
 
 
 class PatientFindingInterventionHistoryData(TypedDict):
     id: int
     intervention_id: int | None
     intervention_name: str | None
-    state: object
-    date: object
-    time_start: object
-    time_end: object
+    state: str | None
+    date: str | None
+    time_start: str | None
+    time_end: str | None
 
 
 class PatientFindingHistoryData(TypedDict):
@@ -162,8 +162,8 @@ class PreviousPatientExaminationHistoryData(TypedDict):
     patient_examination_id: int
     examination_id: int | None
     examination_name: str | None
-    date_start: object
-    date_end: object
+    date_start: str | None
+    date_end: str | None
     findings: list[PatientFindingHistoryData]
 
 
@@ -175,21 +175,21 @@ class PatientExaminationHistoryContextData(TypedDict):
 
 
 class PatientFindingClassificationSyncData(TypedDict, total=False):
-    classification_id: object
-    classification: object
-    classification_choice_id: object
-    classification_choice: object
-    subcategories: object
-    numerical_descriptors: object
+    classification_id: int | None
+    classification: str | None
+    classification_choice_id: int | None
+    classification_choice: str | None
+    subcategories: ReportJsonObject
+    numerical_descriptors: ReportJsonObject
 
 
 class PatientFindingInterventionSyncData(TypedDict, total=False):
-    intervention_id: object
-    intervention: object
-    state: object
-    date: object
-    time_start: object
-    time_end: object
+    intervention_id: int | None
+    intervention: str | None
+    state: str | None
+    date: str | None
+    time_start: str | None
+    time_end: str | None
 
 
 class SegmentFrameSelectorQueryData(TypedDict, total=False):
@@ -267,10 +267,12 @@ class ReportSegmentFrameSelectionPayload(BaseModel):
 
     @field_validator("relative_path", "updated_at", "selection_source", mode="before")
     @classmethod
-    def blank_to_none(cls, value: object) -> object:
+    def blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
         if isinstance(value, str):
             return value.strip() or None
-        return value
+        if value is None:
+            return None
+        return str(value).strip() or None
 
 
 class SegmentFrameSelectorQueryPayload(BaseModel):
@@ -281,7 +283,7 @@ class SegmentFrameSelectorQueryPayload(BaseModel):
 
     @field_validator("patient_examination_id", "report_id", mode="before")
     @classmethod
-    def normalize_optional_id(cls, value: object) -> object:
+    def normalize_optional_id(cls, value: int | str | None) -> int | str | None:
         if value == "":
             return None
         return value
@@ -297,41 +299,47 @@ class SegmentFrameSelectorPatchPayload(SegmentFrameSelectorQueryPayload):
 
     @field_validator("action", mode="before")
     @classmethod
-    def normalize_action(cls, value: object) -> str:
+    def normalize_action(cls, value: str | int | None) -> str:
         return str(value or "set").strip().lower()
 
     @field_validator("frame_number", "finding_id", "template_name", mode="before")
     @classmethod
-    def normalize_blank_optional(cls, value: object) -> object:
+    def normalize_blank_optional(cls, value: int | str | None) -> int | str | None:
         if value == "":
             return None
         if isinstance(value, str) and not value.strip():
             return None
+        if value is None:
+            return None
         return value
 
 
-def report_json_safe(value: object) -> ReportJsonValue:
+def report_json_safe(
+    value: object,
+) -> ReportJsonValue:
     if value is None or isinstance(value, (str, int, float, bool)):
         return cast(ReportJsonValue, value)
     if isinstance(value, Mapping):
-        mapping = cast(Mapping[object, object], value)
+        mapping = cast(Mapping[str, object], value)
         return cast(
             ReportJsonValue,
             {str(key): report_json_safe(item) for key, item in mapping.items()},
         )
     if isinstance(value, (list, tuple)):
-        items = cast(list[object] | tuple[object, ...], value)
-        return cast(ReportJsonValue, [report_json_safe(item) for item in items])
+        return cast(ReportJsonValue, [report_json_safe(item) for item in value])
     if isinstance(value, (date, datetime)):
         return cast(ReportJsonValue, value.isoformat())
     return cast(ReportJsonValue, str(value))
 
 
-def report_json_safe_dict(payload: object) -> ReportJsonObject:
+def report_json_safe_dict(payload: Mapping[str, JsonValue]) -> ReportJsonObject:
     if not isinstance(payload, Mapping):
         return {}
     mapping = cast(Mapping[object, object], payload)
-    return {str(key): report_json_safe(value) for key, value in mapping.items()}
+    return cast(
+        ReportJsonObject,
+        {str(key): report_json_safe(value) for key, value in mapping.items()},
+    )
 
 
 def dump_report_submission_payload(
@@ -375,7 +383,7 @@ def validate_segment_selection_map(payload: object) -> ReportSegmentSelectionMap
     for key, value in selection_map.items():
         if not isinstance(value, Mapping):
             raise ValueError(f"segment selection entry {key!s} must be a JSON object")
-        selection = cast(Mapping[str, object], value)
+        selection = cast(Mapping[str, JsonValue], value)
         result[str(key)] = dump_segment_frame_selection_payload(
             ReportSegmentFrameSelectionPayload.model_validate(dict(selection))
         )

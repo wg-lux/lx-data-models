@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -10,7 +11,7 @@ class VideoFrameStateContract(BaseModel):
 
 
 def parse_video_frame_state_payload(
-    payload: object,
+    payload: Mapping[str, int | float | str | bool | None] | None,
 ) -> VideoFrameStateContract:
     return VideoFrameStateContract.model_validate(payload or {})
 

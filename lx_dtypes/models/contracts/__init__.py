@@ -321,8 +321,25 @@ from .patient_examination_report import (
     report_json_safe_dict,
     validate_segment_selection_map,
 )
+from .report import (
+    Report,
+    ReportMetaJsonObject,
+    ReportMetaJsonValue,
+    ReportPayload,
+    ReportVersion,
+    SerializedReport,
+)
 from .patient_examination import PatientExaminationPatientDataPayload
 from .pdf_meta import PdfMetaPayload, PdfTypeSummaryPayload
+from .pdf_file import (
+    PdfFileContextPayload,
+    PdfFileIdentityPayload,
+    PdfFileMetaJsonObject,
+    PdfFileMetaJsonValue,
+    PdfFilePayload,
+    PdfFileProcessingStatePayload,
+    PdfFileStoragePayload,
+)
 from .transfer_validation import (
     TransferValidationFailureLogPayload,
     TransferValidationLogScalar,
@@ -405,6 +422,15 @@ from .video_examination import (
     dump_video_examination_update_payload,
     validate_video_examination_list_query,
     validate_video_examination_path_payload,
+)
+from .video_file import (
+    FrameSourceMode,
+    VideoFileIdentityPayload,
+    VideoFileMetaJsonObject,
+    VideoFileMetaJsonValue,
+    VideoFilePayload,
+    VideoFileStoragePayload,
+    VideoFileTechnicalMetadataPayload,
 )
 from .video_frame_box_annotations import (
     VideoFrameBoxAnnotationListResponsePayload,
@@ -762,6 +788,13 @@ __all__ = [
     "PatientFindingClassificationSubcategoriesPayload",
     "PdfMetaPayload",
     "PdfTypeSummaryPayload",
+    "PdfFileContextPayload",
+    "PdfFileIdentityPayload",
+    "PdfFileMetaJsonObject",
+    "PdfFileMetaJsonValue",
+    "PdfFilePayload",
+    "PdfFileProcessingStatePayload",
+    "PdfFileStoragePayload",
     "validate_patient_finding_classification_create_payload",
     "PatientExaminationReportMakeReportData",
     "PatientExaminationReportMakeReportPayload",
@@ -779,6 +812,8 @@ __all__ = [
     "ReportExportFrameDetailData",
     "ReportJsonObject",
     "ReportJsonValue",
+    "ReportMetaJsonObject",
+    "ReportMetaJsonValue",
     "ReportPersistedArtifactsData",
     "ReportPersistedArtifactsPayload",
     "ReportSegmentFrameSelectionData",
@@ -805,6 +840,10 @@ __all__ = [
     "report_json_safe",
     "report_json_safe_dict",
     "validate_segment_selection_map",
+    "Report",
+    "ReportPayload",
+    "ReportVersion",
+    "SerializedReport",
     "ReportAnonymizationResult",
     "REPORT_ANONYMIZATION_CONTRACT_VERSION",
     "ReportAnonymizationContractVersion",
@@ -871,6 +910,13 @@ __all__ = [
     "dump_video_examination_update_payload",
     "validate_video_examination_list_query",
     "validate_video_examination_path_payload",
+    "FrameSourceMode",
+    "VideoFileIdentityPayload",
+    "VideoFileMetaJsonObject",
+    "VideoFileMetaJsonValue",
+    "VideoFilePayload",
+    "VideoFileStoragePayload",
+    "VideoFileTechnicalMetadataPayload",
     "VideoFrameBoxAnnotationListResponsePayload",
     "VideoFrameBoxAnnotationMutationResponsePayload",
     "VideoFrameBoxAnnotationRequestPayload",

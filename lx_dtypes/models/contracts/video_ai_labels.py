@@ -22,7 +22,7 @@ def _empty_huggingface_model_list() -> list[VideoAiHuggingFaceModelPayload]:
     return []
 
 
-def _strip_optional_text(value: object) -> object:
+def _strip_optional_text(value: str | int | float | bool | None) -> str | None:
     if value is None:
         return None
     if isinstance(value, str):
@@ -133,7 +133,9 @@ class VideoAiRerunPredictionRequestPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def _normalize_optional_text(cls, value: object) -> object:
+    def _normalize_optional_text(
+        cls, value: str | int | float | bool | None
+    ) -> str | None:
         return _strip_optional_text(value)
 
     @field_validator(
@@ -143,7 +145,7 @@ class VideoAiRerunPredictionRequestPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def _normalize_bool(cls, value: object) -> object:
+    def _normalize_bool(cls, value: bool | str | int | None) -> bool | str | int | None:
         if value is None or isinstance(value, bool):
             return value
         if isinstance(value, str):
@@ -234,7 +236,7 @@ class VideoAiLabelMutationResponsePayload(BaseModel):
         return cast(VideoAiJsonObject, self.model_dump(mode="json", exclude_none=True))
 
 
-def video_ai_json_safe_dict(payload: object) -> VideoAiJsonObject:
+def video_ai_json_safe_dict(payload: Mapping[str, JsonValue]) -> VideoAiJsonObject:
     if not isinstance(payload, Mapping):
         return {}
     mapping = cast(Mapping[object, object], payload)
@@ -242,19 +244,21 @@ def video_ai_json_safe_dict(payload: object) -> VideoAiJsonObject:
 
 
 def validate_video_ai_rerun_prediction_request(
-    payload: object,
+    payload: Mapping[str, JsonValue],
 ) -> VideoAiRerunPredictionRequestPayload:
     return VideoAiRerunPredictionRequestPayload.model_validate(
         video_ai_json_safe_dict(payload)
     )
 
 
-def validate_video_ai_label_name_payload(payload: object) -> VideoAiLabelNamePayload:
+def validate_video_ai_label_name_payload(
+    payload: Mapping[str, JsonValue],
+) -> VideoAiLabelNamePayload:
     return VideoAiLabelNamePayload.model_validate(video_ai_json_safe_dict(payload))
 
 
 def validate_video_ai_label_rename_payload(
-    payload: object,
+    payload: Mapping[str, JsonValue],
 ) -> VideoAiLabelRenamePayload:
     return VideoAiLabelRenamePayload.model_validate(video_ai_json_safe_dict(payload))
 

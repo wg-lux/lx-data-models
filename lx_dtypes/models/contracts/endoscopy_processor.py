@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict
 from lx_dtypes.models.meta.VideoMeta import VideoRoiBox
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 
 class RoiBoxCore(VideoRoiBox):
@@ -66,7 +68,7 @@ def roi_box_to_crop_template(
     return [y, y + height, x, x + width]
 
 
-def roi_box_from_object(value: object) -> RoiBoxCore:
+def roi_box_from_object(value: RoiBoxCore | Mapping[str, JsonValue]) -> RoiBoxCore:
     """
     Normalize a VideoMeta/processor ROI-like object into RoiBoxCore.
 
@@ -78,7 +80,9 @@ def roi_box_from_object(value: object) -> RoiBoxCore:
     return RoiBoxCore.model_validate(value)
 
 
-def roi_box_or_none_from_object(value: object | None) -> RoiBoxCore | None:
+def roi_box_or_none_from_object(
+    value: RoiBoxCore | Mapping[str, JsonValue] | None,
+) -> RoiBoxCore | None:
     """Normalize a nullable ROI-like object into RoiBoxCore."""
     if value is None:
         return None

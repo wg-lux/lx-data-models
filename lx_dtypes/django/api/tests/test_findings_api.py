@@ -19,6 +19,7 @@ try:
     FindingClassification = host_models.FindingClassification
     FindingClassificationChoice = host_models.FindingClassificationChoice
     Gender = host_models.Gender
+    Indication = host_models.Indication
     Patient = host_models.Patient
     PatientExamination = host_models.PatientExamination
 except (ModuleNotFoundError, RuntimeError, AttributeError):  # pragma: no cover
@@ -75,6 +76,7 @@ def _mock_kb_lookup(module_name: str, version: str | None = None) -> dict[str, A
             "finding": {},
             "classification": {},
             "classification_choice": {},
+            "indication": {},
         }
     normalized_version = str(version or "").strip()
     if normalized_version == "1.0.0":
@@ -83,6 +85,7 @@ def _mock_kb_lookup(module_name: str, version: str | None = None) -> dict[str, A
                 "colonoscopy": {
                     "name": "colonoscopy",
                     "findings": ["colon_polyp"],
+                    "indications": ["screening"],
                 }
             },
             "finding": {
@@ -100,6 +103,9 @@ def _mock_kb_lookup(module_name: str, version: str | None = None) -> dict[str, A
             "classification_choice": {
                 "small_polyp": {"name": "small_polyp"},
             },
+            "indication": {
+                "screening": {"name": "screening"},
+            },
         }
     if normalized_version == "2.0.0":
         return {
@@ -107,23 +113,49 @@ def _mock_kb_lookup(module_name: str, version: str | None = None) -> dict[str, A
                 "colonoscopy": {
                     "name": "colonoscopy",
                     "findings": [],
+                    "indications": [],
                 }
             },
             "finding": {},
             "classification": {},
             "classification_choice": {},
+            "indication": {},
         }
     return {
         "examination": {},
         "finding": {},
         "classification": {},
         "classification_choice": {},
+        "indication": {},
     }
+
+
+def _create_exam_graph_with_indication() -> tuple[Any, Any, Any, Any, Any]:
+    examination = Examination.objects.create(name="colonoscopy")
+    finding = Finding.objects.create(name="colon_polyp")
+    examination.findings.add(finding)
+    classification = FindingClassification.objects.create(
+        name="size_classification",
+        description="Size category",
+    )
+    choice_small = FindingClassificationChoice.objects.create(
+        name="small_polyp",
+        description="small",
+        subcategories={},
+        numerical_descriptors={},
+    )
+    classification.choices.add(choice_small)
+    finding.finding_classifications.add(classification)
+    indication = Indication.objects.create(name="screening")
+    examination.indications.add(indication)
+    return examination, finding, classification, choice_small, indication
 
 
 def test_base_api_findings_read_endpoints_shape() -> None:
     client = Client()
-    examination, finding, classification, choice = _create_exam_graph()
+    examination, finding, classification, choice, indication = (
+        _create_exam_graph_with_indication()
+    )
 
     findings_res = client.get(
         f"/base_api/examinations/{examination.id}/findings/",
@@ -156,12 +188,39 @@ def test_base_api_findings_read_endpoints_shape() -> None:
     assert "choices" in choices_payload
     assert choices_payload["choices"][0]["id"] == choice.id
 
+    indications_res = client.get(
+        f"/base_api/examinations/{examination.id}/indications/",
+        secure=True,
+    )
+    assert indications_res.status_code == 200
+    indications_payload = indications_res.json()
+    assert isinstance(indications_payload, list)
+    assert indications_payload[0]["name"] == "screening"
+
+    indications_tree_res = client.get(
+        "/base_api/indications/tree/",
+        secure=True,
+    )
+    assert indications_tree_res.status_code == 200
+    indications_tree_payload = indications_tree_res.json()
+    assert isinstance(indications_tree_payload, list)
+    tree_screening = next(
+        (item for item in indications_tree_payload if item["name"] == "screening"), None
+    )
+    assert tree_screening is not None
+    assert any(
+        examination_entry["id"] == examination.id
+        for examination_entry in tree_screening.get("examinations", [])
+    )
+
 
 def test_base_api_findings_read_endpoints_support_module_version_overrides(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     client = Client()
-    examination, finding, classification, choice = _create_exam_graph()
+    examination, finding, classification, choice, indication = (
+        _create_exam_graph_with_indication()
+    )
     monkeypatch.setattr(findings_routes, "_kb_lookup", _mock_kb_lookup)
 
     legacy_findings = client.get(
@@ -208,6 +267,44 @@ def test_base_api_findings_read_endpoints_support_module_version_overrides(
     )
     assert modern_choices.status_code == 200
     assert modern_choices.json() == {"choices": []}
+
+    legacy_indications = client.get(
+        f"/base_api/examinations/{examination.id}/indications/?module_name=catalog_module&module_version=1.0.0",
+        secure=True,
+    )
+    assert legacy_indications.status_code == 200
+    assert len(legacy_indications.json()) == 1
+    assert legacy_indications.json()[0]["id"] == indication.id
+
+    modern_indications = client.get(
+        f"/base_api/examinations/{examination.id}/indications/?module_name=catalog_module&module_version=2.0.0",
+        secure=True,
+    )
+    assert modern_indications.status_code == 200
+    assert modern_indications.json() == []
+
+    legacy_tree = client.get(
+        "/base_api/indications/tree/?module_name=catalog_module&module_version=1.0.0",
+        secure=True,
+    )
+    assert legacy_tree.status_code == 200
+    legacy_tree_payload = legacy_tree.json()
+    assert isinstance(legacy_tree_payload, list)
+    assert any(node["name"] == indication.name for node in legacy_tree_payload)
+    legacy_screening_node = next(
+        node for node in legacy_tree_payload if node["name"] == indication.name
+    )
+    assert any(
+        examination_entry["id"] == examination.id
+        for examination_entry in legacy_screening_node.get("examinations", [])
+    )
+
+    modern_tree = client.get(
+        "/base_api/indications/tree/?module_name=catalog_module&module_version=2.0.0",
+        secure=True,
+    )
+    assert modern_tree.status_code == 200
+    assert modern_tree.json() == []
 
 
 def test_base_api_findings_read_routes_use_patient_examination_kb_when_requested(

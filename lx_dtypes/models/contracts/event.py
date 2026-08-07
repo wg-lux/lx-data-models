@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 # Common configuration shared across your core DTOs
 # Keeps data immutable, strict, and prevents unexpected fields
@@ -26,8 +27,8 @@ class EventClassificationChoiceCore(BaseModel):
     name: str
     event_classification_name: str
     # Typed dicts slightly better by specifying keys are strings
-    subcategories: dict[str, object] = Field(default_factory=dict)
-    numerical_descriptors: dict[str, object] = Field(default_factory=dict)
+    subcategories: dict[str, JsonValue] = Field(default_factory=dict)
+    numerical_descriptors: dict[str, JsonValue] = Field(default_factory=dict)
 
 
 class EventClassificationDeep(EventClassificationCore):

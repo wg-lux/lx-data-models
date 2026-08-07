@@ -9,7 +9,7 @@ class NamedObject(Protocol):
     name: str
 
 
-def normalize_name_reference(value: object, *, default: str) -> str:
+def normalize_name_reference(value: str | NamedObject | None, *, default: str) -> str:
     source_value = getattr(value, "name", value)
     normalized = str(source_value or default).strip()
     return normalized or default
@@ -22,5 +22,5 @@ class InformationSourceRef(BaseModel):
 
     @field_validator("name", mode="before")
     @classmethod
-    def normalize(cls, value: object) -> str:
+    def normalize(cls, value: str | NamedObject | None) -> str:
         return normalize_name_reference(value, default="manual_annotation")

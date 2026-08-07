@@ -1,7 +1,7 @@
 # /lx-data-models/lx_dtypes/models/contracts/frame_annotation.py
 from __future__ import annotations
 
-from typing import Any, Literal, cast
+from typing import Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -51,7 +51,7 @@ class FrameAnnotationQueueSpecPayload(BaseModel):
 
     @field_validator("information_source_name", mode="before")
     @classmethod
-    def normalize_information_source_name(cls, value: object) -> str:
+    def normalize_information_source_name(cls, value: str | None) -> str:
         return normalize_name_reference(value, default="manual_annotation")
 
 
@@ -101,7 +101,7 @@ class FrameAnnotationQueueResultPayload(BaseModel):
 
     tasks: list[FrameAnnotationTaskPayload]
     selection_strategy: str
-    label_distribution: list[dict[str, Any]] = Field(default_factory=list)
+    label_distribution: list[JsonObject] = Field(default_factory=list)
     selected_label_counts: dict[str, int] = Field(default_factory=dict)
     segment_bucket_counts: dict[str, int] = Field(default_factory=dict)
     annotation_bucket_counts: dict[str, int] = Field(default_factory=dict)

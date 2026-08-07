@@ -1,0 +1,44 @@
+- model: report_template_section
+  name: upper_gi_mini_baseline
+  position: 0
+  section_kind: findings
+  types:
+    - baseline
+  findings:
+    - finding: star_upper_gi_mucosa_esophagus_abnormal
+      required: true
+      multiple_allowed: false
+      classifications:
+        - classification: yes_no_unknown_classification
+          required: true
+
+- model: report_template
+  name: star_upper_gi_mini_report_template
+  name_de: "STAR Upper GI – Basismodul"
+  name_en: "STAR Upper GI – Basic Template"
+  description: "Minimal lauffähiges Template für star_upper_gi-Endoskopie mit gültiger Coverage-Definition."
+  examination: star_upper_gi_endoscopy
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - concept_id: upper_gi.baseline.esophagus_mucosa_status
+      label: Esophagussichtbefund
+      applicability_status: required
+      evidence_path:
+        - patient_findings
+      finding_selector:
+        finding_name: star_upper_gi_mucosa_esophagus_abnormal
+        classification_name: yes_no_unknown_classification
+      allowed_values:
+        - yes
+        - no
+        - unknown
+      guideline_citations:
+        - "Local baseline coverage reference"
+  report_sections:
+    - upper_gi_mini_baseline
+  validators:
+    examination_validators: []
+    findings_validators: []
+    classification_validators: []
+    intervention_validators: []
+    unit_validators: []

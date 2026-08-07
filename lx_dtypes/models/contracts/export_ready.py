@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict, field_validator
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 
 class VideoReadyForExportData(TypedDict):
@@ -20,12 +21,13 @@ class VideoReadyForExportPayload(BaseModel):
 
     @field_validator("center_key", "processed_file_sha256", mode="before")
     @classmethod
-    def blank_to_none(cls, value: object) -> object:
+    def blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
         if value is None:
             return None
         if isinstance(value, str):
             return value.strip() or None
-        return value
+        converted = str(value).strip()
+        return converted or None
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,7 +38,7 @@ class ReadyForExportResult:
     ready_for_export_by: str
     processed_file_sha256: str
 
-    def to_dict(self) -> dict[str, object | None]:
+    def to_dict(self) -> dict[str, JsonValue | None]:
         return {
             "video_id": self.video_id,
             "ready_for_export": self.ready_for_export,
@@ -47,7 +49,7 @@ class ReadyForExportResult:
 
 
 def validate_video_ready_for_export_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> VideoReadyForExportPayload:
     return VideoReadyForExportPayload.model_validate(dict(payload))
 

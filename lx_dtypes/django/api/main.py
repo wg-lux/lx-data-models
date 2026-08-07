@@ -38,6 +38,7 @@ from .findings_routes import (
     clear_findings_route_caches,
     register_findings_routes,
 )
+from .indications_routes import register_indications_routes
 from .examinations_routes import register_examinations_routes
 from .request_types import BaseRequest
 from .report_template_routes import register_report_template_routes
@@ -677,6 +678,12 @@ register_findings_routes(
     persist_patient_examination_dtypes_record=lambda *args, **kwargs: (
         _persist_patient_examination_dtypes_record(*args, **kwargs)
     ),
+)
+
+register_indications_routes(
+    api,
+    orm_models=lambda: _orm_models(),
+    api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
 )
 
 register_examinations_routes(

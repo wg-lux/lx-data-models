@@ -27,7 +27,7 @@ class VideoEncoderConfig(BaseModel):
         mode="before",
     )
     @classmethod
-    def normalize_non_empty_text(cls, value: object) -> str:
+    def normalize_non_empty_text(cls, value: str | int | float | bool | None) -> str:
         normalized = str(value).strip()
         if not normalized:
             raise ValueError("value must not be empty")
@@ -46,7 +46,7 @@ class VideoMaskConfig(BaseModel):
 
     @field_validator("x", "y", "width", "height", "image_width", "image_height")
     @classmethod
-    def validate_int(cls, value: object) -> int:
+    def validate_int(cls, value: str | int | float | bool | None) -> int:
         normalized = int(str(value))
         if normalized < 0:
             raise ValueError("value must be >= 0")

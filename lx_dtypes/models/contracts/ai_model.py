@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .json_types import JsonObject
+
 
 class AiModelSerializerInputPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
@@ -20,13 +22,13 @@ class AiModelSerializerOutputPayload(BaseModel):
 
 
 def validate_ai_model_serializer_input_payload(
-    payload: object,
+    payload: JsonObject,
 ) -> AiModelSerializerInputPayload:
     return AiModelSerializerInputPayload.model_validate(payload)
 
 
 def validate_ai_model_serializer_output_payload(
-    payload: object,
+    payload: JsonObject,
 ) -> AiModelSerializerOutputPayload:
     return AiModelSerializerOutputPayload.model_validate(payload)
 

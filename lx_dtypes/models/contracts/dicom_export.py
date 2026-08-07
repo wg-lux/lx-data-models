@@ -6,6 +6,7 @@ from typing import Literal, Self
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from .json_types import JsonObject
 
 
 _DICOM_UID_PATTERN = re.compile(r"^[0-9]+(?:\.[0-9]+)+$")
@@ -137,7 +138,7 @@ class DicomExportManifestV2(DicomContractModel):
         return value
 
 
-def validate_dicom_export_manifest_v2(value: object) -> DicomExportManifestV2:
+def validate_dicom_export_manifest_v2(value: JsonObject) -> DicomExportManifestV2:
     return DicomExportManifestV2.model_validate(value)
 
 

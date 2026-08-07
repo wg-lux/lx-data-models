@@ -2,6 +2,7 @@ from __future__ import annotations
 
 
 from pydantic import BaseModel, ConfigDict, Field
+from lx_dtypes.models.contracts.json_types import JsonObject
 
 
 class SetupConfigDefaultModelsPayload(BaseModel):
@@ -46,7 +47,7 @@ class SetupConfigDataPayload(BaseModel):
 class SetupConfigModelSpecificDataPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
-    setup_config: dict[str, object] = Field(default_factory=dict)
+    setup_config: JsonObject = Field(default_factory=dict)
 
 
 class SetupConfigModelSpecificEntryFieldsPayload(BaseModel):

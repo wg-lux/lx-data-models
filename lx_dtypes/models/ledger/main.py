@@ -130,6 +130,21 @@ from .p_video import (
     l_p_video_lookup,
     l_p_video_models,
 )
+from .report import (
+    LReportLookupType,
+    l_report_ddicts,
+    l_report_lookup,
+    l_report_models,
+)
+from .video_file import (
+    LVidFileDjangoLookupType,
+    LVidFileLookupType,
+    l_vid_file_ddicts,
+    l_vid_file_django_lookup,
+    l_vid_file_django_models,
+    l_vid_file_lookup,
+    l_vid_file_models,
+)
 from .patient import (
     LPatientDjangoLookupType,
     LPatientLookupType,
@@ -144,6 +159,7 @@ from .patient import (
 class LedgerModelsLookupType(
     LCenterLookupType,
     LPExaminationLookupType,
+    LReportLookupType,
     LCaseLookupType,
     LExaminerLookupType,
     LPFindingLookupType,
@@ -157,6 +173,7 @@ class LedgerModelsLookupType(
     LPFindingInterventionLookupType,
     LPatientLookupType,
     LPVideoLookupType,
+    LVidFileLookupType,
     LMedicalLookupType,
 ):
     pass
@@ -166,6 +183,7 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_center_lookup,
     **l_p_examination_lookup,
     **l_case_lookup,
+    **l_report_lookup,
     **l_examiner_lookup,
     **l_p_finding_lookup,
     **l_p_indication_lookup,
@@ -178,6 +196,7 @@ ledger_models_lookup = LedgerModelsLookupType(
     **l_p_finding_intervention_lookup,
     **l_patient_lookup,
     **l_p_video_lookup,
+    **l_vid_file_lookup,
     **l_medical_lookup,
 )
 
@@ -196,6 +215,7 @@ class LedgerModelsDjangoLookupType(
     LPFindingInterventionsDjangoLookupType,
     LPFindingInterventionDjangoLookupType,
     LPatientDjangoLookupType,
+    LVidFileDjangoLookupType,
     # LPVideoDjangoLookupType, # TODO
 ):
     pass
@@ -216,6 +236,7 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
         **l_p_finding_interventions_django_lookup,
         **l_p_finding_intervention_django_lookup,
         **l_patient_django_lookup,
+        **l_vid_file_django_lookup,
         # **l_p_video_django_lookup, # TODO
     )
 )
@@ -224,6 +245,7 @@ L_MODELS = Union[
     l_center_models,
     l_p_examination_models,
     l_case_models,
+    l_report_models,
     l_examiner_models,
     l_p_finding_models,
     l_p_indication_models,
@@ -234,6 +256,7 @@ L_MODELS = Union[
     l_p_finding_classification_choice_descriptor_models,
     l_p_finding_interventions_models,
     l_p_finding_intervention_models,
+    l_vid_file_models,
     l_patient_models,
     l_p_video_models,
     l_medical_models,
@@ -253,6 +276,7 @@ L_MODELS_DJANGO = Union[
     l_p_finding_interventions_django_models,
     l_p_finding_intervention_django_models,
     l_patient_django_models,
+    l_vid_file_django_models,
     # l_p_video_django_models, # TODO
 ]
 
@@ -271,6 +295,8 @@ L_DDICTS = Union[
     l_p_finding_interventions_ddicts,
     l_p_finding_intervention_ddicts,
     l_patient_ddicts,
+    l_vid_file_ddicts,
+    l_report_ddicts,
     l_p_video_ddicts,
     l_medical_ddicts,
 ]
@@ -280,6 +306,7 @@ L_MODEL_NAMES_LITERAL = Literal[
     "Patient",
     "PExamination",
     "Case",
+    "Report",
     "PFinding",
     "PIndication",
     "PIndicationClassification",
@@ -288,6 +315,7 @@ L_MODEL_NAMES_LITERAL = Literal[
     "PFindingClassificationChoice",
     "PFindingInterventions",
     "PFindingIntervention",
+    "VideoFile",
     "PatientVideoFile",
     "RawPatientVideoFile",
     "PatientDisease",
@@ -305,6 +333,7 @@ L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "Patient",
     "PExamination",
     "Case",
+    "Report",
     "PFinding",
     "PIndication",
     "PIndicationClassification",
@@ -313,6 +342,7 @@ L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
     "PFindingClassificationChoice",
     "PFindingInterventions",
     "PFindingIntervention",
+    "VideoFile",
     "PatientVideoFile",
     "RawPatientVideoFile",
     "PatientDisease",

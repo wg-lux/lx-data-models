@@ -169,13 +169,13 @@ class AIDataSetContract(BaseModel):
 
     @field_validator("name", "description", mode="before")
     @classmethod
-    def blank_string_to_none(cls, value: object) -> object:
+    def blank_string_to_none(cls, value: str | int | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
             stripped = value.strip()
             return stripped or ""
-        return value
+        return str(value)
 
     @model_validator(mode="after")
     def validate_model_type_matches_dataset_type(self) -> AIDataSetContract:
@@ -243,7 +243,9 @@ class AIDataSetAttachVideoContract(BaseModel):
 
     @field_validator("information_source_names", mode="before")
     @classmethod
-    def normalize_information_source_names(cls, value: object) -> object:
+    def normalize_information_source_names(
+        cls, value: list[str] | str | None
+    ) -> list[str] | None:
         if value in (None, ""):
             return []
         if isinstance(value, str):
@@ -393,12 +395,13 @@ class AIDataSetExportCreateContract(BaseModel):
 
     @field_validator("center_key", "ai_dataset_name", mode="before")
     @classmethod
-    def blank_to_none(cls, value: object) -> object:
+    def blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
         if value is None:
             return None
         if isinstance(value, str):
             return value.strip() or None
-        return value
+        converted = str(value).strip()
+        return converted or None
 
     @model_validator(mode="after")
     def validate_dataset_selector(self) -> AIDataSetExportCreateContract:
@@ -436,7 +439,9 @@ class AITrainingManifestBuildContract(BaseModel):
 
     @field_validator("information_source_names", mode="before")
     @classmethod
-    def normalize_information_source_names(cls, value: object) -> object:
+    def normalize_information_source_names(
+        cls, value: list[str] | str | None
+    ) -> list[str] | None:
         if value in (None, ""):
             return None
         if isinstance(value, str):
@@ -454,12 +459,12 @@ class AIDataSetStandardExportScopeContract(BaseModel):
 
     @field_validator("center_key", mode="before")
     @classmethod
-    def normalize_center_key(cls, value: object) -> object:
+    def normalize_center_key(cls, value: str | int | float | bool | None) -> str | None:
         if value is None:
             return None
         if isinstance(value, str):
             return value.strip() or None
-        return value
+        return str(value).strip() or None
 
     @model_validator(mode="after")
     def validate_scope(self) -> AIDataSetStandardExportScopeContract:

@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple, TypedDict
+from typing import Dict, List, NotRequired, Tuple, TypedDict
 
 from pydantic import Field
 
@@ -13,6 +13,7 @@ from lx_dtypes.models.ledger.case import Case, CaseDataDict
 from lx_dtypes.models.ledger.center import Center, CenterDataDict
 from lx_dtypes.models.ledger.examiner.DataDict import ExaminerDataDict
 from lx_dtypes.models.ledger.examiner.Pydantic import Examiner
+from lx_dtypes.models.ledger.report import Report, ReportDataDict
 from lx_dtypes.models.ledger.p_examination import PExamination, PExaminationDataDict
 from lx_dtypes.models.ledger.p_examination.DataDict import (
     SerializedPExaminationDataDict,
@@ -47,9 +48,11 @@ from lx_dtypes.models.ledger.p_video import (
     # RawVideoFile,
 )
 from lx_dtypes.models.ledger.patient import Patient, PatientDataDict
+from lx_dtypes.models.ledger.video_file import VideoFile, VideoFileDataDict
 
 
 class LedgerRecordList(TypedDict):
+    reports: NotRequired[List[ReportDataDict]]
     patients: List[PatientDataDict]
     p_examinations: List[SerializedPExaminationDataDict]
     centers: List[CenterDataDict]
@@ -69,12 +72,15 @@ class LedgerRecordList(TypedDict):
     ]
     p_finding_interventions: List[SerializedPFindingInterventionsDataDict]
     p_finding_intervention: List[PFindingInterventionDataDict]
+    video_files: NotRequired[List[VideoFileDataDict]]
     p_videos: List[PatientVideoFileDataDict]
     # p_raw_videos: List[RawPatientVideoFileDataDict]
 
 
 class LedgerDataDict(AppBaseModelUUIDTagsDataDict):
     cases: Dict[str, CaseDataDict]
+    reports: NotRequired[Dict[str, ReportDataDict]]
+    video_files: NotRequired[Dict[str, VideoFileDataDict]]
     patient_examinations: Dict[str, PExaminationDataDict]
     patients: Dict[str, PatientDataDict]
     centers: Dict[str, CenterDataDict]
@@ -84,10 +90,12 @@ class LedgerDataDict(AppBaseModelUUIDTagsDataDict):
 
 class Ledger(AppBaseModelUUIDTags):
     cases: Dict[str, Case] = Field(default_factory=dict)
+    reports: Dict[str, Report] = Field(default_factory=dict)
     patient_examinations: Dict[str, PExamination] = Field(default_factory=dict)
     patients: Dict[str, Patient] = Field(default_factory=dict)
     centers: Dict[str, Center] = Field(default_factory=dict)
     examiners: Dict[str, Examiner] = Field(default_factory=dict)
+    video_files: Dict[str, VideoFile] = Field(default_factory=dict)
     patient_videos: Dict[str, PatientVideoFile] = Field(default_factory=dict)
     # raw_patient_videos: Dict[str, RawVideoFile] = Field(default_factory=dict)
     # patient_images: Dict[str, PFile] = Field(default_factory=dict)
@@ -257,9 +265,13 @@ class Ledger(AppBaseModelUUIDTags):
                 - p_finding_classification_choice_descriptors: List of classification choice descriptor data dicts.
                 - p_finding_interventions: List of serialized finding interventions data dicts.
                 - p_finding_intervention: List of individual finding intervention data dicts.
+                - video_files: List of serialized technical VideoFile records.
                 - patient_video_file_dicts (List[PatientVideoFileDataDict]): Serialized patient video file records.
                 - raw_patient_video_file_dicts (List[RawPatientVideoFileDataDict]): Serialized raw patient video file records.
         """
+        report_dicts: List[ReportDataDict] = [
+            r.serialized_ddict for r in self.reports.values()
+        ]
         patient_dicts: List[PatientDataDict] = [
             r.serialized_ddict for r in self.patients.values()
         ]
@@ -270,6 +282,9 @@ class Ledger(AppBaseModelUUIDTags):
             r.serialized_ddict for r in self.centers.values()
         ]
 
+        video_file_dicts: List[VideoFileDataDict] = [
+            r.serialized_ddict for r in self.video_files.values()
+        ]
         video_dicts = [r.serialized_ddict for r in self.patient_videos.values()]
         # raw_video_dicts = [r.serialized_ddict for r in self.raw_patient_videos.values()]
 
@@ -287,6 +302,7 @@ class Ledger(AppBaseModelUUIDTags):
         ) = self.export_patient_examination_record_list()
 
         record_list: LedgerRecordList = LedgerRecordList(
+            reports=report_dicts,
             patients=patient_dicts,
             p_examinations=p_examination_dicts,
             centers=center_dicts,
@@ -302,6 +318,7 @@ class Ledger(AppBaseModelUUIDTags):
             p_finding_classification_choice_descriptors=p_finding_classification_choice_descriptor_dicts,
             p_finding_interventions=p_finding_interventions_dicts,
             p_finding_intervention=p_finding_intervention_dicts,
+            video_files=video_file_dicts,
             p_videos=video_dicts,
             # p_raw_videos=raw_video_dicts,
         )

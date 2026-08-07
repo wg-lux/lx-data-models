@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from collections.abc import Sequence
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -28,7 +29,7 @@ class ModelInputCommandOptionsPayload(BaseModel):
 
     @field_validator("annotation_source_scope", "backbone_name", mode="before")
     @classmethod
-    def normalize_required_text(cls, value: object) -> str:
+    def normalize_required_text(cls, value: str | int | float | bool | None) -> str:
         if isinstance(value, str):
             normalized = value.strip()
             if normalized:
@@ -37,7 +38,9 @@ class ModelInputCommandOptionsPayload(BaseModel):
 
     @field_validator("backbone_checkpoint", mode="before")
     @classmethod
-    def normalize_backbone_checkpoint(cls, value: object) -> str:
+    def normalize_backbone_checkpoint(
+        cls, value: str | int | float | bool | None
+    ) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -52,7 +55,7 @@ class ModelTrainingResultPayload(BaseModel):
 
     @field_validator("model_path", mode="before")
     @classmethod
-    def normalize_model_path(cls, value: object) -> str:
+    def normalize_model_path(cls, value: str | None) -> str:
         if isinstance(value, str) and value.strip():
             return value
         raise ValueError("model_path must be a non-empty string")
@@ -83,7 +86,7 @@ class TrainImageMultilabelModelCommandOptionsPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def normalize_required_text(cls, value: object) -> str:
+    def normalize_required_text(cls, value: str | int | float | bool | None) -> str:
         if isinstance(value, str):
             normalized = value.strip()
             if normalized:
@@ -92,7 +95,9 @@ class TrainImageMultilabelModelCommandOptionsPayload(BaseModel):
 
     @field_validator("backbone_checkpoint", mode="before")
     @classmethod
-    def normalize_backbone_checkpoint(cls, value: object) -> str:
+    def normalize_backbone_checkpoint(
+        cls, value: str | int | float | bool | None
+    ) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -120,7 +125,7 @@ class TrainPhiRegionDetectorCommandOptionsPayload(BaseModel):
 
     @field_validator("base_model", "device", mode="before")
     @classmethod
-    def normalize_required_text(cls, value: object) -> str:
+    def normalize_required_text(cls, value: str | int | float | bool | None) -> str:
         if isinstance(value, str):
             normalized = value.strip()
             if normalized:
@@ -129,7 +134,7 @@ class TrainPhiRegionDetectorCommandOptionsPayload(BaseModel):
 
     @field_validator("run_name", "class_ids", mode="before")
     @classmethod
-    def normalize_optional_text(cls, value: object) -> str:
+    def normalize_optional_text(cls, value: str | int | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -160,7 +165,7 @@ class TranscodeVideoCommandOptionsPayload(BaseModel):
 
     @field_validator("input_dir", "output_dir", mode="before")
     @classmethod
-    def normalize_required_path_text(cls, value: object) -> str:
+    def normalize_required_path_text(cls, value: str | Path | None) -> str:
         if isinstance(value, Path):
             return str(value)
         if isinstance(value, str):
@@ -171,7 +176,7 @@ class TranscodeVideoCommandOptionsPayload(BaseModel):
 
     @field_validator("filename", mode="before")
     @classmethod
-    def normalize_filename(cls, value: object) -> str:
+    def normalize_filename(cls, value: str | Path | None) -> str:
         if value is None:
             return ""
         if isinstance(value, Path):
@@ -182,7 +187,9 @@ class TranscodeVideoCommandOptionsPayload(BaseModel):
 
     @field_validator("extension", mode="before")
     @classmethod
-    def normalize_extensions(cls, value: object) -> tuple[str, ...]:
+    def normalize_extensions(
+        cls, value: Sequence[str] | tuple[str, ...] | list[str] | str | None
+    ) -> tuple[str, ...]:
         if value is None:
             return ()
         if isinstance(value, tuple) and all(isinstance(item, str) for item in value):
@@ -223,7 +230,7 @@ class ValidateVideoFilesCommandOptionsPayload(BaseModel):
 
     @field_validator("video_id", mode="before")
     @classmethod
-    def normalize_video_id(cls, value: object) -> int:
+    def normalize_video_id(cls, value: int | str | None) -> int:
         if value is None:
             return 0
         if isinstance(value, int):
@@ -261,7 +268,7 @@ class ReapUploadJobSourcesCommandOptionsPayload(BaseModel):
 
     @field_validator("limit", mode="before")
     @classmethod
-    def normalize_limit(cls, value: object) -> int:
+    def normalize_limit(cls, value: int | None) -> int:
         if value is None:
             return 0
         if isinstance(value, int):
@@ -283,7 +290,9 @@ class ReconcileFrameSegmentAnnotationsCommandOptionsPayload(BaseModel):
 
     @field_validator("video_ids", "segment_ids", mode="before")
     @classmethod
-    def normalize_id_tuple(cls, value: object) -> tuple[int, ...]:
+    def normalize_id_tuple(
+        cls, value: tuple[int, ...] | list[int] | None
+    ) -> tuple[int, ...]:
         if value is None:
             return ()
         if isinstance(value, tuple) and all(isinstance(item, int) for item in value):
@@ -294,7 +303,7 @@ class ReconcileFrameSegmentAnnotationsCommandOptionsPayload(BaseModel):
 
     @field_validator("annotator", mode="before")
     @classmethod
-    def normalize_annotator(cls, value: object) -> str:
+    def normalize_annotator(cls, value: str | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -320,7 +329,7 @@ class ReconcileMediaIntegrityCommandOptionsPayload(BaseModel):
 
     @field_validator("video_id", "repair_frame", mode="before")
     @classmethod
-    def normalize_id_list(cls, value: object) -> list[int]:
+    def normalize_id_list(cls, value: list[int] | None) -> list[int]:
         if value is None:
             return []
         if isinstance(value, list) and all(isinstance(item, int) for item in value):
@@ -336,7 +345,7 @@ class ReconcileSegmentValidationStateCommandOptionsPayload(BaseModel):
 
     @field_validator("video_ids", mode="before")
     @classmethod
-    def normalize_video_ids(cls, value: object) -> list[int]:
+    def normalize_video_ids(cls, value: list[int] | None) -> list[int]:
         if value is None:
             return []
         if isinstance(value, list) and all(isinstance(item, int) for item in value):
@@ -367,7 +376,7 @@ class ReconcileVideoFormatsCommandOptionsPayload(BaseModel):
 
     @field_validator("root", "extension", mode="before")
     @classmethod
-    def normalize_text_list(cls, value: object) -> list[str]:
+    def normalize_text_list(cls, value: list[str] | None) -> list[str]:
         if value is None:
             return []
         if isinstance(value, list) and all(isinstance(item, str) for item in value):
@@ -376,7 +385,7 @@ class ReconcileVideoFormatsCommandOptionsPayload(BaseModel):
 
     @field_validator("max_files", mode="before")
     @classmethod
-    def normalize_max_files(cls, value: object) -> int:
+    def normalize_max_files(cls, value: int | None) -> int:
         if value is None:
             return 0
         if isinstance(value, int):
@@ -399,7 +408,7 @@ class RegisterAiModelCommandOptionsPayload(BaseModel):
 
     @field_validator("model_meta_path", mode="before")
     @classmethod
-    def normalize_model_meta_path(cls, value: object) -> str:
+    def normalize_model_meta_path(cls, value: str | None) -> str:
         if isinstance(value, str) and value.strip():
             return value
         raise ValueError("model_meta_path must be a non-empty string")
@@ -425,7 +434,7 @@ class RegisterAiModelMetaPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def normalize_required_text(cls, value: object) -> str:
+    def normalize_required_text(cls, value: str | int | float | bool | None) -> str:
         if isinstance(value, int):
             return str(value)
         if isinstance(value, str):
@@ -436,7 +445,7 @@ class RegisterAiModelMetaPayload(BaseModel):
 
     @field_validator("description", mode="before")
     @classmethod
-    def normalize_description(cls, value: object) -> str:
+    def normalize_description(cls, value: str | int | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -459,7 +468,7 @@ class ShowUrlsCommandOptionsPayload(BaseModel):
 
     @field_validator("format_style", mode="before")
     @classmethod
-    def normalize_format_style(cls, value: object) -> str:
+    def normalize_format_style(cls, value: str | int | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -477,7 +486,7 @@ class ShowUrlsRoutePayload(BaseModel):
 
     @field_validator("url", "module", "name", "decorators", mode="before")
     @classmethod
-    def normalize_route_text(cls, value: object) -> str:
+    def normalize_route_text(cls, value: str | int | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -544,7 +553,7 @@ class MigrateMediaStorageCommandOptionsPayload(BaseModel):
 
     @field_validator("video_ids", mode="before")
     @classmethod
-    def normalize_video_ids(cls, value: object) -> list[int]:
+    def normalize_video_ids(cls, value: list[int] | None) -> list[int]:
         if value is None:
             return []
         if isinstance(value, list) and all(isinstance(item, int) for item in value):
@@ -553,7 +562,7 @@ class MigrateMediaStorageCommandOptionsPayload(BaseModel):
 
     @field_validator("hash_value", mode="before")
     @classmethod
-    def normalize_hash_value(cls, value: object) -> str:
+    def normalize_hash_value(cls, value: str | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -571,7 +580,7 @@ class MigrateVideoStreamableStorageCommandOptionsPayload(BaseModel):
 
     @field_validator("video_ids", mode="before")
     @classmethod
-    def normalize_video_ids(cls, value: object) -> list[int]:
+    def normalize_video_ids(cls, value: list[int] | None) -> list[int]:
         if value is None:
             return []
         if isinstance(value, list) and all(isinstance(item, int) for item in value):

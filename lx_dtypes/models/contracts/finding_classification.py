@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 
 class FindingClassificationTypeCore(BaseModel):
@@ -22,8 +23,8 @@ class FindingClassificationChoiceCore(BaseModel):
 
     name: str
     description: str = ""
-    subcategories: dict[str, object] = Field(default_factory=dict)
-    numerical_descriptors: dict[str, object] = Field(default_factory=dict)
+    subcategories: dict[str, JsonValue] = Field(default_factory=dict)
+    numerical_descriptors: dict[str, JsonValue] = Field(default_factory=dict)
 
 
 class PatientFindingClassificationCore(BaseModel):
@@ -34,8 +35,8 @@ class PatientFindingClassificationCore(BaseModel):
     classification_name: str
     classification_choice_name: str
     is_active: bool = True
-    subcategories: dict[str, object] = Field(default_factory=dict)
-    numerical_descriptors: dict[str, object] = Field(default_factory=dict)
+    subcategories: dict[str, JsonValue] = Field(default_factory=dict)
+    numerical_descriptors: dict[str, JsonValue] = Field(default_factory=dict)
 
 
 __all__ = [

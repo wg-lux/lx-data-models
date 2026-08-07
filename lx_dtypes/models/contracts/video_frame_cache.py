@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from typing import cast
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -38,13 +39,13 @@ class FrameCacheValidationLogPayload(FrameCacheManifestLogPayload):
 
 
 def parse_frame_cache_manifest_payload(
-    payload: Mapping[str, object] | None,
+    payload: Mapping[str, JsonValue] | None,
 ) -> FrameCacheManifestLogPayload:
     return FrameCacheManifestLogPayload.model_validate(payload or {})
 
 
 def parse_frame_cache_validation_payload(
-    payload: Mapping[str, object] | None,
+    payload: Mapping[str, JsonValue] | None,
 ) -> FrameCacheValidationLogPayload:
     return FrameCacheValidationLogPayload.model_validate(payload or {})
 

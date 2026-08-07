@@ -14,6 +14,7 @@ from pydantic import (
 )
 
 from .json_types import JsonObject
+from .json_types import JsonValue
 
 
 VideoSegmentsPayloadDict: TypeAlias = dict[str, list[tuple[int, int]]]
@@ -61,12 +62,14 @@ class SegmentAnnotationInput(BaseModel):
         )
 
 
-def validate_video_segments_payload(value: object) -> VideoSegmentsPayload:
+def validate_video_segments_payload(
+    value: VideoSegmentsPayloadDict | Mapping[str, list[tuple[int, int]]],
+) -> VideoSegmentsPayload:
     return VideoSegmentsPayload.model_validate(value)
 
 
 def parse_segment_annotation_input(
-    annotation: SegmentAnnotationInput | Mapping[str, object],
+    annotation: SegmentAnnotationInput | Mapping[str, JsonValue],
 ) -> SegmentAnnotationInput | None:
     if isinstance(annotation, SegmentAnnotationInput):
         return annotation
@@ -77,14 +80,16 @@ def parse_segment_annotation_input(
         return None
 
 
-def _blank_to_none(value: object) -> object:
+def _blank_to_none(value: str | int | float | bool | None) -> str | None:
     if isinstance(value, str):
         stripped = value.strip()
         return stripped or None
-    return value
+    if value is None:
+        return None
+    return str(value).strip() or None
 
 
-def _payload_dict(payload: Mapping[str, object]) -> dict[str, object]:
+def _payload_dict(payload: Mapping[str, JsonValue]) -> dict[str, JsonValue]:
     return dict(payload)
 
 
@@ -117,7 +122,9 @@ class SegmentCrudPayload(BaseModel):
 
     @field_validator("label_name", mode="before")
     @classmethod
-    def _normalize_label_name(cls, value: object) -> object:
+    def _normalize_label_name(
+        cls, value: str | int | float | bool | None
+    ) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")
@@ -171,7 +178,9 @@ class SegmentListQuery(BaseModel):
 
     @field_validator("label", "source_kind", mode="before")
     @classmethod
-    def _normalize_optional_text(cls, value: object) -> object:
+    def _normalize_optional_text(
+        cls, value: str | int | float | bool | None
+    ) -> str | None:
         return _blank_to_none(value)
 
 
@@ -192,13 +201,13 @@ class SegmentValidationPayload(BaseModel):
 
     @field_validator("information_source_name", mode="before")
     @classmethod
-    def _default_information_source(cls, value: object) -> str:
+    def _default_information_source(cls, value: str | int | float | bool | None) -> str:
         normalized = _blank_to_none(value)
         return str(normalized or "manual_annotation")
 
     @field_validator("annotator", mode="before")
     @classmethod
-    def _normalize_annotator(cls, value: object) -> object:
+    def _normalize_annotator(cls, value: str | int | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")
@@ -286,27 +295,33 @@ class SegmentBulkValidationPayload(BaseModel):
 
     @field_validator("segment_ids", mode="before")
     @classmethod
-    def _normalize_segment_ids(cls, value: object) -> object:
+    def _normalize_segment_ids(
+        cls, value: list[int] | tuple[int, ...] | int | str | None
+    ) -> list[int] | None:
         if value is None:
             return []
         if isinstance(value, list):
-            return [item for item in cast(list[object], value) if item is not None]
-        return [value]
+            return [
+                cast(int, item)
+                for item in cast(list[object], value)
+                if item is not None
+            ]
+        return [cast(int, value)]
 
     @field_validator("information_source_name", mode="before")
     @classmethod
-    def _default_information_source(cls, value: object) -> str:
+    def _default_information_source(cls, value: str | int | float | bool | None) -> str:
         normalized = _blank_to_none(value)
         return str(normalized or "manual_annotation")
 
     @field_validator("annotator", mode="before")
     @classmethod
-    def _normalize_annotator(cls, value: object) -> object:
+    def _normalize_annotator(cls, value: str | int | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
     @field_validator("notes", mode="before")
     @classmethod
-    def _default_notes(cls, value: object) -> str:
+    def _default_notes(cls, value: str | int | float | bool | None) -> str:
         return str(value or "")
 
     @model_validator(mode="after")
@@ -331,7 +346,9 @@ class SegmentPredictionImportItem(BaseModel):
 
     @field_validator("label_name", "label", mode="before")
     @classmethod
-    def _normalize_label_text(cls, value: object) -> object:
+    def _normalize_label_text(
+        cls, value: str | int | float | bool | None
+    ) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")
@@ -375,16 +392,22 @@ class SegmentAnnotationEnsurePayload(BaseModel):
 
     @field_validator("video_ids", "segment_ids", mode="before")
     @classmethod
-    def _normalize_optional_int_list(cls, value: object) -> object:
+    def _normalize_optional_int_list(
+        cls, value: list[int] | tuple[int, ...] | int | str | None
+    ) -> list[int] | None:
         if value is None:
             return None
         if isinstance(value, list):
-            return [item for item in cast(list[object], value) if item is not None]
-        return [value]
+            return [
+                cast(int, item)
+                for item in cast(list[object], value)
+                if item is not None
+            ]
+        return [cast(int, value)]
 
     @field_validator("information_source_name", mode="before")
     @classmethod
-    def _default_information_source(cls, value: object) -> str:
+    def _default_information_source(cls, value: str | int | float | bool | None) -> str:
         normalized = _blank_to_none(value)
         return str(normalized or "manual_annotation")
 
@@ -404,44 +427,48 @@ class SegmentValidationStatusPayload(BaseModel):
 
     @field_validator("label_name", mode="before")
     @classmethod
-    def _normalize_label_name(cls, value: object) -> object:
+    def _normalize_label_name(
+        cls, value: str | int | float | bool | None
+    ) -> str | None:
         return _blank_to_none(value)
 
 
-def validate_segment_crud_payload(payload: Mapping[str, object]) -> SegmentCrudPayload:
+def validate_segment_crud_payload(
+    payload: Mapping[str, JsonValue],
+) -> SegmentCrudPayload:
     return SegmentCrudPayload.model_validate(_payload_dict(payload))
 
 
-def validate_segment_list_query(payload: Mapping[str, object]) -> SegmentListQuery:
+def validate_segment_list_query(payload: Mapping[str, JsonValue]) -> SegmentListQuery:
     return SegmentListQuery.model_validate(_payload_dict(payload))
 
 
 def validate_segment_blacken_outside_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> SegmentBlackenOutsidePayload:
     return SegmentBlackenOutsidePayload.model_validate(_payload_dict(payload))
 
 
 def validate_segment_validation_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> SegmentValidationPayload:
     return SegmentValidationPayload.model_validate(_payload_dict(payload))
 
 
 def validate_segment_bulk_validation_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> SegmentBulkValidationPayload:
     return SegmentBulkValidationPayload.model_validate(_payload_dict(payload))
 
 
 def validate_segment_prediction_import_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> SegmentPredictionImportPayload:
     return SegmentPredictionImportPayload.model_validate(_payload_dict(payload))
 
 
 def validate_segment_annotation_ensure_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
     *,
     default_information_source_name: str,
 ) -> SegmentAnnotationEnsurePayload:
@@ -451,7 +478,7 @@ def validate_segment_annotation_ensure_payload(
 
 
 def validate_segment_validation_status_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> SegmentValidationStatusPayload:
     return SegmentValidationStatusPayload.model_validate(_payload_dict(payload))
 

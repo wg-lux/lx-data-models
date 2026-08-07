@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 
 class ExaminationIndicationCore(BaseModel):
@@ -21,8 +22,8 @@ class ExaminationIndicationClassificationChoiceCore(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     name: str
-    subcategories: dict[str, object] = Field(default_factory=dict)
-    numerical_descriptors: dict[str, object] = Field(default_factory=dict)
+    subcategories: dict[str, JsonValue] = Field(default_factory=dict)
+    numerical_descriptors: dict[str, JsonValue] = Field(default_factory=dict)
 
 
 __all__ = [

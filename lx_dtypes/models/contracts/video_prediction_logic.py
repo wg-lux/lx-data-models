@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
+from .json_types import JsonValue
 
 
 class PredictionSegmentCreatePayload(BaseModel):
@@ -8,10 +9,10 @@ class PredictionSegmentCreatePayload(BaseModel):
 
     start_frame_number: int = Field(ge=0)
     end_frame_number: int = Field(ge=0)
-    source: object
-    label: object
-    prediction_meta: object
-    video_file: object
+    source: JsonValue
+    label: JsonValue
+    prediction_meta: JsonValue
+    video_file: JsonValue
 
 
 __all__ = ["PredictionSegmentCreatePayload"]

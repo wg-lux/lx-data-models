@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal, TypeAlias
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 from lx_dtypes.models.contracts.json_types import JsonNull, JsonValue
 
@@ -14,7 +14,7 @@ FrameSourceMode: TypeAlias = Literal["cache", "stream", "auto"]
 type VideoFileMetaJsonValue = (
     JsonValue
     | JsonNull
-    | list[VideoFileMetaJsonValue]  # Look, no quotes needed!
+    | list[VideoFileMetaJsonValue]
     | dict[str, VideoFileMetaJsonValue]
 )
 
@@ -33,7 +33,7 @@ class VideoFileIdentityPayload(BaseModel):
 
     @field_validator("id", mode="after")
     @classmethod
-    def _id_or_pk(cls, value: int | None, info: object) -> int | None:
+    def _id_or_pk(cls, value: int | None, info: ValidationInfo) -> int | None:
         return value
 
 

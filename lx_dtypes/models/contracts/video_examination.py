@@ -5,6 +5,7 @@ from datetime import date, datetime
 from typing import NotRequired, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 
 class VideoExaminationCreateData(TypedDict):
@@ -68,7 +69,7 @@ class VideoExaminationListQueryPayload(BaseModel):
 
     @field_validator("video_id", "patient_id", "examination_id", mode="before")
     @classmethod
-    def normalize_optional_id(cls, value: object) -> object:
+    def normalize_optional_id(cls, value: int | str | None) -> int | str | None:
         if value in (None, ""):
             return None
         return value
@@ -114,13 +115,13 @@ def dump_video_examination_list_query_payload(
 
 
 def validate_video_examination_list_query(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> VideoExaminationListQueryPayload:
     return VideoExaminationListQueryPayload.model_validate(dict(payload))
 
 
 def validate_video_examination_path_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> VideoExaminationPathPayload:
     return VideoExaminationPathPayload.model_validate(dict(payload))
 

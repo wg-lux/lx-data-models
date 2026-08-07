@@ -16,13 +16,13 @@ class VideoFormatInfo(BaseModel):
 
     @field_validator("video_codec", "pixel_format", "container", mode="before")
     @classmethod
-    def normalize_text(cls, value: object) -> str:
+    def normalize_text(cls, value: str | int | float | bool | None) -> str:
         normalized = str(value).strip()
         return normalized or "unknown"
 
     @field_validator("width", "height", mode="before")
     @classmethod
-    def normalize_size(cls, value: object) -> int:
+    def normalize_size(cls, value: int | str | float | bool | None) -> int:
         normalized = int(str(value))
         if normalized < 0:
             raise ValueError("size values must be >= 0")

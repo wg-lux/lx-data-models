@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Literal, Protocol, TypeAlias, cast
+
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 from lx_dtypes.serialization import parse_str_list, serialize_str_list
 
@@ -109,12 +111,73 @@ CoreConceptModel: TypeAlias = (
     | CitationCore
 )
 
-CoreConceptStorageRecord: TypeAlias = Mapping[str, Any] | KnowledgeBaseCoreConceptModel
+CoreConceptStorageRecord: TypeAlias = (
+    Mapping[str, JsonValue] | KnowledgeBaseCoreConceptModel
+)
 
 
 class SupportsKnowledgeBaseListFields(Protocol):
     @classmethod
     def list_type_fields(cls) -> list[str]: ...
+
+
+class _KnowledgeBaseConfig(Protocol):
+    @property
+    def name(self) -> str: ...
+
+
+class _KnowledgeBaseSection(Protocol):
+    def values(self) -> Iterable[CoreConceptStorageRecord]: ...
+
+
+class _KnowledgeBaseLike(Protocol):
+    @property
+    def config(self) -> _KnowledgeBaseConfig | None: ...
+
+    @property
+    def classification(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def classification_choice(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def classification_choice_descriptor(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def examination(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def finding(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def finding_type(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def indication(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def indication_type(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def intervention(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def intervention_type(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def unit(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def unit_type(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def information_source(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def information_source_type(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def citation(self) -> Mapping[str, Any] | None: ...
 
 
 _CONCEPT_MODEL_LOOKUP: dict[CoreConceptName, type[CoreConceptModel]] = {
@@ -239,14 +302,17 @@ _KB_FIELDS: dict[CoreConceptName, str] = {
 }
 
 
-def _read_value(record: CoreConceptStorageRecord, field: str) -> Any:
+def _read_value(record: CoreConceptStorageRecord, field: str) -> JsonValue | None:
     if isinstance(record, Mapping):
-        return record.get(field)
-    return getattr(record, field, None)
+        value = record.get(field)
+        return cast(JsonValue | None, value)
+    value = getattr(record, field, None)
+    return cast(JsonValue | None, value)
 
 
-def _base_payload(record: CoreConceptStorageRecord) -> dict[str, Any]:
-    payload: dict[str, Any] = {
+def _base_payload(record: CoreConceptStorageRecord) -> dict[str, JsonValue]:
+    tags_value = _read_value(record, "tags")
+    payload: dict[str, JsonValue] = {
         "id": _read_value(record, "id"),
         "name": _read_value(record, "name"),
         "name_de": _read_value(record, "name_de"),
@@ -254,7 +320,9 @@ def _base_payload(record: CoreConceptStorageRecord) -> dict[str, Any]:
         "description": _read_value(record, "description"),
         "uuid": _read_value(record, "uuid"),
         "kb_module_name": _read_value(record, "kb_module_name"),
-        "tags": parse_str_list(_read_value(record, "tags")),
+        "tags": _coerce_json_values(
+            parse_str_list(cast(str | Sequence[str] | None, tags_value))
+        ),
     }
     # Canonical payloads should skip absent DB ids rather than emit None.
     if payload["id"] is None:
@@ -287,7 +355,9 @@ def record_to_core_concept(
     payload = _base_payload(record)
 
     for field in _record_list_fields(concept, record):
-        payload[field] = parse_str_list(_read_value(record, field))
+        payload[field] = _coerce_json_values(
+            parse_str_list(cast(str | Sequence[str] | None, _read_value(record, field)))
+        )
 
     for field in _DICT_FIELDS[concept]:
         value = _read_value(record, field)
@@ -299,20 +369,30 @@ def record_to_core_concept(
     return model_cls.model_validate(payload)
 
 
+def _coerce_json_values(values: list[str]) -> list[JsonValue]:
+    return [cast(JsonValue, value) for value in values]
+
+
 def core_concept_to_storage(
     concept: CoreConceptName,
-    value: CoreConceptModel | Mapping[str, Any],
-) -> dict[str, Any]:
+    value: CoreConceptModel | Mapping[str, JsonValue],
+) -> dict[str, JsonValue]:
     """Convert canonical concept payload back to storage-compatible representation."""
 
     model_cls = _CONCEPT_MODEL_LOOKUP[concept]
     model_value = model_cls.model_validate(value)
-    payload = model_value.model_dump(mode="python", exclude_none=True)
+    payload = cast(
+        dict[str, JsonValue],
+        model_value.model_dump(mode="python", exclude_none=True),
+    )
 
-    payload["tags"] = serialize_str_list(model_value.tags)
+    payload["tags"] = serialize_str_list(cast(list[str], model_value.tags))
 
     for field in _LIST_FIELDS[concept]:
-        payload[field] = serialize_str_list(payload.get(field, []))
+        list_value = payload.get(field, [])
+        if not isinstance(list_value, (list, tuple)):
+            list_value = None
+        payload[field] = serialize_str_list(cast(Sequence[str] | None, list_value))
 
     # KB/YAML storage is keyed by semantic names; API-facing numeric ids are optional.
     payload.pop("id", None)
@@ -327,7 +407,7 @@ def records_to_core_concepts(
     return [record_to_core_concept(concept, record) for record in records]
 
 
-def kb_to_core_concepts_payload(kb: Any) -> CoreConceptCollection:
+def kb_to_core_concepts_payload(kb: _KnowledgeBaseLike) -> CoreConceptCollection:
     """Export all supported core KB concepts into canonical cross-layer payload."""
 
     module_name = getattr(getattr(kb, "config", None), "name", "unknown")
@@ -339,18 +419,21 @@ def kb_to_core_concepts_payload(kb: Any) -> CoreConceptCollection:
     for concept, kb_field in _KB_FIELDS.items():
         entries = getattr(kb, kb_field, {})
         values = entries.values() if isinstance(entries, Mapping) else []
-        payload[kb_field] = records_to_core_concepts(concept, values)
+        payload[kb_field] = records_to_core_concepts(
+            concept,
+            cast(Iterable[CoreConceptStorageRecord], values),
+        )
 
     return CoreConceptCollection.model_validate(payload)
 
 
 def canonical_payload_to_storage(
-    payload: CoreConceptCollection | Mapping[str, Any],
-) -> dict[str, Any]:
+    payload: CoreConceptCollection | Mapping[str, JsonValue],
+) -> dict[str, JsonValue]:
     """Convert canonical payload collections back to storage-compatible records."""
 
     collection = CoreConceptCollection.model_validate(payload)
-    out: dict[str, Any] = {"module_name": collection.module_name}
+    out: dict[str, JsonValue] = {"module_name": collection.module_name}
 
     for concept, kb_field in _KB_FIELDS.items():
         concept_values = getattr(collection, kb_field)

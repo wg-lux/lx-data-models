@@ -18,7 +18,7 @@ class MediaManagementCleanupQueryPayload(BaseModel):
 
     @field_validator("file_id", mode="before")
     @classmethod
-    def normalize_file_id(cls, value: object) -> int | None:
+    def normalize_file_id(cls, value: int | str | None) -> int | None:
         if value is None or value == "":
             return None
         if isinstance(value, bool):

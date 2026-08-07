@@ -215,11 +215,15 @@ def _build_kb_lookup(core: Dict[str, Any]) -> Dict[str, Dict[str, Dict[str, Any]
         _norm_name(item.get("name")): item
         for item in core.get("classification_choice", [])
     }
+    indication_by_name = {
+        _norm_name(item.get("name")): item for item in core.get("indication", [])
+    }
     return {
         "examination": examination_by_name,
         "finding": finding_by_name,
         "classification": classification_by_name,
         "classification_choice": choice_by_name,
+        "indication": indication_by_name,
     }
 
 

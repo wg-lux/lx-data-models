@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Literal, NotRequired, TypedDict, cast
+from collections.abc import Mapping
+from typing import Literal, NotRequired, TypedDict, cast
 
 from pydantic import (
     BaseModel,
@@ -250,7 +251,7 @@ class HubTransferVideoSegmentPayload(_StrictPayload):
 
     @field_validator("source_segment_id", mode="before")
     @classmethod
-    def _normalize_source_segment_id(cls, value: object) -> int | str:
+    def _normalize_source_segment_id(cls, value: int | str) -> int | str:
         if isinstance(value, bool) or not isinstance(value, (int, str)):
             raise ValueError("source_segment_id must be an integer or string")
         if isinstance(value, str):
@@ -372,18 +373,20 @@ class HubTransferReportTransferPayload(_HubTransferPayload):
     resource_rows: HubTransferReportResourceRowsPayload
 
 
-def _validate_payload(model_cls: type[BaseModel], value: Any) -> dict[str, JsonValue]:
+def _validate_payload(
+    model_cls: type[BaseModel], value: Mapping[str, JsonValue]
+) -> HubTransferJsonObject:
     if not isinstance(value, dict):
         raise ValueError("payload must be a JSON object")
     try:
         model = model_cls.model_validate(value)
     except ValidationError as exc:
         raise ValueError(str(exc)) from exc
-    return cast(dict[str, JsonValue], model.model_dump(mode="json", exclude_none=True))
+    return cast(HubTransferJsonObject, model.model_dump(mode="json", exclude_none=True))
 
 
 def validate_hub_transfer_video_resource_rows(
-    value: Any,
+    value: Mapping[str, JsonValue],
 ) -> HubTransferVideoResourceRowsData:
     return cast(
         HubTransferVideoResourceRowsData,
@@ -392,7 +395,7 @@ def validate_hub_transfer_video_resource_rows(
 
 
 def validate_hub_transfer_report_resource_rows(
-    value: Any,
+    value: Mapping[str, JsonValue],
 ) -> HubTransferReportResourceRowsData:
     return cast(
         HubTransferReportResourceRowsData,
@@ -401,7 +404,7 @@ def validate_hub_transfer_report_resource_rows(
 
 
 def validate_hub_transfer_processing_snapshot(
-    value: Any,
+    value: Mapping[str, JsonValue],
 ) -> HubTransferProcessingSnapshotData:
     return cast(
         HubTransferProcessingSnapshotData,
@@ -410,7 +413,7 @@ def validate_hub_transfer_processing_snapshot(
 
 
 def validate_hub_transfer_video_payload(
-    value: Any,
+    value: Mapping[str, JsonValue],
 ) -> HubTransferVideoTransferPayloadData:
     return cast(
         HubTransferVideoTransferPayloadData,
@@ -419,7 +422,7 @@ def validate_hub_transfer_video_payload(
 
 
 def validate_hub_transfer_report_payload(
-    value: Any,
+    value: Mapping[str, JsonValue],
 ) -> HubTransferReportTransferPayloadData:
     return cast(
         HubTransferReportTransferPayloadData,

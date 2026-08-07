@@ -30,7 +30,7 @@ class TextAnonymizationMeta(BaseModel):
         mode="before",
     )
     @classmethod
-    def normalize_text(cls, value: object) -> str:
+    def normalize_text(cls, value: str | int | None) -> str:
         if value is None:
             return ""
         return str(value).strip()
@@ -69,7 +69,7 @@ class PersonNameMetadata(BaseModel):
 
     @field_validator("first_name", "last_name", mode="before")
     @classmethod
-    def normalize_name(cls, value: object) -> str:
+    def normalize_name(cls, value: str | int | float | bool | None) -> str:
         text = str(value).strip()
         if not text:
             raise ValueError("name components must not be empty")
@@ -102,7 +102,7 @@ class LLMMetadataPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def normalize_text_fields(cls, value: object) -> str:
+    def normalize_text_fields(cls, value: str | int | None) -> str:
         if value is None:
             return ""
         return str(value).strip()

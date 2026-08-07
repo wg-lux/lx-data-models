@@ -48,7 +48,7 @@ class AnonymizationStatusPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def blank_to_none(cls, value: object) -> object:
+    def blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
         if value is None:
             return None
         if isinstance(value, str):

@@ -1,13 +1,43 @@
 from __future__ import annotations
 
 from pathlib import Path
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from typing import TypeAlias, cast
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator
 
 JsonPath: TypeAlias = str
-ActivationCallable: TypeAlias = Callable[[object], object]
+ActivationCallable: TypeAlias = Callable[[float], float]
+
+
+def _coerce_float(value: object) -> float:
+    if isinstance(value, bool):
+        return float(int(value))
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("value cannot be blank")
+        return float(stripped)
+    raise ValueError("value must be numeric")
+
+
+def _coerce_int(value: object) -> int:
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, (int,)):
+        return int(value)
+    if isinstance(value, float):
+        if not value.is_integer():
+            raise ValueError("value must be an integer")
+        return int(value)
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("value cannot be blank")
+        return int(float(stripped)) if "." in stripped else int(stripped)
+    raise ValueError("value must be an integer")
 
 
 class AiPredictionConfigPayload(BaseModel):
@@ -34,17 +64,25 @@ class AiPredictionConfigPayload(BaseModel):
     @classmethod
     def _normalize_float_triplet(
         cls,
-        value: object,
+        value: Sequence[object],
     ) -> tuple[float, float, float]:
         if isinstance(value, (list, tuple)) and len(value) == 3:
-            return (float(value[0]), float(value[1]), float(value[2]))
+            return (
+                _coerce_float(value[0]),
+                _coerce_float(value[1]),
+                _coerce_float(value[2]),
+            )
         raise ValueError("mean/std must contain exactly three numeric values")
 
     @field_validator("axes", mode="before")
     @classmethod
-    def _normalize_axes(cls, value: object) -> list[int]:
+    def _normalize_axes(cls, value: Sequence[object]) -> list[int]:
         if isinstance(value, (list, tuple)) and len(value) == 3:
-            return [int(value[0]), int(value[1]), int(value[2])]
+            return [
+                _coerce_int(value[0]),
+                _coerce_int(value[1]),
+                _coerce_int(value[2]),
+            ]
         raise ValueError("axes must contain exactly three integer values")
 
 
@@ -88,7 +126,9 @@ class VideoSegmentsPayload(RootModel[dict[str, list[tuple[int, int]]]]):
 
     @field_validator("root", mode="before")
     @classmethod
-    def _normalize_root(cls, value: object) -> dict[str, list[tuple[int, int]]]:
+    def _normalize_root(
+        cls, value: Mapping[str, list[tuple[object, object]]] | Mapping[object, object]
+    ) -> dict[str, list[tuple[int, int]]]:
         if not isinstance(value, Mapping):
             raise ValueError("Video sequences payload must be a JSON object.")
 

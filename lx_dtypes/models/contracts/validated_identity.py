@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
+from lx_dtypes.models.contracts.json_types import JsonObject
 
 
 MediaType = Literal["video", "pdf"]
@@ -28,5 +29,5 @@ class ValidatedIdentityPayload(BaseModel):
 
 def dump_validated_identity_payload(
     payload: ValidatedIdentityPayload,
-) -> dict[str, object]:
+) -> JsonObject:
     return payload.model_dump(mode="python")

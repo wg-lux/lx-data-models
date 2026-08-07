@@ -53,6 +53,39 @@ class Case(LedgerBaseModel[CaseDataDict]):
             "patient_examinations", "examinations", "related_examinations"
         ),
     )
+    report_ids: list[str] = Field(
+        default_factory=list,
+        validation_alias=AliasChoices("report_ids", "reports"),
+    )
+
+    @field_validator("report_ids", mode="before")
+    @classmethod
+    def _coerce_report_ids(cls, value: Any) -> list[str]:
+        if value is None:
+            return []
+        if not isinstance(value, list):
+            raise ValueError("report_ids must be a list of references")
+        report_ids: list[str] = []
+        for report_ref in value:
+            if isinstance(report_ref, str):
+                report_ids.append(report_ref)
+            elif isinstance(report_ref, dict):
+                if "uuid" in report_ref:
+                    report_ids.append(str(report_ref["uuid"]))
+                elif "id" in report_ref:
+                    report_ids.append(str(report_ref["id"]))
+                else:
+                    raise ValueError(
+                        "report_ids dict items must contain 'uuid' or 'id'"
+                    )
+            else:
+                if hasattr(report_ref, "uuid"):
+                    report_ids.append(str(getattr(report_ref, "uuid")))
+                else:
+                    raise ValueError(
+                        "report_ids list items must be strings or objects with uuid"
+                    )
+        return report_ids
 
     @field_validator("admission_date", "leave_date", mode="before")
     @classmethod
@@ -86,7 +119,7 @@ class Case(LedgerBaseModel[CaseDataDict]):
 
     @classmethod
     def nested_fields(cls) -> list[str]:
-        return CASE_MODEL_NESTED_FIELDS
+        return CASE_MODEL_NESTED_FIELDS + ["report_ids"]
 
     @property
     def serialized_ddict_class(self) -> type[SerializedCaseDataDict]:
@@ -103,6 +136,7 @@ class SerializedCase(LedgerBaseModel[SerializedCaseDataDict]):
     admission_date: AwareDatetime
     leave_date: AwareDatetime | None = None
     patient_examinations: str = ""
+    report_ids: str = ""
 
     @classmethod
     def list_type_fields(cls) -> list[str]:

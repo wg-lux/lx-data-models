@@ -5,7 +5,7 @@ from dataclasses import asdict, dataclass
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .json_types import JsonObject
+from .json_types import JsonObject, JsonValue
 
 
 @dataclass(frozen=True)
@@ -23,7 +23,7 @@ class TemporalInferenceDispatchResult:
     message: str | None = None
     blocked_by_history_id: int | None = None
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, JsonValue]:
         return asdict(self)
 
 
@@ -72,13 +72,13 @@ class TemporalInferenceHistoryConfigPayload(BaseModel):
 
 
 def parse_temporal_inference_history_config_payload(
-    payload: Mapping[str, object] | None,
+    payload: Mapping[str, JsonValue] | None,
 ) -> TemporalInferenceHistoryConfigPayload:
     return TemporalInferenceHistoryConfigPayload.model_validate(payload or {})
 
 
 def parse_temporal_inference_history_result_payload(
-    payload: Mapping[str, object] | None,
+    payload: Mapping[str, JsonValue] | None,
 ) -> TemporalInferenceHistoryResultPayload:
     return TemporalInferenceHistoryResultPayload.model_validate(payload or {})
 

@@ -2,13 +2,32 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Literal, Sequence, cast
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from lx_dtypes.models.contracts.video_frame_export import export_config
+from lx_dtypes.models.contracts.json_types import JsonValue
+
+
+def _coerce_int(value: object) -> int:
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return int(value)
+    if isinstance(value, float):
+        if not value.is_integer():
+            raise ValueError("segment ids must be integer values")
+        return int(value)
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return 0
+        return int(stripped)
+    raise ValueError("segment ids must be integers")
 
 
 class ExportAnnotatedConfigContract(BaseModel):
@@ -57,7 +76,9 @@ class ExportAnnotatedConfigContract(BaseModel):
         mode="before",
     )
     @classmethod
-    def normalize_bool_string(cls, value: object) -> object:
+    def normalize_bool_string(
+        cls, value: bool | str | int | float | None
+    ) -> bool | str | int | None:
         if isinstance(value, bool):
             return value
 
@@ -68,29 +89,37 @@ class ExportAnnotatedConfigContract(BaseModel):
             if normalized in {"0", "false", "no", "off", ""}:
                 return False
 
+        if isinstance(value, float):
+            if not value.is_integer():
+                raise ValueError("Boolean-like number must be 0 or 1.")
+            return bool(int(value))
+        if isinstance(value, int):
+            return bool(value)
         return value
 
     @field_validator("center_key", mode="before")
     @classmethod
-    def normalize_center_key(cls, value: object) -> object:
+    def normalize_center_key(cls, value: str | int | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
             return value.strip()
-        return value
+        return str(value)
 
     @field_validator("information_source_name", "transcode_ext", mode="before")
     @classmethod
-    def normalize_required_string(cls, value: object) -> object:
+    def normalize_required_string(
+        cls, value: str | int | float | bool | None
+    ) -> str | None:
         if value is None:
             return value
         if isinstance(value, str):
             return value.strip()
-        return value
+        return str(value).strip()
 
     @field_validator("output_path", "output_dir", mode="before")
     @classmethod
-    def normalize_path(cls, value: object) -> object:
+    def normalize_path(cls, value: Path | str | None) -> Path | str | None:
         if isinstance(value, Path):
             return value
         if isinstance(value, str):
@@ -102,10 +131,19 @@ class ExportAnnotatedConfigContract(BaseModel):
 
     @field_validator("segment_ids", mode="before")
     @classmethod
-    def normalize_segment_ids(cls, value: object) -> object:
+    def normalize_segment_ids(
+        cls, value: Sequence[object] | str | None
+    ) -> Sequence[int] | list[int]:
         if value in (None, ""):
             return []
-        return value
+        if isinstance(value, str):
+            parts = [part.strip() for part in value.split(",")]
+            return [_coerce_int(part) for part in parts if part]
+        if isinstance(value, (bytes, bytearray)):
+            raise ValueError("segment_ids cannot be bytes.")
+        if isinstance(value, Sequence):
+            return [_coerce_int(item) for item in value]
+        raise ValueError("segment_ids must be a sequence of integers.")
 
     @model_validator(mode="after")
     def validate_required_values(self) -> ExportAnnotatedConfigContract:
@@ -142,7 +180,9 @@ class ExportAnnotatedConfigContract(BaseModel):
         return self.output_dir
 
     @classmethod
-    def from_api_payload(cls, payload: dict[str, Any]) -> ExportAnnotatedConfigContract:
+    def from_api_payload(
+        cls, payload: Mapping[str, JsonValue]
+    ) -> ExportAnnotatedConfigContract:
         raw = dict(payload)
 
         config_path = raw.pop("config_path", None)
@@ -154,7 +194,7 @@ class ExportAnnotatedConfigContract(BaseModel):
         return cls.model_validate(raw)
 
     @staticmethod
-    def _load_yaml_payload(config_path: Path) -> dict[str, Any]:
+    def _load_yaml_payload(config_path: Path) -> dict[str, JsonValue]:
         if not config_path.exists():
             raise FileNotFoundError(f"config file not found: {config_path}")
 
@@ -166,7 +206,7 @@ class ExportAnnotatedConfigContract(BaseModel):
         if not isinstance(loaded, dict):
             raise ValueError("export config must be a mapping/object")
 
-        return cast(dict[str, Any], loaded)
+        return cast(dict[str, JsonValue], loaded)
 
     def to_export_config(self) -> export_config:
         return export_config(

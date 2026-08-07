@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 
 def _empty_combined_results() -> list[
@@ -34,7 +35,7 @@ class ImageProcessingResultPayload(BaseModel):
         default_factory=_empty_modified_images
     )
     gender_pars: list[str] = Field(default_factory=list)
-    llm_results: dict[str, object] = Field(default_factory=dict)
+    llm_results: dict[str, JsonValue] = Field(default_factory=dict)
 
 
 __all__ = ["ImageProcessingResultPayload"]

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
+from lx_dtypes.models.contracts.json_types import JsonObject
 
 
 class LabelVideoSegmentSummaryPayload(BaseModel):
@@ -25,7 +26,7 @@ class LabelVideoSegmentFrameClassificationPayload(BaseModel):
     frame_filename: str
     frame_file_path: str
     frame_url: str
-    all_classifications: list[dict[str, object]] = Field(default_factory=list)
+    all_classifications: list[JsonObject] = Field(default_factory=list)
     frame_id: int
 
 

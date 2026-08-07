@@ -14,6 +14,7 @@ class CaseDataDict(LedgerBaseModelDataDict):
     admission_date: str
     leave_date: Optional[str]
     patient_examinations: List["PExaminationDataDict"]
+    report_ids: List[str]
 
 
 class SerializedCaseDataDict(LedgerBaseModelDataDict):
@@ -22,3 +23,4 @@ class SerializedCaseDataDict(LedgerBaseModelDataDict):
     admission_date: str
     leave_date: Optional[str]
     patient_examinations: str
+    report_ids: str

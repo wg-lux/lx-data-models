@@ -76,7 +76,9 @@ class VideoReimportRequestPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def _normalize_optional_bool(cls, value: object) -> object:
+    def _normalize_optional_bool(
+        cls, value: bool | str | int | None
+    ) -> bool | str | int | None:
         if value is None or isinstance(value, bool):
             return value
         if isinstance(value, str):
@@ -89,7 +91,7 @@ class VideoReimportRequestPayload(BaseModel):
 
     @field_validator("model_name", "model_meta_version", mode="before")
     @classmethod
-    def _blank_to_none(cls, value: object) -> object:
+    def _blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
         if isinstance(value, str):
             return value.strip() or None
         if value is None:
@@ -204,24 +206,29 @@ def video_reimport_json_safe(value: object) -> VideoReimportJsonValue:
         return value
     if isinstance(value, Mapping):
         mapping = cast(Mapping[object, object], value)
-        return {
-            str(key): video_reimport_json_safe(item) for key, item in mapping.items()
-        }
+        return cast(
+            VideoReimportJsonValue,
+            {str(key): video_reimport_json_safe(item) for key, item in mapping.items()},
+        )
     if isinstance(value, (list, tuple)):
         items = cast(list[object] | tuple[object, ...], value)
-        return [video_reimport_json_safe(item) for item in items]
+        return cast(
+            VideoReimportJsonValue,
+            [video_reimport_json_safe(item) for item in items],
+        )
     return str(value)
 
 
-def video_reimport_json_safe_dict(payload: object) -> JsonObject:
-    if not isinstance(payload, Mapping):
-        return {}
+def video_reimport_json_safe_dict(payload: Mapping[str, JsonValue]) -> JsonObject:
     mapping = cast(Mapping[object, object], payload)
-    return {str(key): video_reimport_json_safe(value) for key, value in mapping.items()}
+    return cast(
+        JsonObject,
+        {str(key): video_reimport_json_safe(value) for key, value in mapping.items()},
+    )
 
 
 def validate_video_reimport_request_payload(
-    payload: object,
+    payload: Mapping[str, JsonValue],
 ) -> VideoReimportRequestPayload:
     return VideoReimportRequestPayload.model_validate(
         video_reimport_json_safe_dict(payload)

@@ -39,7 +39,9 @@ class VideoCorrectionRoiPayload(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def normalize_endoscope_roi_aliases(cls, value: object) -> object:
+    def normalize_endoscope_roi_aliases(
+        cls, value: Mapping[str, JsonValue] | VideoCorrectionRoiPayload
+    ) -> Mapping[str, JsonValue] | VideoCorrectionRoiPayload:
         if not isinstance(value, Mapping):
             return value
         data = dict(value)
@@ -62,18 +64,20 @@ class VideoCorrectionRoiPayload(BaseModel):
         return data
 
 
-def _blank_to_none(value: object) -> object:
+def _blank_to_none(value: str | int | float | bool | None) -> str | None:
     if isinstance(value, str):
         stripped = value.strip()
         return stripped or None
-    return value
+    if value is None:
+        return None
+    return str(value).strip() or None
 
 
-def _payload_dict(payload: Mapping[str, object]) -> dict[str, object]:
+def _payload_dict(payload: Mapping[str, JsonValue]) -> dict[str, JsonValue]:
     return dict(payload)
 
 
-def _coerce_payload_bool(value: object) -> object:
+def _coerce_payload_bool(value: bool | str | int | None) -> bool | None:
     if value is None or isinstance(value, bool):
         return value
     if isinstance(value, str):
@@ -81,12 +85,16 @@ def _coerce_payload_bool(value: object) -> object:
     return bool(value)
 
 
-def _normalize_optional_int_list(value: object) -> object:
+def _normalize_optional_int_list(
+    value: list[int] | tuple[int, ...] | int | str | None,
+) -> list[int] | None:
     if value is None:
         return None
     if isinstance(value, list):
-        return [item for item in cast(list[object], value) if item is not None]
-    return [value]
+        return [
+            cast(int, item) for item in cast(list[object], value) if item is not None
+        ]
+    return [cast(int, value)]
 
 
 class VideoCorrectionProcessingMethodMixin(BaseModel):
@@ -95,7 +103,7 @@ class VideoCorrectionProcessingMethodMixin(BaseModel):
 
     @field_validator("use_streaming", mode="before")
     @classmethod
-    def normalize_use_streaming(cls, value: object) -> object:
+    def normalize_use_streaming(cls, value: bool | str | int | None) -> bool | None:
         return _coerce_payload_bool(value)
 
     @property
@@ -117,7 +125,9 @@ class VideoCorrectionApplyMaskPayload(VideoCorrectionProcessingMethodMixin):
 
     @field_validator("device_name", mode="before")
     @classmethod
-    def normalize_device_name(cls, value: object) -> object:
+    def normalize_device_name(
+        cls, value: str | int | float | bool | None
+    ) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")
@@ -156,14 +166,18 @@ class VideoCorrectionFrameRemovalPayload(VideoCorrectionProcessingMethodMixin):
 
     @field_validator("frame_list", "manual_frames", mode="before")
     @classmethod
-    def normalize_frame_list(cls, value: object) -> object:
+    def normalize_frame_list(
+        cls, value: list[int] | tuple[int, ...] | int | str | None
+    ) -> list[int] | None:
         return _normalize_optional_int_list(value)
 
     @field_validator(
         "frame_ranges", "detection_method", "selection_method", mode="before"
     )
     @classmethod
-    def normalize_optional_text(cls, value: object) -> object:
+    def normalize_optional_text(
+        cls, value: str | int | float | bool | None
+    ) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")
@@ -271,13 +285,13 @@ def dump_video_correction_segment_update_payload(
 
 
 def validate_video_correction_apply_mask_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> VideoCorrectionApplyMaskPayload:
     return VideoCorrectionApplyMaskPayload.model_validate(_payload_dict(payload))
 
 
 def validate_video_correction_frame_removal_payload(
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
 ) -> VideoCorrectionFrameRemovalPayload:
     return VideoCorrectionFrameRemovalPayload.model_validate(_payload_dict(payload))
 
