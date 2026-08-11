@@ -68,7 +68,7 @@ def test_upload_api_request_data_excludes_multipart_file_field() -> None:
     data = upload_api_request_data_from_mapping(
         {
             "center_key": "site-a",
-            "file": "not-part-of-the-contract",
+            "file": object(),
         }
     )
 

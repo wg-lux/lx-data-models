@@ -5,9 +5,6 @@ from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
-from .json_types import JsonValue
-
-
 _UPLOAD_API_REQUEST_FIELD_NAMES = frozenset(
     {"center_key", "center_name", "source_system", "idempotency_key"}
 )
@@ -41,7 +38,7 @@ class UploadApiRequestPayload(BaseModel):
 
 
 def upload_api_request_data_from_mapping(
-    payload: Mapping[str, JsonValue],
+    payload: Mapping[str, object],
 ) -> UploadApiRequestData:
     unknown_field_names = (
         set(payload)
@@ -66,7 +63,7 @@ def upload_api_request_data_from_mapping(
 
 
 def validate_upload_api_request_payload(
-    value: Mapping[str, JsonValue],
+    value: Mapping[str, object],
 ) -> UploadApiRequestPayload:
     try:
         return UploadApiRequestPayload.model_validate(

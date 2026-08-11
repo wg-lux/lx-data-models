@@ -266,10 +266,18 @@ Read the Docs or GitHub Pages.
 
 
 ## Release Process
-1. Update `CHANGELOG.md` and bump the version in `pyproject.toml`.
-2. Run formatting, linting, type-checking, and the full test suite.
-3. Build artifacts with `python -m build` and verify with `twine check dist/*`.
-4. Trigger the "Publish" GitHub workflow (either via tag/release or manual
+
+1. Update `CHANGELOG.md` and bump the Python distribution version in
+   `pyproject.toml`. Do not rewrite knowledge-base module versions as part of a
+   Python package release.
+2. Refresh and install the locked development toolchain with `uv lock` and
+   `uv sync --locked --extra dev`. This currently provides the Twine version
+   required to validate the build backend's package metadata.
+3. Run formatting, linting, type-checking, and the full test suite.
+4. Run `uv run --locked --extra dev lx-dtypes-release build`. The helper
+   validates only the wheel and sdist for the current project version, even if
+   `dist/` contains older artifacts. Never upload a reused `dist/*` glob.
+5. Trigger the "Publish" GitHub workflow (either via tag/release or manual
 	dispatch). Trusted Publisher entries for `test.pypi.org` and `pypi.org`
 	should already reference the `publish.yml` workflow and the `testpypi`/`pypi`
 	environments; approve those environments as needed and the workflow will
@@ -278,10 +286,11 @@ Read the Docs or GitHub Pages.
 ### Easier Release Commands
 
 ```bash
-lx-dtypes-release current
-lx-dtypes-release prepare 0.1.2
-lx-dtypes-release build
-git tag v0.1.2 && git push origin v0.1.2
+uv run --locked --extra dev lx-dtypes-release current
+uv run --locked --extra dev lx-dtypes-release prepare 0.2.14
+uv lock
+uv run --locked --extra dev lx-dtypes-release build
+git tag v0.2.14 && git push origin v0.2.14
 ```
 
 ### Easier KB Registry Commands

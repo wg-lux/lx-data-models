@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+from argparse import Namespace
 from pathlib import Path
 
+from _pytest.capture import CaptureFixture
 from _pytest.monkeypatch import MonkeyPatch
 
 from lx_dtypes.scripts.kb_registry import _add_entry
 from lx_dtypes.scripts.release import (
+    cmd_build,
     read_project_version,
     write_project_version,
 )
@@ -38,7 +41,7 @@ def test_add_entry_writes_expected_registry_shape(tmp_path: Path) -> None:
     }
 
 
-def test_write_project_version_updates_pyproject(
+def test_write_project_version_does_not_rewrite_kb_module_versions(
     monkeypatch: MonkeyPatch, tmp_path: Path
 ) -> None:
     project_root = tmp_path
@@ -66,21 +69,45 @@ def test_write_project_version_updates_pyproject(
         "_init_path",
         lambda: project_root / "lx_dtypes" / "__init__.py",
     )
-    monkeypatch.setattr(
-        release_module,
-        "_kb_config_paths",
-        lambda: (kb_config_path, demo_kb_config_path),
-    )
-    monkeypatch.setattr(
-        release_module,
-        "_kb_package_path",
-        lambda: kb_package_path,
-    )
-
     assert read_project_version() == "0.1.1"
     write_project_version("0.1.2")
     assert read_project_version() == "0.1.2"
-    assert "version: 0.1.2" in kb_config_path.read_text()
-    assert "version: 0.1.2" in demo_kb_config_path.read_text()
-    assert 'version = "0.1.2";' in kb_package_path.read_text()
-    assert 'kbModuleVersion = "0.1.2";' in kb_package_path.read_text()
+    assert "version: 0.1.1" in kb_config_path.read_text()
+    assert "version: 0.1.1" in demo_kb_config_path.read_text()
+    assert 'version = "0.1.1";' in kb_package_path.read_text()
+    assert 'kbModuleVersion = "0.1.1";' in kb_package_path.read_text()
+
+
+def test_cmd_build_checks_only_current_version_artifacts(
+    monkeypatch: MonkeyPatch, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "lx-dtypes"\nversion = "0.2.14"\n'
+    )
+    dist_dir = tmp_path / "dist"
+    dist_dir.mkdir()
+    old_wheel = dist_dir / "lx_dtypes-0.2.13-py3-none-any.whl"
+    current_wheel = dist_dir / "lx_dtypes-0.2.14-py3-none-any.whl"
+    current_sdist = dist_dir / "lx_dtypes-0.2.14.tar.gz"
+    for artifact in (old_wheel, current_wheel, current_sdist):
+        artifact.touch()
+
+    import lx_dtypes.scripts.release as release_module
+
+    commands: list[list[str]] = []
+    monkeypatch.setattr(release_module, "_project_root", lambda: tmp_path)
+    monkeypatch.setattr(
+        release_module, "_pyproject_path", lambda: tmp_path / "pyproject.toml"
+    )
+    monkeypatch.setattr(
+        release_module,
+        "run_command",
+        lambda args, *, cwd: commands.append(args),
+    )
+
+    assert cmd_build(Namespace()) == 0
+    assert commands[1][-2:] == [str(current_wheel), str(current_sdist)]
+    assert str(old_wheel) not in commands[1]
+    output = capsys.readouterr().out
+    assert "lx-dtypes 0.2.14 artifacts only" in output
+    assert "do not upload dist/*" in output
