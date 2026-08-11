@@ -7,17 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.14] - 2026-08-11
+
 ### Added
 - Project metadata reshaped for eventual PyPI publication.
 - Development dependency group separated from runtime requirements.
 - A public, complete `DtypesRecordPersistencePayload` contract and JSON
   parse/dump helpers for Django host persistence boundaries.
+- An installed-wheel release check that verifies the packaged
+  `upper_gi_quality_2025` and `colonoscopy_training_basic` report templates are
+  published and production-ready.
 
 ### Changed
 - LXDM record persistence now covers the complete `PExamination` ledger graph;
   unknown root and nested fields are rejected instead of being silently kept.
 - Patient-finding deletion requires host authentication and object authorization,
   records actor/time provenance, and refreshes the persisted LXDM record atomically.
+- Report-template lifecycle mutations now resolve the active writable module and
+  version used by runtime discovery, while immutable templates installed from the
+  Python package fail closed instead of being modified in `site-packages`.
+- Release metadata checks now use a pinned Twine version that accepts the
+  metadata format emitted by the pinned build toolchain.
 
 ## [0.1.0] - 2025-12-10
 

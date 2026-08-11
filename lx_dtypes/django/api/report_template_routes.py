@@ -8,24 +8,19 @@ from lx_dtypes.models.contracts import KnowledgeBaseContract
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
-from lx_dtypes.models.interface.KnowledgeBaseResolver import load_knowledge_base
-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
-    get_knowledge_base_identity,
-)
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.knowledge_base.report_template.ReportConceptCoverageBuilder import (
     build_report_concept_coverage,
 )
 
-from . import report_template_builder
 from .report_template_builder import (
     PublishReportTemplateResponse,
+    ReportTemplateModuleLocation,
     SaveReportTemplateRequest,
     SaveReportTemplateResponse,
     save_report_template_definition,
     set_saved_report_template_lifecycle,
 )
-from .lookup_tracker import register_runtime_lookup_tracker
 from .request_types import BaseRequest
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -64,28 +59,12 @@ def _attach_resolved_kb_identity(
     return response
 
 
-def _load_builder_module_kb(module_name: str) -> KnowledgeBaseContract:
-    _, resolved_version = get_knowledge_base_identity(
-        module_name,
-        input_dirs=[report_template_builder.MODULES_ROOT],
-    )
-    kb = cast(
-        KnowledgeBaseContract,
-        load_knowledge_base(
-            module_name,
-            version=resolved_version,
-            input_dirs=[report_template_builder.MODULES_ROOT],
-        ),
-    )
-    register_runtime_lookup_tracker(cast(Any, kb))
-    return kb
-
-
 def register_report_template_routes(
     api: _TypedApi,
     *,
     load_module_kb: Callable[..., KnowledgeBaseContract],
     clear_kb_caches: Callable[[], None],
+    resolve_builder_module_location: Callable[[str], ReportTemplateModuleLocation],
     resolve_payload_kb_identity: Callable[[str, PExamination], tuple[str, str | None]],
     orm_models: Callable[[], Dict[str, Any]],
     build_p_examination_payload_from_host_ledger: Callable[..., PExamination],
@@ -117,15 +96,19 @@ def register_report_template_routes(
         Persist a new report-template YAML file into one lx_dtypes knowledge-base module.
         """
         require_builder_access(request, "report_template:write")
+        module_name = payload.module_name.strip() or "report_template_examples"
+        location = resolve_builder_module_location(module_name)
         try:
-            saved = save_report_template_definition(payload)
+            saved = save_report_template_definition(
+                payload, modules_root=location.modules_root
+            )
         except FileExistsError as exc:
             raise HttpError(409, str(exc)) from exc
         except ValueError as exc:
             raise HttpError(400, str(exc)) from exc
 
         clear_kb_caches()
-        kb = _load_builder_module_kb(saved.module_name)
+        kb = load_module_kb(saved.module_name, version=location.version)
         compiled = _compile_report_template(kb, saved.template_name, mode="preview")
         saved.readiness = compiled["summary"].model_dump(mode="json")
         return saved
@@ -211,11 +194,8 @@ def register_report_template_routes(
         request: BaseRequest, module_name: str, template_name: str
     ) -> PublishReportTemplateResponse:
         require_builder_access(request, "report_template:write")
-        _, resolved_version = get_knowledge_base_identity(
-            module_name,
-            input_dirs=[report_template_builder.MODULES_ROOT],
-        )
-        kb = load_module_kb(module_name, version=resolved_version)
+        location = resolve_builder_module_location(module_name)
+        kb = load_module_kb(module_name, version=location.version)
         try:
             compiled = _compile_report_template(kb, template_name, mode="publish")
         except KeyError as exc:
@@ -235,9 +215,10 @@ def register_report_template_routes(
             module_name=module_name,
             template_name=template_name,
             lifecycle_status="published",
+            modules_root=location.modules_root,
         )
         clear_kb_caches()
-        refreshed_kb = load_module_kb(module_name, version=resolved_version)
+        refreshed_kb = load_module_kb(module_name, version=location.version)
         refreshed = _compile_report_template(
             refreshed_kb, template_name, mode="production"
         )
@@ -251,11 +232,8 @@ def register_report_template_routes(
         request: BaseRequest, module_name: str, template_name: str
     ) -> PublishReportTemplateResponse:
         require_builder_access(request, "report_template:write")
-        _, resolved_version = get_knowledge_base_identity(
-            module_name,
-            input_dirs=[report_template_builder.MODULES_ROOT],
-        )
-        kb = load_module_kb(module_name, version=resolved_version)
+        location = resolve_builder_module_location(module_name)
+        kb = load_module_kb(module_name, version=location.version)
         if template_name not in kb.report_template:
             raise HttpError(
                 404,
@@ -266,9 +244,10 @@ def register_report_template_routes(
             module_name=module_name,
             template_name=template_name,
             lifecycle_status="draft",
+            modules_root=location.modules_root,
         )
         clear_kb_caches()
-        refreshed_kb = load_module_kb(module_name, version=resolved_version)
+        refreshed_kb = load_module_kb(module_name, version=location.version)
         refreshed = _compile_report_template(
             refreshed_kb, template_name, mode="preview"
         )
@@ -428,11 +407,7 @@ def register_report_template_routes(
         request: BaseRequest, module_name: str, template_name: str
     ) -> Dict[str, Any]:
         require_builder_access(request, "report_template:read")
-        _, resolved_version = get_knowledge_base_identity(
-            module_name,
-            input_dirs=[report_template_builder.MODULES_ROOT],
-        )
-        kb = load_module_kb(module_name, version=resolved_version)
+        kb = load_module_kb(module_name)
         if template_name not in kb.report_template:
             raise HttpError(
                 404,

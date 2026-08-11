@@ -58,6 +58,12 @@ Current readiness:
 - Good enough for clinician plus engineer collaboration
 - Not good enough for unsupported editing by non-technical staff
 
+The copy installed from the `lx-dtypes` wheel is immutable release content.
+Runtime builder APIs must not edit files in `site-packages`. Import an editable,
+versioned terminology bundle before saving a new template or changing lifecycle
+state. Packaged templates are published by the protected package release
+workflow and verified from the built wheel.
+
 Why not:
 
 - exact string matching is required everywhere

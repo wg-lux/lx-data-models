@@ -143,6 +143,12 @@ class PublishReportTemplateResponse(BaseModel):
     readiness: ReportTemplateReadinessSummaryDataDict | None = None
 
 
+class ReportTemplateModuleLocation(BaseModel):
+    module_name: str = Field(min_length=1)
+    version: str = Field(min_length=1)
+    modules_root: Path
+
+
 def module_dir(module_name: str, *, modules_root: Path | None = None) -> Path:
     modules_root = modules_root or MODULES_ROOT
     safe_name = slugify_name(module_name)

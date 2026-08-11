@@ -29,6 +29,7 @@ def test_serialize_path_handles_values_and_none(tmp_path: Path) -> None:
 
 def test_wheel_build_includes_knowledge_base_data() -> None:
     payload = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+    wheel_packages = payload["tool"]["hatch"]["build"]["targets"]["wheel"]["packages"]
     wheel_force_include = payload["tool"]["hatch"]["build"]["targets"]["wheel"][
         "force-include"
     ]
@@ -36,6 +37,7 @@ def test_wheel_build_includes_knowledge_base_data() -> None:
         "force-include"
     ]
 
+    assert wheel_packages == ["lx_dtypes"]
     assert "demo-data" not in wheel_force_include
     assert sdist_force_include["lx_dtypes/data"] == "lx_dtypes/data"
 

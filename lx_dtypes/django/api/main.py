@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from functools import lru_cache
 from importlib import import_module
+from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -28,8 +29,10 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseVersionNotFoundError,
     clear_knowledge_base_resolver_caches,
     load_knowledge_base,
+    load_module_config,
 )
 from lx_dtypes.models.interface import KnowledgeBaseResolver as _knowledge_base_resolver
+from lx_dtypes.models.interface.data_roots import package_data_root
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 from .findings_routes import (
@@ -42,6 +45,10 @@ from .indications_routes import register_indications_routes
 from .examinations_routes import register_examinations_routes
 from .request_types import BaseRequest
 from .report_template_routes import register_report_template_routes
+from .report_template_builder import (
+    ReportTemplateModuleLocation,
+    module_dir as report_template_module_dir,
+)
 from .lookup_tracker import register_runtime_lookup_tracker
 from .terminology_routes import (
     active_terminology_selection,
@@ -268,6 +275,54 @@ def _load_module_kb(
         raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
     register_runtime_lookup_tracker(cast(Any, kb))
     return kb
+
+
+def _resolve_report_template_module_location(
+    module_name: str,
+) -> ReportTemplateModuleLocation:
+    version = _resolve_active_version(module_name, None)
+    if version is None:
+        raise HttpError(
+            409,
+            f"Knowledge-base module '{module_name}' has no active version.",
+        )
+    config = load_module_config(module_name, version=version)
+    source_file = config.source_file
+    if source_file is None:
+        raise HttpError(
+            409,
+            f"Knowledge-base module '{module_name}' has no attributable source file.",
+        )
+
+    module_path = Path(source_file).resolve().parent
+    modules_root = module_path.parent
+    if config.name != module_name:
+        raise HttpError(
+            409,
+            f"Resolved knowledge-base module '{config.name}' does not match '{module_name}'.",
+        )
+    try:
+        expected_module_path = report_template_module_dir(
+            module_name, modules_root=modules_root
+        )
+    except ValueError as exc:
+        raise HttpError(409, str(exc)) from exc
+    if expected_module_path != module_path:
+        raise HttpError(
+            409,
+            f"Knowledge-base module '{module_name}' is not in its resolved module root.",
+        )
+    if modules_root.resolve() == package_data_root().resolve():
+        raise HttpError(
+            409,
+            "Packaged report templates are immutable. Import an editable terminology "
+            "bundle before saving or changing publication state.",
+        )
+    return ReportTemplateModuleLocation(
+        module_name=module_name,
+        version=version,
+        modules_root=modules_root,
+    )
 
 
 def _kb_loader() -> Any:
@@ -647,6 +702,9 @@ register_report_template_routes(
     api,
     load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
     clear_kb_caches=lambda: _clear_kb_caches(),
+    resolve_builder_module_location=lambda module_name: (
+        _resolve_report_template_module_location(module_name)
+    ),
     resolve_payload_kb_identity=lambda *args, **kwargs: _resolve_payload_kb_identity(
         *args, **kwargs
     ),

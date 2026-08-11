@@ -8,11 +8,16 @@ from pathlib import Path
 
 import pytest
 from django.test import Client
+from ninja.errors import HttpError
 
 from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api import report_template_routes
 from lx_dtypes.django.api import report_template_builder
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+
+resolve_report_template_module_location = (
+    api_main._resolve_report_template_module_location
+)
 
 
 @dataclass
@@ -98,6 +103,15 @@ def builder_route_authorization(monkeypatch: pytest.MonkeyPatch) -> None:
         "_report_template_access_allowed",
         lambda actor, capability: True,
     )
+    monkeypatch.setattr(
+        api_main,
+        "_resolve_report_template_module_location",
+        lambda module_name: report_template_builder.ReportTemplateModuleLocation(
+            module_name=module_name,
+            version="1.0.0",
+            modules_root=report_template_builder.MODULES_ROOT,
+        ),
+    )
 
 
 def test_builder_routes_fail_closed_and_separate_read_from_write(
@@ -180,7 +194,7 @@ def test_save_report_template_returns_400_for_unknown_module(client: Client) -> 
     assert "Unknown report-template module" in response.content.decode()
 
 
-def test_save_report_template_uses_resolver_input_dirs(
+def test_save_report_template_uses_resolved_mutable_module_location(
     client: Client, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     captured: dict[str, Any] = {}
@@ -212,18 +226,15 @@ def test_save_report_template_uses_resolver_input_dirs(
         captured["input_dirs"] = input_dirs
         return _FakeKb()
 
+    monkeypatch.setattr(api_main, "_load_module_kb", _fake_load_knowledge_base)
     monkeypatch.setattr(
-        report_template_routes, "load_knowledge_base", _fake_load_knowledge_base
-    )
-    monkeypatch.setattr(
-        report_template_builder,
-        "MODULES_ROOT",
-        tmp_path,
-    )
-    monkeypatch.setattr(
-        report_template_routes,
-        "register_runtime_lookup_tracker",
-        lambda kb: None,
+        api_main,
+        "_resolve_report_template_module_location",
+        lambda module_name: report_template_builder.ReportTemplateModuleLocation(
+            module_name=module_name,
+            version="1.0.0",
+            modules_root=tmp_path,
+        ),
     )
     monkeypatch.setattr(
         report_template_routes,
@@ -250,8 +261,32 @@ def test_save_report_template_uses_resolver_input_dirs(
     assert captured == {
         "module_name": "builder_module",
         "version": "1.0.0",
-        "input_dirs": [tmp_path],
+        "input_dirs": None,
     }
+
+
+def test_packaged_report_template_module_is_immutable(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    package_root = tmp_path / "data"
+    module_path = package_root / "report_template_examples"
+    module_path.mkdir(parents=True)
+    source_file = module_path / "config.yaml"
+    source_file.write_text("name: report_template_examples\n", encoding="utf-8")
+
+    monkeypatch.setattr(api_main, "_resolve_active_version", lambda *args: "1.0.0")
+    monkeypatch.setattr(
+        api_main,
+        "load_module_config",
+        lambda *args, **kwargs: SimpleNamespace(
+            name="report_template_examples",
+            source_file=source_file,
+        ),
+    )
+    monkeypatch.setattr(api_main, "package_data_root", lambda: package_root)
+
+    with pytest.raises(HttpError, match="Packaged report templates are immutable"):
+        resolve_report_template_module_location("report_template_examples")
 
 
 def test_publish_report_template_returns_409_when_summary_blocks_publish(

@@ -8,7 +8,6 @@ from typing import Any
 from django.test import Client
 from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api import report_template_builder
-from lx_dtypes.django.api import report_template_routes
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,
     load_knowledge_base,
@@ -215,13 +214,13 @@ def test_builder_module_kb_loader_uses_resolved_version(
 
     captured: dict[str, str | None] = {}
 
-    monkeypatch.setattr(report_template_builder, "MODULES_ROOT", tmp_path)
     monkeypatch.setattr(
-        report_template_routes,
-        "get_knowledge_base_identity",
-        lambda module_name, *, version=None, input_dirs=None: (
-            module_name,
-            "1.0.0",
+        api_main,
+        "_resolve_report_template_module_location",
+        lambda module_name: report_template_builder.ReportTemplateModuleLocation(
+            module_name=module_name,
+            version="1.0.0",
+            modules_root=tmp_path,
         ),
     )
 
@@ -237,8 +236,8 @@ def test_builder_module_kb_loader_uses_resolved_version(
         return load_knowledge_base(module_name, version=version, input_dirs=[tmp_path])
 
     monkeypatch.setattr(
-        report_template_routes,
-        "load_knowledge_base",
+        api_main,
+        "_load_module_kb",
         _fake_load_knowledge_base,
     )
 
