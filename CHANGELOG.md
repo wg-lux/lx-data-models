@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Canonical Django migration `0005_videofiledjango` for the concrete
+  `VideoFileDjango` model exported by the package.
+- Release artifacts are rejected when their migration filenames, contents, or
+  declared maximum differ from the source tree.
+
 ### Changed
 - Release preparation keeps Python distribution versions separate from
   knowledge-base module identities and ignores historical artifacts in reused

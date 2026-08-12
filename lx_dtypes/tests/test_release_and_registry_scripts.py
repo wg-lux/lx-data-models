@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import json
+import tarfile
+import zipfile
 from argparse import Namespace
+from io import BytesIO
 from pathlib import Path
 
+import pytest
 from _pytest.capture import CaptureFixture
 from _pytest.monkeypatch import MonkeyPatch
 
@@ -11,6 +15,7 @@ from lx_dtypes.scripts.kb_registry import _add_entry
 from lx_dtypes.scripts.release import (
     cmd_build,
     read_project_version,
+    verify_migration_artifacts,
     write_project_version,
 )
 
@@ -104,10 +109,102 @@ def test_cmd_build_checks_only_current_version_artifacts(
         "run_command",
         lambda args, *, cwd: commands.append(args),
     )
+    verified_artifacts: list[Path] = []
+    monkeypatch.setattr(
+        release_module,
+        "verify_migration_artifacts",
+        lambda root, *, version, artifacts: verified_artifacts.extend(artifacts),
+    )
 
     assert cmd_build(Namespace()) == 0
+    assert verified_artifacts == [current_wheel, current_sdist]
     assert commands[1][-2:] == [str(current_wheel), str(current_sdist)]
     assert str(old_wheel) not in commands[1]
     output = capsys.readouterr().out
     assert "lx-dtypes 0.2.14 artifacts only" in output
     assert "do not upload dist/*" in output
+
+
+def _write_release_artifacts(
+    root: Path,
+    *,
+    version: str,
+    include_migration: bool = True,
+    artifact_migration_contents: bytes | None = None,
+) -> list[Path]:
+    migration_root = root / "lx_dtypes" / "django" / "migrations"
+    migration_root.mkdir(parents=True)
+    migration_contents = b"from django.db import migrations\n"
+    migration_path = migration_root / "0001_initial.py"
+    migration_path.write_bytes(migration_contents)
+    (migration_root / "max_migration.txt").write_text("0001_initial\n")
+    packaged_migration_contents = artifact_migration_contents or migration_contents
+
+    wheel = root / f"lx_dtypes-{version}-py3-none-any.whl"
+    with zipfile.ZipFile(wheel, mode="w") as archive:
+        if include_migration:
+            archive.writestr(
+                "lx_dtypes/django/migrations/0001_initial.py",
+                packaged_migration_contents,
+            )
+        archive.writestr(
+            "lx_dtypes/django/migrations/max_migration.txt",
+            "0001_initial\n",
+        )
+
+    sdist = root / f"lx_dtypes-{version}.tar.gz"
+    with tarfile.open(sdist, mode="w:gz") as archive:
+        files = {
+            "lx_dtypes/django/migrations/max_migration.txt": b"0001_initial\n",
+        }
+        if include_migration:
+            files["lx_dtypes/django/migrations/0001_initial.py"] = (
+                packaged_migration_contents
+            )
+        for relative_path, contents in files.items():
+            info = tarfile.TarInfo(f"lx_dtypes-{version}/{relative_path}")
+            info.size = len(contents)
+            archive.addfile(info, BytesIO(contents))
+    return [wheel, sdist]
+
+
+def test_verify_migration_artifacts_matches_source_tree(tmp_path: Path) -> None:
+    artifacts = _write_release_artifacts(tmp_path, version="0.2.16")
+
+    verify_migration_artifacts(
+        tmp_path,
+        version="0.2.16",
+        artifacts=artifacts,
+    )
+
+
+def test_verify_migration_artifacts_rejects_packaging_omission(
+    tmp_path: Path,
+) -> None:
+    artifacts = _write_release_artifacts(
+        tmp_path,
+        version="0.2.16",
+        include_migration=False,
+    )
+
+    with pytest.raises(SystemExit, match="missing migration"):
+        verify_migration_artifacts(
+            tmp_path,
+            version="0.2.16",
+            artifacts=artifacts,
+        )
+
+
+def test_verify_migration_artifacts_rejects_content_drift(tmp_path: Path) -> None:
+    artifacts = _write_release_artifacts(
+        tmp_path,
+        version="0.2.16",
+        artifact_migration_contents=b"from django.db import models\n",
+    )
+
+    with pytest.raises(SystemExit, match="differs from the source tree"):
+        verify_migration_artifacts(
+            tmp_path,
+            version="0.2.16",
+            artifacts=artifacts,
+        )
