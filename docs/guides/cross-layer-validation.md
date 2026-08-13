@@ -36,7 +36,16 @@ Collection validation guarantees:
 - UUIDs, when supplied, do not identify multiple concepts;
 - relation lists contain non-empty, unique semantic names;
 - every relation resolves to an exported concept in the same snapshot; and
+- descriptor numbers are finite and descriptor ranges, selection cardinalities,
+  default options, and probabilities are internally consistent;
 - unknown fields are rejected.
+
+Knowledge-base descriptor models historically use positive and negative
+infinity as in-memory sentinels for an unbounded numeric range. The canonical
+snapshot adapter converts those sentinels to `null`; direct canonical payloads
+containing `NaN` or infinity are rejected. Persistence and frontend consumers
+therefore receive standards-compliant JSON without reconstructing sentinel
+semantics.
 
 `kb_to_core_concepts_payload()` performs this validation when exporting a
 loaded knowledge base. `canonical_payload_to_storage()` validates an incoming

@@ -183,6 +183,11 @@ levels:
       rule: >-
         Exports an internally consistent terminology graph and rejects duplicate
         names, shared UUIDs, dangling references, and half-specified identities.
+      descriptor_rule: >-
+        Canonical descriptor numbers are finite and their ranges, selection
+        cardinalities, default options, and probabilities are internally
+        consistent. Legacy knowledge-base infinities used to mean an unbounded
+        numeric range are exported as null at the JSON boundary.
 
   - id: 3
     name: "Patient ledger"

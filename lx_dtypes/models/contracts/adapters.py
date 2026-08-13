@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
+from math import isfinite
 from typing import TYPE_CHECKING, Any, Literal, Protocol, TypeAlias, cast
 
 from lx_dtypes.models.contracts.json_types import JsonValue
@@ -348,6 +349,21 @@ def _read_value(record: CoreConceptStorageRecord, field: str) -> JsonValue | Non
     return cast(JsonValue | None, value)
 
 
+def _canonical_scalar_value(
+    record: CoreConceptStorageRecord, field: str
+) -> JsonValue | None:
+    """Normalize legacy unbounded KB sentinels at the canonical JSON boundary."""
+
+    value = _read_value(record, field)
+    if (
+        field in {"numeric_min", "numeric_max"}
+        and isinstance(value, float)
+        and not isfinite(value)
+    ):
+        return None
+    return value
+
+
 def _base_payload(record: CoreConceptStorageRecord) -> dict[str, JsonValue]:
     tags_value = _read_value(record, "tags")
     payload: dict[str, JsonValue] = {
@@ -402,7 +418,7 @@ def record_to_core_concept(
         payload[field] = dict(value) if isinstance(value, Mapping) else {}
 
     for field in _SCALAR_EXTRA_FIELDS[concept]:
-        payload[field] = _read_value(record, field)
+        payload[field] = _canonical_scalar_value(record, field)
 
     return model_cls.model_validate(payload)
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from math import isfinite
 from typing import ClassVar, Dict, List, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -64,15 +65,70 @@ class ClassificationChoiceDescriptorCore(CoreConceptBase):
     numeric_distribution_params: Dict[str, str | float | int] = Field(
         default_factory=dict
     )
-    text_max_length: int | None = None
+    text_max_length: int | None = Field(default=None, gt=0)
     default_value_str: str | None = None
     default_value_num: float | None = None
     default_value_bool: bool | None = None
     selection_options: List[str] = Field(default_factory=list)
     selection_multiple: bool | None = None
-    selection_multiple_n_min: int | None = None
-    selection_multiple_n_max: int | None = None
+    selection_multiple_n_min: int | None = Field(default=None, ge=0)
+    selection_multiple_n_max: int | None = Field(default=None, ge=0)
     selection_default_options: Dict[str, float] = Field(default_factory=dict)
+
+    @field_validator("numeric_min", "numeric_max", "default_value_num")
+    @classmethod
+    def validate_finite_numeric_value(cls, value: float | None) -> float | None:
+        if value is not None and not isfinite(value):
+            raise ValueError("descriptor numeric values must be finite")
+        return value
+
+    @field_validator("numeric_distribution_params")
+    @classmethod
+    def validate_finite_distribution_params(
+        cls, values: Dict[str, str | float | int]
+    ) -> Dict[str, str | float | int]:
+        for key, value in values.items():
+            if isinstance(value, float) and not isfinite(value):
+                raise ValueError(f"numeric_distribution_params.{key} must be finite")
+        return values
+
+    @field_validator("selection_default_options")
+    @classmethod
+    def validate_selection_probabilities(
+        cls, values: Dict[str, float]
+    ) -> Dict[str, float]:
+        for option, probability in values.items():
+            if not isfinite(probability) or not 0 <= probability <= 1:
+                raise ValueError(
+                    f"selection_default_options.{option} must be between 0 and 1"
+                )
+        return values
+
+    @model_validator(mode="after")
+    def validate_descriptor_bounds(self) -> Self:
+        if (
+            self.numeric_min is not None
+            and self.numeric_max is not None
+            and self.numeric_min > self.numeric_max
+        ):
+            raise ValueError("numeric_min must not exceed numeric_max")
+        if (
+            self.selection_multiple_n_min is not None
+            and self.selection_multiple_n_max is not None
+            and self.selection_multiple_n_min > self.selection_multiple_n_max
+        ):
+            raise ValueError(
+                "selection_multiple_n_min must not exceed selection_multiple_n_max"
+            )
+        unknown_defaults = sorted(
+            set(self.selection_default_options) - set(self.selection_options)
+        )
+        if unknown_defaults:
+            raise ValueError(
+                "selection_default_options contains unknown options: "
+                f"{', '.join(unknown_defaults)}"
+            )
+        return self
 
 
 class ExaminationCore(CoreConceptBase):
@@ -167,8 +223,8 @@ class InformationSourceTypeCore(CoreConceptBase):
 
 
 class CitationCore(CoreConceptBase):
-    citation_key: str
-    title: str
+    citation_key: str = Field(min_length=1)
+    title: str = Field(min_length=1)
     abstract: str | None = None
     authors: List[str] = Field(default_factory=list)
     publication_year: int | None = None

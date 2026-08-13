@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from math import isfinite
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import pytest
 from pydantic import ValidationError
 
 from lx_dtypes.models.contracts import (
+    ClassificationChoiceDescriptorCore,
     CoreConceptCollection,
     core_concept_to_storage,
     kb_to_core_concepts_payload,
@@ -422,3 +424,88 @@ def test_core_concept_collection_rejects_duplicate_or_empty_references() -> None
                 ],
             }
         )
+
+
+@pytest.mark.parametrize(
+    "descriptor",
+    [
+        {"name": "diameter", "numeric_min": float("nan")},
+        {"name": "diameter", "numeric_max": float("inf")},
+        {
+            "name": "diameter",
+            "numeric_distribution_params": {"mean": float("-inf")},
+        },
+        {"name": "diameter", "numeric_min": 2, "numeric_max": 1},
+        {
+            "name": "choice",
+            "selection_multiple_n_min": 2,
+            "selection_multiple_n_max": 1,
+        },
+        {
+            "name": "choice",
+            "selection_options": ["known"],
+            "selection_default_options": {"missing": 1.0},
+        },
+        {
+            "name": "choice",
+            "selection_options": ["known"],
+            "selection_default_options": {"known": 1.1},
+        },
+    ],
+)
+def test_core_concept_collection_rejects_invalid_descriptor_values(
+    descriptor: dict[str, object],
+) -> None:
+    with pytest.raises(ValidationError):
+        CoreConceptCollection.model_validate(
+            {
+                "module_name": "test",
+                "classification_choice_descriptor": [descriptor],
+            }
+        )
+
+
+def test_core_concept_collection_rejects_empty_citation_identity() -> None:
+    with pytest.raises(ValidationError):
+        CoreConceptCollection.model_validate(
+            {
+                "module_name": "test",
+                "citation": [{"name": "citation", "citation_key": " ", "title": " "}],
+            }
+        )
+
+
+def test_kb_snapshot_normalizes_unbounded_descriptor_sentinels() -> None:
+    descriptor = ClassificationChoiceDescriptor(name="unbounded")
+
+    canonical = cast(
+        ClassificationChoiceDescriptorCore,
+        record_to_core_concept("classification_choice_descriptor", descriptor),
+    )
+
+    assert canonical.numeric_min is None
+    assert canonical.numeric_max is None
+
+
+def test_packaged_snapshot_contains_only_finite_descriptor_numbers() -> None:
+    package_data_dir = Path(__file__).resolve().parents[3] / "data"
+    loader = DataLoader(input_dirs=[package_data_dir])
+    loader.load_module_configs()
+
+    for module_name in sorted(loader.module_configs):
+        snapshot = kb_to_core_concepts_payload(loader.load_knowledge_base(module_name))
+        for descriptor in snapshot.classification_choice_descriptor:
+            scalar_values = (
+                descriptor.numeric_min,
+                descriptor.numeric_max,
+                descriptor.default_value_num,
+            )
+            assert all(value is None or isfinite(value) for value in scalar_values)
+            assert all(
+                not isinstance(value, float) or isfinite(value)
+                for value in descriptor.numeric_distribution_params.values()
+            )
+            assert all(
+                isfinite(value)
+                for value in descriptor.selection_default_options.values()
+            )
