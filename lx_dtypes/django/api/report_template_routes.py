@@ -59,6 +59,37 @@ def _attach_resolved_kb_identity(
     return response
 
 
+def _resolved_loaded_kb_version(
+    kb: KnowledgeBaseContract,
+    *,
+    module_name: str,
+) -> str:
+    config = getattr(kb, "config", None)
+    resolved_module = getattr(config, "name", None)
+    resolved_version = getattr(config, "version", None)
+    if resolved_module != module_name:
+        raise HttpError(
+            500,
+            "Loaded knowledge-base module does not match the requested module.",
+        )
+    if not isinstance(resolved_version, str) or not resolved_version.strip():
+        raise HttpError(500, "Loaded knowledge base has no version identity.")
+    return resolved_version.strip()
+
+
+def _attach_loaded_kb_identity(
+    payload: Mapping[str, Any],
+    *,
+    kb: KnowledgeBaseContract,
+    module_name: str,
+) -> Dict[str, Any]:
+    return _attach_resolved_kb_identity(
+        payload,
+        module_name=module_name,
+        version=_resolved_loaded_kb_version(kb, module_name=module_name),
+    )
+
+
 def register_report_template_routes(
     api: _TypedApi,
     *,
@@ -122,6 +153,10 @@ def register_report_template_routes(
         """
         del request
         kb = load_module_kb(module_name)
+        resolved_version = _resolved_loaded_kb_version(
+            kb,
+            module_name=module_name,
+        )
         matches: list[Dict[str, Any]] = []
         for template_name, template in cast(
             Mapping[str, Any], kb.report_template
@@ -134,7 +169,13 @@ def register_report_template_routes(
             compiled = _compile_report_template(kb, template_name, mode="production")
             if not compiled["summary"].can_publish:
                 continue
-            matches.append(kb.export_report_template(template_name))
+            matches.append(
+                _attach_resolved_kb_identity(
+                    kb.export_report_template(template_name),
+                    module_name=module_name,
+                    version=resolved_version,
+                )
+            )
         return matches
 
     @api.get(
@@ -146,6 +187,10 @@ def register_report_template_routes(
         """Return preview exports for all builder templates, including drafts."""
         require_builder_access(request, "report_template:read")
         kb = load_module_kb(module_name)
+        resolved_version = _resolved_loaded_kb_version(
+            kb,
+            module_name=module_name,
+        )
         matches: list[Dict[str, Any]] = []
         for template_name, template in cast(
             Mapping[str, Any], kb.report_template
@@ -153,7 +198,13 @@ def register_report_template_routes(
             template = cast(Any, template)
             if template.examination != examination_name:
                 continue
-            matches.append(kb.export_report_template_preview(template_name))
+            matches.append(
+                _attach_resolved_kb_identity(
+                    kb.export_report_template_preview(template_name),
+                    module_name=module_name,
+                    version=resolved_version,
+                )
+            )
         return matches
 
     @api.get("/report-templates/{module_name}/{template_name}")
@@ -166,7 +217,11 @@ def register_report_template_routes(
         del request
         kb = load_module_kb(module_name)
         try:
-            return kb.export_report_template(template_name)
+            return _attach_loaded_kb_identity(
+                kb.export_report_template(template_name),
+                kb=kb,
+                module_name=module_name,
+            )
         except KeyError as exc:
             raise HttpError(
                 404,
@@ -180,7 +235,11 @@ def register_report_template_routes(
         require_builder_access(request, "report_template:read")
         kb = load_module_kb(module_name)
         try:
-            return kb.export_report_template_preview(template_name)
+            return _attach_loaded_kb_identity(
+                kb.export_report_template_preview(template_name),
+                kb=kb,
+                module_name=module_name,
+            )
         except KeyError as exc:
             raise HttpError(
                 404,

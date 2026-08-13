@@ -105,7 +105,10 @@ def _observation_is_supported(resource: Mapping[str, Any]) -> bool:
         and bool(resource.get("status"))
         and _has_coded_concept(resource.get("code"))
         and subject_reference.startswith("Patient/")
-        and (top_level_values == 1 or (top_level_values == 0 and has_supported_components))
+        and (
+            top_level_values == 1
+            or (top_level_values == 0 and has_supported_components)
+        )
     )
 
 
@@ -164,17 +167,14 @@ def _clinical_subset(
             if isinstance(item, Mapping)
         ]
         linked_observations = [index.get(reference) for reference in result_references]
-        if (
-            len(linked_observations) != len(result_items)
-            or not all(
-                observation is not None
-                and _observation_is_supported(observation)
-                and _normalise_reference(
-                    str(observation.get("subject", {}).get("reference", ""))
-                )
-                == patient_reference
-                for observation in linked_observations
+        if len(linked_observations) != len(result_items) or not all(
+            observation is not None
+            and _observation_is_supported(observation)
+            and _normalise_reference(
+                str(observation.get("subject", {}).get("reference", ""))
             )
+            == patient_reference
+            for observation in linked_observations
         ):
             continue
 
@@ -193,7 +193,9 @@ def _clinical_subset(
             observations[reference] = cleaned_observation
 
     if not reports:
-        raise ValueError("The FHIR response contained no complete supported report graphs")
+        raise ValueError(
+            "The FHIR response contained no complete supported report graphs"
+        )
 
     entries: list[dict[str, Any]] = [
         {

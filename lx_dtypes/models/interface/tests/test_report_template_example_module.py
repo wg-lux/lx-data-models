@@ -183,6 +183,21 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
         "pathologische_befunde_und_interventionen",
         "komplikationen_und_empfehlungen",
     ]
+    assert {
+        section_name: section["title_de"] for section_name, section in sections.items()
+    } == {
+        "patienten_und_untersuchungskontext": "Patienten- und Untersuchungskontext",
+        "indikation_und_sedierung": "Indikation und Sedierung",
+        "darmvorbereitung_nach_bbps": "Darmvorbereitung nach BBPS",
+        "untersuchungsqualitaet_und_reichweite": (
+            "Untersuchungsqualität und Reichweite"
+        ),
+        "pathologische_befunde_und_interventionen": (
+            "Pathologische Befunde und Interventionen"
+        ),
+        "komplikationen_und_empfehlungen": "Komplikationen und Empfehlungen",
+    }
+    assert all(section["title_en"] for section in sections.values())
 
     required_findings = {
         finding["finding"]

@@ -267,7 +267,6 @@ class Ledger(AppBaseModelUUIDTags):
                 - p_finding_intervention: List of individual finding intervention data dicts.
                 - video_files: List of serialized technical VideoFile records.
                 - patient_video_file_dicts (List[PatientVideoFileDataDict]): Serialized patient video file records.
-                - raw_patient_video_file_dicts (List[RawPatientVideoFileDataDict]): Serialized raw patient video file records.
         """
         report_dicts: List[ReportDataDict] = [
             r.serialized_ddict for r in self.reports.values()

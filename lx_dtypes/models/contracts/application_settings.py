@@ -5,6 +5,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from lx_dtypes.models.contracts.ai_dataset import AIModelType, DatasetType
+
 
 type ApplicationSettingsDeploymentRole = Literal[
     "standalone",
@@ -67,13 +69,25 @@ class ApplicationSettingsBackupStatusPayload(BaseModel):
 class ApplicationSettingsDataSetEntryPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
-    id: int | None = None
-    value: str = ""
-    label: str = ""
-    dataset_type: str
-    ai_model_type: str
+    id: int | None = Field(default=None, ge=1)
+    value: str = Field(min_length=1)
+    label: str = Field(min_length=1)
+    dataset_type: DatasetType
+    ai_model_type: AIModelType
     is_active: bool
     name_count: int = Field(ge=1)
+
+    @model_validator(mode="after")
+    def validate_model_type_matches_dataset_type(
+        self,
+    ) -> "ApplicationSettingsDataSetEntryPayload":
+        allowed_by_dataset_type: dict[DatasetType, set[AIModelType]] = {
+            "image": {"image_multilabel_classification", "phi_region_detector"},
+            "video": {"video_segment_classification"},
+        }
+        if self.ai_model_type not in allowed_by_dataset_type[self.dataset_type]:
+            raise ValueError("ai_model_type is not compatible with dataset_type")
+        return self
 
 
 class ApplicationSettingsDeploymentProfilePayload(BaseModel):

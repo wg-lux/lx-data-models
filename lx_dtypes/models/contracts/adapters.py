@@ -12,8 +12,10 @@ from .core_concepts import (
     ClassificationChoiceCore,
     ClassificationChoiceDescriptorCore,
     ClassificationCore,
+    ClassificationTypeCore,
     CoreConceptCollection,
     ExaminationCore,
+    KnowledgeBaseExaminationTypeCore,
     FindingCore,
     FindingTypeCore,
     IndicationCore,
@@ -31,6 +33,9 @@ if TYPE_CHECKING:
     from lx_dtypes.models.knowledge_base.classification.Classification import (
         Classification,
     )
+    from lx_dtypes.models.knowledge_base.classification.ClassificationType import (
+        ClassificationType,
+    )
     from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice import (
         ClassificationChoice,
     )
@@ -38,6 +43,9 @@ if TYPE_CHECKING:
         ClassificationChoiceDescriptor,
     )
     from lx_dtypes.models.knowledge_base.examination.Examination import Examination
+    from lx_dtypes.models.knowledge_base.examination.ExaminationType import (
+        ExaminationType,
+    )
     from lx_dtypes.models.knowledge_base.finding._Finding import Finding
     from lx_dtypes.models.knowledge_base.finding._FindingType import FindingType
     from lx_dtypes.models.knowledge_base.indication.Indication import Indication
@@ -59,7 +67,9 @@ if TYPE_CHECKING:
         Classification
         | ClassificationChoice
         | ClassificationChoiceDescriptor
+        | ClassificationType
         | Examination
+        | ExaminationType
         | Finding
         | FindingType
         | Indication
@@ -79,7 +89,9 @@ CoreConceptName: TypeAlias = Literal[
     "classification",
     "classification_choice",
     "classification_choice_descriptor",
+    "classification_type",
     "examination",
+    "examination_type",
     "finding",
     "finding_type",
     "indication",
@@ -97,7 +109,9 @@ CoreConceptModel: TypeAlias = (
     ClassificationCore
     | ClassificationChoiceCore
     | ClassificationChoiceDescriptorCore
+    | ClassificationTypeCore
     | ExaminationCore
+    | KnowledgeBaseExaminationTypeCore
     | FindingCore
     | FindingTypeCore
     | IndicationCore
@@ -125,6 +139,9 @@ class _KnowledgeBaseConfig(Protocol):
     @property
     def name(self) -> str: ...
 
+    @property
+    def version(self) -> str: ...
+
 
 class _KnowledgeBaseSection(Protocol):
     def values(self) -> Iterable[CoreConceptStorageRecord]: ...
@@ -144,7 +161,13 @@ class _KnowledgeBaseLike(Protocol):
     def classification_choice_descriptor(self) -> Mapping[str, Any] | None: ...
 
     @property
+    def classification_type(self) -> Mapping[str, Any] | None: ...
+
+    @property
     def examination(self) -> Mapping[str, Any] | None: ...
+
+    @property
+    def examination_type(self) -> Mapping[str, Any] | None: ...
 
     @property
     def finding(self) -> Mapping[str, Any] | None: ...
@@ -184,7 +207,9 @@ _CONCEPT_MODEL_LOOKUP: dict[CoreConceptName, type[CoreConceptModel]] = {
     "classification": ClassificationCore,
     "classification_choice": ClassificationChoiceCore,
     "classification_choice_descriptor": ClassificationChoiceDescriptorCore,
+    "classification_type": ClassificationTypeCore,
     "examination": ExaminationCore,
+    "examination_type": KnowledgeBaseExaminationTypeCore,
     "finding": FindingCore,
     "finding_type": FindingTypeCore,
     "indication": IndicationCore,
@@ -202,8 +227,15 @@ _LIST_FIELDS: dict[CoreConceptName, list[str]] = {
     "classification": ["classification_choices", "classification_types"],
     "classification_choice": ["classification_choice_descriptors"],
     "classification_choice_descriptor": ["selection_options"],
+    "classification_type": [],
     "examination": ["findings", "examination_types", "indications"],
-    "finding": ["finding_types", "classifications", "interventions"],
+    "examination_type": [],
+    "finding": [
+        "finding_types",
+        "classifications",
+        "interventions",
+        "caused_by_interventions",
+    ],
     "finding_type": [],
     "indication": ["indication_types", "classifications", "interventions"],
     "indication_type": [],
@@ -223,7 +255,9 @@ _DICT_FIELDS: dict[CoreConceptName, list[str]] = {
         "numeric_distribution_params",
         "selection_default_options",
     ],
+    "classification_type": [],
     "examination": [],
+    "examination_type": [],
     "finding": [],
     "finding_type": [],
     "indication": [],
@@ -254,7 +288,9 @@ _SCALAR_EXTRA_FIELDS: dict[CoreConceptName, list[str]] = {
         "selection_multiple_n_min",
         "selection_multiple_n_max",
     ],
+    "classification_type": [],
     "examination": [],
+    "examination_type": [],
     "finding": [],
     "finding_type": [],
     "indication": [],
@@ -287,7 +323,9 @@ _KB_FIELDS: dict[CoreConceptName, str] = {
     "classification": "classification",
     "classification_choice": "classification_choice",
     "classification_choice_descriptor": "classification_choice_descriptor",
+    "classification_type": "classification_type",
     "examination": "examination",
+    "examination_type": "examination_type",
     "finding": "finding",
     "finding_type": "finding_type",
     "indication": "indication",
@@ -410,11 +448,16 @@ def records_to_core_concepts(
 def kb_to_core_concepts_payload(kb: _KnowledgeBaseLike) -> CoreConceptCollection:
     """Export all supported core KB concepts into canonical cross-layer payload."""
 
-    module_name = getattr(getattr(kb, "config", None), "name", "unknown")
+    config = getattr(kb, "config", None)
+    module_name = getattr(config, "name", "unknown")
+    module_version = getattr(config, "version", None)
 
     payload = {
         "module_name": module_name,
     }
+    if module_version is not None:
+        payload["knowledge_base_module"] = module_name
+        payload["knowledge_base_version"] = module_version
 
     for concept, kb_field in _KB_FIELDS.items():
         entries = getattr(kb, kb_field, {})

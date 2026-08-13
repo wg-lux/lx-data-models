@@ -1,5 +1,8 @@
 from pathlib import Path
 
+import pytest
+from pydantic import ValidationError
+
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 
 MAIN_KNOWLEDGE_BASE_CONFIG_FILE_PATH = Path(
@@ -67,6 +70,38 @@ class TestKnowledgeBaseConfig:
         assert uninitialized_demo_kb_config.name == "lx_knowledge_base"
         assert isinstance(uninitialized_demo_kb_config.depends_on, list)
         assert isinstance(uninitialized_demo_kb_config.modules, list)
+
+    def test_exposes_canonical_contract_identity(
+        self,
+        uninitialized_demo_kb_config: KnowledgeBaseConfig,
+    ) -> None:
+        identity = uninitialized_demo_kb_config.knowledge_base_identity
+
+        assert identity.knowledge_base_module == "lx_knowledge_base"
+        assert identity.knowledge_base_version == "0.1.0"
+        assert identity.canonical_name == "lx_knowledge_base@0.1.0"
+
+    @pytest.mark.parametrize(
+        ("field_name", "value"),
+        [
+            ("modules", ["child", "child"]),
+            ("depends_on", [""]),
+            ("modules", ["root"]),
+        ],
+    )
+    def test_rejects_ambiguous_module_graph_entries(
+        self, field_name: str, value: list[str]
+    ) -> None:
+        payload = {
+            "name": "root",
+            "version": "1.0.0",
+            "modules": [],
+            "depends_on": [],
+        }
+        payload[field_name] = value
+
+        with pytest.raises(ValidationError):
+            KnowledgeBaseConfig.model_validate(payload)
 
     def test_normalize_data_paths_no_config_file_error(
         self,

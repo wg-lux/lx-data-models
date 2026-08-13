@@ -9,6 +9,7 @@ from lx_dtypes.models.contracts.fhir_clinical import (
     FhirClinicalBundle,
     FhirDiagnosticReport,
     FhirObservation,
+    FhirObservationComponent,
 )
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     export_reported_findings_to_fhir_observations,
@@ -85,7 +86,12 @@ def test_clinical_fixture_observation_components_roundtrip_through_lxdm() -> Non
             "interventions": [],
         }
     ]
-    assert exported[0]["component"][0]["valueQuantity"] == {
+    exported_components = exported[0]["component"]
+    assert isinstance(exported_components, list)
+    exported_component = FhirObservationComponent.model_validate(exported_components[0])
+    exported_quantity = exported_component.valueQuantity
+    assert exported_quantity is not None
+    assert exported_quantity.model_dump(exclude_none=True) == {
         "value": 13.4,
         "unit": "g/dL",
         "system": "http://unitsofmeasure.org",
@@ -93,7 +99,8 @@ def test_clinical_fixture_observation_components_roundtrip_through_lxdm() -> Non
     }
     # The generic clinical contract retains this standard value. The existing
     # LXDM bridge intentionally round-trips only finding/classification components.
-    assert observation_payload["valueQuantity"]["value"] == 13.4
+    assert observation.valueQuantity is not None
+    assert observation.valueQuantity.value == 13.4
     assert "valueQuantity" not in exported[0]
 
 

@@ -16,6 +16,8 @@ class ReportTemplateSectionFieldDataDict(KnowledgebaseBaseModelDataDict):
 
 
 class ReportTemplateSectionDataDict(KnowledgebaseBaseModelDataDict):
+    title_de: str
+    title_en: str
     position: int
     types: List[str]
     findings: List[ReportTemplateFindingRequirementDataDict | str]

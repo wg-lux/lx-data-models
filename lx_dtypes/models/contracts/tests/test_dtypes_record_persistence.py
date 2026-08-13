@@ -140,3 +140,17 @@ def test_record_contract_rejects_patient_findings_from_a_different_patient_exami
 
     with pytest.raises(ValidationError):
         parse_dtypes_record_persistence_payload(payload)
+
+
+@pytest.mark.parametrize(
+    "missing_field",
+    ["knowledge_base_module", "knowledge_base_version"],
+)
+def test_record_contract_rejects_partial_knowledge_base_identity(
+    missing_field: str,
+) -> None:
+    payload = _complete_record()
+    del payload[missing_field]
+
+    with pytest.raises(ValidationError, match="must be provided together"):
+        parse_dtypes_record_persistence_payload(payload)

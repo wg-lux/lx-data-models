@@ -39,6 +39,31 @@ class _FakeEmptyFindingsQueryset:
         return []
 
 
+class _FakeRelation:
+    def __init__(self, values: list[Any]) -> None:
+        self._values = values
+
+    def filter(self, **kwargs: Any) -> "_FakeRelation":
+        del kwargs
+        return self
+
+    def select_related(self, *fields: str) -> "_FakeRelation":
+        del fields
+        return self
+
+    def all(self) -> list[Any]:
+        return self._values
+
+
+class _FakeFindingsQueryset:
+    def __init__(self, values: list[Any]) -> None:
+        self._values = values
+
+    def filter(self, **kwargs: Any) -> list[Any]:
+        assert kwargs == {"patient_examination_id": 101}
+        return self._values
+
+
 def test_build_p_examination_payload_from_host_ledger_without_findings(
     monkeypatch: Any,
 ) -> None:
@@ -69,6 +94,44 @@ def test_build_p_examination_payload_from_host_ledger_without_findings(
     assert payload.knowledge_base_module == "report_template_examples"
     assert payload.knowledge_base_version == "0.1.0"
     assert payload.patient_findings == []
+
+
+def test_build_p_examination_payload_uses_canonical_examination_reference(
+    monkeypatch: Any,
+) -> None:
+    class _Exam:
+        name = "colonoscopy"
+
+    class _PatientExam:
+        id = 101
+        patient_id = 202
+        examination = _Exam()
+        examination_safe = _Exam()
+        knowledge_base_module = "report_template_examples"
+        knowledge_base_version = "0.1.0"
+        examiners: list[Any] = []
+
+    class _Finding:
+        name = "colon_polyp"
+
+    class _PatientFinding:
+        id = 303
+        finding = _Finding()
+        classifications = _FakeRelation([])
+        interventions = _FakeRelation([])
+
+    monkeypatch.setattr(
+        api_main,
+        "_active_patient_findings_queryset",
+        lambda: _FakeFindingsQueryset([_PatientFinding()]),
+    )
+
+    payload = api_main._build_p_examination_payload_from_host_ledger(
+        _PatientExam(), route_module_name="report_template_examples"
+    )
+
+    assert len(payload.patient_findings) == 1
+    assert payload.patient_findings[0].patient_examination == payload.examination
 
 
 def test_validate_report_template_runtime_from_ledger_not_found(

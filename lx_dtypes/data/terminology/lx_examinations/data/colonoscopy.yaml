@@ -1,5 +1,7 @@
 - model: examination
   name: colonoscopy
+  name_de: Koloskopie
+  name_en: Colonoscopy
   description: Colonoscopy examination.
   findings:
     # Sources for all guideline-derived colonoscopy findings below, including

@@ -131,7 +131,11 @@ def _mock_kb_lookup(module_name: str, version: str | None = None) -> dict[str, A
 
 
 def _create_exam_graph_with_indication() -> tuple[Any, Any, Any, Any, Any]:
-    examination = Examination.objects.create(name="colonoscopy")
+    examination = Examination.objects.create(
+        name="colonoscopy",
+        name_de="Koloskopie",
+        name_en="Colonoscopy",
+    )
     finding = Finding.objects.create(name="colon_polyp")
     examination.findings.add(finding)
     classification = FindingClassification.objects.create(
@@ -146,7 +150,11 @@ def _create_exam_graph_with_indication() -> tuple[Any, Any, Any, Any, Any]:
     )
     classification.choices.add(choice_small)
     finding.finding_classifications.add(classification)
-    indication = Indication.objects.create(name="screening")
+    indication = Indication.objects.create(
+        name="screening",
+        name_de="Vorsorge",
+        name_en="Screening",
+    )
     examination.indications.add(indication)
     return examination, finding, classification, choice_small, indication
 
@@ -196,6 +204,8 @@ def test_base_api_findings_read_endpoints_shape() -> None:
     indications_payload = indications_res.json()
     assert isinstance(indications_payload, list)
     assert indications_payload[0]["name"] == "screening"
+    assert indications_payload[0]["name_de"] == "Vorsorge"
+    assert indications_payload[0]["name_en"] == "Screening"
 
     indications_tree_res = client.get(
         "/base_api/indications/tree/",
@@ -208,10 +218,15 @@ def test_base_api_findings_read_endpoints_shape() -> None:
         (item for item in indications_tree_payload if item["name"] == "screening"), None
     )
     assert tree_screening is not None
+    assert tree_screening["name_de"] == "Vorsorge"
+    assert tree_screening["name_en"] == "Screening"
     assert any(
         examination_entry["id"] == examination.id
         for examination_entry in tree_screening.get("examinations", [])
     )
+    tree_examination = tree_screening["examinations"][0]
+    assert tree_examination["name_de"] == "Koloskopie"
+    assert tree_examination["name_en"] == "Colonoscopy"
 
 
 def test_base_api_findings_read_endpoints_support_module_version_overrides(

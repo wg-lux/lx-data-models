@@ -39,6 +39,7 @@ class _CompiledSummary:
 
 class _FakeKb:
     def __init__(self) -> None:
+        self.config = SimpleNamespace(name="report_template_examples", version="0.1.0")
         self.report_template: dict[str, Any] = {}
         self.findings_validator: dict[str, Any] = {}
         self.classification_validator: dict[str, Any] = {}
@@ -372,7 +373,13 @@ def test_report_templates_by_examination_filters_unpublished_and_unready_templat
     )
 
     assert response.status_code == 200
-    assert response.json() == [{"name": "published_ready"}]
+    assert response.json() == [
+        {
+            "name": "published_ready",
+            "knowledge_base_module": "report_template_examples",
+            "knowledge_base_version": "0.1.0",
+        }
+    ]
 
 
 def test_preview_and_definition_validation_return_404_for_missing_template(

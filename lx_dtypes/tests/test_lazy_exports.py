@@ -5,7 +5,11 @@ import pytest
 import lx_dtypes
 import lx_dtypes.models as lx_models
 import lx_dtypes.models.interface as lx_interface
-from lx_dtypes.models.contracts import CoreConceptBase
+from lx_dtypes.models.contracts import (
+    CoreConceptBase,
+    KnowledgeBaseIdentity,
+    PatientExaminationReportDraft,
+)
 from lx_dtypes.models.interface import load_knowledge_base
 from lx_dtypes.models.interface.LookupTracker import KnowledgeBaseLookupTracker
 from lx_dtypes.models.knowledge_base import KB_MODELS
@@ -17,6 +21,8 @@ from lx_dtypes.models.main import MODELS
 def test_lx_dtypes_lazy_exports_cover_all_dispatch_branches() -> None:
     assert lx_dtypes.ReportTemplate is ReportTemplate
     assert lx_dtypes.CoreConceptBase is CoreConceptBase
+    assert lx_dtypes.KnowledgeBaseIdentity is KnowledgeBaseIdentity
+    assert lx_dtypes.PatientExaminationReportDraft is PatientExaminationReportDraft
     assert lx_dtypes.load_knowledge_base is load_knowledge_base
 
     with pytest.raises(AttributeError):

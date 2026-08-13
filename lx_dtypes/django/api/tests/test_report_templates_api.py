@@ -88,6 +88,8 @@ def test_report_template_api_by_name() -> None:
     payload = response.json()
     assert payload["name"] == "star_upper_gi_main"
     assert payload["examination"] == "star_upper_gi_endoscopy"
+    assert payload["knowledge_base_module"] == "report_template_examples"
+    assert payload["knowledge_base_version"] == "0.1.0"
 
 
 def test_report_template_api_by_examination() -> None:
@@ -104,6 +106,8 @@ def test_report_template_api_by_examination() -> None:
         template for template in payload if template["name"] == "upper_gi_quality_2025"
     )
     assert quality_template["name_de"].startswith("ÖGD")
+    assert quality_template["knowledge_base_module"] == "report_template_examples"
+    assert quality_template["knowledge_base_version"] == "0.1.0"
     assert quality_template["readiness"]["can_publish"] is True
     assert len(quality_template["coverage_concepts"]) == 7
 
@@ -126,6 +130,16 @@ def test_colonoscopy_template_api_exposes_localized_guideline_provenance() -> No
     assert template["name_en"] == (
         "Colonoscopy – guideline-based quality documentation"
     )
+    assert template["knowledge_base_module"] == "report_template_examples"
+    assert template["knowledge_base_version"] == "0.1.0"
+    assert [section["title_de"] for section in template["report_sections"]] == [
+        "Patienten- und Untersuchungskontext",
+        "Indikation und Sedierung",
+        "Darmvorbereitung nach BBPS",
+        "Untersuchungsqualität und Reichweite",
+        "Pathologische Befunde und Interventionen",
+        "Komplikationen und Empfehlungen",
+    ]
     assert template["readiness"]["can_publish"] is True
     assert [
         reference["guideline_id"] for reference in template["guideline_references"]

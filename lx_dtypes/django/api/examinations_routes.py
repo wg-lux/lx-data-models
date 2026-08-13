@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, List, NoReturn, Protocol, TypeVar
 
+from lx_dtypes.models.contracts.terminology_catalog import ExaminationCatalogDTO
+
 from .findings_routes import (
     _findings_module_name,
     _resolve_exam_kb_finding_names,
@@ -42,24 +44,35 @@ def _serialize_examination(examination: Any, *, module_name: str) -> Dict[str, A
         else examination_types_relation or []
     )
 
-    return {
-        "id": examination.id,
-        "name": examination.name,
-        "findings": [
-            _serialize_finding(
-                finding,
-                allowed_classification_names=_resolve_kb_finding_classification_names(
-                    finding, module_name=module_name
-                ),
-                required_classification_names=set(),
-            )
-            for finding in findings
-        ],
-        "examination_types": [
-            {"id": getattr(examination_type, "id", None), "name": examination_type.name}
-            for examination_type in examination_types_items
-        ],
-    }
+    return ExaminationCatalogDTO.model_validate(
+        {
+            "id": examination.id,
+            "name": examination.name,
+            "name_de": getattr(examination, "name_de", ""),
+            "name_en": getattr(examination, "name_en", ""),
+            "description": getattr(examination, "description", None),
+            "findings": [
+                _serialize_finding(
+                    finding,
+                    allowed_classification_names=_resolve_kb_finding_classification_names(
+                        finding, module_name=module_name
+                    ),
+                    required_classification_names=set(),
+                )
+                for finding in findings
+            ],
+            "examination_types": [
+                {
+                    "id": examination_type.id,
+                    "name": examination_type.name,
+                    "name_de": getattr(examination_type, "name_de", ""),
+                    "name_en": getattr(examination_type, "name_en", ""),
+                    "description": getattr(examination_type, "description", None),
+                }
+                for examination_type in examination_types_items
+            ],
+        }
+    ).model_dump(mode="json")
 
 
 def register_examinations_routes(

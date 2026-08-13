@@ -113,6 +113,7 @@ from .core_concepts import (
     ClassificationChoiceCore,
     ClassificationChoiceDescriptorCore,
     ClassificationCore,
+    ClassificationTypeCore,
     CoreConceptBase,
     CoreConceptCollection,
     ExaminationCore,
@@ -131,6 +132,9 @@ from .ai_dataset import (
     AIDataSetActiveLearningCandidateContract,
     AIDataSetActiveLearningConfigContract,
     AIDataSetActiveLearningSelectionContract,
+    AIDataSetAttachmentResultContract,
+    AIDataSetAttachVideoContract,
+    AIDataSetCreateContract,
     AIDataSetScoredActiveLearningCandidateContract,
     AIDataSetStandardExportScopeContract,
 )
@@ -154,7 +158,16 @@ from .lab_value import (
     LabValueNormalRangeData,
     LabValueNormalRangePayload,
 )
-from .knowledge_base import KnowledgeBaseContract
+from .knowledge_base import (
+    KnowledgeBaseContract,
+    KnowledgeBaseIdentity,
+    validate_optional_knowledge_base_identity,
+)
+from .terminology_catalog import (
+    ExaminationCatalogDTO,
+    IndicationCatalogDTO,
+    LocalizedCatalogItem,
+)
 from .nginx_accel import NginxAccelResponseHeadersPayload
 from .huggingface_model_meta import (
     HuggingFaceModelMetaCommandData,
@@ -362,6 +375,12 @@ from .report_anonymization import (
     ReportArtifactValidationV2,
 )
 from .report_context import ReportContext
+from .report_draft import (
+    PatientExaminationReportDraft,
+    REPORT_DRAFT_SCHEMA_VERSION,
+    ReportDraftTemplateIdentity,
+    dump_patient_examination_report_draft,
+)
 from .video_ai_labels import (
     VideoAiHuggingFaceModelPayload,
     VideoAiJsonObject,
@@ -575,6 +594,9 @@ __all__ = [
     "AIDataSetActiveLearningCandidateContract",
     "AIDataSetActiveLearningConfigContract",
     "AIDataSetActiveLearningSelectionContract",
+    "AIDataSetAttachmentResultContract",
+    "AIDataSetAttachVideoContract",
+    "AIDataSetCreateContract",
     "AIDataSetScoredActiveLearningCandidateContract",
     "AIDataSetStandardExportScopeContract",
     "DjangoBeatScheduleEntryPayload",
@@ -605,6 +627,7 @@ __all__ = [
     "validate_hub_transfer_video_payload",
     "CoreConceptBase",
     "ClassificationCore",
+    "ClassificationTypeCore",
     "ClassificationChoiceCore",
     "ClassificationChoiceDescriptorCore",
     "ExaminationCore",
@@ -672,6 +695,11 @@ __all__ = [
     "LabValueNormalRangeData",
     "LabValueNormalRangePayload",
     "KnowledgeBaseContract",
+    "KnowledgeBaseIdentity",
+    "validate_optional_knowledge_base_identity",
+    "ExaminationCatalogDTO",
+    "IndicationCatalogDTO",
+    "LocalizedCatalogItem",
     "NginxAccelResponseHeadersPayload",
     "KeycloakClaimsPayload",
     "AiModelSerializerInputPayload",
@@ -858,6 +886,10 @@ __all__ = [
     "ReportAnonymizationWarningV2",
     "ReportArtifactValidationV2",
     "ReportContext",
+    "PatientExaminationReportDraft",
+    "REPORT_DRAFT_SCHEMA_VERSION",
+    "ReportDraftTemplateIdentity",
+    "dump_patient_examination_report_draft",
     "VideoAiHuggingFaceModelPayload",
     "VideoAiJsonObject",
     "VideoAiLabelNamePayload",

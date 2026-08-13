@@ -34,12 +34,12 @@ PFindingClassificationChoiceLookupTuple = NamedTuple(
 
 
 class PExamination(LedgerBaseModel[PExaminationDataDict]):
-    patient: str
+    patient: str = Field(min_length=1)
     examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
     date: Optional[AwareDatetime] = None
-    examination: str
-    knowledge_base_module: Optional[str] = None
-    knowledge_base_version: Optional[str] = None
+    examination: str = Field(min_length=1)
+    knowledge_base_module: Optional[str] = Field(default=None, min_length=1)
+    knowledge_base_version: Optional[str] = Field(default=None, min_length=1)
     patient_findings: List[PFinding] = Field(default_factory=list)
     patient_indications: List[PIndication] = Field(default_factory=list)
 
@@ -77,30 +77,21 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
     @classmethod
     def validate_date(
         cls, v: Optional[Union[str, datetime.date, datetime.datetime]]
-    ) -> Optional[AwareDatetime]:
+    ) -> Optional[Union[str, datetime.datetime]]:
         """
         Normalize a string/date/datetime input into an aware datetime or return None.
 
         Parameters:
             v (Optional[Union[str, datetime.date, datetime.datetime]]): Input value to normalize. Accepted forms:
-                - ISO 8601 datetime string: parsed to a datetime; returns None if parsing fails.
-                - datetime: returned with timezone set to UTC if it is naive; returned unchanged if tz-aware.
+                - ISO 8601 datetime string: validated by Pydantic as timezone-aware.
+                - datetime: returned unchanged and rejected by ``AwareDatetime`` if naive.
                 - date: converted to a datetime at midnight UTC.
-                - Any other value: returned unchanged.
+                - Any invalid or unsupported value is rejected by Pydantic.
 
         Returns:
-            Optional[AwareDatetime]: The resulting timezone-aware datetime in UTC for parsed/converted inputs, `None` when an ISO string fails to parse, or the original value for unsupported types.
+            Optional[str | datetime]: A value for strict ``AwareDatetime`` validation.
         """
-        if isinstance(v, str):
-            try:
-                return datetime.datetime.fromisoformat(v)
-            except ValueError:
-                return None
-        if isinstance(v, datetime.datetime):
-            if v.tzinfo is None:
-                return v.replace(tzinfo=datetime.timezone.utc)
-            return v
-        if isinstance(v, datetime.date):
+        if isinstance(v, datetime.date) and not isinstance(v, datetime.datetime):
             return datetime.datetime(
                 year=v.year, month=v.month, day=v.day, tzinfo=datetime.timezone.utc
             )
@@ -191,12 +182,12 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
 
 
 class SerializedPExamination(LedgerBaseModel[SerializedPExaminationDataDict]):
-    patient: str
+    patient: str = Field(min_length=1)
     examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
     date: Optional[AwareDatetime] = None
-    examination: str
-    knowledge_base_module: Optional[str] = None
-    knowledge_base_version: Optional[str] = None
+    examination: str = Field(min_length=1)
+    knowledge_base_module: Optional[str] = Field(default=None, min_length=1)
+    knowledge_base_version: Optional[str] = Field(default=None, min_length=1)
     patient_findings: str = ""
     patient_indications: str = ""
 

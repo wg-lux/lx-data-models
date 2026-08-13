@@ -20,6 +20,8 @@ guides/pydantic-cheatsheet
 guides/dates-and-times
 guides/typing_conventions
 guides/package_boundary
+guides/data-model-concept-map
+guides/cross-layer-validation
 guides/django-host-integration
 guides/fhir-clinical-testing
 guides/fhir-lxdm-mapping-diagrams

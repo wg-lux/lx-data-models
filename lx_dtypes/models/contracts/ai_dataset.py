@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import datetime
-from typing import Literal
+from typing import Literal, cast
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -32,6 +33,7 @@ class AIDataSetScoredActiveLearningCandidateContract(BaseModel):
 DatasetType = Literal["image", "video"]
 AIModelType = Literal[
     "image_multilabel_classification",
+    "phi_region_detector",
     "video_segment_classification",
 ]
 TrainingRunStatus = Literal["queued", "running", "completed", "failed", "lost"]
@@ -179,27 +181,48 @@ class AIDataSetContract(BaseModel):
 
     @model_validator(mode="after")
     def validate_model_type_matches_dataset_type(self) -> AIDataSetContract:
-        expected_by_dataset_type: dict[str, str] = {
-            "image": "image_multilabel_classification",
-            "video": "video_segment_classification",
+        allowed_by_dataset_type: dict[str, set[AIModelType]] = {
+            "image": {"image_multilabel_classification", "phi_region_detector"},
+            "video": {"video_segment_classification"},
         }
-        expected = expected_by_dataset_type[self.dataset_type]
-        if self.ai_model_type != expected:
+        allowed = allowed_by_dataset_type[self.dataset_type]
+        if self.ai_model_type not in allowed:
             raise ValueError(
                 f"ai_model_type={self.ai_model_type!r} is not compatible with "
-                f"dataset_type={self.dataset_type!r}; expected {expected!r}."
+                f"dataset_type={self.dataset_type!r}; expected one of {sorted(allowed)!r}."
             )
         return self
 
 
 class AIDataSetCreateContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
 
     name: str
     description: str = ""
     dataset_type: DatasetType = "image"
     ai_model_type: AIModelType
     is_active: bool = True
+
+    @model_validator(mode="before")
+    @classmethod
+    def fill_default_ai_model_type(cls, value: object) -> object:
+        if not isinstance(value, Mapping):
+            return value
+        candidate = dict(cast(Mapping[object, object], value))
+        dataset_type = candidate.get("dataset_type", "image")
+        expected_by_dataset_type: dict[object, AIModelType] = {
+            "image": "image_multilabel_classification",
+            "video": "video_segment_classification",
+        }
+        if candidate.get("ai_model_type") in (None, ""):
+            expected = (
+                expected_by_dataset_type.get(dataset_type)
+                if isinstance(dataset_type, str)
+                else None
+            )
+            if expected is not None:
+                candidate["ai_model_type"] = expected
+        return candidate
 
     @field_validator("name")
     @classmethod
@@ -211,34 +234,37 @@ class AIDataSetCreateContract(BaseModel):
             raise ValueError("name must be 255 characters or fewer")
         return normalized
 
-    @field_validator("description")
+    @field_validator("description", mode="before")
     @classmethod
-    def normalize_description(cls, value: str) -> str:
+    def normalize_description(cls, value: object) -> str:
+        if value is None:
+            return ""
+        if not isinstance(value, str):
+            raise ValueError("description must be a string")
         return value.strip()
 
     @model_validator(mode="after")
     def fill_and_validate_ai_model_type(self) -> AIDataSetCreateContract:
-        expected_by_dataset_type: dict[str, AIModelType] = {
-            "image": "image_multilabel_classification",
-            "video": "video_segment_classification",
+        allowed_by_dataset_type: dict[str, set[AIModelType]] = {
+            "image": {"image_multilabel_classification", "phi_region_detector"},
+            "video": {"video_segment_classification"},
         }
-        expected = expected_by_dataset_type[self.dataset_type]
-        if self.ai_model_type is None:
-            self.ai_model_type = expected
-        elif self.ai_model_type != expected:
+        if self.ai_model_type not in allowed_by_dataset_type[self.dataset_type]:
             raise ValueError("ai_model_type is not compatible with dataset_type")
         return self
 
 
 class AIDataSetAttachVideoContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    """Canonical request for explicit or bulk dataset annotation attachment."""
 
-    video_id: int
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    video_id: int | None = Field(default=None, ge=1)
     frame_annotation_ids: list[int] = Field(default_factory=list)
     segment_ids: list[int] = Field(default_factory=list)
     include_all_annotations: bool = False
-    include_frame_annotations: bool = True
-    include_video_annotations: bool = True
+    include_frame_annotations: bool = False
+    include_video_annotations: bool = False
     information_source_names: list[str] = Field(default_factory=list)
 
     @field_validator("information_source_names", mode="before")
@@ -257,18 +283,47 @@ class AIDataSetAttachVideoContract(BaseModel):
     def strip_information_source_names(cls, value: list[str]) -> list[str]:
         return [item.strip() for item in value if item.strip()]
 
+    @field_validator("frame_annotation_ids", "segment_ids")
+    @classmethod
+    def validate_positive_identifiers(cls, value: list[int]) -> list[int]:
+        if any(identifier < 1 for identifier in value):
+            raise ValueError("identifiers must be positive")
+        return value
+
+    @model_validator(mode="after")
+    def validate_bulk_selection(self) -> AIDataSetAttachVideoContract:
+        if not self.include_all_annotations:
+            return self
+        if self.video_id is not None or self.frame_annotation_ids or self.segment_ids:
+            raise ValueError(
+                "include_all_annotations cannot be combined with "
+                "video_id, frame_annotation_ids, or segment_ids."
+            )
+        if not (self.include_frame_annotations or self.include_video_annotations):
+            raise ValueError("At least one annotation type must be selected.")
+        return self
+
 
 class AIDataSetAttachmentResultContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    """Canonical result for explicit or bulk dataset annotation attachment."""
 
-    dataset_id: int
-    video_id: int
-    frame_annotation_count: int = 0
-    video_annotation_count: int = 0
-    attached_frame_annotation_count: int = 0
-    attached_segment_count: int = 0
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    dataset_id: int = Field(ge=1)
+    video_id: int | None = Field(default=None, ge=1)
+    frame_annotation_count: int = Field(default=0, ge=0)
+    video_annotation_count: int = Field(default=0, ge=0)
+    attached_frame_annotation_count: int = Field(default=0, ge=0)
+    attached_segment_count: int = Field(default=0, ge=0)
     attached_frame_annotation_ids: list[int] = Field(default_factory=list)
     attached_segment_ids: list[int] = Field(default_factory=list)
+
+    @field_validator("attached_frame_annotation_ids", "attached_segment_ids")
+    @classmethod
+    def validate_positive_identifiers(cls, value: list[int]) -> list[int]:
+        if any(identifier < 1 for identifier in value):
+            raise ValueError("identifiers must be positive")
+        return value
 
 
 class AIModelTrainingRunContract(BaseModel):

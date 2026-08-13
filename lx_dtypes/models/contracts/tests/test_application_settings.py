@@ -6,8 +6,64 @@ from pydantic import ValidationError
 from lx_dtypes.models.contracts.application_settings import (
     ApplicationSettingsBackupSourcePayload,
     ApplicationSettingsBackupStatusPayload,
+    ApplicationSettingsDataSetEntryPayload,
     ApplicationSettingsDeploymentProfilePayload,
 )
+
+
+def test_dataset_entry_accepts_compatible_typed_values() -> None:
+    entry = ApplicationSettingsDataSetEntryPayload(
+        id=7,
+        value="video-training",
+        label="video-training",
+        dataset_type="video",
+        ai_model_type="video_segment_classification",
+        is_active=True,
+        name_count=1,
+    )
+
+    assert entry.dataset_type == "video"
+
+
+def test_dataset_entry_accepts_phi_detector_for_image_data() -> None:
+    entry = ApplicationSettingsDataSetEntryPayload(
+        id=8,
+        value="phi-regions",
+        label="phi-regions",
+        dataset_type="image",
+        ai_model_type="phi_region_detector",
+        is_active=True,
+        name_count=1,
+    )
+
+    assert entry.ai_model_type == "phi_region_detector"
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"id": "7"},
+        {"dataset_type": "unknown"},
+        {"dataset_type": "video", "ai_model_type": "image_multilabel_classification"},
+        {"unknown": True},
+    ],
+)
+def test_dataset_entry_rejects_invalid_persisted_values(
+    overrides: dict[str, object],
+) -> None:
+    payload: dict[str, object] = {
+        "id": 7,
+        "value": "image-training",
+        "label": "image-training",
+        "dataset_type": "image",
+        "ai_model_type": "image_multilabel_classification",
+        "is_active": True,
+        "name_count": 1,
+    }
+    payload.update(overrides)
+
+    with pytest.raises(ValidationError):
+        ApplicationSettingsDataSetEntryPayload.model_validate(payload)
 
 
 def test_backup_status_accepts_consistent_source_summary() -> None:

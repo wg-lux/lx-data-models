@@ -15,6 +15,7 @@ from lx_dtypes.scripts.kb_registry import _add_entry
 from lx_dtypes.scripts.release import (
     cmd_build,
     read_project_version,
+    verify_knowledge_base_artifacts,
     verify_migration_artifacts,
     write_project_version,
 )
@@ -115,11 +116,21 @@ def test_cmd_build_checks_only_current_version_artifacts(
         "verify_migration_artifacts",
         lambda root, *, version, artifacts: verified_artifacts.extend(artifacts),
     )
+    verified_knowledge_base_artifacts: list[Path] = []
+    monkeypatch.setattr(
+        release_module,
+        "verify_knowledge_base_artifacts",
+        lambda root, *, version, artifacts: verified_knowledge_base_artifacts.extend(
+            artifacts
+        ),
+    )
 
     assert cmd_build(Namespace()) == 0
     assert verified_artifacts == [current_wheel, current_sdist]
-    assert commands[1][-2:] == [str(current_wheel), str(current_sdist)]
-    assert str(old_wheel) not in commands[1]
+    assert verified_knowledge_base_artifacts == [current_wheel, current_sdist]
+    assert commands[1][-1] == "lx_dtypes.scripts.verify_packaged_report_templates"
+    assert commands[2][-2:] == [str(current_wheel), str(current_sdist)]
+    assert str(old_wheel) not in commands[2]
     output = capsys.readouterr().out
     assert "lx-dtypes 0.2.14 artifacts only" in output
     assert "do not upload dist/*" in output
@@ -131,6 +142,8 @@ def _write_release_artifacts(
     version: str,
     include_migration: bool = True,
     artifact_migration_contents: bytes | None = None,
+    include_knowledge_base: bool = True,
+    artifact_knowledge_base_contents: bytes | None = None,
 ) -> list[Path]:
     migration_root = root / "lx_dtypes" / "django" / "migrations"
     migration_root.mkdir(parents=True)
@@ -139,6 +152,13 @@ def _write_release_artifacts(
     migration_path.write_bytes(migration_contents)
     (migration_root / "max_migration.txt").write_text("0001_initial\n")
     packaged_migration_contents = artifact_migration_contents or migration_contents
+    knowledge_base_root = root / "lx_dtypes" / "data" / "report_template_examples"
+    knowledge_base_root.mkdir(parents=True)
+    knowledge_base_contents = b"name: report_template_examples\nversion: 0.1.0\n"
+    (knowledge_base_root / "config.yaml").write_bytes(knowledge_base_contents)
+    packaged_knowledge_base_contents = (
+        artifact_knowledge_base_contents or knowledge_base_contents
+    )
 
     wheel = root / f"lx_dtypes-{version}-py3-none-any.whl"
     with zipfile.ZipFile(wheel, mode="w") as archive:
@@ -151,6 +171,11 @@ def _write_release_artifacts(
             "lx_dtypes/django/migrations/max_migration.txt",
             "0001_initial\n",
         )
+        if include_knowledge_base:
+            archive.writestr(
+                "lx_dtypes/data/report_template_examples/config.yaml",
+                packaged_knowledge_base_contents,
+            )
 
     sdist = root / f"lx_dtypes-{version}.tar.gz"
     with tarfile.open(sdist, mode="w:gz") as archive:
@@ -160,6 +185,10 @@ def _write_release_artifacts(
         if include_migration:
             files["lx_dtypes/django/migrations/0001_initial.py"] = (
                 packaged_migration_contents
+            )
+        if include_knowledge_base:
+            files["lx_dtypes/data/report_template_examples/config.yaml"] = (
+                packaged_knowledge_base_contents
             )
         for relative_path, contents in files.items():
             info = tarfile.TarInfo(f"lx_dtypes-{version}/{relative_path}")
@@ -206,5 +235,51 @@ def test_verify_migration_artifacts_rejects_content_drift(tmp_path: Path) -> Non
         verify_migration_artifacts(
             tmp_path,
             version="0.2.16",
+            artifacts=artifacts,
+        )
+
+
+def test_verify_knowledge_base_artifacts_matches_source_tree(tmp_path: Path) -> None:
+    artifacts = _write_release_artifacts(tmp_path, version="0.2.17")
+
+    verify_knowledge_base_artifacts(
+        tmp_path,
+        version="0.2.17",
+        artifacts=artifacts,
+    )
+
+
+def test_verify_knowledge_base_artifacts_rejects_packaging_omission(
+    tmp_path: Path,
+) -> None:
+    artifacts = _write_release_artifacts(
+        tmp_path,
+        version="0.2.17",
+        include_knowledge_base=False,
+    )
+
+    with pytest.raises(SystemExit, match="knowledge-base data contract differs"):
+        verify_knowledge_base_artifacts(
+            tmp_path,
+            version="0.2.17",
+            artifacts=artifacts,
+        )
+
+
+def test_verify_knowledge_base_artifacts_rejects_content_drift(
+    tmp_path: Path,
+) -> None:
+    artifacts = _write_release_artifacts(
+        tmp_path,
+        version="0.2.17",
+        artifact_knowledge_base_contents=(
+            b"name: report_template_examples\nversion: 9.9.9\n"
+        ),
+    )
+
+    with pytest.raises(SystemExit, match="knowledge-base data contract differs"):
+        verify_knowledge_base_artifacts(
+            tmp_path,
+            version="0.2.17",
             artifacts=artifacts,
         )

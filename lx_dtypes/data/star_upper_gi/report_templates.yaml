@@ -1,5 +1,7 @@
 - model: report_template_section
   name: upper_gi_mini_baseline
+  title_de: Basisbefunde
+  title_en: Baseline findings
   position: 0
   section_kind: findings
   types:

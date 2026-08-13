@@ -18,6 +18,7 @@ PROJECT_VERSION_RE = re.compile(r'(?ms)^(\[project\].*?^\s*version\s*=\s*")([^"]
 INIT_VERSION_RE = re.compile(r'(?m)^(__version__\s*=\s*")([^"]+)(")')
 MIGRATION_FILE_RE = re.compile(r"^\d{4}_.+\.py$")
 MIGRATION_PACKAGE_PATH = PurePosixPath("lx_dtypes/django/migrations")
+KNOWLEDGE_BASE_DATA_PATH = PurePosixPath("lx_dtypes/data")
 
 
 def _project_root() -> Path:
@@ -167,6 +168,80 @@ def verify_migration_artifacts(
             )
 
 
+def _source_knowledge_base_contract(root: Path) -> tuple[tuple[str, str], ...]:
+    data_root = root / KNOWLEDGE_BASE_DATA_PATH
+    return tuple(
+        sorted(
+            (
+                path.relative_to(root).as_posix(),
+                hashlib.sha256(path.read_bytes()).hexdigest(),
+            )
+            for path in data_root.rglob("*")
+            if path.is_file() and path.name != ".gitkeep"
+        )
+    )
+
+
+def _artifact_knowledge_base_contract(
+    artifact: Path,
+    *,
+    version: str,
+) -> tuple[tuple[str, str], ...]:
+    if artifact.suffix == ".whl":
+        with zipfile.ZipFile(artifact) as archive:
+            entries = {
+                PurePosixPath(name): archive.read(name)
+                for name in archive.namelist()
+                if not name.endswith("/")
+            }
+        artifact_root = PurePosixPath()
+    elif artifact.name.endswith(".tar.gz"):
+        with tarfile.open(artifact, mode="r:gz") as archive:
+            entries = {
+                PurePosixPath(member.name): extracted.read()
+                for member in archive.getmembers()
+                if member.isfile()
+                and (extracted := archive.extractfile(member)) is not None
+            }
+        artifact_root = PurePosixPath(f"lx_dtypes-{version}")
+    else:
+        raise SystemExit(f"Unsupported release artifact: {artifact.name}")
+
+    data_root = artifact_root / KNOWLEDGE_BASE_DATA_PATH
+    return tuple(
+        sorted(
+            (
+                (KNOWLEDGE_BASE_DATA_PATH / path.relative_to(data_root)).as_posix(),
+                hashlib.sha256(contents).hexdigest(),
+            )
+            for path, contents in entries.items()
+            if path.is_relative_to(data_root) and path.name != ".gitkeep"
+        )
+    )
+
+
+def verify_knowledge_base_artifacts(
+    root: Path,
+    *,
+    version: str,
+    artifacts: list[Path],
+) -> None:
+    """Require release artifacts to contain the exact source terminology data."""
+    source_contract = _source_knowledge_base_contract(root)
+    if not source_contract:
+        raise SystemExit("Source knowledge-base data contract is empty.")
+    for artifact in artifacts:
+        artifact_contract = _artifact_knowledge_base_contract(
+            artifact,
+            version=version,
+        )
+        if artifact_contract != source_contract:
+            raise SystemExit(
+                f"{artifact.name} knowledge-base data contract differs from the "
+                "source tree."
+            )
+
+
 def cmd_current(_: argparse.Namespace) -> int:
     print(read_project_version())
     return 0
@@ -197,6 +272,15 @@ def cmd_build(_: argparse.Namespace) -> int:
             f"found {len(dist_paths)} artifact(s)."
         )
     verify_migration_artifacts(root, version=version, artifacts=dist_paths)
+    verify_knowledge_base_artifacts(root, version=version, artifacts=dist_paths)
+    run_command(
+        [
+            sys.executable,
+            "-m",
+            "lx_dtypes.scripts.verify_packaged_report_templates",
+        ],
+        cwd=root,
+    )
     run_command(
         [sys.executable, "-m", "twine", "check", *[str(path) for path in dist_paths]],
         cwd=root,

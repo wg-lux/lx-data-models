@@ -14,6 +14,7 @@ from pydantic import (
 )
 
 from .json_types import JsonValue
+from .knowledge_base import validate_optional_knowledge_base_identity
 
 DescriptorValue = str | int | float | bool | list[str]
 
@@ -119,6 +120,10 @@ class DtypesRecordPersistencePayload(_DtypesRecordLedgerPayload):
 
     @model_validator(mode="after")
     def validate_patient_examination(self) -> "DtypesRecordPersistencePayload":
+        validate_optional_knowledge_base_identity(
+            self.knowledge_base_module,
+            self.knowledge_base_version,
+        )
         for finding in self.patient_findings:
             if finding.patient_examination != self.examination:
                 raise ValueError(

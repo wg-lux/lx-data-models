@@ -1,6 +1,8 @@
+from datetime import datetime
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from lx_dtypes.models.ledger.p_finding.Django import PFindingDjango
 from lx_dtypes.models.ledger.p_indication.Django import PIndicationDjango
@@ -39,6 +41,36 @@ class TestPExaminationFixtures:
 
         assert ddict["knowledge_base_module"] == "report_template_examples"
         assert ddict["knowledge_base_version"] == "0.1.0"
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {"date": "not-a-date"},
+            {"date": "2024-01-01T10:00:00"},
+            {"date": datetime(2024, 1, 1, 10, 0)},
+        ],
+    )
+    def test_rejects_ambiguous_dates(self, payload: dict[str, object]) -> None:
+        with pytest.raises(ValidationError):
+            PExamination.model_validate(
+                {
+                    "patient": "patient-1",
+                    "examination": "sample_examination",
+                    **payload,
+                }
+            )
+
+    def test_allows_route_boundary_to_supply_missing_kb_identity_part(self) -> None:
+        payload = PExamination.model_validate(
+            {
+                "patient": "patient-1",
+                "examination": "sample_examination",
+                "knowledge_base_version": "0.1.0",
+            }
+        )
+
+        assert payload.knowledge_base_module is None
+        assert payload.knowledge_base_version == "0.1.0"
 
 
 @pytest.mark.django_db

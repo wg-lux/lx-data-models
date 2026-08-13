@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import ClassVar, Dict, List, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from .knowledge_base import validate_optional_knowledge_base_identity
 
 
 class CoreConceptBase(BaseModel):
     """Canonical cross-layer entity shape for KB-driven concepts."""
 
-    id: int | None = None
-    name: str
+    id: int | None = Field(default=None, gt=0)
+    name: str = Field(min_length=1)
     name_de: str | None = None
     name_en: str | None = None
     description: str | None = None
@@ -17,16 +19,40 @@ class CoreConceptBase(BaseModel):
     tags: List[str] = Field(default_factory=list)
     kb_module_name: str | None = None
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        str_strip_whitespace=True,
+        validate_default=True,
+        revalidate_instances="always",
+    )
+
+    @field_validator("tags")
+    @classmethod
+    def validate_tags(cls, values: List[str]) -> List[str]:
+        return _validate_names(values, field_name="tags")
 
 
 class ClassificationCore(CoreConceptBase):
     classification_choices: List[str] = Field(default_factory=list)
     classification_types: List[str] = Field(default_factory=list)
 
+    @field_validator("classification_choices", "classification_types")
+    @classmethod
+    def validate_references(cls, values: List[str]) -> List[str]:
+        return _validate_names(values, field_name="classification references")
+
+
+class ClassificationTypeCore(CoreConceptBase):
+    pass
+
 
 class ClassificationChoiceCore(CoreConceptBase):
     classification_choice_descriptors: List[str] = Field(default_factory=list)
+
+    @field_validator("classification_choice_descriptors")
+    @classmethod
+    def validate_references(cls, values: List[str]) -> List[str]:
+        return _validate_names(values, field_name="classification choice descriptors")
 
 
 class ClassificationChoiceDescriptorCore(CoreConceptBase):
@@ -54,11 +80,31 @@ class ExaminationCore(CoreConceptBase):
     examination_types: List[str] = Field(default_factory=list)
     indications: List[str] = Field(default_factory=list)
 
+    @field_validator("findings", "examination_types", "indications")
+    @classmethod
+    def validate_references(cls, values: List[str]) -> List[str]:
+        return _validate_names(values, field_name="examination references")
+
+
+class KnowledgeBaseExaminationTypeCore(CoreConceptBase):
+    pass
+
 
 class FindingCore(CoreConceptBase):
     finding_types: List[str] = Field(default_factory=list)
     classifications: List[str] = Field(default_factory=list)
     interventions: List[str] = Field(default_factory=list)
+    caused_by_interventions: List[str] = Field(default_factory=list)
+
+    @field_validator(
+        "finding_types",
+        "classifications",
+        "interventions",
+        "caused_by_interventions",
+    )
+    @classmethod
+    def validate_references(cls, values: List[str]) -> List[str]:
+        return _validate_names(values, field_name="finding references")
 
 
 class FindingTypeCore(CoreConceptBase):
@@ -70,6 +116,11 @@ class IndicationCore(CoreConceptBase):
     classifications: List[str] = Field(default_factory=list)
     interventions: List[str] = Field(default_factory=list)
 
+    @field_validator("indication_types", "classifications", "interventions")
+    @classmethod
+    def validate_references(cls, values: List[str]) -> List[str]:
+        return _validate_names(values, field_name="indication references")
+
 
 class IndicationTypeCore(CoreConceptBase):
     pass
@@ -77,6 +128,11 @@ class IndicationTypeCore(CoreConceptBase):
 
 class InterventionCore(CoreConceptBase):
     intervention_types: List[str] = Field(default_factory=list)
+
+    @field_validator("intervention_types")
+    @classmethod
+    def validate_references(cls, values: List[str]) -> List[str]:
+        return _validate_names(values, field_name="intervention types")
 
 
 class InterventionTypeCore(CoreConceptBase):
@@ -87,6 +143,11 @@ class UnitCore(CoreConceptBase):
     abbreviation: str | None = None
     unit_types: List[str] = Field(default_factory=list)
 
+    @field_validator("unit_types")
+    @classmethod
+    def validate_references(cls, values: List[str]) -> List[str]:
+        return _validate_names(values, field_name="unit types")
+
 
 class UnitTypeCore(CoreConceptBase):
     pass
@@ -94,6 +155,11 @@ class UnitTypeCore(CoreConceptBase):
 
 class InformationSourceCore(CoreConceptBase):
     information_source_types: List[str] = Field(default_factory=list)
+
+    @field_validator("information_source_types")
+    @classmethod
+    def validate_references(cls, values: List[str]) -> List[str]:
+        return _validate_names(values, field_name="information source types")
 
 
 class InformationSourceTypeCore(CoreConceptBase):
@@ -121,13 +187,21 @@ class CitationCore(CoreConceptBase):
 
 
 class CoreConceptCollection(BaseModel):
-    module_name: str
+    """Complete, internally consistent terminology snapshot for API consumers."""
+
+    module_name: str = Field(min_length=1)
+    knowledge_base_module: str | None = Field(default=None, min_length=1)
+    knowledge_base_version: str | None = Field(default=None, min_length=1)
     classification: List[ClassificationCore] = Field(default_factory=list)
+    classification_type: List[ClassificationTypeCore] = Field(default_factory=list)
     classification_choice: List[ClassificationChoiceCore] = Field(default_factory=list)
     classification_choice_descriptor: List[ClassificationChoiceDescriptorCore] = Field(
         default_factory=list
     )
     examination: List[ExaminationCore] = Field(default_factory=list)
+    examination_type: List[KnowledgeBaseExaminationTypeCore] = Field(
+        default_factory=list
+    )
     finding: List[FindingCore] = Field(default_factory=list)
     finding_type: List[FindingTypeCore] = Field(default_factory=list)
     indication: List[IndicationCore] = Field(default_factory=list)
@@ -142,15 +216,124 @@ class CoreConceptCollection(BaseModel):
     )
     citation: List[CitationCore] = Field(default_factory=list)
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        str_strip_whitespace=True,
+        validate_default=True,
+        revalidate_instances="always",
+    )
+
+    _REFERENCE_FIELDS: ClassVar[dict[str, dict[str, str]]] = {
+        "classification": {
+            "classification_choices": "classification_choice",
+            "classification_types": "classification_type",
+        },
+        "classification_choice": {
+            "classification_choice_descriptors": ("classification_choice_descriptor"),
+        },
+        "examination": {
+            "findings": "finding",
+            "examination_types": "examination_type",
+            "indications": "indication",
+        },
+        "finding": {
+            "finding_types": "finding_type",
+            "classifications": "classification",
+            "interventions": "intervention",
+            "caused_by_interventions": "intervention",
+        },
+        "indication": {
+            "indication_types": "indication_type",
+            "classifications": "classification",
+            "interventions": "intervention",
+        },
+        "intervention": {"intervention_types": "intervention_type"},
+        "unit": {"unit_types": "unit_type"},
+        "information_source": {"information_source_types": "information_source_type"},
+    }
+    _OPTIONAL_REFERENCE_FIELDS: ClassVar[dict[str, dict[str, str]]] = {
+        "classification_choice_descriptor": {"unit": "unit"},
+    }
+
+    @model_validator(mode="after")
+    def validate_graph(self) -> Self:
+        identity = validate_optional_knowledge_base_identity(
+            self.knowledge_base_module,
+            self.knowledge_base_version,
+        )
+        if identity is not None and identity.knowledge_base_module != self.module_name:
+            raise ValueError(
+                "module_name and knowledge_base_module must identify the same module"
+            )
+
+        collection_names: dict[str, set[str]] = {}
+        seen_uuids: dict[str, str] = {}
+
+        for field_name in self.__class__.model_fields:
+            if field_name in {
+                "module_name",
+                "knowledge_base_module",
+                "knowledge_base_version",
+            }:
+                continue
+            records = getattr(self, field_name)
+            names = [record.name for record in records]
+            if len(names) != len(set(names)):
+                raise ValueError(f"{field_name} names must be unique")
+            collection_names[field_name] = set(names)
+
+            for record in records:
+                if record.uuid is None:
+                    continue
+                previous = seen_uuids.get(record.uuid)
+                if previous is not None:
+                    raise ValueError(
+                        f"uuid {record.uuid!r} is shared by {previous} and {field_name}"
+                    )
+                seen_uuids[record.uuid] = field_name
+
+        for source_name, reference_fields in self._REFERENCE_FIELDS.items():
+            for record in getattr(self, source_name):
+                for reference_field, target_name in reference_fields.items():
+                    references = getattr(record, reference_field)
+                    missing = sorted(set(references) - collection_names[target_name])
+                    if missing:
+                        raise ValueError(
+                            f"{source_name}.{record.name}.{reference_field} contains "
+                            f"unknown {target_name} names: {', '.join(missing)}"
+                        )
+
+        for source_name, reference_fields in self._OPTIONAL_REFERENCE_FIELDS.items():
+            for record in getattr(self, source_name):
+                for reference_field, target_name in reference_fields.items():
+                    reference = getattr(record, reference_field)
+                    if (
+                        reference is not None
+                        and reference not in collection_names[target_name]
+                    ):
+                        raise ValueError(
+                            f"{source_name}.{record.name}.{reference_field} contains "
+                            f"unknown {target_name} name: {reference}"
+                        )
+        return self
+
+
+def _validate_names(values: List[str], *, field_name: str) -> List[str]:
+    if any(not value for value in values):
+        raise ValueError(f"{field_name} must not contain empty names")
+    if len(values) != len(set(values)):
+        raise ValueError(f"{field_name} must contain unique names")
+    return values
 
 
 __all__ = [
     "CoreConceptBase",
     "ClassificationCore",
+    "ClassificationTypeCore",
     "ClassificationChoiceCore",
     "ClassificationChoiceDescriptorCore",
     "ExaminationCore",
+    "KnowledgeBaseExaminationTypeCore",
     "FindingCore",
     "FindingTypeCore",
     "IndicationCore",

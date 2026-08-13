@@ -17,7 +17,7 @@ l_report_lookup = LReportLookupType(
     SerializedReportDataDict=SerializedReportDataDict,
     SerializedReport=SerializedReport,
 )
-l_report_models = Union[Report, SerializedReport]
+l_report_models = Union[Report]
 l_report_ddicts = Union[ReportDataDict, SerializedReportDataDict]
 
 __all__ = [

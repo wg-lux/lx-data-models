@@ -375,7 +375,7 @@ def build_p_examination_payload_from_host_ledger(
         patient_findings_payload.append(
             {
                 "finding": finding_name,
-                "patient_examination": str(patient_examination_id),
+                "patient_examination": examination_name,
                 "patient_finding_classifications": [
                     {
                         "patient_finding": str(patient_finding.id),

@@ -295,8 +295,23 @@ def test_report_template_section_defaults_preserve_existing_templates() -> None:
     )
 
     assert section.section_kind == "findings"
+    assert section.title_de == "baseline"
+    assert section.title_en == "baseline"
     assert section.fields == []
     assert section.findings == ["rf_polyp"]
+
+
+def test_report_template_section_exports_localized_titles() -> None:
+    section = ReportTemplateSection.model_validate(
+        {
+            "name": "findings",
+            "title_de": "Befunde",
+            "title_en": "Findings",
+        }
+    )
+
+    assert section.ddict["title_de"] == "Befunde"
+    assert section.ddict["title_en"] == "Findings"
 
 
 def test_report_template_section_supports_patient_history_fields() -> None:

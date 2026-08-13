@@ -6,7 +6,7 @@
 
 - model: classification_choice_descriptor
   name: "length_mm_descriptor"
-  unit: "millimeter"
+  unit: "milimeter"
   classification_choice_descriptor_type: numeric
   default_value_num: 0.0
 

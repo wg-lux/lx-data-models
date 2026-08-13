@@ -3,6 +3,11 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any, Callable, Dict, List, NoReturn, Optional, Protocol, Set, cast
 
+from lx_dtypes.models.contracts.terminology_catalog import (
+    IndicationCatalogDTO,
+    LocalizedCatalogItem,
+)
+
 from . import findings_routes
 from .request_types import BaseRequest
 
@@ -26,7 +31,16 @@ def _relation_items(relation: Any | None) -> list[Any]:
 
 
 def _serialize_relation_items(relation: Any | None) -> list[dict[str, Any]]:
-    return [{"id": item.id, "name": item.name} for item in _relation_items(relation)]
+    return [
+        {
+            "id": item.id,
+            "name": item.name,
+            "name_de": getattr(item, "name_de", ""),
+            "name_en": getattr(item, "name_en", ""),
+            "description": getattr(item, "description", None),
+        }
+        for item in _relation_items(relation)
+    ]
 
 
 def _serialize_indication(indication: Any) -> Dict[str, Any]:
@@ -35,14 +49,18 @@ def _serialize_indication(indication: Any) -> Dict[str, Any]:
     classifications = _serialize_relation_items(classifications_relation)
     interventions_relation = getattr(indication, "interventions", None)
     interventions = _serialize_relation_items(interventions_relation)
-    return {
-        "id": indication.id,
-        "name": indication.name,
-        "description": indication.description,
-        "indication_types": _serialize_relation_items(indication_types_relation),
-        "classifications": classifications,
-        "interventions": interventions,
-    }
+    return IndicationCatalogDTO.model_validate(
+        {
+            "id": indication.id,
+            "name": indication.name,
+            "name_de": getattr(indication, "name_de", ""),
+            "name_en": getattr(indication, "name_en", ""),
+            "description": indication.description,
+            "indication_types": _serialize_relation_items(indication_types_relation),
+            "classifications": classifications,
+            "interventions": interventions,
+        }
+    ).model_dump(mode="json")
 
 
 def _resolve_kb_finding_names(
@@ -81,9 +99,17 @@ def _serialize_examination_node_for_indication_tree(
             for finding in findings
             if findings_routes._norm_name(finding.name) in allowed_finding_names
         ]
+    localized_examination = LocalizedCatalogItem.model_validate(
+        {
+            "id": examination.id,
+            "name": examination.name,
+            "name_de": getattr(examination, "name_de", ""),
+            "name_en": getattr(examination, "name_en", ""),
+            "description": getattr(examination, "description", None),
+        }
+    ).model_dump(mode="json")
     return {
-        "id": examination.id,
-        "name": examination.name,
+        **localized_examination,
         "findings": [
             {
                 "id": finding.id,

@@ -49,6 +49,8 @@ class ReportTemplateCompiler:
 
         return {
             "name": section.name,
+            "title_de": section.title_de,
+            "title_en": section.title_en,
             "position": section.position,
             "types": section.types,
             "section_kind": section.section_kind,

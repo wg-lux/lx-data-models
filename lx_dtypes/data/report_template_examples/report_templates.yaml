@@ -54,6 +54,8 @@
 
 - model: report_template_section
   name: examination_baseline
+  title_de: Untersuchungsbasis
+  title_en: Examination baseline
   position: 0
   types: []
   findings:
@@ -224,6 +226,8 @@
 
 - model: report_template_section
   name: upper_gi_quality_2025_landmarks_and_completeness
+  title_de: Landmarken und Vollständigkeit
+  title_en: Landmarks and completeness
   position: 0
   types: [baseline]
   findings:
@@ -398,6 +402,8 @@
 
 - model: report_template_section
   name: base_required_section
+  title_de: Pflichtbefunde
+  title_en: Required findings
   position: 0
   types:
     - baseline
@@ -1680,6 +1686,8 @@
 
 - model: report_template_section
   name: patienten_und_untersuchungskontext
+  title_de: Patienten- und Untersuchungskontext
+  title_en: Patient and examination context
   position: 0
   section_kind: patient_data
   types:
@@ -1709,6 +1717,8 @@
 
 - model: report_template_section
   name: indikation_und_sedierung
+  title_de: Indikation und Sedierung
+  title_en: Indication and sedation
   position: 1
   types:
     - baseline
@@ -1733,6 +1743,8 @@
 
 - model: report_template_section
   name: darmvorbereitung_nach_bbps
+  title_de: Darmvorbereitung nach BBPS
+  title_en: Bowel preparation by BBPS
   position: 2
   types:
     - baseline
@@ -1744,6 +1756,8 @@
 
 - model: report_template_section
   name: untersuchungsqualitaet_und_reichweite
+  title_de: Untersuchungsqualität und Reichweite
+  title_en: Examination quality and extent
   position: 3
   types:
     - baseline
@@ -1755,6 +1769,8 @@
 
 - model: report_template_section
   name: pathologische_befunde_und_interventionen
+  title_de: Pathologische Befunde und Interventionen
+  title_en: Pathological findings and interventions
   position: 4
   types:
     - findings
@@ -1771,6 +1787,8 @@
 
 - model: report_template_section
   name: komplikationen_und_empfehlungen
+  title_de: Komplikationen und Empfehlungen
+  title_en: Complications and recommendations
   position: 5
   types:
     - complication
@@ -2488,6 +2506,8 @@
 
 - model: report_template_section
   name: ercp_quality_documentation_2018
+  title_de: ERCP-Qualitätsdokumentation
+  title_en: ERCP quality documentation
   position: 0
   types: [baseline]
   findings:
@@ -2653,6 +2673,8 @@
 
 - model: report_template_section
   name: eus_quality_documentation_2025
+  title_de: EUS-Qualitätsdokumentation
+  title_en: EUS quality documentation
   position: 0
   types: [baseline]
   findings:

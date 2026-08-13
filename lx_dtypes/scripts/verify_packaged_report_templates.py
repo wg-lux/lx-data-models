@@ -33,6 +33,25 @@ def verify_packaged_report_templates(
             raise RuntimeError(
                 f"Packaged report template '{template_name}' is not production-ready."
             )
+        german_name = payload.get("name_de")
+        if not isinstance(german_name, str) or not german_name.strip():
+            raise RuntimeError(
+                f"Packaged report template '{template_name}' has no German title."
+            )
+        sections = payload.get("report_sections")
+        if not isinstance(sections, list) or not sections:
+            raise RuntimeError(
+                f"Packaged report template '{template_name}' has no report sections."
+            )
+        if any(
+            not isinstance(section, dict)
+            or not isinstance(section.get("title_de"), str)
+            or not section["title_de"].strip()
+            for section in sections
+        ):
+            raise RuntimeError(
+                f"Packaged report template '{template_name}' has an unlabeled German section."
+            )
         verified.append(template_name)
     return verified
 
