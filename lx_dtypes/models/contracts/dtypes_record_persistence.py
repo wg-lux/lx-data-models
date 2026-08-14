@@ -13,10 +13,10 @@ from pydantic import (
     model_validator,
 )
 
+from lx_dtypes.models.descriptor_value import DescriptorValue
+
 from .json_types import JsonValue
 from .knowledge_base import validate_optional_knowledge_base_identity
-
-DescriptorValue = str | int | float | bool | list[str]
 
 
 class _DtypesRecordLedgerPayload(BaseModel):

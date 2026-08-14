@@ -18,9 +18,11 @@ from lx_dtypes.models.knowledge_base.classification_choice_descriptor.TextDescri
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.UnitMixin import (
     UnitMixin,
 )
+from lx_dtypes.models.descriptor_value import DescriptorValue
 from lx_dtypes.names import (
     CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS,
 )
+from lx_dtypes.serialization import parse_str_list
 
 from .ClassificationChoiceDescriptorDataDict import (
     ClassificationChoiceDescriptorDataDict,
@@ -59,3 +61,45 @@ class ClassificationChoiceDescriptor(
             ddict_class (type[ClassificationChoiceDescriptorDataDict]): The class used to represent this descriptor's data dictionary.
         """
         return ClassificationChoiceDescriptorDataDict
+
+    def normalize_value(self, value: DescriptorValue) -> DescriptorValue:
+        """Normalize a ledger value according to this descriptor's type.
+
+        Keeping this conversion on the knowledge-base descriptor ensures that
+        finding and indication ledger records interpret identical descriptor
+        definitions in the same way.
+        """
+
+        if self.is_numeric:
+            if isinstance(value, list):
+                raise ValueError(
+                    f"List value is not supported for numeric descriptor {self.name}"
+                )
+            return float(value)
+
+        if self.is_boolean:
+            if isinstance(value, list):
+                raise ValueError(
+                    f"List value is not supported for boolean descriptor {self.name}"
+                )
+            if isinstance(value, str):
+                normalized = value.strip().lower()
+                if normalized in {"true", "1", "yes", "y", "on"}:
+                    return True
+                if normalized in {"false", "0", "no", "n", "off"}:
+                    return False
+                raise ValueError(
+                    f"Unsupported boolean string value '{value}' "
+                    f"for descriptor {self.name}"
+                )
+            return bool(value)
+
+        if self.is_selection:
+            if isinstance(value, (str, list)):
+                return parse_str_list(value)
+            return [str(value)]
+
+        if self.is_text:
+            return str(value)
+
+        raise ValueError(f"Unsupported descriptor type for descriptor {self.name}")
