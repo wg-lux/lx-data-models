@@ -325,6 +325,7 @@ levels:
         - finding_type
         - information_source
         - knowledge_base
+        - knowledge_base_graph
         - lab_value
         - numeric_value_distribution
         - patient_examination

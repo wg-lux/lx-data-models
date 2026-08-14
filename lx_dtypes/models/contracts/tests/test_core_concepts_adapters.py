@@ -485,6 +485,7 @@ def test_kb_snapshot_normalizes_unbounded_descriptor_sentinels() -> None:
 
     assert canonical.numeric_min is None
     assert canonical.numeric_max is None
+    assert canonical.unit is None
 
 
 def test_packaged_snapshot_contains_only_finite_descriptor_numbers() -> None:

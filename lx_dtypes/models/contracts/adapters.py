@@ -361,6 +361,8 @@ def _canonical_scalar_value(
         and not isfinite(value)
     ):
         return None
+    if field == "unit" and value == "unknown":
+        return None
     return value
 
 

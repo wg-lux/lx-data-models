@@ -1,0 +1,137 @@
+# STAR Upper GI 2025 reporting choices (Esposito et al., DOI 10.1055/a-2652-8941).
+- model: classification_choice
+  name: star_upper_gi_text_value
+  classification_choice_descriptors:
+    - additional_text_info
+
+- model: classification_choice
+  name: star_upper_gi_antithrombotic_active
+  name_en: Active
+  name_de: Fortgeführt
+
+- model: classification_choice
+  name: star_upper_gi_antithrombotic_interrupted
+  name_en: Interrupted
+  name_de: Unterbrochen
+
+- model: classification_choice
+  name: star_upper_gi_biopsy_random
+  name_en: Random biopsy
+  name_de: Zufallsbiopsie
+
+- model: classification_choice
+  name: star_upper_gi_biopsy_targeted
+  name_en: Targeted biopsy
+  name_de: Gezielte Biopsie
+
+- model: classification_choice
+  name: star_upper_gi_cleanliness_grace
+  name_en: GRACE
+
+- model: classification_choice
+  name: star_upper_gi_cleanliness_peace
+  name_en: PEACE
+
+- model: classification_choice
+  name: star_upper_gi_cleanliness_barcelona
+  name_en: Barcelona
+
+- model: classification_choice
+  name: star_upper_gi_grace_0
+  description: "Solid food is present."
+- model: classification_choice
+  name: star_upper_gi_grace_1
+  description: "Mucus, bubbles, biliary fluid, or foam severely covers more than 50% of the surface."
+- model: classification_choice
+  name: star_upper_gi_grace_2
+  description: "Mucus, bubbles, biliary fluid, or foam moderately covers 5% to 50% of the surface."
+- model: classification_choice
+  name: star_upper_gi_grace_3
+  description: "No or minimal residue covers less than 5% of the surface."
+
+- model: classification_choice
+  name: star_upper_gi_peace_0
+  description: "Fluid, foam, or solid content completely prevents mucosal evaluation."
+- model: classification_choice
+  name: star_upper_gi_peace_1
+  description: "Substantial opaque content prevents evaluation of some mucosal areas."
+- model: classification_choice
+  name: star_upper_gi_peace_2
+  description: "A small amount of hazy content permits inspection of most mucosa."
+- model: classification_choice
+  name: star_upper_gi_peace_3
+  description: "Clean mucosa or minor transparent fluid does not impede inspection."
+
+- model: classification_choice
+  name: star_upper_gi_barcelona_0
+  description: "Nonaspirable residue, bile, or foam prevents visualization of most mucosa."
+- model: classification_choice
+  name: star_upper_gi_barcelona_1
+  description: "A small amount of residue, bile, or foam permits visualization of most mucosa."
+- model: classification_choice
+  name: star_upper_gi_barcelona_2
+  description: "No residue is present and visualization is nearly complete."
+
+- model: classification_choice
+  name: star_upper_gi_mucosa_normal
+  name_en: Normal
+  name_de: Normal
+
+- model: classification_choice
+  name: star_upper_gi_mucosa_abnormal
+  name_en: Abnormal
+  name_de: Auffällig
+
+- model: classification_choice
+  name: star_upper_gi_mucosa_not_visualized
+  name_en: Not visualized
+  name_de: Nicht eingesehen
+
+- model: classification_choice
+  name: star_upper_gi_papilla_normal
+  name_en: Normal
+  name_de: Normal
+
+- model: classification_choice
+  name: star_upper_gi_papilla_suspected_adenoma
+  name_en: Suspected adenoma
+  name_de: Adenomverdacht
+
+- model: classification_choice
+  name: star_upper_gi_papilla_not_visualized
+  name_en: Not visualized
+  name_de: Nicht eingesehen
+
+- model: classification_choice
+  name: star_upper_gi_photo_proximal_esophagus
+  name_en: Proximal esophagus
+- model: classification_choice
+  name: star_upper_gi_photo_distal_esophagus
+  name_en: Distal esophagus
+- model: classification_choice
+  name: star_upper_gi_photo_z_line_and_hiatus
+  name_en: Z-line and diaphragmatic indentation
+- model: classification_choice
+  name: star_upper_gi_photo_duodenal_bulb
+  name_en: Duodenal bulb
+- model: classification_choice
+  name: star_upper_gi_photo_second_duodenum
+  name_en: Second part of duodenum
+- model: classification_choice
+  name: star_upper_gi_photo_antrum
+  name_en: Antrum
+- model: classification_choice
+  name: star_upper_gi_photo_cardia_fundus_retroflexion
+  name_en: Cardia and fundus in full inversion
+- model: classification_choice
+  name: star_upper_gi_photo_corpus_lesser_curve
+  name_en: Lesser curvature of corpus in partial inversion
+- model: classification_choice
+  name: star_upper_gi_photo_incisura
+  name_en: Incisura in partial inversion
+- model: classification_choice
+  name: star_upper_gi_photo_corpus_greater_curve
+  name_en: Greater curvature of corpus in forward view
+- model: classification_choice
+  name: star_upper_gi_photo_abnormal_finding
+  name_en: Abnormal finding

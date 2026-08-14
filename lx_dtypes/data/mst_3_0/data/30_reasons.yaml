@@ -1,0 +1,156 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Source: MST 3.0 section 4. Symptom qualifiers are duration/degree. Disease
+# qualifiers are suspected, established, follow-up, sampling, treatment and
+# screening (EUS substitutes staging for sampling where stated in §4.5).
+
+# Upper endoscopy (§4.1)
+- {model: indication, name: mst30_upper_symptom_abdominal_distress_pain, name_en: Abdominal distress/pain, name_de: Abdominal distress/pain, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_dyspepsia, name_en: Dyspepsia, name_de: Dyspepsia, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_heartburn, name_en: Heartburn, name_de: Heartburn, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_dysphagia, name_en: Dysphagia, name_de: Dysphagia, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_odynophagia, name_en: Odynophagia, name_de: Odynophagia, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_vomiting, name_en: Vomiting, name_de: Vomiting, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_hematemesis, name_en: Hematemesis, name_de: Hematemesis, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_melena, name_en: Melena, name_de: Melena, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_nausea, name_en: Nausea, name_de: Nausea, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_weight_loss, name_en: Weight loss, name_de: Weight loss, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_anemia, name_en: Anemia, name_de: Anemia, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_symptom_diarrhea, name_en: Diarrhea, name_de: Diarrhea, indication_types: [mst30_symptom], description: "§4.1; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_upper_disease_achalasia, name_en: Achalasia, name_de: Achalasia, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_anastomic_leak, name_en: Anastomic leak, name_de: Anastomic leak, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_angioectasia, name_en: Angioectasia, name_de: Angioectasia, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_atrophic_gastritis, name_en: Atrophic gastritis, name_de: Atrophic gastritis, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_barretts_esophagus, name_en: Barretts esophagus, name_de: Barretts esophagus, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_caustic_ingestion, name_en: Caustic ingestion, name_de: Caustic ingestion, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_celiac_disease, name_en: Celiac disease, name_de: Celiac disease, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_diverticulum, name_en: Diverticulum, name_de: Diverticulum, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_duodenal_stricture, name_en: Duodenal stricture, name_de: Duodenal stricture, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_duodenal_ulcer, name_en: Duodenal ulcer, name_de: Duodenal ulcer, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_esophageal_stricture, name_en: Esophageal stricture, name_de: Esophageal stricture, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_esophageal_varices, name_en: Esophageal varices, name_de: Esophageal varices, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_fistula, name_en: Fistula, name_de: Fistula, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_foreign_body, name_en: Foreign body, name_de: Foreign body, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_gastric_ulcer, name_en: Gastric ulcer, name_de: Gastric ulcer, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_gastric_varices, name_en: Gastric varices, name_de: Gastric varices, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_gerd, name_en: GERD, name_de: GERD, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_lymphoma, name_en: Lymphoma, name_de: Lymphoma, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_metastasis_unknown_origin, name_en: "Metastasis, unknown origin", name_de: "Metastasis, unknown origin", indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_other_esophagitis, name_en: Other esophagitis, name_de: Other esophagitis, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_pernicious_anaemia, name_en: Pernicious anaemia, name_de: Pernicious anaemia, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_polyp, name_en: Polyp, name_de: Polyp, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_precancrous_lesions, name_en: Precancrous lesions, name_de: Precancrous lesions, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_pyloric_stenosis, name_en: Pyloric stenosis, name_de: Pyloric stenosis, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_reflux_esophagitis, name_en: Reflux esophagitis, name_de: Reflux esophagitis, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_superficial_neoplastic_lesion, name_en: Superficial neoplastic lesion, name_de: Superficial neoplastic lesion, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+- {model: indication, name: mst30_upper_disease_tumor_mass, name_en: Tumor/mass, name_de: Tumor/mass, indication_types: [mst30_disease], description: "§4.1 disease qualifiers."}
+
+# Colonoscopy (§4.2)
+- {model: indication, name: mst30_colon_symptom_hematochezia, name_en: Hematochezia, name_de: Hematochezia, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_symptom_melena, name_en: Melena, name_de: Melena, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_symptom_diarrhea, name_en: Diarrhea, name_de: Diarrhea, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_symptom_abdominal_distress_pain, name_en: Abdominal distress/pain, name_de: Abdominal distress/pain, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_symptom_altered_bowel_habits, name_en: Altered bowel habits, name_de: Altered bowel habits, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_symptom_anemia, name_en: Anemia, name_de: Anemia, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_symptom_weight_loss, name_en: Weight loss, name_de: Weight loss, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_symptom_constipation, name_en: Constipation, name_de: Constipation, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_symptom_defecation_disorder, name_en: Defecation disorder, name_de: Defecation disorder, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_symptom_abdominal_mass, name_en: Abdominal mass, name_de: Abdominal mass, indication_types: [mst30_symptom], description: "§4.2; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_colon_disease_anastomotic_leak, name_en: Anastomotic leak, name_de: Anastomotic leak, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_angioectasia, name_en: Angioectasia, name_de: Angioectasia, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_colonic_obstruction, name_en: Colonic obstruction, name_de: Colonic obstruction, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_colorectal_cancer, name_en: Colorectal cancer, name_de: Colorectal cancer, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_crohns_disease, name_en: Crohns disease, name_de: Crohns disease, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_diverticula, name_en: Diverticula, name_de: Diverticula, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_endocrine_mass, name_en: Endocrine mass, name_de: Endocrine mass, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_fistula, name_en: Fistula, name_de: Fistula, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_ischemic_colitis, name_en: Ischemic colitis, name_de: Ischemic colitis, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_metastasis_unknown_origin, name_en: "Metastasis, unknown origin", name_de: "Metastasis, unknown origin", indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_other_colitis, name_en: Other colitis, name_de: Other colitis, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_polyps, name_en: Polyps, name_de: Polyps, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_pouchitis, name_en: Pouchitis, name_de: Pouchitis, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_pseudomembranous_colitis, name_en: Pseudomembranous colitis, name_de: Pseudomembranous colitis, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_superficial_neoplastic_lesion, name_en: Superficial neoplastic lesion, name_de: Superficial neoplastic lesion, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+- {model: indication, name: mst30_colon_disease_ulcerative_colitis, name_en: Ulcerative colitis, name_de: Ulcerative colitis, indication_types: [mst30_disease], description: "§4.2 disease qualifiers."}
+
+# Enteroscopy (§4.3)
+- {model: indication, name: mst30_enteroscopy_symptom_abdominal_distress_pain, name_en: Abdominal distress/pain, name_de: Abdominal distress/pain, indication_types: [mst30_symptom], description: "§4.3; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_enteroscopy_symptom_vomiting, name_en: Vomiting, name_de: Vomiting, indication_types: [mst30_symptom], description: "§4.3; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_enteroscopy_symptom_melena, name_en: Melena, name_de: Melena, indication_types: [mst30_symptom], description: "§4.3; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_enteroscopy_symptom_anemia, name_en: Anemia, name_de: Anemia, indication_types: [mst30_symptom], description: "§4.3; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_enteroscopy_symptom_diarrhea, name_en: Diarrhea, name_de: Diarrhea, indication_types: [mst30_symptom], description: "§4.3; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_enteroscopy_disease_angioectasia, name_en: Angioectasia, name_de: Angioectasia, indication_types: [mst30_disease], description: "§4.3 disease qualifiers."}
+- {model: indication, name: mst30_enteroscopy_disease_celiac_disease, name_en: Celiac disease, name_de: Celiac disease, indication_types: [mst30_disease], description: "§4.3 disease qualifiers."}
+- {model: indication, name: mst30_enteroscopy_disease_crohns_disease, name_en: Crohns disease, name_de: Crohns disease, indication_types: [mst30_disease], description: "§4.3 disease qualifiers."}
+- {model: indication, name: mst30_enteroscopy_disease_hereditary_polyposis_syndrome, name_en: Hereditary polyposis syndrome, name_de: Hereditary polyposis syndrome, indication_types: [mst30_disease], description: "§4.3 disease qualifiers."}
+- {model: indication, name: mst30_enteroscopy_disease_lymphoma, name_en: Lymphoma, name_de: Lymphoma, indication_types: [mst30_disease], description: "§4.3 disease qualifiers."}
+- {model: indication, name: mst30_enteroscopy_disease_nsaid_enteropathy, name_en: NSAID enteropathy, name_de: NSAID enteropathy, indication_types: [mst30_disease], description: "§4.3 disease qualifiers."}
+- {model: indication, name: mst30_enteroscopy_disease_polyps, name_en: Polyps, name_de: Polyps, indication_types: [mst30_disease], description: "§4.3 disease qualifiers."}
+- {model: indication, name: mst30_enteroscopy_disease_stricture, name_en: Stricture, name_de: Stricture, indication_types: [mst30_disease], description: "§4.3 disease qualifiers."}
+- {model: indication, name: mst30_enteroscopy_disease_mass, name_en: mass, name_de: mass, indication_types: [mst30_disease], description: "§4.3 disease qualifiers."}
+
+# ERCP (§4.4)
+- {model: indication, name: mst30_ercp_symptom_jaundice, name_en: Jaundice, name_de: Jaundice, indication_types: [mst30_symptom], description: "§4.4; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_ercp_symptom_pancreatobiliary_pain, name_en: Pancreatobiliary pain, name_de: Pancreatobiliary pain, indication_types: [mst30_symptom], description: "§4.4; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_ercp_symptom_pruritus, name_en: Pruritus, name_de: Pruritus, indication_types: [mst30_symptom], description: "§4.4; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_ercp_disease_acute_pancreatitis, name_en: Acute pancreatitis, name_de: Acute pancreatitis, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_ampullary_mass, name_en: Ampullary mass, name_de: Ampullary mass, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_anastomotic_stricture, name_en: Anastomotic stricture, name_de: Anastomotic stricture, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_bile_duct_injury, name_en: Bile duct injury, name_de: Bile duct injury, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_bile_duct_leak, name_en: Bile duct leak, name_de: Bile duct leak, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_bile_duct_stone, name_en: Bile duct stone, name_de: Bile duct stone, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_bile_duct_stricture, name_en: Bile duct stricture, name_de: Bile duct stricture, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_carolis_disease, name_en: Carolis disease, name_de: Carolis disease, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_choledochal_cyst, name_en: Choledochal cyst, name_de: Choledochal cyst, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_choledochocele, name_en: Choledochocele, name_de: Choledochocele, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_chronic_pancreatitis, name_en: Chronic pancreatitis, name_de: Chronic pancreatitis, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_fistula, name_en: Fistula, name_de: Fistula, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_gallbladder_polyp, name_en: Gallbladder polyp, name_de: Gallbladder polyp, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_gallbladder_stone, name_en: Gallbladder stone, name_de: Gallbladder stone, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_gallbladder_mass, name_en: Gallbladder mass, name_de: Gallbladder mass, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_hepatobiliary_mass, name_en: Hepatobiliary mass, name_de: Hepatobiliary mass, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_ipmt, name_en: IPMT, name_de: IPMT, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_mirizzi_syndrome, name_en: Mirizzi syndrome, name_de: Mirizzi syndrome, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_pancreatic_duct_leak, name_en: Pancreatic duct leak, name_de: Pancreatic duct leak, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_pancreatic_injury, name_en: Pancreatic injury, name_de: Pancreatic injury, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_pancreatic_pseudocyst, name_en: Pancreatic pseudocyst, name_de: Pancreatic pseudocyst, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_pancreatic_stone, name_en: Pancreatic stone, name_de: Pancreatic stone, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_pancreatic_mass, name_en: Pancreatic mass, name_de: Pancreatic mass, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_papillary_dysfunction, name_en: Papillary dysfunction, name_de: Papillary dysfunction, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_parasites, name_en: Parasites, name_de: Parasites, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_parenchymal_liver_disease, name_en: Parenchymal liver disease, name_de: Parenchymal liver disease, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_primary_sclerosing_cholangitis, name_en: Primary sclerosing cholangitis, name_de: Primary sclerosing cholangitis, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_purulent_cholangitis, name_en: Purulent cholangitis, name_de: Purulent cholangitis, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+- {model: indication, name: mst30_ercp_disease_stent_dysfunction, name_en: Stent dysfunction, name_de: Stent dysfunction, indication_types: [mst30_disease], description: "§4.4 disease qualifiers."}
+
+# EUS (§4.5)
+- {model: indication, name: mst30_eus_symptom_abdominal_pain, name_en: Abdominal pain, name_de: Abdominal pain, indication_types: [mst30_symptom], description: "§4.5; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_eus_symptom_diarrhea, name_en: Diarrhea, name_de: Diarrhea, indication_types: [mst30_symptom], description: "§4.5; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_eus_symptom_jaundice, name_en: Jaundice, name_de: Jaundice, indication_types: [mst30_symptom], description: "§4.5; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_eus_symptom_pancreatobiliary_pain, name_en: Pancreatobiliary pain, name_de: Pancreatobiliary pain, indication_types: [mst30_symptom], description: "§4.5; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_eus_symptom_weight_loss, name_en: Weight loss, name_de: Weight loss, indication_types: [mst30_symptom], description: "§4.5; qualifiers: Duration, Degree."}
+- {model: indication, name: mst30_eus_disease_abdominal_mass, name_en: Abdominal mass, name_de: Abdominal mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_ampullary_mass, name_en: Ampullary mass, name_de: Ampullary mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_bile_duct_mass, name_en: Bile duct mass, name_de: Bile duct mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_bile_duct_stone, name_en: Bile duct stone, name_de: Bile duct stone, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_bile_duct_stricture, name_en: Bile duct stricture, name_de: Bile duct stricture, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_colorectal_intramural_lesion, name_en: Colorectal intramural lesion, name_de: Colorectal intramural lesion, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_colorectal_mass, name_en: Colorectal mass, name_de: Colorectal mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_colorectal_stricture, name_en: Colorectal stricture, name_de: Colorectal stricture, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_duodenal_intramural_lesion, name_en: Duodenal intramural lesion, name_de: Duodenal intramural lesion, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_duodenal_mass, name_en: Duodenal mass, name_de: Duodenal mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_duodenal_stricture, name_en: Duodenal stricture, name_de: Duodenal stricture, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_esophageal_intramural_lesion, name_en: Esophageal intramural lesion, name_de: Esophageal intramural lesion, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_esophageal_mass, name_en: Esophageal mass, name_de: Esophageal mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_esophageal_stricture, name_en: Esophageal stricture, name_de: Esophageal stricture, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_gastric_intramural_lesion, name_en: Gastric intramural lesion, name_de: Gastric intramural lesion, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_gastric_mass, name_en: Gastric mass, name_de: Gastric mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_liver_mass, name_en: Liver mass, name_de: Liver mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_mediastinal_lymph_node_mass, name_en: Mediastinal lymph node/mass, name_de: Mediastinal lymph node/mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_pancreatic_cyst, name_en: Pancreatic cyst, name_de: Pancreatic cyst, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_pancreatic_mass, name_en: Pancreatic mass, name_de: Pancreatic mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_pancreatic_pseudocyst, name_en: Pancreatic pseudocyst, name_de: Pancreatic pseudocyst, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_pancreatic_stone, name_en: Pancreatic stone, name_de: Pancreatic stone, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_pancreatitis_acute, name_en: Pancreatitis - acute, name_de: Pancreatitis - acute, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_pancreatitis_chronic, name_en: Pancreatitis - chronic, name_de: Pancreatitis - chronic, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_perirectal_mass, name_en: Perirectal mass, name_de: Perirectal mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}
+- {model: indication, name: mst30_eus_disease_pulmonary_mass, name_en: Pulmonary mass, name_de: Pulmonary mass, indication_types: [mst30_disease], description: "§4.5 disease qualifiers, including staging."}

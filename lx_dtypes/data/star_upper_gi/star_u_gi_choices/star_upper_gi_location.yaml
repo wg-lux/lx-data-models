@@ -23,6 +23,13 @@
     - length_cm_descriptor
 
 - model: classification_choice
+  name: "star_upper_gi_location_hiatus"
+  name_de: "Hiatus"
+  name_en: "Hiatus"
+  classification_choice_descriptors:
+    - length_cm_descriptor
+
+- model: classification_choice
   name: "star_upper_gi_location_stomach_fundus"
   name_de: "Magen (Fundus)"
   name_en: "Stomach (Fundus)"
@@ -36,6 +43,11 @@
   name: "star_upper_gi_location_stomach_antrum"
   name_de: "Magen (Antrum)"
   name_en: "Stomach (Antrum)"
+
+- model: classification_choice
+  name: "star_upper_gi_location_stomach_incisura"
+  name_de: "Magen (Incisura)"
+  name_en: "Stomach (Incisura)"
 
 - model: classification_choice
   name: "star_upper_gi_location_stomach_cardia"

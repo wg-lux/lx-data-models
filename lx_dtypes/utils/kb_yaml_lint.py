@@ -232,6 +232,50 @@ def _discover_yaml_files_from_module_config(
     ) -> tuple[Path | None, list[KbYamlLintIssue]]:
         candidates = sorted(set(module_index.get(module_name, [])))
         if not candidates:
+            directory_candidates = sorted(
+                {
+                    candidate
+                    for indexed_configs in module_index.values()
+                    for candidate in indexed_configs
+                    if candidate.parent.name == module_name
+                }
+            )
+            if len(directory_candidates) == 1:
+                mismatched_config = directory_candidates[0]
+                mismatched_loaded = yaml.safe_load(
+                    mismatched_config.read_text(encoding="utf-8")
+                )
+                declared_name = (
+                    mismatched_loaded.get("name")
+                    if isinstance(mismatched_loaded, dict)
+                    else None
+                )
+                declared_modules = (
+                    mismatched_loaded.get("modules")
+                    if isinstance(mismatched_loaded, dict)
+                    else None
+                )
+                if (
+                    isinstance(declared_name, str)
+                    and declared_name.strip()
+                    and isinstance(declared_modules, list)
+                    and declared_modules
+                ):
+                    return None, [
+                        _issue(
+                            code="aggregator_name_directory_mismatch",
+                            severity="warning",
+                            file=config_path,
+                            line=1,
+                            column=1,
+                            message=(
+                                f"Referenced aggregator directory '{module_name}' "
+                                f"declares module name '{declared_name.strip()}'. "
+                                "Request the declared module name or align the two "
+                                "names."
+                            ),
+                        )
+                    ]
             return None, [
                 _issue(
                     code="missing_config_module",
@@ -462,6 +506,40 @@ def _load_yaml_items(file_path: Path) -> tuple[list[_YamlItem], list[KbYamlLintI
             )
         )
         return [], issues
+
+    def _find_duplicate_mapping_keys(node: yaml.Node) -> None:
+        if isinstance(node, yaml.MappingNode):
+            seen_keys: dict[tuple[str, str], yaml.Node] = {}
+            for key_node, value_node in node.value:
+                if isinstance(key_node, yaml.ScalarNode):
+                    key_identity = (key_node.tag, key_node.value)
+                    previous = seen_keys.get(key_identity)
+                    if previous is not None:
+                        issues.append(
+                            _issue(
+                                code="duplicate_mapping_key",
+                                severity="error",
+                                file=file_path,
+                                line=int(key_node.start_mark.line) + 1,
+                                column=int(key_node.start_mark.column) + 1,
+                                message=(
+                                    f"Duplicate YAML mapping key '{key_node.value}'; "
+                                    "the earlier value at "
+                                    f"{file_path}:{int(previous.start_mark.line) + 1}:"
+                                    f"{int(previous.start_mark.column) + 1} would be "
+                                    "silently overwritten by standard YAML loading."
+                                ),
+                            )
+                        )
+                    else:
+                        seen_keys[key_identity] = key_node
+                _find_duplicate_mapping_keys(value_node)
+            return
+        if isinstance(node, yaml.SequenceNode):
+            for child_node in node.value:
+                _find_duplicate_mapping_keys(child_node)
+
+    _find_duplicate_mapping_keys(composed)
 
     items: list[_YamlItem] = []
     for idx, raw_item in enumerate(loaded):
@@ -739,6 +817,81 @@ def _lint_incomplete_input_rules(
     return issues
 
 
+def _lint_unresolved_model_references(
+    definitions: dict[tuple[str, str], _DefinitionLocation],
+    items_by_definition: dict[tuple[str, str], _YamlItem],
+) -> list[KbYamlLintIssue]:
+    """Reject typed references that cannot be resolved in the discovered module graph.
+
+    Descriptor units are validated by the runtime loader, but historically the
+    lightweight YAML linter stopped after syntax and local input-chain checks.
+    Keep this check model-aware so a literal such as ``unit: unknown`` cannot
+    pass ``ok`` and then fail during ``KnowledgeBase`` construction.
+    """
+
+    issues: list[KbYamlLintIssue] = []
+    for (model_name, descriptor_name), item in items_by_definition.items():
+        if model_name != "classification_choice_descriptor":
+            continue
+        raw_unit = item.payload.get("unit")
+        descriptor_type = item.payload.get("classification_choice_descriptor_type")
+        if raw_unit is None and descriptor_type == "numeric":
+            issues.append(
+                _issue(
+                    code="numeric_descriptor_missing_unit",
+                    severity="error",
+                    file=item.file,
+                    line=item.line,
+                    column=item.column,
+                    message=(
+                        f"Numeric classification choice descriptor "
+                        f"'{descriptor_name}' omits 'unit'; the runtime default "
+                        "would resolve to the sentinel 'unknown'. Define and "
+                        "reference an explicit unit, including for dimensionless "
+                        "counts."
+                    ),
+                )
+            )
+            continue
+        if raw_unit is None:
+            continue
+        if not isinstance(raw_unit, str) or not raw_unit.strip():
+            issues.append(
+                _issue(
+                    code="invalid_unit_reference",
+                    severity="error",
+                    file=item.file,
+                    line=item.line,
+                    column=item.column,
+                    message=(
+                        f"Classification choice descriptor '{descriptor_name}' "
+                        "must reference a unit by a non-empty string name."
+                    ),
+                )
+            )
+            continue
+
+        unit_name = raw_unit.strip()
+        if ("unit", unit_name) in definitions:
+            continue
+        issues.append(
+            _issue(
+                code="missing_unit_reference",
+                severity="error",
+                file=item.file,
+                line=item.line,
+                column=item.column,
+                message=(
+                    f"Classification choice descriptor '{descriptor_name}' "
+                    f"references missing unit '{unit_name}'. Define a unit with "
+                    "that exact name in this module or one of its configured "
+                    "dependencies."
+                ),
+            )
+        )
+    return issues
+
+
 def lint_kb_yaml_files(
     yaml_files: Iterable[Path],
     *,
@@ -874,6 +1027,7 @@ def lint_kb_yaml_files(
                 )
 
     issues.extend(_lint_incomplete_input_rules(definitions, items_by_definition))
+    issues.extend(_lint_unresolved_model_references(definitions, items_by_definition))
 
     issues.sort(
         key=lambda issue: (

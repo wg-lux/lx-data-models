@@ -43,11 +43,12 @@ def parse_args() -> argparse.Namespace:
         "--config",
         action="append",
         dest="config_paths",
-        default=default_config_paths,
+        default=[],
         type=Path,
         help=(
             "Module config.yaml files to expand and lint recursively. "
-            "Defaults to canonical entry modules."
+            "May be repeated. When neither paths nor --config are supplied, "
+            "the canonical entry modules are linted."
         ),
     )
     parser.add_argument(
@@ -65,7 +66,10 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Return non-zero exit code if warnings exist.",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    if not args.paths and not args.config_paths:
+        args.config_paths = default_config_paths
+    return args
 
 
 def main() -> int:

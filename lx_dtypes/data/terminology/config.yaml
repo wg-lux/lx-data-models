@@ -1,6 +1,7 @@
-name: example_terminology
+name: DGVS_Terminology
 description: ""
 version: 0.1.0
+medical_field: gastroenterology
 modules:
   - lx_examinations
   - lx_findings

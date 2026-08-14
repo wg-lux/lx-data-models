@@ -22,10 +22,19 @@ python scripts/lint_kb_yaml.py lx_dtypes/data/report_template_examples/data
 ## What It Checks
 
 - invalid YAML syntax (`file:line:column`)
+- duplicate YAML mapping keys, including nested mappings
 - invalid root/item structure
 - duplicate `(model, name)` definitions (with both source locations)
 - deprecated model aliases (for example `finding_validator` instead of `findings_validator`)
 - mixed finding reference styles in `report_template_section.findings`
+- unresolved descriptor-unit references across the discovered module graph
+- numeric descriptors that would implicitly use the `unknown` unit sentinel
+- module references that use an aggregator directory instead of its declared name
+
+The aggregator-name warning is emitted when a consumer references an aggregator
+by its folder name even though module loading uses the different `name` declared
+in `config.yaml`. Use `--fail-on-warnings` when packaging or import workflows
+must resolve every configured module reference.
 
 ## Strict Modes
 

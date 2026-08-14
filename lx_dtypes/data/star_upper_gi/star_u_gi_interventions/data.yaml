@@ -1,5 +1,3 @@
 - model: intervention
   name: "star_upper_gi_biopsy_performed"
-  classifications:
-    - star_upper_gi_location_classification
-    - count
+  description: "Upper-GI biopsy; sampling type, location, count, vials, and specimens are documented by the linked biopsy findings."

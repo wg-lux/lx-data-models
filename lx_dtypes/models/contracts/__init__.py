@@ -163,6 +163,16 @@ from .knowledge_base import (
     KnowledgeBaseIdentity,
     validate_optional_knowledge_base_identity,
 )
+from .knowledge_base_graph import (
+    KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION,
+    ExaminationReportingContext,
+    KnowledgeBaseGraphEdge,
+    KnowledgeBaseGraphNodeRef,
+    KnowledgeBaseGraphSnapshot,
+    ReportTemplateGraphProjection,
+    build_examination_reporting_context,
+    build_knowledge_base_graph_snapshot,
+)
 from .terminology_catalog import (
     ExaminationCatalogDTO,
     IndicationCatalogDTO,
@@ -696,6 +706,14 @@ __all__ = [
     "LabValueNormalRangePayload",
     "KnowledgeBaseContract",
     "KnowledgeBaseIdentity",
+    "KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION",
+    "ExaminationReportingContext",
+    "KnowledgeBaseGraphEdge",
+    "KnowledgeBaseGraphNodeRef",
+    "KnowledgeBaseGraphSnapshot",
+    "ReportTemplateGraphProjection",
+    "build_examination_reporting_context",
+    "build_knowledge_base_graph_snapshot",
     "validate_optional_knowledge_base_identity",
     "ExaminationCatalogDTO",
     "IndicationCatalogDTO",

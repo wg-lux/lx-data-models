@@ -2,7 +2,7 @@ name: report_template_examples
 version: 0.1.0
 modules: []
 depends_on:
-  - example_terminology
+  - DGVS_Terminology
   - star_upper_gi
 
 data:

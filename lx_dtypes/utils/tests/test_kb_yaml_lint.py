@@ -3,6 +3,9 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import pytest
+
+from lx_dtypes.scripts.lint_kb_yaml import parse_args
 from lx_dtypes.utils.kb_yaml_lint import (
     discover_yaml_files,
     lint_kb_yaml_files,
@@ -122,6 +125,28 @@ def test_linter_reports_duplicate_name_with_line_reference(tmp_path: Path) -> No
     assert issue.line == 3
     assert issue.column == 3
     assert "previously defined at" in issue.message
+
+
+def test_linter_rejects_duplicate_yaml_mapping_key(tmp_path: Path) -> None:
+    data_file = tmp_path / "duplicate_key.yaml"
+    data_file.write_text(
+        (
+            "- model: finding\n"
+            "  name: complication_generic\n"
+            "  name_de: Komplikation\n"
+            "  name_de: Komplikation (generisch)\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+
+    issue = next(issue for issue in issues if issue.code == "duplicate_mapping_key")
+    assert issue.severity == "error"
+    assert issue.line == 4
+    assert issue.column == 3
+    assert "name_de" in issue.message
+    assert ":3:3" in issue.message
 
 
 def test_linter_flags_alias_and_mixed_style(tmp_path: Path) -> None:
@@ -278,6 +303,69 @@ def test_linter_flags_broken_classification_input_chain(tmp_path: Path) -> None:
     assert "missing_choice_descriptor_reference" in codes
 
 
+def test_linter_rejects_descriptor_with_unresolved_unit(tmp_path: Path) -> None:
+    data_file = tmp_path / "unresolved_unit.yaml"
+    data_file.write_text(
+        (
+            "- model: classification_choice_descriptor\n"
+            "  name: mst30_count_value\n"
+            "  classification_choice_descriptor_type: numeric\n"
+            "  unit: unknown\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+
+    issue = next(issue for issue in issues if issue.code == "missing_unit_reference")
+    assert issue.severity == "error"
+    assert issue.line == 1
+    assert "mst30_count_value" in issue.message
+    assert "unknown" in issue.message
+
+
+def test_linter_rejects_numeric_descriptor_with_implicit_unknown_unit(
+    tmp_path: Path,
+) -> None:
+    data_file = tmp_path / "implicit_unknown_unit.yaml"
+    data_file.write_text(
+        (
+            "- model: classification_choice_descriptor\n"
+            "  name: mst30_count_value\n"
+            "  classification_choice_descriptor_type: numeric\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+
+    issue = next(
+        issue for issue in issues if issue.code == "numeric_descriptor_missing_unit"
+    )
+    assert issue.severity == "error"
+    assert "mst30_count_value" in issue.message
+    assert "unknown" in issue.message
+
+
+def test_linter_accepts_descriptor_with_resolved_unit(tmp_path: Path) -> None:
+    data_file = tmp_path / "resolved_unit.yaml"
+    data_file.write_text(
+        (
+            "- model: unit\n"
+            "  name: count\n"
+            "- model: classification_choice_descriptor\n"
+            "  name: mst30_count_value\n"
+            "  classification_choice_descriptor_type: numeric\n"
+            "  unit: count\n"
+        ),
+        encoding="utf-8",
+    )
+
+    issues = lint_kb_yaml_files([data_file])
+
+    assert not any(issue.code == "missing_unit_reference" for issue in issues)
+
+
 def test_linter_flags_template_finding_without_description(tmp_path: Path) -> None:
     data_file = tmp_path / "missing_finding_description.yaml"
     data_file.write_text(
@@ -363,6 +451,40 @@ def test_discover_yaml_files_expands_module_config(tmp_path: Path) -> None:
     assert files == [target_file.resolve()]
 
 
+def test_discovery_warns_when_aggregator_name_differs_from_directory(
+    tmp_path: Path,
+) -> None:
+    child_dir = tmp_path / "child"
+    child_dir.mkdir()
+    (child_dir / "config.yaml").write_text(
+        'name: child\nversion: "1.0.0"\ndata: {files: [], dirs: []}\n',
+        encoding="utf-8",
+    )
+    umbrella_dir = tmp_path / "terminology"
+    umbrella_dir.mkdir()
+    config_file = umbrella_dir / "config.yaml"
+    config_file.write_text(
+        ('name: example_terminology\nversion: "1.0.0"\nmodules:\n  - child\n'),
+        encoding="utf-8",
+    )
+    consumer_dir = tmp_path / "consumer"
+    consumer_dir.mkdir()
+    consumer_config = consumer_dir / "config.yaml"
+    consumer_config.write_text(
+        'name: consumer\nversion: "1.0.0"\nmodules:\n  - terminology\n',
+        encoding="utf-8",
+    )
+
+    _, issues = discover_yaml_files(paths=[], config_paths=[consumer_config])
+
+    issue = next(
+        issue for issue in issues if issue.code == "aggregator_name_directory_mismatch"
+    )
+    assert issue.severity == "warning"
+    assert "terminology" in issue.message
+    assert "example_terminology" in issue.message
+
+
 def test_lx_kb_lint_shim_imports_runtime_module(tmp_path: Path) -> None:
     repo_root = Path(__file__).resolve().parents[3]
     shim_path = repo_root / "lx_kb_lint.py"
@@ -376,3 +498,19 @@ def test_lx_kb_lint_shim_imports_runtime_module(tmp_path: Path) -> None:
     issues = module.lint_kb_yaml_files([tmp_path / "missing.yaml"])
     assert len(issues) == 1
     assert issues[0].code == "missing_file"
+
+
+def test_cli_explicit_config_does_not_include_default_modules(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    config_file = tmp_path / "config.yaml"
+    monkeypatch.setattr(
+        "sys.argv",
+        ["ok", "--config", str(config_file)],
+    )
+
+    args = parse_args()
+
+    assert args.paths == []
+    assert args.config_paths == [config_file]

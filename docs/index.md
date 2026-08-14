@@ -29,6 +29,7 @@ guides/konzept-verknuepfungen
 guides/knowledge-base-authoring
 guides/kb-yaml-linting
 guides/knowledge-base-contract-migration
+guides/knowledge-base-graph-api
 guides/runtime-output-vs-canonical-ddict
 guides/report-concept-coverage
 guides/report-template-infrastructure

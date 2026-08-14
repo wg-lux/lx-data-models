@@ -43,6 +43,7 @@ from .findings_routes import (
 )
 from .indications_routes import register_indications_routes
 from .examinations_routes import register_examinations_routes
+from .knowledge_base_graph_routes import register_knowledge_base_graph_routes
 from .request_types import BaseRequest
 from .report_template_routes import register_report_template_routes
 from .report_template_builder import (
@@ -719,6 +720,11 @@ register_report_template_routes(
     report_template_access_allowed=lambda actor, capability: (
         _report_template_access_allowed(actor, capability)
     ),
+)
+
+register_knowledge_base_graph_routes(
+    api,
+    load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
 )
 
 register_findings_routes(

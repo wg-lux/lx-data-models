@@ -6,6 +6,7 @@ description: |
   Based on the ESGE STAR Upper GI qualitiy improvement initiative 
   (Esposito et al 2025, doi.org/10.1055/a-2652-8941).
 version: 0.1.1
+medical_field: gastroenterology
 depends_on:
   - lx_classification_choices
 modules:
@@ -16,7 +17,9 @@ data:
     - "./main.yaml" # Contains the data fixture for gastroscopy
     - "./report_templates.yaml"
   dirs: # Subdirectories containing .yaml files for findings, classifications, etc.
+    - "./star_u_gi_units/"
     - "./star_u_gi_descriptors/"
     - "./star_u_gi_choices/"
     - "./star_u_gi_classifications/"
     - "./star_u_gi_findings/"
+    - "./star_u_gi_interventions/"

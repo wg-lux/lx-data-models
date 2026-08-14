@@ -1,0 +1,62 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Source: MST 3.0 appendix 8.1. Reference citations and definitions are retained
+# in classification/choice descriptions.
+- {model: classification, name: mst30_los_angeles, name_en: LA classification of erosive esophagitis, name_de: LA classification of erosive esophagitis, classification_types: [mst30_standard_classification], classification_choices: [mst30_la_a, mst30_la_b, mst30_la_c, mst30_la_d], description: "§8.1.1. Lundell L, Dent J, Bennett J, et al. Gut 1999;45:172-80."}
+- {model: classification_choice, name: mst30_la_a, name_en: Grade A, name_de: Grade A, description: "Mucosal break < 5 mm in length."}
+- {model: classification_choice, name: mst30_la_b, name_en: Grade B, name_de: Grade B, description: "Mucosal break > 5 mm."}
+- {model: classification_choice, name: mst30_la_c, name_en: Grade C, name_de: Grade C, description: "Mucosal break continuous between > 2 mucosal folds."}
+- {model: classification_choice, name: mst30_la_d, name_en: Grade D, name_de: Grade D, description: "Mucosal break >75% of esophageal circumference."}
+- {model: classification, name: mst30_esophageal_varices_size, name_en: Size classification of esophageal varices, name_de: Size classification of esophageal varices, classification_types: [mst30_standard_classification], classification_choices: [mst30_varices_grade_1, mst30_varices_grade_2, mst30_varices_grade_3], description: "§8.1.2. Pungpapong S et al. Endoscopy 2007;39:673-80."}
+- {model: classification_choice, name: mst30_varices_grade_1, name_en: grade 1, name_de: grade 1, description: "Small and nontortuous esophageal varices, flattened with insufflation."}
+- {model: classification_choice, name: mst30_varices_grade_2, name_en: grade 2, name_de: grade 2, description: "Tortuous esophageal varices covering less than 50% of the radius of the distal esophagus."}
+- {model: classification_choice, name: mst30_varices_grade_3, name_en: grade 3, name_de: grade 3, description: "Large and tortuous esophageal varices covering more than 50% of the radius of the distal esophagus."}
+- {model: classification, name: mst30_prague_cm, name_en: Prague C & M classification of Barretts esophagus extension, name_de: Prague C & M classification of Barretts esophagus extension, classification_types: [mst30_standard_classification], classification_choices: [mst30_prague_c, mst30_prague_m], description: "§8.1.3. Sharma P et al. Gastroenterology 2006;131:1392-9."}
+- {model: classification_choice, name: mst30_prague_c, name_en: C, name_de: C, description: "Difference in insertion distances between GEJ and proximal margin of circumferential Barretts epithelium."}
+- {model: classification_choice, name: mst30_prague_m, name_en: M, name_de: M, description: "Difference in insertion distances between GEJ and proximal margin of the longest tongue-like Barretts segment; excludes islands."}
+- {model: classification, name: mst30_paris, name_en: Paris classification of neoplastic lesions, name_de: Paris classification of neoplastic lesions, classification_types: [mst30_standard_classification], classification_choices: [mst30_paris_0, mst30_paris_1, mst30_paris_2, mst30_paris_3, mst30_paris_4, mst30_paris_5], description: "§8.1.4. The Paris endoscopic classification. Gastrointestinal Endosc. 58(6 Suppl 1):S3-S43."}
+- {model: classification_choice, name: mst30_paris_0, name_en: type 0, name_de: type 0, description: "Superficial polypoid, flat/depressed, or excavated tumors."}
+- {model: classification_choice, name: mst30_paris_1, name_en: type 1, name_de: type 1, description: "Polypoid carcinomas, usually attached on a wide base."}
+- {model: classification_choice, name: mst30_paris_2, name_en: type 2, name_de: type 2, description: "Ulcerated carcinomas with sharply demarcated and raised margins."}
+- {model: classification_choice, name: mst30_paris_3, name_en: type 3, name_de: type 3, description: "Ulcerated, infiltrating carcinomas without definite limits."}
+- {model: classification_choice, name: mst30_paris_4, name_en: type 4, name_de: type 4, description: "Nonulcerated, diffusely infiltrating carcinomas."}
+- {model: classification_choice, name: mst30_paris_5, name_en: type 5, name_de: type 5, description: "Unclassifiable advanced carcinomas."}
+- {model: classification, name: mst30_jgca_superficial_neoplastic_lesions, name_en: JGCA classification of superficial neoplastic lesions, name_de: JGCA classification of superficial neoplastic lesions, classification_types: [mst30_standard_classification], classification_choices: [mst30_jgca_0_1p, mst30_jgca_0_1s, mst30_jgca_0_iia, mst30_jgca_0_iib, mst30_jgca_0_iic, mst30_jgca_0_iic_iia, mst30_jgca_0_iia_iic, mst30_jgca_0_iii, mst30_jgca_0_iic_iii, mst30_jgca_0_iii_iic], description: "§8.1.5. Endoscopic classification review group. Endoscopy 2005;37:570-8."}
+- {model: classification_choice, name: mst30_jgca_0_1p, name_en: 0-1p, name_de: 0-1p, description: "Protruding, pedunculated."}
+- {model: classification_choice, name: mst30_jgca_0_1s, name_en: 0-1s, name_de: 0-1s, description: "Protruding, sessile."}
+- {model: classification_choice, name: mst30_jgca_0_iia, name_en: 0-IIa, name_de: 0-IIa, description: "Slightly elevated."}
+- {model: classification_choice, name: mst30_jgca_0_iib, name_en: 0-IIb, name_de: 0-IIb, description: "Completely flat."}
+- {model: classification_choice, name: mst30_jgca_0_iic, name_en: 0-IIc, name_de: 0-IIc, description: "Slightly depressed."}
+- {model: classification_choice, name: mst30_jgca_0_iic_iia, name_en: 0-IIc + IIa, name_de: 0-IIc + IIa, description: "Depressed plus elevated; order denotes relative importance."}
+- {model: classification_choice, name: mst30_jgca_0_iia_iic, name_en: 0-IIa + IIc, name_de: 0-IIa + IIc, description: "Elevated plus depressed; order denotes relative importance."}
+- {model: classification_choice, name: mst30_jgca_0_iii, name_en: 0-III, name_de: 0-III, description: "Excavated ulcer."}
+- {model: classification_choice, name: mst30_jgca_0_iic_iii, name_en: 0-IIc + III, name_de: 0-IIc + III, description: "Depressed plus excavated; order denotes relative importance."}
+- {model: classification_choice, name: mst30_jgca_0_iii_iic, name_en: 0-III + IIc, name_de: 0-III + IIc, description: "Excavated plus depressed; order denotes relative importance."}
+- {model: classification, name: mst30_forrest, name_en: Forrest classification of ulcer bleeding, name_de: Forrest classification of ulcer bleeding, classification_types: [mst30_standard_classification], classification_choices: [mst30_forrest_ia, mst30_forrest_ib, mst30_forrest_iia, mst30_forrest_iib, mst30_forrest_iic, mst30_forrest_iii], description: "§8.1.6. Forrest JA, Finlayson ND, Shearman DJ. Lancet 1974;2:394-397."}
+- {model: classification_choice, name: mst30_forrest_ia, name_en: Forrest I a, name_de: Forrest I a, description: "Arterial, spurting hemorrhage."}
+- {model: classification_choice, name: mst30_forrest_ib, name_en: Forrest I b, name_de: Forrest I b, description: "Oozing hemorrhage."}
+- {model: classification_choice, name: mst30_forrest_iia, name_en: Forrest II a, name_de: Forrest II a, description: "Visible vessel; g = vessel <2 mm, G = vessel >2 mm."}
+- {model: classification_choice, name: mst30_forrest_iib, name_en: Forrest II b, name_de: Forrest II b, description: "Adherent clot."}
+- {model: classification_choice, name: mst30_forrest_iic, name_en: Forrest II c, name_de: Forrest II c, description: "Hematin-covered lesion."}
+- {model: classification_choice, name: mst30_forrest_iii, name_en: Forrest III, name_de: Forrest III, description: "No signs of recent hemorrhage."}
+- {model: classification, name: mst30_goligher, name_en: Goligher grading of hemorrhoids, name_de: Goligher grading of hemorrhoids, classification_types: [mst30_standard_classification], classification_choices: [mst30_goligher_1, mst30_goligher_2, mst30_goligher_3, mst30_goligher_4], description: "§8.1.7. T.R. Schrock, Advanced therapeutic endoscopy, Raven Press (1991)."}
+- {model: classification_choice, name: mst30_goligher_1, name_en: grade 1, name_de: grade 1, description: "Hemorrhoids with bleeding."}
+- {model: classification_choice, name: mst30_goligher_2, name_en: grade 2, name_de: grade 2, description: "Bleeding and protrusion, with spontaneous reduction."}
+- {model: classification_choice, name: mst30_goligher_3, name_en: grade 3, name_de: grade 3, description: "Bleeding and protrusion that require manual reduction."}
+- {model: classification_choice, name: mst30_goligher_4, name_en: grade 4, name_de: grade 4, description: "Prolapse that cannot be replaced."}
+- {model: classification, name: mst30_kudo, name_en: Kudo classification of colon polyp surface pattern, name_de: Kudo classification of colon polyp surface pattern, classification_types: [mst30_standard_classification], classification_choices: [mst30_kudo_i, mst30_kudo_ii, mst30_kudo_iiis, mst30_kudo_iiil, mst30_kudo_iv, mst30_kudo_v], description: "§8.1.8. Kudo S et al. J Clin Pathol 1994;47:880-5."}
+- {model: classification_choice, name: mst30_kudo_i, name_en: type I, name_de: type I, description: "Non-neoplastic pit pattern."}
+- {model: classification_choice, name: mst30_kudo_ii, name_en: type II, name_de: type II, description: "Non-neoplastic pit pattern."}
+- {model: classification_choice, name: mst30_kudo_iiis, name_en: type IIIS, name_de: type IIIS, description: "Low-grade or high-grade intramucosal neoplasia pattern."}
+- {model: classification_choice, name: mst30_kudo_iiil, name_en: type IIIL, name_de: type IIIL, description: "Low-grade or high-grade intramucosal neoplasia pattern."}
+- {model: classification_choice, name: mst30_kudo_iv, name_en: type IV, name_de: type IV, description: "Low-grade or high-grade intramucosal neoplasia pattern."}
+- {model: classification_choice, name: mst30_kudo_v, name_en: type V, name_de: type V, description: "Distorted epithelial crests or amorphous surface; carcinoma with suspicion of submucosal invasion."}
+- {model: classification, name: mst30_bismuth, name_en: Bismuth classification of cholangiocarcinoma, name_de: Bismuth classification of cholangiocarcinoma, classification_types: [mst30_standard_classification], classification_choices: [mst30_bismuth_i, mst30_bismuth_ii, mst30_bismuth_iiia, mst30_bismuth_iiib, mst30_bismuth_iv], description: "§8.1.9. Bismuth H, Castaing D, Traynor O. World J Surg 1988;12:39-47."}
+- {model: classification_choice, name: mst30_bismuth_i, name_en: Type I, name_de: Type I, description: "Extrahepatic involvement only."}
+- {model: classification_choice, name: mst30_bismuth_ii, name_en: Type II, name_de: Type II, description: "Extrahepatic and hilar involvement."}
+- {model: classification_choice, name: mst30_bismuth_iiia, name_en: Type IIIa, name_de: Type IIIa, description: "Extrahepatic, hilar and right-sided segmental involvement."}
+- {model: classification_choice, name: mst30_bismuth_iiib, name_en: Type IIIb, name_de: Type IIIb, description: "Extrahepatic, hilar and left-sided segmental involvement."}
+- {model: classification_choice, name: mst30_bismuth_iv, name_en: Type IV, name_de: Type IV, description: "Extrahepatic and bilateral segmental involvement."}
+- {model: classification, name: mst30_esophagogastric_region_landmarks, name_en: Definitions of the esophagogastric region, name_de: Definitions of the esophagogastric region, classification_types: [mst30_standard_classification], classification_choices: [mst30_landmark_egj, mst30_landmark_scj, mst30_landmark_diaphragm], description: "§8.1.10. Arbitrary region limits commonly 2 cm above/below EGJ; source adapted from Sharma P et al. Gastroenterology 2006;131:1392-9."}
+- {model: classification_choice, name: mst30_landmark_egj, name_en: EGJ, name_de: EGJ, description: "Esophagogastric junction: where tubular esophagus joins stomach at cardia; proximal gastric folds and distal palisade vessels are additional markers."}
+- {model: classification_choice, name: mst30_landmark_scj, name_en: SCJ, name_de: SCJ, description: "Squamo-columnar junction (Z-line): transition between esophageal squamous and columnar epithelium."}
+- {model: classification_choice, name: mst30_landmark_diaphragm, name_en: Diaphragm impression, name_de: Diaphragm impression, description: "Hiatal hernia size is measured from EGJ to the impression of the hiatus of the diaphragm."}
