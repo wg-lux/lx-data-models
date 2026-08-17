@@ -6,6 +6,12 @@ from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
+from lx_dtypes.knowledge_bases import (
+    BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+    PackagedKnowledgeBaseIntegrityError,
+    PackagedKnowledgeBaseResourceError,
+    get_packaged_knowledge_base,
+)
 from lx_dtypes.models.interface.DataLoader import (
     AmbiguousModuleConfigError,
     DataLoader,
@@ -73,7 +79,84 @@ def _get_registry_path() -> Path | None:
     return Path(configured_path).expanduser().resolve()
 
 
-def _coerce_input_dirs(raw_entry: Any) -> tuple[str, ...]:
+def _resolve_provider_source(
+    raw_source: Mapping[object, object],
+    *,
+    module_name: str,
+    version: str,
+) -> str:
+    provider = raw_source.get("provider")
+    if provider != BUILTIN_KNOWLEDGE_BASE_PROVIDER:
+        raise KnowledgeBaseRegistryError(
+            f"Unknown knowledge-base provider for {module_name}@{version}: {provider!r}."
+        )
+    expected_digest = raw_source.get("content_sha256")
+    if not isinstance(expected_digest, str):
+        raise KnowledgeBaseRegistryError(
+            f"Provider source for {module_name}@{version} requires content_sha256."
+        )
+    try:
+        descriptor = get_packaged_knowledge_base(module_name, version)
+    except LookupError as exc:
+        raise KnowledgeBaseVersionNotFoundError(str(exc)) from exc
+    if descriptor.content_sha256 != expected_digest:
+        raise KnowledgeBaseVersionConflictError(
+            "Registered knowledge-base digest conflicts with the installed provider "
+            f"for {module_name}@{version}: expected {expected_digest}, installed "
+            f"{descriptor.content_sha256}."
+        )
+    try:
+        return str(descriptor.installed_data_root())
+    except PackagedKnowledgeBaseIntegrityError as exc:
+        raise KnowledgeBaseVersionConflictError(str(exc)) from exc
+    except PackagedKnowledgeBaseResourceError as exc:
+        raise KnowledgeBaseRegistryError(str(exc)) from exc
+
+
+def _coerce_sources(
+    raw_sources: object,
+    *,
+    module_name: str,
+    version: str,
+) -> tuple[str, ...]:
+    if not isinstance(raw_sources, Sequence) or isinstance(raw_sources, (str, bytes)):
+        raise KnowledgeBaseRegistryError("Registry sources must be a non-empty list.")
+    resolved: list[str] = []
+    for raw_source in raw_sources:
+        if not isinstance(raw_source, Mapping):
+            raise KnowledgeBaseRegistryError("Registry sources must be objects.")
+        kind = raw_source.get("kind")
+        if kind == "provider":
+            resolved.append(
+                _resolve_provider_source(
+                    raw_source,
+                    module_name=module_name,
+                    version=version,
+                )
+            )
+        elif kind == "filesystem":
+            resolved.extend(
+                _coerce_input_dirs(
+                    raw_source.get("input_dirs"),
+                    module_name=module_name,
+                    version=version,
+                )
+            )
+        else:
+            raise KnowledgeBaseRegistryError(
+                f"Unknown knowledge-base source kind: {kind!r}."
+            )
+    if not resolved:
+        raise KnowledgeBaseRegistryError("Registry sources must not be empty.")
+    return tuple(resolved)
+
+
+def _coerce_input_dirs(
+    raw_entry: Any,
+    *,
+    module_name: str,
+    version: str,
+) -> tuple[str, ...]:
     if isinstance(raw_entry, str):
         return (_normalize_registry_input(raw_entry),)
     if isinstance(raw_entry, Sequence) and not isinstance(raw_entry, (str, bytes)):
@@ -90,14 +173,42 @@ def _coerce_input_dirs(raw_entry: Any) -> tuple[str, ...]:
             )
         return tuple(resolved_paths)
     if isinstance(raw_entry, Mapping):
+        if "sources" in raw_entry:
+            return _coerce_sources(
+                raw_entry["sources"],
+                module_name=module_name,
+                version=version,
+            )
         if "input_dirs" in raw_entry:
-            return _coerce_input_dirs(raw_entry["input_dirs"])
+            return _coerce_input_dirs(
+                raw_entry["input_dirs"],
+                module_name=module_name,
+                version=version,
+            )
         for key in ("data_root", "path"):
             if key in raw_entry:
-                return _coerce_input_dirs(raw_entry[key])
+                return _coerce_input_dirs(
+                    raw_entry[key],
+                    module_name=module_name,
+                    version=version,
+                )
     raise KnowledgeBaseRegistryError(
         "Registry entries must be a path string, a list of path strings, "
-        "or an object containing `input_dirs`, `data_root`, or `path`."
+        "or an object containing `sources`, `input_dirs`, `data_root`, or `path`."
+    )
+
+
+def resolve_registry_entry_inputs(
+    module_name: str,
+    version: str,
+    raw_entry: object,
+) -> tuple[str, ...]:
+    """Resolve one persisted registry entry against the current runtime."""
+
+    return _coerce_input_dirs(
+        raw_entry,
+        module_name=module_name,
+        version=version,
     )
 
 
@@ -138,7 +249,9 @@ def _load_registry() -> dict[tuple[str, str], tuple[str, ...]]:
                 raise KnowledgeBaseRegistryError(
                     "Knowledge-base registry versions must be non-empty strings."
                 )
-            registry[(module_name, version)] = _coerce_input_dirs(raw_entry)
+            registry[(module_name, version)] = resolve_registry_entry_inputs(
+                module_name, version, raw_entry
+            )
     return registry
 
 
@@ -292,6 +405,7 @@ __all__ = [
     "load_knowledge_base",
     "load_module_config",
     "resolve_default_data_root",
+    "resolve_registry_entry_inputs",
     "resolve_versioned_input_dirs",
     "ModuleConfigNotFoundError",
 ]

@@ -74,11 +74,11 @@ _test_registry_path.write_text(
         {
             "active": {
                 "module_name": "report_template_examples",
-                "version": "0.1.0",
+                "version": "0.1.1",
             },
             "modules": {
                 "report_template_examples": {
-                    "0.1.0": {
+                    "0.1.1": {
                         "input_dirs": [str(Path(__file__).resolve().parent / "data")]
                     }
                 }

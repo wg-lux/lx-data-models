@@ -5,7 +5,7 @@ description: |
   endoscopy procedures.
   Based on the ESGE STAR Upper GI qualitiy improvement initiative 
   (Esposito et al 2025, doi.org/10.1055/a-2652-8941).
-version: 0.1.1
+version: 0.1.2
 medical_field: gastroenterology
 depends_on:
   - lx_classification_choices

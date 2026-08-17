@@ -80,7 +80,7 @@ def test_guideline_extension_files_declare_sources() -> None:
         repository_root
         / "lx_dtypes/data/terminology/lx_examinations/data/colonoscopy.yaml",
         repository_root
-        / "lx_dtypes/data/report_template_examples/report_templates.yaml",
+        / "lx_dtypes/data/dgvs_reporting/data/00_colonoscopy_reporting.yaml",
     ):
         content = integration_file.read_text(encoding="utf-8")
         assert "DGVS S2k quality guideline" in content, integration_file

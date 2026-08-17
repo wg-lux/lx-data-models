@@ -27,16 +27,16 @@ from ninja.errors import HttpError  # type: ignore[import-untyped]
 from pydantic import BaseModel
 import yaml
 
+from lx_dtypes.knowledge_bases import (
+    BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+    get_packaged_knowledge_base,
+)
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseRegistryError,
     clear_knowledge_base_resolver_caches,
     get_knowledge_base_identity,
     load_knowledge_base,
-)
-from lx_dtypes.models.interface.data_roots import package_data_root
-from lx_dtypes.models.interface.remote_data_roots import (
-    normalize_registry_input,
-    RemoteDataRootError,
+    resolve_registry_entry_inputs,
 )
 from lx_dtypes.models.knowledge_base import KB_MODEL_NAMES_ORDERED
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
@@ -50,7 +50,6 @@ logger = logging.getLogger(__name__)
 
 
 _DEFAULT_KB_MODULE_NAME = "star_upper_gi"
-_DEFAULT_KB_VERSION = "0.1.1"
 
 
 if TYPE_CHECKING:
@@ -141,25 +140,11 @@ def _terminology_registry_path_for_write() -> Path:
 
 
 def _packaged_default_kb_identity() -> tuple[str, str] | None:
-    module_root = package_data_root() / _DEFAULT_KB_MODULE_NAME
-    if not module_root.exists():
+    try:
+        descriptor = get_packaged_knowledge_base(_DEFAULT_KB_MODULE_NAME)
+    except LookupError:
         return None
-    config_path = module_root / "config.yaml"
-    default_version = _DEFAULT_KB_VERSION
-    if config_path.exists():
-        try:
-            config_payload = (
-                yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
-            )
-            if isinstance(config_payload, Mapping):
-                configured_version = config_payload.get("version")
-                if isinstance(configured_version, str):
-                    configured_version = configured_version.strip()
-                    if configured_version:
-                        default_version = configured_version
-        except Exception:
-            pass
-    return _DEFAULT_KB_MODULE_NAME, default_version
+    return descriptor.module_name, descriptor.version
 
 
 def _first_registered_bundle(
@@ -198,7 +183,16 @@ def _ensure_default_packaged_module(modules: dict[str, Any]) -> bool:
         changed = True
 
     if module_versions.get(version) is None:
-        module_versions[version] = {"input_dirs": [str(package_data_root())]}
+        descriptor = get_packaged_knowledge_base(module_name, version)
+        module_versions[version] = {
+            "sources": [
+                {
+                    "kind": "provider",
+                    "provider": BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+                    "content_sha256": descriptor.content_sha256,
+                }
+            ]
+        }
         changed = True
 
     return changed
@@ -263,40 +257,6 @@ def _terminology_import_root(registry_path: Path) -> Path:
     return (registry_path.parent / "terminology-packages").resolve()
 
 
-def _coerce_input_dirs(raw_entry: object) -> tuple[str, ...]:
-    if isinstance(raw_entry, str):
-        try:
-            return (normalize_registry_input(raw_entry),)
-        except RemoteDataRootError as exc:
-            raise KnowledgeBaseRegistryError(str(exc)) from exc
-    if isinstance(raw_entry, list):
-        resolved: list[str] = []
-        for item in raw_entry:
-            if not isinstance(item, str):
-                raise KnowledgeBaseRegistryError(
-                    "Registry input_dirs entries must be strings."
-                )
-            try:
-                resolved.append(normalize_registry_input(item))
-            except RemoteDataRootError as exc:
-                raise KnowledgeBaseRegistryError(str(exc)) from exc
-        if not resolved:
-            raise KnowledgeBaseRegistryError(
-                "Registry input_dirs entries must not be empty."
-            )
-        return tuple(resolved)
-    if isinstance(raw_entry, Mapping):
-        if "input_dirs" in raw_entry:
-            return _coerce_input_dirs(raw_entry["input_dirs"])
-        for key in ("data_root", "path"):
-            if key in raw_entry:
-                return _coerce_input_dirs(raw_entry[key])
-    raise KnowledgeBaseRegistryError(
-        "Registry entries must be a path string, a list of path strings, "
-        "or an object containing `input_dirs`, `data_root`, or `path`."
-    )
-
-
 def _normalize_medical_field(value: object) -> str | None:
     if value is None:
         return None
@@ -308,12 +268,16 @@ def _normalize_medical_field(value: object) -> str | None:
     return normalized or None
 
 
-def _coerce_registry_entry(raw_entry: object) -> TerminologyRegistryEntry:
+def _coerce_registry_entry(
+    module_name: str,
+    version: str,
+    raw_entry: object,
+) -> TerminologyRegistryEntry:
     medical_field = None
     if isinstance(raw_entry, Mapping) and "medical_field" in raw_entry:
         medical_field = _normalize_medical_field(raw_entry["medical_field"])
     return TerminologyRegistryEntry(
-        input_dirs=_coerce_input_dirs(raw_entry),
+        input_dirs=resolve_registry_entry_inputs(module_name, version, raw_entry),
         medical_field=medical_field,
     )
 
@@ -366,7 +330,9 @@ def load_terminology_registry(
                 raise KnowledgeBaseRegistryError(
                     "Terminology registry versions must be non-empty strings."
                 )
-            registry[(module_name, version)] = _coerce_registry_entry(raw_entry)
+            registry[(module_name, version)] = _coerce_registry_entry(
+                module_name, version, raw_entry
+            )
     return registry
 
 
@@ -636,7 +602,14 @@ def _register_imported_bundle(
             500, "Terminology registry module version map must be a JSON object."
         )
 
-    entry: dict[str, Any] = {"input_dirs": [str(input_dir.resolve())]}
+    entry: dict[str, Any] = {
+        "sources": [
+            {
+                "kind": "filesystem",
+                "input_dirs": [str(input_dir.resolve())],
+            }
+        ]
+    }
     if medical_field:
         entry["medical_field"] = medical_field
     module_versions[version] = entry

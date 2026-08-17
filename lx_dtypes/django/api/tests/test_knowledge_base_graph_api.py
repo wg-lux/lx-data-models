@@ -15,6 +15,7 @@ from lx_dtypes.models.contracts.knowledge_base_graph import (
     build_examination_reporting_context,
     build_knowledge_base_graph_snapshot,
 )
+from lx_dtypes.models.interface.DataLoader import DataLoader
 
 
 @pytest.fixture(autouse=True)
@@ -173,6 +174,59 @@ def test_graph_snapshot_is_deterministic_and_typed() -> None:
         and edge.target.name == "gastroscopy"
         for edge in first.edges
     )
+
+
+@pytest.mark.parametrize(
+    ("module_name", "module_version", "expected_templates"),
+    [
+        (
+            "dgvs_reporting",
+            "0.1.0",
+            {
+                "colonoscopy_training_basic": "DGVS-AWMF-021-022-v2.1-2025-07",
+            },
+        ),
+        (
+            "mst_3_0",
+            "3.0.0",
+            {
+                "mst30_colonoscopy_report": "3.0",
+                "mst30_egd_report": "3.0",
+                "mst30_enteroscopy_report": "3.0",
+                "mst30_ercp_report": "3.0",
+                "mst30_eus_report": "3.0",
+                "mst30_gastroscopy_report": "3.0",
+                "mst30_vce_report": "3.0",
+            },
+        ),
+        (
+            "star_upper_gi",
+            "0.1.2",
+            {
+                "star_upper_gi_mini_report_template": "0.1.1",
+                "star_upper_gi_standard_report_template": "2025.1",
+            },
+        ),
+    ],
+)
+def test_packaged_reporting_bundle_builds_versioned_graph_snapshot(
+    module_name: str,
+    module_version: str,
+    expected_templates: dict[str, str],
+) -> None:
+    kb = DataLoader().load_knowledge_base(module_name)
+
+    snapshot = build_knowledge_base_graph_snapshot(
+        kb,
+        identity=KnowledgeBaseIdentity(
+            knowledge_base_module=module_name,
+            knowledge_base_version=module_version,
+        ),
+    )
+
+    assert {
+        template.name: template.version for template in snapshot.report_templates
+    } == expected_templates
 
 
 def test_reporting_context_is_a_closed_examination_projection() -> None:

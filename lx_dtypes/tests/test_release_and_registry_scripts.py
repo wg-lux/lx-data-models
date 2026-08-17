@@ -39,8 +39,13 @@ def test_add_entry_writes_expected_registry_shape(tmp_path: Path) -> None:
         "modules": {
             "report_template_examples": {
                 "0.1.0": {
-                    "input_dirs": [str(data_root.resolve())],
                     "medical_field": "gastroenterology",
+                    "sources": [
+                        {
+                            "kind": "filesystem",
+                            "input_dirs": [str(data_root.resolve())],
+                        }
+                    ],
                 }
             }
         }

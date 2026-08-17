@@ -156,43 +156,58 @@ The editor is the preferred authoring surface for terminology content. It can:
 
 - edit bundle metadata and terminology modules
 - generate `config.yaml` plus `data/*.yaml`
-- run the `lx-data-models` KB linter through the local `ok` button
-- publish the current bundle under `.published/<publish-name>/<version>/`
-- update `.published/kb_registry.json`
+- run the browser-packaged `lx-data-models` KB linter through **Paket prüfen**
+- export the complete bundle through **ZIP zur Veröffentlichung herunterladen**
 
-That local registry is already in the format expected by `LX_DTYPES_KB_REGISTRY`.
+The editor is a static browser application. It does not write a `.published/`
+directory, update `kb_registry.json`, or activate runtime terminology. The ZIP is
+the authoring handoff artifact.
 
-For deterministic prototyping in `lx-data-models`, prefer consuming that
-published registry directly instead of copying the bundle into `lx_dtypes/data`
-during early iteration.
+### 2. Publish Through LX-Annotate
 
-Inside `lx-data-models/devenv`:
+Import the exported ZIP in the LX-Annotate reporting or terminology settings UI.
+The frontend submits each ZIP sequentially as multipart field `file` to:
 
-- `LX_DTYPES_EDITOR_KB_REGISTRY` points at `../lx-terminology-editor/.published/kb_registry.json`
-- `use_editor_kb` exports `LX_DTYPES_KB_REGISTRY` for the current shell
-- `use_packaged_kb` returns to packaged/default resolution
-- `lx-dtypes-prototype-kb-smoke --module <name> --version <version>` verifies that an explicit module/version resolves and loads
-
-### 2. Prototype Through The Published Registry
-
-Use the editor-published registry as the first-class prototype handoff:
-
-```bash
-cd lx-data-models
-devenv shell
-use_editor_kb
-lx-dtypes-prototype-kb-smoke --module my_module --version 0.1.0-dev.1
+```text
+POST /dtypes-api/terminology/bundles/import
 ```
 
-This is the recommended quick-feedback loop because:
+The server strips the editor ZIP's single outer directory, reads the root
+`config.yaml`, validates the full module graph, installs the artifact, writes a
+filesystem source to the governed registry, and activates the imported identity.
+An existing module/version is rejected instead of overwritten.
+
+The successful identity is immediately addressable through the stable graph API:
+
+```text
+GET /dtypes-api/knowledge-bases/{module}/{version}/graph
+GET /dtypes-api/knowledge-bases/{module}/{version}/examinations/{name}/reporting-context
+```
+
+Those routes and the `knowledge_base_graph_v1` response contract are the
+integration boundary used by the LX-Annotate reporting frontend.
+
+For a local CLI-only prototype, extract the ZIP so its package directory sits
+under one data root, register that root, and smoke-test the exact identity:
+
+```bash
+lx-dtypes-kb-registry add ./kb_registry.json \
+  --module my_module \
+  --version 1.0.0 \
+  --input-dir /path/to/extracted-parent
+export LX_DTYPES_KB_REGISTRY="$PWD/kb_registry.json"
+lx-dtypes-prototype-kb-smoke --module my_module --version 1.0.0
+```
+
+This keeps both supported handoffs deterministic because:
 
 - the editor remains the single authoring surface
 - `lx_dtypes` resolves the module through the normal versioned registry path
 - the requested module and version are explicit and deterministic
 
-### 3. Move the Module into `lx-data-models`
+### 3. Package an Approved Module in `lx-data-models`
 
-Once the bundle looks correct, copy the published module into the module source
+Once the bundle is approved, extract and copy the module into the module source
 tree used by `lx-data-models`.
 
 The current Nix example package in `package.nix` packages:
@@ -328,7 +343,8 @@ This verifies that:
 - Prefer editing module content through `lx-terminology-editor`.
 - Keep the module folder name stable and intentional, because the current Nix package derives its module identity from that folder.
 - Lint before packaging.
-- Treat the local `.published/kb_registry.json` from `lx-terminology-editor` as the pre-Nix handoff artifact and prototype source of truth.
+- Treat the editor ZIP as an authoring handoff, not as an active runtime artifact.
+- Treat the registry entry written by the validated LX-Annotate import as the deployed filesystem handoff.
 - Treat the Nix-installed registry JSON as the deployable handoff artifact.
 
 ## Related Guides

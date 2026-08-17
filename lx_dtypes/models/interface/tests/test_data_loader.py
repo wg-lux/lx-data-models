@@ -160,7 +160,7 @@ class TestDataLoader:
         initialized_kb = empty_data_loader.get_initialized_config("root")
         assert initialized_kb.modules == []
 
-    def test_collect_modules_with_dependencies(
+    def test_collect_module_closure_traverses_dependencies_and_child_modules(
         self,
         empty_data_loader: DataLoader,
     ) -> None:
@@ -168,7 +168,7 @@ class TestDataLoader:
             name="mod_a", version="1.0.0", depends_on=["mod_b"], modules=[]
         )
         mod_b = KnowledgeBaseConfig(
-            name="mod_b", version="1.0.0", depends_on=["mod_c"], modules=[]
+            name="mod_b", version="1.0.0", depends_on=[], modules=["mod_c"]
         )
         mod_c = KnowledgeBaseConfig(name="mod_c", version="1.0.0", modules=[])
         empty_data_loader.module_configs = {
@@ -177,13 +177,17 @@ class TestDataLoader:
             mod_c.name: mod_c,
         }
 
-        collected = empty_data_loader._collect_modules_with_dependencies(["mod_a"])  # type: ignore
+        collected, preferred_order = empty_data_loader._collect_module_closure(  # type: ignore
+            ["mod_a"]
+        )
         assert set(collected.keys()) == {"mod_a", "mod_b", "mod_c"}
+        assert preferred_order == ["mod_a", "mod_b", "mod_c"]
 
-        collected = empty_data_loader._collect_modules_with_dependencies(  # type:ignore
+        collected, preferred_order = empty_data_loader._collect_module_closure(  # type:ignore
             ["mod_b", "mod_a"]
         )  # type: ignore
         assert set(collected.keys()) == {"mod_a", "mod_b", "mod_c"}
+        assert preferred_order == ["mod_b", "mod_c", "mod_a"]
 
     def test_resolve_module_load_order(
         self,

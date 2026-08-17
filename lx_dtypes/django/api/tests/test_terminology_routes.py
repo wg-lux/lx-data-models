@@ -10,6 +10,10 @@ from django.test import Client
 import pytest
 
 from lx_dtypes.django.api import terminology_routes
+from lx_dtypes.knowledge_bases import (
+    BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+    get_packaged_knowledge_base,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -380,8 +384,13 @@ def test_import_terminology_bundle_zip_registers_and_activates_bundle(
         "version": "2026.05.04",
     }
     assert entry["medical_field"] == "gastroenterology"
-    assert entry["input_dirs"] == [
-        str((import_root / "published_terminology" / "2026.05.04").resolve())
+    assert entry["sources"] == [
+        {
+            "kind": "filesystem",
+            "input_dirs": [
+                str((import_root / "published_terminology" / "2026.05.04").resolve())
+            ],
+        }
     ]
     assert (
         import_root
@@ -591,29 +600,10 @@ def test_ensure_default_terminology_registry_populates_empty_registry(
     tmp_path: Path,
 ) -> None:
     registry_path = tmp_path / "kb_registry.json"
-    data_root = tmp_path / "lx_dtypes_data"
     default_module = terminology_routes._DEFAULT_KB_MODULE_NAME
-    module_root = data_root / default_module
-    module_root.mkdir(parents=True, exist_ok=True)
-    (module_root / "config.yaml").write_text(
-        "\n".join(
-            [
-                f"name: {default_module}",
-                'description: ""',
-                "version: 0.2.0",
-                "modules: []",
-                "depends_on: []",
-            ]
-        )
-        + "\n"
-    )
+    descriptor = get_packaged_knowledge_base(default_module)
 
     monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
-    monkeypatch.setattr(
-        terminology_routes,
-        "package_data_root",
-        lambda: data_root,
-    )
 
     terminology_routes.ensure_default_terminology_registry()
 
@@ -621,12 +611,20 @@ def test_ensure_default_terminology_registry_populates_empty_registry(
     assert payload == {
         "modules": {
             default_module: {
-                "0.2.0": {"input_dirs": [str(data_root)]},
+                descriptor.version: {
+                    "sources": [
+                        {
+                            "kind": "provider",
+                            "provider": BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+                            "content_sha256": descriptor.content_sha256,
+                        }
+                    ]
+                },
             }
         },
         "active": {
             "module_name": default_module,
-            "version": "0.2.0",
+            "version": descriptor.version,
         },
     }
 
@@ -650,10 +648,6 @@ def test_ensure_default_terminology_registry_preserves_existing_active_selection
     )
 
     monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
-    monkeypatch.setattr(
-        terminology_routes, "package_data_root", lambda: tmp_path / "unused"
-    )
-
     terminology_routes.ensure_default_terminology_registry()
 
     payload = json.loads(registry_path.read_text(encoding="utf-8"))
@@ -709,10 +703,6 @@ def test_ensure_default_terminology_registry_falls_back_to_first_registered_bund
         )
     )
     monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
-    monkeypatch.setattr(
-        terminology_routes, "package_data_root", lambda: tmp_path / "unused"
-    )
-
     terminology_routes.ensure_default_terminology_registry()
 
     payload = json.loads(registry_path.read_text(encoding="utf-8"))

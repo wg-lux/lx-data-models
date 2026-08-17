@@ -1,8 +1,8 @@
 name: report_template_examples
-version: 0.1.0
+version: 0.1.1
 modules: []
 depends_on:
-  - DGVS_Terminology
+  - dgvs_reporting
   - star_upper_gi
 
 data:

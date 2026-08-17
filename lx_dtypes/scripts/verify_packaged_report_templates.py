@@ -1,13 +1,22 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Any, Protocol
 
+from lx_dtypes.knowledge_bases import list_packaged_knowledge_bases
 from lx_dtypes.models.interface.DataLoader import DataLoader
 
 REQUIRED_PACKAGED_REPORT_TEMPLATES = (
     "upper_gi_quality_2025",
     "colonoscopy_training_basic",
 )
+PACKAGED_REPORT_TEMPLATE_MODULES = {
+    "colonoscopy_training_basic": "dgvs_reporting",
+}
+
+
+class _ReportTemplateExporter(Protocol):
+    def export_report_template(self, name: str) -> dict[str, Any]: ...
 
 
 def verify_packaged_report_templates(
@@ -16,9 +25,20 @@ def verify_packaged_report_templates(
     if len(template_names) < 2:
         raise ValueError("At least two packaged report templates must be verified.")
 
-    knowledge_base = DataLoader().load_knowledge_base("report_template_examples")
+    for descriptor in list_packaged_knowledge_bases():
+        descriptor.verified_resource_directory()
+
+    loader = DataLoader()
+    loaded_modules: dict[str, _ReportTemplateExporter] = {}
     verified: list[str] = []
     for template_name in template_names:
+        module_name = PACKAGED_REPORT_TEMPLATE_MODULES.get(
+            template_name, "report_template_examples"
+        )
+        knowledge_base = loaded_modules.get(module_name)
+        if knowledge_base is None:
+            knowledge_base = loader.load_knowledge_base(module_name)
+            loaded_modules[module_name] = knowledge_base
         payload = knowledge_base.export_report_template(template_name)
         readiness = payload.get("readiness")
         if not isinstance(readiness, dict):

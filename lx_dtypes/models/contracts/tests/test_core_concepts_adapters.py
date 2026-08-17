@@ -323,7 +323,7 @@ def test_kb_to_core_concepts_payload_exports_all_concepts() -> None:
     assert {item["name"] for item in dumped["classification_type"]}
     assert {item["name"] for item in dumped["examination_type"]}
     assert dumped["knowledge_base_module"] == dumped["module_name"]
-    assert dumped["knowledge_base_version"] == "0.1.0"
+    assert dumped["knowledge_base_version"] == "0.1.1"
 
 
 @pytest.mark.parametrize(

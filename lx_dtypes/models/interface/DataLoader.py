@@ -129,16 +129,14 @@ class DataLoader(AppBaseModel):
         if not requested_modules:
             return kb_config
 
-        expanded_modules = self._expand_module_hierarchy(
+        module_configs, preferred_order = self._collect_module_closure(
             requested_modules,
             context_config=kb_config,
         )
-
-        temp_module_dict = self._collect_modules_with_dependencies(
-            expanded_modules,
-            context_config=kb_config,
+        load_order = resolve_kb_module_load_order(
+            module_configs,
+            preferred_order,
         )
-        load_order = resolve_kb_module_load_order(temp_module_dict, expanded_modules)
         kb_config.modules = load_order
         return kb_config
 
@@ -234,72 +232,46 @@ class DataLoader(AppBaseModel):
 
         return []
 
-    def _expand_module_hierarchy(
-        self,
-        module_names: List[str],
-        *,
-        context_config: "KnowledgeBaseConfig",
-    ) -> List[str]:
-        """Return a flattened list of modules including nested declarations."""
-
-        expanded: List[str] = []
-        seen: Set[str] = set()
-
-        def visit(name: str, parent_config: "KnowledgeBaseConfig") -> None:
-            if name in seen:
-                return
-            seen.add(name)
-            expanded.append(name)
-
-            nested_config = self._resolve_module_config(
-                name,
-                context_config=parent_config,
-                relation="module" if name in parent_config.modules else "dependency",
-            )
-
-            for child_name in nested_config.modules:
-                visit(child_name, nested_config)
-
-        for module_name in module_names:
-            visit(module_name, context_config)
-
-        return expanded
-
-    def _collect_modules_with_dependencies(
+    def _collect_module_closure(
         self,
         module_names: List[str],
         *,
         context_config: "KnowledgeBaseConfig | None" = None,
-    ) -> Dict[str, "KnowledgeBaseConfig"]:
-        """Return all module configs reachable from ``module_names`` via depends_on graph."""
+    ) -> tuple[Dict[str, "KnowledgeBaseConfig"], List[str]]:
+        """Resolve the transitive closure across dependency and module edges."""
 
         resolved: Dict[str, KnowledgeBaseConfig] = {}
         visiting: Set[str] = set()
+        preferred_order: List[str] = []
 
         def visit(name: str, parent_config: "KnowledgeBaseConfig | None") -> None:
             if name in resolved:
                 return
             if name in visiting:
                 raise ValueError(
-                    f"Circular dependency detected while visiting '{name}'."
+                    "Circular dependency or module reference detected while "
+                    f"visiting '{name}'."
                 )
 
-            dependency_config = self._resolve_module_config(
+            module_config = self._resolve_module_config(
                 name,
                 context_config=parent_config,
                 relation=self._reference_relation(name, parent_config),
             )
 
             visiting.add(name)
-            for dependency in dependency_config.depends_on:
-                visit(dependency, dependency_config)
+            preferred_order.append(name)
+            for dependency in module_config.depends_on:
+                visit(dependency, module_config)
+            for child_module in module_config.modules:
+                visit(child_module, module_config)
             visiting.remove(name)
-            resolved[name] = dependency_config
+            resolved[name] = module_config
 
         for module_name in module_names:
             visit(module_name, context_config)
 
-        return resolved
+        return resolved, preferred_order
 
     def _reference_relation(
         self,

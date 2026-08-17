@@ -139,26 +139,24 @@ That guide defines:
 
 ## Prototype KB Workflow
 
-For fast local knowledge-base prototyping with `lx-terminology-editor`, keep the
-editor's `.published/` output as the handoff artifact and point
-`LX_DTYPES_KB_REGISTRY` at its registry JSON.
+`lx-terminology-editor` is a browser-only authoring application. Its handoff
+artifact is the ZIP produced by **ZIP zur Veröffentlichung herunterladen**; it
+does not create a `.published/` directory or registry.
 
-Inside `devenv shell`, this repo exposes:
+For the production-shaped prototype path, import that ZIP through the
+LX-Annotate terminology UI. The UI submits it as multipart field `file` to:
 
-- `LX_DTYPES_EDITOR_KB_REGISTRY`
-- `use_editor_kb`
-- `use_packaged_kb`
-- `show_kb_mode`
-
-Example:
-
-```bash
-use_editor_kb
-lx-dtypes-prototype-kb-smoke --module my_module --version 0.1.0-dev.1
+```text
+POST /dtypes-api/terminology/bundles/import
 ```
 
-This keeps prototype loading deterministic because resolution happens through
-the same versioned registry path used by `KnowledgeBaseResolver`.
+Prefer the authenticated UI. A direct API call must use an authenticated
+LX-Annotate session whose actor has the terminology write role; unauthenticated
+requests return `401`, and authenticated actors without that role receive `403`.
+
+The endpoint validates the complete bundle, registers its exact module and
+version, activates it, and makes it available through the same versioned graph
+API used by the reporting frontend.
 
 ## Terminology Editor Publish Workflow
 
@@ -194,11 +192,26 @@ Normal unversioned loads use only the immutable `lx_dtypes/data` content shipped
 in the installed package. Runtime checkout and `LOOKUP_DTYPES_DATA_ROOT`
 overlays are not supported.
 
-`lx-annotate` can also import the editor ZIP directly through
+`lx-annotate` imports the editor ZIP through
 `POST /dtypes-api/terminology/bundles/import`. The endpoint extracts the ZIP into
 `LX_DTYPES_TERMINOLOGY_IMPORT_ROOT` (or a `terminology-packages/` directory next
 to the configured registry), validates it with the normal knowledge-base loader,
 updates the registry, and activates the imported version.
+
+After import, consumers load the registered identity explicitly:
+
+```python
+from lx_dtypes.models.interface import load_knowledge_base
+
+kb = load_knowledge_base("my_module", version="1.0.0")
+```
+
+The graph endpoints remain version-addressed:
+
+```text
+GET /dtypes-api/knowledge-bases/my_module/1.0.0/graph
+GET /dtypes-api/knowledge-bases/my_module/1.0.0/examinations/{name}/reporting-context
+```
 
 ## Migrations
 
@@ -313,7 +326,7 @@ lx-dtypes-kb-registry add /path/to/kb_registry.json \
 Smoke-test an explicit prototype module/version through the configured registry:
 
 ```bash
-lx-dtypes-prototype-kb-smoke --module report_template_examples --version 0.1.0
+lx-dtypes-prototype-kb-smoke --module report_template_examples --version 0.1.1
 ```
 
 ## Contributing

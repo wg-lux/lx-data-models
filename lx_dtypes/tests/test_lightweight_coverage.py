@@ -7,6 +7,10 @@ from pathlib import Path
 
 import pytest
 
+from lx_dtypes.knowledge_bases import (
+    BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+    get_packaged_knowledge_base,
+)
 from lx_dtypes.models import main as models_main
 from lx_dtypes.scripts import kb_registry, lint_kb_yaml, release
 from lx_dtypes.serialization.path import serialize_path
@@ -145,8 +149,11 @@ def test_kb_registry_payload_and_commands(
     assert kb_registry.cmd_add(args) == 0
 
     payload = json.loads(registry_path.read_text())
-    assert payload["modules"]["report_template_examples"]["0.1.0"]["input_dirs"] == [
-        str(data_root.resolve())
+    assert payload["modules"]["report_template_examples"]["0.1.0"]["sources"] == [
+        {
+            "kind": "filesystem",
+            "input_dirs": [str(data_root.resolve())],
+        }
     ]
 
     args_with_medical_field = argparse.Namespace(
@@ -170,9 +177,20 @@ def test_kb_registry_payload_and_commands(
 
     add_current_args = argparse.Namespace(
         registry=registry_path,
-        module="report_template_examples",
+        module="dgvs_reporting",
     )
     assert kb_registry.cmd_add_current(add_current_args) == 0
+    descriptor = get_packaged_knowledge_base("dgvs_reporting")
+    payload = json.loads(registry_path.read_text())
+    assert payload["modules"][descriptor.module_name][descriptor.version][
+        "sources"
+    ] == [
+        {
+            "kind": "provider",
+            "provider": BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+            "content_sha256": descriptor.content_sha256,
+        }
+    ]
 
 
 def test_kb_registry_handles_invalid_registry_payload(tmp_path: Path) -> None:

@@ -89,7 +89,7 @@ def test_report_template_api_by_name() -> None:
     assert payload["name"] == "star_upper_gi_main"
     assert payload["examination"] == "star_upper_gi_endoscopy"
     assert payload["knowledge_base_module"] == "report_template_examples"
-    assert payload["knowledge_base_version"] == "0.1.0"
+    assert payload["knowledge_base_version"] == "0.1.1"
 
 
 def test_report_template_api_by_examination() -> None:
@@ -107,7 +107,7 @@ def test_report_template_api_by_examination() -> None:
     )
     assert quality_template["name_de"].startswith("ÖGD")
     assert quality_template["knowledge_base_module"] == "report_template_examples"
-    assert quality_template["knowledge_base_version"] == "0.1.0"
+    assert quality_template["knowledge_base_version"] == "0.1.1"
     assert quality_template["readiness"]["can_publish"] is True
     assert len(quality_template["coverage_concepts"]) == 7
 
@@ -131,7 +131,7 @@ def test_colonoscopy_template_api_exposes_localized_guideline_provenance() -> No
         "Colonoscopy – guideline-based quality documentation"
     )
     assert template["knowledge_base_module"] == "report_template_examples"
-    assert template["knowledge_base_version"] == "0.1.0"
+    assert template["knowledge_base_version"] == "0.1.1"
     assert [section["title_de"] for section in template["report_sections"]] == [
         "Patienten- und Untersuchungskontext",
         "Indikation und Sedierung",
@@ -337,7 +337,7 @@ def test_report_template_runtime_validation_api_resolves_current_kb_version(
     assert response.status_code == 200
     assert captured == {
         "module_name": "report_template_examples",
-        "version": "0.1.0",
+        "version": "0.1.1",
     }
 
 

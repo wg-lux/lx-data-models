@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "knowledge_bases": [
+    {
+      "module_name": "dgvs_reporting",
+      "version": "0.1.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/dgvs_reporting",
+      "content_sha256": "6cc8d27a57b86d8afefd2108de5df24252bdead400a82696c57783fc10581f0f",
+      "default": true
+    },
+    {
+      "module_name": "mst_3_0",
+      "version": "3.0.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/mst_3_0",
+      "content_sha256": "8bd98920624f91ab16bccf6fe68a7aab7fb9c7b81bea175b7d34958a17e940e8",
+      "default": true
+    },
+    {
+      "module_name": "star_upper_gi",
+      "version": "0.1.2",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/star_upper_gi",
+      "content_sha256": "57769ae68496c974e1f2250317290c50d71d0db24a13827ee7d3b348c8e1a570",
+      "default": true
+    }
+  ]
+}

@@ -19,6 +19,7 @@
   name_de: "STAR Upper GI – Basismodul"
   name_en: "STAR Upper GI – Basic Template"
   description: "Minimal lauffähiges Template für star_upper_gi-Endoskopie mit gültiger Coverage-Definition."
+  version: "0.1.1"
   examination: star_upper_gi_endoscopy
   coverage_version: report_concept_coverage_v1
   coverage_concepts:
