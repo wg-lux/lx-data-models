@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Any
+import uuid
 
 import yaml
 
@@ -85,7 +87,16 @@ def _registry_payload(path: Path) -> dict[str, Any]:
 
 def _write_registry(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    serialized = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    temporary_path = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        with temporary_path.open("w", encoding="utf-8") as registry_file:
+            registry_file.write(serialized)
+            registry_file.flush()
+            os.fsync(registry_file.fileno())
+        os.replace(temporary_path, path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
 
 
 def _add_entry(
@@ -129,6 +140,14 @@ def _add_packaged_entry(*, registry_path: Path, module_name: str) -> tuple[str, 
     }
     if descriptor.medical_field:
         entry["medical_field"] = descriptor.medical_field
+    existing_entry = module_versions.get(descriptor.version)
+    if existing_entry is not None and existing_entry != entry:
+        raise SystemExit(
+            "Refusing to replace existing knowledge-base registry entry for "
+            f"{descriptor.module_name}@{descriptor.version}."
+        )
+    if existing_entry == entry:
+        return descriptor.module_name, descriptor.version
     module_versions[descriptor.version] = entry
     _write_registry(registry_path, payload)
     return descriptor.module_name, descriptor.version

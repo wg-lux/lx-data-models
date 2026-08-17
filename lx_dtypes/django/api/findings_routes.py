@@ -160,8 +160,52 @@ def _resolve_catalog_kb_identity(
     api_error: Callable[[int, str, str], NoReturn],
 ) -> tuple[str, str | None]:
     requested_module_name = str(module_name or "").strip()
+    requested_module_version = str(module_version or "").strip()
     if requested_module_name:
-        return requested_module_name, str(module_version or "").strip() or None
+        if not requested_module_version:
+            api_error(
+                409,
+                "knowledge-base-identity-required",
+                "module_version is required when module_name is supplied.",
+            )
+
+        if patient_examination_id is not None:
+            patient_examination_model = orm_models()["PatientExamination"]
+            patient_examination = patient_examination_model.objects.filter(
+                id=patient_examination_id
+            ).first()
+            if not patient_examination:
+                api_error(
+                    404,
+                    "not-found",
+                    f"PatientExamination '{patient_examination_id}' not found.",
+                )
+            assert patient_examination is not None
+            pinned_module = str(
+                getattr(patient_examination, "knowledge_base_module", "") or ""
+            ).strip()
+            pinned_version = str(
+                getattr(patient_examination, "knowledge_base_version", "") or ""
+            ).strip()
+            if (
+                pinned_module != requested_module_name
+                or pinned_version != requested_module_version
+            ):
+                api_error(
+                    409,
+                    "knowledge-base-identity-conflict",
+                    "Requested knowledge-base identity does not match the "
+                    f"PatientExamination '{patient_examination_id}' identity.",
+                )
+
+        return requested_module_name, requested_module_version
+
+    if requested_module_version:
+        api_error(
+            409,
+            "knowledge-base-identity-required",
+            "module_name is required when module_version is supplied.",
+        )
 
     if patient_examination_id is not None:
         patient_examination_model = orm_models()["PatientExamination"]
@@ -466,7 +510,10 @@ def _serialize_finding(
     selected_classifications = []
     for classification in all_classifications:
         c_name = _norm_name(classification.name)
-        if allowed_classification_names and c_name not in allowed_classification_names:
+        if (
+            allowed_classification_names is not None
+            and c_name not in allowed_classification_names
+        ):
             continue
         selected_classifications.append(
             _serialize_classification(
@@ -524,40 +571,40 @@ def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
 
 def _resolve_exam_kb_finding_names(
     examination: Any, *, module_name: str, version: str | None = None
-) -> Optional[Set[str]]:
+) -> Set[str]:
     lookup = _kb_lookup(module_name, version=version)
     exam_entry = lookup["examination"].get(_norm_name(examination.name))
     if not exam_entry:
-        return None
+        return set()
     finding_names = exam_entry.get("findings", [])
     if not isinstance(finding_names, list):
-        return None
+        return set()
     return {_norm_name(name) for name in finding_names}
 
 
 def _resolve_kb_finding_classification_names(
     finding: Any, *, module_name: str, version: str | None = None
-) -> Optional[Set[str]]:
+) -> Set[str]:
     lookup = _kb_lookup(module_name, version=version)
     finding_entry = lookup["finding"].get(_norm_name(finding.name))
     if not finding_entry:
-        return None
+        return set()
     classifications = finding_entry.get("classifications", [])
     if not isinstance(classifications, list):
-        return None
+        return set()
     return {_norm_name(name) for name in classifications}
 
 
 def _resolve_kb_classification_choice_names(
     classification: Any, *, module_name: str, version: str | None = None
-) -> Optional[Set[str]]:
+) -> Set[str]:
     lookup = _kb_lookup(module_name, version=version)
     classification_entry = lookup["classification"].get(_norm_name(classification.name))
     if not classification_entry:
-        return None
+        return set()
     choices = classification_entry.get("classification_choices", [])
     if not isinstance(choices, list):
-        return None
+        return set()
     return {_norm_name(name) for name in choices}
 
 
@@ -580,10 +627,7 @@ def _validate_finding_for_examination(
     kb_allowed_names = _resolve_exam_kb_finding_names(
         patient_examination.examination_safe, module_name=module_name, version=version
     )
-    if (
-        kb_allowed_names is not None
-        and _norm_name(finding.name) not in kb_allowed_names
-    ):
+    if _norm_name(finding.name) not in kb_allowed_names:
         api_error(
             400,
             "invalid-finding",
@@ -616,10 +660,7 @@ def _validate_classification_payload(
     kb_classifications = _resolve_kb_finding_classification_names(
         finding, module_name=module_name, version=version
     )
-    if (
-        kb_classifications is not None
-        and _norm_name(classification.name) not in kb_classifications
-    ):
+    if _norm_name(classification.name) not in kb_classifications:
         api_error(
             400,
             "invalid-choice",
@@ -629,7 +670,7 @@ def _validate_classification_payload(
     kb_choices = _resolve_kb_classification_choice_names(
         classification, module_name=module_name, version=version
     )
-    if kb_choices is not None and _norm_name(choice.name) not in kb_choices:
+    if _norm_name(choice.name) not in kb_choices:
         api_error(
             400,
             "invalid-choice",
@@ -836,12 +877,11 @@ def register_findings_routes(
         kb_allowed_finding_names = _resolve_exam_kb_finding_names(
             examination, module_name=module_name, version=resolved_version
         )
-        if kb_allowed_finding_names is not None:
-            findings = [
-                finding
-                for finding in findings
-                if _norm_name(finding.name) in kb_allowed_finding_names
-            ]
+        findings = [
+            finding
+            for finding in findings
+            if _norm_name(finding.name) in kb_allowed_finding_names
+        ]
 
         response = []
         for finding in findings:
@@ -925,12 +965,11 @@ def register_findings_routes(
             classification, module_name=module_name, version=resolved_version
         )
         all_choices = list(classification.choices.all())
-        if kb_allowed_choices is not None:
-            all_choices = [
-                choice
-                for choice in all_choices
-                if _norm_name(choice.name) in kb_allowed_choices
-            ]
+        all_choices = [
+            choice
+            for choice in all_choices
+            if _norm_name(choice.name) in kb_allowed_choices
+        ]
         return {"choices": [_serialize_choice(choice) for choice in all_choices]}
 
     @api.get("/patient-findings/")

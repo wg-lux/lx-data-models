@@ -593,6 +593,53 @@ def test_load_knowledge_base_raises_for_unprovisioned_version(
         clear_knowledge_base_resolver_caches()
 
 
+def test_registry_cache_observes_external_atomic_registry_replacement(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    module_name = "externally_replaced_module"
+    first_root = tmp_path / "first"
+    second_root = tmp_path / "second"
+    _write_unit_module(
+        first_root / module_name,
+        module_name=module_name,
+        unit_name="unit_from_first_registry",
+    )
+    _write_unit_module(
+        second_root / module_name,
+        module_name=module_name,
+        unit_name="unit_from_replaced_registry",
+    )
+    registry_path = tmp_path / "kb_registry.json"
+    _write_filesystem_registry(
+        registry_path,
+        module_name=module_name,
+        version="1.0.0",
+        input_dir=first_root,
+    )
+
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    clear_knowledge_base_resolver_caches()
+    try:
+        first = load_knowledge_base(module_name, version="1.0.0")
+
+        replacement_path = tmp_path / "replacement.json"
+        _write_filesystem_registry(
+            replacement_path,
+            module_name=module_name,
+            version="1.0.0",
+            input_dir=second_root,
+        )
+        replacement_path.replace(registry_path)
+
+        replaced = load_knowledge_base(module_name, version="1.0.0")
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+    assert set(first.unit) == {"unit_from_first_registry"}
+    assert set(replaced.unit) == {"unit_from_replaced_registry"}
+
+
 def test_configured_registry_never_falls_back_to_default_data_roots(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

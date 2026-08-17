@@ -4,9 +4,12 @@ import json
 import zipfile
 from io import BytesIO
 from pathlib import Path
+from typing import cast
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
+from ninja.errors import HttpError
+from ninja.files import UploadedFile
 import pytest
 
 from lx_dtypes.django.api import terminology_routes
@@ -213,7 +216,7 @@ def _write_registry(tmp_path: Path, *, active: bool = False) -> Path:
     return registry_path
 
 
-def test_list_terminology_bundles_from_registry(
+def test_list_terminology_bundles_reports_no_active_selection(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -224,18 +227,13 @@ def test_list_terminology_bundles_from_registry(
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["active"] == {
-        "module_name": "published_terminology",
-        "version": "2026.04.30",
-        "medical_field": "gastroenterology",
-        "is_active": True,
-    }
+    assert payload["active"] is None
     assert payload["bundles"] == [
         {
             "module_name": "published_terminology",
             "version": "2026.04.30",
             "medical_field": "gastroenterology",
-            "is_active": True,
+            "is_active": False,
         }
     ]
 
@@ -439,6 +437,52 @@ def test_import_rejects_overwriting_an_existing_bundle_version(
     assert not list(registry_path.parent.glob(".*.tmp"))
 
 
+def test_import_rejects_registered_identity_before_filesystem_publication(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "modules": {
+                    "published_terminology": {
+                        "2026.05.04": {
+                            "sources": [
+                                {
+                                    "kind": "filesystem",
+                                    "input_dirs": ["/governed/existing/source"],
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    import_root = tmp_path / "imported-packages"
+    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", str(import_root))
+    original_registry = registry_path.read_bytes()
+
+    with pytest.raises(HttpError) as exc_info:
+        terminology_routes._install_terminology_zip(
+            upload=cast(
+                UploadedFile,
+                SimpleUploadedFile(
+                    "published_terminology.zip",
+                    _editor_bundle_zip(),
+                    content_type="application/zip",
+                ),
+            ),
+            registry_path=registry_path,
+        )
+
+    assert getattr(exc_info.value, "status_code", None) == 409
+    assert registry_path.read_bytes() == original_registry
+    assert not import_root.exists()
+
+
 def test_import_rejects_data_dir_path_traversal_before_host_system_parsing(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -505,7 +549,7 @@ def test_missing_registry_error_does_not_expose_server_path(
     assert str(registry_path) not in response.content.decode()
 
 
-def test_export_active_terminology_fhir_falls_back_to_first_registered_bundle(
+def test_export_active_terminology_fhir_rejects_missing_active_selection(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -514,14 +558,8 @@ def test_export_active_terminology_fhir_falls_back_to_first_registered_bundle(
 
     response = Client().get("/base_api/terminology/active/fhir", secure=True)
 
-    assert response.status_code == 200
-    payload = response.json()
-    extension = {
-        "url": "https://wg-lux.de/fhir/StructureDefinition/lx-medical-field",
-        "valueCode": "gastroenterology",
-    }
-    assert payload["resourceType"] == "Bundle"
-    assert extension in payload["extension"]
+    assert response.status_code == 404
+    assert b"No active terminology bundle is selected" in response.content
 
 
 def test_select_terminology_bundle_rejects_unregistered_version(
@@ -629,6 +667,32 @@ def test_ensure_default_terminology_registry_populates_empty_registry(
     }
 
 
+@pytest.mark.parametrize(
+    "invalid_payload",
+    [
+        "{not-json",
+        "[]",
+        '{"modules": []}',
+        '{"modules": {}, "active": "invalid"}',
+        '{"modules": {}, "active": {"module_name": "missing", "version": "1.0"}}',
+    ],
+)
+def test_ensure_default_terminology_registry_preserves_malformed_existing_file(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    invalid_payload: str,
+) -> None:
+    registry_path = tmp_path / "kb_registry.json"
+    registry_path.write_text(invalid_payload, encoding="utf-8")
+    original_registry = registry_path.read_bytes()
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+
+    with pytest.raises(terminology_routes.KnowledgeBaseRegistryError):
+        terminology_routes.ensure_default_terminology_registry()
+
+    assert registry_path.read_bytes() == original_registry
+
+
 def test_ensure_default_terminology_registry_preserves_existing_active_selection(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -684,7 +748,7 @@ def test_terminology_import_root_uses_env_or_registry_parent(
     )
 
 
-def test_ensure_default_terminology_registry_falls_back_to_first_registered_bundle(
+def test_ensure_default_terminology_registry_preserves_nonempty_registry_without_active(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -702,8 +766,9 @@ def test_ensure_default_terminology_registry_falls_back_to_first_registered_bund
             }
         )
     )
+    original_registry = registry_path.read_bytes()
     monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
     terminology_routes.ensure_default_terminology_registry()
 
-    payload = json.loads(registry_path.read_text(encoding="utf-8"))
-    assert payload["active"] == {"module_name": "bundle_a", "version": "0.1.0"}
+    assert registry_path.read_bytes() == original_registry
+    assert terminology_routes.active_terminology_selection() is None

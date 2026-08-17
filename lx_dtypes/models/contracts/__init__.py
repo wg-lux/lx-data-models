@@ -554,6 +554,11 @@ from .hub_transfer import (
     validate_hub_transfer_report_payload,
     validate_hub_transfer_video_payload,
 )
+from .hub_media_envelope import (
+    HubMediaEnvelopeMetadata,
+    HubMediaEnvelopeReceipt,
+    validate_hub_media_receipt_matches_envelope,
+)
 from .video_reimport import (
     JsonObject,
     JsonValue,
@@ -635,6 +640,9 @@ __all__ = [
     "HubTransferVideoTransferPayload",
     "validate_hub_transfer_report_payload",
     "validate_hub_transfer_video_payload",
+    "HubMediaEnvelopeMetadata",
+    "HubMediaEnvelopeReceipt",
+    "validate_hub_media_receipt_matches_envelope",
     "CoreConceptBase",
     "ClassificationCore",
     "ClassificationTypeCore",

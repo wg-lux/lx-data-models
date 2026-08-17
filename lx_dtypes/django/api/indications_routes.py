@@ -65,27 +65,27 @@ def _serialize_indication(indication: Any) -> Dict[str, Any]:
 
 def _resolve_kb_finding_names(
     examination: Any, *, module_name: str, version: str | None = None
-) -> Optional[Set[str]]:
+) -> Set[str]:
     lookup = findings_routes._kb_lookup(module_name, version=version)
     exam_entry = lookup["examination"].get(findings_routes._norm_name(examination.name))
     if not exam_entry:
-        return None
+        return set()
     finding_names = exam_entry.get("findings", [])
     if not isinstance(finding_names, list):
-        return None
+        return set()
     return {findings_routes._norm_name(name) for name in finding_names}
 
 
 def _resolve_exam_kb_indication_names(
     examination: Any, *, module_name: str, version: str | None = None
-) -> Optional[Set[str]]:
+) -> Set[str]:
     lookup = findings_routes._kb_lookup(module_name, version=version)
     exam_entry = lookup["examination"].get(findings_routes._norm_name(examination.name))
     if not exam_entry:
-        return None
+        return set()
     indication_names = exam_entry.get("indications", [])
     if not isinstance(indication_names, list):
-        return None
+        return set()
     return {findings_routes._norm_name(name) for name in indication_names}
 
 
@@ -179,13 +179,12 @@ def register_indications_routes(
         kb_allowed_indication_names = _resolve_exam_kb_indication_names(
             examination, module_name=module_name, version=resolved_version
         )
-        if kb_allowed_indication_names is not None:
-            indications = [
-                indication
-                for indication in indications
-                if findings_routes._norm_name(indication.name)
-                in kb_allowed_indication_names
-            ]
+        indications = [
+            indication
+            for indication in indications
+            if findings_routes._norm_name(indication.name)
+            in kb_allowed_indication_names
+        ]
         return [_serialize_indication(indication) for indication in indications]
 
     @api.get("/indications/tree/")
@@ -249,8 +248,7 @@ def register_indications_routes(
                 continue
             for indication in examination_indications:
                 if (
-                    allowed_indication_names is not None
-                    and findings_routes._norm_name(indication.name)
+                    findings_routes._norm_name(indication.name)
                     not in allowed_indication_names
                 ):
                     continue

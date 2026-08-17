@@ -1,14 +1,21 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+import json
+from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from django.conf import settings
 from django.test import Client
 import pytest
 
 from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api.lookup_tracker import consume_runtime_lookup_trackers
+from lx_dtypes.knowledge_bases import (
+    BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+    get_packaged_knowledge_base,
+)
 from lx_dtypes.models.contracts.core_concepts import CoreConceptCollection
 from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
 from lx_dtypes.models.contracts.knowledge_base_graph import (
@@ -16,6 +23,9 @@ from lx_dtypes.models.contracts.knowledge_base_graph import (
     build_knowledge_base_graph_snapshot,
 )
 from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    clear_knowledge_base_resolver_caches,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -227,6 +237,62 @@ def test_packaged_reporting_bundle_builds_versioned_graph_snapshot(
     assert {
         template.name: template.version for template in snapshot.report_templates
     } == expected_templates
+
+
+def test_packaged_provider_registry_serves_full_dgvs_reporting_context(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    descriptor = get_packaged_knowledge_base("dgvs_reporting", "0.1.0")
+    registry_path = tmp_path / "registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "modules": {
+                    descriptor.module_name: {
+                        descriptor.version: {
+                            "sources": [
+                                {
+                                    "kind": "provider",
+                                    "provider": BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+                                    "content_sha256": descriptor.content_sha256,
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        settings,
+        "LX_DTYPES_KB_REGISTRY",
+        str(registry_path),
+        raising=False,
+    )
+    clear_knowledge_base_resolver_caches()
+    try:
+        response = Client().get(
+            "/base_api/knowledge-bases/dgvs_reporting/0.1.0/examinations/"
+            "colonoscopy/reporting-context",
+            secure=True,
+        )
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+    assert response.status_code == 200, response.content.decode()
+    payload = response.json()
+    assert payload["identity"] == {
+        "knowledge_base_module": "dgvs_reporting",
+        "knowledge_base_version": "0.1.0",
+    }
+    assert payload["examination_name"] == "colonoscopy"
+    assert payload["concepts"]["finding"]
+    assert payload["concepts"]["classification"]
+    assert [template["name"] for template in payload["report_templates"]] == [
+        "colonoscopy_training_basic"
+    ]
 
 
 def test_reporting_context_is_a_closed_examination_projection() -> None:

@@ -21,7 +21,8 @@ Use these documents in this order:
 
 - knowledge base: a versioned collection of YAML modules that `lx-dtypes` can load
 - module: one publishable folder containing `config.yaml` plus one or more data files
-- registry: a JSON file mapping `module -> version -> input_dirs`
+- registry: a JSON file mapping `module -> version` to typed `provider` or
+  `filesystem` source descriptors
 - authoring bundle: the editable YAML structure produced by `lx-terminology-editor`
 - packaged kb: the Nix derivation that installs a module and emits a registry JSON
 - app bundle: the Python package plus packaged KB, wrapped with `LX_DTYPES_KB_REGISTRY`
@@ -29,16 +30,18 @@ Use these documents in this order:
 When `LX_DTYPES_KB_REGISTRY` is configured, runtime resolution is fail-closed:
 callers must request an explicit `module@version`, and that exact identity must
 exist in the registry. The resolver validates the selected artifact's root
-`config.yaml` against the requested identity and never falls back to checkout,
-wheel, or example data. Explicit `input_dirs` remain available only for direct
-authoring/import validation before an artifact is registered.
+`config.yaml` against the requested identity and never substitutes another
+registered version, checkout, or example data. A registered provider may
+resolve an immutable resource from the installed wheel, while explicit
+`input_dirs` remain available for authoring, imports, and deployment-owned
+filesystem artifacts.
 
 Every referenced `modules` and `depends_on` entry is resolved transitively from
 the selected artifact before it is accepted. Missing dependencies, conflicting
 versions, and ambiguous root `config.yaml` candidates are typed load errors;
 input-directory ordering is not a package-selection mechanism.
 
-Registry `input_dirs` may also contain an HTTPS GitHub tree URL ending in the
+Filesystem-source `input_dirs` may also contain an HTTPS GitHub tree URL ending in the
 module directory, for example:
 
 ```json
@@ -46,9 +49,12 @@ module directory, for example:
   "modules": {
     "star_upper_gi": {
       "0.1.1": {
-        "input_dirs": [
-          "https://github.com/wg-lux/lx-data-models/tree/main/lx_dtypes/data/star_upper_gi"
-        ]
+        "sources": [{
+          "kind": "filesystem",
+          "input_dirs": [
+            "https://github.com/wg-lux/lx-data-models/tree/main/lx_dtypes/data/star_upper_gi"
+          ]
+        }]
       }
     }
   }
@@ -67,20 +73,24 @@ rather than a mutable branch name.
 
 `lx-dtypes` separates:
 
-- **Registry storage (`registry.json`)**: which module/version identities map to one or more physical roots.
+- **Registry storage (`registry.json`)**: which module/version identities map to
+  stable provider identities or deployment-owned physical roots.
 - **Module internals (`config.yaml` + `data/*`)**: what each KB version contains.
 
-The canonical package path is the repository-level root returned by
-`package_data_root()`, which is `lx_dtypes/data` in this project.
-A registry entry points to that root, not to a hardcoded absolute path inside
-`config.yaml`.
+Built-in wheel content is registered by provider and digest. The runtime
+resolves its installation path; do not persist a resolved `site-packages`,
+virtual-environment, or Nix-store wheel path:
 
 ```json
 {
   "modules": {
     "star_upper_gi": {
       "0.1.1": {
-        "input_dirs": ["/home/admin/lx-data-models/lx_dtypes/data"]
+        "sources": [{
+          "kind": "provider",
+          "provider": "lx_dtypes.builtin",
+          "content_sha256": "<64-character catalog digest>"
+        }]
       }
     }
   },
@@ -91,19 +101,19 @@ A registry entry points to that root, not to a hardcoded absolute path inside
 }
 ```
 
-### Startup auto-seed and fallback
+### Startup bootstrap and migration
 
 - At Django app startup `LxDtypesDjangoConfig.ready()` calls
   `ensure_default_terminology_registry()`.
-- If `LX_DTYPES_KB_REGISTRY` does not exist, the seeding step writes nothing.
-- If the configured registry exists but has no usable `active` selection and no
-  modules, `_ensure_default_packaged_module()` seeds `star_upper_gi` from the
-  packaged data under `lx_dtypes/data` and sets the default active version.
-- If `active` is missing but modules exist, the loader picks the first available
-  registered bundle.
-
-This gives a deployed service a usable default while still preserving persistence
-for user selections because `active` is only rewritten when absent.
+- If `LX_DTYPES_KB_REGISTRY` is not configured, the seeding step writes nothing.
+- If the configured registry file is missing, empty, or has no active selection,
+  bootstrap registers packaged provider descriptors and activates the
+  configured/default packaged identity.
+- Every package-catalog identity is fully loaded during bootstrap.
+- A stale active built-in provider or legacy installed-wheel filesystem entry
+  is atomically migrated to the matching current catalog identity.
+- Active custom/imported filesystem identities are preserved. Resolution never
+  silently chooses the first registered module or another version.
 
 ### Import flow: from KB ZIP upload to `config.yaml`
 
@@ -119,8 +129,9 @@ The backend import endpoint is `POST /terminology/bundles/import`.
 4. Files are written to
    `<import root>/<module>/<version>/.tmp/<module>-<uuid>/...`, then atomically
    moved to `<import root>/<module>/<version>`.
-5. `_register_imported_bundle()` stores the absolute `input_dirs` path for that version in
-   the registry and marks it active when imported through the endpoint.
+5. `_register_imported_bundle()` stores a typed `filesystem` source containing
+   the absolute `input_dirs` path for that version and marks it active when
+   imported through the endpoint.
 
 Because paths are now registry-driven, moving a KB version directory changes only
 registry state; `config.yaml` remains stable and local.

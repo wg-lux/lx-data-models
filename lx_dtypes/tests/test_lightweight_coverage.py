@@ -199,3 +199,72 @@ def test_kb_registry_handles_invalid_registry_payload(tmp_path: Path) -> None:
 
     with pytest.raises(SystemExit, match="Registry payload must be a JSON object."):
         kb_registry._registry_payload(registry_path)
+
+
+def test_kb_registry_atomic_write_preserves_existing_file_on_replace_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "registry.json"
+    registry_path.write_text('{"modules":{"preserved":{}}}\n', encoding="utf-8")
+    original_bytes = registry_path.read_bytes()
+
+    def fail_replace(source: Path, destination: Path) -> None:
+        del source, destination
+        raise OSError("simulated replace failure")
+
+    monkeypatch.setattr(kb_registry.os, "replace", fail_replace)
+
+    with pytest.raises(OSError, match="simulated replace failure"):
+        kb_registry._write_registry(registry_path, {"modules": {"new": {}}})
+
+    assert registry_path.read_bytes() == original_bytes
+    assert not list(tmp_path.glob(".registry.json.*.tmp"))
+
+
+def test_kb_registry_add_current_rejects_conflicting_existing_source(
+    tmp_path: Path,
+) -> None:
+    descriptor = get_packaged_knowledge_base("dgvs_reporting")
+    registry_path = tmp_path / "registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "modules": {
+                    descriptor.module_name: {
+                        descriptor.version: {
+                            "sources": [
+                                {
+                                    "kind": "filesystem",
+                                    "input_dirs": ["/governed/import"],
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    original_bytes = registry_path.read_bytes()
+
+    with pytest.raises(SystemExit, match="Refusing to replace"):
+        kb_registry.cmd_add_current(
+            argparse.Namespace(registry=registry_path, module=descriptor.module_name)
+        )
+
+    assert registry_path.read_bytes() == original_bytes
+
+
+def test_kb_registry_add_current_is_idempotent_for_same_provider_entry(
+    tmp_path: Path,
+) -> None:
+    descriptor = get_packaged_knowledge_base("dgvs_reporting")
+    registry_path = tmp_path / "registry.json"
+    args = argparse.Namespace(registry=registry_path, module=descriptor.module_name)
+
+    assert kb_registry.cmd_add_current(args) == 0
+    original_bytes = registry_path.read_bytes()
+    assert kb_registry.cmd_add_current(args) == 0
+
+    assert registry_path.read_bytes() == original_bytes

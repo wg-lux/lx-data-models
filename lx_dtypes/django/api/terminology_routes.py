@@ -223,10 +223,22 @@ def ensure_default_terminology_registry() -> None:
     if registry_path.exists():
         try:
             loaded_payload = json.loads(registry_path.read_text(encoding="utf-8"))
-        except Exception:
-            loaded_payload = None
-        if isinstance(loaded_payload, dict):
-            payload = dict(loaded_payload)
+        except (OSError, json.JSONDecodeError) as exc:
+            raise KnowledgeBaseRegistryError(
+                "Existing terminology registry could not be read as JSON."
+            ) from exc
+        if not isinstance(loaded_payload, dict):
+            raise KnowledgeBaseRegistryError(
+                "Existing terminology registry must be a JSON object."
+            )
+        try:
+            load_terminology_registry(registry_path)
+            _active_selection_from_registry(registry_path)
+        except (KnowledgeBaseRegistryError, json.JSONDecodeError) as exc:
+            raise KnowledgeBaseRegistryError(
+                "Existing terminology registry is malformed."
+            ) from exc
+        payload = dict(loaded_payload)
 
     modules = payload.get("modules")
     if not isinstance(modules, dict):
@@ -234,10 +246,12 @@ def ensure_default_terminology_registry() -> None:
         modules = payload["modules"]
         changed = True
 
+    if modules:
+        return
+
     active = payload.get("active")
     if active is None:
-        if not modules:
-            changed = _ensure_default_packaged_module(modules)
+        changed = _ensure_default_packaged_module(modules) or changed
         active_selection = _default_active_selection_from_payload(payload)
         if active_selection is not None:
             payload["active"] = {
@@ -342,7 +356,7 @@ def _active_selection_from_registry(registry_path: Path) -> tuple[str, str] | No
         raise KnowledgeBaseRegistryError("Terminology registry must be a JSON object.")
     raw_active = raw_payload.get("active")
     if raw_active is None:
-        return _default_active_selection_from_payload(raw_payload)
+        return None
     if not isinstance(raw_active, Mapping):
         raise KnowledgeBaseRegistryError(
             "Terminology registry `active` entry must be a JSON object."
@@ -357,7 +371,12 @@ def _active_selection_from_registry(registry_path: Path) -> tuple[str, str] | No
         raise KnowledgeBaseRegistryError(
             "Terminology registry active version must be a non-empty string."
         )
-    return module_name.strip(), version.strip()
+    selection = module_name.strip(), version.strip()
+    if selection not in load_terminology_registry(registry_path):
+        raise KnowledgeBaseRegistryError(
+            "Terminology registry active selection must reference a registered bundle."
+        )
+    return selection
 
 
 def _bundle_payload(
@@ -601,6 +620,11 @@ def _register_imported_bundle(
         raise HttpError(
             500, "Terminology registry module version map must be a JSON object."
         )
+    if version in module_versions:
+        raise HttpError(
+            409,
+            f"Terminology bundle '{module_name}' version '{version}' is already registered.",
+        )
 
     entry: dict[str, Any] = {
         "sources": [
@@ -631,6 +655,26 @@ def _register_imported_bundle(
     )
 
 
+def _assert_import_identity_available(
+    *,
+    registry_path: Path,
+    module_name: str,
+    version: str,
+) -> None:
+    payload = _load_registry_payload_for_write(registry_path)
+    modules = payload["modules"]
+    module_versions = modules.get(module_name, {})
+    if not isinstance(module_versions, dict):
+        raise HttpError(
+            500, "Terminology registry module version map must be a JSON object."
+        )
+    if version in module_versions:
+        raise HttpError(
+            409,
+            f"Terminology bundle '{module_name}' version '{version}' is already registered.",
+        )
+
+
 def _validate_imported_bundle(
     *,
     module_name: str,
@@ -659,6 +703,11 @@ def _install_terminology_zip(
 ) -> tuple[str, str, str | None, Path, Dict[str, int]]:
     file_map = _strip_single_zip_root(_read_zip_file_map(upload))
     module_name, version, medical_field = _read_bundle_identity(file_map)
+    _assert_import_identity_available(
+        registry_path=registry_path,
+        module_name=module_name,
+        version=version,
+    )
 
     import_root = _terminology_import_root(registry_path)
     import_root.mkdir(parents=True, exist_ok=True)

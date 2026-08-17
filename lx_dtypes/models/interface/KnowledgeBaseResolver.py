@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from functools import lru_cache
+from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
@@ -212,7 +213,6 @@ def resolve_registry_entry_inputs(
     )
 
 
-@lru_cache(maxsize=1)
 def _load_registry() -> dict[tuple[str, str], tuple[str, ...]]:
     registry_path = _get_registry_path()
     if registry_path is None:
@@ -222,7 +222,23 @@ def _load_registry() -> dict[tuple[str, str], tuple[str, ...]]:
             f"Configured knowledge-base registry does not exist: {registry_path}"
         )
 
-    raw_payload = json.loads(registry_path.read_text())
+    payload_bytes = registry_path.read_bytes()
+    content_sha256 = sha256(payload_bytes).hexdigest()
+    return _load_registry_payload_cached(
+        str(registry_path),
+        content_sha256,
+        payload_bytes,
+    )
+
+
+@lru_cache(maxsize=8)
+def _load_registry_payload_cached(
+    registry_path: str,
+    content_sha256: str,
+    payload_bytes: bytes,
+) -> dict[tuple[str, str], tuple[str, ...]]:
+    del registry_path, content_sha256
+    raw_payload = json.loads(payload_bytes)
     if not isinstance(raw_payload, Mapping):
         raise KnowledgeBaseRegistryError(
             "Knowledge-base registry must be a JSON object."
@@ -389,7 +405,7 @@ def load_knowledge_base(
 
 
 def clear_knowledge_base_resolver_caches() -> None:
-    _load_registry.cache_clear()
+    _load_registry_payload_cached.cache_clear()
     _load_module_config_cached.cache_clear()
     _load_knowledge_base_cached.cache_clear()
 

@@ -29,12 +29,11 @@ def _serialize_examination(examination: Any, *, module_name: str) -> Dict[str, A
     kb_allowed_finding_names = _resolve_exam_kb_finding_names(
         examination, module_name=module_name
     )
-    if kb_allowed_finding_names is not None:
-        findings = [
-            finding
-            for finding in findings
-            if _norm_name(finding.name) in kb_allowed_finding_names
-        ]
+    findings = [
+        finding
+        for finding in findings
+        if _norm_name(finding.name) in kb_allowed_finding_names
+    ]
 
     examination_types_relation = getattr(examination, "examination_types", None)
     examination_types_items = (
