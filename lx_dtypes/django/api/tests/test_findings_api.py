@@ -349,7 +349,7 @@ def test_base_api_findings_read_routes_use_patient_examination_kb_when_requested
     assert len(response.json()) == 1
 
 
-def test_base_api_findings_read_routes_fallback_to_active_for_unpinned_patient_examination(
+def test_base_api_findings_read_routes_reject_unpinned_patient_examination(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     client = Client()
@@ -372,8 +372,11 @@ def test_base_api_findings_read_routes_fallback_to_active_for_unpinned_patient_e
         f"/base_api/examinations/{examination.id}/findings/?patient_examination_id={patient_examination.id}",
         secure=True,
     )
-    assert response.status_code == 200
-    assert response.json() == []
+    assert response.status_code == 409
+    assert response.json() == {
+        "code": "knowledge-base-identity-required",
+        "message": "PatientExamination requires an explicit knowledge-base identity.",
+    }
 
 
 def test_base_api_patient_examination_findings_read_uses_pinned_kb_when_examination_context_present(

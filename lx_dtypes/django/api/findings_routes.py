@@ -126,6 +126,8 @@ def _as_str_list_from_relation(relation: object) -> list[str]:
 
 
 def _findings_module_name() -> str:
+    """Resolve the active module only for legacy, non-examination discovery routes."""
+
     from .terminology_routes import active_terminology_selection
 
     active = active_terminology_selection()
@@ -134,22 +136,26 @@ def _findings_module_name() -> str:
     return active[0]
 
 
-def _resolve_exam_kb_identity(patient_examination: Any) -> tuple[str, str | None]:
+class PatientExaminationKnowledgeBaseIdentityError(RuntimeError):
+    """Raised when an examination-bound route has no complete persisted identity."""
+
+
+def _resolve_exam_kb_identity(patient_examination: Any) -> tuple[str, str]:
     module_name = str(
         getattr(patient_examination, "knowledge_base_module", "") or ""
     ).strip()
     version = str(
         getattr(patient_examination, "knowledge_base_version", "") or ""
     ).strip()
-    if module_name:
-        return module_name, version or None
-
-    from .terminology_routes import active_terminology_selection
-
-    active = active_terminology_selection()
-    if active is None:
-        raise RuntimeError("No active knowledge-base bundle is selected.")
-    return active[0], active[1]
+    if bool(module_name) != bool(version):
+        raise PatientExaminationKnowledgeBaseIdentityError(
+            "PatientExamination knowledge-base identity is incomplete."
+        )
+    if module_name and version:
+        return module_name, version
+    raise PatientExaminationKnowledgeBaseIdentityError(
+        "PatientExamination requires an explicit knowledge-base identity."
+    )
 
 
 def _resolve_catalog_kb_identity(
@@ -786,23 +792,16 @@ def register_findings_routes(
                 f"Patient finding '{patient_finding_id}' not found.",
             )
 
-    def resolve_findings_module_name() -> str:
-        try:
-            return _findings_module_name()
-        except RuntimeError as exc:
-            api_error(409, "no-active-knowledge-base", str(exc))
-
     def refresh_patient_examination_dtypes_record(patient_examination: object) -> None:
         if (
             build_p_examination_payload_from_host_ledger is None
             or persist_patient_examination_dtypes_record is None
         ):
             return
-        module_name = resolve_findings_module_name()
         try:
             module_name_for_record, _ = _resolve_exam_kb_identity(patient_examination)
-        except RuntimeError:
-            module_name_for_record = module_name
+        except PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
         payload = build_p_examination_payload_from_host_ledger(
             patient_examination,
             route_module_name=module_name_for_record,
@@ -845,6 +844,8 @@ def register_findings_routes(
                 patient_examination_id=patient_examination_id,
                 api_error=api_error,
             )
+        except PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
         except RuntimeError as exc:
             api_error(409, "no-active-knowledge-base", str(exc))
         examination_model = orm_models()["Examination"]
@@ -914,6 +915,8 @@ def register_findings_routes(
                 patient_examination_id=patient_examination_id,
                 api_error=api_error,
             )
+        except PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
         except RuntimeError as exc:
             api_error(409, "no-active-knowledge-base", str(exc))
         finding_model = orm_models()["Finding"]
@@ -949,6 +952,8 @@ def register_findings_routes(
                 patient_examination_id=patient_examination_id,
                 api_error=api_error,
             )
+        except PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
         except RuntimeError as exc:
             api_error(409, "no-active-knowledge-base", str(exc))
         finding_classification_model = orm_models()["FindingClassification"]

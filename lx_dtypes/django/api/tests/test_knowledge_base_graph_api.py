@@ -186,6 +186,49 @@ def test_graph_snapshot_is_deterministic_and_typed() -> None:
     )
 
 
+def test_graph_projection_strips_template_source_file_paths() -> None:
+    class SourcePathKb(_GraphKb):
+        def export_report_template(self, name: str) -> dict[str, Any]:
+            payload = _template_payload(name)
+            payload["issues"] = [
+                {
+                    "code": "x001",
+                    "source": {
+                        "file": "/opt/local/lib/python3.12/site-packages/lx_dtypes/data/foo.yaml",
+                        "line": 42,
+                    },
+                },
+                {
+                    "code": "x002",
+                    "source": [
+                        {
+                            "file": "/opt/local/lib/python3.12/site-packages/lx_dtypes/data/bar.yaml",
+                            "line": 99,
+                        },
+                    ],
+                },
+            ]
+            return payload
+
+    identity = KnowledgeBaseIdentity(
+        knowledge_base_module="demo_graph",
+        knowledge_base_version="1.2.3",
+    )
+
+    snapshot = build_knowledge_base_graph_snapshot(
+        SourcePathKb(),
+        identity=identity,
+    )
+    templates = snapshot.report_templates
+    assert [template.name for template in templates] == ["gastroscopy_report"]
+
+    issues = templates[0].issues
+    assert issues == [
+        {"code": "x001", "source": {"line": 42}},
+        {"code": "x002", "source": [{"line": 99}]},
+    ]
+
+
 @pytest.mark.parametrize(
     ("module_name", "module_version", "expected_templates"),
     [

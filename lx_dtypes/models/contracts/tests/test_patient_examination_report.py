@@ -21,6 +21,8 @@ def test_report_submission_payload_supplies_defaults() -> None:
         {
             "patient_examination_id": "7",
             "template_name": " colonoscopy ",
+            "knowledge_base_module": " reporting ",
+            "knowledge_base_version": " 1.2.3 ",
             "patient_data": {"dob": "1970-01-02"},
         }
     )
@@ -28,6 +30,8 @@ def test_report_submission_payload_supplies_defaults() -> None:
     assert dump_report_submission_payload(payload) == {
         "patient_examination_id": 7,
         "template_name": "colonoscopy",
+        "knowledge_base_module": "reporting",
+        "knowledge_base_version": "1.2.3",
         "template_version": "",
         "template_hash": "",
         "title": "",
@@ -45,6 +49,8 @@ def test_make_report_payload_validates_nested_patient_identity() -> None:
     payload = PatientExaminationReportMakeReportPayload.model_validate(
         {
             "patient_examination_id": 9,
+            "knowledge_base_module": "reporting",
+            "knowledge_base_version": "1.2.3",
             "patient": {
                 "first_name": "Ada",
                 "last_name": "Lovelace",
@@ -55,6 +61,8 @@ def test_make_report_payload_validates_nested_patient_identity() -> None:
 
     assert dump_make_report_payload(payload) == {
         "patient_examination_id": 9,
+        "knowledge_base_module": "reporting",
+        "knowledge_base_version": "1.2.3",
         "patient": {
             "first_name": "Ada",
             "last_name": "Lovelace",

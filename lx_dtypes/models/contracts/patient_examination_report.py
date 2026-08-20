@@ -4,9 +4,10 @@ from collections.abc import Mapping
 from datetime import date, datetime
 from typing import Literal, NotRequired, TypeAlias, TypedDict, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .json_types import JsonNull, JsonValue
+from .knowledge_base import KnowledgeBaseIdentity
 
 ReportJsonValue: TypeAlias = JsonValue | JsonNull
 ReportJsonObject: TypeAlias = dict[str, ReportJsonValue]
@@ -23,6 +24,8 @@ class PatientReportIdentityData(TypedDict):
 class PatientExaminationReportSubmissionData(TypedDict):
     patient_examination_id: int
     template_name: str
+    knowledge_base_module: str
+    knowledge_base_version: str
     template_version: str
     template_hash: str
     title: str
@@ -39,6 +42,8 @@ class PatientExaminationReportSubmissionData(TypedDict):
 
 class PatientExaminationReportMakeReportData(TypedDict):
     patient_examination_id: int
+    knowledge_base_module: str
+    knowledge_base_version: str
     patient: PatientReportIdentityData
     max_frames: int
     report_id: NotRequired[int]
@@ -220,6 +225,8 @@ class PatientExaminationReportSubmissionPayload(BaseModel):
     report_id: int | None = Field(default=None, ge=1)
     patient_examination_id: int = Field(ge=1)
     template_name: str = Field(min_length=1)
+    knowledge_base_module: str = Field(min_length=1)
+    knowledge_base_version: str = Field(min_length=1)
     template_version: str = ""
     template_hash: str = ""
     title: str = ""
@@ -232,14 +239,36 @@ class PatientExaminationReportSubmissionPayload(BaseModel):
     expected_version: int | None = Field(default=None, ge=1)
     history_limit: int = Field(default=5, ge=1, le=50)
 
+    @model_validator(mode="after")
+    def validate_knowledge_base_identity(
+        self,
+    ) -> "PatientExaminationReportSubmissionPayload":
+        KnowledgeBaseIdentity(
+            knowledge_base_module=self.knowledge_base_module,
+            knowledge_base_version=self.knowledge_base_version,
+        )
+        return self
+
 
 class PatientExaminationReportMakeReportPayload(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     patient_examination_id: int = Field(ge=1)
     report_id: int | None = Field(default=None, ge=1)
+    knowledge_base_module: str = Field(min_length=1)
+    knowledge_base_version: str = Field(min_length=1)
     patient: PatientReportIdentityPayload
     max_frames: int = Field(default=12, ge=1, le=24)
+
+    @model_validator(mode="after")
+    def validate_knowledge_base_identity(
+        self,
+    ) -> "PatientExaminationReportMakeReportPayload":
+        KnowledgeBaseIdentity(
+            knowledge_base_module=self.knowledge_base_module,
+            knowledge_base_version=self.knowledge_base_version,
+        )
+        return self
 
 
 class ReportPersistedArtifactsPayload(BaseModel):

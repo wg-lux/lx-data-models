@@ -514,14 +514,24 @@ def _content_hash(payload: dict[str, object]) -> str:
     return f"sha256:{hashlib.sha256(encoded).hexdigest()}"
 
 
-def _strip_runtime_metadata(value: Any) -> Any:
+def _strip_runtime_metadata(
+    value: Any,
+    *,
+    inside_source: bool = False,
+) -> Any:
     if isinstance(value, list):
-        return [_strip_runtime_metadata(item) for item in value]
+        return [
+            _strip_runtime_metadata(item, inside_source=inside_source) for item in value
+        ]
     if isinstance(value, dict):
         return {
-            key: _strip_runtime_metadata(item)
+            key: _strip_runtime_metadata(
+                item,
+                inside_source=inside_source or key == "source",
+            )
             for key, item in value.items()
             if key not in {"created_at", "id", "source_file", "uuid"}
+            and not (inside_source and key == "file")
         }
     return value
 
