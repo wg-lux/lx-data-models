@@ -103,9 +103,9 @@ virtual-environment, or Nix-store wheel path:
 
 ### Startup bootstrap and migration
 
-- At Django app startup `LxDtypesDjangoConfig.ready()` calls
-  `ensure_default_terminology_registry()`.
-- If `LX_DTYPES_KB_REGISTRY` is not configured, the seeding step writes nothing.
+- Before Django starts, the deployment runs `lx-dtypes-kb-registry bootstrap`.
+- The CLI requires `--registry` or `LX_DTYPES_KB_REGISTRY` and fails closed when
+  neither is configured.
 - If the configured registry file is missing, empty, or has no active selection,
   bootstrap registers packaged provider descriptors and activates the
   configured/default packaged identity.
@@ -114,6 +114,16 @@ virtual-environment, or Nix-store wheel path:
   is atomically migrated to the matching current catalog identity.
 - Active custom/imported filesystem identities are preserved. Resolution never
   silently chooses the first registered module or another version.
+- Django application import performs no implicit registry mutation; deployment
+  ordering and bootstrap failures remain visible to the service manager.
+
+For example:
+
+```bash
+export LX_DTYPES_KB_REGISTRY=/var/lib/my-host/terminology/registry.json
+lx-dtypes-kb-registry bootstrap --module star_upper_gi
+python -m django migrate --noinput
+```
 
 ### Import flow: from KB ZIP upload to `config.yaml`
 

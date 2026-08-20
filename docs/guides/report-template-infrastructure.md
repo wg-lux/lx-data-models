@@ -141,8 +141,8 @@ In short:
 - YAML parser: `lx_dtypes/utils/parser.py`
 - KB export methods: `lx_dtypes/models/interface/KnowledgeBase.py`
 - Tests:
-  - `lx_dtypes/models/interface/tests/test_report_template_example_module.py`
-  - `lx_dtypes/models/interface/tests/test_report_template_export.py`
+  - `tests/unit/lx_dtypes/models/interface/test_report_template_example_module.py`
+  - `tests/unit/lx_dtypes/models/interface/test_report_template_export.py`
 
 ## Mental Model
 

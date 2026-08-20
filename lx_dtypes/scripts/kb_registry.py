@@ -6,6 +6,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 import uuid
@@ -15,6 +17,11 @@ import yaml
 from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
     get_packaged_knowledge_base,
+)
+from lx_dtypes.knowledge_base_registry import (
+    DEFAULT_PACKAGED_KNOWLEDGE_BASE,
+    bootstrap_packaged_knowledge_bases,
+    configured_registry_path,
 )
 from lx_dtypes.models.interface.data_roots import resolve_default_data_root
 
@@ -193,6 +200,43 @@ def cmd_add_current(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_bootstrap(args: argparse.Namespace) -> int:
+    """Strictly provision and validate the installed packaged catalog."""
+
+    try:
+        result = bootstrap_packaged_knowledge_bases(
+            configured_registry_path(args.registry),
+            default_module=args.module,
+        )
+    except Exception as exc:
+        print(
+            json.dumps(
+                {
+                    "event": "lx_dtypes.knowledge_base_bootstrap",
+                    "status": "error",
+                    "detail": str(exc),
+                },
+                sort_keys=True,
+            ),
+            file=sys.stderr,
+        )
+        return 1
+
+    print(
+        json.dumps(
+            {
+                "event": "lx_dtypes.knowledge_base_bootstrap",
+                "status": "ok",
+                "registry": str(result.registry),
+                "module": result.module_name,
+                "version": result.version,
+            },
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Create and update LX_DTYPES_KB_REGISTRY JSON files."
@@ -237,12 +281,32 @@ def build_parser() -> argparse.ArgumentParser:
     )
     add_current_parser.set_defaults(func=cmd_add_current)
 
+    bootstrap_parser = subparsers.add_parser(
+        "bootstrap",
+        help="Strictly provision and validate all packaged knowledge bases.",
+    )
+    bootstrap_parser.add_argument(
+        "--registry",
+        type=Path,
+        default=None,
+        help="Registry path; defaults to LX_DTYPES_KB_REGISTRY.",
+    )
+    bootstrap_parser.add_argument(
+        "--module",
+        default=DEFAULT_PACKAGED_KNOWLEDGE_BASE,
+        help=(
+            "Packaged module to activate when no active identity exists. "
+            f"Defaults to {DEFAULT_PACKAGED_KNOWLEDGE_BASE}."
+        ),
+    )
+    bootstrap_parser.set_defaults(func=cmd_bootstrap)
+
     return parser
 
 
-def main() -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     return int(args.func(args))
 
 

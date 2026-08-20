@@ -49,7 +49,7 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.2.22"
+version = "0.2.24"
 
 [project.optional-dependencies]
 dev = [
@@ -139,16 +139,17 @@ ignore_errors = true
 django_settings_module = "lx_dtypes.django_settings"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "lx_dtypes.django_settings_ci_test"
+DJANGO_SETTINGS_MODULE = "tests.django_settings"
 addopts = """
-    --ds=lx_dtypes.django_settings_ci_test
+    --ds=tests.django_settings
+    --import-mode=importlib
     --cov-report=xml
     --cov-fail-under=70
 """
 markers = [
   "localfiles: depends on files present only on dev machines",
 ]
-testpaths = ["tests", "lx_dtypes/**/tests"]
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 88

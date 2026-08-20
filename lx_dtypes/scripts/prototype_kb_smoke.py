@@ -35,7 +35,7 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help=(
             "Optional Django settings module to export before loading the KB. "
-            "Defaults to lx_dtypes.django_settings_ci_test when unset and "
+            "Defaults to lx_dtypes.django.smoke_settings when unset and "
             "DJANGO_SETTINGS_MODULE is not already defined."
         ),
     )
@@ -69,7 +69,7 @@ def main() -> int:
     if args.django_settings_module:
         os.environ["DJANGO_SETTINGS_MODULE"] = args.django_settings_module
     else:
-        os.environ["DJANGO_SETTINGS_MODULE"] = "lx_dtypes.django_settings_ci_test"
+        os.environ["DJANGO_SETTINGS_MODULE"] = "lx_dtypes.django.smoke_settings"
     django.setup()
     try:
         input_dirs = resolve_versioned_input_dirs(args.module, args.version)

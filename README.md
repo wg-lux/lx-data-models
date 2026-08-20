@@ -54,6 +54,16 @@ Registry-backed deployments should supply the exact module version. See the
 [graph API guide](docs/guides/knowledge-base-graph-api.md) for the complete
 workflow.
 
+Provision the packaged catalog before starting a registry-backed host:
+
+```bash
+export LX_DTYPES_KB_REGISTRY=/var/lib/my-host/terminology/registry.json
+lx-dtypes-kb-registry bootstrap
+```
+
+This boundary is strict: invalid registry state or an unloadable packaged
+identity exits nonzero and must block host startup.
+
 ## Documentation
 
 Start with the [documentation index](docs/index.md). Key guides include:

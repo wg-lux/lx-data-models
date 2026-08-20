@@ -25,8 +25,4 @@ repos:
         entry: .devenv/state/venv/bin/pytest
         language: system
         pass_filenames: false
-      - id: findings-validator-operator-guard
-        name: findings validator operator guard
-        entry: .devenv/state/venv/bin/pytest -q lx_dtypes/models/interface/tests/test_findings_validator_operator_guard.py
-        language: system
-        pass_filenames: false
+

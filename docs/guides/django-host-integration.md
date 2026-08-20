@@ -24,11 +24,17 @@ The host project must configure:
 - `LX_DTYPES_TERMINOLOGY_IMPORT_ROOT` (optional)
   Base path for uploaded KB ZIP extraction.
   Defaults to `<registry parent>/terminology-packages`.
-- `LX_DTYPES_KB_REGISTRY` seeding behavior
-  The Django app config calls `ensure_default_terminology_registry()` in startup.
-  If `active` is missing and no registered modules are present, it seeds the
-  packaged default from `lx_dtypes/data/star_upper_gi` and sets active
-  selection.
+
+Before starting Django, run the strict package-owned bootstrap boundary:
+
+```bash
+lx-dtypes-kb-registry bootstrap
+```
+
+The command reads `LX_DTYPES_KB_REGISTRY`, provisions every packaged provider
+identity, selects the packaged default only when no active identity exists, and
+fully loads every packaged bundle. Django startup does not silently seed or
+repair registry state. Bootstrap failure must block service startup.
 
 Example:
 
