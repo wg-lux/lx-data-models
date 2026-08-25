@@ -7,7 +7,10 @@ import posixpath
 import shutil
 import uuid
 import zipfile
+from contextlib import contextmanager
 from dataclasses import dataclass
+import fcntl
+from hashlib import sha256
 from io import BytesIO
 from pathlib import Path
 from typing import (
@@ -24,7 +27,7 @@ from typing import (
 
 from django.conf import settings
 from ninja.errors import HttpError  # type: ignore[import-untyped]
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import yaml
 
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
@@ -73,6 +76,7 @@ class TerminologyBundleVersion(Schema):
 
 
 class TerminologyBundleListResponse(Schema):
+    revision: str
     active: TerminologyBundleVersion | None
     bundles: List[TerminologyBundleVersion]
 
@@ -80,16 +84,19 @@ class TerminologyBundleListResponse(Schema):
 class SelectTerminologyBundleRequest(Schema):
     module_name: str
     version: str
+    expected_revision: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
 
 
 class SelectTerminologyBundleResponse(Schema):
     ok: bool
+    revision: str
     active: TerminologyBundleVersion
     counts: Dict[str, int]
 
 
 class ImportTerminologyBundleResponse(Schema):
     ok: bool
+    revision: str
     imported: TerminologyBundleVersion
     counts: Dict[str, int]
 
@@ -271,20 +278,48 @@ def _set_active_selection(
     registry_path: Path,
     module_name: str,
     version: str,
-    medical_field: str | None,
-) -> None:
-    del medical_field
-    payload = _load_registry_payload_for_write(registry_path)
-    modules = payload.get("modules", {})
-    versions = modules.get(module_name, {}) if isinstance(modules, Mapping) else {}
-    if not isinstance(versions, Mapping) or version not in versions:
-        raise HttpError(
-            404,
-            f"Terminology bundle '{module_name}' version '{version}' is not registered.",
+    expected_revision: str,
+) -> str:
+    with _registry_write_lock(registry_path):
+        current_revision = _registry_revision(registry_path)
+        if expected_revision != current_revision:
+            logger.warning(
+                "Terminology registry compare-and-swap rejected",
+                extra={
+                    "event": "terminology_registry_revision_conflict",
+                    "expected_revision": expected_revision,
+                    "current_revision": current_revision,
+                    "module_name": module_name,
+                    "version": version,
+                },
+            )
+            raise HttpError(
+                409,
+                "Terminology registry changed since it was read; reload bundles before selecting.",
+            )
+        payload = _load_registry_payload_for_write(registry_path)
+        modules = payload.get("modules", {})
+        versions = modules.get(module_name, {}) if isinstance(modules, Mapping) else {}
+        if not isinstance(versions, Mapping) or version not in versions:
+            raise HttpError(
+                404,
+                f"Terminology bundle '{module_name}' version '{version}' is not registered.",
+            )
+        payload["active"] = {"module_name": module_name, "version": version}
+        _write_registry_payload_atomic(registry_path, payload)
+        revision = _registry_revision(registry_path)
+        logger.info(
+            "Terminology active selection updated",
+            extra={
+                "event": "terminology_active_selection_updated",
+                "previous_revision": current_revision,
+                "revision": revision,
+                "module_name": module_name,
+                "version": version,
+            },
         )
-    payload["active"] = {"module_name": module_name, "version": version}
-    _write_registry_payload_atomic(registry_path, payload)
     clear_knowledge_base_resolver_caches()
+    return revision
 
 
 def _record_counts(kb: KnowledgeBase) -> Dict[str, int]:
@@ -472,6 +507,23 @@ def _write_registry_payload_atomic(
         temporary_registry.unlink(missing_ok=True)
 
 
+def _registry_revision(registry_path: Path) -> str:
+    payload = registry_path.read_bytes() if registry_path.exists() else b""
+    return f"sha256:{sha256(payload).hexdigest()}"
+
+
+@contextmanager
+def _registry_write_lock(registry_path: Path) -> Any:
+    lock_path = registry_path.with_name(f".{registry_path.name}.lock")
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with lock_path.open("a+b") as lock_file:
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+
+
 def _register_imported_bundle(
     *,
     registry_path: Path,
@@ -479,47 +531,52 @@ def _register_imported_bundle(
     version: str,
     input_dir: Path,
     medical_field: str | None,
-    activate: bool = False,
-) -> TerminologyRegistryEntry:
-    payload = _load_registry_payload_for_write(registry_path)
-    modules = payload.setdefault("modules", {})
-    module_versions = modules.setdefault(module_name, {})
-    if not isinstance(module_versions, dict):
-        raise HttpError(
-            500, "Terminology registry module version map must be a JSON object."
-        )
-    if version in module_versions:
-        raise HttpError(
-            409,
-            f"Terminology bundle '{module_name}' version '{version}' is already registered.",
-        )
+) -> tuple[TerminologyRegistryEntry, str, tuple[str, str] | None]:
+    with _registry_write_lock(registry_path):
+        payload = _load_registry_payload_for_write(registry_path)
+        modules = payload.setdefault("modules", {})
+        module_versions = modules.setdefault(module_name, {})
+        if not isinstance(module_versions, dict):
+            raise HttpError(
+                500, "Terminology registry module version map must be a JSON object."
+            )
+        if version in module_versions:
+            raise HttpError(
+                409,
+                f"Terminology bundle '{module_name}' version '{version}' is already registered.",
+            )
 
-    entry: dict[str, Any] = {
-        "sources": [
-            {
-                "kind": "filesystem",
-                "input_dirs": [str(input_dir.resolve())],
-            }
-        ]
-    }
-    if medical_field:
-        entry["medical_field"] = medical_field
-    module_versions[version] = entry
-    if activate:
-        payload["active"] = {"module_name": module_name, "version": version}
-    _write_registry_payload_atomic(registry_path, payload)
+        entry: dict[str, Any] = {
+            "sources": [
+                {
+                    "kind": "filesystem",
+                    "input_dirs": [str(input_dir.resolve())],
+                }
+            ]
+        }
+        if medical_field:
+            entry["medical_field"] = medical_field
+        module_versions[version] = entry
+        _write_registry_payload_atomic(registry_path, payload)
+        revision = _registry_revision(registry_path)
+        active = _active_selection_from_registry(registry_path)
     logger.info(
         "Terminology registry updated",
         extra={
             "event": "terminology_registry_updated",
             "module_name": module_name,
             "version": version,
+            "revision": revision,
         },
     )
     clear_knowledge_base_resolver_caches()
-    return TerminologyRegistryEntry(
-        input_dirs=(str(input_dir.resolve()),),
-        medical_field=medical_field,
+    return (
+        TerminologyRegistryEntry(
+            input_dirs=(str(input_dir.resolve()),),
+            medical_field=medical_field,
+        ),
+        revision,
+        active,
     )
 
 
@@ -724,6 +781,7 @@ def register_terminology_routes(
             for (module_name, version), entry in sorted(registry.items())
         ]
         return TerminologyBundleListResponse(
+            revision=_registry_revision(registry_path),
             active=_active_payload(registry, registry_path=registry_path),
             bundles=bundles,
         )
@@ -808,23 +866,23 @@ def register_terminology_routes(
                 registry_path=registry_path,
             )
         )
-        entry = _register_imported_bundle(
+        entry, revision, active = _register_imported_bundle(
             registry_path=registry_path,
             module_name=module_name,
             version=version,
             input_dir=input_dir,
             medical_field=medical_field,
-            activate=True,
         )
         imported = _bundle_payload(
             module_name=module_name,
             version=version,
             entry=entry,
-            active=(module_name, version),
+            active=active,
         )
         clear_kb_caches()
         return ImportTerminologyBundleResponse(
             ok=True,
+            revision=revision,
             imported=imported,
             counts=counts,
         )
@@ -869,15 +927,16 @@ def register_terminology_routes(
             active=(module_name, version),
         )
 
-        _set_active_selection(
+        revision = _set_active_selection(
             registry_path=registry_path,
             module_name=module_name,
             version=version,
-            medical_field=active_payload.medical_field,
+            expected_revision=payload.expected_revision,
         )
         clear_kb_caches()
         return SelectTerminologyBundleResponse(
             ok=True,
+            revision=revision,
             active=active_payload,
             counts=_record_counts(kb),
         )

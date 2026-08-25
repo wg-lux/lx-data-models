@@ -36,6 +36,14 @@ identity, selects the packaged default only when no active identity exists, and
 fully loads every packaged bundle. Django startup does not silently seed or
 repair registry state. Bootstrap failure must block service startup.
 
+The registry's `active` field is a user-interface preference, not an evaluation
+identity. Reporting endpoints never infer a template version from it. Clients
+read the opaque `revision` returned by `GET /terminology/bundles` and must send
+it as `expected_revision` when calling `POST /terminology/bundles/select`.
+Selection is serialized with an inter-process lock and stale revisions return
+`409`, preventing silent last-writer-wins updates. Import registers a new bundle
+without changing `active`; activation is a separate compare-and-swap request.
+
 Example:
 
 ```python

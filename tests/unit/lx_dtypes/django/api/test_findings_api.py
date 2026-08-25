@@ -659,7 +659,7 @@ def test_base_api_report_template_endpoints_shape() -> None:
     client = Client()
 
     by_name_res = client.get(
-        "/base_api/report-templates/report_template_examples/colonoscopy_training_basic",
+        "/base_api/report-templates/report_template_examples/colonoscopy_training_basic?version=0.1.1",
         secure=True,
     )
     assert by_name_res.status_code == 200, by_name_res.content.decode()
@@ -670,7 +670,7 @@ def test_base_api_report_template_endpoints_shape() -> None:
     assert by_name_payload["coverage_version"] == "report_concept_coverage_v1"
 
     by_exam_res = client.get(
-        "/base_api/report-templates/by-examination/report_template_examples/colonoscopy",
+        "/base_api/report-templates/by-examination/report_template_examples/colonoscopy?version=0.1.1",
         secure=True,
     )
     assert by_exam_res.status_code == 200, by_exam_res.content.decode()
@@ -695,11 +695,13 @@ def test_base_api_report_template_runtime_validation() -> None:
     client = Client()
 
     missing_findings_res = client.post(
-        "/base_api/report-templates/report_template_examples/colonoscopy_training_basic/validate",
+        "/base_api/report-templates/report_template_examples/colonoscopy_training_basic/validate?version=0.1.1",
         data=json.dumps(
             {
                 "patient": "test_patient",
                 "examination": "colonoscopy",
+                "knowledge_base_module": "report_template_examples",
+                "knowledge_base_version": "0.1.1",
                 "patient_findings": [],
             }
         ),
@@ -719,11 +721,13 @@ def test_base_api_report_template_runtime_validation() -> None:
     )
 
     partial_findings_res = client.post(
-        "/base_api/report-templates/report_template_examples/colonoscopy_training_basic/validate",
+        "/base_api/report-templates/report_template_examples/colonoscopy_training_basic/validate?version=0.1.1",
         data=json.dumps(
             {
                 "patient": "test_patient",
                 "examination": "colonoscopy",
+                "knowledge_base_module": "report_template_examples",
+                "knowledge_base_version": "0.1.1",
                 "patient_findings": [
                     {
                         "finding": "colonoscopy_deepest_viewed_location",
@@ -756,6 +760,7 @@ def test_base_api_report_template_runtime_validation_from_ledger() -> None:
         (
             "/base_api/report-templates/report_template_examples/"
             f"colonoscopy_training_basic/validate-from-ledger/{patient_examination.id}"
+            "?version=0.1.1"
         ),
         secure=True,
     )
@@ -773,7 +778,7 @@ def test_base_api_report_template_runtime_validation_from_ledger_not_found() -> 
     response = client.post(
         (
             "/base_api/report-templates/report_template_examples/"
-            "colonoscopy_training_basic/validate-from-ledger/999999"
+            "colonoscopy_training_basic/validate-from-ledger/999999?version=0.1.1"
         ),
         secure=True,
     )

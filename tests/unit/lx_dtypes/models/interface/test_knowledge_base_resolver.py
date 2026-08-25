@@ -3,6 +3,7 @@ from __future__ import annotations
 import builtins
 import json
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from pathlib import Path
 from typing import Any
@@ -640,6 +641,221 @@ def test_registry_cache_observes_external_atomic_registry_replacement(
     assert set(replaced.unit) == {"unit_from_replaced_registry"}
 
 
+@pytest.mark.parametrize(
+    "payload",
+    [
+        pytest.param(b'{"modules":', id="truncated-json"),
+        pytest.param(b"\xff\xfe\x00", id="invalid-utf8"),
+    ],
+)
+def test_malformed_registry_payload_fails_with_typed_error(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    payload: bytes,
+) -> None:
+    registry_path = tmp_path / "malformed-registry.json"
+    registry_path.write_bytes(payload)
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    clear_knowledge_base_resolver_caches()
+    try:
+        with pytest.raises(
+            KnowledgeBaseRegistryError,
+            match="not valid JSON",
+        ) as exc_info:
+            load_module_config("clinical_module", version="1.0.0")
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+    assert isinstance(exc_info.value.__cause__, (json.JSONDecodeError, UnicodeDecodeError))
+    assert str(registry_path) in str(exc_info.value)
+
+
+def test_registry_rejects_duplicate_keys_instead_of_last_value_wins(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_path = tmp_path / "duplicate-version-registry.json"
+    registry_path.write_text(
+        '{"modules":{"clinical_module":{"1.0.0":{"path":"/first"},'
+        '"1.0.0":{"path":"/second"}}}}'
+    )
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    clear_knowledge_base_resolver_caches()
+    try:
+        with pytest.raises(
+            KnowledgeBaseRegistryError,
+            match=r"duplicate JSON key: '1\.0\.0'",
+        ):
+            load_module_config("clinical_module", version="1.0.0")
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+
+@pytest.mark.parametrize(
+    ("payload", "message"),
+    [
+        pytest.param([], "must be a JSON object", id="top-level-array"),
+        pytest.param({"modules": []}, "modules.*must be a JSON object", id="modules-array"),
+        pytest.param(
+            {"modules": {" ": {"1.0.0": "/bundle"}}},
+            "module names must be non-empty strings",
+            id="blank-module",
+        ),
+        pytest.param(
+            {"modules": {"clinical_module": {" ": "/bundle"}}},
+            "versions must be non-empty strings",
+            id="blank-version",
+        ),
+        pytest.param(
+            {"modules": {"clinical_module": {"1.0.0": {"sources": []}}}},
+            "sources must not be empty",
+            id="empty-sources",
+        ),
+        pytest.param(
+            {
+                "modules": {
+                    "clinical_module": {
+                        "1.0.0": {"sources": [{"kind": "untrusted"}]}
+                    }
+                }
+            },
+            "Unknown knowledge-base source kind",
+            id="unknown-source-kind",
+        ),
+    ],
+)
+def test_invalid_registry_schema_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    payload: object,
+    message: str,
+) -> None:
+    registry_path = tmp_path / "invalid-schema-registry.json"
+    registry_path.write_text(json.dumps(payload))
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    clear_knowledge_base_resolver_caches()
+    try:
+        with pytest.raises(KnowledgeBaseRegistryError, match=message):
+            load_module_config("clinical_module", version="1.0.0")
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+
+def test_registry_read_failure_is_wrapped_in_typed_error(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    registry_directory = tmp_path / "registry-directory"
+    registry_directory.mkdir()
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_directory))
+    clear_knowledge_base_resolver_caches()
+    try:
+        with pytest.raises(
+            KnowledgeBaseRegistryError,
+            match="could not be read",
+        ) as exc_info:
+            load_module_config("clinical_module", version="1.0.0")
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+    assert isinstance(exc_info.value.__cause__, OSError)
+
+
+def test_corrected_registry_is_observed_after_a_failed_parse_without_cache_clear(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    module_name = "corrected_registry_module"
+    bundle_root = tmp_path / "bundle"
+    _write_kb_root(bundle_root, module_name=module_name, version="1.0.0")
+    registry_path = tmp_path / "corrected-registry.json"
+    registry_path.write_text("{")
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    clear_knowledge_base_resolver_caches()
+    try:
+        with pytest.raises(KnowledgeBaseRegistryError):
+            load_module_config(module_name, version="1.0.0")
+
+        _write_filesystem_registry(
+            registry_path,
+            module_name=module_name,
+            version="1.0.0",
+            input_dir=bundle_root,
+        )
+        resolved = load_module_config(module_name, version="1.0.0")
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+    assert (resolved.name, resolved.version) == (module_name, "1.0.0")
+
+
+def test_explicit_versioned_input_dirs_are_isolated_from_broken_global_registry(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    module_name = "explicit_source_module"
+    bundle_root = tmp_path / "explicit-bundle"
+    _write_kb_root(bundle_root, module_name=module_name, version="1.0.0")
+    monkeypatch.setenv(
+        "LX_DTYPES_KB_REGISTRY",
+        str(tmp_path / "missing-global-registry.json"),
+    )
+    clear_knowledge_base_resolver_caches()
+    try:
+        resolved = load_module_config(
+            module_name,
+            version="1.0.0",
+            input_dirs=[bundle_root],
+        )
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+    assert (resolved.name, resolved.version) == (module_name, "1.0.0")
+
+
+def test_concurrent_exact_version_resolution_never_cross_contaminates_versions(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    module_name = "concurrent_versioned_module"
+    roots = {version: tmp_path / version for version in ("1.0.0", "2.0.0")}
+    for version, root in roots.items():
+        _write_kb_root(root, module_name=module_name, version=version)
+    registry_path = tmp_path / "concurrent-registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "modules": {
+                    module_name: {
+                        version: {"input_dirs": [str(root)]}
+                        for version, root in roots.items()
+                    }
+                }
+            }
+        )
+    )
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+    requested_versions = ["1.0.0", "2.0.0"] * 16
+    clear_knowledge_base_resolver_caches()
+    try:
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            resolved_identities = list(
+                executor.map(
+                    lambda version: get_knowledge_base_identity(
+                        module_name,
+                        version=version,
+                    ),
+                    requested_versions,
+                )
+            )
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+    assert resolved_identities == [
+        (module_name, version) for version in requested_versions
+    ]
+
+
 def test_configured_registry_never_falls_back_to_default_data_roots(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -658,6 +874,28 @@ def test_configured_registry_never_falls_back_to_default_data_roots(
     clear_knowledge_base_resolver_caches()
     try:
         with pytest.raises(KnowledgeBaseVersionNotFoundError):
+            load_knowledge_base(module_name, version="0.1.0")
+    finally:
+        clear_knowledge_base_resolver_caches()
+
+
+def test_versioned_resolution_without_registry_never_uses_default_data_roots(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    module_name = "packaged_example_only"
+    default_root = tmp_path / "package-data"
+    _write_kb_root(default_root, module_name=module_name, version="0.1.0")
+    monkeypatch.delenv("LX_DTYPES_KB_REGISTRY", raising=False)
+    monkeypatch.setattr(
+        "lx_dtypes.models.interface.KnowledgeBaseResolver._default_input_dirs",
+        lambda: (default_root,),
+    )
+    clear_knowledge_base_resolver_caches()
+    try:
+        with pytest.raises(
+            KnowledgeBaseRegistryError, match="not an implicit runtime fallback"
+        ):
             load_knowledge_base(module_name, version="0.1.0")
     finally:
         clear_knowledge_base_resolver_caches()

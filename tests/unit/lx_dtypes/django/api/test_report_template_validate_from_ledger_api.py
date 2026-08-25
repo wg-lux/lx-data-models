@@ -147,7 +147,7 @@ def test_validate_report_template_runtime_from_ledger_not_found(
     response = client.post(
         (
             "/base_api/report-templates/report_template_examples/"
-            "star_upper_gi_main/validate-from-ledger/999999"
+            "star_upper_gi_main/validate-from-ledger/999999?version=0.1.0"
         ),
         content_type="application/json",
         secure=True,
@@ -174,6 +174,9 @@ def test_validate_report_template_runtime_from_ledger_success(
 
     class _FakeKnowledgeBase:
         class _Config:
+            name = "report_template_examples"
+            version = "0.1.0"
+
             def model_dump(self, *, mode: str) -> dict[str, str]:
                 assert mode == "json"
                 return {"name": "report_template_examples", "version": "0.1.0"}
@@ -237,7 +240,7 @@ def test_validate_report_template_runtime_from_ledger_success(
     response = client.post(
         (
             "/base_api/report-templates/report_template_examples/"
-            "star_upper_gi_main/validate-from-ledger/7"
+            "star_upper_gi_main/validate-from-ledger/7?version=0.1.0"
         ),
         data=json.dumps({}),
         content_type="application/json",

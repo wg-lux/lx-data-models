@@ -280,12 +280,13 @@ def _load_module_kb(
 
 def _resolve_report_template_module_location(
     module_name: str,
+    version: str,
 ) -> ReportTemplateModuleLocation:
-    version = _resolve_active_version(module_name, None)
-    if version is None:
+    version = version.strip()
+    if not version:
         raise HttpError(
-            409,
-            f"Knowledge-base module '{module_name}' has no active version.",
+            400,
+            "Report-template mutations require an explicit knowledge-base version.",
         )
     config = load_module_config(module_name, version=version)
     source_file = config.source_file
@@ -338,15 +339,21 @@ def _clear_kb_caches() -> None:
 def _resolve_payload_kb_identity(
     route_module_name: str,
     payload: PExamination,
-) -> tuple[str, str | None]:
+) -> tuple[str, str]:
     payload_module_name = str(payload.knowledge_base_module or "").strip()
-    payload_version = str(payload.knowledge_base_version or "").strip() or None
+    payload_version = str(payload.knowledge_base_version or "").strip()
 
     if payload_module_name and payload_module_name != route_module_name:
         raise HttpError(
             409,
             "Payload knowledge-base module does not match route module: "
             f"'{payload_module_name}' != '{route_module_name}'.",
+        )
+
+    if not payload_version:
+        raise HttpError(
+            409,
+            "Payload must include an explicit knowledge-base version.",
         )
 
     return payload_module_name or route_module_name, payload_version
@@ -703,8 +710,8 @@ register_report_template_routes(
     api,
     load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
     clear_kb_caches=lambda: _clear_kb_caches(),
-    resolve_builder_module_location=lambda module_name: (
-        _resolve_report_template_module_location(module_name)
+    resolve_builder_module_location=lambda module_name, version: (
+        _resolve_report_template_module_location(module_name, version)
     ),
     resolve_payload_kb_identity=lambda *args, **kwargs: _resolve_payload_kb_identity(
         *args, **kwargs

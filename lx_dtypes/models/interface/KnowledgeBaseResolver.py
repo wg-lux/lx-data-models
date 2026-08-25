@@ -222,7 +222,12 @@ def _load_registry() -> dict[tuple[str, str], tuple[str, ...]]:
             f"Configured knowledge-base registry does not exist: {registry_path}"
         )
 
-    payload_bytes = registry_path.read_bytes()
+    try:
+        payload_bytes = registry_path.read_bytes()
+    except OSError as exc:
+        raise KnowledgeBaseRegistryError(
+            f"Configured knowledge-base registry could not be read: {registry_path}"
+        ) from exc
     content_sha256 = sha256(payload_bytes).hexdigest()
     return _load_registry_payload_cached(
         str(registry_path),
@@ -237,8 +242,18 @@ def _load_registry_payload_cached(
     content_sha256: str,
     payload_bytes: bytes,
 ) -> dict[tuple[str, str], tuple[str, ...]]:
-    del registry_path, content_sha256
-    raw_payload = json.loads(payload_bytes)
+    del content_sha256
+    try:
+        raw_payload = json.loads(
+            payload_bytes,
+            object_pairs_hook=_reject_duplicate_json_object_keys,
+        )
+    except KnowledgeBaseRegistryError:
+        raise
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        raise KnowledgeBaseRegistryError(
+            f"Knowledge-base registry is not valid JSON: {registry_path}"
+        ) from exc
     if not isinstance(raw_payload, Mapping):
         raise KnowledgeBaseRegistryError(
             "Knowledge-base registry must be a JSON object."
@@ -269,6 +284,19 @@ def _load_registry_payload_cached(
                 module_name, version, raw_entry
             )
     return registry
+
+
+def _reject_duplicate_json_object_keys(
+    pairs: list[tuple[str, Any]],
+) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise KnowledgeBaseRegistryError(
+                f"Knowledge-base registry contains duplicate JSON key: {key!r}."
+            )
+        result[key] = value
+    return result
 
 
 def resolve_versioned_input_dirs(
@@ -314,7 +342,10 @@ def _resolve_input_dirs_for_identity(
     if _get_registry_path() is not None:
         resolved_input_dirs = resolve_versioned_input_dirs(module_name, version)
     else:
-        resolved_input_dirs = _default_input_dirs()
+        raise KnowledgeBaseRegistryError(
+            "Versioned knowledge-base resolution requires LX_DTYPES_KB_REGISTRY "
+            "or explicit input_dirs; packaged data roots are not an implicit runtime fallback."
+        )
     _validate_resolved_identity(module_name, version, resolved_input_dirs)
     return resolved_input_dirs
 

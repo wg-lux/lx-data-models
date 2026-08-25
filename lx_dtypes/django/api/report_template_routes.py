@@ -63,6 +63,7 @@ def _resolved_loaded_kb_version(
     kb: KnowledgeBaseContract,
     *,
     module_name: str,
+    expected_version: str,
 ) -> str:
     config = getattr(kb, "config", None)
     resolved_module = getattr(config, "name", None)
@@ -74,7 +75,13 @@ def _resolved_loaded_kb_version(
         )
     if not isinstance(resolved_version, str) or not resolved_version.strip():
         raise HttpError(500, "Loaded knowledge base has no version identity.")
-    return resolved_version.strip()
+    normalized_version = resolved_version.strip()
+    if normalized_version != expected_version:
+        raise HttpError(
+            409,
+            "Loaded knowledge-base version does not match the requested version.",
+        )
+    return normalized_version
 
 
 def _attach_loaded_kb_identity(
@@ -82,11 +89,16 @@ def _attach_loaded_kb_identity(
     *,
     kb: KnowledgeBaseContract,
     module_name: str,
+    version: str,
 ) -> Dict[str, Any]:
     return _attach_resolved_kb_identity(
         payload,
         module_name=module_name,
-        version=_resolved_loaded_kb_version(kb, module_name=module_name),
+        version=_resolved_loaded_kb_version(
+            kb,
+            module_name=module_name,
+            expected_version=version,
+        ),
     )
 
 
@@ -95,8 +107,8 @@ def register_report_template_routes(
     *,
     load_module_kb: Callable[..., KnowledgeBaseContract],
     clear_kb_caches: Callable[[], None],
-    resolve_builder_module_location: Callable[[str], ReportTemplateModuleLocation],
-    resolve_payload_kb_identity: Callable[[str, PExamination], tuple[str, str | None]],
+    resolve_builder_module_location: Callable[[str, str], ReportTemplateModuleLocation],
+    resolve_payload_kb_identity: Callable[[str, PExamination], tuple[str, str]],
     orm_models: Callable[[], Dict[str, Any]],
     build_p_examination_payload_from_host_ledger: Callable[..., PExamination],
     persist_patient_examination_dtypes_record: Callable[
@@ -118,6 +130,12 @@ def register_report_template_routes(
                 f"{capability} access is required for report-template builder routes.",
             )
 
+    def require_version(version: str) -> str:
+        resolved = version.strip()
+        if not resolved:
+            raise HttpError(400, "An explicit knowledge-base version is required.")
+        return resolved
+
     @api.post("/report-templates/builder/templates")
     def save_report_template(
         request: BaseRequest,
@@ -127,11 +145,14 @@ def register_report_template_routes(
         Persist a new report-template YAML file into one lx_dtypes knowledge-base module.
         """
         require_builder_access(request, "report_template:write")
-        module_name = payload.module_name.strip() or "report_template_examples"
-        location = resolve_builder_module_location(module_name)
+        module_name = payload.module_name.strip()
+        module_version = require_version(payload.module_version)
+        location = resolve_builder_module_location(module_name, module_version)
         try:
             saved = save_report_template_definition(
-                payload, modules_root=location.modules_root
+                payload,
+                resolved_version=location.version,
+                modules_root=location.modules_root,
             )
         except FileExistsError as exc:
             raise HttpError(409, str(exc)) from exc
@@ -140,22 +161,29 @@ def register_report_template_routes(
 
         clear_kb_caches()
         kb = load_module_kb(saved.module_name, version=location.version)
+        _resolved_loaded_kb_version(
+            kb,
+            module_name=saved.module_name,
+            expected_version=location.version,
+        )
         compiled = _compile_report_template(kb, saved.template_name, mode="preview")
         saved.readiness = compiled["summary"].model_dump(mode="json")
         return saved
 
     @api.get("/report-templates/by-examination/{module_name}/{examination_name}")
     def report_templates_by_examination(
-        request: BaseRequest, module_name: str, examination_name: str
+        request: BaseRequest, module_name: str, examination_name: str, version: str
     ) -> List[Dict[str, Any]]:
         """
         Return all resolved report templates for the given examination in one module.
         """
         del request
-        kb = load_module_kb(module_name)
+        version = require_version(version)
+        kb = load_module_kb(module_name, version=version)
         resolved_version = _resolved_loaded_kb_version(
             kb,
             module_name=module_name,
+            expected_version=version,
         )
         matches: list[Dict[str, Any]] = []
         for template_name, template in cast(
@@ -182,14 +210,16 @@ def register_report_template_routes(
         "/report-templates/builder/by-examination/{module_name}/{examination_name}"
     )
     def builder_report_templates_by_examination(
-        request: BaseRequest, module_name: str, examination_name: str
+        request: BaseRequest, module_name: str, examination_name: str, version: str
     ) -> List[Dict[str, Any]]:
         """Return preview exports for all builder templates, including drafts."""
         require_builder_access(request, "report_template:read")
-        kb = load_module_kb(module_name)
+        version = require_version(version)
+        kb = load_module_kb(module_name, version=version)
         resolved_version = _resolved_loaded_kb_version(
             kb,
             module_name=module_name,
+            expected_version=version,
         )
         matches: list[Dict[str, Any]] = []
         for template_name, template in cast(
@@ -209,18 +239,19 @@ def register_report_template_routes(
 
     @api.get("/report-templates/{module_name}/{template_name}")
     def report_template_by_name(
-        request: BaseRequest, module_name: str, template_name: str
+        request: BaseRequest, module_name: str, template_name: str, version: str
     ) -> Dict[str, Any]:
         """
         Return a resolved report template JSON payload by module/template name.
         """
         del request
-        kb = load_module_kb(module_name)
+        kb = load_module_kb(module_name, version=require_version(version))
         try:
             return _attach_loaded_kb_identity(
                 kb.export_report_template(template_name),
                 kb=kb,
                 module_name=module_name,
+                version=require_version(version),
             )
         except KeyError as exc:
             raise HttpError(
@@ -230,15 +261,16 @@ def register_report_template_routes(
 
     @api.get("/report-templates/{module_name}/{template_name}/preview")
     def preview_report_template_by_name(
-        request: BaseRequest, module_name: str, template_name: str
+        request: BaseRequest, module_name: str, template_name: str, version: str
     ) -> Dict[str, Any]:
         require_builder_access(request, "report_template:read")
-        kb = load_module_kb(module_name)
+        kb = load_module_kb(module_name, version=require_version(version))
         try:
             return _attach_loaded_kb_identity(
                 kb.export_report_template_preview(template_name),
                 kb=kb,
                 module_name=module_name,
+                version=require_version(version),
             )
         except KeyError as exc:
             raise HttpError(
@@ -250,11 +282,17 @@ def register_report_template_routes(
         "/report-templates/builder/templates/{module_name}/{template_name}/publish"
     )
     def publish_report_template(
-        request: BaseRequest, module_name: str, template_name: str
+        request: BaseRequest, module_name: str, template_name: str, version: str
     ) -> PublishReportTemplateResponse:
         require_builder_access(request, "report_template:write")
-        location = resolve_builder_module_location(module_name)
+        version = require_version(version)
+        location = resolve_builder_module_location(module_name, version)
         kb = load_module_kb(module_name, version=location.version)
+        _resolved_loaded_kb_version(
+            kb,
+            module_name=module_name,
+            expected_version=version,
+        )
         try:
             compiled = _compile_report_template(kb, template_name, mode="publish")
         except KeyError as exc:
@@ -272,12 +310,18 @@ def register_report_template_routes(
 
         response = set_saved_report_template_lifecycle(
             module_name=module_name,
+            module_version=version,
             template_name=template_name,
             lifecycle_status="published",
             modules_root=location.modules_root,
         )
         clear_kb_caches()
         refreshed_kb = load_module_kb(module_name, version=location.version)
+        _resolved_loaded_kb_version(
+            refreshed_kb,
+            module_name=module_name,
+            expected_version=version,
+        )
         refreshed = _compile_report_template(
             refreshed_kb, template_name, mode="production"
         )
@@ -288,11 +332,17 @@ def register_report_template_routes(
         "/report-templates/builder/templates/{module_name}/{template_name}/unpublish"
     )
     def unpublish_report_template(
-        request: BaseRequest, module_name: str, template_name: str
+        request: BaseRequest, module_name: str, template_name: str, version: str
     ) -> PublishReportTemplateResponse:
         require_builder_access(request, "report_template:write")
-        location = resolve_builder_module_location(module_name)
+        version = require_version(version)
+        location = resolve_builder_module_location(module_name, version)
         kb = load_module_kb(module_name, version=location.version)
+        _resolved_loaded_kb_version(
+            kb,
+            module_name=module_name,
+            expected_version=version,
+        )
         if template_name not in kb.report_template:
             raise HttpError(
                 404,
@@ -301,12 +351,18 @@ def register_report_template_routes(
 
         response = set_saved_report_template_lifecycle(
             module_name=module_name,
+            module_version=version,
             template_name=template_name,
             lifecycle_status="draft",
             modules_root=location.modules_root,
         )
         clear_kb_caches()
         refreshed_kb = load_module_kb(module_name, version=location.version)
+        _resolved_loaded_kb_version(
+            refreshed_kb,
+            module_name=module_name,
+            expected_version=version,
+        )
         refreshed = _compile_report_template(
             refreshed_kb, template_name, mode="preview"
         )
@@ -318,6 +374,7 @@ def register_report_template_routes(
         request: BaseRequest,
         module_name: str,
         template_name: str,
+        version: str,
         payload: PExamination,
     ) -> Dict[str, Any]:
         """
@@ -327,7 +384,16 @@ def register_report_template_routes(
         resolved_module_name, resolved_version = resolve_payload_kb_identity(
             module_name, payload
         )
+        if resolved_version != require_version(version):
+            raise HttpError(
+                409, "Payload knowledge-base version does not match request version."
+            )
         kb = load_module_kb(resolved_module_name, version=resolved_version)
+        _resolved_loaded_kb_version(
+            kb,
+            module_name=resolved_module_name,
+            expected_version=resolved_version,
+        )
         try:
             template_export = kb.export_report_template(template_name)
             validation = kb.evaluate_report_template_validators(
@@ -410,6 +476,7 @@ def register_report_template_routes(
         module_name: str,
         template_name: str,
         patient_examination_id: int,
+        version: str,
     ) -> Dict[str, Any]:
         del request
         patient_examination_model = orm_models()["PatientExamination"]
@@ -432,7 +499,16 @@ def register_report_template_routes(
         resolved_module_name, resolved_version = resolve_payload_kb_identity(
             module_name, payload
         )
+        if resolved_version != require_version(version):
+            raise HttpError(
+                409, "Ledger knowledge-base version does not match request version."
+            )
         kb = load_module_kb(resolved_module_name, version=resolved_version)
+        _resolved_loaded_kb_version(
+            kb,
+            module_name=resolved_module_name,
+            expected_version=resolved_version,
+        )
         try:
             template_export = kb.export_report_template(template_name)
             validation = kb.evaluate_report_template_validators(
@@ -463,10 +539,16 @@ def register_report_template_routes(
 
     @api.get("/report-templates/{module_name}/{template_name}/validate-definition")
     def validate_report_template_definition(
-        request: BaseRequest, module_name: str, template_name: str
+        request: BaseRequest, module_name: str, template_name: str, version: str
     ) -> Dict[str, Any]:
         require_builder_access(request, "report_template:read")
-        kb = load_module_kb(module_name)
+        version = require_version(version)
+        kb = load_module_kb(module_name, version=version)
+        _resolved_loaded_kb_version(
+            kb,
+            module_name=module_name,
+            expected_version=version,
+        )
         if template_name not in kb.report_template:
             raise HttpError(
                 404,
@@ -487,13 +569,23 @@ def register_report_template_routes(
         module_name: str,
         validator_kind: str,
         validator_name: str,
+        version: str,
         payload: PExamination,
     ) -> Dict[str, Any]:
         del request
         resolved_module_name, resolved_version = resolve_payload_kb_identity(
             module_name, payload
         )
+        if resolved_version != require_version(version):
+            raise HttpError(
+                409, "Payload knowledge-base version does not match request version."
+            )
         kb = load_module_kb(resolved_module_name, version=resolved_version)
+        _resolved_loaded_kb_version(
+            kb,
+            module_name=resolved_module_name,
+            expected_version=resolved_version,
+        )
 
         if validator_kind == "findings_validator":
             if validator_name not in kb.findings_validator:

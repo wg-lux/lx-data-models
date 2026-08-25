@@ -107,10 +107,12 @@ def builder_route_authorization(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         api_main,
         "_resolve_report_template_module_location",
-        lambda module_name: report_template_builder.ReportTemplateModuleLocation(
-            module_name=module_name,
-            version="1.0.0",
-            modules_root=report_template_builder.MODULES_ROOT,
+        lambda module_name, version: (
+            report_template_builder.ReportTemplateModuleLocation(
+                module_name=module_name,
+                version=version,
+                modules_root=report_template_builder.MODULES_ROOT,
+            )
         ),
     )
 
@@ -128,7 +130,7 @@ def test_builder_routes_fail_closed_and_separate_read_from_write(
     monkeypatch.setattr(api_main, "_report_template_access_allowed", authorize)
 
     anonymous = client.get(
-        "/base_api/report-templates/builder/by-examination/example/colonoscopy",
+        "/base_api/report-templates/builder/by-examination/example/colonoscopy?version=1.0.0",
         secure=True,
     )
     assert anonymous.status_code == 401
@@ -138,6 +140,7 @@ def test_builder_routes_fail_closed_and_separate_read_from_write(
         data=json.dumps(
             {
                 "module_name": "missing_module",
+                "module_version": "1.0.0",
                 "file_name": "template",
                 "template_name": "template",
                 "examination": "colonoscopy",
@@ -151,7 +154,7 @@ def test_builder_routes_fail_closed_and_separate_read_from_write(
     assert reader_write.status_code == 403
 
     reader_read = client.get(
-        "/base_api/report-templates/example/missing/preview",
+        "/base_api/report-templates/example/missing/preview?version=1.0.0",
         secure=True,
         headers={"X-Test-Actor": "reader"},
     )
@@ -162,6 +165,7 @@ def test_builder_routes_fail_closed_and_separate_read_from_write(
         data=json.dumps(
             {
                 "module_name": "missing_module",
+                "module_version": "1.0.0",
                 "file_name": "template",
                 "template_name": "template",
                 "examination": "colonoscopy",
@@ -181,6 +185,7 @@ def test_save_report_template_returns_400_for_unknown_module(client: Client) -> 
         data=json.dumps(
             {
                 "module_name": "missing_module",
+                "module_version": "1.0.0",
                 "file_name": "custom_template",
                 "template_name": "custom_template",
                 "examination": "star_upper_gi_endoscopy",
@@ -225,16 +230,20 @@ def test_save_report_template_uses_resolved_mutable_module_location(
         captured["module_name"] = module_name
         captured["version"] = version
         captured["input_dirs"] = input_dirs
-        return _FakeKb()
+        kb = _FakeKb()
+        kb.config = SimpleNamespace(name=module_name, version=version)
+        return kb
 
     monkeypatch.setattr(api_main, "_load_module_kb", _fake_load_knowledge_base)
     monkeypatch.setattr(
         api_main,
         "_resolve_report_template_module_location",
-        lambda module_name: report_template_builder.ReportTemplateModuleLocation(
-            module_name=module_name,
-            version="1.0.0",
-            modules_root=tmp_path,
+        lambda module_name, version: (
+            report_template_builder.ReportTemplateModuleLocation(
+                module_name=module_name,
+                version=version,
+                modules_root=tmp_path,
+            )
         ),
     )
     monkeypatch.setattr(
@@ -248,6 +257,7 @@ def test_save_report_template_uses_resolved_mutable_module_location(
         data=json.dumps(
             {
                 "module_name": "builder_module",
+                "module_version": "1.0.0",
                 "file_name": "custom_template",
                 "template_name": "custom_template",
                 "examination": "star_upper_gi_endoscopy",
@@ -287,7 +297,7 @@ def test_packaged_report_template_module_is_immutable(
     monkeypatch.setattr(api_main, "package_data_root", lambda: package_root)
 
     with pytest.raises(HttpError, match="Packaged report templates are immutable"):
-        resolve_report_template_module_location("report_template_examples")
+        resolve_report_template_module_location("report_template_examples", "1.0.0")
 
 
 def test_publish_report_template_returns_409_when_summary_blocks_publish(
@@ -308,7 +318,7 @@ def test_publish_report_template_returns_409_when_summary_blocks_publish(
     )
 
     response = client.post(
-        "/base_api/report-templates/builder/templates/report_template_examples/blocked_template/publish",
+        "/base_api/report-templates/builder/templates/report_template_examples/blocked_template/publish?version=0.1.0",
         secure=True,
     )
 
@@ -322,7 +332,7 @@ def test_unpublish_report_template_returns_404_when_template_missing(
     monkeypatch.setattr(api_main, "_load_module_kb", lambda *args, **kwargs: _FakeKb())
 
     response = client.post(
-        "/base_api/report-templates/builder/templates/report_template_examples/missing_template/unpublish",
+        "/base_api/report-templates/builder/templates/report_template_examples/missing_template/unpublish?version=0.1.0",
         secure=True,
     )
 
@@ -368,7 +378,7 @@ def test_report_templates_by_examination_filters_unpublished_and_unready_templat
     )
 
     response = client.get(
-        "/base_api/report-templates/by-examination/report_template_examples/colonoscopy",
+        "/base_api/report-templates/by-examination/report_template_examples/colonoscopy?version=0.1.0",
         secure=True,
     )
 
@@ -382,19 +392,40 @@ def test_report_templates_by_examination_filters_unpublished_and_unready_templat
     ]
 
 
+def test_report_template_read_rejects_missing_or_mismatched_version(
+    client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_kb = _FakeKb()
+    fake_kb.report_template["demo"] = object()
+    monkeypatch.setattr(api_main, "_load_module_kb", lambda *args, **kwargs: fake_kb)
+
+    missing = client.get(
+        "/base_api/report-templates/report_template_examples/demo",
+        secure=True,
+    )
+    mismatched = client.get(
+        "/base_api/report-templates/report_template_examples/demo?version=9.9.9",
+        secure=True,
+    )
+
+    assert missing.status_code == 422
+    assert mismatched.status_code == 409
+    assert "does not match" in mismatched.content.decode()
+
+
 def test_preview_and_definition_validation_return_404_for_missing_template(
     client: Client, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(api_main, "_load_module_kb", lambda *args, **kwargs: _FakeKb())
 
     preview = client.get(
-        "/base_api/report-templates/report_template_examples/missing_template/preview",
+        "/base_api/report-templates/report_template_examples/missing_template/preview?version=0.1.0",
         secure=True,
     )
     assert preview.status_code == 404
 
     definition = client.get(
-        "/base_api/report-templates/report_template_examples/missing_template/validate-definition",
+        "/base_api/report-templates/report_template_examples/missing_template/validate-definition?version=0.1.0",
         secure=True,
     )
     assert definition.status_code == 404
@@ -429,7 +460,7 @@ def test_validate_from_ledger_returns_422_when_payload_build_fails(
     )
 
     response = client.post(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate-from-ledger/5",
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate-from-ledger/5?version=0.1.0",
         data=json.dumps({}),
         content_type="application/json",
         secure=True,
@@ -461,8 +492,16 @@ def test_single_validator_runtime_supports_all_validator_kinds(
     monkeypatch.setattr(api_main, "_load_module_kb", lambda *args, **kwargs: fake_kb)
 
     response = client.post(
-        f"/base_api/validators/report_template_examples/{validator_kind}/demo_validator/validate",
-        data=json.dumps({"patient": "p", "examination": "e", "patient_findings": []}),
+        f"/base_api/validators/report_template_examples/{validator_kind}/demo_validator/validate?version=0.1.0",
+        data=json.dumps(
+            {
+                "patient": "p",
+                "examination": "e",
+                "knowledge_base_module": "report_template_examples",
+                "knowledge_base_version": "0.1.0",
+                "patient_findings": [],
+            }
+        ),
         content_type="application/json",
         secure=True,
     )
@@ -477,8 +516,16 @@ def test_single_validator_runtime_returns_404_for_unknown_kind(
     monkeypatch.setattr(api_main, "_load_module_kb", lambda *args, **kwargs: _FakeKb())
 
     response = client.post(
-        "/base_api/validators/report_template_examples/not_a_kind/demo/validate",
-        data=json.dumps({"patient": "p", "examination": "e", "patient_findings": []}),
+        "/base_api/validators/report_template_examples/not_a_kind/demo/validate?version=0.1.0",
+        data=json.dumps(
+            {
+                "patient": "p",
+                "examination": "e",
+                "knowledge_base_module": "report_template_examples",
+                "knowledge_base_version": "0.1.0",
+                "patient_findings": [],
+            }
+        ),
         content_type="application/json",
         secure=True,
     )

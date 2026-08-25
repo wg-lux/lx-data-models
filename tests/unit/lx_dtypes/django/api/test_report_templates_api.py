@@ -23,6 +23,9 @@ class _RuntimeValidationKb:
     examination_validator: dict[str, object] = {}
 
     class _Config:
+        name = "report_template_examples"
+        version = "0.1.0"
+
         def model_dump(self, mode: str) -> dict[str, str]:
             assert mode == "json"
             return {"name": "report_template_examples", "version": "0.1.0"}
@@ -81,7 +84,7 @@ class _RuntimeValidationKb:
 def test_report_template_api_by_name() -> None:
     client = Client()
     response = client.get(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main",
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main?version=0.1.1",
         secure=True,
     )
     assert response.status_code == 200
@@ -95,7 +98,7 @@ def test_report_template_api_by_name() -> None:
 def test_report_template_api_by_examination() -> None:
     client = Client()
     response = client.get(
-        "/base_api/report-templates/by-examination/report_template_examples/star_upper_gi_endoscopy",
+        "/base_api/report-templates/by-examination/report_template_examples/star_upper_gi_endoscopy?version=0.1.1",
         secure=True,
     )
     assert response.status_code == 200
@@ -115,7 +118,7 @@ def test_report_template_api_by_examination() -> None:
 def test_colonoscopy_template_api_exposes_localized_guideline_provenance() -> None:
     client = Client()
     response = client.get(
-        "/base_api/report-templates/by-examination/report_template_examples/colonoscopy",
+        "/base_api/report-templates/by-examination/report_template_examples/colonoscopy?version=0.1.1",
         secure=True,
     )
 
@@ -172,7 +175,7 @@ def test_advanced_endoscopy_template_api_exposes_production_template(
 ) -> None:
     response = Client().get(
         "/base_api/report-templates/by-examination/"
-        f"report_template_examples/{examination}",
+        f"report_template_examples/{examination}?version=0.1.1",
         secure=True,
     )
 
@@ -194,11 +197,13 @@ def test_report_template_runtime_validation_api(
     )
     client = Client()
     response = client.post(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate",
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.0",
         data=json.dumps(
             {
                 "patient": "test_patient",
                 "examination": "star_upper_gi_endoscopy",
+                "knowledge_base_module": "report_template_examples",
+                "knowledge_base_version": "0.1.0",
                 "patient_findings": [
                     {
                         "finding": "star_upper_gi_mucosa_esophagus_abnormal",
@@ -273,7 +278,7 @@ def test_report_template_runtime_validation_api_uses_payload_kb_identity(
     monkeypatch.setattr(api_main, "load_knowledge_base", _fake_load_knowledge_base)
 
     response = client.post(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate",
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.0",
         data=json.dumps(
             {
                 "patient": "test_patient",
@@ -301,7 +306,7 @@ def test_report_template_runtime_validation_api_uses_payload_kb_identity(
     }
 
 
-def test_report_template_runtime_validation_api_resolves_current_kb_version(
+def test_report_template_runtime_validation_api_rejects_missing_payload_version(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     client = Client()
@@ -322,7 +327,7 @@ def test_report_template_runtime_validation_api_resolves_current_kb_version(
     monkeypatch.setattr(api_main, "load_knowledge_base", _fake_load_knowledge_base)
 
     response = client.post(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate",
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.1",
         data=json.dumps(
             {
                 "patient": "test_patient",
@@ -334,11 +339,9 @@ def test_report_template_runtime_validation_api_resolves_current_kb_version(
         secure=True,
     )
 
-    assert response.status_code == 200
-    assert captured == {
-        "module_name": "report_template_examples",
-        "version": "0.1.1",
-    }
+    assert response.status_code == 409
+    assert captured == {}
+    assert "explicit knowledge-base version" in response.content.decode()
 
 
 def test_report_template_definition_validation_api(
@@ -354,7 +357,7 @@ def test_report_template_definition_validation_api(
     )
     client = Client()
     response = client.get(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate-definition",
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate-definition?version=0.1.1",
         secure=True,
     )
     assert response.status_code == 200
@@ -374,11 +377,13 @@ def test_single_validator_runtime_validation_api(
     )
     client = Client()
     response = client.post(
-        "/base_api/validators/report_template_examples/findings_validator/polyp_has_lst_if_large/validate",
+        "/base_api/validators/report_template_examples/findings_validator/polyp_has_lst_if_large/validate?version=0.1.0",
         data=json.dumps(
             {
                 "patient": "test_patient",
                 "examination": "star_upper_gi_endoscopy",
+                "knowledge_base_module": "report_template_examples",
+                "knowledge_base_version": "0.1.0",
                 "patient_findings": [
                     {
                         "finding": "star_upper_gi_polyp",
@@ -421,11 +426,13 @@ def test_report_template_runtime_validation_api_rejects_semantically_forbidden_p
 ):
     client = Client()
     response = client.post(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate",
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.1",
         data=json.dumps(
             {
                 "patient": "test_patient",
                 "examination": "colonoscopy",
+                "knowledge_base_module": "report_template_examples",
+                "knowledge_base_version": "0.1.1",
                 "patient_findings": [
                     {
                         "finding": "esophagus_polyp",
@@ -448,7 +455,7 @@ def test_report_template_runtime_validation_api_rejects_payload_module_conflict(
 ):
     client = Client()
     response = client.post(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate",
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.0",
         data=json.dumps(
             {
                 "patient": "test_patient",
@@ -476,7 +483,7 @@ def test_report_template_runtime_validation_api_rejects_unavailable_payload_vers
     monkeypatch.setattr(api_main, "load_knowledge_base", _missing_version)
 
     response = client.post(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate",
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=9.9.9",
         data=json.dumps(
             {
                 "patient": "test_patient",

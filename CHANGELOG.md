@@ -10,10 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - A strict `lx-dtypes-kb-registry bootstrap` startup boundary that provisions,
   migrates, and fully validates every packaged knowledge-base identity.
+- Revisioned compare-and-swap terminology selection with inter-process writer
+  serialization and deterministic conflict responses.
 
 ### Changed
 - Django application import no longer performs implicit best-effort registry
   seeding; deployments must run the package-owned bootstrap command first.
+- Report-template reads and mutations now require an explicit knowledge-base
+  version and reject mismatched loaded or payload identities.
+- Terminology import no longer changes the deployment-global active selection.
+- Versioned knowledge-base resolution no longer falls back to installed package
+  data when no registry or explicit input directories are configured.
 
 ## [0.2.17] - 2026-08-13
 

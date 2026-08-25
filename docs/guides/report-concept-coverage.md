@@ -35,8 +35,8 @@ Die autoritative Auflösung entsteht ausschließlich serverseitig aus:
 Die Validierungsrouten liefern das Ergebnis unter `concept_coverage`:
 
 ```text
-POST /report-templates/{module}/{template}/validate
-POST /report-templates/{module}/{template}/validate-from-ledger/{id}
+POST /report-templates/{module}/{template}/validate?version={module_version}
+POST /report-templates/{module}/{template}/validate-from-ledger/{id}?version={module_version}
 ```
 
 Das Frontend zeigt die Serverantwort. Eine lokale Heuristik darf nur als

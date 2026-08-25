@@ -144,6 +144,28 @@ In short:
   - `tests/unit/lx_dtypes/models/interface/test_report_template_example_module.py`
   - `tests/unit/lx_dtypes/models/interface/test_report_template_export.py`
 
+`report_template_examples` is package-owned example and test data. It is not a
+clinical fallback module and it is not a valid builder write target. Production
+resolution must use an explicitly provisioned registry identity.
+
+## Versioned API And Builder Contract
+
+Every report-template read, preview, validation, publication, and unpublication
+request requires an exact knowledge-base version. GET and lifecycle routes use
+the required `version` query parameter. Runtime validation additionally requires
+the same version in the typed `PExamination` payload. A mismatch returns `409`
+before template evaluation.
+
+Builder save requests require both `module_name` and `module_version`. The
+backend resolves that exact registry entry, verifies the loaded artifact
+identity, and rejects package-owned sources. Blank modules never normalize to
+`report_template_examples`.
+
+Versioned resolver calls require either `LX_DTYPES_KB_REGISTRY` or explicit
+`input_dirs`. They never fall back to installed package data roots. Unversioned
+library loading remains available for explicit local authoring and test code,
+but is not used by the versioned Django reporting contract.
+
 ## Mental Model
 
 Think of the flow as:
@@ -286,8 +308,8 @@ Current scope:
 - Structural validation via `validate_report_template_structure(...)`
 - Runtime validator execution for `exists`, `missing`, and `condition` operators via:
   - `KnowledgeBase.evaluate_report_template_validators(...)`
-  - `POST /base_api/report-templates/{module_name}/{template_name}/validate`
-- Version-aware KB loading for runtime validation when a payload carries `knowledge_base_version`
+  - `POST /base_api/report-templates/{module_name}/{template_name}/validate?version={module_version}`
+- Exact-version KB loading for runtime validation; the query and payload identities must match
 
 Operators are strict canonical-only now:
 
@@ -375,7 +397,7 @@ Do not treat the raw YAML format as a safe end-user authoring surface yet.
 Use either:
 
 - `KnowledgeBase.evaluate_report_template_validators(template_name, p_examination=...)`
-- `POST /base_api/report-templates/{module_name}/{template_name}/validate`
+- `POST /base_api/report-templates/{module_name}/{template_name}/validate?version={module_version}`
 
 Expected typed examination payload example:
 

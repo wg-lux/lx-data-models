@@ -128,8 +128,12 @@ def test_editor_zip_import_is_immediately_available_through_graph_api(
         "module_name": "editor_graph_bundle",
         "version": "1.2.3",
         "medical_field": "gastroenterology",
-        "is_active": True,
+        "is_active": False,
     }
+    assert (
+        client.get("/base_api/terminology/bundles", secure=True).json()["active"]
+        is None
+    )
 
     graph_response = client.get(
         "/base_api/knowledge-bases/editor_graph_bundle/1.2.3/graph",

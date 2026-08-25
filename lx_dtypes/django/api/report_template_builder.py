@@ -118,7 +118,8 @@ class ReportTemplateBuilderSection(BaseModel):
 
 
 class SaveReportTemplateRequest(BaseModel):
-    module_name: str = "report_template_examples"
+    module_name: str = Field(min_length=1)
+    module_version: str = Field(min_length=1)
     file_name: str = Field(min_length=1)
     template_name: str = Field(min_length=1)
     examination: str = Field(min_length=1)
@@ -128,6 +129,7 @@ class SaveReportTemplateRequest(BaseModel):
 
 class SaveReportTemplateResponse(BaseModel):
     module_name: str
+    module_version: str
     file_name: str
     path: str
     template_name: str
@@ -138,6 +140,7 @@ class SaveReportTemplateResponse(BaseModel):
 
 class PublishReportTemplateResponse(BaseModel):
     module_name: str
+    module_version: str
     template_name: str
     lifecycle_status: ReportTemplateLifecycleStatusLiteral
     readiness: ReportTemplateReadinessSummaryDataDict | None = None
@@ -344,10 +347,20 @@ def build_yaml_records(payload: SaveReportTemplateRequest) -> list[dict[str, Any
 def save_report_template_definition(
     payload: SaveReportTemplateRequest,
     *,
+    resolved_version: str,
     modules_root: Path | None = None,
 ) -> SaveReportTemplateResponse:
     modules_root = modules_root or MODULES_ROOT
-    module_name = payload.module_name.strip() or "report_template_examples"
+    module_name = payload.module_name.strip()
+    module_version = payload.module_version.strip()
+    if not module_name or not module_version:
+        raise ValueError(
+            "Report-template writes require an explicit module and version."
+        )
+    if module_version != resolved_version:
+        raise ValueError(
+            "Resolved report-template module version does not match the request."
+        )
     module_path = module_dir(module_name, modules_root=modules_root)
     ensure_module_config_supports_generated_templates(module_path)
 
@@ -368,6 +381,7 @@ def save_report_template_definition(
 
     return SaveReportTemplateResponse(
         module_name=module_name,
+        module_version=module_version,
         file_name=output_path.name,
         path=str(output_path),
         template_name=payload.template_name.strip(),
@@ -379,6 +393,7 @@ def save_report_template_definition(
 def set_saved_report_template_lifecycle(
     *,
     module_name: str,
+    module_version: str,
     template_name: str,
     lifecycle_status: ReportTemplateLifecycleStatusLiteral,
     modules_root: Path | None = None,
@@ -388,6 +403,7 @@ def set_saved_report_template_lifecycle(
     set_report_template_lifecycle_status(module_path, template_name, lifecycle_status)
     return PublishReportTemplateResponse(
         module_name=module_name,
+        module_version=module_version,
         template_name=template_name,
         lifecycle_status=lifecycle_status,
     )

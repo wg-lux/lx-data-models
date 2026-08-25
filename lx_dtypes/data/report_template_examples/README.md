@@ -446,12 +446,12 @@ python scripts/audit_fixture.py \
 
 Test API output:
 
-- `GET /base_api/report-templates/{module_name}/{template_name}`
-- `GET /base_api/report-templates/by-examination/{module_name}/{examination_name}`
+- `GET /base_api/report-templates/{module_name}/{template_name}?version={module_version}`
+- `GET /base_api/report-templates/by-examination/{module_name}/{examination_name}?version={module_version}`
 
 ## Historical Runtime Validation
 
-If you validate a historical `PExamination` payload, you can now include:
+Every historical `PExamination` validation payload must include:
 
 - `knowledge_base_module`
 - `knowledge_base_version`
@@ -460,7 +460,7 @@ Important:
 
 - `knowledge_base_version` only works when deployment has provisioned that version through `LX_DTYPES_KB_REGISTRY`
 - if the version is not available locally, runtime validation fails closed instead of silently using the current module version
-- route `module_name` is still present in the API for compatibility, but payload KB identity is authoritative when supplied
+- route module, required version query, and payload identity must agree exactly
 
 ## Mapping To `base_api` Requirement Objects
 

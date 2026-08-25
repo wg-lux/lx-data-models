@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from pathlib import Path
+from threading import Barrier
 from typing import cast
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -223,6 +225,7 @@ def test_list_terminology_bundles_reports_no_active_selection(
 
     assert response.status_code == 200
     payload = response.json()
+    assert payload["revision"] == terminology_routes._registry_revision(registry_path)
     assert payload["active"] is None
     assert payload["bundles"] == [
         {
@@ -268,6 +271,9 @@ def test_select_terminology_bundle_sets_active_runtime_selection(
             {
                 "module_name": "published_terminology",
                 "version": "2026.04.30",
+                "expected_revision": terminology_routes._registry_revision(
+                    registry_path
+                ),
             }
         ),
         content_type="application/json",
@@ -277,6 +283,7 @@ def test_select_terminology_bundle_sets_active_runtime_selection(
     assert response.status_code == 200
     payload = response.json()
     assert payload["ok"] is True
+    assert payload["revision"] == terminology_routes._registry_revision(registry_path)
     assert payload["active"]["module_name"] == "published_terminology"
     assert payload["active"]["version"] == "2026.04.30"
     assert payload["active"]["medical_field"] == "gastroenterology"
@@ -286,6 +293,66 @@ def test_select_terminology_bundle_sets_active_runtime_selection(
         "published_terminology",
         "2026.04.30",
     )
+
+
+def test_active_selection_rejects_stale_registry_revision(
+    tmp_path: Path,
+) -> None:
+    registry_path = _write_registry(tmp_path)
+    stale_revision = terminology_routes._registry_revision(registry_path)
+
+    current_revision = terminology_routes._set_active_selection(
+        registry_path=registry_path,
+        module_name="published_terminology",
+        version="2026.04.30",
+        expected_revision=stale_revision,
+    )
+
+    assert current_revision != stale_revision
+    with pytest.raises(HttpError) as exc_info:
+        terminology_routes._set_active_selection(
+            registry_path=registry_path,
+            module_name="published_terminology",
+            version="2026.04.30",
+            expected_revision=stale_revision,
+        )
+    assert getattr(exc_info.value, "status_code", None) == 409
+    assert terminology_routes._registry_revision(registry_path) == current_revision
+
+
+def test_concurrent_active_selections_have_one_compare_and_swap_winner(
+    tmp_path: Path,
+) -> None:
+    registry_path = _write_registry(tmp_path)
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    versions = registry["modules"]["published_terminology"]
+    versions["2026.05.01"] = versions["2026.04.30"]
+    registry_path.write_text(json.dumps(registry), encoding="utf-8")
+    expected_revision = terminology_routes._registry_revision(registry_path)
+    barrier = Barrier(2)
+
+    def select(version: str) -> tuple[str, str | int]:
+        barrier.wait()
+        try:
+            revision = terminology_routes._set_active_selection(
+                registry_path=registry_path,
+                module_name="published_terminology",
+                version=version,
+                expected_revision=expected_revision,
+            )
+            return "selected", revision
+        except HttpError as exc:
+            return "conflict", int(getattr(exc, "status_code", 0))
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        outcomes = list(executor.map(select, ["2026.04.30", "2026.05.01"]))
+
+    assert sorted(status for status, _ in outcomes) == ["conflict", "selected"]
+    assert next(value for status, value in outcomes if status == "conflict") == 409
+    assert terminology_routes._active_selection_from_registry(registry_path) in {
+        ("published_terminology", "2026.04.30"),
+        ("published_terminology", "2026.05.01"),
+    }
 
 
 def test_export_active_terminology_bundle_as_fhir(
@@ -337,7 +404,7 @@ def test_export_registered_terminology_bundle_as_fhir_without_selecting(
     assert payload["extension"][0]["valueCode"] == "gastroenterology"
 
 
-def test_import_terminology_bundle_zip_registers_and_activates_bundle(
+def test_import_terminology_bundle_zip_registers_without_changing_active_selection(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -364,19 +431,14 @@ def test_import_terminology_bundle_zip_registers_and_activates_bundle(
     assert payload["imported"]["module_name"] == "published_terminology"
     assert payload["imported"]["version"] == "2026.05.04"
     assert payload["imported"]["medical_field"] == "gastroenterology"
-    assert payload["imported"]["is_active"] is True
+    assert payload["imported"]["is_active"] is False
+    assert payload["revision"] == terminology_routes._registry_revision(registry_path)
     assert payload["counts"]["unit"] == 1
-    assert terminology_routes.active_terminology_selection() == (
-        "published_terminology",
-        "2026.05.04",
-    )
+    assert terminology_routes.active_terminology_selection() is None
 
     registry = json.loads(registry_path.read_text(encoding="utf-8"))
     entry = registry["modules"]["published_terminology"]["2026.05.04"]
-    assert registry["active"] == {
-        "module_name": "published_terminology",
-        "version": "2026.05.04",
-    }
+    assert "active" not in registry
     assert entry["medical_field"] == "gastroenterology"
     assert entry["sources"] == [
         {
@@ -571,6 +633,9 @@ def test_select_terminology_bundle_rejects_unregistered_version(
             {
                 "module_name": "published_terminology",
                 "version": "missing",
+                "expected_revision": terminology_routes._registry_revision(
+                    registry_path
+                ),
             }
         ),
         content_type="application/json",

@@ -100,6 +100,7 @@ def test_build_yaml_records_adds_default_patient_fields_and_condition_validator(
 ):
     payload = SaveReportTemplateRequest(
         module_name="demo_module",
+        module_version="1.0.0",
         file_name="custom_report",
         template_name="Custom Report",
         examination="colonoscopy",
@@ -164,6 +165,7 @@ def test_save_report_template_definition_rejects_duplicate_output_file(
 
     payload = SaveReportTemplateRequest(
         module_name="demo_module",
+        module_version="1.0.0",
         file_name="custom_report",
         template_name="Custom Report",
         examination="colonoscopy",
@@ -176,4 +178,6 @@ def test_save_report_template_definition_rejects_duplicate_output_file(
     )
 
     with pytest.raises(FileExistsError, match="Template file already exists"):
-        save_report_template_definition(payload, modules_root=tmp_path)
+        save_report_template_definition(
+            payload, resolved_version="1.0.0", modules_root=tmp_path
+        )
