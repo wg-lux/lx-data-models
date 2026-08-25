@@ -34,17 +34,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev]
 
-      - name: Ruff lint
-        run: ruff check lx_dtypes tests
-
-      - name: Ruff format check
-        run: ruff format --check lx_dtypes tests
-
-      - name: Type checking
-        run: mypy lx_dtypes
-
-      - name: Run tests
-        run: pytest -m "not localfiles" --junitxml=junit.xml -o junit_family=legacy --cov=lx_dtypes --cov-report=xml
+      - name: Run pre-commit quality gate
+        run: pre-commit run --all-files
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

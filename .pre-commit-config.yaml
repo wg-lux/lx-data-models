@@ -1,28 +1,36 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.7
+    rev: v0.16.4
     hooks:
       - id: ruff
+        name: ruff lint
         args: ["--fix", "lx_dtypes", "tests"]
+        always_run: true
         pass_filenames: false
       - id: ruff-format
+        name: ruff format
         args: ["lx_dtypes", "tests"]
+        always_run: true
         pass_filenames: false
   - repo: local
     hooks:
       - id: kb-yaml-lint
         name: knowledge base yaml lint
-        entry: .devenv/state/venv/bin/python lx_dtypes/scripts/lint_kb_yaml.py
+        entry: python lx_dtypes/scripts/lint_kb_yaml.py
+        always_run: true
         language: system
         pass_filenames: false
-      - id: pyright
-        name: pyright type check
-        entry: pyright lx_dtypes
+      - id: mypy
+        name: mypy type check
+        entry: python -m mypy lx_dtypes
+        always_run: true
         language: system
         pass_filenames: false
       - id: pytest-suite
-        name: pytest suite
-        entry: .devenv/state/venv/bin/pytest
+        name: pytest suite with test results
+        entry: >-
+          python -m pytest -m not\ localfiles --junitxml=junit.xml
+          -o junit_family=legacy --cov=lx_dtypes --cov-report=xml
+        always_run: true
         language: system
         pass_filenames: false
-
