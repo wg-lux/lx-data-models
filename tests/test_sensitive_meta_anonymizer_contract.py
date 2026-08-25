@@ -28,7 +28,6 @@ def test_sensitive_meta_normalizes_legacy_input_to_lx_dtypes_fields() -> None:
             "patient_dob": "02.01.1990",
             "patient_gender_name": "male",
             "examiner_last_name": "Arzt",
-            "unknown_field": "ignored",
         }
     )
 
@@ -96,11 +95,25 @@ def test_null_equivalent_values_are_normalized() -> None:
     assert meta.text is None
 
 
-def test_unknown_fields_are_ignored_during_contract_normalization() -> None:
-    meta = SensitiveMeta.model_validate({"first_name": "Max", "extra": "ignored"})
-    assert meta.first_name == "Max"
+def test_unknown_fields_are_rejected_during_contract_normalization() -> None:
+    with pytest.raises(ValidationError, match="extra"):
+        SensitiveMeta.model_validate({"first_name": "Max", "extra": "rejected"})
 
     with pytest.raises(ValidationError):
         SensitiveMetaState.model_validate(
             {"sensitive_meta": "abc", "extra": "still-forbidden"}
+        )
+
+
+def test_inverted_clinical_dates_are_rejected() -> None:
+    with pytest.raises(
+        ValidationError,
+        match="examination_date must not be earlier than dob",
+    ):
+        SensitiveMeta.model_validate(
+            {
+                "first_name": "Max",
+                "dob": "2020-01-01",
+                "examination_date": "2010-01-01",
+            }
         )

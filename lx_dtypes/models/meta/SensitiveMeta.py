@@ -87,7 +87,7 @@ class SensitiveMetaDataDict(MetaBaseModelDataDict):
 
 
 class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
-    model_config = ConfigDict(validate_assignment=True)
+    model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
     _LEGACY_FIELD_ALIASES: ClassVar[dict[str, str]] = {
         "patient_first_name": "first_name",
@@ -157,6 +157,7 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
         for raw_key, raw_value in dict(data).items():
             key = cls._LEGACY_FIELD_ALIASES.get(str(raw_key), str(raw_key))
             if key not in cls.model_fields:
+                normalized[key] = raw_value
                 continue
             if key in normalized and cls._is_nonblank(normalized[key]):
                 continue
@@ -260,9 +261,7 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
     @model_validator(mode="after")
     def validate_date_order(self) -> "SensitiveMeta":
         if self.dob and self.examination_date and self.examination_date < self.dob:
-            dob, examination_date = self.examination_date, self.dob
-            object.__setattr__(self, "dob", dob)
-            object.__setattr__(self, "examination_date", examination_date)
+            raise ValueError("examination_date must not be earlier than dob")
         return self
 
     def __getitem__(self, key: str) -> Any:
