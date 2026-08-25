@@ -10,8 +10,8 @@ from importlib.resources.abc import Traversable
 from pathlib import Path, PurePosixPath
 from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 import yaml
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 BUILTIN_KNOWLEDGE_BASE_PROVIDER = "lx_dtypes.builtin"
 RESOURCE_ANCHOR = "lx_dtypes"
@@ -133,9 +133,12 @@ class PackagedKnowledgeBaseIntegrityError(PackagedKnowledgeBaseResourceError):
     """Raised when packaged bytes do not match their declared digest."""
 
 
+_ROOT_RESOURCE_PATH = PurePosixPath()
+
+
 def _iter_yaml_resources(
     root: Traversable,
-    relative_to: PurePosixPath = PurePosixPath(),
+    relative_to: PurePosixPath = _ROOT_RESOURCE_PATH,
 ) -> tuple[tuple[PurePosixPath, Traversable], ...]:
     resources: list[tuple[PurePosixPath, Traversable]] = []
     for child in sorted(root.iterdir(), key=lambda item: item.name):

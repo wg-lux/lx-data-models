@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Annotated, Literal, TypeAlias, TypedDict
+from typing import Annotated, Literal, TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 PositiveInt = Annotated[int, Field(ge=1)]
-VideoAnnotationExportFormat: TypeAlias = Literal["csv", "json"]
+type VideoAnnotationExportFormat = Literal["csv", "json"]
 
 
 class VideoAnnotationExportConfigUpdateData(TypedDict, total=False):

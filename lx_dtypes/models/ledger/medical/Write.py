@@ -56,7 +56,7 @@ def _parse_date(value: object) -> object:
 
 def _parse_aware_datetime(value: object) -> object:
     if isinstance(value, str):
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(value)
         if parsed.tzinfo is None or parsed.utcoffset() is None:
             raise ValueError("datetime must include a timezone offset")
         return parsed

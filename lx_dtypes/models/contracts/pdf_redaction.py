@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import json
-from typing import Literal, cast
-
 from collections.abc import Mapping
+from typing import Literal, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -90,22 +89,22 @@ class PdfRedactionRequest(BaseModel):
                 raise ValueError("redaction_manifest must not be empty")
             parsed = json.loads(payload)
             if not isinstance(parsed, dict):
-                raise ValueError("redaction_manifest must be a JSON object")
+                raise ValueError(  # noqa: TRY004 - Pydantic validator contract
+                    "redaction_manifest must be a JSON object"
+                )
             return cast(dict[str, JsonValue], parsed)
         return cast(dict[str, JsonValue], value)
 
     @field_validator("note", mode="before")
     @classmethod
-    def normalize_note(cls, value: str | int | float | bool | None) -> str:
+    def normalize_note(cls, value: str | float | bool | None) -> str:
         if value in (None, ""):
             return ""
         return str(value).strip()
 
     @field_validator("client_source_sha256", mode="before")
     @classmethod
-    def normalize_client_source_sha256(
-        cls, value: str | int | float | bool | None
-    ) -> str:
+    def normalize_client_source_sha256(cls, value: str | float | bool | None) -> str:
         if value in (None, ""):
             return ""
         return str(value).strip().lower()

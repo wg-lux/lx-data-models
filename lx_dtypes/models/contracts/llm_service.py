@@ -5,7 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
-def _empty_response_choices() -> list["LLMChatResponseChoicePayload"]:
+def _empty_response_choices() -> list[LLMChatResponseChoicePayload]:
     return []
 
 
@@ -69,8 +69,8 @@ class LLMChatResponsePayload(BaseModel):
 
 __all__ = [
     "LLMChatMessagePayload",
-    "LLMChatOllamaPayload",
     "LLMChatOllamaOptionsPayload",
+    "LLMChatOllamaPayload",
     "LLMChatOpenAIPayload",
     "LLMChatResponseChoicePayload",
     "LLMChatResponseMessagePayload",

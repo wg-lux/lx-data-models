@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Literal, Sequence
+from typing import Any, Literal
 
 import yaml
 
@@ -63,7 +64,7 @@ class KbYamlLintIssue:
 
 @dataclass(frozen=True)
 class _YamlItem:
-    payload: Dict[str, Any]
+    payload: dict[str, Any]
     file: Path
     line: int
     column: int
@@ -291,7 +292,7 @@ def _discover_yaml_files_from_module_config(
 
         visited_matches = [c for c in candidates if c in visited_configs]
         if visited_matches:
-            selected = sorted(visited_matches)[0]
+            selected = min(visited_matches)
             return selected, []
 
         current_group = config_path.parent.parent.resolve()
@@ -736,15 +737,22 @@ def _lint_incomplete_input_rules(
             selector = raw_concept.get("finding_selector")
             if not isinstance(selector, dict):
                 continue
-            classification_name = selector.get("classification_name")
-            if not isinstance(classification_name, str) or not classification_name:
+            selector_classification_name = selector.get("classification_name")
+            if (
+                not isinstance(selector_classification_name, str)
+                or not selector_classification_name
+            ):
                 continue
 
-            classification_item = _definition("classification", classification_name)
-            if classification_item is None:
+            selector_classification_item = _definition(
+                "classification", selector_classification_name
+            )
+            if selector_classification_item is None:
                 continue
             classification_choices = set(
-                _string_list(classification_item.payload.get("classification_choices"))
+                _string_list(
+                    selector_classification_item.payload.get("classification_choices")
+                )
             )
 
             selected_choice = selector.get("classification_choice")
@@ -806,7 +814,8 @@ def _lint_incomplete_input_rules(
                         f"Coverage concept '{concept_id}' in template "
                         f"'{template_name}' selects descriptor-backed choice(s) "
                         f"{choice_summary} for classification "
-                        f"'{classification_name}', but its value path evaluates "
+                        f"'{selector_classification_name}', but its value path "
+                        "evaluates "
                         "only the choice token. The entered descriptor value "
                         "cannot be evaluated; set concept_value_path to the "
                         "choice descriptor's descriptor_value."
@@ -902,7 +911,7 @@ def lint_kb_yaml_files(
     definitions: dict[tuple[str, str], _DefinitionLocation] = {}
     items_by_definition: dict[tuple[str, str], _YamlItem] = {}
 
-    for file_path in sorted(set(path.resolve() for path in yaml_files)):
+    for file_path in sorted({path.resolve() for path in yaml_files}):
         if not file_path.exists():
             issues.append(
                 _issue(

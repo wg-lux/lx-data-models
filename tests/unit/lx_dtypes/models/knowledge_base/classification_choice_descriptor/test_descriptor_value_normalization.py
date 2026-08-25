@@ -1,10 +1,10 @@
 import pytest
 
+from lx_dtypes.models.contracts import DescriptorValue as PublicDescriptorValue
+from lx_dtypes.models.descriptor_value import DescriptorValue
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor import (
     ClassificationChoiceDescriptor,
 )
-from lx_dtypes.models.contracts import DescriptorValue as PublicDescriptorValue
-from lx_dtypes.models.descriptor_value import DescriptorValue
 from lx_dtypes.names import ClassificationChoiceDescriptorTypes
 
 

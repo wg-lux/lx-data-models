@@ -2,14 +2,13 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal, TypeAlias
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 from lx_dtypes.models.contracts.json_types import JsonNull, JsonValue
 
-
-FrameSourceMode: TypeAlias = Literal["cache", "stream", "auto"]
+type FrameSourceMode = Literal["cache", "stream", "auto"]
 
 type VideoFileMetaJsonValue = (
     JsonValue

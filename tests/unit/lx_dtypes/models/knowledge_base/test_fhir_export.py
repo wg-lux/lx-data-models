@@ -15,17 +15,17 @@ from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice 
     ClassificationChoice,
 )
 from lx_dtypes.models.knowledge_base.examination.Examination import Examination
-from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.fhir import (
     DEFAULT_FHIR_BASE_URL,
-    infer_fhir_code_system_domain,
     import_fhir_terminology,
+    infer_fhir_code_system_domain,
 )
 from lx_dtypes.models.knowledge_base.fhir_yaml import (
     fhir_to_yaml,
     knowledge_base_from_fhir,
     write_fhir_yaml,
 )
+from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 
 

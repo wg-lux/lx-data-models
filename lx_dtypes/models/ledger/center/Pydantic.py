@@ -1,5 +1,3 @@
-from typing import List, Union
-
 from pydantic import Field
 
 from lx_dtypes.factories.literals import str_unknown_factory
@@ -16,10 +14,10 @@ from .DataDict import (
 
 class Center(LedgerBaseModel[CenterDataDict]):
     name: str = Field(default_factory=str_unknown_factory)
-    examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
+    examiners: str | list[str] = Field(default_factory=list_of_str_factory)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Identify model fields that should be treated as list types.
 
@@ -39,7 +37,7 @@ class Center(LedgerBaseModel[CenterDataDict]):
         return CenterDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         """
         Provide the model's nested field names.
 

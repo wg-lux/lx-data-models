@@ -253,7 +253,9 @@ class HubTransferVideoSegmentPayload(_StrictPayload):
     @classmethod
     def _normalize_source_segment_id(cls, value: int | str) -> int | str:
         if isinstance(value, bool) or not isinstance(value, (int, str)):
-            raise ValueError("source_segment_id must be an integer or string")
+            raise ValueError(  # noqa: TRY004 - Pydantic validation failure
+                "source_segment_id must be an integer or string"
+            )
         if isinstance(value, str):
             normalized = value.strip()
             if not normalized:
@@ -262,7 +264,7 @@ class HubTransferVideoSegmentPayload(_StrictPayload):
         return value
 
     @model_validator(mode="after")
-    def _validate_segment_contract(self) -> "HubTransferVideoSegmentPayload":
+    def _validate_segment_contract(self) -> HubTransferVideoSegmentPayload:
         if self.end_frame_number_exclusive <= self.start_frame_number:
             raise ValueError(
                 "end_frame_number_exclusive must exceed start_frame_number"
@@ -357,7 +359,7 @@ class HubTransferVideoTransferPayload(_HubTransferPayload):
     resource_rows: HubTransferVideoResourceRowsPayload
 
     @model_validator(mode="after")
-    def _validate_resource_linkage(self) -> "HubTransferVideoTransferPayload":
+    def _validate_resource_linkage(self) -> HubTransferVideoTransferPayload:
         if self.resource_rows.video_file.video_hash != self.resource_hash:
             raise ValueError("video_file.video_hash must match resource_hash")
         for segment in self.resource_rows.video_segments:
@@ -377,7 +379,7 @@ def _validate_payload(
     model_cls: type[BaseModel], value: Mapping[str, JsonValue]
 ) -> HubTransferJsonObject:
     if not isinstance(value, dict):
-        raise ValueError("payload must be a JSON object")
+        raise TypeError("payload must be a JSON object")
     try:
         model = model_cls.model_validate(value)
     except ValidationError as exc:

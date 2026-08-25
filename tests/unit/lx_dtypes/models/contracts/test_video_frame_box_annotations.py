@@ -6,8 +6,8 @@ from pydantic import ValidationError
 from lx_dtypes.models.contracts.video_frame_box_annotations import (
     VideoFrameBoxAnnotationListResponsePayload,
     VideoFrameBoxAnnotationMutationResponsePayload,
-    validate_video_phi_frame_observations,
     validate_video_frame_box_annotation_request,
+    validate_video_phi_frame_observations,
 )
 
 

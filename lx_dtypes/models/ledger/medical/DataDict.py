@@ -12,9 +12,9 @@ from lx_dtypes.models.contracts.json_types import JsonObject, JsonValue
 class NormalRangeDataDict(TypedDict):
     min: NotRequired[float | None]
     max: NotRequired[float | None]
-    male: NotRequired["NormalRangeBandDataDict | None"]
-    female: NotRequired["NormalRangeBandDataDict | None"]
-    other: NotRequired["NormalRangeBandDataDict | None"]
+    male: NotRequired[NormalRangeBandDataDict | None]
+    female: NotRequired[NormalRangeBandDataDict | None]
+    other: NotRequired[NormalRangeBandDataDict | None]
 
 
 class NormalRangeBandDataDict(TypedDict):

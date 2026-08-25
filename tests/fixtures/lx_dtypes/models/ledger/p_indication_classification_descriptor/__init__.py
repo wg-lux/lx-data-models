@@ -6,7 +6,6 @@ from lx_dtypes.models.knowledge_base.classification_choice_descriptor.Classifica
 from lx_dtypes.models.ledger.p_indication_classification.Django import (
     PIndicationClassificationDjango,
 )
-
 from lx_dtypes.models.ledger.p_indication_classification_descriptor.Django import (
     PIndicationClassificationDescriptorDjango,
 )

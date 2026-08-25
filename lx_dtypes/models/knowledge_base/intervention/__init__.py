@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
 
 if TYPE_CHECKING:
     from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
@@ -36,18 +36,13 @@ if TYPE_CHECKING:
         InterventionType: type[InterventionTypeDjango]
 
     kb_intervention_django_lookup: KbInterventionDjangoLookupType
-    kb_intervention_django_models = Union[
-        InterventionDjango,
-        InterventionTypeDjango,
+    kb_intervention_django_models: TypeAlias = Union[
+        InterventionDjango, InterventionTypeDjango
     ]
-kb_intervention_models = Union[
-    Intervention,
-    InterventionType,
-]
+kb_intervention_models: TypeAlias = Union[Intervention, InterventionType]
 
-kb_intervention_ddicts = Union[
-    InterventionDataDict,
-    InterventionTypeDataDict,
+kb_intervention_ddicts: TypeAlias = Union[
+    InterventionDataDict, InterventionTypeDataDict
 ]
 
 __all__ = [
@@ -55,13 +50,13 @@ __all__ = [
     "InterventionDataDict",
     "InterventionType",
     "InterventionTypeDataDict",
-    "kb_intervention_lookup",
-    "KbInterventionLookupType",
-    "kb_intervention_models",
-    "kb_intervention_ddicts",
-    "kb_intervention_django_models",
-    "kb_intervention_django_lookup",
     "KbInterventionDjangoLookupType",
+    "KbInterventionLookupType",
+    "kb_intervention_ddicts",
+    "kb_intervention_django_lookup",
+    "kb_intervention_django_models",
+    "kb_intervention_lookup",
+    "kb_intervention_models",
 ]
 
 
@@ -89,9 +84,7 @@ def __getattr__(name: str) -> Any:
             Intervention=InterventionDjango,
             InterventionType=InterventionTypeDjango,
         ),
-        "kb_intervention_django_models": Union[
-            InterventionDjango, InterventionTypeDjango
-        ],
+        "kb_intervention_django_models": InterventionDjango | InterventionTypeDjango,
     }
     globals().update(exports)
     return exports[name]

@@ -4,7 +4,6 @@ from lx_dtypes.models.ledger.p_finding.Django import PFindingDjango
 from lx_dtypes.models.ledger.p_finding_classification_choice.Django import (
     PFindingClassificationChoiceDjango,
 )
-
 from lx_dtypes.models.ledger.p_finding_classifications.Django import (
     PFindingClassificationsDjango,
 )

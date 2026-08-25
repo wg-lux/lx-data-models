@@ -42,7 +42,7 @@ def verify_packaged_report_templates(
         payload = knowledge_base.export_report_template(template_name)
         readiness = payload.get("readiness")
         if not isinstance(readiness, dict):
-            raise RuntimeError(
+            raise TypeError(
                 f"Packaged report template '{template_name}' has no readiness payload."
             )
         if readiness.get("lifecycle_status") != "published":

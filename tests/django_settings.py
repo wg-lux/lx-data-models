@@ -20,9 +20,9 @@ INSTALLED_APPS: list[str] = []
 
 try:
     # Preferred in the monorepo: tested baseline with in-memory SQLite
-    from lx_annotate.settings.settings_test import *  # type: ignore # noqa: F401,F403
-except Exception:  # pragma: no cover - fallback for standalone lx-data-models usage
-    from lx_dtypes.django_settings import *  # type: ignore # noqa: F401,F403
+    from lx_annotate.settings.settings_test import *  # type: ignore
+except Exception:  # noqa: BLE001  # pragma: no cover - standalone fallback
+    from lx_dtypes.django_settings import *  # type: ignore
 
     INSTALLED_APPS = list(INSTALLED_APPS)  # type: ignore[name-defined]
 

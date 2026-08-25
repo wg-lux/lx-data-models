@@ -77,27 +77,27 @@ class KnowledgeBaseContract(Protocol):
     def get_report_template_lifecycle_status(self, name: str) -> str: ...
 
     def evaluate_report_template_validators(
-        self, name: str, p_examination: "PExamination"
+        self, name: str, p_examination: PExamination
     ) -> JsonObject: ...
 
     def evaluate_findings_validator(
-        self, name: str, p_examination: "PExamination"
+        self, name: str, p_examination: PExamination
     ) -> JsonObject: ...
 
     def evaluate_classification_validator(
-        self, name: str, p_examination: "PExamination"
+        self, name: str, p_examination: PExamination
     ) -> JsonObject: ...
 
     def evaluate_intervention_validator(
-        self, name: str, p_examination: "PExamination"
+        self, name: str, p_examination: PExamination
     ) -> JsonObject: ...
 
     def evaluate_unit_validator(
-        self, name: str, p_examination: "PExamination"
+        self, name: str, p_examination: PExamination
     ) -> JsonObject: ...
 
     def evaluate_examination_validator(
-        self, name: str, p_examination: "PExamination"
+        self, name: str, p_examination: PExamination
     ) -> JsonObject: ...
 
 

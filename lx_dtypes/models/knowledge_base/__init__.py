@@ -3,19 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from .pydantic_main import (
-        KB_DDICTS,
-        KB_MODEL_NAMES_LITERAL,
-        KB_MODEL_NAMES_ORDERED,
-        KB_MODELS,
-        KnowledgeBaseModelsLookupType,
-        knowledge_base_models_lookup,
-    )
     from .main import (
-        KB_MODELS_DJANGO,
         DEFAULT_FHIR_BASE_URL,
         DEFAULT_FHIR_PUBLISHER,
         FHIR_EXPORT_DOMAINS,
+        KB_MODELS_DJANGO,
         KnowledgeBaseModelsDjangoLookupType,
         export_fhir_terminology,
         export_fhir_terminology_bundle,
@@ -25,25 +17,33 @@ if TYPE_CHECKING:
         knowledge_base_models_django_lookup,
         write_fhir_yaml,
     )
+    from .pydantic_main import (
+        KB_DDICTS,
+        KB_MODEL_NAMES_LITERAL,
+        KB_MODEL_NAMES_ORDERED,
+        KB_MODELS,
+        KnowledgeBaseModelsLookupType,
+        knowledge_base_models_lookup,
+    )
 
 __all__ = [
-    "KB_DDICTS",
-    "KnowledgeBaseModelsLookupType",
-    "knowledge_base_models_lookup",
-    "KB_MODELS",
-    "KB_MODEL_NAMES_LITERAL",
-    "KB_MODEL_NAMES_ORDERED",
-    "KnowledgeBaseModelsDjangoLookupType",
-    "knowledge_base_models_django_lookup",
-    "KB_MODELS_DJANGO",
     "DEFAULT_FHIR_BASE_URL",
     "DEFAULT_FHIR_PUBLISHER",
     "FHIR_EXPORT_DOMAINS",
+    "KB_DDICTS",
+    "KB_MODELS",
+    "KB_MODELS_DJANGO",
+    "KB_MODEL_NAMES_LITERAL",
+    "KB_MODEL_NAMES_ORDERED",
+    "KnowledgeBaseModelsDjangoLookupType",
+    "KnowledgeBaseModelsLookupType",
     "export_fhir_terminology",
     "export_fhir_terminology_bundle",
     "fhir_to_yaml",
     "import_fhir_terminology",
     "knowledge_base_from_fhir",
+    "knowledge_base_models_django_lookup",
+    "knowledge_base_models_lookup",
     "write_fhir_yaml",
 ]
 
@@ -68,10 +68,10 @@ def __getattr__(name: str) -> Any:
         return getattr(pydantic_main, name)
 
     from .main import (
-        KB_MODELS_DJANGO,
         DEFAULT_FHIR_BASE_URL,
         DEFAULT_FHIR_PUBLISHER,
         FHIR_EXPORT_DOMAINS,
+        KB_MODELS_DJANGO,
         KnowledgeBaseModelsDjangoLookupType,
         export_fhir_terminology,
         export_fhir_terminology_bundle,

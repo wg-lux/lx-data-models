@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.examples import (
     build_demo_star_upper_gi_export_paths,
     build_star_upper_gi_demo_interface,
 )
+from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.utils.dataframe import interface2dataset
 
 

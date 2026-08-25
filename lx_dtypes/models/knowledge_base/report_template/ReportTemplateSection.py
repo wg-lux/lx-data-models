@@ -1,4 +1,4 @@
-from typing import List, Literal, Self
+from typing import Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -24,10 +24,10 @@ class ReportTemplateSection(KnowledgebaseBaseModel[ReportTemplateSectionDataDict
     title_de: str = ""
     title_en: str = ""
     position: int = 0
-    types: List[str] = Field(default_factory=list)
+    types: list[str] = Field(default_factory=list)
     section_kind: Literal["findings", "patient_data", "history"] = "findings"
-    fields: List[ReportTemplateSectionField] = Field(default_factory=list)
-    findings: List[ReportTemplateFindingRequirement | str] = Field(default_factory=list)
+    fields: list[ReportTemplateSectionField] = Field(default_factory=list)
+    findings: list[ReportTemplateFindingRequirement | str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def guarantee_localized_titles(self) -> Self:
@@ -48,7 +48,7 @@ class ReportTemplateSection(KnowledgebaseBaseModel[ReportTemplateSectionDataDict
         return self
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return []
 
     @property

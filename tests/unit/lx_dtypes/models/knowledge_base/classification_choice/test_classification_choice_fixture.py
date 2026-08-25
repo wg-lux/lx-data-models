@@ -1,15 +1,13 @@
 import pytest
 
-from tests.paths import GENERATED_TEST_OUTPUT_ROOT
-
-from lx_dtypes.utils.ddict_schema import dump_ddict_schema
-
 from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice import (
     ClassificationChoice,
 )
 from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoiceDjango import (
     ClassificationChoiceDjango,
 )
+from lx_dtypes.utils.ddict_schema import dump_ddict_schema
+from tests.paths import GENERATED_TEST_OUTPUT_ROOT
 
 TEST_EXPORT = GENERATED_TEST_OUTPUT_ROOT / "classification_choice_fixture.yaml"
 TEST_EXPORT_DDICT_SCHEMA = (
@@ -47,8 +45,6 @@ class TestClassificationChoiceFixture:
             ClassificationChoice.validate_ddict(invalid_dict)
         except ValueError as e:
             assert "Invalid DataDict" in str(e)
-
-        return None
 
     def test_invalid_class_instance_raises(self) -> None:
         try:

@@ -9,7 +9,6 @@ from lx_dtypes.models.ledger.p_finding.Django import (
 from lx_dtypes.models.ledger.p_intervention.Django import (
     PFindingInterventionDjango,
 )
-
 from lx_dtypes.models.ledger.p_interventions.Django import PFindingInterventionsDjango
 from lx_dtypes.models.ledger.p_interventions.Pydantic import PFindingInterventions
 

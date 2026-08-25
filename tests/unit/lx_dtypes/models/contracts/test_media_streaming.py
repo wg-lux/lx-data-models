@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -25,7 +25,7 @@ def test_byte_range_length_and_order_validation() -> None:
 
 
 def test_media_operation_lease_summary_dump_preserves_datetime() -> None:
-    expires_at = datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+    expires_at = datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC)
 
     payload = dump_media_operation_lease_summary(
         MediaOperationLeaseSummary(
@@ -38,7 +38,7 @@ def test_media_operation_lease_summary_dump_preserves_datetime() -> None:
 
 
 def test_ffmpeg_stream_throttle_state_dump_serializes_datetimes() -> None:
-    checked_at = datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+    checked_at = datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC)
 
     payload = dump_ffmpeg_stream_throttle_state(
         FfmpegActiveStreamThrottleState(
@@ -60,7 +60,7 @@ def test_ffmpeg_stream_throttle_state_dump_serializes_datetimes() -> None:
 
 
 def test_ffmpeg_stream_throttle_state_dump_omits_missing_expiry() -> None:
-    checked_at = datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+    checked_at = datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC)
 
     payload = dump_ffmpeg_stream_throttle_state(
         FfmpegStreamThrottleState(

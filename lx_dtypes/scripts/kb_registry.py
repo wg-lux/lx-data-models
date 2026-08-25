@@ -7,21 +7,21 @@ import argparse
 import json
 import os
 import sys
+import uuid
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
-import uuid
 
 import yaml
 
-from lx_dtypes.knowledge_bases import (
-    BUILTIN_KNOWLEDGE_BASE_PROVIDER,
-    get_packaged_knowledge_base,
-)
 from lx_dtypes.knowledge_base_registry import (
     DEFAULT_PACKAGED_KNOWLEDGE_BASE,
     bootstrap_packaged_knowledge_bases,
     configured_registry_path,
+)
+from lx_dtypes.knowledge_bases import (
+    BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+    get_packaged_knowledge_base,
 )
 from lx_dtypes.models.interface.data_roots import resolve_default_data_root
 
@@ -208,7 +208,7 @@ def cmd_bootstrap(args: argparse.Namespace) -> int:
             configured_registry_path(args.registry),
             default_module=args.module,
         )
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - CLI boundary emits structured failure
         print(
             json.dumps(
                 {

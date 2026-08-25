@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from pydantic import BaseModel, ConfigDict, Field
+
 from lx_dtypes.models.contracts.json_types import JsonValue
 
 # Common configuration shared across your core DTOs
@@ -44,9 +46,9 @@ class EventDeep(EventCore):
 
 
 __all__ = [
-    "EventCore",
-    "EventClassificationCore",
     "EventClassificationChoiceCore",
+    "EventClassificationCore",
     "EventClassificationDeep",
+    "EventCore",
     "EventDeep",
 ]

@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from types import NoneType
-from typing import TypeAlias, TypedDict
+from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
-JsonNull: TypeAlias = NoneType
-SensitiveMetaRepairValue: TypeAlias = str | date
+type JsonNull = None
+type SensitiveMetaRepairValue = str | date
 
 
 class SensitiveMetaPatientRepairData(TypedDict, total=False):
@@ -46,7 +45,7 @@ class VideoPathRepairFileInfoPayload(BaseModel):
     size_mb: float = Field(ge=0.0)
 
 
-VideoPathRepairFileIndex: TypeAlias = dict[str, VideoPathRepairFileInfoPayload]
+type VideoPathRepairFileIndex = dict[str, VideoPathRepairFileInfoPayload]
 
 
 def dump_sensitive_meta_patient_repair_create_payload(

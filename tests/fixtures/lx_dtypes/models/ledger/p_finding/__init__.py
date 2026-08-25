@@ -6,15 +6,14 @@ from lx_dtypes.models.knowledge_base.finding._FindingDjango import (
 from lx_dtypes.models.ledger.p_examination.Django import (
     PExaminationDjango,
 )
+from lx_dtypes.models.ledger.p_finding.Django import PFindingDjango
+from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
 from lx_dtypes.models.ledger.p_finding_classifications.Django import (
     PFindingClassificationsDjango,
 )
 from lx_dtypes.models.ledger.p_interventions.Django import (
     PFindingInterventionsDjango,
 )
-
-from lx_dtypes.models.ledger.p_finding.Django import PFindingDjango
-from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
 
 
 @pytest.fixture()

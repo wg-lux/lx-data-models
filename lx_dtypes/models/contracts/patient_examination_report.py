@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import date, datetime
-from typing import Literal, NotRequired, TypeAlias, TypedDict, cast
+from typing import Literal, NotRequired, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .json_types import JsonNull, JsonValue
 from .knowledge_base import KnowledgeBaseIdentity
 
-ReportJsonValue: TypeAlias = JsonValue | JsonNull
-ReportJsonObject: TypeAlias = dict[str, ReportJsonValue]
-ReportStatus: TypeAlias = Literal["draft", "final"]
-SegmentFrameSelectionAction: TypeAlias = Literal["set", "clear", "random", "step"]
+type ReportJsonValue = JsonValue | JsonNull
+type ReportJsonObject = dict[str, ReportJsonValue]
+type ReportStatus = Literal["draft", "final"]
+type SegmentFrameSelectionAction = Literal["set", "clear", "random", "step"]
 
 
 class PatientReportIdentityData(TypedDict):
@@ -69,7 +69,7 @@ class ReportSegmentFrameSelectionData(TypedDict, total=False):
     selection_source: str
 
 
-ReportSegmentSelectionMap: TypeAlias = dict[str, ReportSegmentFrameSelectionData]
+type ReportSegmentSelectionMap = dict[str, ReportSegmentFrameSelectionData]
 
 
 class SegmentFramePreviewData(TypedDict):
@@ -242,7 +242,7 @@ class PatientExaminationReportSubmissionPayload(BaseModel):
     @model_validator(mode="after")
     def validate_knowledge_base_identity(
         self,
-    ) -> "PatientExaminationReportSubmissionPayload":
+    ) -> PatientExaminationReportSubmissionPayload:
         KnowledgeBaseIdentity(
             knowledge_base_module=self.knowledge_base_module,
             knowledge_base_version=self.knowledge_base_version,
@@ -263,7 +263,7 @@ class PatientExaminationReportMakeReportPayload(BaseModel):
     @model_validator(mode="after")
     def validate_knowledge_base_identity(
         self,
-    ) -> "PatientExaminationReportMakeReportPayload":
+    ) -> PatientExaminationReportMakeReportPayload:
         KnowledgeBaseIdentity(
             knowledge_base_module=self.knowledge_base_module,
             knowledge_base_version=self.knowledge_base_version,
@@ -296,7 +296,7 @@ class ReportSegmentFrameSelectionPayload(BaseModel):
 
     @field_validator("relative_path", "updated_at", "selection_source", mode="before")
     @classmethod
-    def blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
+    def blank_to_none(cls, value: str | float | bool | None) -> str | None:
         if isinstance(value, str):
             return value.strip() or None
         if value is None:
@@ -406,12 +406,16 @@ def dump_segment_frame_selection_payload(
 
 def validate_segment_selection_map(payload: object) -> ReportSegmentSelectionMap:
     if not isinstance(payload, Mapping):
-        raise ValueError("segment selection map must be a JSON object")
+        raise ValueError(  # noqa: TRY004 - malformed contract value
+            "segment selection map must be a JSON object"
+        )
     result: ReportSegmentSelectionMap = {}
     selection_map = cast(Mapping[object, object], payload)
     for key, value in selection_map.items():
         if not isinstance(value, Mapping):
-            raise ValueError(f"segment selection entry {key!s} must be a JSON object")
+            raise ValueError(  # noqa: TRY004 - malformed contract value
+                f"segment selection entry {key!s} must be a JSON object"
+            )
         selection = cast(Mapping[str, JsonValue], value)
         result[str(key)] = dump_segment_frame_selection_payload(
             ReportSegmentFrameSelectionPayload.model_validate(dict(selection))
@@ -438,19 +442,19 @@ def dump_selector_patch_payload(
 
 
 __all__ = [
-    "PatientExaminationReportMakeReportData",
-    "PreviousPatientExaminationHistoryData",
-    "PatientFindingInterventionSyncData",
-    "PatientFindingInterventionHistoryData",
-    "PatientFindingHistoryData",
-    "PatientFindingClassificationSyncData",
-    "PatientFindingClassificationHistoryData",
     "PatientExaminationHistoryContextData",
+    "PatientExaminationReportMakeReportData",
     "PatientExaminationReportMakeReportPayload",
     "PatientExaminationReportSubmissionData",
     "PatientExaminationReportSubmissionPayload",
+    "PatientFindingClassificationHistoryData",
+    "PatientFindingClassificationSyncData",
+    "PatientFindingHistoryData",
+    "PatientFindingInterventionHistoryData",
+    "PatientFindingInterventionSyncData",
     "PatientReportIdentityData",
     "PatientReportIdentityPayload",
+    "PreviousPatientExaminationHistoryData",
     "ReportExportFrameDetailData",
     "ReportJsonObject",
     "ReportJsonValue",

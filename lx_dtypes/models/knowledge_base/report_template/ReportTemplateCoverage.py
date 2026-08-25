@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Literal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -15,7 +15,7 @@ class ReportTemplateCoverageFindingSelector(BaseModel):
     classification_choice: str | None = Field(default=None, min_length=1)
 
     @model_validator(mode="after")
-    def validate_classification_choice(self) -> "ReportTemplateCoverageFindingSelector":
+    def validate_classification_choice(self) -> ReportTemplateCoverageFindingSelector:
         if self.classification_choice and not self.classification_name:
             raise ValueError(
                 "classification_choice requires classification_name in a finding selector"
@@ -33,9 +33,9 @@ class ReportTemplateCoverageConcept(BaseModel):
     applicability_status: Literal["required", "conditional", "not_applicable"]
     applicability_rule: str | None = None
     applicability_reason: str | None = None
-    validator_names: List[str] = Field(default_factory=list)
-    evidence_path: List[str] = Field(min_length=1)
-    concept_value_path: List[str] | None = None
+    validator_names: list[str] = Field(default_factory=list)
+    evidence_path: list[str] = Field(min_length=1)
+    concept_value_path: list[str] | None = None
     finding_selector: ReportTemplateCoverageFindingSelector | None = None
     value_constraint: Literal[
         "allowed_values",
@@ -43,13 +43,13 @@ class ReportTemplateCoverageConcept(BaseModel):
         "non_empty_string_list",
         "number_range",
     ] = "allowed_values"
-    allowed_values: List[str | int | float | bool] | None = None
+    allowed_values: list[str | int | float | bool] | None = None
     numeric_min: float | None = None
     numeric_max: float | None = None
-    guideline_citations: List[str] = Field(default_factory=list)
+    guideline_citations: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def validate_applicability(self) -> "ReportTemplateCoverageConcept":
+    def validate_applicability(self) -> ReportTemplateCoverageConcept:
         if self.applicability_status == "conditional" and not self.applicability_rule:
             raise ValueError("conditional coverage requires applicability_rule")
         if (

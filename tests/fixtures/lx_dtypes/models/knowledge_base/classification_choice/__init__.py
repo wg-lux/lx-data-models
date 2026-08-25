@@ -1,17 +1,16 @@
 import pytest
 
-from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
-    ClassificationChoiceDescriptor,
-)
-from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptorDjango import (
-    ClassificationChoiceDescriptorDjango,
-)
-
 from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice import (
     ClassificationChoice,
 )
 from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoiceDjango import (
     ClassificationChoiceDjango,
+)
+from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
+    ClassificationChoiceDescriptor,
+)
+from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptorDjango import (
+    ClassificationChoiceDescriptorDjango,
 )
 
 

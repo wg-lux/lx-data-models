@@ -21,12 +21,12 @@ l_report_models = Union[Report]
 l_report_ddicts = Union[ReportDataDict, SerializedReportDataDict]
 
 __all__ = [
-    "Report",
-    "SerializedReport",
-    "ReportDataDict",
-    "SerializedReportDataDict",
     "LReportLookupType",
+    "Report",
+    "ReportDataDict",
+    "SerializedReport",
+    "SerializedReportDataDict",
+    "l_report_ddicts",
     "l_report_lookup",
     "l_report_models",
-    "l_report_ddicts",
 ]

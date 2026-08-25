@@ -10,7 +10,6 @@ import yaml
 
 from tests.paths import PACKAGE_ROOT, REPOSITORY_ROOT
 
-
 SCRIPT_PATH = REPOSITORY_ROOT / "scripts" / "migrate_findings_validator_operators.py"
 DATA_ROOT = PACKAGE_ROOT / "data"
 

@@ -1,4 +1,4 @@
-from typing import List, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -31,7 +31,7 @@ class ReportTemplateFindingRequirement(BaseModel):
         Literal["required", "conditional", "not_applicable"] | None
     ) = None
     applicability_reason: str | None = None
-    classifications: List[ReportTemplateClassificationRequirement] = Field(
+    classifications: list[ReportTemplateClassificationRequirement] = Field(
         default_factory=list
     )
 
@@ -46,7 +46,7 @@ class ReportFinding(KnowledgebaseBaseModel[ReportFindingDataDict]):
         Literal["required", "conditional", "not_applicable"] | None
     ) = None
     applicability_reason: str | None = None
-    classifications: List[ReportTemplateClassificationRequirement] = Field(
+    classifications: list[ReportTemplateClassificationRequirement] = Field(
         default_factory=list
     )
 
@@ -63,7 +63,7 @@ class ReportFinding(KnowledgebaseBaseModel[ReportFindingDataDict]):
         )
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return []
 
     @property

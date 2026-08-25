@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, ClassVar
 
 from django.test import Client
 
@@ -77,7 +77,7 @@ def test_build_p_examination_payload_from_host_ledger_without_findings(
         examination_safe = _Exam()
         knowledge_base_module = "report_template_examples"
         knowledge_base_version = "0.1.0"
-        examiners: list[Any] = []
+        examiners: ClassVar[list[Any]] = []
 
     monkeypatch.setattr(
         api_main,
@@ -109,7 +109,7 @@ def test_build_p_examination_payload_uses_canonical_examination_reference(
         examination_safe = _Exam()
         knowledge_base_module = "report_template_examples"
         knowledge_base_version = "0.1.0"
-        examiners: list[Any] = []
+        examiners: ClassVar[list[Any]] = []
 
     class _Finding:
         name = "colon_polyp"
@@ -170,7 +170,7 @@ def test_validate_report_template_runtime_from_ledger_success(
         examination_safe = _Exam()
         knowledge_base_module = "report_template_examples"
         knowledge_base_version = "0.1.0"
-        examiners: list[Any] = []
+        examiners: ClassVar[list[Any]] = []
 
     class _FakeKnowledgeBase:
         class _Config:

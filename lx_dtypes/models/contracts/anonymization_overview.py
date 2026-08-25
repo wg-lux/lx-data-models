@@ -124,7 +124,7 @@ class OverviewHlsMaterializationPayload(BaseModel):
     updated_at: datetime
 
     @model_validator(mode="after")
-    def validate_state(self) -> "OverviewHlsMaterializationPayload":
+    def validate_state(self) -> OverviewHlsMaterializationPayload:
         if self.status == "ready" and self.segment_count < 1:
             raise ValueError("ready HLS materialization requires at least one segment")
         if self.status == "failed" and not self.error_code:
@@ -174,7 +174,7 @@ class OverviewUploadJobMonitoringPayload(BaseModel):
     updated_at: datetime
 
     @model_validator(mode="after")
-    def validate_state(self) -> "OverviewUploadJobMonitoringPayload":
+    def validate_state(self) -> OverviewUploadJobMonitoringPayload:
         if self.status == "retrying":
             if not self.retryable:
                 raise ValueError("retrying upload job must be retryable")

@@ -13,7 +13,7 @@ class MultilingualResponseData(TypedDict, total=False):
     description_en: str
     required: bool
     classification_id: int
-    choices: list["MultilingualResponseData"]
+    choices: list[MultilingualResponseData]
 
 
 __all__ = ["MultilingualResponseData"]

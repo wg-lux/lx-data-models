@@ -4,15 +4,14 @@ from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import
     ClassificationDjango,
 )
 from lx_dtypes.models.knowledge_base.classification.Classification import Classification
-from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
-from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
-    InterventionDjango,
-)
-
 from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.finding._FindingDjango import FindingDjango
 from lx_dtypes.models.knowledge_base.finding._FindingType import FindingType
 from lx_dtypes.models.knowledge_base.finding._FindingTypeDjango import FindingTypeDjango
+from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
+from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
+    InterventionDjango,
+)
 
 
 @pytest.fixture(scope="session")

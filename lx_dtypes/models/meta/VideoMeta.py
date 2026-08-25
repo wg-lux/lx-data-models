@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from enum import Enum
 from datetime import date, time
+from enum import Enum
 from pathlib import Path
-from typing import Any, Literal, TypeAlias
-from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta, SensitiveMetaDataDict
+from typing import Any, Literal
+
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -14,6 +14,7 @@ from pydantic import (
     model_validator,
 )
 
+from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta, SensitiveMetaDataDict
 
 FrameCleanerSource = Literal["frame_extraction"]
 FrameObservationSourceTag = Literal[
@@ -90,7 +91,7 @@ class VideoPhiRegion(VideoRoiBox):
         return value
 
     @model_validator(mode="after")
-    def validate_dimensions_match_corners(self) -> "VideoPhiRegion":
+    def validate_dimensions_match_corners(self) -> VideoPhiRegion:
         if self.width != self.x2 - self.x1:
             raise ValueError("width must equal x2 - x1.")
         if self.height != self.y2 - self.y1:
@@ -138,7 +139,7 @@ class FrameObservation(BaseModel):
     source_tags: list[FrameObservationSourceTag] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def validate_frame_identifiers_match(self) -> "FrameObservation":
+    def validate_frame_identifiers_match(self) -> FrameObservation:
         if (
             self.frame_id is not None
             and self.frame_number is not None
@@ -162,7 +163,7 @@ class FrameCollectionItem(BaseModel):
     phi_regions: list[VideoPhiRegion] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def validate_frame_identifiers_match(self) -> "FrameCollectionItem":
+    def validate_frame_identifiers_match(self) -> FrameCollectionItem:
         if (
             self.frame_id is not None
             and self.frame_number is not None
@@ -283,7 +284,7 @@ class VideoMetadataAnonymizationState(str, Enum):
     ANONYMIZED = "anonymized"
 
 
-VideoMetadataStatus: TypeAlias = VideoMetadataAnonymizationState | Literal["BLANK"]
+type VideoMetadataStatus = VideoMetadataAnonymizationState | Literal["BLANK"]
 
 
 class VideoFpsDetailsPayload(BaseModel):
@@ -313,7 +314,7 @@ class VideoFpsStatsPayload(BaseModel):
     fps: float = Field(gt=0.0)
 
 
-VideoFpsPayload: TypeAlias = VideoFpsStatsPayload | VideoFpsErrorPayload
+type VideoFpsPayload = VideoFpsStatsPayload | VideoFpsErrorPayload
 
 
 class VideoMetadataStatsPayload(BaseModel):
@@ -339,25 +340,25 @@ class VideoMetadataStatsPayload(BaseModel):
 
 
 __all__ = [
-    "VideoFpsDetailsPayload",
-    "VideoFpsErrorPayload",
-    "VideoFpsPayload",
-    "VideoFpsStatsPayload",
-    "VideoMetadataAnonymizationState",
-    "VideoMetadataStatsPayload",
-    "VideoMetadataStatus",
     "FrameAnalysisResult",
     "FrameCleanerAccumulatedMeta",
     "FrameCleanerSource",
     "FrameCollectionItem",
+    "FrameObservation",
+    "FrameObservationSourceTag",
     "FrameProcessResult",
     "FrameRemovalFilterArgs",
     "FrameRemovalPlan",
-    "FrameObservation",
-    "FrameObservationSourceTag",
     "VideoAnonymizerProvenance",
     "VideoFormatProbe",
+    "VideoFpsDetailsPayload",
+    "VideoFpsErrorPayload",
+    "VideoFpsPayload",
+    "VideoFpsStatsPayload",
     "VideoMeta",
+    "VideoMetadataAnonymizationState",
+    "VideoMetadataStatsPayload",
+    "VideoMetadataStatus",
     "VideoOcrRoi",
     "VideoPhiRegion",
     "VideoRoiBox",

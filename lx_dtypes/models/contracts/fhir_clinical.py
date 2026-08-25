@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import builtins
 from datetime import datetime
-from typing import Annotated, Literal, Self, Type, TypeVar
+from typing import Annotated, Literal, Self, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -187,13 +188,13 @@ class FhirClinicalBundle(FhirModel):
     def resolve_reference(
         self,
         reference: FhirReference,
-        expected_type: Type[ClinicalResourceT],
+        expected_type: builtins.type[ClinicalResourceT],
     ) -> ClinicalResourceT:
         resource = self.resource_index().get(reference.reference)
         if resource is None:
             raise ValueError(f"Unresolved FHIR reference {reference.reference!r}")
         if not isinstance(resource, expected_type):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004 - invalid clinical reference target
                 f"FHIR reference {reference.reference!r} resolves to "
                 f"{resource.resourceType}, expected {expected_type.__name__}"
             )

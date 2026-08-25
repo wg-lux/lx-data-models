@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
 from math import isfinite
-from typing import TYPE_CHECKING, Any, Literal, Protocol, TypeAlias, cast
+from typing import TYPE_CHECKING, Any, Literal, Protocol, cast
 
 from lx_dtypes.models.contracts.json_types import JsonValue
-
 from lx_dtypes.serialization import parse_str_list, serialize_str_list
 
 from .core_concepts import (
@@ -16,7 +15,6 @@ from .core_concepts import (
     ClassificationTypeCore,
     CoreConceptCollection,
     ExaminationCore,
-    KnowledgeBaseExaminationTypeCore,
     FindingCore,
     FindingTypeCore,
     IndicationCore,
@@ -25,6 +23,7 @@ from .core_concepts import (
     InformationSourceTypeCore,
     InterventionCore,
     InterventionTypeCore,
+    KnowledgeBaseExaminationTypeCore,
     UnitCore,
     UnitTypeCore,
 )
@@ -64,7 +63,7 @@ if TYPE_CHECKING:
     from lx_dtypes.models.knowledge_base.unit.Unit import Unit
     from lx_dtypes.models.knowledge_base.unit.UnitType import UnitType
 
-    KnowledgeBaseCoreConceptModel: TypeAlias = (
+    type KnowledgeBaseCoreConceptModel = (
         Classification
         | ClassificationChoice
         | ClassificationChoiceDescriptor
@@ -84,9 +83,9 @@ if TYPE_CHECKING:
         | Citation
     )
 else:
-    KnowledgeBaseCoreConceptModel: TypeAlias = object
+    type KnowledgeBaseCoreConceptModel = object
 
-CoreConceptName: TypeAlias = Literal[
+type CoreConceptName = Literal[
     "classification",
     "classification_choice",
     "classification_choice_descriptor",
@@ -106,7 +105,7 @@ CoreConceptName: TypeAlias = Literal[
     "citation",
 ]
 
-CoreConceptModel: TypeAlias = (
+type CoreConceptModel = (
     ClassificationCore
     | ClassificationChoiceCore
     | ClassificationChoiceDescriptorCore
@@ -126,9 +125,7 @@ CoreConceptModel: TypeAlias = (
     | CitationCore
 )
 
-CoreConceptStorageRecord: TypeAlias = (
-    Mapping[str, JsonValue] | KnowledgeBaseCoreConceptModel
-)
+type CoreConceptStorageRecord = Mapping[str, JsonValue] | KnowledgeBaseCoreConceptModel
 
 
 class SupportsKnowledgeBaseListFields(Protocol):
@@ -344,7 +341,7 @@ _KB_FIELDS: dict[CoreConceptName, str] = {
 def _read_value(record: CoreConceptStorageRecord, field: str) -> JsonValue | None:
     if isinstance(record, Mapping):
         value = record.get(field)
-        return cast(JsonValue | None, value)
+        return value
     value = getattr(record, field, None)
     return cast(JsonValue | None, value)
 
@@ -442,7 +439,7 @@ def core_concept_to_storage(
         model_value.model_dump(mode="python", exclude_none=True),
     )
 
-    payload["tags"] = serialize_str_list(cast(list[str], model_value.tags))
+    payload["tags"] = serialize_str_list(model_value.tags)
 
     for field in _LIST_FIELDS[concept]:
         list_value = payload.get(field, [])
@@ -506,11 +503,11 @@ def canonical_payload_to_storage(
 
 
 __all__ = [
-    "CoreConceptName",
     "CoreConceptModel",
-    "record_to_core_concept",
-    "records_to_core_concepts",
+    "CoreConceptName",
+    "canonical_payload_to_storage",
     "core_concept_to_storage",
     "kb_to_core_concepts_payload",
-    "canonical_payload_to_storage",
+    "record_to_core_concept",
+    "records_to_core_concepts",
 ]

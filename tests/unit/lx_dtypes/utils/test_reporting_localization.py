@@ -5,7 +5,6 @@ import yaml
 from lx_dtypes.models.interface.DataLoader import DataLoader
 from tests.paths import PACKAGE_ROOT
 
-
 TERMINOLOGY_ROOT = PACKAGE_ROOT / "data" / "terminology"
 
 

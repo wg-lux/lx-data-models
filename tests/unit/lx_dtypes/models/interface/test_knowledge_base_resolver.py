@@ -1,3 +1,5 @@
+# ruff: noqa: FLY002 - line lists keep embedded YAML fixtures readable
+
 from __future__ import annotations
 
 import builtins
@@ -14,6 +16,8 @@ from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
     get_packaged_knowledge_base,
 )
+from lx_dtypes.models.interface import remote_data_roots
+from lx_dtypes.models.interface.data_roots import package_data_root
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseIdentityRequiredError,
     KnowledgeBaseRegistryError,
@@ -25,8 +29,6 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     load_module_config,
     resolve_default_data_root,
 )
-from lx_dtypes.models.interface import remote_data_roots
-from lx_dtypes.models.interface.data_roots import package_data_root
 
 
 def _write_kb_root(root: Path, *, module_name: str, version: str) -> None:
@@ -487,8 +489,10 @@ def test_load_module_config_materializes_github_tree_registry_source(
                     module_name: {
                         "0.1.0": {
                             "input_dirs": [
-                                "https://github.com/wg-lux/lx-data-models/"
-                                f"tree/main/demo-data/{module_name}"
+                                (
+                                    "https://github.com/wg-lux/lx-data-models/"
+                                    f"tree/main/demo-data/{module_name}"
+                                )
                             ]
                         }
                     }
@@ -666,7 +670,9 @@ def test_malformed_registry_payload_fails_with_typed_error(
     finally:
         clear_knowledge_base_resolver_caches()
 
-    assert isinstance(exc_info.value.__cause__, (json.JSONDecodeError, UnicodeDecodeError))
+    assert isinstance(
+        exc_info.value.__cause__, (json.JSONDecodeError, UnicodeDecodeError)
+    )
     assert str(registry_path) in str(exc_info.value)
 
 
@@ -695,7 +701,9 @@ def test_registry_rejects_duplicate_keys_instead_of_last_value_wins(
     ("payload", "message"),
     [
         pytest.param([], "must be a JSON object", id="top-level-array"),
-        pytest.param({"modules": []}, "modules.*must be a JSON object", id="modules-array"),
+        pytest.param(
+            {"modules": []}, "modules.*must be a JSON object", id="modules-array"
+        ),
         pytest.param(
             {"modules": {" ": {"1.0.0": "/bundle"}}},
             "module names must be non-empty strings",
@@ -714,9 +722,7 @@ def test_registry_rejects_duplicate_keys_instead_of_last_value_wins(
         pytest.param(
             {
                 "modules": {
-                    "clinical_module": {
-                        "1.0.0": {"sources": [{"kind": "untrusted"}]}
-                    }
+                    "clinical_module": {"1.0.0": {"sources": [{"kind": "untrusted"}]}}
                 }
             },
             "Unknown knowledge-base source kind",

@@ -1,21 +1,20 @@
 import pytest
 
+from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import (
+    ClassificationDjango,
+)
+from lx_dtypes.models.knowledge_base.classification._ClassificationTypeDjango import (
+    ClassificationTypeDjango,
+)
+from lx_dtypes.models.knowledge_base.classification.Classification import Classification
+from lx_dtypes.models.knowledge_base.classification.ClassificationType import (
+    ClassificationType,
+)
 from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice import (
     ClassificationChoice,
 )
 from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoiceDjango import (
     ClassificationChoiceDjango,
-)
-
-from lx_dtypes.models.knowledge_base.classification.Classification import Classification
-from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import (
-    ClassificationDjango,
-)
-from lx_dtypes.models.knowledge_base.classification.ClassificationType import (
-    ClassificationType,
-)
-from lx_dtypes.models.knowledge_base.classification._ClassificationTypeDjango import (
-    ClassificationTypeDjango,
 )
 
 

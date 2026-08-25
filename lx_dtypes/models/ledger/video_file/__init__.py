@@ -1,8 +1,8 @@
 from typing import TypedDict, Union
 
-from .DataDict import VideoFileDataDict, SerializedVideoFileDataDict
+from .DataDict import SerializedVideoFileDataDict, VideoFileDataDict
 from .Django import VideoFileDjango
-from .Pydantic import VideoFile, SerializedVideoFile
+from .Pydantic import SerializedVideoFile, VideoFile
 
 
 class LVidFileLookupType(TypedDict):
@@ -37,15 +37,15 @@ l_vid_file_django_models = Union[VideoFileDjango]
 
 
 __all__ = [
-    "VideoFile",
-    "SerializedVideoFile",
-    "VideoFileDataDict",
-    "SerializedVideoFileDataDict",
-    "l_vid_file_lookup",
-    "l_vid_file_django_lookup",
-    "LVidFileLookupType",
-    "l_vid_file_models",
-    "l_vid_file_django_models",
-    "l_vid_file_ddicts",
     "LVidFileDjangoLookupType",
+    "LVidFileLookupType",
+    "SerializedVideoFile",
+    "SerializedVideoFileDataDict",
+    "VideoFile",
+    "VideoFileDataDict",
+    "l_vid_file_ddicts",
+    "l_vid_file_django_lookup",
+    "l_vid_file_django_models",
+    "l_vid_file_lookup",
+    "l_vid_file_models",
 ]

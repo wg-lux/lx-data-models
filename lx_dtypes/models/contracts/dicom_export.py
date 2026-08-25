@@ -6,8 +6,8 @@ from typing import Literal, Self
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
-from .json_types import JsonObject
 
+from .json_types import JsonObject
 
 _DICOM_UID_PATTERN = re.compile(r"^[0-9]+(?:\.[0-9]+)+$")
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")

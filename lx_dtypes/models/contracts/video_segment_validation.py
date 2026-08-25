@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Literal, TypeAlias, TypedDict
+from typing import Literal, TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
-VideoSegmentValidationNull: TypeAlias = Literal[None]
-VideoSegmentValidationText: TypeAlias = str | VideoSegmentValidationNull
+type VideoSegmentValidationNull = None
+type VideoSegmentValidationText = str | VideoSegmentValidationNull
 
-OutsideFrameBlackeningKind: TypeAlias = Literal["outside_frame_blackening"]
+type OutsideFrameBlackeningKind = Literal["outside_frame_blackening"]
 
 
 class OutsideFrameBlackeningHistoryConfigData(TypedDict):

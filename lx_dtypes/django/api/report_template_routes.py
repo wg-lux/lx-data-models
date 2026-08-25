@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Literal, Mapping, Protocol, TypeVar, cast
+from collections.abc import Callable, Mapping
+from typing import Any, Literal, Protocol, TypeVar, cast
 
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
 from lx_dtypes.models.contracts import KnowledgeBaseContract
+from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
-from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
-from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.knowledge_base.report_template.ReportConceptCoverageBuilder import (
     build_report_concept_coverage,
 )
+from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 from .report_template_builder import (
     PublishReportTemplateResponse,
@@ -42,7 +43,7 @@ def _compile_report_template(
     template_name: str,
     *,
     mode: Literal["preview", "publish", "production"],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     validator = ReportTemplateValidator(kb=kb, compiler=ReportTemplateCompiler(kb=kb))
     return validator.validate_and_compile(template_name, mode=mode)
 
@@ -52,7 +53,7 @@ def _attach_resolved_kb_identity(
     *,
     module_name: str,
     version: str | None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     response = dict(validation)
     response["knowledge_base_module"] = module_name
     response["knowledge_base_version"] = version
@@ -90,7 +91,7 @@ def _attach_loaded_kb_identity(
     kb: KnowledgeBaseContract,
     module_name: str,
     version: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return _attach_resolved_kb_identity(
         payload,
         module_name=module_name,
@@ -109,7 +110,7 @@ def register_report_template_routes(
     clear_kb_caches: Callable[[], None],
     resolve_builder_module_location: Callable[[str, str], ReportTemplateModuleLocation],
     resolve_payload_kb_identity: Callable[[str, PExamination], tuple[str, str]],
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
     build_p_examination_payload_from_host_ledger: Callable[..., PExamination],
     persist_patient_examination_dtypes_record: Callable[
         [object, PExamination], dict[str, Any]
@@ -173,7 +174,7 @@ def register_report_template_routes(
     @api.get("/report-templates/by-examination/{module_name}/{examination_name}")
     def report_templates_by_examination(
         request: BaseRequest, module_name: str, examination_name: str, version: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Return all resolved report templates for the given examination in one module.
         """
@@ -185,7 +186,7 @@ def register_report_template_routes(
             module_name=module_name,
             expected_version=version,
         )
-        matches: list[Dict[str, Any]] = []
+        matches: list[dict[str, Any]] = []
         for template_name, template in cast(
             Mapping[str, Any], kb.report_template
         ).items():
@@ -211,7 +212,7 @@ def register_report_template_routes(
     )
     def builder_report_templates_by_examination(
         request: BaseRequest, module_name: str, examination_name: str, version: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Return preview exports for all builder templates, including drafts."""
         require_builder_access(request, "report_template:read")
         version = require_version(version)
@@ -221,7 +222,7 @@ def register_report_template_routes(
             module_name=module_name,
             expected_version=version,
         )
-        matches: list[Dict[str, Any]] = []
+        matches: list[dict[str, Any]] = []
         for template_name, template in cast(
             Mapping[str, Any], kb.report_template
         ).items():
@@ -240,7 +241,7 @@ def register_report_template_routes(
     @api.get("/report-templates/{module_name}/{template_name}")
     def report_template_by_name(
         request: BaseRequest, module_name: str, template_name: str, version: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Return a resolved report template JSON payload by module/template name.
         """
@@ -262,7 +263,7 @@ def register_report_template_routes(
     @api.get("/report-templates/{module_name}/{template_name}/preview")
     def preview_report_template_by_name(
         request: BaseRequest, module_name: str, template_name: str, version: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         require_builder_access(request, "report_template:read")
         kb = load_module_kb(module_name, version=require_version(version))
         try:
@@ -376,7 +377,7 @@ def register_report_template_routes(
         template_name: str,
         version: str,
         payload: PExamination,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute report-template validator logic against typed patient examination state.
         """
@@ -426,7 +427,7 @@ def register_report_template_routes(
     def get_patient_examination_dtypes_record(
         request: BaseRequest,
         patient_examination_id: int,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         del request
         patient_examination_model = orm_models()["PatientExamination"]
         patient_examination = patient_examination_model.objects.filter(
@@ -440,14 +441,14 @@ def register_report_template_routes(
         record = getattr(patient_examination, "dtypes_record", None)
         if not isinstance(record, dict):
             return {}
-        return cast(Dict[str, Any], record)
+        return cast(dict[str, Any], record)
 
     @api.post("/patient-examinations/{patient_examination_id}/dtypes-record/")
     def persist_patient_examination_dtypes_record_route(
         request: BaseRequest,
         patient_examination_id: int,
         payload: PExamination,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         del request
         patient_examination_model = orm_models()["PatientExamination"]
         patient_examination = patient_examination_model.objects.filter(
@@ -477,7 +478,7 @@ def register_report_template_routes(
         template_name: str,
         patient_examination_id: int,
         version: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         del request
         patient_examination_model = orm_models()["PatientExamination"]
         patient_examination = patient_examination_model.objects.filter(
@@ -540,7 +541,7 @@ def register_report_template_routes(
     @api.get("/report-templates/{module_name}/{template_name}/validate-definition")
     def validate_report_template_definition(
         request: BaseRequest, module_name: str, template_name: str, version: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         require_builder_access(request, "report_template:read")
         version = require_version(version)
         kb = load_module_kb(module_name, version=version)
@@ -561,7 +562,7 @@ def register_report_template_routes(
                 404,
                 f"Report template '{template_name}' not found in module '{module_name}'.",
             ) from exc
-        return cast(Dict[str, Any], compiled["summary"].model_dump(mode="json"))
+        return cast(dict[str, Any], compiled["summary"].model_dump(mode="json"))
 
     @api.post("/validators/{module_name}/{validator_kind}/{validator_name}/validate")
     def validate_single_validator_runtime(
@@ -571,7 +572,7 @@ def register_report_template_routes(
         validator_name: str,
         version: str,
         payload: PExamination,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         del request
         resolved_module_name, resolved_version = resolve_payload_kb_identity(
             module_name, payload

@@ -6,16 +6,15 @@ from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import
 from lx_dtypes.models.knowledge_base.indication.Indication import (
     Indication,
 )
+from lx_dtypes.models.knowledge_base.indication.IndicationDjango import IndicationDjango
 from lx_dtypes.models.knowledge_base.indication.IndicationType import (
     IndicationType,
 )
-from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
-    InterventionDjango,
-)
-
-from lx_dtypes.models.knowledge_base.indication.IndicationDjango import IndicationDjango
 from lx_dtypes.models.knowledge_base.indication.IndicationTypeDjango import (
     IndicationTypeDjango,
+)
+from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
+    InterventionDjango,
 )
 
 

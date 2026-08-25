@@ -28,15 +28,9 @@ def _as_aware_datetime(value: Any) -> Any:
         except ValueError:
             return value
     if isinstance(value, datetime.datetime):
-        return (
-            value
-            if value.tzinfo is not None
-            else value.replace(tzinfo=datetime.timezone.utc)
-        )
+        return value if value.tzinfo is not None else value.replace(tzinfo=datetime.UTC)
     if isinstance(value, datetime.date):
-        return datetime.datetime.combine(
-            value, datetime.time.min, tzinfo=datetime.timezone.utc
-        )
+        return datetime.datetime.combine(value, datetime.time.min, tzinfo=datetime.UTC)
     return value
 
 
@@ -64,7 +58,9 @@ class Case(LedgerBaseModel[CaseDataDict]):
         if value is None:
             return []
         if not isinstance(value, list):
-            raise ValueError("report_ids must be a list of references")
+            raise ValueError(  # noqa: TRY004 - Pydantic validators require ValueError
+                "report_ids must be a list of references"
+            )
         report_ids: list[str] = []
         for report_ref in value:
             if isinstance(report_ref, str):
@@ -80,7 +76,7 @@ class Case(LedgerBaseModel[CaseDataDict]):
                     )
             else:
                 if hasattr(report_ref, "uuid"):
-                    report_ids.append(str(getattr(report_ref, "uuid")))
+                    report_ids.append(str(report_ref.uuid))
                 else:
                     raise ValueError(
                         "report_ids list items must be strings or objects with uuid"

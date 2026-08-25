@@ -9,7 +9,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from lx_dtypes.models.contracts.json_types import JsonObject
 
-
 SHA256_HEX_PATTERN = r"^[0-9a-f]{64}$"
 
 

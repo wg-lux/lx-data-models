@@ -1,14 +1,5 @@
 import pytest
 
-from lx_dtypes.models.knowledge_base.finding._Finding import Finding
-from lx_dtypes.models.knowledge_base.finding._FindingDjango import (
-    FindingDjango,
-)
-from lx_dtypes.models.knowledge_base.indication.Indication import Indication
-from lx_dtypes.models.knowledge_base.indication.IndicationDjango import (
-    IndicationDjango,
-)
-
 from lx_dtypes.models.knowledge_base.examination.Examination import Examination
 from lx_dtypes.models.knowledge_base.examination.ExaminationDjango import (
     ExaminationDjango,
@@ -16,6 +7,14 @@ from lx_dtypes.models.knowledge_base.examination.ExaminationDjango import (
 from lx_dtypes.models.knowledge_base.examination.ExaminationType import ExaminationType
 from lx_dtypes.models.knowledge_base.examination.ExaminationTypeDjango import (
     ExaminationTypeDjango,
+)
+from lx_dtypes.models.knowledge_base.finding._Finding import Finding
+from lx_dtypes.models.knowledge_base.finding._FindingDjango import (
+    FindingDjango,
+)
+from lx_dtypes.models.knowledge_base.indication.Indication import Indication
+from lx_dtypes.models.knowledge_base.indication.IndicationDjango import (
+    IndicationDjango,
 )
 
 

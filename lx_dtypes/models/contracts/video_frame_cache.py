@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from typing import cast
-from lx_dtypes.models.contracts.json_types import JsonValue
 
 from pydantic import BaseModel, ConfigDict, Field
+
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 FrameCacheLogValue = str | int | float | bool | list[int] | list[str]
 FrameCacheLogPayload = dict[str, FrameCacheLogValue]

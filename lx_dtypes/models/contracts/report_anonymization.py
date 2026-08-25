@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Literal
 from uuid import UUID
 
-from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -15,8 +14,12 @@ from pydantic import (
     model_validator,
 )
 
-REPORT_ANONYMIZATION_CONTRACT_VERSION = "report_anonymization_v2"
+from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta
+
 ReportAnonymizationContractVersion = Literal["report_anonymization_v2"]
+REPORT_ANONYMIZATION_CONTRACT_VERSION: ReportAnonymizationContractVersion = (
+    "report_anonymization_v2"
+)
 
 
 class ReportAnonymizationPhase(StrEnum):
@@ -73,7 +76,7 @@ class ReportAnonymizationRequestV2(BaseModel):
     )
 
     @model_validator(mode="after")
-    def validate_local_paths(self) -> "ReportAnonymizationRequestV2":
+    def validate_local_paths(self) -> ReportAnonymizationRequestV2:
         if self.source_path.is_symlink() or not self.source_path.is_file():
             raise ValueError("source_path must be a regular non-symlink file")
         if self.output_directory.is_symlink() or not self.output_directory.is_dir():
@@ -204,7 +207,7 @@ class ReportAnonymizationResult(BaseModel):
 
     @field_validator("original_text", "anonymized_text", mode="before")
     @classmethod
-    def normalize_text(cls, value: str | int | float | bool | None) -> str:
+    def normalize_text(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         return str(value)
@@ -212,7 +215,7 @@ class ReportAnonymizationResult(BaseModel):
     @field_validator("extracted_metadata", mode="before")
     @classmethod
     def normalize_extracted_metadata(
-        cls, value: SensitiveMeta | dict | None
+        cls, value: SensitiveMeta | dict[str, object] | None
     ) -> SensitiveMeta:
         if isinstance(value, SensitiveMeta):
             return value
@@ -220,8 +223,8 @@ class ReportAnonymizationResult(BaseModel):
 
     @classmethod
     def from_process_report_result(
-        cls, value: Sequence[str | Path | dict | None]
-    ) -> "ReportAnonymizationResult":
+        cls, value: Sequence[str | Path | dict[str, object] | None]
+    ) -> ReportAnonymizationResult:
         if len(value) != 4:
             raise ValueError("process_report result must contain exactly four values")
         original_text, anonymized_text, extracted_metadata, anonymized_path = value

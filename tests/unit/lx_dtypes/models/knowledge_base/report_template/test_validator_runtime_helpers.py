@@ -13,12 +13,13 @@ from lx_dtypes.models.knowledge_base.classification_choice_descriptor.Classifica
 )
 from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
+from lx_dtypes.models.knowledge_base.report_template import ValidatorRuntime as runtime
 from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
     ClassificationValidator,
 )
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
-    FindingsValidatorConditionClause,
     FindingsValidator,
+    FindingsValidatorConditionClause,
 )
 from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
     InterventionValidator,
@@ -27,7 +28,6 @@ from lx_dtypes.models.knowledge_base.report_template.UnitValidator import UnitVa
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRequirementReference import (
     ValidatorRequirementReference,
 )
-from lx_dtypes.models.knowledge_base.report_template import ValidatorRuntime as runtime
 from lx_dtypes.models.knowledge_base.report_template.ValueTypes import ValidationScalar
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 

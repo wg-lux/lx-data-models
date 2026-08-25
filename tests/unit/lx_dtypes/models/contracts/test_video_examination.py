@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -10,9 +10,9 @@ from lx_dtypes.models.contracts import (
     VideoExaminationFindingPayload,
     VideoExaminationListQueryPayload,
     VideoExaminationUpdatePayload,
-    dump_video_examination_list_query_payload,
     dump_video_examination_create_payload,
     dump_video_examination_finding_payload,
+    dump_video_examination_list_query_payload,
     dump_video_examination_update_payload,
     validate_video_examination_path_payload,
 )
@@ -44,7 +44,7 @@ def test_video_examination_payload_rejects_invalid_ids() -> None:
 
 
 def test_video_examination_finding_payload_keeps_datetime_value() -> None:
-    created_at = datetime(2026, 6, 3, 12, 30, tzinfo=timezone.utc)
+    created_at = datetime(2026, 6, 3, 12, 30, tzinfo=UTC)
     payload = VideoExaminationFindingPayload(
         id=1,
         finding_id=2,

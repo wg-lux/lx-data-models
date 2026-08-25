@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
@@ -69,7 +70,7 @@ class PersonNameMetadata(BaseModel):
 
     @field_validator("first_name", "last_name", mode="before")
     @classmethod
-    def normalize_name(cls, value: str | int | float | bool | None) -> str:
+    def normalize_name(cls, value: str | float | bool | None) -> str:
         text = str(value).strip()
         if not text:
             raise ValueError("name components must not be empty")
@@ -109,10 +110,10 @@ class LLMMetadataPayload(BaseModel):
 
 
 __all__ = [
-    "TextAnonymizationMeta",
-    "GenderGuess",
-    "GenderDisplayLabel",
     "DateOfBirthCore",
-    "PersonNameMetadata",
+    "GenderDisplayLabel",
+    "GenderGuess",
     "LLMMetadataPayload",
+    "PersonNameMetadata",
+    "TextAnonymizationMeta",
 ]

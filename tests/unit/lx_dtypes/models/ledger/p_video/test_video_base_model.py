@@ -1,11 +1,10 @@
 from pathlib import Path
 
-from tests.paths import GENERATED_TEST_OUTPUT_ROOT
-
 from lx_dtypes.models.ledger.p_video import (
     PatientVideoFile,
     PatientVideoFileDataDict,
 )
+from tests.paths import GENERATED_TEST_OUTPUT_ROOT
 
 
 class TestVideoBaseModel:

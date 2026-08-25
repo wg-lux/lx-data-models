@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from math import isfinite
-from typing import Any, Callable, cast
+from typing import Any, cast
 
 import pytest
 from pydantic import ValidationError
@@ -38,7 +39,6 @@ from lx_dtypes.models.knowledge_base.information_source.InformationSource import
 from lx_dtypes.models.knowledge_base.information_source.InformationSourceType import (
     InformationSourceType,
 )
-from tests.paths import PACKAGE_ROOT
 from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
 from lx_dtypes.models.knowledge_base.intervention.InterventionType import (
     InterventionType,
@@ -49,6 +49,7 @@ from lx_dtypes.names import (
     ClassificationChoiceDescriptorTypes,
     NumericDistributionChoices,
 )
+from tests.paths import PACKAGE_ROOT
 
 _LIST_FIELDS: dict[CoreConceptName, list[str]] = {
     "classification": ["classification_choices", "classification_types"],

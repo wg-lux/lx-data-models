@@ -4,7 +4,6 @@ from lx_dtypes.models.knowledge_base.indication.IndicationDjango import Indicati
 from lx_dtypes.models.ledger.p_examination.Django import (
     PExaminationDjango,
 )
-
 from lx_dtypes.models.ledger.p_indication.Django import PIndicationDjango
 from lx_dtypes.models.ledger.p_indication.Pydantic import PIndication
 

@@ -6,18 +6,17 @@ from lx_dtypes.models.knowledge_base.classification._ClassificationDjango import
 from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoiceDjango import (
     ClassificationChoiceDjango,
 )
-from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.Django import (
-    PFindingClassificationChoiceDescriptorDjango,
-)
-from lx_dtypes.models.ledger.p_finding_classifications.Django import (
-    PFindingClassificationsDjango,
-)
-
 from lx_dtypes.models.ledger.p_finding_classification_choice.Django import (
     PFindingClassificationChoiceDjango,
 )
 from lx_dtypes.models.ledger.p_finding_classification_choice.Pydantic import (
     PFindingClassificationChoice,
+)
+from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.Django import (
+    PFindingClassificationChoiceDescriptorDjango,
+)
+from lx_dtypes.models.ledger.p_finding_classifications.Django import (
+    PFindingClassificationsDjango,
 )
 
 

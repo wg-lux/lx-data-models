@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional
+from typing import Literal
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
@@ -19,7 +19,7 @@ class ReportTemplateSectionDataDict(KnowledgebaseBaseModelDataDict):
     title_de: str
     title_en: str
     position: int
-    types: List[str]
-    findings: List[ReportTemplateFindingRequirementDataDict | str]
-    section_kind: Optional[Literal["findings", "patient_data", "history"]]
-    fields: Optional[List[ReportTemplateSectionFieldDataDict]]
+    types: list[str]
+    findings: list[ReportTemplateFindingRequirementDataDict | str]
+    section_kind: Literal["findings", "patient_data", "history"] | None
+    fields: list[ReportTemplateSectionFieldDataDict] | None

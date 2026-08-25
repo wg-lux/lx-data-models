@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-import pytest
-from pydantic import ValidationError
 from typing import cast
 
+import pytest
+from pydantic import ValidationError
+
+from lx_dtypes.models.contracts.json_types import JsonValue
 from lx_dtypes.models.contracts.upload import (
     UploadApiRequestPayload,
     upload_api_request_data_from_mapping,
     validate_upload_api_request_payload,
 )
-from lx_dtypes.models.contracts.json_types import JsonValue
 
 
 def test_upload_api_request_payload_defaults_to_empty_scope() -> None:

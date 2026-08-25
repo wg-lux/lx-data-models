@@ -12,7 +12,6 @@ import pytest
 
 from lx_dtypes.models.interface import remote_data_roots
 
-
 _SOURCE_URL = (
     "https://github.com/wg-lux/lx-data-models/tree/main/demo-data/remote_demo_module"
 )
@@ -64,12 +63,14 @@ def test_safe_archive_members_rejects_symlinks() -> None:
     with zipfile.ZipFile(archive_buffer, "w") as archive:
         archive.writestr(link, "../../outside.yaml")
 
-    with zipfile.ZipFile(BytesIO(archive_buffer.getvalue())) as archive:
-        with pytest.raises(
+    with (
+        zipfile.ZipFile(BytesIO(archive_buffer.getvalue())) as archive,
+        pytest.raises(
             remote_data_roots.RemoteDataRootError,
             match="unsupported symlink",
-        ):
-            remote_data_roots._safe_archive_members(archive, source=_SOURCE)
+        ),
+    ):
+        remote_data_roots._safe_archive_members(archive, source=_SOURCE)
 
 
 @pytest.mark.parametrize(
@@ -95,9 +96,11 @@ def test_safe_archive_members_rejects_ambiguous_paths(
         if message == "duplicate file paths":
             archive.writestr(filename, "second")
 
-    with zipfile.ZipFile(BytesIO(archive_buffer.getvalue())) as archive:
-        with pytest.raises(remote_data_roots.RemoteDataRootError, match=message):
-            remote_data_roots._safe_archive_members(archive, source=_SOURCE)
+    with (
+        zipfile.ZipFile(BytesIO(archive_buffer.getvalue())) as archive,
+        pytest.raises(remote_data_roots.RemoteDataRootError, match=message),
+    ):
+        remote_data_roots._safe_archive_members(archive, source=_SOURCE)
 
 
 def test_ensure_directory_rejects_symlink_target(tmp_path: Path) -> None:

@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated, Literal, TypeAlias, cast
+from typing import Annotated, Literal, cast
 
 import yaml
-
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .json_types import JsonNull
@@ -14,8 +13,8 @@ type YamlScalar = str | int | float | bool | JsonNull
 type YamlValue = YamlScalar | list[YamlValue] | dict[str, YamlValue]
 
 PositiveInt = Annotated[int, Field(ge=1)]
-VideoFrameAnnotationExportFormat: TypeAlias = Literal["csv", "json"]
-VideoFrameAnnotationExportProfile: TypeAlias = Literal[
+type VideoFrameAnnotationExportFormat = Literal["csv", "json"]
+type VideoFrameAnnotationExportProfile = Literal[
     "legacy_table_v1",
     "pts_dataset_v1",
 ]
@@ -106,7 +105,9 @@ def validate_video_frame_annotation_export_config(
     payload: YamlValue,
 ) -> VideoFrameAnnotationExportConfigPayload:
     if not isinstance(payload, dict):
-        raise ValueError("export config must be a mapping")
+        raise ValueError(  # noqa: TRY004 - public validation contract
+            "export config must be a mapping"
+        )
     return VideoFrameAnnotationExportConfigPayload.model_validate(payload)
 
 

@@ -1,8 +1,7 @@
-from typing import List
-
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
 )
+from lx_dtypes.models.descriptor_value import DescriptorValue
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.BooleanDescriptorMixin import (
     BooleanDescriptorMixin,
 )
@@ -18,7 +17,6 @@ from lx_dtypes.models.knowledge_base.classification_choice_descriptor.TextDescri
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.UnitMixin import (
     UnitMixin,
 )
-from lx_dtypes.models.descriptor_value import DescriptorValue
 from lx_dtypes.names import (
     CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS,
 )
@@ -43,7 +41,7 @@ class ClassificationChoiceDescriptor(
     name: str
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Get the model's list-type field names.
 

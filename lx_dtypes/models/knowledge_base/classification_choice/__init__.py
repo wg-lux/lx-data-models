@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict
 
 from .ClassificationChoice import ClassificationChoice
 from .ClassificationChoiceDataDict import ClassificationChoiceDataDict
@@ -19,9 +19,9 @@ kb_classification_choice_lookup = KbClassificationChoiceLookupType(
     ClassificationChoiceDataDict=ClassificationChoiceDataDict,
 )
 
-kb_classification_choice_models = Union[ClassificationChoice,]
+kb_classification_choice_models: TypeAlias = ClassificationChoice
 
-kb_classification_choice_ddicts = Union[ClassificationChoiceDataDict,]
+kb_classification_choice_ddicts: TypeAlias = ClassificationChoiceDataDict
 
 if TYPE_CHECKING:
 
@@ -29,18 +29,18 @@ if TYPE_CHECKING:
         ClassificationChoice: type[ClassificationChoiceDjango]
 
     kb_classification_choice_django_lookup: KbClassificationChoiceDjangoLookupType
-    kb_classification_choice_django_models = Union[ClassificationChoiceDjango,]
+    kb_classification_choice_django_models: TypeAlias = ClassificationChoiceDjango
 
 __all__ = [
     "ClassificationChoice",
     "ClassificationChoiceDataDict",
-    "kb_classification_choice_django_models",
-    "kb_classification_choice_django_lookup",
     "KbClassificationChoiceDjangoLookupType",
-    "kb_classification_choice_lookup",
     "KbClassificationChoiceLookupType",
-    "kb_classification_choice_models",
     "kb_classification_choice_ddicts",
+    "kb_classification_choice_django_lookup",
+    "kb_classification_choice_django_models",
+    "kb_classification_choice_lookup",
+    "kb_classification_choice_models",
 ]
 
 
@@ -63,7 +63,7 @@ def __getattr__(name: str) -> Any:
         "kb_classification_choice_django_lookup": KbClassificationChoiceDjangoLookupType(
             ClassificationChoice=ClassificationChoiceDjango
         ),
-        "kb_classification_choice_django_models": Union[ClassificationChoiceDjango,],
+        "kb_classification_choice_django_models": ClassificationChoiceDjango,
     }
     globals().update(exports)
     return exports[name]

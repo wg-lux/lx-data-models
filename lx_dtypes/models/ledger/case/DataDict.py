@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING
 
 from lx_dtypes.models.base.app_base_model.ddict.LedgerBaseModelDataDict import (
     LedgerBaseModelDataDict,
@@ -12,15 +12,15 @@ class CaseDataDict(LedgerBaseModelDataDict):
     case_id: str
     patient: str
     admission_date: str
-    leave_date: Optional[str]
-    patient_examinations: List["PExaminationDataDict"]
-    report_ids: List[str]
+    leave_date: str | None
+    patient_examinations: list["PExaminationDataDict"]
+    report_ids: list[str]
 
 
 class SerializedCaseDataDict(LedgerBaseModelDataDict):
     case_id: str
     patient: str
     admission_date: str
-    leave_date: Optional[str]
+    leave_date: str | None
     patient_examinations: str
     report_ids: str

@@ -22,7 +22,7 @@ class MediaManagementCleanupQueryPayload(BaseModel):
         if value is None or value == "":
             return None
         if isinstance(value, bool):
-            raise ValueError("file_id must be an integer")
+            raise ValueError("file_id must be an integer")  # noqa: TRY004
         if isinstance(value, int):
             return value
         if isinstance(value, str):

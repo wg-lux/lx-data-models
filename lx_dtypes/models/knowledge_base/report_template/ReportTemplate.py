@@ -1,5 +1,4 @@
 import datetime
-from typing import List, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -7,20 +6,20 @@ from lx_dtypes.factories.typed_lists import list_of_str_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
 )
-from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict import (
-    ReportTemplateDataDict,
-)
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateCoverage import (
     ReportTemplateCoverageConcept,
+)
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict import (
+    ReportTemplateDataDict,
 )
 
 
 class ReportTemplateValidators(BaseModel):
-    examination_validators: List[str] = Field(default_factory=list)
-    findings_validators: List[str] = Field(default_factory=list)
-    classification_validators: List[str] = Field(default_factory=list)
-    intervention_validators: List[str] = Field(default_factory=list)
-    unit_validators: List[str] = Field(default_factory=list)
+    examination_validators: list[str] = Field(default_factory=list)
+    findings_validators: list[str] = Field(default_factory=list)
+    classification_validators: list[str] = Field(default_factory=list)
+    intervention_validators: list[str] = Field(default_factory=list)
+    unit_validators: list[str] = Field(default_factory=list)
 
 
 class ReportTemplateGuidelineReference(BaseModel):
@@ -34,7 +33,7 @@ class ReportTemplateGuidelineReference(BaseModel):
     version: str = Field(min_length=1)
     publication_date: datetime.date
     canonical_url: str = Field(min_length=1)
-    cited_sections: List[str] = Field(min_length=1)
+    cited_sections: list[str] = Field(min_length=1)
 
     @field_validator("canonical_url")
     @classmethod
@@ -47,18 +46,18 @@ class ReportTemplateGuidelineReference(BaseModel):
 class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):
     examination: str
     version: str | None = None
-    guideline_references: List[ReportTemplateGuidelineReference] = Field(
+    guideline_references: list[ReportTemplateGuidelineReference] = Field(
         default_factory=list
     )
     coverage_version: str | None = None
-    coverage_concepts: List[ReportTemplateCoverageConcept] = Field(default_factory=list)
-    report_sections: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
+    coverage_concepts: list[ReportTemplateCoverageConcept] = Field(default_factory=list)
+    report_sections: str | list[str] = Field(default_factory=list_of_str_factory)
     validators: ReportTemplateValidators = Field(
         default_factory=ReportTemplateValidators
     )
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return ["report_sections"]
 
     @property

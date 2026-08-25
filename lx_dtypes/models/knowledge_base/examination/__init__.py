@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
 
 from .Examination import Examination
 from .ExaminationDataDict import ExaminationDataDict
@@ -26,15 +26,9 @@ kb_examination_lookup = KbExaminationLookupType(
     ExaminationTypeDataDict=ExaminationTypeDataDict,
 )
 
-kb_examination_models = Union[
-    Examination,
-    ExaminationType,
-]
+kb_examination_models: TypeAlias = Union[Examination, ExaminationType]
 
-kb_examination_ddicts = Union[
-    ExaminationDataDict,
-    ExaminationTypeDataDict,
-]
+kb_examination_ddicts: TypeAlias = Union[ExaminationDataDict, ExaminationTypeDataDict]
 
 if TYPE_CHECKING:
 
@@ -43,9 +37,8 @@ if TYPE_CHECKING:
         ExaminationType: type[ExaminationTypeDjango]
 
     kb_examination_django_lookup: KbExaminationDjangoLookupType
-    kb_examination_django_models = Union[
-        ExaminationDjango,
-        ExaminationTypeDjango,
+    kb_examination_django_models: TypeAlias = Union[
+        ExaminationDjango, ExaminationTypeDjango
     ]
 
 __all__ = [
@@ -53,13 +46,13 @@ __all__ = [
     "ExaminationDataDict",
     "ExaminationType",
     "ExaminationTypeDataDict",
-    "kb_examination_lookup",
-    "KbExaminationLookupType",
-    "kb_examination_models",
-    "kb_examination_ddicts",
-    "kb_examination_django_models",
-    "kb_examination_django_lookup",
     "KbExaminationDjangoLookupType",
+    "KbExaminationLookupType",
+    "kb_examination_ddicts",
+    "kb_examination_django_lookup",
+    "kb_examination_django_models",
+    "kb_examination_lookup",
+    "kb_examination_models",
 ]
 
 
@@ -87,10 +80,7 @@ def __getattr__(name: str) -> Any:
             Examination=ExaminationDjango,
             ExaminationType=ExaminationTypeDjango,
         ),
-        "kb_examination_django_models": Union[
-            ExaminationDjango,
-            ExaminationTypeDjango,
-        ],
+        "kb_examination_django_models": ExaminationDjango | ExaminationTypeDjango,
     }
     globals().update(exports)
     return exports[name]

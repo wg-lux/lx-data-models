@@ -53,7 +53,7 @@ class UploadProvenancePayload(BaseModel):
 
     def with_updates(
         self, updates: Mapping[str, JsonValue | None]
-    ) -> "UploadProvenancePayload":
+    ) -> UploadProvenancePayload:
         payload = self.as_json()
         for key, value in updates.items():
             if value is not None:

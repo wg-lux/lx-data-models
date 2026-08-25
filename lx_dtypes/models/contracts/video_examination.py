@@ -5,6 +5,7 @@ from datetime import date, datetime
 from typing import NotRequired, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from lx_dtypes.models.contracts.json_types import JsonValue
 
 

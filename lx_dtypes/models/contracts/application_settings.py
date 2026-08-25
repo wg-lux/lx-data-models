@@ -7,7 +7,6 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from lx_dtypes.models.contracts.ai_dataset import AIModelType, DatasetType
 
-
 type ApplicationSettingsDeploymentRole = Literal[
     "standalone",
     "site_node",
@@ -25,7 +24,7 @@ class ApplicationSettingsBackupSourcePayload(BaseModel):
     file_count: int = Field(ge=0)
 
     @model_validator(mode="after")
-    def _validate_file_count(self) -> "ApplicationSettingsBackupSourcePayload":
+    def _validate_file_count(self) -> ApplicationSettingsBackupSourcePayload:
         if not self.exists and self.file_count != 0:
             raise ValueError("a missing backup source cannot contain files")
         return self
@@ -43,7 +42,7 @@ class ApplicationSettingsBackupStatusPayload(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _validate_source_summary(self) -> "ApplicationSettingsBackupStatusPayload":
+    def _validate_source_summary(self) -> ApplicationSettingsBackupStatusPayload:
         if self.required_path_count != len(self.source_roots):
             raise ValueError("required_path_count must match source_roots")
 
@@ -80,7 +79,7 @@ class ApplicationSettingsDataSetEntryPayload(BaseModel):
     @model_validator(mode="after")
     def validate_model_type_matches_dataset_type(
         self,
-    ) -> "ApplicationSettingsDataSetEntryPayload":
+    ) -> ApplicationSettingsDataSetEntryPayload:
         allowed_by_dataset_type: dict[DatasetType, set[AIModelType]] = {
             "image": {"image_multilabel_classification", "phi_region_detector"},
             "video": {"video_segment_classification"},
@@ -103,7 +102,7 @@ class ApplicationSettingsDeploymentProfilePayload(BaseModel):
     @model_validator(mode="after")
     def _validate_derived_flags(
         self,
-    ) -> "ApplicationSettingsDeploymentProfilePayload":
+    ) -> ApplicationSettingsDeploymentProfilePayload:
         expected_hub_mode = self.deployment_role == "central_hub"
         if self.hub_mode != expected_hub_mode:
             raise ValueError("hub_mode must match deployment_role")

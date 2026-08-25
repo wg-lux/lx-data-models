@@ -1,9 +1,10 @@
 # lx_dtypes/models/meta/SensitiveMeta
 import math
 import re
+from collections.abc import Mapping
 from datetime import date, datetime, time
 from functools import lru_cache
-from typing import Any, ClassVar, List, Mapping, Optional, Union
+from typing import Any, ClassVar
 
 from pydantic import (
     BaseModel,
@@ -58,31 +59,31 @@ class SensitiveMetaState(StateBaseModel[SensitiveMetaStateDataDict]):
 
 
 class SensitiveMetaDataDict(MetaBaseModelDataDict):
-    file_path: Optional[str]
-    examination_date: Optional[date]
-    examination_time: Optional[time]
-    casenumber: Optional[str]
-    pseudo_patient: Optional[str]
-    pseudo_examination: Optional[str]
-    gender: Optional[str]
-    pseudo_examiners: Optional[Union[str, List[str]]]
+    file_path: str | None
+    examination_date: date | None
+    examination_time: time | None
+    casenumber: str | None
+    pseudo_patient: str | None
+    pseudo_examination: str | None
+    gender: str | None
+    pseudo_examiners: str | list[str] | None
 
-    sensitive_meta_state: Optional[Union[str, SensitiveMetaStateDataDict]]
+    sensitive_meta_state: str | SensitiveMetaStateDataDict | None
 
     first_name: str
     last_name: str
-    dob: Optional[date]
+    dob: date | None
 
-    endoscope_type: Optional[str]
-    endoscope_sn: Optional[str]
-    examiner_first_name: Optional[str]
-    examiner_last_name: Optional[str]
-    center: Optional[str]
+    endoscope_type: str | None
+    endoscope_sn: str | None
+    examiner_first_name: str | None
+    examiner_last_name: str | None
+    center: str | None
 
-    text: Optional[str]
-    anonymized_text: Optional[str]
+    text: str | None
+    anonymized_text: str | None
 
-    external_id: Optional[str]  # TODO was previously a model with fields like origin
+    external_id: str | None  # TODO was previously a model with fields like origin
 
 
 class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
@@ -119,30 +120,30 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
         (re.compile(r"^\d{4}/\d{2}/\d{2}$"), "%Y/%m/%d"),
     )
 
-    file_path: Optional[str] = None
-    examination_date: Optional[date] = None
-    examination_time: Optional[time] = None
-    casenumber: Optional[str] = None
-    pseudo_patient: Optional[str] = None
-    pseudo_examination: Optional[str] = None
+    file_path: str | None = None
+    examination_date: date | None = None
+    examination_time: time | None = None
+    casenumber: str | None = None
+    pseudo_patient: str | None = None
+    pseudo_examination: str | None = None
     gender: GENDER_OPTIONS_LITERAL = Field(default_factory=str_unknown_factory)
-    pseudo_examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
+    pseudo_examiners: str | list[str] = Field(default_factory=list_of_str_factory)
     sensitive_meta_state: "SensitiveMetaState | None" = None
 
     first_name: str = Field(default_factory=str_unknown_factory)
     last_name: str = Field(default_factory=str_unknown_factory)
-    dob: Optional[date] = None
+    dob: date | None = None
 
-    endoscope_type: Optional[str] = None
-    endoscope_sn: Optional[str] = None
-    examiner_first_name: Optional[str] = None
-    examiner_last_name: Optional[str] = None
-    center: Optional[str] = None
+    endoscope_type: str | None = None
+    endoscope_sn: str | None = None
+    examiner_first_name: str | None = None
+    examiner_last_name: str | None = None
+    center: str | None = None
 
-    text: Optional[str] = None
-    anonymized_text: Optional[str] = None
+    text: str | None = None
+    anonymized_text: str | None = None
 
-    external_id: Optional[str] = (
+    external_id: str | None = (
         None  # TODO was previously a model with fields like origin
     )
 
@@ -168,7 +169,7 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
         return cls._normalize_value(value, getattr(info, "field_name", None))
 
     @staticmethod
-    def _parse_date_like(value: Any) -> Optional[date]:
+    def _parse_date_like(value: Any) -> date | None:
         if isinstance(value, date) and not isinstance(value, datetime):
             return value
         if not isinstance(value, str):
@@ -180,7 +181,7 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
 
     @staticmethod
     @lru_cache(maxsize=4096)
-    def _parse_date_like_cached(value: str) -> Optional[date]:
+    def _parse_date_like_cached(value: str) -> date | None:
         for pattern, date_format in SensitiveMeta._DATE_PATTERNS:
             if not pattern.match(value):
                 continue
@@ -190,7 +191,7 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
                 except ValueError:
                     return None
             try:
-                return datetime.strptime(value, date_format).date()
+                return datetime.strptime(value, date_format).date()  # noqa: DTZ007
             except ValueError:
                 return None
         return None

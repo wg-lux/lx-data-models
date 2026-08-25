@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 from collections.abc import Mapping
 
 from pydantic import BaseModel
@@ -16,7 +17,7 @@ def direct_parent_field_collisions(
     )
     owners: dict[str, list[type[BaseModel]]] = {}
     for parent in direct_parents:
-        raw_annotations = parent.__dict__.get("__annotations__", {})
+        raw_annotations = inspect.get_annotations(parent, eval_str=False)
         if not isinstance(raw_annotations, Mapping):
             continue
         for field_name in raw_annotations:

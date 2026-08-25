@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Protocol, TypeVar, cast
+from collections.abc import Callable
+from typing import Any, Protocol, TypeVar, cast
 
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
@@ -56,7 +57,7 @@ def register_knowledge_base_graph_routes(
         request: BaseRequest,
         module_name: str,
         version: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Return one deterministic, fully resolved terminology graph snapshot."""
 
         del request
@@ -71,7 +72,7 @@ def register_knowledge_base_graph_routes(
         module_name: str,
         version: str,
         examination_name: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Return the closed terminology/template projection for one examination."""
 
         del request

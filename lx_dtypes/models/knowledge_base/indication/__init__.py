@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
 
 from .Indication import Indication
 from .IndicationDataDict import IndicationDataDict
@@ -33,30 +33,26 @@ if TYPE_CHECKING:
         IndicationType: type[IndicationTypeDjango]
 
     kb_indication_django_lookup: KbIndicationDjangoLookupType
-    kb_indication_django_models = Union[IndicationDjango, IndicationTypeDjango]
+    kb_indication_django_models: TypeAlias = Union[
+        IndicationDjango, IndicationTypeDjango
+    ]
 
-kb_indication_models = Union[
-    Indication,
-    IndicationType,
-]
+kb_indication_models: TypeAlias = Union[Indication, IndicationType]
 
-kb_indication_ddicts = Union[
-    IndicationDataDict,
-    IndicationTypeDataDict,
-]
+kb_indication_ddicts: TypeAlias = Union[IndicationDataDict, IndicationTypeDataDict]
 
 __all__ = [
     "Indication",
     "IndicationDataDict",
     "IndicationType",
     "IndicationTypeDataDict",
-    "kb_indication_lookup",
+    "KbIndicationDjangoLookupType",
     "KbIndicationLookupType",
-    "kb_indication_models",
     "kb_indication_ddicts",
     "kb_indication_django_lookup",
-    "KbIndicationDjangoLookupType",
     "kb_indication_django_models",
+    "kb_indication_lookup",
+    "kb_indication_models",
 ]
 
 
@@ -84,7 +80,7 @@ def __getattr__(name: str) -> Any:
             Indication=IndicationDjango,
             IndicationType=IndicationTypeDjango,
         ),
-        "kb_indication_django_models": Union[IndicationDjango, IndicationTypeDjango],
+        "kb_indication_django_models": IndicationDjango | IndicationTypeDjango,
     }
     globals().update(exports)
     return exports[name]

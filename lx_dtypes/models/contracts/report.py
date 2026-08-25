@@ -7,7 +7,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from .json_types import JsonNull, JsonValue
 from .patient_examination_report import ReportJsonObject, ReportStatus
 
-
 type ReportMetaJsonValue = (
     JsonValue
     | JsonNull
@@ -46,9 +45,9 @@ ReportPayload = Report
 
 __all__: list[str] = [
     "Report",
-    "SerializedReport",
-    "ReportPayload",
     "ReportMetaJsonObject",
     "ReportMetaJsonValue",
+    "ReportPayload",
     "ReportVersion",
+    "SerializedReport",
 ]

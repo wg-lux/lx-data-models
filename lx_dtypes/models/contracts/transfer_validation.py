@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import TypeAlias, cast
+from typing import cast
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-TransferValidationLogScalar: TypeAlias = str | int | float | bool | None
-TransferValidationLogValue: TypeAlias = (
+type TransferValidationLogScalar = str | int | float | bool | None
+type TransferValidationLogValue = (
     TransferValidationLogScalar
     | list["TransferValidationLogValue"]
     | dict[str, "TransferValidationLogValue"]

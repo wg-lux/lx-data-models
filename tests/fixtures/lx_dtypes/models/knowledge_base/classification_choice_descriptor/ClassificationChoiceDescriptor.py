@@ -1,17 +1,16 @@
 from pytest import fixture
 
-from lx_dtypes.models.knowledge_base.unit.Unit import Unit
-from lx_dtypes.models.knowledge_base.unit.UnitDjango import UnitDjango
-from lx_dtypes.names import (
-    ClassificationChoiceDescriptorTypes,
-    NumericDistributionChoices,
-)
-
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
     ClassificationChoiceDescriptor,
 )
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptorDjango import (
     ClassificationChoiceDescriptorDjango,
+)
+from lx_dtypes.models.knowledge_base.unit.Unit import Unit
+from lx_dtypes.models.knowledge_base.unit.UnitDjango import UnitDjango
+from lx_dtypes.names import (
+    ClassificationChoiceDescriptorTypes,
+    NumericDistributionChoices,
 )
 
 

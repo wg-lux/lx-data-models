@@ -76,7 +76,7 @@ class ReportTemplateBuilderFindingValidator(BaseModel):
     )
 
     @model_validator(mode="after")
-    def validate_condition_payload(self) -> "ReportTemplateBuilderFindingValidator":
+    def validate_condition_payload(self) -> ReportTemplateBuilderFindingValidator:
         if not self.enabled or self.operator != "condition":
             return self
         if not self.condition.classification.strip():
@@ -109,7 +109,7 @@ class ReportTemplateBuilderSection(BaseModel):
     findings: list[ReportTemplateBuilderFinding] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def validate_section_shape(self) -> "ReportTemplateBuilderSection":
+    def validate_section_shape(self) -> ReportTemplateBuilderSection:
         if self.section_type == "findings" and not self.findings:
             raise ValueError("Findings sections must contain at least one finding.")
         if self.section_type != "findings" and self.findings:
@@ -171,15 +171,15 @@ def ensure_module_config_supports_generated_templates(module_path: Path) -> None
 
     loaded = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
     if not isinstance(loaded, dict):
-        raise ValueError(f"Module config has invalid shape: {config_path}")
+        raise TypeError(f"Module config has invalid shape: {config_path}")
 
     data = loaded.setdefault("data", {})
     if not isinstance(data, dict):
-        raise ValueError(f"Module config data section must be a mapping: {config_path}")
+        raise TypeError(f"Module config data section must be a mapping: {config_path}")
 
     dirs = data.setdefault("dirs", [])
     if not isinstance(dirs, list):
-        raise ValueError(f"Module config data.dirs must be a list: {config_path}")
+        raise TypeError(f"Module config data.dirs must be a list: {config_path}")
 
     generated_entry = f"./{GENERATED_DIR_NAME}"
     if generated_entry not in dirs:

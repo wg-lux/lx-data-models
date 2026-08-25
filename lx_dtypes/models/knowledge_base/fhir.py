@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterator, Mapping
-from datetime import date
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 if TYPE_CHECKING:
@@ -188,7 +188,7 @@ _DOMAIN_INFERENCE_TIE_BREAK: tuple[str, ...] = (
 
 
 def export_fhir_terminology(
-    kb: "KnowledgeBase",
+    kb: KnowledgeBase,
     *,
     base_url: str = DEFAULT_FHIR_BASE_URL,
     publisher: str = DEFAULT_FHIR_PUBLISHER,
@@ -243,7 +243,7 @@ def export_fhir_terminology(
 
 
 def export_fhir_terminology_bundle(
-    kb: "KnowledgeBase",
+    kb: KnowledgeBase,
     *,
     base_url: str = DEFAULT_FHIR_BASE_URL,
     publisher: str = DEFAULT_FHIR_PUBLISHER,
@@ -346,14 +346,14 @@ def import_fhir_terminology(
     return imported
 
 
-def _collection_values(kb: "KnowledgeBase", domain: str) -> list[object]:
+def _collection_values(kb: KnowledgeBase, domain: str) -> list[object]:
     collection = getattr(kb, domain, {})
     if isinstance(collection, Mapping):
         return list(collection.values())
     return []
 
 
-def _kb_medical_field(kb: "KnowledgeBase") -> str | None:
+def _kb_medical_field(kb: KnowledgeBase) -> str | None:
     value = getattr(getattr(kb, "config", None), "medical_field", None)
     return value.strip() if isinstance(value, str) and value.strip() else None
 
@@ -1086,7 +1086,7 @@ def _build_code_system(
         "title": config["title"],
         "status": status,
         "experimental": False,
-        "date": date.today().isoformat(),
+        "date": datetime.now(UTC).date().isoformat(),
         "publisher": publisher,
         "description": config["description"],
         "caseSensitive": True,
@@ -1143,7 +1143,7 @@ def _base_value_set(
         "title": title,
         "status": status,
         "experimental": False,
-        "date": date.today().isoformat(),
+        "date": datetime.now(UTC).date().isoformat(),
         "publisher": publisher,
         "description": description,
         "compose": {
@@ -1240,9 +1240,9 @@ __all__ = [
     "DEFAULT_FHIR_BASE_URL",
     "DEFAULT_FHIR_PUBLISHER",
     "FHIR_EXPORT_DOMAINS",
-    "extract_fhir_resources",
     "export_fhir_terminology",
     "export_fhir_terminology_bundle",
-    "infer_fhir_code_system_domain",
+    "extract_fhir_resources",
     "import_fhir_terminology",
+    "infer_fhir_code_system_domain",
 ]

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List, Optional
 
 from lx_dtypes.utils.paths import get_files_from_dir_recursive
 
@@ -49,7 +48,7 @@ class FilesAndDirsModel(PathMixin):
                 )
             self.dirs[i] = resolved
 
-    def get_files_with_suffix(self, suffix: Optional[str]) -> List[Path]:
+    def get_files_with_suffix(self, suffix: str | None) -> list[Path]:
         """
         Collects files stored on the model and returns those whose suffix exactly matches the provided value.
 
@@ -67,9 +66,8 @@ class FilesAndDirsModel(PathMixin):
                 continue
             all_files += get_files_from_dir_recursive(directory)
 
-        if self.dir:
-            if self.dir.exists():
-                all_files += get_files_from_dir_recursive(self.dir)
+        if self.dir and self.dir.exists():
+            all_files += get_files_from_dir_recursive(self.dir)
 
         filtered_files = [file for file in all_files if file.suffix == suffix]
 

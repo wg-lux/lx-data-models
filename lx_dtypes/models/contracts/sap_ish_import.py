@@ -5,7 +5,6 @@ from datetime import date, datetime
 
 from pydantic import ConfigDict, RootModel
 
-
 type SapIshImportPayloadScalar = str | int | float | bool | None | datetime | date
 type SapIshImportPayloadValue = (
     SapIshImportPayloadScalar

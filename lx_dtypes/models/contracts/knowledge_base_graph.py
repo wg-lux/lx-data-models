@@ -8,11 +8,22 @@ from typing import Any, Literal, Protocol, cast
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic_core import to_jsonable_python
 
-from .core_concepts import CoreConceptCollection
+from .core_concepts import (
+    ClassificationChoiceCore,
+    ClassificationChoiceDescriptorCore,
+    ClassificationCore,
+    CoreConceptCollection,
+    FindingCore,
+    IndicationCore,
+    InterventionCore,
+    UnitCore,
+)
 from .json_types import JsonObject
 from .knowledge_base import KnowledgeBaseIdentity
 
-KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION = "knowledge_base_graph_v1"
+KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION: Literal["knowledge_base_graph_v1"] = (
+    "knowledge_base_graph_v1"
+)
 
 type GraphNodeKind = Literal[
     "classification",
@@ -98,7 +109,7 @@ class KnowledgeBaseGraphSnapshot(BaseModel):
     edges: list[KnowledgeBaseGraphEdge] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def validate_identity_and_edges(self) -> "KnowledgeBaseGraphSnapshot":
+    def validate_identity_and_edges(self) -> KnowledgeBaseGraphSnapshot:
         if self.concepts.knowledge_base_module != self.identity.knowledge_base_module:
             raise ValueError("concept graph module does not match snapshot identity")
         if self.concepts.knowledge_base_version != self.identity.knowledge_base_version:
@@ -122,7 +133,7 @@ class ExaminationReportingContext(BaseModel):
     edges: list[KnowledgeBaseGraphEdge] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def validate_context(self) -> "ExaminationReportingContext":
+    def validate_context(self) -> ExaminationReportingContext:
         examination_names = {item.name for item in self.concepts.examination}
         if examination_names != {self.examination_name}:
             raise ValueError(
@@ -183,7 +194,7 @@ def build_knowledge_base_graph_snapshot(
             ),
         }
     )
-    content = {
+    content: dict[str, object] = {
         "contract_version": KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION,
         "identity": identity.model_dump(mode="json"),
         "declaring_modules": declaring_modules,
@@ -191,9 +202,8 @@ def build_knowledge_base_graph_snapshot(
         "report_templates": [item.model_dump(mode="json") for item in templates],
         "edges": [item.model_dump(mode="json") for item in edges],
     }
-    return KnowledgeBaseGraphSnapshot(
-        **content,
-        snapshot_id=_content_hash(content),
+    return KnowledgeBaseGraphSnapshot.model_validate(
+        {**content, "snapshot_id": _content_hash(content)}
     )
 
 
@@ -224,35 +234,45 @@ def build_examination_reporting_context(
     }
 
     for finding_name in sorted(selected["finding"]):
-        finding = records["finding"][finding_name]
+        finding = cast(FindingCore, records["finding"][finding_name])
         selected["finding_type"].update(finding.finding_types)
         selected["classification"].update(finding.classifications)
         selected["intervention"].update(finding.interventions)
         selected["intervention"].update(finding.caused_by_interventions)
     for indication_name in sorted(selected["indication"]):
-        indication = records["indication"][indication_name]
+        indication = cast(IndicationCore, records["indication"][indication_name])
         selected["indication_type"].update(indication.indication_types)
         selected["classification"].update(indication.classifications)
         selected["intervention"].update(indication.interventions)
     for classification_name in sorted(selected["classification"]):
-        classification = records["classification"][classification_name]
+        classification = cast(
+            ClassificationCore, records["classification"][classification_name]
+        )
         selected["classification_type"].update(classification.classification_types)
         selected["classification_choice"].update(classification.classification_choices)
     for choice_name in sorted(selected["classification_choice"]):
-        choice = records["classification_choice"][choice_name]
+        choice = cast(
+            ClassificationChoiceCore,
+            records["classification_choice"][choice_name],
+        )
         selected["classification_choice_descriptor"].update(
             choice.classification_choice_descriptors
         )
     for descriptor_name in sorted(selected["classification_choice_descriptor"]):
-        descriptor = records["classification_choice_descriptor"][descriptor_name]
+        descriptor = cast(
+            ClassificationChoiceDescriptorCore,
+            records["classification_choice_descriptor"][descriptor_name],
+        )
         if descriptor.unit is not None:
             selected["unit"].add(descriptor.unit)
     for unit_name in sorted(selected["unit"]):
-        selected["unit_type"].update(records["unit"][unit_name].unit_types)
+        unit = cast(UnitCore, records["unit"][unit_name])
+        selected["unit_type"].update(unit.unit_types)
     for intervention_name in sorted(selected["intervention"]):
-        selected["intervention_type"].update(
-            records["intervention"][intervention_name].intervention_types
+        intervention = cast(
+            InterventionCore, records["intervention"][intervention_name]
         )
+        selected["intervention_type"].update(intervention.intervention_types)
 
     # Provenance records do not currently expose reverse concept references, so
     # retain their complete small catalogs in the projection.
@@ -294,7 +314,7 @@ def build_examination_reporting_context(
         if (edge.source.kind, edge.source.name) in included_nodes
         and (edge.target.kind, edge.target.name) in included_nodes
     ]
-    content = {
+    content: dict[str, object] = {
         "contract_version": KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION,
         "identity": snapshot.identity.model_dump(mode="json"),
         "graph_snapshot_id": snapshot.snapshot_id,
@@ -303,9 +323,8 @@ def build_examination_reporting_context(
         "report_templates": [item.model_dump(mode="json") for item in templates],
         "edges": [item.model_dump(mode="json") for item in edges],
     }
-    return ExaminationReportingContext(
-        **content,
-        context_id=_content_hash(content),
+    return ExaminationReportingContext.model_validate(
+        {**content, "context_id": _content_hash(content)}
     )
 
 
@@ -348,116 +367,128 @@ def _build_edges(
             for target_name in target_names
         )
 
-    for record in concepts.classification:
+    for classification_record in concepts.classification:
         add(
             "classification",
-            record.name,
+            classification_record.name,
             "has_choice",
             "classification_choice",
-            record.classification_choices,
+            classification_record.classification_choices,
         )
         add(
             "classification",
-            record.name,
+            classification_record.name,
             "is_type",
             "classification_type",
-            record.classification_types,
+            classification_record.classification_types,
         )
-    for record in concepts.classification_choice:
+    for choice_record in concepts.classification_choice:
         add(
             "classification_choice",
-            record.name,
+            choice_record.name,
             "has_descriptor",
             "classification_choice_descriptor",
-            record.classification_choice_descriptors,
+            choice_record.classification_choice_descriptors,
         )
-    for record in concepts.classification_choice_descriptor:
-        if record.unit is not None:
+    for descriptor_record in concepts.classification_choice_descriptor:
+        if descriptor_record.unit is not None:
             add(
                 "classification_choice_descriptor",
-                record.name,
+                descriptor_record.name,
                 "uses_unit",
                 "unit",
-                [record.unit],
+                [descriptor_record.unit],
             )
-    for record in concepts.examination:
-        add("examination", record.name, "has_finding", "finding", record.findings)
+    for examination_record in concepts.examination:
         add(
             "examination",
-            record.name,
+            examination_record.name,
+            "has_finding",
+            "finding",
+            examination_record.findings,
+        )
+        add(
+            "examination",
+            examination_record.name,
             "has_indication",
             "indication",
-            record.indications,
+            examination_record.indications,
         )
         add(
             "examination",
-            record.name,
+            examination_record.name,
             "is_type",
             "examination_type",
-            record.examination_types,
+            examination_record.examination_types,
         )
-    for record in concepts.finding:
-        add("finding", record.name, "is_type", "finding_type", record.finding_types)
+    for finding_record in concepts.finding:
         add(
             "finding",
-            record.name,
+            finding_record.name,
+            "is_type",
+            "finding_type",
+            finding_record.finding_types,
+        )
+        add(
+            "finding",
+            finding_record.name,
             "has_classification",
             "classification",
-            record.classifications,
+            finding_record.classifications,
         )
         add(
             "finding",
-            record.name,
+            finding_record.name,
             "supports_intervention",
             "intervention",
-            record.interventions,
+            finding_record.interventions,
         )
         add(
             "finding",
-            record.name,
+            finding_record.name,
             "caused_by_intervention",
             "intervention",
-            record.caused_by_interventions,
+            finding_record.caused_by_interventions,
         )
-    for record in concepts.indication:
+    for indication_record in concepts.indication:
         add(
             "indication",
-            record.name,
+            indication_record.name,
             "is_type",
             "indication_type",
-            record.indication_types,
+            indication_record.indication_types,
         )
         add(
             "indication",
-            record.name,
+            indication_record.name,
             "has_classification",
             "classification",
-            record.classifications,
+            indication_record.classifications,
         )
         add(
             "indication",
-            record.name,
+            indication_record.name,
             "supports_intervention",
             "intervention",
-            record.interventions,
+            indication_record.interventions,
         )
-    for record in concepts.intervention:
+    for intervention_record in concepts.intervention:
         add(
             "intervention",
-            record.name,
+            intervention_record.name,
             "is_type",
             "intervention_type",
-            record.intervention_types,
+            intervention_record.intervention_types,
         )
-    for record in concepts.unit:
-        add("unit", record.name, "is_type", "unit_type", record.unit_types)
-    for record in concepts.information_source:
+    for unit_record in concepts.unit:
+        add("unit", unit_record.name, "is_type", "unit_type", unit_record.unit_types)
+    for information_source_record in concepts.information_source:
         add(
             "information_source",
-            record.name,
+            information_source_record.name,
             "is_type",
             "information_source_type",
-            record.information_source_types,
+            information_source_record.information_source_types,
         )
     for template in templates:
         add(

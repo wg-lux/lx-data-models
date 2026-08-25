@@ -1,3 +1,5 @@
+# ruff: noqa: FLY002 - line lists keep embedded YAML fixtures readable
+
 from __future__ import annotations
 
 import zipfile
@@ -5,9 +7,9 @@ from collections.abc import Iterator
 from io import BytesIO
 from pathlib import Path
 
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
-import pytest
 
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,

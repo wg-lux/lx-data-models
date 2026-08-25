@@ -1,6 +1,5 @@
-from datetime import datetime
 from datetime import date as DateField
-from typing import List
+from datetime import datetime
 
 from lx_dtypes.models.base.app_base_model.ddict.LedgerBaseModelDataDict import (
     LedgerBaseModelDataDict,
@@ -15,7 +14,7 @@ class VideoFileDataDict(LedgerBaseModelDataDict):
     video_meta: str | None
     examination: str | None
     patient: str | None
-    cases: List[str] | None
+    cases: list[str] | None
     ai_model_meta: str | None
     state: str | None
     import_meta: str | None
@@ -45,13 +44,4 @@ class VideoFileDataDict(LedgerBaseModelDataDict):
 
 
 class SerializedVideoFileDataDict(VideoFileDataDict):
-    center: str | None
-    processor: str | None
-    video_meta: str | None
-    examination: str | None
-    patient: str | None
-    cases: List[str] | None
-    ai_model_meta: str | None
-    state: str | None
-    import_meta: str | None
-    sensitive_meta: str | None
+    pass

@@ -1,11 +1,10 @@
 import pytest
 
-from lx_dtypes.models.ledger.examiner.Django import ExaminerDjango
-
 from lx_dtypes.models.ledger.center.Django import (
     CenterDjango,
 )
 from lx_dtypes.models.ledger.center.Pydantic import Center
+from lx_dtypes.models.ledger.examiner.Django import ExaminerDjango
 
 
 @pytest.fixture(scope="session")

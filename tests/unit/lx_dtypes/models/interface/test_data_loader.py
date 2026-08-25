@@ -7,7 +7,6 @@ from lx_dtypes.models.interface.DataLoader import (
     DataLoader,
     ModuleConfigNotFoundError,
 )
-
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.utils.dataloader import resolve_kb_module_load_order
 

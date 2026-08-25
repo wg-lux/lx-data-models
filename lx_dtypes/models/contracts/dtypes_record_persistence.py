@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import cast
 from uuid import UUID, uuid4
 
@@ -28,9 +28,7 @@ class _DtypesRecordLedgerPayload(BaseModel):
         validate_default=True,
     )
 
-    created_at: AwareDatetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    created_at: AwareDatetime = Field(default_factory=lambda: datetime.now(UTC))
     uuid: str | UUID = Field(default_factory=lambda: str(uuid4()))
     tags: str | list[str] = Field(default_factory=list)
     external_ids: dict[str, str] = Field(default_factory=dict)
@@ -119,7 +117,7 @@ class DtypesRecordPersistencePayload(_DtypesRecordLedgerPayload):
     )
 
     @model_validator(mode="after")
-    def validate_patient_examination(self) -> "DtypesRecordPersistencePayload":
+    def validate_patient_examination(self) -> DtypesRecordPersistencePayload:
         validate_optional_knowledge_base_identity(
             self.knowledge_base_module,
             self.knowledge_base_version,

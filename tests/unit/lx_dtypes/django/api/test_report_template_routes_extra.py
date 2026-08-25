@@ -1,18 +1,19 @@
+# ruff: noqa: FLY002 - line lists keep embedded YAML fixtures readable
+
 from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
-from pathlib import Path
 
 import pytest
 from django.test import Client
 from ninja.errors import HttpError
 
 from lx_dtypes.django.api import main as api_main
-from lx_dtypes.django.api import report_template_routes
-from lx_dtypes.django.api import report_template_builder
+from lx_dtypes.django.api import report_template_builder, report_template_routes
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 resolve_report_template_module_location = (

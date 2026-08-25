@@ -30,7 +30,7 @@ def knowledge_base_from_fhir(
     author: str | None = None,
     language: str | None = None,
     strict: bool = True,
-) -> "KnowledgeBase":
+) -> KnowledgeBase:
     """Create a validated KnowledgeBase directly from FHIR terminology."""
     from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
     from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
@@ -141,13 +141,16 @@ def _stable_uuid(module_name: str, domain: str, name: str) -> str:
     return str(uuid5(NAMESPACE_URL, f"lx-kb:{module_name}:{domain}:{name}"))
 
 
-def _yaml_payload(knowledge_base: "KnowledgeBase") -> dict[str, Any]:
+def _yaml_payload(knowledge_base: KnowledgeBase) -> dict[str, Any]:
     serialized = knowledge_base.model_dump(
         mode="json",
         exclude_none=True,
         exclude={"report_template_lifecycle_status"},
     )
-    return _without_runtime_metadata(serialized)
+    cleaned = _without_runtime_metadata(serialized)
+    if not isinstance(cleaned, dict):
+        raise TypeError("serialized knowledge base must be a mapping")
+    return cleaned
 
 
 def _without_runtime_metadata(value: Any) -> Any:

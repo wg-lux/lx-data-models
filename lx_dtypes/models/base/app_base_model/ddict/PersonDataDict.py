@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from lx_dtypes.names import GENDER_OPTIONS_LITERAL
 
@@ -6,12 +6,12 @@ from lx_dtypes.names import GENDER_OPTIONS_LITERAL
 class PersonDataDict(TypedDict):
     first_name: str
     last_name: str
-    dob: Optional[str]
-    email: Optional[str]
+    dob: str | None
+    email: str | None
     gender: GENDER_OPTIONS_LITERAL
-    phone: Optional[str]
-    street: Optional[str]
-    city: Optional[str]
-    state: Optional[str]
-    zip_code: Optional[str]
-    country: Optional[str]
+    phone: str | None
+    street: str | None
+    city: str | None
+    state: str | None
+    zip_code: str | None
+    country: str | None

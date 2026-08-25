@@ -69,7 +69,7 @@ class FrameAnnotationBulkItemPayload(BaseModel):
         "choice_name", "annotator", "external_annotation_id", mode="before"
     )
     @classmethod
-    def _blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
+    def _blank_to_none(cls, value: str | float | bool | None) -> str | None:
         if isinstance(value, str):
             return value.strip() or None
         if value is None:
@@ -106,7 +106,7 @@ class FrameAnnotationSkipPayload(BaseModel):
         "annotator", "information_source_name", "information_source", mode="before"
     )
     @classmethod
-    def _blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
+    def _blank_to_none(cls, value: str | float | bool | None) -> str | None:
         if isinstance(value, str):
             return value.strip() or None
         if value is None:
@@ -170,18 +170,14 @@ class FrameBoxAnnotationBulkEnvelopePayload(BaseModel):
         if not isinstance(annotations, list):
             return value
 
-        normalized_envelope = {
-            str(key): cast(JsonValue, val) for key, val in mapping.items()
-        }
+        normalized_envelope = {str(key): val for key, val in mapping.items()}
 
         normalized_annotations: list[JsonValue] = []
         for item in annotations:
             if not isinstance(item, Mapping):
                 normalized_annotations.append(cast(JsonValue, item))
                 continue
-            item_mapping = {
-                str(key): cast(JsonValue, value) for key, value in item.items()
-            }
+            item_mapping = {str(key): value for key, value in item.items()}
             if outer_frame_id is not None and "frame_id" not in item_mapping:
                 item_mapping["frame_id"] = cast(JsonValue, outer_frame_id)
             if "information_source_name" not in item_mapping:
@@ -207,7 +203,7 @@ class FrameBoxAnnotationBulkEnvelopePayload(BaseModel):
         "annotator", "information_source_name", "information_source", mode="before"
     )
     @classmethod
-    def _blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
+    def _blank_to_none(cls, value: str | float | bool | None) -> str | None:
         if isinstance(value, str):
             return value.strip() or None
         return str(value)
@@ -224,7 +220,9 @@ class FrameAnnotationPayloadMapping(RootModel[JsonObject]):
     @classmethod
     def normalize_mapping(cls, value: Mapping[str, JsonValue]) -> JsonObject:
         if not isinstance(value, Mapping):
-            raise ValueError("payload must be a JSON object")
+            raise ValueError(  # noqa: TRY004 - Pydantic validator contract
+                "payload must be a JSON object"
+            )
         mapping = cast(Mapping[object, JsonValue], value)
         return {str(key): item for key, item in mapping.items()}
 

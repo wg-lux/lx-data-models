@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from typing import cast
 
-from types import NoneType
-
 from pydantic import BaseModel, ConfigDict, Field
 
-
-type JsonNull = NoneType
+type JsonNull = None
 type JsonScalar = str | int | float | bool
 type JsonValue = JsonNull | JsonScalar | list[JsonValue] | dict[str, JsonValue]
 type JsonObject = dict[str, JsonValue]
@@ -45,11 +42,11 @@ class VideoFrameCacheValidationLogPayload(VideoFrameCacheManifestLogPayload):
 
 __all__ = [
     "JsonNull",
+    "JsonNumericObject",
     "JsonObject",
     "JsonScalar",
-    "JsonValue",
-    "JsonNumericObject",
     "JsonStringObject",
+    "JsonValue",
     "VideoFrameCacheManifestLogPayload",
     "VideoFrameCacheValidationLogPayload",
 ]

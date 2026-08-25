@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
 
 from lx_dtypes.models.knowledge_base.information_source.InformationSource import (
     InformationSource,
@@ -34,8 +34,10 @@ kb_information_source_lookup = KbInformationSourceLookupType(
     InformationSourceTypeDataDict=InformationSourceTypeDataDict,
 )
 
-kb_information_source_models = Union[InformationSource, InformationSourceType]
-kb_information_source_ddicts = Union[
+kb_information_source_models: TypeAlias = Union[
+    InformationSource, InformationSourceType
+]
+kb_information_source_ddicts: TypeAlias = Union[
     InformationSourceDataDict, InformationSourceTypeDataDict
 ]
 if TYPE_CHECKING:
@@ -45,7 +47,7 @@ if TYPE_CHECKING:
         InformationSourceType: type[InformationSourceTypeDjango]
 
     kb_information_source_django_lookup: KbInformationSourceDjangoLookupType
-    kb_information_source_django_models = Union[
+    kb_information_source_django_models: TypeAlias = Union[
         InformationSourceDjango, InformationSourceTypeDjango
     ]
 
@@ -54,13 +56,13 @@ __all__ = [
     "InformationSourceDataDict",
     "InformationSourceType",
     "InformationSourceTypeDataDict",
-    "kb_information_source_lookup",
+    "KbInformationSourceDjangoLookupType",
     "KbInformationSourceLookupType",
-    "kb_information_source_models",
     "kb_information_source_ddicts",
     "kb_information_source_django_lookup",
-    "KbInformationSourceDjangoLookupType",
     "kb_information_source_django_models",
+    "kb_information_source_lookup",
+    "kb_information_source_models",
 ]
 
 
@@ -88,9 +90,9 @@ def __getattr__(name: str) -> Any:
             InformationSource=InformationSourceDjango,
             InformationSourceType=InformationSourceTypeDjango,
         ),
-        "kb_information_source_django_models": Union[
-            InformationSourceDjango, InformationSourceTypeDjango
-        ],
+        "kb_information_source_django_models": (
+            InformationSourceDjango | InformationSourceTypeDjango
+        ),
     }
     globals().update(exports)
     return exports[name]

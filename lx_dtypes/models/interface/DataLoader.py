@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Literal, Set
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import Field
 
@@ -23,9 +23,9 @@ class AmbiguousModuleConfigError(ValueError):
 
 
 class DataLoader(AppBaseModel):
-    input_dirs: List[Path] = Field(default_factory=_default_dataloader_dirs_factory)
-    module_configs: Dict[str, "KnowledgeBaseConfig"] = Field(default_factory=dict)
-    module_config_candidates: Dict[str, List["KnowledgeBaseConfig"]] = Field(
+    input_dirs: list[Path] = Field(default_factory=_default_dataloader_dirs_factory)
+    module_configs: dict[str, "KnowledgeBaseConfig"] = Field(default_factory=dict)
+    module_config_candidates: dict[str, list["KnowledgeBaseConfig"]] = Field(
         default_factory=dict
     )
 
@@ -58,7 +58,7 @@ class DataLoader(AppBaseModel):
             kb.import_knowledge_base(sm_kb)
         return kb
 
-    def fetch_config_yamls(self) -> List[Path]:
+    def fetch_config_yamls(self) -> list[Path]:
         """Screens the input directories to ensure they exist.
         Then recursively iterates all directories to the end to locate all
         files named 'config.yaml'.
@@ -66,13 +66,12 @@ class DataLoader(AppBaseModel):
         Returns:
             List[Path]: A list of existing config_files.
         """
-        config_files: List[Path] = []
+        config_files: list[Path] = []
         for input_dir in self.input_dirs:
             if not input_dir.exists() or not input_dir.is_dir():
                 continue
 
-            for path in input_dir.rglob("config.yaml"):
-                config_files.append(path)
+            config_files.extend(input_dir.rglob("config.yaml"))
 
         return config_files
 
@@ -140,7 +139,7 @@ class DataLoader(AppBaseModel):
         kb_config.modules = load_order
         return kb_config
 
-    def _configs_for_name(self, module_name: str) -> List["KnowledgeBaseConfig"]:
+    def _configs_for_name(self, module_name: str) -> list["KnowledgeBaseConfig"]:
         candidates = self.module_config_candidates.get(module_name)
         if candidates:
             return candidates
@@ -197,7 +196,7 @@ class DataLoader(AppBaseModel):
         *,
         context_config: "KnowledgeBaseConfig | None",
         relation: Literal["root", "module", "dependency"],
-    ) -> List[Path]:
+    ) -> list[Path]:
         if context_config is not None and context_config.source_file is not None:
             context_dir = context_config.source_file.parent
             if relation == "module":
@@ -234,15 +233,15 @@ class DataLoader(AppBaseModel):
 
     def _collect_module_closure(
         self,
-        module_names: List[str],
+        module_names: list[str],
         *,
         context_config: "KnowledgeBaseConfig | None" = None,
-    ) -> tuple[Dict[str, "KnowledgeBaseConfig"], List[str]]:
+    ) -> tuple[dict[str, "KnowledgeBaseConfig"], list[str]]:
         """Resolve the transitive closure across dependency and module edges."""
 
-        resolved: Dict[str, KnowledgeBaseConfig] = {}
-        visiting: Set[str] = set()
-        preferred_order: List[str] = []
+        resolved: dict[str, KnowledgeBaseConfig] = {}
+        visiting: set[str] = set()
+        preferred_order: list[str] = []
 
         def visit(name: str, parent_config: "KnowledgeBaseConfig | None") -> None:
             if name in resolved:

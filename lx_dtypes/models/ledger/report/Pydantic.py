@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
@@ -26,10 +24,10 @@ class Report(LedgerBaseModel[ReportDataDict]):
     history_context_snapshot: ReportJsonObject = Field(default_factory=dict)
     version: int = 1
     is_active: bool = True
-    finalized_at: Optional[str] = None
+    finalized_at: str | None = None
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return []
 
     @property
@@ -37,7 +35,7 @@ class Report(LedgerBaseModel[ReportDataDict]):
         return ReportDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return []
 
     @property
@@ -62,10 +60,10 @@ class SerializedReport(LedgerBaseModel[SerializedReportDataDict]):
     history_context_snapshot: ReportJsonObject = Field(default_factory=dict)
     version: int = 1
     is_active: bool = True
-    finalized_at: Optional[str] = None
+    finalized_at: str | None = None
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return []
 
     @property
@@ -73,5 +71,5 @@ class SerializedReport(LedgerBaseModel[SerializedReportDataDict]):
         return SerializedReportDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return []

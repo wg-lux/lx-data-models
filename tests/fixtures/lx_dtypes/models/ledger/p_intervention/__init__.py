@@ -3,12 +3,11 @@ import pytest
 from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
     InterventionDjango,
 )
+from lx_dtypes.models.ledger.p_intervention.Django import PFindingInterventionDjango
+from lx_dtypes.models.ledger.p_intervention.Pydantic import PFindingIntervention
 from lx_dtypes.models.ledger.p_interventions.Django import (
     PFindingInterventionsDjango,
 )
-
-from lx_dtypes.models.ledger.p_intervention.Django import PFindingInterventionDjango
-from lx_dtypes.models.ledger.p_intervention.Pydantic import PFindingIntervention
 
 
 @pytest.fixture()

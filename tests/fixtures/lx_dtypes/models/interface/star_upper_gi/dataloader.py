@@ -1,11 +1,11 @@
 from pathlib import Path
 
 from pytest import fixture
-from tests.paths import PACKAGE_ROOT
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
+from tests.paths import PACKAGE_ROOT
 
 YAML_REPOSITORY_DIRS = [PACKAGE_ROOT / "data"]
 

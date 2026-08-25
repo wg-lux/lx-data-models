@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 import yaml
-from typing import Union
+
 from lx_dtypes.models.interface.DataLoader import DataLoader
 
 
@@ -10,7 +10,7 @@ def _write_module(
     tmp_path: Path,
     *,
     lifecycle_status: str,
-    records: list[dict[str, Union[int, str, dict[str, list[str]], list[str]]]],
+    records: list[dict[str, int | str | dict[str, list[str]] | list[str]]],
 ) -> None:
     module_dir = tmp_path / "report_module"
     generated_dir = module_dir / "generated_templates"

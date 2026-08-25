@@ -171,7 +171,7 @@ class AIDataSetContract(BaseModel):
 
     @field_validator("name", "description", mode="before")
     @classmethod
-    def blank_string_to_none(cls, value: str | int | float | bool | None) -> str:
+    def blank_string_to_none(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -240,7 +240,7 @@ class AIDataSetCreateContract(BaseModel):
         if value is None:
             return ""
         if not isinstance(value, str):
-            raise ValueError("description must be a string")
+            raise ValueError("description must be a string")  # noqa: TRY004
         return value.strip()
 
     @model_validator(mode="after")
@@ -450,7 +450,7 @@ class AIDataSetExportCreateContract(BaseModel):
 
     @field_validator("center_key", "ai_dataset_name", mode="before")
     @classmethod
-    def blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
+    def blank_to_none(cls, value: str | float | bool | None) -> str | None:
         if value is None:
             return None
         if isinstance(value, str):
@@ -514,7 +514,7 @@ class AIDataSetStandardExportScopeContract(BaseModel):
 
     @field_validator("center_key", mode="before")
     @classmethod
-    def normalize_center_key(cls, value: str | int | float | bool | None) -> str | None:
+    def normalize_center_key(cls, value: str | float | bool | None) -> str | None:
         if value is None:
             return None
         if isinstance(value, str):

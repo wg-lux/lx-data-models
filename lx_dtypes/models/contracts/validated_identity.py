@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
-from lx_dtypes.models.contracts.json_types import JsonObject
 
+from lx_dtypes.models.contracts.json_types import JsonObject
 
 MediaType = Literal["video", "pdf"]
 

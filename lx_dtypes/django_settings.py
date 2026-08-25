@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any
 
 import django_stubs_ext
 
@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-^y%swkwtiyx-yj=^hnfdz0iaxq#$-54f11w#(ujemicoptk2%r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS: List[str] = []
+ALLOWED_HOSTS: list[str] = []
 
 
 # Application definition
@@ -58,7 +58,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = f"{DJANGO_APP_MODULE}.urls"
 
-TEMPLATES: List[Dict[str, Any]] = [
+TEMPLATES: list[dict[str, Any]] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
@@ -79,7 +79,7 @@ WSGI_APPLICATION = f"{DJANGO_APP_MODULE}.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES: Dict[str, Dict[str, Union[str, Path]]] = {
+DATABASES: dict[str, dict[str, str | Path]] = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",

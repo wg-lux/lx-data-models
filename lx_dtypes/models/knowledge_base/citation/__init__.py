@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict
 
 from lx_dtypes.models.knowledge_base.citation.Citation import Citation
 from lx_dtypes.models.knowledge_base.citation.CitationDataDict import CitationDataDict
@@ -18,9 +18,9 @@ kb_citation_lookup: KbCitationLookupType = KbCitationLookupType(
 )
 
 
-kb_citation_models = Union[Citation,]
+kb_citation_models: TypeAlias = Citation
 
-kb_citation_ddicts = Union[CitationDataDict,]
+kb_citation_ddicts: TypeAlias = CitationDataDict
 
 if TYPE_CHECKING:
 
@@ -28,18 +28,18 @@ if TYPE_CHECKING:
         Citation: type[CitationDjango]
 
     kb_citation_django_lookup: KbCitationDjangoLookupType
-    kb_citation_django_models = Union[CitationDjango,]
+    kb_citation_django_models: TypeAlias = CitationDjango
 
 __all__ = [
     "Citation",
     "CitationDataDict",
+    "CitationDjango",
+    "KbCitationDjangoLookupType",
+    "kb_citation_ddicts",
+    "kb_citation_django_lookup",
+    "kb_citation_django_models",
     "kb_citation_lookup",
     "kb_citation_models",
-    "kb_citation_ddicts",
-    "kb_citation_django_models",
-    "CitationDjango",
-    "kb_citation_django_lookup",
-    "KbCitationDjangoLookupType",
 ]
 
 
@@ -63,7 +63,7 @@ def __getattr__(name: str) -> Any:
         "kb_citation_django_lookup": KbCitationDjangoLookupType(
             Citation=CitationDjango
         ),
-        "kb_citation_django_models": Union[CitationDjango,],
+        "kb_citation_django_models": CitationDjango,
     }
     globals().update(exports)
     return exports[name]

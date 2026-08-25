@@ -102,11 +102,11 @@ class PatientLabSample(_MedicalLedgerModel, LedgerBaseModel[PatientLabSampleData
         return SerializedPatientLabSampleDataDict
 
     @classmethod
-    def serialized_model_class(cls) -> type["SerializedPatientLabSample"]:
+    def serialized_model_class(cls) -> type[SerializedPatientLabSample]:
         return SerializedPatientLabSample
 
     @property
-    def serialized_model(self) -> "SerializedPatientLabSample":
+    def serialized_model(self) -> SerializedPatientLabSample:
         return cast(SerializedPatientLabSample, super().serialized_model)
 
 
@@ -164,11 +164,11 @@ class PatientMedicationSchedule(
     @classmethod
     def serialized_model_class(
         cls,
-    ) -> type["SerializedPatientMedicationSchedule"]:
+    ) -> type[SerializedPatientMedicationSchedule]:
         return SerializedPatientMedicationSchedule
 
     @property
-    def serialized_model(self) -> "SerializedPatientMedicationSchedule":
+    def serialized_model(self) -> SerializedPatientMedicationSchedule:
         return cast(SerializedPatientMedicationSchedule, super().serialized_model)
 
 
@@ -221,11 +221,11 @@ class PatientMedicalLedger(
         return SerializedPatientMedicalLedgerDataDict
 
     @classmethod
-    def serialized_model_class(cls) -> type["SerializedPatientMedicalLedger"]:
+    def serialized_model_class(cls) -> type[SerializedPatientMedicalLedger]:
         return SerializedPatientMedicalLedger
 
     @property
-    def serialized_model(self) -> "SerializedPatientMedicalLedger":
+    def serialized_model(self) -> SerializedPatientMedicalLedger:
         return cast(SerializedPatientMedicalLedger, super().serialized_model)
 
 

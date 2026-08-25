@@ -3,14 +3,12 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from tests.paths import GENERATED_TEST_OUTPUT_ROOT
-
+from lx_dtypes.models.ledger.p_examination.Django import PExaminationDjango
+from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.ledger.p_finding.Django import PFindingDjango
 from lx_dtypes.models.ledger.p_indication.Django import PIndicationDjango
 from lx_dtypes.utils.testing import validate_django_fixture
-
-from lx_dtypes.models.ledger.p_examination.Django import PExaminationDjango
-from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+from tests.paths import GENERATED_TEST_OUTPUT_ROOT
 
 
 @pytest.mark.django_db
@@ -48,7 +46,7 @@ class TestPExaminationFixtures:
         [
             {"date": "not-a-date"},
             {"date": "2024-01-01T10:00:00"},
-            {"date": datetime(2024, 1, 1, 10, 0)},
+            {"date": datetime(2024, 1, 1, 10, 0)},  # noqa: DTZ001
         ],
     )
     def test_rejects_ambiguous_dates(self, payload: dict[str, object]) -> None:

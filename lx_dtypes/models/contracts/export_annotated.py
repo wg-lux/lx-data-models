@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Literal, Sequence, cast
+from typing import Literal, cast
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from lx_dtypes.models.contracts.video_frame_export import export_config
 from lx_dtypes.models.contracts.json_types import JsonValue
+from lx_dtypes.models.contracts.video_frame_export import export_config
 
 
 def _coerce_int(value: object) -> int:
@@ -77,7 +77,7 @@ class ExportAnnotatedConfigContract(BaseModel):
     )
     @classmethod
     def normalize_bool_string(
-        cls, value: bool | str | int | float | None
+        cls, value: bool | str | float | None
     ) -> bool | str | int | None:
         if isinstance(value, bool):
             return value
@@ -99,7 +99,7 @@ class ExportAnnotatedConfigContract(BaseModel):
 
     @field_validator("center_key", mode="before")
     @classmethod
-    def normalize_center_key(cls, value: str | int | float | bool | None) -> str:
+    def normalize_center_key(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -108,9 +108,7 @@ class ExportAnnotatedConfigContract(BaseModel):
 
     @field_validator("information_source_name", "transcode_ext", mode="before")
     @classmethod
-    def normalize_required_string(
-        cls, value: str | int | float | bool | None
-    ) -> str | None:
+    def normalize_required_string(cls, value: str | float | bool | None) -> str | None:
         if value is None:
             return value
         if isinstance(value, str):
@@ -140,7 +138,9 @@ class ExportAnnotatedConfigContract(BaseModel):
             parts = [part.strip() for part in value.split(",")]
             return [_coerce_int(part) for part in parts if part]
         if isinstance(value, (bytes, bytearray)):
-            raise ValueError("segment_ids cannot be bytes.")
+            raise ValueError(  # noqa: TRY004 - Pydantic validation failure
+                "segment_ids cannot be bytes."
+            )
         if isinstance(value, Sequence):
             return [_coerce_int(item) for item in value]
         raise ValueError("segment_ids must be a sequence of integers.")
@@ -204,7 +204,7 @@ class ExportAnnotatedConfigContract(BaseModel):
             return {}
 
         if not isinstance(loaded, dict):
-            raise ValueError("export config must be a mapping/object")
+            raise TypeError("export config must be a mapping/object")
 
         return cast(dict[str, JsonValue], loaded)
 

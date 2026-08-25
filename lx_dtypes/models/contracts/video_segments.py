@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TypeAlias, cast
+from typing import cast
 
 from pydantic import (
     BaseModel,
@@ -13,11 +13,9 @@ from pydantic import (
     model_validator,
 )
 
-from .json_types import JsonObject
-from .json_types import JsonValue
+from .json_types import JsonObject, JsonValue
 
-
-VideoSegmentsPayloadDict: TypeAlias = dict[str, list[tuple[int, int]]]
+type VideoSegmentsPayloadDict = dict[str, list[tuple[int, int]]]
 
 
 class VideoSegmentsPayload(RootModel[VideoSegmentsPayloadDict]):
@@ -57,8 +55,8 @@ class SegmentAnnotationInput(BaseModel):
 
     def to_frame_range(self, fps: float) -> tuple[int, int]:
         return (
-            int(round(self.start_time * fps)),
-            int(round(self.end_time * fps)),
+            round(self.start_time * fps),
+            round(self.end_time * fps),
         )
 
 
@@ -80,7 +78,7 @@ def parse_segment_annotation_input(
         return None
 
 
-def _blank_to_none(value: str | int | float | bool | None) -> str | None:
+def _blank_to_none(value: str | float | bool | None) -> str | None:
     if isinstance(value, str):
         stripped = value.strip()
         return stripped or None
@@ -122,18 +120,17 @@ class SegmentCrudPayload(BaseModel):
 
     @field_validator("label_name", mode="before")
     @classmethod
-    def _normalize_label_name(
-        cls, value: str | int | float | bool | None
-    ) -> str | None:
+    def _normalize_label_name(cls, value: str | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")
     def _validate_segment_bounds(self) -> SegmentCrudPayload:
-        if self.start_frame_number is not None and self.end_frame_number is not None:
-            if self.end_frame_number <= self.start_frame_number:
-                raise ValueError(
-                    "end_frame_number must be greater than start_frame_number"
-                )
+        if (
+            self.start_frame_number is not None
+            and self.end_frame_number is not None
+            and self.end_frame_number <= self.start_frame_number
+        ):
+            raise ValueError("end_frame_number must be greater than start_frame_number")
 
         if self.start_time is not None and self.end_time is not None:
             SegmentAnnotationInput.model_validate(
@@ -178,9 +175,7 @@ class SegmentListQuery(BaseModel):
 
     @field_validator("label", "source_kind", mode="before")
     @classmethod
-    def _normalize_optional_text(
-        cls, value: str | int | float | bool | None
-    ) -> str | None:
+    def _normalize_optional_text(cls, value: str | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
 
@@ -201,13 +196,13 @@ class SegmentValidationPayload(BaseModel):
 
     @field_validator("information_source_name", mode="before")
     @classmethod
-    def _default_information_source(cls, value: str | int | float | bool | None) -> str:
+    def _default_information_source(cls, value: str | float | bool | None) -> str:
         normalized = _blank_to_none(value)
         return str(normalized or "manual_annotation")
 
     @field_validator("annotator", mode="before")
     @classmethod
-    def _normalize_annotator(cls, value: str | int | float | bool | None) -> str | None:
+    def _normalize_annotator(cls, value: str | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")
@@ -310,18 +305,18 @@ class SegmentBulkValidationPayload(BaseModel):
 
     @field_validator("information_source_name", mode="before")
     @classmethod
-    def _default_information_source(cls, value: str | int | float | bool | None) -> str:
+    def _default_information_source(cls, value: str | float | bool | None) -> str:
         normalized = _blank_to_none(value)
         return str(normalized or "manual_annotation")
 
     @field_validator("annotator", mode="before")
     @classmethod
-    def _normalize_annotator(cls, value: str | int | float | bool | None) -> str | None:
+    def _normalize_annotator(cls, value: str | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
     @field_validator("notes", mode="before")
     @classmethod
-    def _default_notes(cls, value: str | int | float | bool | None) -> str:
+    def _default_notes(cls, value: str | float | bool | None) -> str:
         return str(value or "")
 
     @model_validator(mode="after")
@@ -346,9 +341,7 @@ class SegmentPredictionImportItem(BaseModel):
 
     @field_validator("label_name", "label", mode="before")
     @classmethod
-    def _normalize_label_text(
-        cls, value: str | int | float | bool | None
-    ) -> str | None:
+    def _normalize_label_text(cls, value: str | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")
@@ -407,7 +400,7 @@ class SegmentAnnotationEnsurePayload(BaseModel):
 
     @field_validator("information_source_name", mode="before")
     @classmethod
-    def _default_information_source(cls, value: str | int | float | bool | None) -> str:
+    def _default_information_source(cls, value: str | float | bool | None) -> str:
         normalized = _blank_to_none(value)
         return str(normalized or "manual_annotation")
 
@@ -427,9 +420,7 @@ class SegmentValidationStatusPayload(BaseModel):
 
     @field_validator("label_name", mode="before")
     @classmethod
-    def _normalize_label_name(
-        cls, value: str | int | float | bool | None
-    ) -> str | None:
+    def _normalize_label_name(cls, value: str | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
 
@@ -484,8 +475,6 @@ def validate_segment_validation_status_payload(
 
 
 __all__ = [
-    "VideoSegmentsPayload",
-    "VideoSegmentsPayloadDict",
     "SegmentAnnotationEnsurePayload",
     "SegmentAnnotationInput",
     "SegmentAnnotationMetadataInput",
@@ -498,6 +487,8 @@ __all__ = [
     "SegmentPredictionImportPayload",
     "SegmentValidationPayload",
     "SegmentValidationStatusPayload",
+    "VideoSegmentsPayload",
+    "VideoSegmentsPayloadDict",
     "parse_segment_annotation_input",
     "validate_segment_annotation_ensure_payload",
     "validate_segment_blacken_outside_payload",
@@ -506,6 +497,6 @@ __all__ = [
     "validate_segment_list_query",
     "validate_segment_prediction_import_payload",
     "validate_segment_validation_payload",
-    "validate_video_segments_payload",
     "validate_segment_validation_status_payload",
+    "validate_video_segments_payload",
 ]

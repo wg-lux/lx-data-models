@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal, TypeAlias, TypedDict
+from typing import Literal, TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
-VideoProcessingHistoryOperation: TypeAlias = Literal[
+type VideoProcessingHistoryOperation = Literal[
     "mask_overlay",
     "frame_removal",
     "analysis",
@@ -13,7 +13,7 @@ VideoProcessingHistoryOperation: TypeAlias = Literal[
     "ai_temporal_inference",
 ]
 
-VideoProcessingHistoryStatus: TypeAlias = Literal[
+type VideoProcessingHistoryStatus = Literal[
     "pending",
     "running",
     "success",

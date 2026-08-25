@@ -1,16 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import lru_cache
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Dict,
-    List,
     NoReturn,
-    Optional,
     Protocol,
-    Set,
     TypeVar,
     cast,
 )
@@ -55,19 +51,19 @@ class PatientFindingClassificationInput(Schema):
 class PatientFindingCreateRequest(Schema):
     patient_examination: int
     finding: int
-    classifications: List[PatientFindingClassificationInput] = Field(
+    classifications: list[PatientFindingClassificationInput] = Field(
         default_factory=list
     )
 
 
 class PatientFindingUpdateRequest(Schema):
-    finding: Optional[int] = None
-    is_active: Optional[bool] = None
-    classifications: Optional[List[PatientFindingClassificationInput]] = None
+    finding: int | None = None
+    is_active: bool | None = None
+    classifications: list[PatientFindingClassificationInput] | None = None
 
 
 class PatientFindingClassificationsRequest(Schema):
-    classifications: List[PatientFindingClassificationInput] = Field(
+    classifications: list[PatientFindingClassificationInput] = Field(
         default_factory=list
     )
     replace: bool = True
@@ -161,7 +157,7 @@ def _resolve_exam_kb_identity(patient_examination: Any) -> tuple[str, str]:
 def _resolve_catalog_kb_identity(
     module_name: str | None,
     module_version: str | None,
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
     patient_examination_id: int | None,
     api_error: Callable[[int, str, str], NoReturn],
 ) -> tuple[str, str | None]:
@@ -235,7 +231,7 @@ def _resolve_catalog_kb_identity(
     return active
 
 
-def _norm_name(value: Optional[str]) -> str:
+def _norm_name(value: str | None) -> str:
     return str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
 
 
@@ -243,15 +239,15 @@ def _norm_name(value: Optional[str]) -> str:
 def _kb_core_concepts_by_identity(
     module_name: str,
     version: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     loader = _require_load_module_kb()
     return cast(
-        Dict[str, Any],
+        dict[str, Any],
         loader(module_name, version=version).export_core_concepts(),
     )
 
 
-def _build_kb_lookup(core: Dict[str, Any]) -> Dict[str, Dict[str, Dict[str, Any]]]:
+def _build_kb_lookup(core: dict[str, Any]) -> dict[str, dict[str, dict[str, Any]]]:
     examination_by_name = {
         _norm_name(item.get("name")): item for item in core.get("examination", [])
     }
@@ -277,12 +273,12 @@ def _build_kb_lookup(core: Dict[str, Any]) -> Dict[str, Dict[str, Dict[str, Any]
     }
 
 
-def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
+def _kb_core_concepts(module_name: str) -> dict[str, Any]:
     loader = _require_load_module_kb()
     kb = loader(module_name)
     version = str(getattr(getattr(kb, "config", None), "version", "") or "").strip()
     if not version:
-        return cast(Dict[str, Any], kb.export_core_concepts())
+        return cast(dict[str, Any], kb.export_core_concepts())
     return _kb_core_concepts_by_identity(module_name, version)
 
 
@@ -290,14 +286,14 @@ def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
 def _kb_lookup_by_identity(
     module_name: str,
     version: str,
-) -> Dict[str, Dict[str, Dict[str, Any]]]:
+) -> dict[str, dict[str, dict[str, Any]]]:
     core = _kb_core_concepts_by_identity(module_name, version)
     return _build_kb_lookup(core)
 
 
 def _kb_lookup(
     module_name: str, version: str | None = None
-) -> Dict[str, Dict[str, Dict[str, Any]]]:
+) -> dict[str, dict[str, dict[str, Any]]]:
     if version:
         return _kb_lookup_by_identity(module_name, version)
 
@@ -305,12 +301,12 @@ def _kb_lookup(
     kb = loader(module_name)
     version = str(getattr(getattr(kb, "config", None), "version", "") or "").strip()
     if not version:
-        return _build_kb_lookup(cast(Dict[str, Any], kb.export_core_concepts()))
+        return _build_kb_lookup(cast(dict[str, Any], kb.export_core_concepts()))
     return _kb_lookup_by_identity(module_name, version)
 
 
 def _active_patient_findings_queryset(
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
 ) -> QuerySet[Any]:
     patient_finding_model = orm_models()["PatientFinding"]
     return cast(
@@ -325,7 +321,7 @@ def build_p_examination_payload_from_host_ledger(
     patient_examination: object,
     *,
     route_module_name: str,
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
     active_patient_findings_queryset: Callable[[], Any] | None = None,
 ) -> PExamination:
     patient_examination_id = getattr(patient_examination, "id", None)
@@ -458,7 +454,7 @@ def build_p_examination_payload_from_host_ledger(
     return PExamination.model_validate(payload)
 
 
-def _serialize_choice(choice: Any) -> Dict[str, Any]:
+def _serialize_choice(choice: Any) -> dict[str, Any]:
     return {
         "id": choice.id,
         "name": choice.name,
@@ -470,7 +466,7 @@ def _serialize_choice(choice: Any) -> Dict[str, Any]:
 
 def _serialize_classification(
     classification: Any, *, required: bool = False
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     choices = classification.choices.all()
     classification_types = [
         _norm_name(c_type.name) for c_type in classification.classification_types.all()
@@ -486,10 +482,10 @@ def _serialize_classification(
 
 
 def _split_classifications(
-    classifications: List[Dict[str, Any]],
-) -> Dict[str, List[Dict[str, Any]]]:
-    location: List[Dict[str, Any]] = []
-    morphology: List[Dict[str, Any]] = []
+    classifications: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    location: list[dict[str, Any]] = []
+    morphology: list[dict[str, Any]] = []
     for classification in classifications:
         c_types = {
             _norm_name(v) for v in classification.get("classification_types", [])
@@ -507,9 +503,9 @@ def _split_classifications(
 def _serialize_finding(
     finding: Any,
     *,
-    allowed_classification_names: Optional[Set[str]] = None,
-    required_classification_names: Optional[Set[str]] = None,
-) -> Dict[str, Any]:
+    allowed_classification_names: set[str] | None = None,
+    required_classification_names: set[str] | None = None,
+) -> dict[str, Any]:
     all_classifications = finding.finding_classifications.all().prefetch_related(
         "choices", "classification_types"
     )
@@ -544,7 +540,7 @@ def _serialize_finding(
 
 def _serialize_patient_finding_classification(
     item: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return {
         "id": item.id,
         "classification": item.classification_id,
@@ -557,7 +553,7 @@ def _serialize_patient_finding_classification(
     }
 
 
-def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
+def _serialize_patient_finding(item: Any) -> dict[str, Any]:
     classifications = item.classifications.filter(is_active=True).select_related(
         "classification", "classification_choice"
     )
@@ -577,7 +573,7 @@ def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
 
 def _resolve_exam_kb_finding_names(
     examination: Any, *, module_name: str, version: str | None = None
-) -> Set[str]:
+) -> set[str]:
     lookup = _kb_lookup(module_name, version=version)
     exam_entry = lookup["examination"].get(_norm_name(examination.name))
     if not exam_entry:
@@ -590,7 +586,7 @@ def _resolve_exam_kb_finding_names(
 
 def _resolve_kb_finding_classification_names(
     finding: Any, *, module_name: str, version: str | None = None
-) -> Set[str]:
+) -> set[str]:
     lookup = _kb_lookup(module_name, version=version)
     finding_entry = lookup["finding"].get(_norm_name(finding.name))
     if not finding_entry:
@@ -603,7 +599,7 @@ def _resolve_kb_finding_classification_names(
 
 def _resolve_kb_classification_choice_names(
     classification: Any, *, module_name: str, version: str | None = None
-) -> Set[str]:
+) -> set[str]:
     lookup = _kb_lookup(module_name, version=version)
     classification_entry = lookup["classification"].get(_norm_name(classification.name))
     if not classification_entry:
@@ -686,11 +682,11 @@ def _validate_classification_payload(
 
 def _replace_patient_finding_classifications(
     patient_finding: Any,
-    entries: List[PatientFindingClassificationInput],
+    entries: list[PatientFindingClassificationInput],
     *,
     module_name: str,
     version: str | None = None,
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
 ) -> None:
     patient_finding.classifications.all().delete()
@@ -739,7 +735,7 @@ def _get_or_create_active_patient_finding_classification(
     *,
     classification: Any,
     choice: Any,
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
 ) -> Any:
     existing = patient_finding.classifications.filter(
         classification=classification,
@@ -761,7 +757,7 @@ def register_findings_routes(
     api: _TypedApi,
     *,
     load_module_kb: Callable[..., Any],
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
     authenticate_request_user: Callable[[BaseRequest], Any | None],
     patient_examination_access_allowed: Callable[[BaseRequest, object], bool],
@@ -811,13 +807,13 @@ def register_findings_routes(
     @api.get("/core-concepts/{module_name}")
     def core_concepts_by_module(
         request: BaseRequest, module_name: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Return canonical core concept payloads for one KB module.
         """
         del request
         kb = load_module_kb(module_name)
-        payload = cast(Dict[str, Any], kb.export_core_concepts())
+        payload = cast(dict[str, Any], kb.export_core_concepts())
         config = getattr(kb, "config", None)
         payload["knowledge_base_module"] = str(
             getattr(config, "name", module_name) or module_name
@@ -831,10 +827,10 @@ def register_findings_routes(
     def findings_by_examination(
         request: BaseRequest,
         examination_id: int,
-        module_name: Optional[str] = None,
-        module_version: Optional[str] = None,
-        patient_examination_id: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
+        module_name: str | None = None,
+        module_version: str | None = None,
+        patient_examination_id: int | None = None,
+    ) -> list[dict[str, Any]]:
         del request
         try:
             module_name, resolved_version = _resolve_catalog_kb_identity(
@@ -902,10 +898,10 @@ def register_findings_routes(
     def classifications_by_finding(
         request: BaseRequest,
         finding_id: int,
-        module_name: Optional[str] = None,
-        module_version: Optional[str] = None,
-        patient_examination_id: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
+        module_name: str | None = None,
+        module_version: str | None = None,
+        patient_examination_id: int | None = None,
+    ) -> list[dict[str, Any]]:
         del request
         try:
             module_name, resolved_version = _resolve_catalog_kb_identity(
@@ -933,16 +929,16 @@ def register_findings_routes(
             allowed_classification_names=kb_allowed_classifications,
             required_classification_names=set(),
         )
-        return cast(List[Dict[str, Any]], serialized["classifications"])
+        return cast(list[dict[str, Any]], serialized["classifications"])
 
     @api.get("/classifications/{classification_id}/choices/")
     def choices_by_classification(
         request: BaseRequest,
         classification_id: int,
-        module_name: Optional[str] = None,
-        module_version: Optional[str] = None,
-        patient_examination_id: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        module_name: str | None = None,
+        module_version: str | None = None,
+        patient_examination_id: int | None = None,
+    ) -> dict[str, Any]:
         del request
         try:
             module_name, resolved_version = _resolve_catalog_kb_identity(
@@ -979,8 +975,8 @@ def register_findings_routes(
 
     @api.get("/patient-findings/")
     def list_patient_findings(
-        request: BaseRequest, patient_examination: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+        request: BaseRequest, patient_examination: int | None = None
+    ) -> list[dict[str, Any]]:
         require_authenticated_actor(request)
         queryset = patient_findings_queryset_for_request(request)
         if patient_examination is not None:
@@ -990,7 +986,7 @@ def register_findings_routes(
     @api.post("/patient-findings/")
     def create_patient_finding(
         request: BaseRequest, payload: PatientFindingCreateRequest
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         require_authenticated_actor(request)
         patient_examination_model = orm_models()["PatientExamination"]
         finding_model = orm_models()["Finding"]
@@ -1071,7 +1067,7 @@ def register_findings_routes(
         request: BaseRequest,
         patient_finding_id: int,
         payload: PatientFindingUpdateRequest,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         actor = require_authenticated_actor(request)
         patient_finding = (
             patient_findings_queryset_for_request(request)
@@ -1136,7 +1132,7 @@ def register_findings_routes(
     @api.delete("/patient-findings/{patient_finding_id}/")
     def delete_patient_finding(
         request: BaseRequest, patient_finding_id: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         actor = require_authenticated_actor(request)
 
         patient_finding = (
@@ -1168,7 +1164,7 @@ def register_findings_routes(
         request: BaseRequest,
         patient_finding_id: int,
         payload: PatientFindingClassificationsRequest,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         require_authenticated_actor(request)
         patient_finding = (
             patient_findings_queryset_for_request(request)

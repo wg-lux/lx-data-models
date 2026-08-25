@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from types import NoneType
-from typing import TypeAlias, TypedDict
+from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
-MigrateDataDirNull: TypeAlias = NoneType
-MigrateDataDirManifestValue: TypeAlias = str | bool | MigrateDataDirNull
+type MigrateDataDirNull = None
+type MigrateDataDirManifestValue = str | bool | MigrateDataDirNull
 
 
 class MigrateDataDirCommandOptionsPayload(BaseModel):

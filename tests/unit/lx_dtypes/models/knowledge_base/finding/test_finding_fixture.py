@@ -1,13 +1,11 @@
 import pytest
 
-from tests.paths import GENERATED_TEST_OUTPUT_ROOT
-
-from lx_dtypes.utils.ddict_schema import dump_ddict_schema
-from lx_dtypes.utils.testing import validate_django_fixture
-
 from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.finding._FindingDjango import FindingDjango
 from lx_dtypes.models.knowledge_base.finding._FindingType import FindingType
+from lx_dtypes.utils.ddict_schema import dump_ddict_schema
+from lx_dtypes.utils.testing import validate_django_fixture
+from tests.paths import GENERATED_TEST_OUTPUT_ROOT
 
 TEST_EXPORT = GENERATED_TEST_OUTPUT_ROOT / "finding_fixture.yaml"
 TEST_EXPORT_DDICT_SCHEMA = GENERATED_TEST_OUTPUT_ROOT / "finding_ddict_schema.yaml"

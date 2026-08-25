@@ -1,10 +1,10 @@
-from typing import Optional
-
 from lx_dtypes.models.base.app_base_model.ddict.LedgerBaseModelDataDict import (
     LedgerBaseModelDataDict,
 )
-from lx_dtypes.models.contracts.patient_examination_report import ReportJsonObject
-from lx_dtypes.models.contracts.patient_examination_report import ReportStatus
+from lx_dtypes.models.contracts.patient_examination_report import (
+    ReportJsonObject,
+    ReportStatus,
+)
 
 
 class ReportDataDict(LedgerBaseModelDataDict):
@@ -20,7 +20,7 @@ class ReportDataDict(LedgerBaseModelDataDict):
     history_context_snapshot: ReportJsonObject
     version: int
     is_active: bool
-    finalized_at: Optional[str]
+    finalized_at: str | None
 
 
 class SerializedReportDataDict(LedgerBaseModelDataDict):
@@ -36,4 +36,4 @@ class SerializedReportDataDict(LedgerBaseModelDataDict):
     history_context_snapshot: ReportJsonObject
     version: int
     is_active: bool
-    finalized_at: Optional[str]
+    finalized_at: str | None

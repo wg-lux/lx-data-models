@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from pathlib import Path
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from lx_dtypes.models.contracts.json_types import JsonObject
-
 
 type FrameSegmentReconciliationTrack = Literal["all", "manual", "prediction"]
 
@@ -29,7 +28,7 @@ class ModelInputCommandOptionsPayload(BaseModel):
 
     @field_validator("annotation_source_scope", "backbone_name", mode="before")
     @classmethod
-    def normalize_required_text(cls, value: str | int | float | bool | None) -> str:
+    def normalize_required_text(cls, value: str | float | bool | None) -> str:
         if isinstance(value, str):
             normalized = value.strip()
             if normalized:
@@ -38,9 +37,7 @@ class ModelInputCommandOptionsPayload(BaseModel):
 
     @field_validator("backbone_checkpoint", mode="before")
     @classmethod
-    def normalize_backbone_checkpoint(
-        cls, value: str | int | float | bool | None
-    ) -> str:
+    def normalize_backbone_checkpoint(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -86,7 +83,7 @@ class TrainImageMultilabelModelCommandOptionsPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def normalize_required_text(cls, value: str | int | float | bool | None) -> str:
+    def normalize_required_text(cls, value: str | float | bool | None) -> str:
         if isinstance(value, str):
             normalized = value.strip()
             if normalized:
@@ -95,9 +92,7 @@ class TrainImageMultilabelModelCommandOptionsPayload(BaseModel):
 
     @field_validator("backbone_checkpoint", mode="before")
     @classmethod
-    def normalize_backbone_checkpoint(
-        cls, value: str | int | float | bool | None
-    ) -> str:
+    def normalize_backbone_checkpoint(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -125,7 +120,7 @@ class TrainPhiRegionDetectorCommandOptionsPayload(BaseModel):
 
     @field_validator("base_model", "device", mode="before")
     @classmethod
-    def normalize_required_text(cls, value: str | int | float | bool | None) -> str:
+    def normalize_required_text(cls, value: str | float | bool | None) -> str:
         if isinstance(value, str):
             normalized = value.strip()
             if normalized:
@@ -134,7 +129,7 @@ class TrainPhiRegionDetectorCommandOptionsPayload(BaseModel):
 
     @field_validator("run_name", "class_ids", mode="before")
     @classmethod
-    def normalize_optional_text(cls, value: str | int | float | bool | None) -> str:
+    def normalize_optional_text(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -434,7 +429,7 @@ class RegisterAiModelMetaPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def normalize_required_text(cls, value: str | int | float | bool | None) -> str:
+    def normalize_required_text(cls, value: str | float | bool | None) -> str:
         if isinstance(value, int):
             return str(value)
         if isinstance(value, str):
@@ -445,7 +440,7 @@ class RegisterAiModelMetaPayload(BaseModel):
 
     @field_validator("description", mode="before")
     @classmethod
-    def normalize_description(cls, value: str | int | float | bool | None) -> str:
+    def normalize_description(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -468,7 +463,7 @@ class ShowUrlsCommandOptionsPayload(BaseModel):
 
     @field_validator("format_style", mode="before")
     @classmethod
-    def normalize_format_style(cls, value: str | int | float | bool | None) -> str:
+    def normalize_format_style(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -486,7 +481,7 @@ class ShowUrlsRoutePayload(BaseModel):
 
     @field_validator("url", "module", "name", "decorators", mode="before")
     @classmethod
-    def normalize_route_text(cls, value: str | int | float | bool | None) -> str:
+    def normalize_route_text(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         if isinstance(value, str):
@@ -600,12 +595,14 @@ class MigrationMarkEligibleCommandOptionsPayload(BaseModel):
 
 __all__ = [
     "FrameSegmentReconciliationTrack",
-    "ModelInputCommandOptionsPayload",
-    "ModelTrainingResultPayload",
     "MigrateDataDirCommandOptionsPayload",
     "MigrateMediaStorageCommandOptionsPayload",
     "MigrateVideoStreamableStorageCommandOptionsPayload",
     "MigrationMarkEligibleCommandOptionsPayload",
+    "ModelInputCommandOptionsPayload",
+    "ModelTrainingResultPayload",
+    "ReapQuarantineCommandOptionsPayload",
+    "ReapUploadJobSourcesCommandOptionsPayload",
     "ReconcileFrameSegmentAnnotationsCommandOptionsPayload",
     "ReconcileMediaIntegrityCommandOptionsPayload",
     "ReconcileSegmentValidationStateCommandOptionsPayload",
@@ -613,6 +610,7 @@ __all__ = [
     "RefreshAuditLedgerIntegrityCommandOptionsPayload",
     "RegisterAiModelCommandOptionsPayload",
     "RegisterAiModelMetaPayload",
+    "RuntimeStorageContractPayload",
     "SetupEndoregDbCommandOptionsPayload",
     "ShowUrlsCommandOptionsPayload",
     "ShowUrlsRoutePayload",
@@ -623,13 +621,10 @@ __all__ = [
     "TrainPhiRegionDetectorCommandOptionsPayload",
     "TranscodeVideoCommandOptionsPayload",
     "TranscodeVideoQualityMode",
-    "RuntimeStorageContractPayload",
     "ValidateRuntimeStorageContractCommandOptionsPayload",
     "ValidateVideoFileStatus",
     "ValidateVideoFileStatusPayload",
     "ValidateVideoFilesCommandOptionsPayload",
-    "ReapQuarantineCommandOptionsPayload",
-    "ReapUploadJobSourcesCommandOptionsPayload",
     "VerboseManagementCommandOptionsPayload",
     "validate_model_training_result",
 ]

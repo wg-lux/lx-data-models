@@ -8,9 +8,10 @@ that one FHIR resource is semantically equivalent to one LXDM class.
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -289,16 +290,16 @@ def mappings_from_document(
 
     raw_patterns = document.get("patterns")
     if not isinstance(raw_patterns, list):
-        raise ValueError("Mapping document must contain a 'patterns' list")
+        raise TypeError("Mapping document must contain a 'patterns' list")
     result: list[TransformationPattern] = []
     for idx, raw in enumerate(raw_patterns):
         if not isinstance(raw, Mapping):
-            raise ValueError(f"Pattern at index {idx} must be an object")
+            raise TypeError(f"Pattern at index {idx} must be an object")
         try:
             sources = raw["sources"]
             targets = raw["targets"]
             if not isinstance(sources, list) or not isinstance(targets, list):
-                raise ValueError(
+                raise TypeError(
                     f"Pattern at index {idx} requires list-valued sources and targets"
                 )
             result.append(

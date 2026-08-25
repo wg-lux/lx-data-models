@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-from types import NoneType
-from typing import Literal, TypeAlias
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-MigrateMediaStorageNull: TypeAlias = NoneType
-MigrateMediaStorageLimit: TypeAlias = int | MigrateMediaStorageNull
+type MigrateMediaStorageNull = None
+type MigrateMediaStorageLimit = int | MigrateMediaStorageNull
 
-MigrateMediaStorageObjectKind: TypeAlias = Literal["report", "video"]
-MigrateMediaStorageSourceKind: TypeAlias = Literal[
+type MigrateMediaStorageObjectKind = Literal["report", "video"]
+type MigrateMediaStorageSourceKind = Literal[
     "legacy_path",
     "streamable_path",
 ]
-MigrateMediaStorageRecordStatus: TypeAlias = Literal[
+type MigrateMediaStorageRecordStatus = Literal[
     "failed",
     "migrated",
     "ok",

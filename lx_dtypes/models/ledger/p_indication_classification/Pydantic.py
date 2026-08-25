@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
@@ -27,12 +25,12 @@ class PIndicationClassification(LedgerBaseModel[PIndicationClassificationDataDic
     classification: str
     classification_choice: str
     patient_indication: str
-    patient_indication_classification_descriptors: List[
+    patient_indication_classification_descriptors: list[
         PIndicationClassificationDescriptor
     ] = Field(default_factory=list)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return P_INDICATION_CLASSIFICATION_MODEL_LIST_TYPE_FIELDS
 
     @property
@@ -40,7 +38,7 @@ class PIndicationClassification(LedgerBaseModel[PIndicationClassificationDataDic
         return PIndicationClassificationDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return P_INDICATION_CLASSIFICATION_MODEL_NESTED_FIELDS
 
     def create_descriptor(
@@ -78,7 +76,7 @@ class SerializedPIndicationClassification(
     patient_indication_classification_descriptors: str = ""
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return P_INDICATION_CLASSIFICATION_MODEL_LIST_TYPE_FIELDS
 
     @property
@@ -86,5 +84,5 @@ class SerializedPIndicationClassification(
         return SerializedPIndicationClassificationDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return []

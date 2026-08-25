@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import fcntl
 import json
 import logging
 import os
@@ -7,29 +8,26 @@ import posixpath
 import shutil
 import uuid
 import zipfile
+from collections.abc import Callable, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
-import fcntl
 from hashlib import sha256
 from io import BytesIO
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Dict,
-    List,
-    Mapping,
     Protocol,
     TypeVar,
     cast,
 )
 
+import yaml
 from django.conf import settings
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 from pydantic import BaseModel, Field
-import yaml
 
+from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseRegistryError,
     clear_knowledge_base_resolver_caches,
@@ -38,7 +36,6 @@ from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     resolve_registry_entry_inputs,
 )
 from lx_dtypes.models.knowledge_base import KB_MODEL_NAMES_ORDERED
-from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.utils.parser import camel_to_snake
 
 from .lookup_tracker import register_runtime_lookup_tracker
@@ -53,8 +50,7 @@ if TYPE_CHECKING:
     File = cast(Any, object())
     from ninja.files import UploadedFile
 else:
-    from ninja import File
-    from ninja import Schema
+    from ninja import File, Schema
     from ninja.files import UploadedFile
 
 
@@ -78,7 +74,7 @@ class TerminologyBundleVersion(Schema):
 class TerminologyBundleListResponse(Schema):
     revision: str
     active: TerminologyBundleVersion | None
-    bundles: List[TerminologyBundleVersion]
+    bundles: list[TerminologyBundleVersion]
 
 
 class SelectTerminologyBundleRequest(Schema):
@@ -91,14 +87,14 @@ class SelectTerminologyBundleResponse(Schema):
     ok: bool
     revision: str
     active: TerminologyBundleVersion
-    counts: Dict[str, int]
+    counts: dict[str, int]
 
 
 class ImportTerminologyBundleResponse(Schema):
     ok: bool
     revision: str
     imported: TerminologyBundleVersion
-    counts: Dict[str, int]
+    counts: dict[str, int]
 
 
 @dataclass(frozen=True)
@@ -182,7 +178,7 @@ def _medical_field_from_config(
             continue
         try:
             payload = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
-        except Exception:
+        except (OSError, UnicodeError, yaml.YAMLError):
             return None
         if not isinstance(payload, Mapping):
             return None
@@ -322,8 +318,8 @@ def _set_active_selection(
     return revision
 
 
-def _record_counts(kb: KnowledgeBase) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def _record_counts(kb: KnowledgeBase) -> dict[str, int]:
+    counts: dict[str, int] = {}
     export_record_lists = getattr(kb, "export_record_lists", None)
     if callable(export_record_lists):
         record_lists = export_record_lists()
@@ -388,8 +384,7 @@ def _safe_zip_member_name(raw_name: str) -> str | None:
     if (
         not normalized
         or normalized == "."
-        or normalized.startswith("/")
-        or normalized.startswith("../")
+        or normalized.startswith(("/", "../"))
         or "/../" in normalized
     ):
         raise HttpError(400, f"Unsafe ZIP entry path: {raw_name}")
@@ -604,7 +599,7 @@ def _validate_imported_bundle(
     *,
     module_name: str,
     input_dir: Path,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     clear_knowledge_base_resolver_caches()
     try:
         _, version = get_knowledge_base_identity(module_name, input_dirs=[input_dir])
@@ -625,7 +620,7 @@ def _install_terminology_zip(
     *,
     upload: UploadedFile,
     registry_path: Path,
-) -> tuple[str, str, str | None, Path, Dict[str, int]]:
+) -> tuple[str, str, str | None, Path, dict[str, int]]:
     file_map = _strip_single_zip_root(_read_zip_file_map(upload))
     module_name, version, medical_field = _read_bundle_identity(file_map)
     _assert_import_identity_available(
@@ -709,16 +704,19 @@ def _fhir_bundle_payload(
     *,
     registry_path: Path,
     bundle: TerminologyBundleVersion,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     kb = _load_registered_kb(
         registry_path=registry_path,
         module_name=bundle.module_name,
         version=bundle.version,
     )
-    return kb.export_fhir_terminology(
+    payload = kb.export_fhir_terminology(
         bundle=True,
         medical_field=bundle.medical_field,
     )
+    if not isinstance(payload, dict):
+        raise TypeError("FHIR bundle export must return a mapping")
+    return payload
 
 
 def _active_payload(
@@ -789,7 +787,7 @@ def register_terminology_routes(
     @api.get("/terminology/active/fhir")
     def export_active_terminology_fhir(
         request: BaseRequest,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         del request
         try:
             registry_path = terminology_registry_path()
@@ -818,7 +816,7 @@ def register_terminology_routes(
         request: BaseRequest,
         module_name: str,
         version: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         del request
         module_name = module_name.strip()
         version = version.strip()
@@ -856,7 +854,7 @@ def register_terminology_routes(
     @api.post("/terminology/bundles/import")
     def import_terminology_bundle(
         request: BaseRequest,
-        file: UploadedFile = File(...),
+        file: UploadedFile = File(...),  # noqa: B008 - Ninja request marker
     ) -> ImportTerminologyBundleResponse:
         require_write_access(request)
         registry_path = _terminology_registry_path_for_write()

@@ -1,8 +1,8 @@
 from enum import Enum
-from typing import Dict, List, Literal, Optional
+from typing import Literal
 
 GENDER_OPTIONS_LITERAL = Literal["female", "male", "other", "unknown"]
-GENDER_CHOICES: Dict[GENDER_OPTIONS_LITERAL, str] = {
+GENDER_CHOICES: dict[GENDER_OPTIONS_LITERAL, str] = {
     "female": "Female",
     "male": "Male",
     "other": "Other",
@@ -91,17 +91,17 @@ FieldNames = Enum(
 
 
 # ABM: AppBaseModel
-ABM_UUID_TAGS_MODEL_LIST_TYPE_FIELDS: List[str] = [
+ABM_UUID_TAGS_MODEL_LIST_TYPE_FIELDS: list[str] = [
     FieldNames.TAGS.value,
 ]
 # KBBM = KnowledgeBaseBaseModel
-KBBM_LIST_TYPE_FIELDS: List[str] = ABM_UUID_TAGS_MODEL_LIST_TYPE_FIELDS + []
-LBM_LIST_TYPE_FIELDS: List[str] = ABM_UUID_TAGS_MODEL_LIST_TYPE_FIELDS + []
+KBBM_LIST_TYPE_FIELDS: list[str] = ABM_UUID_TAGS_MODEL_LIST_TYPE_FIELDS + []
+LBM_LIST_TYPE_FIELDS: list[str] = ABM_UUID_TAGS_MODEL_LIST_TYPE_FIELDS + []
 
 
 def mk_lbm_list_type_fields(
-    new_names: Optional[List[str]] = None, m2m_fields: Optional[List[str]] = None
-) -> List[str]:
+    new_names: list[str] | None = None, m2m_fields: list[str] | None = None
+) -> list[str]:
     if not new_names:
         new_names = []
     base = LBM_LIST_TYPE_FIELDS.copy()
@@ -114,8 +114,8 @@ def mk_lbm_list_type_fields(
 
 
 def mk_kbbm_list_type_fields(
-    new_names: Optional[List[str]] = None, m2m_fields: Optional[List[str]] = None
-) -> List[str]:
+    new_names: list[str] | None = None, m2m_fields: list[str] | None = None
+) -> list[str]:
     if not new_names:
         new_names = []
     base = KBBM_LIST_TYPE_FIELDS.copy()
@@ -127,153 +127,153 @@ def mk_kbbm_list_type_fields(
     return new
 
 
-def rm_kbbm_list_type_fields(names: List[str]) -> List[str]:
+def rm_kbbm_list_type_fields(names: list[str]) -> list[str]:
     drop_names = mk_kbbm_list_type_fields()
 
     return [n for n in names if n not in drop_names]
 
 
 ## LEDGER BASE MODELS LIST TYPE FIELDS
-CENTER_MODEL_M2M_FIELDS: List[str] = []
-CENTER_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+CENTER_MODEL_M2M_FIELDS: list[str] = []
+CENTER_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=CENTER_MODEL_M2M_FIELDS
 )
-CENTER_MODEL_NESTED_FIELDS: List[str] = [
+CENTER_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.EXAMINERS.value,
 ]
 
-EXAMINER_MODEL_M2M_FIELDS: List[str] = []
-EXAMINER_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+EXAMINER_MODEL_M2M_FIELDS: list[str] = []
+EXAMINER_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=EXAMINER_MODEL_M2M_FIELDS
 )
 
-P_EXAMINATION_MODEL_M2M_FIELDS: List[str] = []
-P_EXAMINATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+P_EXAMINATION_MODEL_M2M_FIELDS: list[str] = []
+P_EXAMINATION_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=P_EXAMINATION_MODEL_M2M_FIELDS
 )
-P_EXAMINATION_MODEL_NESTED_FIELDS: List[str] = [
+P_EXAMINATION_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.PATIENT_FINDINGS.value,
     FieldNames.PATIENT_INDICATIONS.value,
 ]
 
-CASE_MODEL_M2M_FIELDS: List[str] = []
-CASE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+CASE_MODEL_M2M_FIELDS: list[str] = []
+CASE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=CASE_MODEL_M2M_FIELDS
 )
-CASE_MODEL_NESTED_FIELDS: List[str] = [FieldNames.PATIENT_EXAMINATIONS.value]
+CASE_MODEL_NESTED_FIELDS: list[str] = [FieldNames.PATIENT_EXAMINATIONS.value]
 
-P_INDICATION_MODEL_M2M_FIELDS: List[str] = []
-P_INDICATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+P_INDICATION_MODEL_M2M_FIELDS: list[str] = []
+P_INDICATION_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=P_INDICATION_MODEL_M2M_FIELDS
 )
-P_INDICATION_MODEL_NESTED_FIELDS: List[str] = [
+P_INDICATION_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.PATIENT_INDICATION_CLASSIFICATIONS.value,
 ]
 
-P_INDICATION_CLASSIFICATION_MODEL_M2M_FIELDS: List[str] = []
-P_INDICATION_CLASSIFICATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+P_INDICATION_CLASSIFICATION_MODEL_M2M_FIELDS: list[str] = []
+P_INDICATION_CLASSIFICATION_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=P_INDICATION_CLASSIFICATION_MODEL_M2M_FIELDS
 )
-P_INDICATION_CLASSIFICATION_MODEL_NESTED_FIELDS: List[str] = [
+P_INDICATION_CLASSIFICATION_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.PATIENT_INDICATION_CLASSIFICATION_DESCRIPTORS.value,
 ]
 
-P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_M2M_FIELDS: List[str] = []
-P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS: List[str] = (
+P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_M2M_FIELDS: list[str] = []
+P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS: list[str] = (
     mk_lbm_list_type_fields(
         m2m_fields=P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_M2M_FIELDS
     )
 )
-P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_NESTED_FIELDS: List[str] = []
+P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_NESTED_FIELDS: list[str] = []
 
-P_FINDING_MODEL_M2M_FIELDS: List[str] = []
-P_FINDING_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+P_FINDING_MODEL_M2M_FIELDS: list[str] = []
+P_FINDING_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=P_FINDING_MODEL_M2M_FIELDS
 )
 
-P_FINDING_MODEL_NESTED_FIELDS: List[str] = [
+P_FINDING_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.PATIENT_FINDING_CLASSIFICATIONS.value,
     FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
 ]
 
-P_FINDING_CLASSIFICATIONS_MODEL_M2M_FIELDS: List[str] = []
-P_FINDING_CLASSIFICATIONS_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+P_FINDING_CLASSIFICATIONS_MODEL_M2M_FIELDS: list[str] = []
+P_FINDING_CLASSIFICATIONS_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=P_FINDING_CLASSIFICATIONS_MODEL_M2M_FIELDS
 )
 
-P_FINDING_CLASSIFICATIONS_MODEL_NESTED_FIELDS: List[str] = [
+P_FINDING_CLASSIFICATIONS_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICES.value,
 ]
 
-P_FINDING_CLASSIFICATION_CHOICE_MODEL_M2M_FIELDS: List[str] = []
-P_FINDING_CLASSIFICATION_CHOICE_MODEL_LIST_TYPE_FIELDS: List[str] = (
+P_FINDING_CLASSIFICATION_CHOICE_MODEL_M2M_FIELDS: list[str] = []
+P_FINDING_CLASSIFICATION_CHOICE_MODEL_LIST_TYPE_FIELDS: list[str] = (
     mk_lbm_list_type_fields(m2m_fields=P_FINDING_CLASSIFICATION_CHOICE_MODEL_M2M_FIELDS)
 )
-P_FINDING_CLASSIFICATION_CHOICE_MODEL_NESTED_FIELDS: List[str] = [
+P_FINDING_CLASSIFICATION_CHOICE_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.PATIENT_FINDING_CLASSIFICATION_CHOICE_DESCRIPTORS.value,
 ]
 
-P_FINDING_CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_M2M_FIELDS: List[str] = []
-P_FINDING_CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS: List[str] = (
+P_FINDING_CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_M2M_FIELDS: list[str] = []
+P_FINDING_CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS: list[str] = (
     mk_lbm_list_type_fields(
         m2m_fields=P_FINDING_CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_M2M_FIELDS
     )
 )
-P_FINDING_CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_NESTED_FIELDS: List[str] = []
+P_FINDING_CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_NESTED_FIELDS: list[str] = []
 
-P_INTERVENTIONS_MODEL_M2M_FIELDS: List[str] = []
-P_INTERVENTIONS_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+P_INTERVENTIONS_MODEL_M2M_FIELDS: list[str] = []
+P_INTERVENTIONS_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=P_INTERVENTIONS_MODEL_M2M_FIELDS
 )
-P_INTERVENTIONS_MODEL_NESTED_FIELDS: List[str] = [
+P_INTERVENTIONS_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.PATIENT_FINDING_INTERVENTIONS.value,
 ]
 
-P_INTERVENTION_MODEL_M2M_FIELDS: List[str] = []
-P_INTERVENTION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+P_INTERVENTION_MODEL_M2M_FIELDS: list[str] = []
+P_INTERVENTION_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=P_INTERVENTION_MODEL_M2M_FIELDS
 )
-P_INTERVENTION_MODEL_NESTED_FIELDS: List[str] = []
-PATIENT_MODEL_M2M_FIELDS: List[str] = []
-PATIENT_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+P_INTERVENTION_MODEL_NESTED_FIELDS: list[str] = []
+PATIENT_MODEL_M2M_FIELDS: list[str] = []
+PATIENT_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=PATIENT_MODEL_M2M_FIELDS
 )
-PATIENT_MODEL_NESTED_FIELDS: List[str] = []
+PATIENT_MODEL_NESTED_FIELDS: list[str] = []
 
-PATIENT_FILE_MIXIN_M2M_FIELDS: List[str] = []
-PATIENT_FILE_MIXIN_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+PATIENT_FILE_MIXIN_M2M_FIELDS: list[str] = []
+PATIENT_FILE_MIXIN_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=PATIENT_FILE_MIXIN_M2M_FIELDS
 )
-PATIENT_FILE_MIXIN_NESTED_FIELDS: List[str] = []
+PATIENT_FILE_MIXIN_NESTED_FIELDS: list[str] = []
 
-PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS: List[str] = [] + PATIENT_FILE_MIXIN_M2M_FIELDS
-PATIENT_VIDEO_FILE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS: list[str] = [] + PATIENT_FILE_MIXIN_M2M_FIELDS
+PATIENT_VIDEO_FILE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS
 )
-PATIENT_VIDEO_FILE_MODEL_NESTED_FIELDS: List[str] = [
+PATIENT_VIDEO_FILE_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.PATIENT_VIDEO_SEGMENTS.value,
 ] + PATIENT_FILE_MIXIN_NESTED_FIELDS
 
-PATIENT_VIDEO_SEGMENT_MODEL_M2M_FIELDS: List[str] = []
-PATIENT_VIDEO_SEGMENT_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+PATIENT_VIDEO_SEGMENT_MODEL_M2M_FIELDS: list[str] = []
+PATIENT_VIDEO_SEGMENT_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=PATIENT_VIDEO_SEGMENT_MODEL_M2M_FIELDS
 )
-PATIENT_VIDEO_SEGMENT_MODEL_NESTED_FIELDS: List[str] = [
+PATIENT_VIDEO_SEGMENT_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.PATIENT_VIDEO_SEGMENT_STATE.value,
 ]
 
-PATIENT_VIDEO_SEGMENT_STATE_MODEL_M2M_FIELDS: List[str] = []
-PATIENT_VIDEO_SEGMENT_STATE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+PATIENT_VIDEO_SEGMENT_STATE_MODEL_M2M_FIELDS: list[str] = []
+PATIENT_VIDEO_SEGMENT_STATE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=PATIENT_VIDEO_SEGMENT_STATE_MODEL_M2M_FIELDS
 )
-PATIENT_VIDEO_SEGMENT_STATE_MODEL_NESTED_FIELDS: List[str] = []
+PATIENT_VIDEO_SEGMENT_STATE_MODEL_NESTED_FIELDS: list[str] = []
 
 
-SENSITIVE_META_STATE_MODEL_M2M_FIELDS: List[str] = []
-SENSITIVE_META_STATE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+SENSITIVE_META_STATE_MODEL_M2M_FIELDS: list[str] = []
+SENSITIVE_META_STATE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=SENSITIVE_META_STATE_MODEL_M2M_FIELDS
 )
-SENSITIVE_META_STATE_MODEL_NESTED_FIELDS: List[str] = []
+SENSITIVE_META_STATE_MODEL_NESTED_FIELDS: list[str] = []
 # RAW_PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS: List[str] = [] + PATIENT_FILE_MIXIN_M2M_FIELDS
 # RAW_PATIENT_VIDEO_FILE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
 #     m2m_fields=RAW_PATIENT_VIDEO_FILE_MODEL_M2M_FIELDS
@@ -282,43 +282,43 @@ SENSITIVE_META_STATE_MODEL_NESTED_FIELDS: List[str] = []
 #     [] + PATIENT_FILE_MIXIN_NESTED_FIELDS
 # )
 
-SENSITIVE_META_MODEL_M2M_FIELDS: List[str] = [
+SENSITIVE_META_MODEL_M2M_FIELDS: list[str] = [
     FieldNames.PSEUDO_EXAMINERS.value,  # TODO Will cause an issue; need to modify lookups to handle PSEUDO_EXAMINERS -> Examiner model mapping
 ]
-SENSITIVE_META_MODEL_LIST_TYPE_FIELDS: List[str] = mk_lbm_list_type_fields(
+SENSITIVE_META_MODEL_LIST_TYPE_FIELDS: list[str] = mk_lbm_list_type_fields(
     m2m_fields=SENSITIVE_META_MODEL_M2M_FIELDS
 )
-SENSITIVE_META_MODEL_NESTED_FIELDS: List[str] = [
+SENSITIVE_META_MODEL_NESTED_FIELDS: list[str] = [
     FieldNames.SENSITIVE_META_STATE.value,
 ]
 
 ## KNOWLEDGE BASE MODELS LIST TYPE FIELDS
-CITATION_MODEL_M2M_FIELDS: List[str] = []
+CITATION_MODEL_M2M_FIELDS: list[str] = []
 CITATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
     ["keywords"], m2m_fields=CITATION_MODEL_M2M_FIELDS
 )
-CLASSIFICATION_TYPE_M2M_FIELDS: List[str] = []
-CLASSIFICATION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
+CLASSIFICATION_TYPE_M2M_FIELDS: list[str] = []
+CLASSIFICATION_TYPE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_kbbm_list_type_fields(
     m2m_fields=CLASSIFICATION_TYPE_M2M_FIELDS
 )
-CLASSIFICATION_MODEL_M2M_FIELDS: List[str] = [
+CLASSIFICATION_MODEL_M2M_FIELDS: list[str] = [
     FieldNames.CLASSIFICATION_CHOICES.value,
     FieldNames.CLASSIFICATION_TYPES.value,
 ]
-CLASSIFICATION_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
+CLASSIFICATION_MODEL_LIST_TYPE_FIELDS: list[str] = mk_kbbm_list_type_fields(
     m2m_fields=CLASSIFICATION_MODEL_M2M_FIELDS
 )
 
-CLASSIFICATION_CHOICE_M2M_FIELDS: List[str] = [
+CLASSIFICATION_CHOICE_M2M_FIELDS: list[str] = [
     FieldNames.CLASSIFICATION_CHOICE_DESCRIPTORS.value,
 ]
-CLASSIFICATION_CHOICE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
+CLASSIFICATION_CHOICE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_kbbm_list_type_fields(
     m2m_fields=CLASSIFICATION_CHOICE_M2M_FIELDS
 )
 
 
-CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_M2M_FIELDS: List[str] = []
-CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS: List[str] = (
+CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_M2M_FIELDS: list[str] = []
+CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS: list[str] = (
     mk_kbbm_list_type_fields(
         [
             FieldNames.SELECTION_OPTIONS.value,
@@ -327,7 +327,7 @@ CLASSIFICATION_CHOICE_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS: List[str] = (
     )
 )
 
-FINDING_M2M_FIELDS: List[str] = [
+FINDING_M2M_FIELDS: list[str] = [
     FieldNames.FINDING_TYPES.value,
     FieldNames.CLASSIFICATIONS.value,
     FieldNames.INTERVENTIONS.value,
@@ -335,13 +335,13 @@ FINDING_M2M_FIELDS: List[str] = [
 ]
 FINDING_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(m2m_fields=FINDING_M2M_FIELDS)
 
-FINDING_TYPE_M2M_FIELDS: List[str] = []
+FINDING_TYPE_M2M_FIELDS: list[str] = []
 
 FINDING_TYPE_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
     m2m_fields=FINDING_TYPE_M2M_FIELDS
 )
 
-EXAMINATION_M2M_FIELDS: List[str] = [
+EXAMINATION_M2M_FIELDS: list[str] = [
     FieldNames.FINDINGS.value,
     FieldNames.EXAMINATION_TYPES.value,
     FieldNames.INDICATIONS.value,
@@ -350,12 +350,12 @@ EXAMINATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
     m2m_fields=EXAMINATION_M2M_FIELDS
 )
 
-EXAMINATION_TYPE_M2M_FIELDS: List[str] = []
-EXAMINATION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
+EXAMINATION_TYPE_M2M_FIELDS: list[str] = []
+EXAMINATION_TYPE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_kbbm_list_type_fields(
     m2m_fields=EXAMINATION_TYPE_M2M_FIELDS
 )
 
-INDICATION_M2M_FIELDS: List[str] = [
+INDICATION_M2M_FIELDS: list[str] = [
     FieldNames.INDICATION_TYPES.value,
     FieldNames.CLASSIFICATIONS.value,
     FieldNames.INTERVENTIONS.value,
@@ -364,41 +364,41 @@ INDICATION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
     m2m_fields=INDICATION_M2M_FIELDS
 )
 
-INDICATION_TYPE_M2M_FIELDS: List[str] = []
-INDICATION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
+INDICATION_TYPE_M2M_FIELDS: list[str] = []
+INDICATION_TYPE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_kbbm_list_type_fields(
     m2m_fields=INDICATION_TYPE_M2M_FIELDS
 )
-INTERVENTION_MODEL_M2M_FIELDS: List[str] = [
+INTERVENTION_MODEL_M2M_FIELDS: list[str] = [
     FieldNames.INTERVENTION_TYPES.value,
 ]
 INTERVENTION_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
     m2m_fields=INTERVENTION_MODEL_M2M_FIELDS
 )
 
-INTERVENTION_TYPE_M2M_FIELDS: List[str] = []
-INTERVENTION_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
+INTERVENTION_TYPE_M2M_FIELDS: list[str] = []
+INTERVENTION_TYPE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_kbbm_list_type_fields(
     m2m_fields=INTERVENTION_TYPE_M2M_FIELDS
 )
 
-INFORMATION_SOURCE_M2M_FIELDS: List[str] = [
+INFORMATION_SOURCE_M2M_FIELDS: list[str] = [
     FieldNames.INFORMATION_SOURCE_TYPES.value,
 ]
-INFORMATION_SOURCE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
+INFORMATION_SOURCE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_kbbm_list_type_fields(
     m2m_fields=INFORMATION_SOURCE_M2M_FIELDS
 )
 
-INFORMATION_SOURCE_TYPE_M2M_FIELDS: List[str] = []
+INFORMATION_SOURCE_TYPE_M2M_FIELDS: list[str] = []
 INFORMATION_SOURCE_TYPE_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(
     m2m_fields=INFORMATION_SOURCE_TYPE_M2M_FIELDS
 )
 
 
-UNIT_TYPE_M2M_FIELDS: List[str] = []
-UNIT_TYPE_MODEL_LIST_TYPE_FIELDS: List[str] = mk_kbbm_list_type_fields(
+UNIT_TYPE_M2M_FIELDS: list[str] = []
+UNIT_TYPE_MODEL_LIST_TYPE_FIELDS: list[str] = mk_kbbm_list_type_fields(
     m2m_fields=UNIT_TYPE_M2M_FIELDS
 )
 
-UNIT_MODEL_M2M_FIELDS: List[str] = [
+UNIT_MODEL_M2M_FIELDS: list[str] = [
     FieldNames.UNIT_TYPES.value,
 ]
 UNIT_MODEL_LIST_TYPE_FIELDS = mk_kbbm_list_type_fields(m2m_fields=UNIT_MODEL_M2M_FIELDS)

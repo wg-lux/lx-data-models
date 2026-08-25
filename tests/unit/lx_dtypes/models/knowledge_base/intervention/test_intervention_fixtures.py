@@ -1,10 +1,5 @@
 import pytest
 
-from tests.paths import GENERATED_TEST_OUTPUT_ROOT
-
-from lx_dtypes.utils.ddict_schema import dump_ddict_schema
-from lx_dtypes.utils.testing import validate_django_fixture
-
 from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
 from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
     InterventionDjango,
@@ -12,6 +7,9 @@ from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
 from lx_dtypes.models.knowledge_base.intervention.InterventionType import (
     InterventionType,
 )
+from lx_dtypes.utils.ddict_schema import dump_ddict_schema
+from lx_dtypes.utils.testing import validate_django_fixture
+from tests.paths import GENERATED_TEST_OUTPUT_ROOT
 
 TEST_EXPORT = GENERATED_TEST_OUTPUT_ROOT / "intervention_fixture.yaml"
 TEST_EXPORT_DDICT_SCHEMA = GENERATED_TEST_OUTPUT_ROOT / "intervention_ddict_schema.yaml"

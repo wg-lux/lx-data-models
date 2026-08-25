@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict
 
 from .ClassificationChoiceDescriptor import (
     ClassificationChoiceDescriptor,
@@ -25,11 +25,11 @@ kb_classification_choice_descriptor_lookup = KbClassificationChoiceDescriptorLoo
     ClassificationChoiceDescriptorDataDict=ClassificationChoiceDescriptorDataDict,
 )
 
-kb_classification_choice_descriptor_models = Union[ClassificationChoiceDescriptor,]
+kb_classification_choice_descriptor_models: TypeAlias = ClassificationChoiceDescriptor
 
-kb_classification_choice_descriptor_ddicts = Union[
-    ClassificationChoiceDescriptorDataDict,
-]
+kb_classification_choice_descriptor_ddicts: TypeAlias = (
+    ClassificationChoiceDescriptorDataDict
+)
 
 if TYPE_CHECKING:
 
@@ -39,20 +39,20 @@ if TYPE_CHECKING:
     kb_classification_choice_descriptor_django_lookup: (
         KbClassificationChoiceDescriptorDjangoLookupType
     )
-    kb_classification_choice_descriptor_django_models = Union[
-        ClassificationChoiceDescriptorDjango,
-    ]
+    kb_classification_choice_descriptor_django_models: TypeAlias = (
+        ClassificationChoiceDescriptorDjango
+    )
 
 __all__ = [
     "ClassificationChoiceDescriptor",
     "ClassificationChoiceDescriptorDataDict",
-    "kb_classification_choice_descriptor_django_lookup",
     "KbClassificationChoiceDescriptorDjangoLookupType",
-    "kb_classification_choice_descriptor_lookup",
     "KbClassificationChoiceDescriptorLookupType",
-    "kb_classification_choice_descriptor_models",
     "kb_classification_choice_descriptor_ddicts",
+    "kb_classification_choice_descriptor_django_lookup",
     "kb_classification_choice_descriptor_django_models",
+    "kb_classification_choice_descriptor_lookup",
+    "kb_classification_choice_descriptor_models",
 ]
 
 
@@ -77,9 +77,9 @@ def __getattr__(name: str) -> Any:
         "kb_classification_choice_descriptor_django_lookup": KbClassificationChoiceDescriptorDjangoLookupType(
             ClassificationChoiceDescriptor=ClassificationChoiceDescriptorDjango
         ),
-        "kb_classification_choice_descriptor_django_models": Union[
-            ClassificationChoiceDescriptorDjango,
-        ],
+        "kb_classification_choice_descriptor_django_models": (
+            ClassificationChoiceDescriptorDjango
+        ),
     }
     globals().update(exports)
     return exports[name]

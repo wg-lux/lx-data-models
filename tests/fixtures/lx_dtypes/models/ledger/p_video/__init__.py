@@ -1,15 +1,16 @@
 from pathlib import Path
 
 import pytest
-from lx_dtypes.models.meta.SensitiveMeta import (
-    SensitiveMetaDataDict,
-    SensitiveMetaStateDataDict,
-)
+
 from lx_dtypes.models.ledger.p_video import (
     PatientVideoFile,
     PatientVideoFileDataDict,
 )
 from lx_dtypes.models.ledger.p_video.state import AnonymizationState
+from lx_dtypes.models.meta.SensitiveMeta import (
+    SensitiveMetaDataDict,
+    SensitiveMetaStateDataDict,
+)
 from lx_dtypes.utils.testing import create_black_video
 
 

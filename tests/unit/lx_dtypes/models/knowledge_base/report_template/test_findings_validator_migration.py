@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import importlib.util
-from pathlib import Path
 import sys
+from pathlib import Path
 from types import ModuleType
 
 import yaml
@@ -14,7 +14,6 @@ from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     evaluate_findings_validator_runtime,
 )
 from tests.paths import REPOSITORY_ROOT
-
 
 SCRIPT_PATH = REPOSITORY_ROOT / "scripts" / "migrate_findings_validator_operators.py"
 

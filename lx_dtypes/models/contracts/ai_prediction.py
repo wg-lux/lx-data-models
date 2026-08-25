@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from pathlib import Path
 from collections.abc import Callable, Mapping, Sequence
-from typing import TypeAlias, cast
+from pathlib import Path
+from typing import cast
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator
 
-JsonPath: TypeAlias = str
-ActivationCallable: TypeAlias = Callable[[float], float]
+type JsonPath = str
+type ActivationCallable = Callable[[float], float]
 
 
 def _coerce_float(value: object) -> float:
@@ -130,14 +130,16 @@ class VideoSegmentsPayload(RootModel[dict[str, list[tuple[int, int]]]]):
         cls, value: Mapping[str, list[tuple[object, object]]] | Mapping[object, object]
     ) -> dict[str, list[tuple[int, int]]]:
         if not isinstance(value, Mapping):
-            raise ValueError("Video sequences payload must be a JSON object.")
+            raise ValueError(  # noqa: TRY004 - Pydantic validation failure
+                "Video sequences payload must be a JSON object."
+            )
 
         normalized: dict[str, list[tuple[int, int]]] = {}
         for label, raw_sequences in cast(Mapping[object, object], value).items():
             if not isinstance(label, str) or raw_sequences is None:
                 continue
             if not isinstance(raw_sequences, list):
-                raise ValueError(
+                raise ValueError(  # noqa: TRY004 - Pydantic validation failure
                     f"Sequences for label '{label}' must be a list of pairs."
                 )
             converted: list[tuple[int, int]] = []
@@ -147,7 +149,7 @@ class VideoSegmentsPayload(RootModel[dict[str, list[tuple[int, int]]]]):
                         f"Invalid sequence entry for label '{label}': {item!r}"
                     )
                 if not isinstance(item[0], int) or not isinstance(item[1], int):
-                    raise ValueError(
+                    raise ValueError(  # noqa: TRY004 - Pydantic validation failure
                         f"Sequence coordinates must be int for label '{label}': {item!r}"
                     )
                 converted.append((int(item[0]), int(item[1])))
@@ -168,9 +170,9 @@ __all__ = [
     "AiPredictionConfigPayload",
     "AiPredictionPostProcessPayload",
     "AiPredictionResultPayload",
-    "VideoSegmentsPayload",
     "AiPredictionSequencePayload",
     "AiPredictionSerializablePostProcessPayload",
     "JsonPath",
+    "VideoSegmentsPayload",
     "to_json_path",
 ]

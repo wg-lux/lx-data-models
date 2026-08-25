@@ -72,7 +72,9 @@ def _require_text(value: Any, *, field: str) -> str:
 
 def _mapping(value: Any, *, field: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
-        raise ValueError(f"Report concept coverage expected {field} to be an object.")
+        raise ValueError(  # noqa: TRY004 - malformed contract value
+            f"Report concept coverage expected {field} to be an object."
+        )
     return cast(Mapping[str, Any], value)
 
 
@@ -120,7 +122,8 @@ def _strict_equal(left: Any, right: Any) -> bool:
             _strict_equal(left_item, right_item)
             for left_item, right_item in zip(left, right, strict=True)
         )
-    return left == right
+    result = left == right
+    return result if isinstance(result, bool) else False
 
 
 def _value_matches_allowed(value: Any, allowed_values: Sequence[Any]) -> bool | None:
@@ -248,7 +251,9 @@ def _validator_results(validation: Mapping[str, Any]) -> dict[str, Mapping[str, 
         if not isinstance(raw_results, Sequence) or isinstance(
             raw_results, (str, bytes)
         ):
-            raise ValueError(f"Validator response does not expose {key} as a list.")
+            raise ValueError(  # noqa: TRY004 - malformed contract value
+                f"Validator response does not expose {key} as a list."
+            )
         for raw_result in raw_results:
             result = _mapping(raw_result, field=f"{key} entries")
             name = _require_text(result.get("name"), field=f"{key} validator name")
@@ -272,7 +277,7 @@ def _coerce_coverage_concepts(
         )
     raw_concepts = template_export.get("coverage_concepts")
     if not isinstance(raw_concepts, Sequence) or isinstance(raw_concepts, (str, bytes)):
-        raise ValueError(
+        raise ValueError(  # noqa: TRY004 - malformed contract value
             "Report template export lacks explicit coverage_concepts; stable concept IDs "
             "and applicability rules must be authored in the template."
         )

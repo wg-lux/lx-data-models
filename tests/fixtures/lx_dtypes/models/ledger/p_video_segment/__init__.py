@@ -15,17 +15,15 @@ def p_video_segment_data_dict_fixture(
     patient_video_file_fixture: PatientVideoFile,
 ) -> PVideoSegmentDataDict:
     ddict = PVideoSegmentDataDict(
-        **{
-            "uuid": "123e4567-e89b-12d3-a456-426614174000",
-            "tags": [],
-            "external_ids": {},
-            "start_frame_number": 100,
-            "end_frame_number": 150,
-            "patient_video_file": str(patient_video_file_fixture.uuid),
-            "label": "test_label",  # TODO Update to actual label in KB when available
-            "labelset": "test_labelset",  # TODO Update to actual labelset in KB when available
-            "export_segment": True,
-        }
+        uuid="123e4567-e89b-12d3-a456-426614174000",
+        tags=[],
+        external_ids={},
+        start_frame_number=100,
+        end_frame_number=150,
+        patient_video_file=str(patient_video_file_fixture.uuid),
+        label="test_label",  # TODO Update to actual label in KB when available
+        labelset="test_labelset",  # TODO Update to actual labelset in KB when available
+        export_segment=True,
     )
     return ddict
 

@@ -26,7 +26,7 @@ class CaseResolutionNewPatient(BaseModel):
 
     @field_validator("first_name", "last_name", mode="before")
     @classmethod
-    def normalize_required_name(cls, value: str | int | float | None) -> str:
+    def normalize_required_name(cls, value: str | float | None) -> str:
         normalized = str(value).strip()
         if not normalized:
             raise ValueError("value must not be empty")
@@ -34,7 +34,7 @@ class CaseResolutionNewPatient(BaseModel):
 
     @field_validator("gender", "center", "email", "phone", mode="before")
     @classmethod
-    def normalize_optional_str(cls, value: str | int | float | None) -> str | None:
+    def normalize_optional_str(cls, value: str | float | None) -> str | None:
         if value in (None, ""):
             return None
         normalized = str(value).strip()
@@ -64,14 +64,14 @@ class CaseResolutionRequest(BaseModel):
 
     @field_validator("examination_name", mode="before")
     @classmethod
-    def normalize_examination_name(cls, value: str | int | float | None) -> str | None:
+    def normalize_examination_name(cls, value: str | float | None) -> str | None:
         if value in (None, ""):
             return None
         normalized = str(value).strip()
         return normalized or None
 
     @model_validator(mode="after")
-    def validate_action_requirements(self) -> "CaseResolutionRequest":
+    def validate_action_requirements(self) -> CaseResolutionRequest:
         if self.action == "attach":
             if self.patient_examination_id is None:
                 raise ValueError("patient_examination_id is required for attach action")

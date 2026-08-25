@@ -1,13 +1,12 @@
 import pytest
 
-from lx_dtypes.utils.testing import validate_django_fixture
-
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
     ClassificationChoiceDescriptor,
 )
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptorDjango import (
     ClassificationChoiceDescriptorDjango,
 )
+from lx_dtypes.utils.testing import validate_django_fixture
 
 
 class TestClassificationChoiceDescriptor:

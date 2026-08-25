@@ -4,7 +4,7 @@ This module deliberately excludes every Django model so consumers can import the
 official :class:`KnowledgeBase` type without configuring Django settings.
 """
 
-from typing import List, Literal, Union
+from typing import Literal, TypeAlias, Union
 
 from .citation import (
     KbCitationLookupType,
@@ -104,7 +104,7 @@ knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
     **kb_report_template_lookup,
 )
 
-KB_MODELS = Union[
+KB_MODELS: TypeAlias = Union[
     kb_classification_models,
     kb_classification_choice_models,
     kb_classification_choice_descriptor_models,
@@ -118,7 +118,7 @@ KB_MODELS = Union[
     kb_report_template_models,
 ]
 
-KB_DDICTS = Union[
+KB_DDICTS: TypeAlias = Union[
     kb_classification_ddicts,
     kb_classification_choice_ddicts,
     kb_classification_choice_descriptor_ddicts,
@@ -160,7 +160,7 @@ KB_MODEL_NAMES_LITERAL = Literal[
     "ReportTemplate",
 ]
 
-KB_MODEL_NAMES_ORDERED: List[KB_MODEL_NAMES_LITERAL] = [
+KB_MODEL_NAMES_ORDERED: list[KB_MODEL_NAMES_LITERAL] = [
     "InformationSourceType",
     "InformationSource",
     "Citation",
@@ -190,9 +190,9 @@ KB_MODEL_NAMES_ORDERED: List[KB_MODEL_NAMES_LITERAL] = [
 
 __all__ = [
     "KB_DDICTS",
+    "KB_MODELS",
     "KB_MODEL_NAMES_LITERAL",
     "KB_MODEL_NAMES_ORDERED",
-    "KB_MODELS",
     "KnowledgeBaseModelsLookupType",
     "knowledge_base_models_lookup",
 ]

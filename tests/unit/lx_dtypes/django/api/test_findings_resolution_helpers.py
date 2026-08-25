@@ -16,10 +16,10 @@ class _ApiError(RuntimeError):
 
 
 class _Relation(list[Any]):
-    def all(self) -> "_Relation":
+    def all(self) -> _Relation:
         return self
 
-    def prefetch_related(self, *args: str) -> "_Relation":
+    def prefetch_related(self, *args: str) -> _Relation:
         del args
         return self
 
@@ -30,7 +30,7 @@ def _api_error(status: int, code: str, message: str) -> NoReturn:
 
 def _orm_models_for_patient_examination(patient_examination: object) -> Any:
     class _Query:
-        def filter(self, **kwargs: object) -> "_Query":
+        def filter(self, **kwargs: object) -> _Query:
             del kwargs
             return self
 
@@ -216,7 +216,7 @@ def test_explicit_catalog_module_requires_explicit_version() -> None:
         findings_routes._resolve_catalog_kb_identity(
             module_name="dgvs_reporting",
             module_version=None,
-            orm_models=lambda: {},
+            orm_models=dict,
             patient_examination_id=None,
             api_error=_api_error,
         )

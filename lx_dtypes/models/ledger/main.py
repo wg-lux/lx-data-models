@@ -1,4 +1,4 @@
-from typing import List, Literal, Union
+from typing import Literal, Union
 
 from .case import (
     LCaseLookupType,
@@ -6,7 +6,6 @@ from .case import (
     l_case_lookup,
     l_case_models,
 )
-
 from .center import (
     LCenterDjangoLookupType,
     LCenterLookupType,
@@ -130,6 +129,15 @@ from .p_video import (
     l_p_video_lookup,
     l_p_video_models,
 )
+from .patient import (
+    LPatientDjangoLookupType,
+    LPatientLookupType,
+    l_patient_ddicts,
+    l_patient_django_lookup,
+    l_patient_django_models,
+    l_patient_lookup,
+    l_patient_models,
+)
 from .report import (
     LReportLookupType,
     l_report_ddicts,
@@ -144,15 +152,6 @@ from .video_file import (
     l_vid_file_django_models,
     l_vid_file_lookup,
     l_vid_file_models,
-)
-from .patient import (
-    LPatientDjangoLookupType,
-    LPatientLookupType,
-    l_patient_ddicts,
-    l_patient_django_lookup,
-    l_patient_django_models,
-    l_patient_lookup,
-    l_patient_models,
 )
 
 
@@ -327,7 +326,7 @@ L_MODEL_NAMES_LITERAL = Literal[
     "PatientMedicalLedger",
 ]
 
-L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
+L_MODEL_NAMES_ORDERED: list[L_MODEL_NAMES_LITERAL] = [
     "Center",
     "Examiner",
     "Patient",
@@ -355,13 +354,13 @@ L_MODEL_NAMES_ORDERED: List[L_MODEL_NAMES_LITERAL] = [
 ]
 
 __all__ = [
+    "L_DDICTS",
     "L_MODELS",
     "L_MODELS_DJANGO",
-    "L_DDICTS",
-    "ledger_models_lookup",
-    "LedgerModelsLookupType",
-    "ledger_models_django_lookup",
-    "LedgerModelsDjangoLookupType",
     "L_MODEL_NAMES_LITERAL",
     "L_MODEL_NAMES_ORDERED",
+    "LedgerModelsDjangoLookupType",
+    "LedgerModelsLookupType",
+    "ledger_models_django_lookup",
+    "ledger_models_lookup",
 ]

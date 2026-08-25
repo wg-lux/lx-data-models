@@ -1,3 +1,5 @@
+# ruff: noqa: FLY002 - line lists keep embedded YAML fixtures readable
+
 from pathlib import Path
 
 import pytest

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from pytest import fixture
+
 from tests.paths import PACKAGE_ROOT
 
 DATA_ROOT = PACKAGE_ROOT / "data"

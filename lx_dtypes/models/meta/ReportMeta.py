@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import math
 import re
+from collections.abc import Mapping
 from datetime import date, datetime, time
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from pydantic import (
     BaseModel,
@@ -15,6 +16,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta, SensitiveMetaDataDict
 
 
@@ -394,7 +396,7 @@ class ReportProcessRequest(BaseModel):
         return str(value)
 
     @model_validator(mode="after")
-    def validate_source(self) -> "ReportProcessRequest":
+    def validate_source(self) -> ReportProcessRequest:
         if self.text is None and self.pdf_path is None and self.image_path is None:
             raise ValueError("Either pdf_path, image_path, or text must be provided")
         return self
@@ -537,7 +539,7 @@ def _parse_date_like_cached(value: str) -> date | None:
             except ValueError:
                 return None
         try:
-            return datetime.strptime(value, date_format).date()
+            return datetime.strptime(value, date_format).date()  # noqa: DTZ007
         except ValueError:
             return None
     return None
@@ -557,7 +559,7 @@ def _parse_time_like(value: Any) -> time | None:
         return None
     for time_format in ("%H:%M:%S", "%H:%M"):
         try:
-            return datetime.strptime(stripped, time_format).time()
+            return datetime.strptime(stripped, time_format).time()  # noqa: DTZ007
         except ValueError:
             continue
     return None
@@ -566,14 +568,14 @@ def _parse_time_like(value: Any) -> time | None:
 __all__ = [
     "ReportAnonymizerProvenance",
     "ReportCropInfo",
+    "ReportCroppingRequest",
     "ReportEndoscopeInfo",
-    "ReportExaminerInfo",
     "ReportExaminationInfo",
+    "ReportExaminerInfo",
     "ReportMeta",
     "ReportPatientInfo",
     "ReportProcessRequest",
     "ReportProcessResult",
-    "ReportCroppingRequest",
     "ReportReaderFlags",
     "ReportRedactionSummary",
 ]

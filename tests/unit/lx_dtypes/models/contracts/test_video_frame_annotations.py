@@ -84,9 +84,11 @@ def test_frame_annotation_envelope_accepts_items() -> None:
     ],
 )
 def test_frame_annotation_mutation_payloads_forbid_unknown_fields(
-    payload_type: type[FrameAnnotationBulkItemPayload]
-    | type[FrameAnnotationBulkEnvelopePayload]
-    | type[FrameAnnotationSkipPayload],
+    payload_type: type[
+        FrameAnnotationBulkItemPayload
+        | FrameAnnotationBulkEnvelopePayload
+        | FrameAnnotationSkipPayload
+    ],
     payload: object,
 ) -> None:
     with pytest.raises(ValidationError, match="extra_forbidden"):

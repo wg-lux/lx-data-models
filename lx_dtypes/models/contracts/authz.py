@@ -73,7 +73,7 @@ class KeycloakClaimsPayload(BaseModel):
         return _normalize_group_paths(value)
 
     @model_validator(mode="after")
-    def require_subject_identifier(self) -> "KeycloakClaimsPayload":
+    def require_subject_identifier(self) -> KeycloakClaimsPayload:
         if not self.preferred_username and not self.sub:
             raise ValueError("preferred_username or sub is required")
         return self
@@ -157,7 +157,7 @@ __all__ = [
     "KeycloakClaimsPayload",
     "KeycloakRoleContainerPayload",
     "KeycloakTokenResponsePayload",
-    "validate_keycloak_claims",
     "validate_authz_route_lookup",
+    "validate_keycloak_claims",
     "validate_keycloak_token_response",
 ]

@@ -3,7 +3,6 @@ import pytest
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptorDjango import (
     ClassificationChoiceDescriptorDjango,
 )
-
 from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.Django import (
     PFindingClassificationChoiceDescriptorDjango,
 )

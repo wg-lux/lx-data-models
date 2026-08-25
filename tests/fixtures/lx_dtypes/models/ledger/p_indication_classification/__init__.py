@@ -7,15 +7,14 @@ from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoiceD
     ClassificationChoiceDjango,
 )
 from lx_dtypes.models.ledger.p_indication.Django import PIndicationDjango
-from lx_dtypes.models.ledger.p_indication_classification_descriptor.Django import (
-    PIndicationClassificationDescriptorDjango,
-)
-
 from lx_dtypes.models.ledger.p_indication_classification.Django import (
     PIndicationClassificationDjango,
 )
 from lx_dtypes.models.ledger.p_indication_classification.Pydantic import (
     PIndicationClassification,
+)
+from lx_dtypes.models.ledger.p_indication_classification_descriptor.Django import (
+    PIndicationClassificationDescriptorDjango,
 )
 
 

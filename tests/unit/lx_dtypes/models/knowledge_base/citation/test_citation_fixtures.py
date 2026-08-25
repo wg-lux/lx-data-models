@@ -1,9 +1,8 @@
 import pytest
 
-from lx_dtypes.utils.testing import validate_django_fixture
-
 from lx_dtypes.models.knowledge_base.citation.Citation import Citation
 from lx_dtypes.models.knowledge_base.citation.CitationDjango import CitationDjango
+from lx_dtypes.utils.testing import validate_django_fixture
 
 
 @pytest.mark.django_db

@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
@@ -29,12 +27,12 @@ class PFindingClassificationChoice(
     classification: str
     classification_choice: str
     patient_finding_classifications: str
-    patient_finding_classification_choice_descriptors: List[
+    patient_finding_classification_choice_descriptors: list[
         PFindingClassificationChoiceDescriptor
     ] = Field(default_factory=list)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return P_FINDING_CLASSIFICATION_CHOICE_MODEL_LIST_TYPE_FIELDS
 
     @property
@@ -42,7 +40,7 @@ class PFindingClassificationChoice(
         return PFindingClassificationChoiceDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return P_FINDING_CLASSIFICATION_CHOICE_MODEL_NESTED_FIELDS
 
     def create_descriptor(
@@ -81,7 +79,7 @@ class SerializedPFindingClassificationChoice(
     patient_finding_classification_choice_descriptors: str = ""
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return P_FINDING_CLASSIFICATION_CHOICE_MODEL_LIST_TYPE_FIELDS
 
     @property
@@ -89,5 +87,5 @@ class SerializedPFindingClassificationChoice(
         return SerializedPFindingClassificationChoiceDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return []

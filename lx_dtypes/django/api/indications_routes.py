@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
-from typing import Any, Callable, Dict, List, NoReturn, Optional, Protocol, Set, cast
+from collections.abc import Callable, Iterable
+from typing import Any, NoReturn, Protocol
 
 from lx_dtypes.models.contracts.terminology_catalog import (
     IndicationCatalogDTO,
@@ -27,7 +27,7 @@ def _relation_items(relation: Any | None) -> list[Any]:
     items = all_()
     if not isinstance(items, Iterable):
         return []
-    return list(cast(Iterable[Any], items))
+    return list(items)
 
 
 def _serialize_relation_items(relation: Any | None) -> list[dict[str, Any]]:
@@ -43,7 +43,7 @@ def _serialize_relation_items(relation: Any | None) -> list[dict[str, Any]]:
     ]
 
 
-def _serialize_indication(indication: Any) -> Dict[str, Any]:
+def _serialize_indication(indication: Any) -> dict[str, Any]:
     indication_types_relation = getattr(indication, "indication_types", None)
     classifications_relation = getattr(indication, "classifications", None)
     classifications = _serialize_relation_items(classifications_relation)
@@ -65,7 +65,7 @@ def _serialize_indication(indication: Any) -> Dict[str, Any]:
 
 def _resolve_kb_finding_names(
     examination: Any, *, module_name: str, version: str | None = None
-) -> Set[str]:
+) -> set[str]:
     lookup = findings_routes._kb_lookup(module_name, version=version)
     exam_entry = lookup["examination"].get(findings_routes._norm_name(examination.name))
     if not exam_entry:
@@ -78,7 +78,7 @@ def _resolve_kb_finding_names(
 
 def _resolve_exam_kb_indication_names(
     examination: Any, *, module_name: str, version: str | None = None
-) -> Set[str]:
+) -> set[str]:
     lookup = findings_routes._kb_lookup(module_name, version=version)
     exam_entry = lookup["examination"].get(findings_routes._norm_name(examination.name))
     if not exam_entry:
@@ -90,8 +90,8 @@ def _resolve_exam_kb_indication_names(
 
 
 def _serialize_examination_node_for_indication_tree(
-    examination: Any, allowed_finding_names: Optional[Set[str]] = None
-) -> Dict[str, Any]:
+    examination: Any, allowed_finding_names: set[str] | None = None
+) -> dict[str, Any]:
     findings = list(examination.get_available_findings())
     if allowed_finding_names is not None:
         findings = [
@@ -124,17 +124,17 @@ def _serialize_examination_node_for_indication_tree(
 def register_indications_routes(
     api: _TypedApi,
     *,
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
 ) -> None:
     @api.get("/examinations/{examination_id}/indications/")
     def indications_by_examination(
         request: BaseRequest,
         examination_id: int,
-        module_name: Optional[str] = None,
-        module_version: Optional[str] = None,
-        patient_examination_id: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
+        module_name: str | None = None,
+        module_version: str | None = None,
+        patient_examination_id: int | None = None,
+    ) -> list[dict[str, Any]]:
         del request
         try:
             module_name, resolved_version = (
@@ -190,10 +190,10 @@ def register_indications_routes(
     @api.get("/indications/tree/")
     def indications_tree(
         request: BaseRequest,
-        module_name: Optional[str] = None,
-        module_version: Optional[str] = None,
-        patient_examination_id: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
+        module_name: str | None = None,
+        module_version: str | None = None,
+        patient_examination_id: int | None = None,
+    ) -> list[dict[str, Any]]:
         del request
         try:
             module_name, resolved_version = (
@@ -231,7 +231,7 @@ def register_indications_routes(
         else:
             examinations = list(examination_model.objects.all())
 
-        indication_nodes: Dict[int, Dict[str, Any]] = {}
+        indication_nodes: dict[int, dict[str, Any]] = {}
         for examination in examinations:
             if examination is None:
                 continue

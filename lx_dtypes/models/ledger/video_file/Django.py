@@ -23,7 +23,7 @@ from .DataDict import VideoFileDataDict
 class VideoFileDjango(LedgerBaseModelDjango[VideoFileDataDict]):
     # Core identifiers and linkage fields
     if TYPE_CHECKING:
-        center: models.CharField[str, str]  # type: ignore[misc]
+        center: models.CharField[str | None, str | None]  # type: ignore[misc]
         processor: models.CharField[str | None, str | None]  # type: ignore[misc]
         video_meta: models.CharField[str | None, str | None]  # type: ignore[misc]
         examination: models.CharField[str | None, str | None]  # type: ignore[misc]

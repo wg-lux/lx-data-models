@@ -3,10 +3,9 @@ from pathlib import Path
 
 import pytest
 
+from lx_dtypes.models.interface.DbInterface import DbInterface
 from lx_dtypes.models.knowledge_base.main import KB_MODEL_NAMES_ORDERED
 from lx_dtypes.utils.parser import camel_to_snake
-
-from lx_dtypes.models.interface.DbInterface import DbInterface
 
 
 class TestKnowledgeBaseDataLoader:

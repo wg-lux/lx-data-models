@@ -1,5 +1,6 @@
+from collections.abc import Iterable
 from math import isfinite
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Union, cast
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
@@ -15,7 +16,7 @@ class ReportTemplateCompiler:
         self.kb = kb
         self.tolerant = tolerant
 
-    def compile(self, template_name: str) -> Dict[str, Any]:
+    def compile(self, template_name: str) -> dict[str, Any]:
         template = self.kb.get_report_template(template_name)
 
         return {
@@ -40,7 +41,7 @@ class ReportTemplateCompiler:
             "validators": self._resolve_all_validators(template),
         }
 
-    def _resolve_section(self, section_name: str) -> Dict[str, Any]:
+    def _resolve_section(self, section_name: str) -> dict[str, Any]:
         section = self.kb.report_template_section.get(section_name)
         if not section:
             if self.tolerant:
@@ -60,22 +61,22 @@ class ReportTemplateCompiler:
             ],
         }
 
-    def _resolve_finding_requirement(self, ref: Union[str, Any]) -> Dict[str, Any]:
+    def _resolve_finding_requirement(self, ref: str | Any) -> dict[str, Any]:
         # Handle the polymorphism: is it a string ID or a Requirement object?
         if isinstance(ref, str):
             if ref in self.kb.report_finding:
                 requirement = self.kb.report_finding[ref].as_requirement().model_dump()
                 return self._hydrate_finding_inputs(requirement)
             return {"finding": ref}  # Bare finding reference
-        requirement = cast(Dict[str, Any], ref.model_dump())
+        requirement = cast(dict[str, Any], ref.model_dump())
         return self._hydrate_finding_inputs(requirement)
 
-    def _hydrate_finding_inputs(self, requirement: Dict[str, Any]) -> Dict[str, Any]:
+    def _hydrate_finding_inputs(self, requirement: dict[str, Any]) -> dict[str, Any]:
         """Expose the KB-defined input contract for every requested classification."""
 
         hydrated = dict(requirement)
         raw_requirements = hydrated.get("classifications", [])
-        classification_requirements: List[Dict[str, Any]] = []
+        classification_requirements: list[dict[str, Any]] = []
         for raw_requirement in raw_requirements:
             item = dict(raw_requirement)
             classification_name = str(item.get("classification", "")).strip()
@@ -84,7 +85,7 @@ class ReportTemplateCompiler:
                 classification_requirements.append(item)
                 continue
 
-            choices: List[Dict[str, Any]] = []
+            choices: list[dict[str, Any]] = []
             raw_choice_names = classification.classification_choices
             choice_names = (
                 [raw_choice_names]
@@ -95,7 +96,7 @@ class ReportTemplateCompiler:
                 choice = self.kb.classification_choice.get(choice_name)
                 if choice is None:
                     continue
-                descriptors: List[Dict[str, Any]] = []
+                descriptors: list[dict[str, Any]] = []
                 raw_descriptor_names = choice.classification_choice_descriptors
                 descriptor_names = (
                     [raw_descriptor_names]
@@ -137,7 +138,7 @@ class ReportTemplateCompiler:
         hydrated["classifications"] = classification_requirements
         return hydrated
 
-    def _resolve_all_validators(self, template: Any) -> Dict[str, List[Any]]:
+    def _resolve_all_validators(self, template: Any) -> dict[str, list[Any]]:
         v = template.validators
         return {
             "examination_validators": self._hydrate_list(
@@ -158,8 +159,8 @@ class ReportTemplateCompiler:
         }
 
     def _hydrate_list(
-        self, names: Iterable[str], registry: Dict[str, Any]
-    ) -> List[Any]:
+        self, names: Iterable[str], registry: dict[str, Any]
+    ) -> list[Any]:
         resolved = []
         for name in names:
             if name in registry:

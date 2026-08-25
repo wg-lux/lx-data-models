@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from collections.abc import Iterable, Mapping
-from typing import Any, Dict, Generic, List, TypeVar, cast
+from typing import Any, Generic, TypeVar, cast
 
+from pydantic import SerializationInfo, field_serializer, model_validator
 
-from pydantic import model_validator, field_serializer, SerializationInfo
 from lx_dtypes.serialization import parse_str_list, serialize_str_list
 
 DDictT = TypeVar("DDictT")
@@ -34,7 +34,7 @@ class DDictMixIn(Generic[DDictT], ABC):
 
 class ListFieldSerializationMixIn(ABC):
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """Default implementation, to be overridden by subclasses."""
         return []
 
@@ -81,9 +81,9 @@ class ListFieldSerializationMixIn(ABC):
             return serialize_str_list(value)
         return value
 
-    def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+    def model_dump(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         """Serialize list fields to their configured string representation."""
-        dumped = cast(Dict[str, Any], super().model_dump(*args, **kwargs))  # type: ignore
+        dumped = cast(dict[str, Any], super().model_dump(*args, **kwargs))  # type: ignore
         for field in self._get_all_list_fields():
             value = dumped.get(field)
             if isinstance(value, str):

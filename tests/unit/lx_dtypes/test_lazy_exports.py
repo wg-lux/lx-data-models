@@ -26,7 +26,7 @@ def test_lx_dtypes_lazy_exports_cover_all_dispatch_branches() -> None:
     assert lx_dtypes.load_knowledge_base is load_knowledge_base
 
     with pytest.raises(AttributeError):
-        getattr(lx_dtypes, "does_not_exist")
+        lx_dtypes.__getattr__("does_not_exist")
 
 
 def test_models_lazy_exports_cover_knowledge_base_ledger_and_main() -> None:
@@ -35,7 +35,7 @@ def test_models_lazy_exports_cover_knowledge_base_ledger_and_main() -> None:
     assert lx_models.MODELS is MODELS
 
     with pytest.raises(AttributeError):
-        getattr(lx_models, "does_not_exist")
+        lx_models.__getattr__("does_not_exist")
 
 
 def test_interface_lazy_exports_cover_lookup_tracker_and_resolver() -> None:
@@ -43,4 +43,4 @@ def test_interface_lazy_exports_cover_lookup_tracker_and_resolver() -> None:
     assert lx_interface.load_knowledge_base is load_knowledge_base
 
     with pytest.raises(AttributeError):
-        getattr(lx_interface, "does_not_exist")
+        lx_interface.__getattr__("does_not_exist")

@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal, NotRequired, Self, TypeAlias, TypedDict, cast
+from typing import Literal, NotRequired, Self, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt, model_validator
 
 from .json_types import JsonObject
 
-
-MediaStreamDisposition: TypeAlias = Literal["attachment", "inline"]
-MediaStreamFileKind: TypeAlias = Literal["processed", "raw"]
-StreamThrottleMode: TypeAlias = Literal["normal", "streaming"]
+type MediaStreamDisposition = Literal["attachment", "inline"]
+type MediaStreamFileKind = Literal["processed", "raw"]
+type StreamThrottleMode = Literal["normal", "streaming"]
 
 
 class ByteRange(BaseModel):

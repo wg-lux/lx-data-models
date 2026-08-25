@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from lx_dtypes.models.ledger.p_video.Pydantic import PatientVideoFile
 from pydantic import BaseModel, ConfigDict, Field
+
+from lx_dtypes.models.ledger.p_video.Pydantic import PatientVideoFile
 
 from .json_types import JsonObject
 

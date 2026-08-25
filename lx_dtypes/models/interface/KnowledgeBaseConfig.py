@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Self
+from typing import Self
 
 from pydantic import Field, field_validator, model_validator
 
@@ -13,16 +13,16 @@ from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
 
 class KnowledgeBaseConfig(AppBaseModelNamesUUIDTags):
     name: str = Field(min_length=1)
-    depends_on: List[str] = Field(default_factory=list)
-    modules: List[str] = Field(default_factory=list)
+    depends_on: list[str] = Field(default_factory=list)
+    modules: list[str] = Field(default_factory=list)
     data: FilesAndDirsModel = Field(default_factory=default_data_model_factory)
     version: str = Field(min_length=1)
-    medical_field: Optional[str] = None
-    author: Optional[str] = None
+    medical_field: str | None = None
+    author: str | None = None
 
     @field_validator("depends_on", "modules")
     @classmethod
-    def validate_module_references(cls, values: List[str]) -> List[str]:
+    def validate_module_references(cls, values: list[str]) -> list[str]:
         if any(not value for value in values):
             raise ValueError("knowledge-base module references must not be empty")
         if len(values) != len(set(values)):
@@ -44,7 +44,7 @@ class KnowledgeBaseConfig(AppBaseModelNamesUUIDTags):
             knowledge_base_version=self.version,
         )
 
-    def normalize_data_paths(self, config_file: Optional[Path]) -> None:
+    def normalize_data_paths(self, config_file: Path | None) -> None:
         """
         Normalize data paths to absolute paths relative to the knowledge base module.
 

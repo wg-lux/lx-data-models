@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from typing import Literal, TypeAlias
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-QuasiIdentifierField: TypeAlias = Literal[
+type QuasiIdentifierField = Literal[
     "first_name",
     "last_name",
     "center",
     "gender",
     "dob_band",
 ]
-QuasiIdentifierSubset: TypeAlias = tuple[QuasiIdentifierField, ...]
+type QuasiIdentifierSubset = tuple[QuasiIdentifierField, ...]
 
 
 class KAnonymityResult(BaseModel):

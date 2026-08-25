@@ -1,23 +1,19 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Dict,
-    List,
+    Literal,
     NoReturn,
-    Optional,
     Protocol,
-    Set,
     TypedDict,
     TypeVar,
     cast,
-    Literal,
     runtime_checkable,
 )
 
@@ -25,32 +21,36 @@ from django.conf import settings
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
 from lx_dtypes.models.contracts import KnowledgeBaseContract
+from lx_dtypes.models.interface import KnowledgeBaseResolver as _knowledge_base_resolver
+from lx_dtypes.models.interface.data_roots import package_data_root
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     KnowledgeBaseVersionNotFoundError,
     clear_knowledge_base_resolver_caches,
     load_knowledge_base,
     load_module_config,
 )
-from lx_dtypes.models.interface import KnowledgeBaseResolver as _knowledge_base_resolver
-from lx_dtypes.models.interface.data_roots import package_data_root
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
+from .examinations_routes import register_examinations_routes
 from .findings_routes import (
     PatientFindingClassificationInput,
-    build_p_examination_payload_from_host_ledger as _build_payload_from_host_ledger,
     clear_findings_route_caches,
     register_findings_routes,
 )
+from .findings_routes import (
+    build_p_examination_payload_from_host_ledger as _build_payload_from_host_ledger,
+)
 from .indications_routes import register_indications_routes
-from .examinations_routes import register_examinations_routes
 from .knowledge_base_graph_routes import register_knowledge_base_graph_routes
-from .request_types import BaseRequest
-from .report_template_routes import register_report_template_routes
+from .lookup_tracker import register_runtime_lookup_tracker
 from .report_template_builder import (
     ReportTemplateModuleLocation,
+)
+from .report_template_builder import (
     module_dir as report_template_module_dir,
 )
-from .lookup_tracker import register_runtime_lookup_tracker
+from .report_template_routes import register_report_template_routes
+from .request_types import BaseRequest
 from .terminology_routes import (
     active_terminology_selection,
     register_terminology_routes,
@@ -67,7 +67,7 @@ class ReportLanguageOption(TypedDict):
 
 class ReportLanguagesResponse(TypedDict):
     default_language: ReportLanguageCode
-    languages: List[ReportLanguageOption]
+    languages: list[ReportLanguageOption]
 
 
 class _RouteDecorator(Protocol):
@@ -132,20 +132,16 @@ def _host_integration_is_configured() -> bool:
 
 
 @lru_cache(maxsize=1)
-def _orm_models() -> Dict[str, Any]:
+def _orm_models() -> dict[str, Any]:
     host_models = _host_models_module()
     return {
-        "Examination": getattr(host_models, "Examination"),
-        "Finding": getattr(host_models, "Finding"),
-        "FindingClassification": getattr(host_models, "FindingClassification"),
-        "FindingClassificationChoice": getattr(
-            host_models, "FindingClassificationChoice"
-        ),
-        "PatientExamination": getattr(host_models, "PatientExamination"),
-        "PatientFinding": getattr(host_models, "PatientFinding"),
-        "PatientFindingClassification": getattr(
-            host_models, "PatientFindingClassification"
-        ),
+        "Examination": host_models.Examination,
+        "Finding": host_models.Finding,
+        "FindingClassification": host_models.FindingClassification,
+        "FindingClassificationChoice": host_models.FindingClassificationChoice,
+        "PatientExamination": host_models.PatientExamination,
+        "PatientFinding": host_models.PatientFinding,
+        "PatientFindingClassification": host_models.PatientFindingClassification,
     }
 
 
@@ -153,9 +149,7 @@ def _persist_patient_examination_dtypes_record(
     patient_examination: object,
     payload: PExamination,
 ) -> dict[str, Any]:
-    persist = getattr(
-        _host_models_module(), "persist_patient_examination_dtypes_record"
-    )
+    persist = _host_models_module().persist_patient_examination_dtypes_record
     return cast(dict[str, Any], persist(patient_examination, payload))
 
 
@@ -395,17 +389,17 @@ def _build_p_examination_payload_from_host_ledger(
     )
 
 
-def _norm_name(value: Optional[str]) -> str:
+def _norm_name(value: str | None) -> str:
     return str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
 
 
 @lru_cache(maxsize=8)
-def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
+def _kb_core_concepts(module_name: str) -> dict[str, Any]:
     return _load_module_kb(module_name).export_core_concepts()
 
 
 @lru_cache(maxsize=8)
-def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
+def _kb_lookup(module_name: str) -> dict[str, dict[str, dict[str, Any]]]:
     core = _kb_core_concepts(module_name)
     examination_by_name = {
         _norm_name(item.get("name")): item for item in core.get("examination", [])
@@ -428,14 +422,14 @@ def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
     }
 
 
-def _request_user_if_authenticated(request: BaseRequest) -> Optional[Any]:
+def _request_user_if_authenticated(request: BaseRequest) -> Any | None:
     user = getattr(request, "user", None)
     if getattr(user, "is_authenticated", False):
         return user
     return None
 
 
-def _serialize_choice(choice: Any) -> Dict[str, Any]:
+def _serialize_choice(choice: Any) -> dict[str, Any]:
     return {
         "id": choice.id,
         "name": choice.name,
@@ -447,7 +441,7 @@ def _serialize_choice(choice: Any) -> Dict[str, Any]:
 
 def _serialize_classification(
     classification: Any, *, required: bool = False
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     choices = classification.choices.all()
     classification_types = [
         _norm_name(c_type.name) for c_type in classification.classification_types.all()
@@ -463,10 +457,10 @@ def _serialize_classification(
 
 
 def _split_classifications(
-    classifications: List[Dict[str, Any]],
-) -> Dict[str, List[Dict[str, Any]]]:
-    location: List[Dict[str, Any]] = []
-    morphology: List[Dict[str, Any]] = []
+    classifications: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    location: list[dict[str, Any]] = []
+    morphology: list[dict[str, Any]] = []
     for classification in classifications:
         c_types = {
             _norm_name(v) for v in classification.get("classification_types", [])
@@ -484,9 +478,9 @@ def _split_classifications(
 def _serialize_finding(
     finding: Any,
     *,
-    allowed_classification_names: Optional[Set[str]] = None,
-    required_classification_names: Optional[Set[str]] = None,
-) -> Dict[str, Any]:
+    allowed_classification_names: set[str] | None = None,
+    required_classification_names: set[str] | None = None,
+) -> dict[str, Any]:
     all_classifications = finding.finding_classifications.all().prefetch_related(
         "choices", "classification_types"
     )
@@ -519,7 +513,7 @@ def _serialize_finding(
 
 def _serialize_patient_finding_classification(
     item: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return {
         "id": item.id,
         "classification": item.classification_id,
@@ -532,7 +526,7 @@ def _serialize_patient_finding_classification(
     }
 
 
-def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
+def _serialize_patient_finding(item: Any) -> dict[str, Any]:
     classifications = item.classifications.filter(is_active=True).select_related(
         "classification", "classification_choice"
     )
@@ -552,7 +546,7 @@ def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
 
 def _resolve_exam_kb_finding_names(
     examination: Any, *, module_name: str
-) -> Optional[Set[str]]:
+) -> set[str] | None:
     lookup = _kb_lookup(module_name)
     exam_entry = lookup["examination"].get(_norm_name(examination.name))
     if not exam_entry:
@@ -565,7 +559,7 @@ def _resolve_exam_kb_finding_names(
 
 def _resolve_kb_finding_classification_names(
     finding: Any, *, module_name: str
-) -> Optional[Set[str]]:
+) -> set[str] | None:
     lookup = _kb_lookup(module_name)
     finding_entry = lookup["finding"].get(_norm_name(finding.name))
     if not finding_entry:
@@ -578,7 +572,7 @@ def _resolve_kb_finding_classification_names(
 
 def _resolve_kb_classification_choice_names(
     classification: Any, *, module_name: str
-) -> Optional[Set[str]]:
+) -> set[str] | None:
     lookup = _kb_lookup(module_name)
     classification_entry = lookup["classification"].get(_norm_name(classification.name))
     if not classification_entry:
@@ -663,7 +657,7 @@ def _validate_classification_payload(
 
 def _replace_patient_finding_classifications(
     patient_finding: Any,
-    entries: List[PatientFindingClassificationInput],
+    entries: list[PatientFindingClassificationInput],
     *,
     module_name: str,
 ) -> None:

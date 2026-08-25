@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TypeAlias, cast
+from typing import cast
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from .json_types import JsonNumericObject, JsonObject, JsonScalar, JsonValue
 from .video_frame_annotations import FrameBoxAnnotationBulkEnvelopePayload
 
-VideoFrameBoxJsonObject: TypeAlias = JsonNumericObject
+type VideoFrameBoxJsonObject = JsonNumericObject
 
 
 def _empty_annotation_list() -> list[VideoFrameBoxJsonObject]:
@@ -98,7 +98,9 @@ def validate_video_phi_frame_observations(
     if payload is None:
         return []
     if not isinstance(payload, list):
-        raise ValueError("frame_observations must be a list")
+        raise ValueError(  # noqa: TRY004 - public validation contract
+            "frame_observations must be a list"
+        )
     observations: list[VideoPhiFrameObservationPayload] = []
     for item in payload:
         observations.append(VideoPhiFrameObservationPayload.model_validate(item))
@@ -130,7 +132,7 @@ __all__ = [
     "VideoFrameBoxJsonObject",
     "VideoPhiFrameObservationPayload",
     "VideoPhiRegionPayload",
-    "validate_video_phi_frame_observations",
     "validate_video_frame_box_annotation_request",
+    "validate_video_phi_frame_observations",
     "video_frame_box_json_safe_dict",
 ]

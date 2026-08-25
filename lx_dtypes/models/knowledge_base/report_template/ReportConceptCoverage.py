@@ -4,9 +4,10 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-
-REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION = "report_concept_coverage_v1"
 ReportConceptCoverageContractVersion = Literal["report_concept_coverage_v1"]
+REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION: ReportConceptCoverageContractVersion = (
+    "report_concept_coverage_v1"
+)
 ReportConceptApplicabilityStatus = Literal[
     "required", "conditional", "not_applicable", "unknown"
 ]
@@ -44,7 +45,7 @@ class ReportConceptApplicability(BaseModel):
     reason: str | None = None
 
     @model_validator(mode="after")
-    def validate_conditional_rule(self) -> "ReportConceptApplicability":
+    def validate_conditional_rule(self) -> ReportConceptApplicability:
         if self.status == "conditional" and not self.rule:
             raise ValueError("conditional applicability requires a rule")
         if self.status == "not_applicable" and not self.reason:
@@ -64,7 +65,7 @@ class ReportConceptCoverageItem(BaseModel):
     guideline_citations: tuple[str, ...] = ()
 
     @model_validator(mode="after")
-    def validate_status(self) -> "ReportConceptCoverageItem":
+    def validate_status(self) -> ReportConceptCoverageItem:
         if (
             self.applicability.status == "not_applicable"
             and self.validation_status != "undetermined"

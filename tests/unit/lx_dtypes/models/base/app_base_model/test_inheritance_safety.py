@@ -7,11 +7,11 @@ from types import ModuleType
 from pydantic import BaseModel
 
 import lx_dtypes.models
-from lx_dtypes.models.base.app_base_model.pydantic.InterfaceMixIns import (
-    ListFieldSerializationMixIn,
-)
 from lx_dtypes.models.base.app_base_model.pydantic.field_safety import (
     direct_parent_field_collisions,
+)
+from lx_dtypes.models.base.app_base_model.pydantic.InterfaceMixIns import (
+    ListFieldSerializationMixIn,
 )
 from lx_dtypes.models.base.file.pydantic.FilesAndDirs import FilesAndDirsModel
 from lx_dtypes.models.base.file.pydantic.PathMixIn import PathMixin

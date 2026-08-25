@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-from types import NoneType
-from typing import TypeAlias, TypedDict
+from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
-NullValue: TypeAlias = NoneType
-LegacyExaminationIdValue: TypeAlias = str | int | NullValue
-LegacyTextOrNull: TypeAlias = str | NullValue
-LegacyIntOrNull: TypeAlias = int | NullValue
+type NullValue = None
+type LegacyExaminationIdValue = str | int | NullValue
+type LegacyTextOrNull = str | NullValue
+type LegacyIntOrNull = int | NullValue
 
 
 class LegacyDataImportCommandOptionsPayload(BaseModel):

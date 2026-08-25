@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, NoReturn, Protocol, TypeVar
+from collections.abc import Callable
+from typing import Any, NoReturn, Protocol, TypeVar
 
 from lx_dtypes.models.contracts.terminology_catalog import ExaminationCatalogDTO
 
 from .findings_routes import (
     _findings_module_name,
+    _norm_name,
     _resolve_exam_kb_finding_names,
     _resolve_kb_finding_classification_names,
     _serialize_finding,
-    _norm_name,
 )
 from .request_types import BaseRequest
 
@@ -24,7 +25,7 @@ class _TypedApi(Protocol):
     def get(self, path: str, /) -> _RouteDecorator: ...
 
 
-def _serialize_examination(examination: Any, *, module_name: str) -> Dict[str, Any]:
+def _serialize_examination(examination: Any, *, module_name: str) -> dict[str, Any]:
     findings = list(examination.get_available_findings())
     kb_allowed_finding_names = _resolve_exam_kb_finding_names(
         examination, module_name=module_name
@@ -77,11 +78,11 @@ def _serialize_examination(examination: Any, *, module_name: str) -> Dict[str, A
 def register_examinations_routes(
     api: _TypedApi,
     *,
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
 ) -> None:
     @api.get("/examinations/")
-    def examinations_catalog(request: BaseRequest) -> List[Dict[str, Any]]:
+    def examinations_catalog(request: BaseRequest) -> list[dict[str, Any]]:
         del request
         module_name = _findings_module_name()
         examination_model = orm_models()["Examination"]
@@ -92,7 +93,7 @@ def register_examinations_routes(
         ]
 
     @api.get("/examinations/{examination_id}/")
-    def examination_detail(request: BaseRequest, examination_id: int) -> Dict[str, Any]:
+    def examination_detail(request: BaseRequest, examination_id: int) -> dict[str, Any]:
         del request
         module_name = _findings_module_name()
         examination_model = orm_models()["Examination"]

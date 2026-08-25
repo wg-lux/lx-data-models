@@ -1,5 +1,3 @@
-from typing import List
-
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
 )
@@ -20,7 +18,7 @@ class PIndicationClassificationDescriptor(
     patient_indication_classification: str
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_LIST_TYPE_FIELDS
 
     @property
@@ -28,5 +26,5 @@ class PIndicationClassificationDescriptor(
         return PIndicationClassificationDescriptorDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return P_INDICATION_CLASSIFICATION_DESCRIPTOR_MODEL_NESTED_FIELDS

@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Mapping, Sequence
 from functools import lru_cache
 from hashlib import sha256
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Mapping, Sequence
+from typing import TYPE_CHECKING, Any
 
 from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
@@ -13,20 +14,22 @@ from lx_dtypes.knowledge_bases import (
     PackagedKnowledgeBaseResourceError,
     get_packaged_knowledge_base,
 )
+from lx_dtypes.models.interface.data_roots import (
+    default_data_roots,
+    resolve_default_data_root,
+)
 from lx_dtypes.models.interface.DataLoader import (
     AmbiguousModuleConfigError,
     DataLoader,
     ModuleConfigNotFoundError,
 )
-from lx_dtypes.models.interface.data_roots import (
-    default_data_roots,
-    resolve_default_data_root,
+from lx_dtypes.models.interface.remote_data_roots import (
+    RemoteDataRootError,
+    is_remote_data_root,
+    resolve_remote_data_root,
 )
 from lx_dtypes.models.interface.remote_data_roots import (
-    is_remote_data_root,
     normalize_registry_input as normalize_data_root_input,
-    RemoteDataRootError,
-    resolve_remote_data_root,
 )
 
 if TYPE_CHECKING:
@@ -65,12 +68,14 @@ def _default_input_dirs() -> tuple[Path, ...]:
 
 
 def _get_registry_path() -> Path | None:
+    from django.core.exceptions import ImproperlyConfigured
+
     configured_path = ""
     try:
         from django.conf import settings
 
         configured_path = str(getattr(settings, "LX_DTYPES_KB_REGISTRY", "")).strip()
-    except Exception:
+    except ImproperlyConfigured:
         configured_path = ""
 
     if not configured_path:
@@ -371,7 +376,7 @@ def _validate_resolved_identity(
 def _load_module_config_cached(
     module_name: str,
     input_dir_strings: tuple[str, ...],
-) -> "KnowledgeBaseConfig":
+) -> KnowledgeBaseConfig:
     loader = DataLoader(input_dirs=[Path(path) for path in input_dir_strings])
     loader.load_module_configs()
     return loader.get_initialized_config(module_name)
@@ -392,7 +397,7 @@ def load_module_config(
     *,
     version: str | None = None,
     input_dirs: Sequence[Path] | None = None,
-) -> "KnowledgeBaseConfig":
+) -> KnowledgeBaseConfig:
     resolved_input_dirs = _resolve_input_dirs_for_identity(
         module_name,
         version=version,
@@ -442,17 +447,17 @@ def clear_knowledge_base_resolver_caches() -> None:
 
 
 __all__ = [
-    "clear_knowledge_base_resolver_caches",
-    "get_knowledge_base_identity",
     "AmbiguousModuleConfigError",
     "KnowledgeBaseIdentityRequiredError",
     "KnowledgeBaseRegistryError",
     "KnowledgeBaseVersionConflictError",
     "KnowledgeBaseVersionNotFoundError",
+    "ModuleConfigNotFoundError",
+    "clear_knowledge_base_resolver_caches",
+    "get_knowledge_base_identity",
     "load_knowledge_base",
     "load_module_config",
     "resolve_default_data_root",
     "resolve_registry_entry_inputs",
     "resolve_versioned_input_dirs",
-    "ModuleConfigNotFoundError",
 ]

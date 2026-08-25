@@ -5,9 +5,11 @@ import pytest
 from pydantic import BaseModel, ValidationError
 
 from lx_dtypes.models import SensitiveMeta as ExportedSensitiveMeta
-from lx_dtypes.models import SensitiveMetaDataDict
-from lx_dtypes.models import SensitiveMetaState
-from lx_dtypes.models import SensitiveMetaStateDataDict
+from lx_dtypes.models import (
+    SensitiveMetaDataDict,
+    SensitiveMetaState,
+    SensitiveMetaStateDataDict,
+)
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta
 
 

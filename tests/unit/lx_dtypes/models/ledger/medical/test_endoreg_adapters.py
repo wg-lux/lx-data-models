@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -99,7 +99,7 @@ class PatientMedicationSchedule:
     updated_at: datetime
 
 
-NOW = datetime(2026, 7, 29, 10, 30, tzinfo=timezone.utc)
+NOW = datetime(2026, 7, 29, 10, 30, tzinfo=UTC)
 
 
 def test_endoreg_patient_medical_graph_is_converted_without_orm_dependency() -> None:

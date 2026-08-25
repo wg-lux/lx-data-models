@@ -1,5 +1,3 @@
-from typing import List
-
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
 )
@@ -11,7 +9,7 @@ from lx_dtypes.names import FINDING_TYPE_MODEL_LIST_TYPE_FIELDS
 
 class FindingType(KnowledgebaseBaseModel[FindingTypeDataDict]):
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Get the field names that are treated as list-type attributes for the FindingType model.
 

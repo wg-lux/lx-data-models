@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Literal, TypeAlias, TypedDict, cast
+from typing import Literal, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .json_types import JsonObject as BaseJsonObject
 from .json_types import JsonValue as BaseJsonValue
 
-
-VideoReimportOperation: TypeAlias = Literal["video_reimport"]
-VideoReimportDispatchStatus: TypeAlias = Literal[
+type VideoReimportOperation = Literal["video_reimport"]
+type VideoReimportDispatchStatus = Literal[
     "queued",
     "already_queued",
     "busy",
@@ -18,8 +17,8 @@ VideoReimportDispatchStatus: TypeAlias = Literal[
     "failed",
     "lost",
 ]
-VideoReimportStatus: TypeAlias = VideoReimportDispatchStatus
-VideoReimportApiStatus: TypeAlias = Literal[
+type VideoReimportStatus = VideoReimportDispatchStatus
+type VideoReimportApiStatus = Literal[
     "queued",
     "already_queued",
     "busy",
@@ -28,7 +27,7 @@ VideoReimportApiStatus: TypeAlias = Literal[
     "lost",
     "done",
 ]
-VideoReimportErrorType: TypeAlias = Literal[
+type VideoReimportErrorType = Literal[
     "integrity_lost",
     "missing_source",
     "dispatch_error",
@@ -37,16 +36,16 @@ VideoReimportErrorType: TypeAlias = Literal[
     "storage_error",
     "validation_error",
 ]
-VideoReimportJobMode: TypeAlias = Literal["celery", "inline"]
-VideoReimportPredictionRefreshStatus: TypeAlias = Literal[
+type VideoReimportJobMode = Literal["celery", "inline"]
+type VideoReimportPredictionRefreshStatus = Literal[
     "skipped",
     "not_queued",
     "failed",
 ]
-VideoReimportJsonValue: TypeAlias = BaseJsonValue
-JsonValue: TypeAlias = VideoReimportJsonValue
-JsonObject: TypeAlias = BaseJsonObject
-VideoReimportRequestData: TypeAlias = JsonObject
+type VideoReimportJsonValue = BaseJsonValue
+type JsonValue = VideoReimportJsonValue
+type JsonObject = BaseJsonObject
+type VideoReimportRequestData = JsonObject
 
 VIDEO_REIMPORT_OPERATION: VideoReimportOperation = "video_reimport"
 VIDEO_REIMPORT_HISTORY_KIND: VideoReimportOperation = VIDEO_REIMPORT_OPERATION
@@ -91,7 +90,7 @@ class VideoReimportRequestPayload(BaseModel):
 
     @field_validator("model_name", "model_meta_version", mode="before")
     @classmethod
-    def _blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
+    def _blank_to_none(cls, value: str | float | bool | None) -> str | None:
         if isinstance(value, str):
             return value.strip() or None
         if value is None:
@@ -238,7 +237,7 @@ def validate_video_reimport_request_payload(
 def dump_video_reimport_request_payload(
     payload: VideoReimportRequestPayload,
 ) -> VideoReimportRequestData:
-    return cast(VideoReimportRequestData, payload.to_payload_dict())
+    return payload.to_payload_dict()
 
 
 def dump_video_reimport_api_response(
@@ -251,10 +250,10 @@ def dump_video_reimport_api_response(
 
 
 __all__ = [
-    "JsonObject",
-    "JsonValue",
     "VIDEO_REIMPORT_HISTORY_KIND",
     "VIDEO_REIMPORT_OPERATION",
+    "JsonObject",
+    "JsonValue",
     "VideoReimportApiResponseData",
     "VideoReimportApiResponsePayload",
     "VideoReimportApiStatus",

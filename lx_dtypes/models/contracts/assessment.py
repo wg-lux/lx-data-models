@@ -13,7 +13,7 @@ class AssessmentRecord(BaseModel):
 
     @field_validator("file", "report_id", "first_name", "last_name", mode="before")
     @classmethod
-    def normalize_text_fields(cls, value: str | int | float | bool | None) -> str:
+    def normalize_text_fields(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         return str(value).strip()

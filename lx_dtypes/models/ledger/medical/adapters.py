@@ -18,7 +18,6 @@ from .Pydantic import (
     PatientMedicationSchedule,
 )
 
-
 ENDOREG_DB_LEDGER_NAMESPACE = UUID("57006ca0-0840-5a4a-8569-d33f60ba4549")
 
 

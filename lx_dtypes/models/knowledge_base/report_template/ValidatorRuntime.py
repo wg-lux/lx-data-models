@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Literal, Mapping, Sequence, TypedDict
+from typing import Literal, TypedDict
 
 from ..classification.Classification import Classification
 from ..classification_choice.ClassificationChoice import ClassificationChoice
@@ -17,17 +18,17 @@ from .ClassificationValidator import (
     ClassificationValidatorCondition,
 )
 from .ClassificationValidatorDataDict import ClassificationValidatorHintDataDict
-from .InterventionValidator import (
-    InterventionValidator,
-    InterventionValidatorCondition,
-)
-from .InterventionValidatorDataDict import InterventionValidatorHintDataDict
 from .ExaminationValidator import ExaminationValidator
 from .FindingsValidator import (
     FindingsValidator,
     FindingsValidatorCondition,
     FindingsValidatorConditionClause,
 )
+from .InterventionValidator import (
+    InterventionValidator,
+    InterventionValidatorCondition,
+)
+from .InterventionValidatorDataDict import InterventionValidatorHintDataDict
 from .ReportTemplate import ReportTemplate
 from .UnitValidator import UnitValidator, UnitValidatorCondition
 from .UnitValidatorDataDict import UnitValidatorHintDataDict
@@ -67,8 +68,8 @@ class FindingsValidatorExecutionDataDict(TypedDict):
     finding: str
     matched_occurrences: int
     triggered_occurrences: int
-    missing_required_classifications: List[str]
-    issues: List[RuntimeValidationIssueDataDict]
+    missing_required_classifications: list[str]
+    issues: list[RuntimeValidationIssueDataDict]
 
 
 class ClassificationValidatorExecutionDataDict(TypedDict):
@@ -81,7 +82,7 @@ class ClassificationValidatorExecutionDataDict(TypedDict):
     matched_occurrences: int
     triggered_occurrences: int
     hint: ClassificationValidatorHintDataDict
-    issues: List[RuntimeValidationIssueDataDict]
+    issues: list[RuntimeValidationIssueDataDict]
 
 
 class InterventionValidatorExecutionDataDict(TypedDict):
@@ -94,7 +95,7 @@ class InterventionValidatorExecutionDataDict(TypedDict):
     matched_occurrences: int
     triggered_occurrences: int
     hint: InterventionValidatorHintDataDict
-    issues: List[RuntimeValidationIssueDataDict]
+    issues: list[RuntimeValidationIssueDataDict]
 
 
 class UnitValidatorExecutionDataDict(TypedDict):
@@ -108,41 +109,41 @@ class UnitValidatorExecutionDataDict(TypedDict):
     matched_occurrences: int
     triggered_occurrences: int
     hint: UnitValidatorHintDataDict
-    issues: List[RuntimeValidationIssueDataDict]
+    issues: list[RuntimeValidationIssueDataDict]
 
 
 class ExaminationValidatorExecutionDataDict(TypedDict):
     name: str
     ok: bool
-    finding_validator_status: List[ExaminationValidatorDependencyStatusDataDict]
-    examination_validator_status: List[ExaminationValidatorDependencyStatusDataDict]
-    issues: List[RuntimeValidationIssueDataDict]
+    finding_validator_status: list[ExaminationValidatorDependencyStatusDataDict]
+    examination_validator_status: list[ExaminationValidatorDependencyStatusDataDict]
+    issues: list[RuntimeValidationIssueDataDict]
 
 
 class ReportTemplateRuntimeValidationResultDataDict(TypedDict):
     template_name: str
     ok: bool
     evaluated_findings_count: int
-    classification_validators: List[ClassificationValidatorExecutionDataDict]
-    intervention_validators: List[InterventionValidatorExecutionDataDict]
-    findings_validators: List[FindingsValidatorExecutionDataDict]
-    examination_validators: List[ExaminationValidatorExecutionDataDict]
-    unit_validators: List[UnitValidatorExecutionDataDict]
-    issues: List[RuntimeValidationIssueDataDict]
+    classification_validators: list[ClassificationValidatorExecutionDataDict]
+    intervention_validators: list[InterventionValidatorExecutionDataDict]
+    findings_validators: list[FindingsValidatorExecutionDataDict]
+    examination_validators: list[ExaminationValidatorExecutionDataDict]
+    unit_validators: list[UnitValidatorExecutionDataDict]
+    issues: list[RuntimeValidationIssueDataDict]
 
 
 class _RuntimeFindingOccurrence(TypedDict):
     finding: str
-    classifications: Dict[str, List[ValidationScalar]]
-    classification_units: Dict[str, List[str]]
-    interventions: List[str]
+    classifications: dict[str, list[ValidationScalar]]
+    classification_units: dict[str, list[str]]
+    interventions: list[str]
 
 
 class FhirTerminologyValidatedFindingResultDataDict(TypedDict):
     ok: bool
-    reported_findings: List[Dict[str, object]]
-    observations: List[Dict[str, object]]
-    issues: List[RuntimeValidationIssueDataDict]
+    reported_findings: list[dict[str, object]]
+    observations: list[dict[str, object]]
+    issues: list[RuntimeValidationIssueDataDict]
 
 
 @dataclass(frozen=True)
@@ -158,13 +159,13 @@ class _NormalizedCondition:
     all_clauses: tuple[_NormalizedConditionClause, ...]
 
 
-def _as_str_list(value: object) -> List[str]:
+def _as_str_list(value: object) -> list[str]:
     if value in (None, ""):
         return []
     if isinstance(value, str):
         return [value]
     if isinstance(value, Sequence):
-        result: List[str] = []
+        result: list[str] = []
         for item in value:
             token = _normalize_identifier(item)
             if token:
@@ -238,7 +239,7 @@ def _extract_classification_unit(payload: Mapping[str, object]) -> str | None:
 
 
 def _add_classification_value(
-    target: Dict[str, List[ValidationScalar]],
+    target: dict[str, list[ValidationScalar]],
     classification_name: object,
     value: ValidationValue | None,
 ) -> None:
@@ -259,7 +260,7 @@ def _add_classification_value(
 
 
 def _add_classification_unit(
-    target: Dict[str, List[str]], classification_name: object, unit_name: object
+    target: dict[str, list[str]], classification_name: object, unit_name: object
 ) -> None:
     normalized_name = _normalize_identifier(classification_name)
     normalized_unit = _normalize_identifier(unit_name)
@@ -269,7 +270,7 @@ def _add_classification_unit(
     bucket.append(normalized_unit)
 
 
-def _normalize_interventions(raw: object) -> List[str]:
+def _normalize_interventions(raw: object) -> list[str]:
     if raw is None:
         return []
     if isinstance(raw, Mapping):
@@ -282,7 +283,7 @@ def _normalize_interventions(raw: object) -> List[str]:
         token = _normalize_identifier(raw)
         return [token] if token else []
 
-    interventions: List[str] = []
+    interventions: list[str] = []
     for item in raw:
         if isinstance(item, Mapping):
             token = _normalize_identifier(item.get("intervention"))
@@ -297,9 +298,9 @@ def _normalize_interventions(raw: object) -> List[str]:
 
 def _normalize_classifications(
     raw: object,
-) -> tuple[Dict[str, List[ValidationScalar]], Dict[str, List[str]]]:
-    normalized: Dict[str, List[ValidationScalar]] = {}
-    units: Dict[str, List[str]] = {}
+) -> tuple[dict[str, list[ValidationScalar]], dict[str, list[str]]]:
+    normalized: dict[str, list[ValidationScalar]] = {}
+    units: dict[str, list[str]] = {}
     if raw is None:
         return normalized, units
 
@@ -330,8 +331,8 @@ def _normalize_classifications(
     return normalized, units
 
 
-def _normalize_classification_units(raw: object) -> Dict[str, List[str]]:
-    normalized: Dict[str, List[str]] = {}
+def _normalize_classification_units(raw: object) -> dict[str, list[str]]:
+    normalized: dict[str, list[str]] = {}
     if not isinstance(raw, Mapping):
         return normalized
 
@@ -347,11 +348,11 @@ def _normalize_classification_units(raw: object) -> Dict[str, List[str]]:
 
 def _normalize_reported_findings(
     reported_findings: Sequence[Mapping[str, object]] | None,
-) -> List[_RuntimeFindingOccurrence]:
+) -> list[_RuntimeFindingOccurrence]:
     if not reported_findings:
         return []
 
-    occurrences: List[_RuntimeFindingOccurrence] = []
+    occurrences: list[_RuntimeFindingOccurrence] = []
     for finding_payload in reported_findings:
         if not isinstance(finding_payload, Mapping):
             continue
@@ -398,7 +399,7 @@ def _slug(value: object) -> str:
     return "".join(cleaned).strip("-") or "unknown"
 
 
-def _coding(system: str, code: object, display: object | None = None) -> Dict[str, str]:
+def _coding(system: str, code: object, display: object | None = None) -> dict[str, str]:
     coding = {"system": system, "code": _slug(code)}
     display_value = _normalize_identifier(display if display is not None else code)
     if display_value:
@@ -463,10 +464,10 @@ def _observation_value(component: Mapping[str, object]) -> ValidationScalar:
 
 def import_fhir_observations_to_reported_findings(
     observations: Sequence[Mapping[str, object]],
-) -> List[Dict[str, object]]:
+) -> list[dict[str, object]]:
     """Convert FHIR Observation resources into runtime reported-finding payloads."""
 
-    reported_findings: List[Dict[str, object]] = []
+    reported_findings: list[dict[str, object]] = []
     for observation in observations:
         if observation.get("resourceType") != "Observation":
             continue
@@ -474,7 +475,7 @@ def import_fhir_observations_to_reported_findings(
         if not finding_name:
             continue
 
-        classifications: List[Dict[str, object]] = []
+        classifications: list[dict[str, object]] = []
         raw_components = observation.get("component", [])
         components = raw_components if isinstance(raw_components, Sequence) else []
         for component in components:
@@ -483,7 +484,7 @@ def import_fhir_observations_to_reported_findings(
             classification_name = _first_coding_display(component.get("code"))
             if not classification_name:
                 continue
-            classification_payload: Dict[str, object] = {
+            classification_payload: dict[str, object] = {
                 "classification": classification_name,
                 "value": _observation_value(component),
             }
@@ -508,7 +509,7 @@ def _component_value_for_classification(
     classification_name: str,
     unit: str | None,
     base_url: str,
-) -> Dict[str, object]:
+) -> dict[str, object]:
     if unit and isinstance(value, (int, float)) and not isinstance(value, bool):
         return {
             "valueQuantity": {
@@ -543,18 +544,18 @@ def export_reported_findings_to_fhir_observations(
     reported_findings: Sequence[Mapping[str, object]],
     *,
     base_url: str = "https://wg-lux.de/fhir",
-) -> List[Dict[str, object]]:
+) -> list[dict[str, object]]:
     """Convert runtime reported-finding payloads into FHIR Observation resources."""
 
-    observations: List[Dict[str, object]] = []
+    observations: list[dict[str, object]] = []
     for occurrence in _normalize_reported_findings(reported_findings):
         finding_name = occurrence["finding"]
-        components: List[Dict[str, object]] = []
+        components: list[dict[str, object]] = []
         for classification_name, values in occurrence["classifications"].items():
             units = occurrence["classification_units"].get(classification_name, [])
             unit = units[0] if units else None
             for value in values:
-                component: Dict[str, object] = {
+                component: dict[str, object] = {
                     "code": {
                         "coding": [
                             _coding(
@@ -603,10 +604,10 @@ def validate_reported_findings_against_terminology(
     classifications: Mapping[str, Classification],
     classification_choices: Mapping[str, ClassificationChoice],
     units: Mapping[str, Unit],
-) -> List[RuntimeValidationIssueDataDict]:
+) -> list[RuntimeValidationIssueDataDict]:
     """Validate normalized findings against the currently loaded YAML terminology."""
 
-    issues: List[RuntimeValidationIssueDataDict] = []
+    issues: list[RuntimeValidationIssueDataDict] = []
     for occurrence_index, occurrence in enumerate(
         _normalize_reported_findings(reported_findings)
     ):
@@ -854,7 +855,7 @@ def _normalize_condition(
 
 def _evaluate_clause(
     clause: _NormalizedConditionClause,
-    classifications: Mapping[str, List[ValidationScalar]],
+    classifications: Mapping[str, list[ValidationScalar]],
 ) -> bool | None:
     actual_values = classifications.get(clause.classification, [])
     if not actual_values:
@@ -898,8 +899,8 @@ def _condition_evaluation(
         | InterventionValidatorCondition
         | UnitValidatorCondition
     ),
-    classifications: Mapping[str, List[ValidationScalar]],
-) -> tuple[bool | None, List[str]]:
+    classifications: Mapping[str, list[ValidationScalar]],
+) -> tuple[bool | None, list[str]]:
     normalized_condition = _normalize_condition(condition)
     any_clauses = normalized_condition.any_clauses
     all_clauses = normalized_condition.all_clauses
@@ -950,7 +951,7 @@ def _condition_evaluation(
 
 def _condition_matches(
     condition: FindingsValidatorCondition,
-    classifications: Mapping[str, List[ValidationScalar]],
+    classifications: Mapping[str, list[ValidationScalar]],
 ) -> bool:
     return _condition_evaluation(condition, classifications)[0] is True
 
@@ -961,16 +962,16 @@ def _classification_condition_matches(
         | InterventionValidatorCondition
         | UnitValidatorCondition
     ),
-    classifications: Mapping[str, List[ValidationScalar]],
+    classifications: Mapping[str, list[ValidationScalar]],
 ) -> bool:
     return _condition_evaluation(condition, classifications)[0] is True
 
 
 def _missing_required_classifications(
     condition: FindingsValidatorCondition,
-    classifications: Mapping[str, List[ValidationScalar]],
-) -> List[str]:
-    missing: List[str] = []
+    classifications: Mapping[str, list[ValidationScalar]],
+) -> list[str]:
+    missing: list[str] = []
     for requirement in condition.then_requires or []:
         if isinstance(requirement, Mapping):
             class_name = _normalize_identifier(requirement.get("classification"))
@@ -990,8 +991,8 @@ def _missing_requirement_references(
     *,
     occurrence: _RuntimeFindingOccurrence,
     all_occurrences: Sequence[_RuntimeFindingOccurrence],
-) -> List[str]:
-    missing: List[str] = []
+) -> list[str]:
+    missing: list[str] = []
     for requirement in requirements:
         if requirement.kind == "classification":
             if occurrence["classifications"].get(requirement.name):
@@ -1063,8 +1064,8 @@ def _classification_data_type_hint(
     classification_choice_descriptors: Mapping[str, ClassificationChoiceDescriptor],
 ) -> tuple[
     Literal["binary", "non_categorical", "ordered", "unknown"],
-    List[str],
-    List[str],
+    list[str],
+    list[str],
     bool,
 ]:
     if classification is None:
@@ -1216,8 +1217,8 @@ def evaluate_findings_validator_runtime(
         if finding["finding"] == target_finding
     ]
 
-    issues: List[RuntimeValidationIssueDataDict] = []
-    missing_required_classifications: List[str] = []
+    issues: list[RuntimeValidationIssueDataDict] = []
+    missing_required_classifications: list[str] = []
     triggered_occurrences = 0
 
     if validator.operator == "exists":
@@ -1302,9 +1303,8 @@ def evaluate_findings_validator_runtime(
                     occurrence=occurrence,
                     all_occurrences=normalized_findings,
                 )
-                if not missing:
-                    if not missing_generic:
-                        continue
+                if not missing and not missing_generic:
+                    continue
                 missing.extend(
                     [
                         token.split(":", 1)[1]
@@ -1378,7 +1378,7 @@ def evaluate_classification_validator_runtime(
         if finding["finding"] == target_finding
     ]
 
-    issues: List[RuntimeValidationIssueDataDict] = []
+    issues: list[RuntimeValidationIssueDataDict] = []
     triggered_occurrences = 0
     hint = _build_classification_hint(
         validator=validator,
@@ -1582,7 +1582,7 @@ def evaluate_intervention_validator_runtime(
         for finding in normalized_findings
         if finding["finding"] == validator.finding
     ]
-    issues: List[RuntimeValidationIssueDataDict] = []
+    issues: list[RuntimeValidationIssueDataDict] = []
     triggered_occurrences = 0
     hint = _build_intervention_hint(validator=validator, interventions=interventions)
 
@@ -1732,7 +1732,7 @@ def evaluate_unit_validator_runtime(
         for finding in normalized_findings
         if finding["finding"] == validator.finding
     ]
-    issues: List[RuntimeValidationIssueDataDict] = []
+    issues: list[RuntimeValidationIssueDataDict] = []
     triggered_occurrences = 0
     hint = _build_unit_hint(validator=validator, units=units)
 
@@ -1887,11 +1887,11 @@ def evaluate_report_template_validators_runtime(
 ) -> ReportTemplateRuntimeValidationResultDataDict:
     normalized_findings = _normalize_reported_findings(reported_findings)
 
-    classification_cache: Dict[str, ClassificationValidatorExecutionDataDict] = {}
-    intervention_cache: Dict[str, InterventionValidatorExecutionDataDict] = {}
-    findings_cache: Dict[str, FindingsValidatorExecutionDataDict] = {}
-    exam_cache: Dict[str, ExaminationValidatorExecutionDataDict] = {}
-    unit_cache: Dict[str, UnitValidatorExecutionDataDict] = {}
+    classification_cache: dict[str, ClassificationValidatorExecutionDataDict] = {}
+    intervention_cache: dict[str, InterventionValidatorExecutionDataDict] = {}
+    findings_cache: dict[str, FindingsValidatorExecutionDataDict] = {}
+    exam_cache: dict[str, ExaminationValidatorExecutionDataDict] = {}
+    unit_cache: dict[str, UnitValidatorExecutionDataDict] = {}
 
     def evaluate_classification_validator_by_name(
         validator_name: str,
@@ -2072,7 +2072,7 @@ def evaluate_report_template_validators_runtime(
 
     def evaluate_examination_validator_by_name(
         validator_name: str,
-        stack: List[str],
+        stack: list[str],
     ) -> ExaminationValidatorExecutionDataDict:
         cached = exam_cache.get(validator_name)
         if cached is not None:
@@ -2122,9 +2122,9 @@ def evaluate_report_template_validators_runtime(
             return result
 
         stack.append(validator_name)
-        findings_status: List[ExaminationValidatorDependencyStatusDataDict] = []
-        exams_status: List[ExaminationValidatorDependencyStatusDataDict] = []
-        issues: List[RuntimeValidationIssueDataDict] = []
+        findings_status: list[ExaminationValidatorDependencyStatusDataDict] = []
+        exams_status: list[ExaminationValidatorDependencyStatusDataDict] = []
+        issues: list[RuntimeValidationIssueDataDict] = []
         ok = True
 
         for dep_name in _as_str_list(validator.finding_validators):
@@ -2211,7 +2211,7 @@ def evaluate_report_template_validators_runtime(
         for name in _as_str_list(template.validators.examination_validators)
     ]
 
-    issues: List[RuntimeValidationIssueDataDict] = []
+    issues: list[RuntimeValidationIssueDataDict] = []
     for classification_result in classification_results:
         issues.extend(classification_result["issues"])
     for intervention_result in intervention_results:
@@ -2245,15 +2245,15 @@ def evaluate_report_template_validators_runtime(
 
 
 __all__ = [
-    "RuntimeValidationIssueDataDict",
     "ClassificationValidatorExecutionDataDict",
-    "InterventionValidatorExecutionDataDict",
     "ExaminationValidatorDependencyStatusDataDict",
-    "FindingsValidatorExecutionDataDict",
     "ExaminationValidatorExecutionDataDict",
-    "UnitValidatorExecutionDataDict",
-    "ReportTemplateRuntimeValidationResultDataDict",
     "FhirTerminologyValidatedFindingResultDataDict",
+    "FindingsValidatorExecutionDataDict",
+    "InterventionValidatorExecutionDataDict",
+    "ReportTemplateRuntimeValidationResultDataDict",
+    "RuntimeValidationIssueDataDict",
+    "UnitValidatorExecutionDataDict",
     "evaluate_classification_validator_runtime",
     "evaluate_findings_validator_runtime",
     "evaluate_intervention_validator_runtime",

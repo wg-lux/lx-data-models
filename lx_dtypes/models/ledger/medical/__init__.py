@@ -1,4 +1,4 @@
-from typing import TypedDict, TypeAlias
+from typing import TypedDict
 
 from .adapters import (
     ENDOREG_DB_LEDGER_NAMESPACE,
@@ -50,7 +50,7 @@ l_medical_lookup = LMedicalLookupType(
     PatientMedicalLedger=PatientMedicalLedger,
 )
 
-l_medical_models: TypeAlias = (
+type l_medical_models = (
     PatientDisease
     | PatientEvent
     | PatientLabSample
@@ -59,7 +59,7 @@ l_medical_models: TypeAlias = (
     | PatientMedicationSchedule
     | PatientMedicalLedger
 )
-l_medical_ddicts: TypeAlias = (
+type l_medical_ddicts = (
     PatientDiseaseDataDict
     | PatientEventDataDict
     | PatientLabSampleDataDict

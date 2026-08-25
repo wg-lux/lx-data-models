@@ -7,7 +7,6 @@ from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 from .json_types import JsonObject
 
-
 REPORT_DRAFT_SCHEMA_VERSION: Literal["1.0"] = "1.0"
 
 
@@ -79,8 +78,8 @@ def dump_patient_examination_report_draft(
 
 
 __all__ = [
-    "PatientExaminationReportDraft",
     "REPORT_DRAFT_SCHEMA_VERSION",
+    "PatientExaminationReportDraft",
     "ReportDraftTemplateIdentity",
     "dump_patient_examination_report_draft",
 ]

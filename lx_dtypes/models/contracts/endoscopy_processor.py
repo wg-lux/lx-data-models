@@ -4,8 +4,9 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict
-from lx_dtypes.models.meta.VideoMeta import VideoRoiBox
+
 from lx_dtypes.models.contracts.json_types import JsonValue
+from lx_dtypes.models.meta.VideoMeta import VideoRoiBox
 
 
 class RoiBoxCore(VideoRoiBox):
@@ -115,13 +116,13 @@ def all_black_fallback_roi_box() -> RoiBoxCore:
 
 
 __all__ = [
-    "RoiBoxCore",
     "EndoscopeImageRoiCore",
     "EndoscopyProcessorCore",
     "MaskCallPayload",
-    "roi_box_to_legacy_dict",
-    "roi_box_or_none_from_object",
+    "RoiBoxCore",
     "all_black_fallback_roi_box",
     "roi_box_from_object",
+    "roi_box_or_none_from_object",
     "roi_box_to_crop_template",
+    "roi_box_to_legacy_dict",
 ]

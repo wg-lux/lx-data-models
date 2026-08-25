@@ -5,7 +5,6 @@ from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
-
 type HuggingFaceModelMetaCommandValue = bool | int | str | None
 
 

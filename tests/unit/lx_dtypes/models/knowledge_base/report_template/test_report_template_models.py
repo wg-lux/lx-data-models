@@ -3,20 +3,20 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
-    ReportTemplateClassificationRequirement,
-    ReportTemplateFindingRequirement,
+from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
+    ClassificationValidator,
 )
 from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
     ExaminationValidator,
 )
-from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
-    ClassificationValidator,
-)
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
     FindingsValidator,
 )
-from lx_dtypes.models.knowledge_base.report_template.ReportFinding import ReportFinding
+from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
+    ReportFinding,
+    ReportTemplateClassificationRequirement,
+    ReportTemplateFindingRequirement,
+)
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
     ReportTemplate,
     ReportTemplateValidators,

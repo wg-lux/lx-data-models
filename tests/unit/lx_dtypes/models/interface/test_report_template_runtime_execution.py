@@ -31,7 +31,6 @@ from lx_dtypes.models.ledger.p_intervention.Pydantic import PFindingIntervention
 from lx_dtypes.models.ledger.p_interventions.Pydantic import PFindingInterventions
 from tests.paths import PACKAGE_ROOT
 
-
 DATA_ROOT = PACKAGE_ROOT / "data"
 
 

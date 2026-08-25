@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Literal, TypeAlias
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-JsonNull: TypeAlias = None
-LxAnonymizerPerformanceMediaType: TypeAlias = Literal["video", "report"]
-LxAnonymizerPerformanceCsvCell: TypeAlias = str | int | float | bool | JsonNull
-LxAnonymizerPerformanceCsvRow: TypeAlias = dict[str, LxAnonymizerPerformanceCsvCell]
+type JsonNull = None
+type LxAnonymizerPerformanceMediaType = Literal["video", "report"]
+type LxAnonymizerPerformanceCsvCell = str | int | float | bool | JsonNull
+type LxAnonymizerPerformanceCsvRow = dict[str, LxAnonymizerPerformanceCsvCell]
 
 
 class LxAnonymizerDurationStatsPayload(BaseModel):

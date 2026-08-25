@@ -1,3 +1,5 @@
+# ruff: noqa: FLY002 - line lists keep embedded YAML fixtures readable
+
 from __future__ import annotations
 
 import json
@@ -8,11 +10,11 @@ from pathlib import Path
 from threading import Barrier
 from typing import cast
 
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
 from ninja.errors import HttpError
 from ninja.files import UploadedFile
-import pytest
 
 from lx_dtypes.django.api import terminology_routes
 

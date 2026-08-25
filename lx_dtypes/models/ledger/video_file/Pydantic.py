@@ -1,6 +1,6 @@
 from collections.abc import Mapping
-from datetime import datetime
 from datetime import date as DateField
+from datetime import datetime
 
 from pydantic import Field
 
@@ -13,7 +13,7 @@ from lx_dtypes.models.contracts.video_file import (
 )
 from lx_dtypes.models.contracts.video_segments import VideoSegmentsPayloadDict
 
-from .DataDict import VideoFileDataDict, SerializedVideoFileDataDict
+from .DataDict import SerializedVideoFileDataDict, VideoFileDataDict
 
 
 class VideoFile(LedgerBaseModel[VideoFileDataDict]):

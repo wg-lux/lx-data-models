@@ -2,13 +2,13 @@ from typing import Any
 
 import pytest
 
-from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.knowledge_base.report_template.ReportConceptCoverageBuilder import (
     build_report_concept_coverage,
 )
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateCoverage import (
     ReportTemplateCoverageConcept,
 )
+from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 
 class _Config:

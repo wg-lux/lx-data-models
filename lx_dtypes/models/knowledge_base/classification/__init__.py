@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
 
 from .Classification import Classification
 from .ClassificationDataDict import ClassificationDataDict
 from .ClassificationType import ClassificationType
 from .ClassificationTypeDataDict import ClassificationTypeDataDict
-
 
 if TYPE_CHECKING:
     from ._ClassificationDjango import ClassificationDjango
@@ -27,14 +26,10 @@ kb_classification_lookup = KbClassificationLookupType(
     ClassificationTypeDataDict=ClassificationTypeDataDict,
 )
 
-kb_classification_models = Union[
-    Classification,
-    ClassificationType,
-]
+kb_classification_models: TypeAlias = Union[Classification, ClassificationType]
 
-kb_classification_ddicts = Union[
-    ClassificationDataDict,
-    ClassificationTypeDataDict,
+kb_classification_ddicts: TypeAlias = Union[
+    ClassificationDataDict, ClassificationTypeDataDict
 ]
 
 if TYPE_CHECKING:
@@ -44,27 +39,26 @@ if TYPE_CHECKING:
         ClassificationType: type[ClassificationTypeDjango]
 
     kb_classification_django_lookup: KbClassificationDjangoLookupType
-    kb_classification_django_models = Union[
-        ClassificationDjango,
-        ClassificationTypeDjango,
+    kb_classification_django_models: TypeAlias = Union[
+        ClassificationDjango, ClassificationTypeDjango
     ]
 
 
 __all__ = [
     "Classification",
     "ClassificationDataDict",
+    "ClassificationDjango",
     "ClassificationType",
     # "ClassificationChoicesMixin",
     "ClassificationTypeDataDict",
+    "ClassificationTypeDjango",
+    "KbClassificationLookupType",
+    "kb_classification_ddicts",
+    "kb_classification_django_lookup",
+    "kb_classification_django_models",
     # "ClassificationTypesMixin",
     "kb_classification_lookup",
-    "KbClassificationLookupType",
     "kb_classification_models",
-    "kb_classification_ddicts",
-    "kb_classification_django_models",
-    "kb_classification_django_lookup",
-    "ClassificationDjango",
-    "ClassificationTypeDjango",
 ]
 
 
@@ -92,10 +86,9 @@ def __getattr__(name: str) -> Any:
             Classification=ClassificationDjango,
             ClassificationType=ClassificationTypeDjango,
         ),
-        "kb_classification_django_models": Union[
-            ClassificationDjango,
-            ClassificationTypeDjango,
-        ],
+        "kb_classification_django_models": (
+            ClassificationDjango | ClassificationTypeDjango
+        ),
     }
     globals().update(exports)
     return exports[name]

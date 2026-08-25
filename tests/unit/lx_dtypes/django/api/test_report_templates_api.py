@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
-from django.test import Client
 import pytest
+from django.test import Client
 
 from lx_dtypes.django.api import main as api_main
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
@@ -13,14 +13,14 @@ from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 
 class _RuntimeValidationKb:
-    report_template = {"star_upper_gi_main": object()}
-    findings_validator: dict[str, object] = {
+    report_template: ClassVar[dict[str, object]] = {"star_upper_gi_main": object()}
+    findings_validator: ClassVar[dict[str, object]] = {
         "polyp_has_lst_if_large": object(),
     }
-    classification_validator: dict[str, object] = {}
-    intervention_validator: dict[str, object] = {}
-    unit_validator: dict[str, object] = {}
-    examination_validator: dict[str, object] = {}
+    classification_validator: ClassVar[dict[str, object]] = {}
+    intervention_validator: ClassVar[dict[str, object]] = {}
+    unit_validator: ClassVar[dict[str, object]] = {}
+    examination_validator: ClassVar[dict[str, object]] = {}
 
     class _Config:
         name = "report_template_examples"

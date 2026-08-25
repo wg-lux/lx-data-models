@@ -17,7 +17,7 @@ __all__ = [
     "Case",
     "CaseDataDict",
     "LCaseLookupType",
+    "l_case_ddicts",
     "l_case_lookup",
     "l_case_models",
-    "l_case_ddicts",
 ]

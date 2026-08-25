@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict, field_validator
+
 from lx_dtypes.models.contracts.json_types import JsonValue
 
 
@@ -21,7 +22,7 @@ class VideoReadyForExportPayload(BaseModel):
 
     @field_validator("center_key", "processed_file_sha256", mode="before")
     @classmethod
-    def blank_to_none(cls, value: str | int | float | bool | None) -> str | None:
+    def blank_to_none(cls, value: str | float | bool | None) -> str | None:
         if value is None:
             return None
         if isinstance(value, str):

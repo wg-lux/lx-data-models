@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from math import isfinite
-from typing import Literal, TypeAlias
+from typing import Literal
 
 from pydantic import (
     BaseModel,
@@ -11,6 +11,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+
 from lx_dtypes.models.contracts.json_types import JsonObject
 
 
@@ -97,15 +98,15 @@ class PatientFindingClassificationNumericalDescriptorsPayload(
     model_config = ConfigDict(frozen=True, strict=True)
 
 
-PatientFindingClassificationSubcategoriesData: TypeAlias = dict[str, JsonObject]
-PatientFindingClassificationNumericalDescriptorsData: TypeAlias = dict[str, JsonObject]
+type PatientFindingClassificationSubcategoriesData = dict[str, JsonObject]
+type PatientFindingClassificationNumericalDescriptorsData = dict[str, JsonObject]
 
 
 __all__ = [
     "PatientFindingClassificationNumericalDescriptorPayload",
     "PatientFindingClassificationNumericalDescriptorsData",
     "PatientFindingClassificationNumericalDescriptorsPayload",
-    "PatientFindingClassificationSubcategoryPayload",
     "PatientFindingClassificationSubcategoriesData",
     "PatientFindingClassificationSubcategoriesPayload",
+    "PatientFindingClassificationSubcategoryPayload",
 ]

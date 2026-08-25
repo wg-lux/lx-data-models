@@ -36,7 +36,7 @@ class PFindingInterventionsDjango(LedgerBaseModelDjango[PFindingInterventionsDat
     )
 
     if TYPE_CHECKING:
-        patient_finding_interventions: models.Manager["PFindingInterventionDjango"]
+        patient_finding_interventions: models.Manager[PFindingInterventionDjango]
 
     @property
     def ddict_class(self) -> type[PFindingInterventionsDataDict]:

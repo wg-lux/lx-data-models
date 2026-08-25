@@ -154,6 +154,24 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 88
 
+[tool.ruff.lint.per-file-ignores]
+# Public modules and legacy aggregate aliases intentionally retain their stable names.
+"lx_dtypes/django/smoke_settings.py" = ["F403"]
+"lx_dtypes/django/migrations/*.py" = ["RUF012"]
+"lx_dtypes/models/**/*.py" = ["N999"]
+"lx_dtypes/models/base/app_base_model/django/KnowledgebaseBaseModelDjango.py" = ["PYI059", "UP046"]
+"lx_dtypes/models/base/app_base_model/django/LedgerBaseModelDjango.py" = ["PYI059", "UP046"]
+"lx_dtypes/models/base/app_base_model/pydantic/InterfaceMixIns.py" = ["PYI059", "UP046"]
+"lx_dtypes/models/contracts/adapters.py" = ["PYI046"]
+"lx_dtypes/models/knowledge_base/**/__init__.py" = ["PYI042", "UP007", "UP040"]
+"lx_dtypes/models/knowledge_base/main.py" = ["UP007", "UP040"]
+"lx_dtypes/models/knowledge_base/pydantic_main.py" = ["UP007", "UP040"]
+"lx_dtypes/models/ledger/**/__init__.py" = ["PYI042", "UP007"]
+"lx_dtypes/models/ledger/main.py" = ["UP007"]
+"tests/django_settings.py" = ["F403"]
+"tests/fixtures/lx_dtypes/models/interface/__init__.py" = ["F403"]
+"tests/**/*.py" = ["N999"]
+
 [tool.black]
 line-length = 88
 target-version = ["py312"]

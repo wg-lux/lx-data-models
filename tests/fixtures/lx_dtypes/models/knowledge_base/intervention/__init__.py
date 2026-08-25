@@ -1,15 +1,14 @@
 import pytest
 
+from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
 from lx_dtypes.models.knowledge_base.intervention.InterventionDjango import (
     InterventionDjango,
 )
-from lx_dtypes.models.knowledge_base.intervention.InterventionTypeDjango import (
-    InterventionTypeDjango,
-)
-
-from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
 from lx_dtypes.models.knowledge_base.intervention.InterventionType import (
     InterventionType,
+)
+from lx_dtypes.models.knowledge_base.intervention.InterventionTypeDjango import (
+    InterventionTypeDjango,
 )
 
 

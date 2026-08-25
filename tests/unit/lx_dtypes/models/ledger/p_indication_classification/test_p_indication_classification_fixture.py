@@ -1,15 +1,13 @@
 import pytest
 
-from tests.paths import GENERATED_TEST_OUTPUT_ROOT
-
-from lx_dtypes.utils.testing import validate_django_fixture
-
 from lx_dtypes.models.ledger.p_indication_classification.Django import (
     PIndicationClassificationDjango,
 )
 from lx_dtypes.models.ledger.p_indication_classification.Pydantic import (
     PIndicationClassification,
 )
+from lx_dtypes.utils.testing import validate_django_fixture
+from tests.paths import GENERATED_TEST_OUTPUT_ROOT
 
 
 @pytest.mark.django_db

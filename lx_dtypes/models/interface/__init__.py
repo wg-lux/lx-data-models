@@ -4,6 +4,7 @@ from importlib import import_module
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from lx_dtypes.models.interface.data_roots import default_data_roots
     from lx_dtypes.models.interface.KnowledgeBaseResolver import (
         AmbiguousModuleConfigError,
         KnowledgeBaseIdentityRequiredError,
@@ -17,7 +18,6 @@ if TYPE_CHECKING:
         resolve_default_data_root,
         resolve_versioned_input_dirs,
     )
-    from lx_dtypes.models.interface.data_roots import default_data_roots
     from lx_dtypes.models.interface.LookupTracker import KnowledgeBaseLookupTracker
 
 _INTERFACE_EXPORTS = {
@@ -60,10 +60,10 @@ __all__ = [
     "KnowledgeBaseVersionConflictError",
     "KnowledgeBaseVersionNotFoundError",
     "ModuleConfigNotFoundError",
+    "default_data_roots",
     "get_knowledge_base_identity",
     "load_knowledge_base",
     "load_module_config",
-    "default_data_roots",
     "resolve_default_data_root",
     "resolve_versioned_input_dirs",
 ]

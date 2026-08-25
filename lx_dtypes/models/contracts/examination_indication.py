@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
+
 from lx_dtypes.models.contracts.json_types import JsonValue
 
 
@@ -27,7 +28,7 @@ class ExaminationIndicationClassificationChoiceCore(BaseModel):
 
 
 __all__ = [
-    "ExaminationIndicationCore",
-    "ExaminationIndicationClassificationCore",
     "ExaminationIndicationClassificationChoiceCore",
+    "ExaminationIndicationClassificationCore",
+    "ExaminationIndicationCore",
 ]

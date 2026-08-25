@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Literal, TypedDict, TypeAlias, cast
+from typing import Literal, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
 from .json_types import JsonObject, JsonValue
 
-VideoCorrectionMaskType: TypeAlias = Literal["device", "custom"]
-VideoCorrectionProcessingMethod: TypeAlias = Literal[
-    "streaming", "direct", "traditional"
-]
+type VideoCorrectionMaskType = Literal["device", "custom"]
+type VideoCorrectionProcessingMethod = Literal["streaming", "direct", "traditional"]
 
 
 class VideoCorrectionRoiData(TypedDict, total=False):
@@ -64,7 +63,7 @@ class VideoCorrectionRoiPayload(BaseModel):
         return data
 
 
-def _blank_to_none(value: str | int | float | bool | None) -> str | None:
+def _blank_to_none(value: str | float | bool | None) -> str | None:
     if isinstance(value, str):
         stripped = value.strip()
         return stripped or None
@@ -125,9 +124,7 @@ class VideoCorrectionApplyMaskPayload(VideoCorrectionProcessingMethodMixin):
 
     @field_validator("device_name", mode="before")
     @classmethod
-    def normalize_device_name(
-        cls, value: str | int | float | bool | None
-    ) -> str | None:
+    def normalize_device_name(cls, value: str | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")
@@ -175,9 +172,7 @@ class VideoCorrectionFrameRemovalPayload(VideoCorrectionProcessingMethodMixin):
         "frame_ranges", "detection_method", "selection_method", mode="before"
     )
     @classmethod
-    def normalize_optional_text(
-        cls, value: str | int | float | bool | None
-    ) -> str | None:
+    def normalize_optional_text(cls, value: str | float | bool | None) -> str | None:
         return _blank_to_none(value)
 
     @model_validator(mode="after")

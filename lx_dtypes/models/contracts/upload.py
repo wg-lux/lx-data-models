@@ -49,16 +49,29 @@ def upload_api_request_data_from_mapping(
         formatted_names = ", ".join(sorted(unknown_field_names))
         raise ValueError(f"Unknown upload request field(s): {formatted_names}")
 
-    data: UploadApiRequestData = {}
-    for field_name in _UPLOAD_API_REQUEST_FIELD_NAMES:
+    def optional_text(field_name: str) -> str | None:
         if field_name not in payload:
-            continue
+            return None
         raw_value = payload[field_name]
         if not isinstance(raw_value, str):
-            raise ValueError(f"{field_name} must be a string")
-        value = raw_value.strip()
-        if value:
-            data[field_name] = value
+            raise ValueError(  # noqa: TRY004 - public validation contract
+                f"{field_name} must be a string"
+            )
+        return raw_value.strip() or None
+
+    data: UploadApiRequestData = {}
+    center_key = optional_text("center_key")
+    center_name = optional_text("center_name")
+    source_system = optional_text("source_system")
+    idempotency_key = optional_text("idempotency_key")
+    if center_key is not None:
+        data["center_key"] = center_key
+    if center_name is not None:
+        data["center_name"] = center_name
+    if source_system is not None:
+        data["source_system"] = source_system
+    if idempotency_key is not None:
+        data["idempotency_key"] = idempotency_key
     return data
 
 

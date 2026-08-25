@@ -28,7 +28,7 @@ class TesseractOCRData(BaseModel):
     text: list[str] = Field(default_factory=_empty_str_list)
 
     @model_validator(mode="after")
-    def validate_equal_lengths(self) -> "TesseractOCRData":
+    def validate_equal_lengths(self) -> TesseractOCRData:
         lengths = {
             len(self.left),
             len(self.top),
@@ -55,7 +55,7 @@ class TesseractWordConfidence(BaseModel):
     text: str
 
     @model_validator(mode="after")
-    def validate_box(self) -> "TesseractWordConfidence":
+    def validate_box(self) -> TesseractWordConfidence:
         if self.end_x <= self.start_x:
             raise ValueError("end_x must be greater than start_x")
         if self.end_y <= self.start_y:
@@ -76,7 +76,7 @@ class PixelBoundingBoxCore(BaseModel):
     y2: int
 
     @model_validator(mode="after")
-    def validate_bounds(self) -> "PixelBoundingBoxCore":
+    def validate_bounds(self) -> PixelBoundingBoxCore:
         if self.x1 < 0 or self.y1 < 0:
             raise ValueError("x1 and y1 must be >= 0")
         if self.x2 <= self.x1:
@@ -98,7 +98,7 @@ class OcrTextBoxCore(BaseModel):
     box: PixelBoundingBoxCore
 
     @model_validator(mode="after")
-    def validate_text(self) -> "OcrTextBoxCore":
+    def validate_text(self) -> OcrTextBoxCore:
         if self.text.strip() == "":
             raise ValueError("text must not be empty")
         return self
@@ -119,7 +119,7 @@ class EastDetectionConfidenceCore(BaseModel):
     confidence: float
 
     @model_validator(mode="after")
-    def validate_box(self) -> "EastDetectionConfidenceCore":
+    def validate_box(self) -> EastDetectionConfidenceCore:
         if self.end_x <= self.start_x:
             raise ValueError("end_x must be greater than start_x")
         if self.end_y <= self.start_y:
@@ -130,8 +130,8 @@ class EastDetectionConfidenceCore(BaseModel):
 
 
 __all__ = [
-    "OcrTextBoxCore",
     "EastDetectionConfidenceCore",
+    "OcrTextBoxCore",
     "PixelBoundingBoxCore",
     "TesseractOCRData",
     "TesseractWordConfidence",

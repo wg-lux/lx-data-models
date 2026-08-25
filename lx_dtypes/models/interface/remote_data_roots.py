@@ -9,11 +9,10 @@ import stat
 import time
 import uuid
 import zipfile
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path, PurePosixPath
-from typing import Callable
 from urllib.parse import quote, urlparse
 
 import requests  # type: ignore[import-untyped]
@@ -384,7 +383,7 @@ def _materialize_archive(
     except Exception as exc:
         try:
             filesystem.safe_rmtree(temporary_root, missing_ok=True)
-        except Exception as cleanup_exc:
+        except OSError as cleanup_exc:
             logger.warning(
                 "Could not clean remote data-root staging directory: %s",
                 type(cleanup_exc).__name__,
@@ -419,9 +418,9 @@ def resolve_remote_data_root(source_url: str, *, module_name: str) -> Path:
 
 
 __all__ = [
+    "RemoteDataRootError",
     "is_remote_data_root",
     "normalize_registry_input",
     "parse_github_tree_url",
-    "RemoteDataRootError",
     "resolve_remote_data_root",
 ]

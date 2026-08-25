@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+import pytest
 from django.conf import settings
 from django.test import Client
-import pytest
 
 from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api.lookup_tracker import consume_runtime_lookup_trackers
@@ -142,7 +142,7 @@ def _template_payload(name: str) -> dict[str, Any]:
 
 
 class _GraphKb:
-    report_template = {
+    report_template = {  # noqa: RUF012 - immutable test fixture catalog
         "gastroscopy_report": object(),
         "draft_report": object(),
     }

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, Literal, cast
+from typing import Literal, cast
 
 import yaml
 
@@ -17,7 +17,7 @@ def registry_path_for_module(module_dir: Path) -> Path:
 
 def load_report_template_registry(
     module_dir: Path,
-) -> Dict[str, ReportTemplateLifecycleStatusLiteral]:
+) -> dict[str, ReportTemplateLifecycleStatusLiteral]:
     registry_path = registry_path_for_module(module_dir)
     if not registry_path.exists():
         return {}
@@ -30,7 +30,7 @@ def load_report_template_registry(
     if not isinstance(templates, dict):
         return {}
 
-    result: Dict[str, ReportTemplateLifecycleStatusLiteral] = {}
+    result: dict[str, ReportTemplateLifecycleStatusLiteral] = {}
     for template_name, entry in templates.items():
         if not isinstance(template_name, str) or not template_name.strip():
             continue
@@ -48,7 +48,7 @@ def load_report_template_registry(
 
 def write_report_template_registry(
     module_dir: Path,
-    statuses: Dict[str, ReportTemplateLifecycleStatusLiteral],
+    statuses: dict[str, ReportTemplateLifecycleStatusLiteral],
 ) -> Path:
     registry_path = registry_path_for_module(module_dir)
     registry_path.parent.mkdir(parents=True, exist_ok=True)

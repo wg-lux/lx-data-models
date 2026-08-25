@@ -8,8 +8,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, cast
 
-from lx_dtypes.django_settings import *  # type: ignore # noqa: F401,F403
-
+from lx_dtypes.django_settings import *  # type: ignore
 
 DATABASES = {
     "default": {

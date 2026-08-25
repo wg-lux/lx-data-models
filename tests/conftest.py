@@ -149,7 +149,7 @@ from tests.fixtures.lx_dtypes.models.ledger.patient import (
     patient_fixture,
 )
 
-__all__ = [
+__all__ = [  # noqa: RUF022 - grouped by fixture domain for maintainability
     # App Base Model Fixtures
     "app_base_model_data_dict_fixture",
     "app_base_model_uuid_tags_data_dict_fixture",

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TypeAlias, cast
+from typing import cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .json_types import JsonObject, JsonValue
 
-VideoAiJsonObject: TypeAlias = JsonObject
+type VideoAiJsonObject = JsonObject
 
 
 def _empty_label_list() -> list[VideoAiLabelPayload]:
@@ -22,7 +22,7 @@ def _empty_huggingface_model_list() -> list[VideoAiHuggingFaceModelPayload]:
     return []
 
 
-def _strip_optional_text(value: str | int | float | bool | None) -> str | None:
+def _strip_optional_text(value: str | float | bool | None) -> str | None:
     if value is None:
         return None
     if isinstance(value, str):
@@ -133,9 +133,7 @@ class VideoAiRerunPredictionRequestPayload(BaseModel):
         mode="before",
     )
     @classmethod
-    def _normalize_optional_text(
-        cls, value: str | int | float | bool | None
-    ) -> str | None:
+    def _normalize_optional_text(cls, value: str | float | bool | None) -> str | None:
         return _strip_optional_text(value)
 
     @field_validator(
@@ -266,8 +264,8 @@ def validate_video_ai_label_rename_payload(
 __all__ = [
     "VideoAiHuggingFaceModelPayload",
     "VideoAiJsonObject",
-    "VideoAiLabelNamePayload",
     "VideoAiLabelMutationResponsePayload",
+    "VideoAiLabelNamePayload",
     "VideoAiLabelPayload",
     "VideoAiLabelRenamePayload",
     "VideoAiLabelSetPayload",

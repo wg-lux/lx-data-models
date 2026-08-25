@@ -4,8 +4,8 @@ from importlib import import_module
 from typing import Any
 
 import pytest
-from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test import Client
 
 try:
@@ -161,7 +161,7 @@ def _create_exam_graph_with_indication() -> tuple[Any, Any, Any, Any, Any]:
 
 def test_base_api_findings_read_endpoints_shape() -> None:
     client = Client()
-    examination, finding, classification, choice, indication = (
+    examination, finding, classification, choice, _indication = (
         _create_exam_graph_with_indication()
     )
 

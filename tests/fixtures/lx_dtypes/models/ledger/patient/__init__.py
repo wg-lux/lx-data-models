@@ -1,9 +1,8 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
 from lx_dtypes.models.ledger.center.Django import CenterDjango
-
 from lx_dtypes.models.ledger.patient.Django import PatientDjango
 
 
@@ -12,7 +11,7 @@ def patient_fixture(
     django_center_fixture: CenterDjango,
 ) -> PatientDjango:
     instance = PatientDjango(
-        center=django_center_fixture, dob=datetime(1990, 1, 1, tzinfo=timezone.utc)
+        center=django_center_fixture, dob=datetime(1990, 1, 1, tzinfo=UTC)
     )
     instance.save()
     return instance
