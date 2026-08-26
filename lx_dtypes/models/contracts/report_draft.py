@@ -45,6 +45,25 @@ class ReportDraftTemplateIdentity(BaseModel):
     )
 
 
+class ReportDraftIndication(BaseModel):
+    """One selected examination indication and optional choice."""
+
+    model_config = ConfigDict(allow_inf_nan=False, extra="forbid", strict=True)
+
+    examination_indication_id: int | None = Field(default=None, gt=0)
+    indication_choice_id: int | None = Field(default=None, gt=0)
+
+
+class ReportDraftSectionState(BaseModel):
+    """Editable presentation state for one report-template section."""
+
+    model_config = ConfigDict(allow_inf_nan=False, extra="forbid", strict=True)
+
+    note: str = ""
+    include_patient_data: bool = False
+    include_examination_data: bool = False
+
+
 class PatientExaminationReportDraft(BaseModel):
     """Versioned report-editor state persisted on a patient examination."""
 
@@ -56,9 +75,18 @@ class PatientExaminationReportDraft(BaseModel):
     )
 
     schema_version: Literal["1.0"] = REPORT_DRAFT_SCHEMA_VERSION
+    revision: int = Field(default=0, ge=0)
     module_name: str = ""
     template_name: str = ""
     template_identity: ReportDraftTemplateIdentity | None = None
+    indications: list[ReportDraftIndication] = Field(default_factory=list)
+    template_section_drafts: dict[str, ReportDraftSectionState] = Field(
+        default_factory=dict
+    )
+    selected_report_language: Literal["de", "en"] = "de"
+    active_report_id: int | None = Field(default=None, gt=0)
+    report_text_mode: Literal["generated", "manual"] = "generated"
+    rendered_text: str = ""
     payload: JsonObject = Field(default_factory=dict)
 
 
@@ -80,6 +108,8 @@ def dump_patient_examination_report_draft(
 __all__ = [
     "REPORT_DRAFT_SCHEMA_VERSION",
     "PatientExaminationReportDraft",
+    "ReportDraftIndication",
+    "ReportDraftSectionState",
     "ReportDraftTemplateIdentity",
     "dump_patient_examination_report_draft",
 ]

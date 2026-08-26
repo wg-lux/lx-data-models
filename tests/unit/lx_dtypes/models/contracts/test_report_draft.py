@@ -38,12 +38,27 @@ def test_report_draft_roundtrip_uses_canonical_snake_case(
             "module_name": " report_template_examples ",
             "template_name": " colonoscopy ",
             "template_identity": template_identity,
+            "indications": [
+                {"examination_indication_id": 12, "indication_choice_id": 21}
+            ],
+            "template_section_drafts": {
+                "findings": {
+                    "note": "No acute bleeding",
+                    "include_patient_data": True,
+                    "include_examination_data": False,
+                }
+            },
+            "selected_report_language": "de",
+            "active_report_id": 88,
+            "report_text_mode": "manual",
+            "rendered_text": "Klinischer Freitext",
             "payload": {"examination": "colonoscopy", "patientFindings": []},
         }
     )
 
     assert result == {
         "schema_version": "1.0",
+        "revision": 0,
         "module_name": "report_template_examples",
         "template_name": "colonoscopy",
         "template_identity": {
@@ -53,6 +68,18 @@ def test_report_draft_roundtrip_uses_canonical_snake_case(
             "template_hash": "sha256:template",
             "lifecycle_status": "published",
         },
+        "indications": [{"examination_indication_id": 12, "indication_choice_id": 21}],
+        "template_section_drafts": {
+            "findings": {
+                "note": "No acute bleeding",
+                "include_patient_data": True,
+                "include_examination_data": False,
+            }
+        },
+        "selected_report_language": "de",
+        "active_report_id": 88,
+        "report_text_mode": "manual",
+        "rendered_text": "Klinischer Freitext",
         "payload": {"examination": "colonoscopy", "patientFindings": []},
     }
 
@@ -66,6 +93,12 @@ def test_report_draft_roundtrip_uses_canonical_snake_case(
         {"payload": {"answer": math.nan}},
         {"payload": {"answer": math.inf}},
         {"module_name": 7, "payload": {}},
+        {"report_text_mode": "unknown", "payload": {}},
+        {"selected_report_language": "fr", "payload": {}},
+        {"active_report_id": 0, "payload": {}},
+        {"revision": -1, "payload": {}},
+        {"revision": 1.5, "payload": {}},
+        {"template_section_drafts": {"findings": {"note": 7}}, "payload": {}},
     ],
 )
 def test_report_draft_rejects_noncanonical_persisted_values(

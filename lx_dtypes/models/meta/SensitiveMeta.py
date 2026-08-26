@@ -284,6 +284,19 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
     def from_dict(cls, data: Mapping[str, Any] | None) -> "SensitiveMeta":
         return cls.model_validate(dict(data or {}))
 
+    @classmethod
+    def from_mixed_mapping(cls, data: Mapping[str, Any] | None) -> "SensitiveMeta":
+        """Validate recognized sensitive fields projected from a mixed payload."""
+        projected: dict[str, Any] = {}
+        for raw_key, value in dict(data or {}).items():
+            key = cls._LEGACY_FIELD_ALIASES.get(str(raw_key), str(raw_key))
+            if key not in cls.model_fields:
+                continue
+            if key in projected and cls._is_nonblank(projected[key]):
+                continue
+            projected[key] = value
+        return cls.model_validate(projected)
+
     def safe_update(
         self,
         data: "SensitiveMeta | BaseModel | Mapping[str, Any] | None" = None,
@@ -304,7 +317,7 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
             return
 
         try:
-            validated_updates = SensitiveMeta.model_validate(payload)
+            validated_updates = SensitiveMeta.from_mixed_mapping(payload)
         except ValidationError:
             return
 

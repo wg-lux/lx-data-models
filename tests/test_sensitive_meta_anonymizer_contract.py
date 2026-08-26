@@ -1,4 +1,5 @@
 import math
+from datetime import date
 from typing import Any, cast
 
 import pytest
@@ -79,6 +80,20 @@ def test_safe_update_prevents_partial_mutation_on_validation_error() -> None:
     assert meta.dob is None
 
 
+def test_safe_update_projects_known_fields_from_mixed_payload() -> None:
+    meta = SensitiveMeta()
+
+    meta.safe_update(
+        {
+            "backend": "rapidocr",
+            "roi_count": 5,
+            "patient_first_name": "Thomas",
+        }
+    )
+
+    assert meta.first_name == "Thomas"
+
+
 def test_null_equivalent_values_are_normalized() -> None:
     meta = SensitiveMeta(
         first_name="unknown",
@@ -102,6 +117,31 @@ def test_unknown_fields_are_rejected_during_contract_normalization() -> None:
     with pytest.raises(ValidationError):
         SensitiveMetaState.model_validate(
             {"sensitive_meta": "abc", "extra": "still-forbidden"}
+        )
+
+
+def test_sensitive_meta_projects_known_fields_from_mixed_boundary_payload() -> None:
+    meta = SensitiveMeta.from_mixed_mapping(
+        {
+            "backend": "rapidocr",
+            "roi_count": 5,
+            "patient_first_name": " Thomas ",
+            "examination_date": "15.02.2024",
+        }
+    )
+
+    assert meta.first_name == "Thomas"
+    assert meta.examination_date == date(2024, 2, 15)
+    assert "backend" not in meta.model_dump()
+
+
+def test_sensitive_meta_mixed_boundary_rejects_invalid_known_field() -> None:
+    with pytest.raises(ValidationError, match="dob"):
+        SensitiveMeta.from_mixed_mapping(
+            {
+                "backend": "rapidocr",
+                "dob": ["invalid"],
+            }
         )
 
 
