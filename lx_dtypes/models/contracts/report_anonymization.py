@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 from enum import StrEnum
 from pathlib import Path
 from typing import Literal
@@ -16,9 +15,9 @@ from pydantic import (
 
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta
 
-ReportAnonymizationContractVersion = Literal["report_anonymization_v2"]
+ReportAnonymizationContractVersion = Literal["report_anonymization"]
 REPORT_ANONYMIZATION_CONTRACT_VERSION: ReportAnonymizationContractVersion = (
-    "report_anonymization_v2"
+    "report_anonymization"
 )
 
 
@@ -56,7 +55,7 @@ class ReportAnonymizationOptions(BaseModel):
     use_llm: bool | None = None
 
 
-class ReportAnonymizationRequestV2(BaseModel):
+class ReportAnonymizationRequest(BaseModel):
     """One immutable local report snapshot assigned to one host-owned attempt."""
 
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
@@ -76,7 +75,7 @@ class ReportAnonymizationRequestV2(BaseModel):
     )
 
     @model_validator(mode="after")
-    def validate_local_paths(self) -> ReportAnonymizationRequestV2:
+    def validate_local_paths(self) -> ReportAnonymizationRequest:
         if self.source_path.is_symlink() or not self.source_path.is_file():
             raise ValueError("source_path must be a regular non-symlink file")
         if self.output_directory.is_symlink() or not self.output_directory.is_dir():
@@ -88,7 +87,7 @@ class ReportAnonymizationRequestV2(BaseModel):
         return self
 
 
-class ReportAnonymizationProvenanceV2(BaseModel):
+class ReportAnonymizationProvenance(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     contract_version: ReportAnonymizationContractVersion = (
@@ -134,7 +133,7 @@ class ReportAnonymizationProvenanceV2(BaseModel):
         return value
 
 
-class ReportArtifactValidationV2(BaseModel):
+class ReportArtifactValidation(BaseModel):
     """Evidence that the closed attempt artifact passed a full parser traversal."""
 
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
@@ -145,14 +144,14 @@ class ReportArtifactValidationV2(BaseModel):
     repaired: bool
 
 
-class ReportAnonymizationWarningV2(BaseModel):
+class ReportAnonymizationWarning(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     code: ReportAnonymizationWarningCode
     phase: ReportAnonymizationPhase
 
 
-class ReportAnonymizationResultV2(BaseModel):
+class ReportAnonymizationResult(BaseModel):
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
         extra="forbid",
@@ -172,12 +171,12 @@ class ReportAnonymizationResultV2(BaseModel):
     artifact_path: Path
     artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     artifact_size_bytes: int = Field(gt=0)
-    artifact_validation: ReportArtifactValidationV2
-    provenance: ReportAnonymizationProvenanceV2
-    warnings: tuple[ReportAnonymizationWarningV2, ...] = ()
+    artifact_validation: ReportArtifactValidation
+    provenance: ReportAnonymizationProvenance
+    warnings: tuple[ReportAnonymizationWarning, ...] = ()
 
 
-class ReportAnonymizationFailureV2(BaseModel):
+class ReportAnonymizationFailure(BaseModel):
     """Machine-safe failure classification returned across integration boundaries."""
 
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
@@ -191,65 +190,17 @@ class ReportAnonymizationFailureV2(BaseModel):
     retryable: bool
 
 
-class ReportAnonymizationResult(BaseModel):
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra="forbid",
-        frozen=True,
-        strict=True,
-        str_strip_whitespace=False,
-    )
-
-    original_text: str
-    anonymized_text: str
-    extracted_metadata: SensitiveMeta = Field(default_factory=SensitiveMeta)
-    anonymized_path: Path
-
-    @field_validator("original_text", "anonymized_text", mode="before")
-    @classmethod
-    def normalize_text(cls, value: str | float | bool | None) -> str:
-        if value is None:
-            return ""
-        return str(value)
-
-    @field_validator("extracted_metadata", mode="before")
-    @classmethod
-    def normalize_extracted_metadata(
-        cls, value: SensitiveMeta | dict[str, object] | None
-    ) -> SensitiveMeta:
-        if isinstance(value, SensitiveMeta):
-            return value
-        return SensitiveMeta.from_dict(value if isinstance(value, dict) else None)
-
-    @classmethod
-    def from_process_report_result(
-        cls, value: Sequence[str | Path | dict[str, object] | None]
-    ) -> ReportAnonymizationResult:
-        if len(value) != 4:
-            raise ValueError("process_report result must contain exactly four values")
-        original_text, anonymized_text, extracted_metadata, anonymized_path = value
-        return cls.model_validate(
-            {
-                "original_text": original_text,
-                "anonymized_text": anonymized_text,
-                "extracted_metadata": extracted_metadata,
-                "anonymized_path": anonymized_path,
-            }
-        )
-
-
 __all__ = [
     "REPORT_ANONYMIZATION_CONTRACT_VERSION",
     "ReportAnonymizationContractVersion",
     "ReportAnonymizationErrorCode",
-    "ReportAnonymizationFailureV2",
+    "ReportAnonymizationFailure",
     "ReportAnonymizationOptions",
     "ReportAnonymizationPhase",
-    "ReportAnonymizationProvenanceV2",
-    "ReportAnonymizationRequestV2",
+    "ReportAnonymizationProvenance",
+    "ReportAnonymizationRequest",
     "ReportAnonymizationResult",
-    "ReportAnonymizationResultV2",
+    "ReportAnonymizationWarning",
     "ReportAnonymizationWarningCode",
-    "ReportAnonymizationWarningV2",
-    "ReportArtifactValidationV2",
+    "ReportArtifactValidation",
 ]

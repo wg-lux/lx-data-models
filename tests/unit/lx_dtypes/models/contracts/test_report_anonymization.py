@@ -8,23 +8,23 @@ import pytest
 from pydantic import ValidationError
 
 from lx_dtypes.models.contracts import (
-    ReportAnonymizationRequestV2 as ExportedReportAnonymizationRequestV2,
+    ReportAnonymizationRequest as ExportedReportAnonymizationRequest,
 )
 from lx_dtypes.models.contracts.report_anonymization import (
     ReportAnonymizationErrorCode,
-    ReportAnonymizationFailureV2,
+    ReportAnonymizationFailure,
     ReportAnonymizationPhase,
-    ReportAnonymizationProvenanceV2,
-    ReportAnonymizationRequestV2,
-    ReportAnonymizationResultV2,
-    ReportArtifactValidationV2,
+    ReportAnonymizationProvenance,
+    ReportAnonymizationRequest,
+    ReportAnonymizationResult,
+    ReportArtifactValidation,
 )
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta
 
 
-def _request(source: Path, output_directory: Path) -> ReportAnonymizationRequestV2:
+def _request(source: Path, output_directory: Path) -> ReportAnonymizationRequest:
     content = source.read_bytes()
-    return ReportAnonymizationRequestV2(
+    return ReportAnonymizationRequest(
         attempt_id=uuid4(),
         source_path=source,
         source_sha256=hashlib.sha256(content).hexdigest(),
@@ -34,7 +34,7 @@ def _request(source: Path, output_directory: Path) -> ReportAnonymizationRequest
     )
 
 
-def test_report_v2_request_rejects_unknown_fields_and_nonpositive_deadline(
+def test_report_request_rejects_unknown_fields_and_nonpositive_deadline(
     tmp_path: Path,
 ) -> None:
     source = tmp_path / "source.pdf"
@@ -44,7 +44,7 @@ def test_report_v2_request_rejects_unknown_fields_and_nonpositive_deadline(
     request = _request(source, output_directory)
 
     with pytest.raises(ValidationError):
-        ReportAnonymizationRequestV2.model_validate(
+        ReportAnonymizationRequest.model_validate(
             {
                 **request.model_dump(),
                 "deadline_monotonic_ns": 0,
@@ -53,7 +53,7 @@ def test_report_v2_request_rejects_unknown_fields_and_nonpositive_deadline(
         )
 
 
-def test_report_v2_contract_rejects_unknown_version_and_is_exported(
+def test_report_contract_rejects_unknown_name_and_is_exported(
     tmp_path: Path,
 ) -> None:
     source = tmp_path / "source.pdf"
@@ -62,17 +62,17 @@ def test_report_v2_contract_rejects_unknown_version_and_is_exported(
     output_directory.mkdir()
     request = _request(source, output_directory)
 
-    assert ExportedReportAnonymizationRequestV2 is ReportAnonymizationRequestV2
+    assert ExportedReportAnonymizationRequest is ReportAnonymizationRequest
     with pytest.raises(ValidationError):
-        ReportAnonymizationRequestV2.model_validate(
+        ReportAnonymizationRequest.model_validate(
             {
                 **request.model_dump(),
-                "contract_version": "report_anonymization_v3",
+                "contract_version": "unsupported_report_anonymization",
             }
         )
 
 
-def test_report_v2_request_rejects_symlink_source(tmp_path: Path) -> None:
+def test_report_request_rejects_symlink_source(tmp_path: Path) -> None:
     source = tmp_path / "source.pdf"
     linked_source = tmp_path / "linked.pdf"
     output_directory = tmp_path / "attempt"
@@ -84,11 +84,11 @@ def test_report_v2_request_rejects_symlink_source(tmp_path: Path) -> None:
         _request(linked_source, output_directory)
 
 
-def test_report_v2_result_round_trips_as_json(tmp_path: Path) -> None:
+def test_report_result_round_trips_as_json(tmp_path: Path) -> None:
     artifact = tmp_path / "artifact.pdf"
     artifact.write_bytes(b"%PDF-1.4\n%%EOF\n")
     digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
-    result = ReportAnonymizationResultV2(
+    result = ReportAnonymizationResult(
         attempt_id=uuid4(),
         source_sha256="a" * 64,
         original_text="original",
@@ -97,11 +97,11 @@ def test_report_v2_result_round_trips_as_json(tmp_path: Path) -> None:
         artifact_path=artifact,
         artifact_sha256=digest,
         artifact_size_bytes=artifact.stat().st_size,
-        artifact_validation=ReportArtifactValidationV2(
+        artifact_validation=ReportArtifactValidation(
             page_count=1,
             repaired=False,
         ),
-        provenance=ReportAnonymizationProvenanceV2(
+        provenance=ReportAnonymizationProvenance(
             anonymizer_version="0.9.3.4",
             detector_sources=("spacy",),
             model_names=("de_core_news_lg",),
@@ -112,15 +112,15 @@ def test_report_v2_result_round_trips_as_json(tmp_path: Path) -> None:
         ),
     )
 
-    restored = ReportAnonymizationResultV2.model_validate_json(result.model_dump_json())
+    restored = ReportAnonymizationResult.model_validate_json(result.model_dump_json())
 
     assert restored == result
     assert restored.extracted_metadata.first_name == "ANON"
     assert restored.artifact_validation.validator == "pymupdf_full_parse_v1"
 
 
-def test_report_v2_failure_is_machine_safe_and_strict() -> None:
-    failure = ReportAnonymizationFailureV2(
+def test_report_failure_is_machine_safe_and_strict() -> None:
+    failure = ReportAnonymizationFailure(
         attempt_id=uuid4(),
         phase=ReportAnonymizationPhase.VALIDATE_ARTIFACT,
         error_code=ReportAnonymizationErrorCode.VALIDATION_FAILED,
@@ -129,6 +129,6 @@ def test_report_v2_failure_is_machine_safe_and_strict() -> None:
 
     assert "detail" not in failure.model_dump()
     with pytest.raises(ValidationError):
-        ReportAnonymizationFailureV2.model_validate(
+        ReportAnonymizationFailure.model_validate(
             {**failure.model_dump(), "retryable": "false"}
         )
