@@ -12,6 +12,7 @@ def test_catalog_exposes_verified_reporting_resources() -> None:
     descriptors = list_packaged_knowledge_bases()
 
     assert {(item.module_name, item.version) for item in descriptors} >= {
+        ("coloreg", "0.1.0"),
         ("dgvs_reporting", "0.1.0"),
         ("mst_3_0", "3.0.0"),
         ("star_upper_gi", "0.1.2"),

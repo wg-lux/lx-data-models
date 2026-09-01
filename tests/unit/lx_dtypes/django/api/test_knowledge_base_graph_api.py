@@ -239,6 +239,7 @@ def test_graph_projection_strips_template_source_file_paths() -> None:
                 "colonoscopy_training_basic": "DGVS-AWMF-021-022-v2.1-2025-07",
             },
         ),
+        ("coloreg", "0.1.0", {"coloreg_colonoscopy": "1.0.0"}),
         (
             "mst_3_0",
             "3.0.0",
@@ -334,7 +335,7 @@ def test_packaged_provider_registry_serves_full_dgvs_reporting_context(
     assert payload["concepts"]["finding"]
     assert payload["concepts"]["classification"]
     assert [template["name"] for template in payload["report_templates"]] == [
-        "colonoscopy_training_basic"
+        "colonoscopy_training_basic",
     ]
 
 

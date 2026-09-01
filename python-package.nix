@@ -94,6 +94,10 @@ py.buildPythonPackage {
     mkdir -p "$featureRoot"
     cp ${./features/PackagedKnowledgeBaseResources.yml} \
       "$featureRoot/packaged_knowledge_base_resources.yml"
+    cp ${./features/FrameCleanerIntegration.yml} \
+      "$featureRoot/frame_cleaner_integration.yml"
+    cp ${./features/ReportReaderIntegration.yml} \
+      "$featureRoot/report_reader_integration.yml"
   '';
 
   makeWrapperArgs = [

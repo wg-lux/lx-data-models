@@ -10,6 +10,14 @@
       "default": true
     },
     {
+      "module_name": "coloreg",
+      "version": "0.1.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/coloreg",
+      "content_sha256": "2797c304e322c7dcf1ce9d3b974dfefea443eb769065113edd41442ff2f9e09d",
+      "default": true
+    },
+    {
       "module_name": "mst_3_0",
       "version": "3.0.0",
       "medical_field": "gastroenterology",

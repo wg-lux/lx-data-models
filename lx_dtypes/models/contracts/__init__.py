@@ -399,6 +399,12 @@ from .report_draft import (
     ReportDraftTemplateIdentity,
     dump_patient_examination_report_draft,
 )
+from .study_cohort import (
+    StudyCohortCaseRow,
+    StudyCohortExaminationRow,
+    StudyCohortMediaRow,
+    StudyCohortReportRow,
+)
 from .terminology_catalog import (
     ExaminationCatalogDTO,
     IndicationCatalogDTO,
@@ -885,6 +891,10 @@ __all__ = [
     "StorageManagementCommandOptionsPayload",
     "StorageManagementInfoPayload",
     "StreamThrottleMode",
+    "StudyCohortCaseRow",
+    "StudyCohortExaminationRow",
+    "StudyCohortMediaRow",
+    "StudyCohortReportRow",
     "TemporalInferenceDispatchResult",
     "TemporalInferenceHistoryConfigPayload",
     "TemporalInferenceHistoryResultPayload",

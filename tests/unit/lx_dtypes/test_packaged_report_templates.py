@@ -20,6 +20,32 @@ def test_packaged_report_template_verifier_requires_multiple_templates() -> None
         verify_packaged_report_templates(["upper_gi_quality_2025"])
 
 
+def test_coloreg_template_exposes_only_conditional_paris_and_nice_polyps() -> None:
+    payload = (
+        verifier_module.DataLoader()
+        .load_knowledge_base("coloreg")
+        .export_report_template("coloreg_colonoscopy")
+    )
+
+    assert payload["examination"] == "colonoscopy"
+    assert payload["version"] == "1.0.0"
+    assert payload["readiness"]["lifecycle_status"] == "published"
+    assert payload["readiness"]["can_publish"] is True
+    assert len(payload["report_sections"]) == 1
+    findings = payload["report_sections"][0]["findings"]
+    assert len(findings) == 1
+    assert findings[0]["finding"] == "colon_polyp"
+    assert findings[0]["required"] is False
+    assert findings[0]["multiple_allowed"] is True
+    assert {
+        requirement["classification"]: requirement["required"]
+        for requirement in findings[0]["classifications"]
+    } == {
+        "colon_lesion_paris": True,
+        "colon_lesion_nice": True,
+    }
+
+
 @pytest.mark.parametrize(
     ("payload", "message"),
     [

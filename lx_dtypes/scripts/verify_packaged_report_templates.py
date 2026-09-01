@@ -9,9 +9,11 @@ from lx_dtypes.models.interface.DataLoader import DataLoader
 REQUIRED_PACKAGED_REPORT_TEMPLATES = (
     "upper_gi_quality_2025",
     "colonoscopy_training_basic",
+    "coloreg_colonoscopy",
 )
 PACKAGED_REPORT_TEMPLATE_MODULES = {
     "colonoscopy_training_basic": "dgvs_reporting",
+    "coloreg_colonoscopy": "coloreg",
 }
 
 

@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- An independently versioned `coloreg` knowledge-base package with a published
+  colonoscopy template and Paris/NICE-only polyps.
 - A strict `lx-dtypes-kb-registry bootstrap` startup boundary that provisions,
   migrates, and fully validates every packaged knowledge-base identity.
 - Revisioned compare-and-swap terminology selection with inter-process writer
