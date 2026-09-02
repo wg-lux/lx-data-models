@@ -1,3 +1,5 @@
+# Sources for guideline-derived additions in this file:
+# - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
 - model: finding
   name: "examination_setting"
   finding_types:
@@ -8,7 +10,9 @@
 
 - model: finding
   name: "sedation_endoscopy"
-  description: "Sedation during an examination"
+  name_de: "Sedierung bei der Endoskopie"
+  name_en: "Sedation during endoscopy"
+  description: "Zusammenfassende Dokumentation, ob eine Sedierung durchgeführt wurde und welches Sedierungsverfahren verwendet wurde."
   finding_types:
     - baseline
   classifications:

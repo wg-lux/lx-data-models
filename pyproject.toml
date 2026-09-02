@@ -6,7 +6,10 @@ classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3 :: Only",
+  "Typing :: Typed",
   "Topic :: Scientific/Engineering :: Medical Science Apps.",
 ]
 dependencies = [
@@ -17,7 +20,6 @@ dependencies = [
   "django-stubs-ext>=5.2.8",
   "icecream>=2.1.4",
   "numpy>=2.2.3",
-  "opencv-python>=4.12.0.88",
   "openpyxl>=3.1.5",
   "pandas>=2.2.3",
   "pandas-stubs>=2.3.3.251201",
@@ -31,12 +33,14 @@ dependencies = [
   "scipy>=1.16.1",
   "types-pyyaml>=6.0.12.20250915",
 ]
-description = "lx-data-types"
+description = "Typed clinical data models, terminology, and interoperability contracts"
 keywords = [
-  "medical",
+  "clinical-data",
   "data-models",
+  "fhir",
+  "medical-research",
   "pydantic",
-  "research",
+  "terminology",
 ]
 license = {file = "LICENSE"}
 maintainers = [
@@ -45,7 +49,7 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.1.3"
+version = "0.2.34"
 
 [project.optional-dependencies]
 dev = [
@@ -62,12 +66,15 @@ dev = [
   "pytest-mypy-plugins>=3.2.0",
   "pytest-xdist>=3.8.0",
   "pytest-django>=4.11.1",
+  "radon>=6.0.1",
   "sphinx-autodoc-typehints>=3.5.2",
   "sphinx-copybutton>=0.5.2",
   "sphinx>=8.2.3,<9.0",
   "furo>=2025.9.25",
   "ruff>=0.14.8",
-  "twine>=6.2.0",
+  "twine>=7.0.0",
+  "opencv-python-headless>=4.12.0.88",
+
 ]
 
 docs = [
@@ -84,13 +91,17 @@ ok = "lx_dtypes.scripts.lint_kb_yaml:main"
 lx-dtypes-kb-registry = "lx_dtypes.scripts.kb_registry:main"
 lx-dtypes-prototype-kb-smoke = "lx_dtypes.scripts.prototype_kb_smoke:main"
 lx-dtypes-release = "lx_dtypes.scripts.release:main"
+lx-dtypes-verify-packaged-templates = "lx_dtypes.scripts.verify_packaged_report_templates:main"
+lx-dtypes-fhir-lxdm-diagram = "lx_dtypes.scripts.fhir_lxdm_diagram:main"
 
 [project.urls]
-Homepage = "https://info.coloreg.de"
+Changelog = "https://github.com/wg-lux/lx-data-models/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/wg-lux/lx-data-models"
+Issues = "https://github.com/wg-lux/lx-data-models/issues"
 Repository = "https://github.com/wg-lux/lx-data-models"
 
 [tool.pyright]
-extraPaths = ["lx_dtypes"]
+include = ["lx_dtypes", "scripts", "tests"]
 stubPath = "typings"
 # These settings help fix the "Unknown" errors specifically
 # reportMissingTypeStubs = false
@@ -98,11 +109,20 @@ stubPath = "typings"
 # reportUnknownVariableType = false
 
 exclude = [
+  "**/__pycache__",
+  ".devenv",
+  ".direnv",
+  ".mypy_cache",
+  ".pytest_cache",
+  ".ruff_cache",
+  "dist",
+  "docs/_build",
+  "lx-terminology-editor",
   "**/migrations/**",
   "**/manage.py",
   "**/settings.py",
 ]
-useLibraryCodeForTypes = true
+useLibraryCodeForTypes = false
 
 [tool.mypy]
 exclude = '^(typings/|\.venv/|venv/|env/)'
@@ -119,19 +139,38 @@ ignore_errors = true
 django_settings_module = "lx_dtypes.django_settings"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "lx_dtypes.django_settings_ci_test"
+DJANGO_SETTINGS_MODULE = "tests.django_settings"
 addopts = """
-    --ds=lx_dtypes.django_settings_ci_test
+    --ds=tests.django_settings
+    --import-mode=importlib
     --cov-report=xml
     --cov-fail-under=70
 """
 markers = [
   "localfiles: depends on files present only on dev machines",
 ]
-testpaths = ["tests", "lx_dtypes/**/tests"]
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 88
+
+[tool.ruff.lint.per-file-ignores]
+# Public modules and legacy aggregate aliases intentionally retain their stable names.
+"lx_dtypes/django/smoke_settings.py" = ["F403"]
+"lx_dtypes/django/migrations/*.py" = ["RUF012"]
+"lx_dtypes/models/**/*.py" = ["N999"]
+"lx_dtypes/models/base/app_base_model/django/KnowledgebaseBaseModelDjango.py" = ["PYI059", "UP046"]
+"lx_dtypes/models/base/app_base_model/django/LedgerBaseModelDjango.py" = ["PYI059", "UP046"]
+"lx_dtypes/models/base/app_base_model/pydantic/InterfaceMixIns.py" = ["PYI059", "UP046"]
+"lx_dtypes/models/contracts/adapters.py" = ["PYI046"]
+"lx_dtypes/models/knowledge_base/**/__init__.py" = ["PYI042", "UP007", "UP040"]
+"lx_dtypes/models/knowledge_base/main.py" = ["UP007", "UP040"]
+"lx_dtypes/models/knowledge_base/pydantic_main.py" = ["UP007", "UP040"]
+"lx_dtypes/models/ledger/**/__init__.py" = ["PYI042", "UP007"]
+"lx_dtypes/models/ledger/main.py" = ["UP007"]
+"tests/django_settings.py" = ["F403"]
+"tests/fixtures/lx_dtypes/models/interface/__init__.py" = ["F403"]
+"tests/**/*.py" = ["N999"]
 
 [tool.black]
 line-length = 88

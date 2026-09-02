@@ -1,18 +1,15 @@
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    List,
     Self,
-    Tuple,
     TypedDict,
-    Union,
     cast,
 )
 
 import yaml
-from pydantic import Field, PrivateAttr
+from pydantic import BaseModel, Field, PrivateAttr
 
 from lx_dtypes.models.base.app_base_model.ddict.AppBaseModelUUIDTagsDataDict import (
     AppBaseModelUUIDTagsDataDict,
@@ -22,12 +19,9 @@ from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelUUIDTags import (
 )
 from lx_dtypes.models.contracts import kb_to_core_concepts_payload
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
-from lx_dtypes.models.knowledge_base import (
-    KB_MODEL_NAMES_LITERAL,
-    KB_MODEL_NAMES_ORDERED,
-    KB_MODELS,
-    knowledge_base_models_lookup,
-)
+from lx_dtypes.models.interface.LookupTracker import KnowledgeBaseLookupTracker
+from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
+from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 from lx_dtypes.models.knowledge_base.citation.Citation import Citation
 from lx_dtypes.models.knowledge_base.citation.CitationDataDict import CitationDataDict
 from lx_dtypes.models.knowledge_base.classification.Classification import (
@@ -98,11 +92,11 @@ from lx_dtypes.models.knowledge_base.intervention.InterventionType import (
 from lx_dtypes.models.knowledge_base.intervention.InterventionTypeDataDict import (
     InterventionTypeDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
-    ExaminationValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.ExaminationValidatorDataDict import (
-    ExaminationValidatorDataDict,
+from lx_dtypes.models.knowledge_base.pydantic_main import (
+    KB_MODEL_NAMES_LITERAL,
+    KB_MODEL_NAMES_ORDERED,
+    KB_MODELS,
+    knowledge_base_models_lookup,
 )
 from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
     ClassificationValidator,
@@ -110,11 +104,11 @@ from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator imp
 from lx_dtypes.models.knowledge_base.report_template.ClassificationValidatorDataDict import (
     ClassificationValidatorDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
-    InterventionValidator,
+from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
+    ExaminationValidator,
 )
-from lx_dtypes.models.knowledge_base.report_template.InterventionValidatorDataDict import (
-    InterventionValidatorDataDict,
+from lx_dtypes.models.knowledge_base.report_template.ExaminationValidatorDataDict import (
+    ExaminationValidatorDataDict,
 )
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
     FindingsValidator,
@@ -122,7 +116,17 @@ from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict import (
     FindingsValidatorDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.ReportFinding import ReportFinding
+from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
+    InterventionValidator,
+)
+from lx_dtypes.models.knowledge_base.report_template.InterventionValidatorDataDict import (
+    InterventionValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
+    ReportFinding,
+    ReportTemplateClassificationRequirement,
+    ReportTemplateFindingRequirement,
+)
 from lx_dtypes.models.knowledge_base.report_template.ReportFindingDataDict import (
     ReportFindingDataDict,
 )
@@ -149,6 +153,7 @@ from lx_dtypes.models.knowledge_base.report_template.UnitValidatorDataDict impor
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     ClassificationValidatorExecutionDataDict,
     ExaminationValidatorExecutionDataDict,
+    FhirTerminologyValidatedFindingResultDataDict,
     FindingsValidatorExecutionDataDict,
     InterventionValidatorExecutionDataDict,
     ReportTemplateRuntimeValidationResultDataDict,
@@ -158,10 +163,8 @@ from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     evaluate_intervention_validator_runtime,
     evaluate_report_template_validators_runtime,
     evaluate_unit_validator_runtime,
-)
-from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
-    ReportTemplateClassificationRequirement,
-    ReportTemplateFindingRequirement,
+    export_terminology_validated_fhir_observations,
+    import_terminology_validated_fhir_observations,
 )
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 from lx_dtypes.models.knowledge_base.unit.UnitDataDict import UnitDataDict
@@ -176,9 +179,6 @@ from lx_dtypes.utils.report_template_registry import (
     load_report_template_registry,
     registry_path_for_module,
 )
-from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
-from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
-from lx_dtypes.models.interface.LookupTracker import KnowledgeBaseLookupTracker
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.Ledger import Ledger
@@ -187,31 +187,31 @@ if TYPE_CHECKING:
 
 class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
     config: KnowledgeBaseConfig
-    citation: Dict[str, CitationDataDict]
-    classification: Dict[str, ClassificationDataDict]
-    classification_type: Dict[str, ClassificationTypeDataDict]
-    classification_choice: Dict[str, ClassificationChoiceDataDict]
-    classification_choice_descriptor: Dict[str, ClassificationChoiceDescriptorDataDict]
-    examination: Dict[str, ExaminationDataDict]
-    examination_type: Dict[str, ExaminationTypeDataDict]
-    finding: Dict[str, FindingDataDict]
-    finding_type: Dict[str, FindingTypeDataDict]
-    indication: Dict[str, IndicationDataDict]
-    indication_type: Dict[str, IndicationTypeDataDict]
-    intervention: Dict[str, InterventionDataDict]
-    intervention_type: Dict[str, InterventionTypeDataDict]
-    unit_type: Dict[str, UnitTypeDataDict]
-    unit: Dict[str, UnitDataDict]
-    information_source: Dict[str, InformationSourceDataDict]
-    information_source_type: Dict[str, InformationSourceTypeDataDict]
-    report_template_section: Dict[str, ReportTemplateSectionDataDict]
-    report_finding: Dict[str, ReportFindingDataDict]
-    classification_validator: Dict[str, ClassificationValidatorDataDict]
-    intervention_validator: Dict[str, InterventionValidatorDataDict]
-    unit_validator: Dict[str, UnitValidatorDataDict]
-    findings_validator: Dict[str, FindingsValidatorDataDict]
-    examination_validator: Dict[str, ExaminationValidatorDataDict]
-    report_template: Dict[str, ReportTemplateDataDict]
+    citation: dict[str, CitationDataDict]
+    classification: dict[str, ClassificationDataDict]
+    classification_type: dict[str, ClassificationTypeDataDict]
+    classification_choice: dict[str, ClassificationChoiceDataDict]
+    classification_choice_descriptor: dict[str, ClassificationChoiceDescriptorDataDict]
+    examination: dict[str, ExaminationDataDict]
+    examination_type: dict[str, ExaminationTypeDataDict]
+    finding: dict[str, FindingDataDict]
+    finding_type: dict[str, FindingTypeDataDict]
+    indication: dict[str, IndicationDataDict]
+    indication_type: dict[str, IndicationTypeDataDict]
+    intervention: dict[str, InterventionDataDict]
+    intervention_type: dict[str, InterventionTypeDataDict]
+    unit_type: dict[str, UnitTypeDataDict]
+    unit: dict[str, UnitDataDict]
+    information_source: dict[str, InformationSourceDataDict]
+    information_source_type: dict[str, InformationSourceTypeDataDict]
+    report_template_section: dict[str, ReportTemplateSectionDataDict]
+    report_finding: dict[str, ReportFindingDataDict]
+    classification_validator: dict[str, ClassificationValidatorDataDict]
+    intervention_validator: dict[str, InterventionValidatorDataDict]
+    unit_validator: dict[str, UnitValidatorDataDict]
+    findings_validator: dict[str, FindingsValidatorDataDict]
+    examination_validator: dict[str, ExaminationValidatorDataDict]
+    report_template: dict[str, ReportTemplateDataDict]
     # labelset -> links to labels
     # label -> links to finding, intervention, classification + classificationchoice, examination
 
@@ -227,31 +227,31 @@ YAML_IMPORT_SKIP_FIELDS = [
 
 
 class KnowledgeBaseRecordList(TypedDict):
-    citations: List[CitationDataDict]
-    classifications: List[ClassificationDataDict]
-    classification_types: List[ClassificationTypeDataDict]
-    classification_choices: List[ClassificationChoiceDataDict]
-    classification_choice_descriptors: List[ClassificationChoiceDescriptorDataDict]
-    examinations: List[ExaminationDataDict]
-    examination_types: List[ExaminationTypeDataDict]
-    findings: List[FindingDataDict]
-    finding_types: List[FindingTypeDataDict]
-    indications: List[IndicationDataDict]
-    indication_types: List[IndicationTypeDataDict]
-    interventions: List[InterventionDataDict]
-    intervention_types: List[InterventionTypeDataDict]
-    units: List[UnitDataDict]
-    unit_types: List[UnitTypeDataDict]
-    information_sources: List[InformationSourceDataDict]
-    information_source_types: List[InformationSourceTypeDataDict]
-    report_template_sections: List[ReportTemplateSectionDataDict]
-    report_findings: List[ReportFindingDataDict]
-    classification_validators: List[ClassificationValidatorDataDict]
-    intervention_validators: List[InterventionValidatorDataDict]
-    unit_validators: List[UnitValidatorDataDict]
-    findings_validators: List[FindingsValidatorDataDict]
-    examination_validators: List[ExaminationValidatorDataDict]
-    report_templates: List[ReportTemplateDataDict]
+    citations: list[CitationDataDict]
+    classifications: list[ClassificationDataDict]
+    classification_types: list[ClassificationTypeDataDict]
+    classification_choices: list[ClassificationChoiceDataDict]
+    classification_choice_descriptors: list[ClassificationChoiceDescriptorDataDict]
+    examinations: list[ExaminationDataDict]
+    examination_types: list[ExaminationTypeDataDict]
+    findings: list[FindingDataDict]
+    finding_types: list[FindingTypeDataDict]
+    indications: list[IndicationDataDict]
+    indication_types: list[IndicationTypeDataDict]
+    interventions: list[InterventionDataDict]
+    intervention_types: list[InterventionTypeDataDict]
+    units: list[UnitDataDict]
+    unit_types: list[UnitTypeDataDict]
+    information_sources: list[InformationSourceDataDict]
+    information_source_types: list[InformationSourceTypeDataDict]
+    report_template_sections: list[ReportTemplateSectionDataDict]
+    report_findings: list[ReportFindingDataDict]
+    classification_validators: list[ClassificationValidatorDataDict]
+    intervention_validators: list[InterventionValidatorDataDict]
+    unit_validators: list[UnitValidatorDataDict]
+    findings_validators: list[FindingsValidatorDataDict]
+    examination_validators: list[ExaminationValidatorDataDict]
+    report_templates: list[ReportTemplateDataDict]
 
 
 class SemanticAdmissibilityError(ValueError):
@@ -262,42 +262,42 @@ class SemanticAdmissibilityError(ValueError):
 
 class KnowledgeBase(AppBaseModelUUIDTags):
     config: KnowledgeBaseConfig
-    citation: Dict[str, Citation] = Field(default_factory=dict)
-    classification: Dict[str, Classification] = Field(default_factory=dict)
-    classification_type: Dict[str, ClassificationType] = Field(default_factory=dict)
-    classification_choice: Dict[str, ClassificationChoice] = Field(default_factory=dict)
-    classification_choice_descriptor: Dict[str, ClassificationChoiceDescriptor] = Field(
+    citation: dict[str, Citation] = Field(default_factory=dict)
+    classification: dict[str, Classification] = Field(default_factory=dict)
+    classification_type: dict[str, ClassificationType] = Field(default_factory=dict)
+    classification_choice: dict[str, ClassificationChoice] = Field(default_factory=dict)
+    classification_choice_descriptor: dict[str, ClassificationChoiceDescriptor] = Field(
         default_factory=dict
     )
-    examination: Dict[str, Examination] = Field(default_factory=dict)
-    examination_type: Dict[str, ExaminationType] = Field(default_factory=dict)
-    finding: Dict[str, Finding] = Field(default_factory=dict)
-    finding_type: Dict[str, FindingType] = Field(default_factory=dict)
-    indication: Dict[str, Indication] = Field(default_factory=dict)
-    indication_type: Dict[str, IndicationType] = Field(default_factory=dict)
-    intervention: Dict[str, Intervention] = Field(default_factory=dict)
-    intervention_type: Dict[str, InterventionType] = Field(default_factory=dict)
-    unit_type: Dict[str, UnitType] = Field(default_factory=dict)
-    unit: Dict[str, Unit] = Field(default_factory=dict)
-    information_source: Dict[str, InformationSource] = Field(default_factory=dict)
-    information_source_type: Dict[str, InformationSourceType] = Field(
+    examination: dict[str, Examination] = Field(default_factory=dict)
+    examination_type: dict[str, ExaminationType] = Field(default_factory=dict)
+    finding: dict[str, Finding] = Field(default_factory=dict)
+    finding_type: dict[str, FindingType] = Field(default_factory=dict)
+    indication: dict[str, Indication] = Field(default_factory=dict)
+    indication_type: dict[str, IndicationType] = Field(default_factory=dict)
+    intervention: dict[str, Intervention] = Field(default_factory=dict)
+    intervention_type: dict[str, InterventionType] = Field(default_factory=dict)
+    unit_type: dict[str, UnitType] = Field(default_factory=dict)
+    unit: dict[str, Unit] = Field(default_factory=dict)
+    information_source: dict[str, InformationSource] = Field(default_factory=dict)
+    information_source_type: dict[str, InformationSourceType] = Field(
         default_factory=dict
     )
-    report_template_section: Dict[str, ReportTemplateSection] = Field(
+    report_template_section: dict[str, ReportTemplateSection] = Field(
         default_factory=dict
     )
-    report_finding: Dict[str, ReportFinding] = Field(default_factory=dict)
-    classification_validator: Dict[str, ClassificationValidator] = Field(
+    report_finding: dict[str, ReportFinding] = Field(default_factory=dict)
+    classification_validator: dict[str, ClassificationValidator] = Field(
         default_factory=dict
     )
-    intervention_validator: Dict[str, InterventionValidator] = Field(
+    intervention_validator: dict[str, InterventionValidator] = Field(
         default_factory=dict
     )
-    unit_validator: Dict[str, UnitValidator] = Field(default_factory=dict)
-    findings_validator: Dict[str, FindingsValidator] = Field(default_factory=dict)
-    examination_validator: Dict[str, ExaminationValidator] = Field(default_factory=dict)
-    report_template: Dict[str, ReportTemplate] = Field(default_factory=dict)
-    report_template_lifecycle_status: Dict[
+    unit_validator: dict[str, UnitValidator] = Field(default_factory=dict)
+    findings_validator: dict[str, FindingsValidator] = Field(default_factory=dict)
+    examination_validator: dict[str, ExaminationValidator] = Field(default_factory=dict)
+    report_template: dict[str, ReportTemplate] = Field(default_factory=dict)
+    report_template_lifecycle_status: dict[
         str, ReportTemplateLifecycleStatusLiteral
     ] = Field(default_factory=dict, exclude=True)
     _lookup_tracker: KnowledgeBaseLookupTracker = PrivateAttr(
@@ -311,7 +311,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         key: str,
         source: str = "knowledge_base",
     ) -> Any:
-        collection = cast(Dict[str, Any], getattr(self, collection_name))
+        collection = cast(dict[str, Any], getattr(self, collection_name))
         found = key in collection
         self._lookup_tracker.record_lookup(
             source=source,
@@ -328,7 +328,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         key: str,
         source: str = "knowledge_base",
     ) -> Any:
-        collection = cast(Dict[str, Any], getattr(self, collection_name))
+        collection = cast(dict[str, Any], getattr(self, collection_name))
         found = key in collection
         self._lookup_tracker.record_lookup(
             source=source,
@@ -341,7 +341,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     def reset_lookup_tracker(self) -> None:
         self._lookup_tracker.reset()
 
-    def get_lookup_tracker_summary(self) -> Dict[str, Any]:
+    def get_lookup_tracker_summary(self) -> dict[str, Any]:
         return self._lookup_tracker.as_summary()
 
     def export_lookup_tracker_mermaid(self) -> str:
@@ -356,7 +356,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         snomed_lookup_count: int,
         lx_elapsed_seconds: float | None = None,
         snomed_elapsed_seconds: float | None = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         return self._lookup_tracker.compare_to_snomed(
             snomed_lookup_count=snomed_lookup_count,
             lx_elapsed_seconds=lx_elapsed_seconds,
@@ -607,21 +607,21 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             return "published"
         return cast(ReportTemplateLifecycleStatusLiteral, status)
 
-    def published_report_template_names(self) -> List[str]:
+    def published_report_template_names(self) -> list[str]:
         return [
             template_name
-            for template_name in self.report_template.keys()
+            for template_name in self.report_template
             if self.get_report_template_lifecycle_status(template_name) == "published"
         ]
 
-    def export_report_template_preview(self, name: str) -> Dict[str, Any]:
+    def export_report_template_preview(self, name: str) -> dict[str, Any]:
         validator = ReportTemplateValidator(
             kb=self, compiler=ReportTemplateCompiler(kb=self)
         )
         validated_and_compiled = validator.validate_and_compile(name, mode="preview")
-        return cast(Dict[str, Any], validated_and_compiled["template"])
+        return cast(dict[str, Any], validated_and_compiled["template"])
 
-    def export_report_template(self, name: str) -> Dict[str, Any]:
+    def export_report_template(self, name: str) -> dict[str, Any]:
         validator = ReportTemplateValidator(
             kb=self, compiler=ReportTemplateCompiler(kb=self)
         )
@@ -637,11 +637,11 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             raise KeyError(
                 f"Report template '{name}' is not production-ready for export."
             )
-        return cast(Dict[str, Any], validated_and_compiled["template"])
+        return cast(dict[str, Any], validated_and_compiled["template"])
 
     def export_report_templates(
         self, *, published_only: bool = True
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Export report templates as frontend-friendly dicts.
         """
@@ -657,23 +657,101 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         )
         return [exporter(template_name) for template_name in template_names]
 
-    def export_core_concepts(self) -> Dict[str, Any]:
+    def export_core_concepts(self) -> dict[str, Any]:
         """
         Export canonical core concept payloads for frontend consumption.
         """
         payload = kb_to_core_concepts_payload(self)
         return payload.model_dump(mode="json")
 
+    def export_fhir_terminology(
+        self,
+        *,
+        base_url: str = "https://wg-lux.de/fhir",
+        publisher: str = "Working Group Lux",
+        bundle: bool = False,
+        medical_field: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Export core KB terminology as FHIR CodeSystem and ValueSet resources.
+        """
+        from lx_dtypes.models.knowledge_base.fhir import (
+            export_fhir_terminology,
+            export_fhir_terminology_bundle,
+        )
+
+        if bundle:
+            return export_fhir_terminology_bundle(
+                self,
+                base_url=base_url,
+                publisher=publisher,
+                medical_field=medical_field,
+            )
+        return export_fhir_terminology(
+            self,
+            base_url=base_url,
+            publisher=publisher,
+            medical_field=medical_field,
+        )
+
+    @staticmethod
+    def import_fhir_terminology(
+        payload: Mapping[str, Any] | list[Mapping[str, Any]],
+        *,
+        module_name: str = "fhir_import",
+        language: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Import FHIR CodeSystem resources into KB storage-compatible concepts.
+        """
+        from lx_dtypes.models.knowledge_base.fhir import import_fhir_terminology
+
+        return import_fhir_terminology(
+            payload,
+            module_name=module_name,
+            language=language,
+        )
+
+    @classmethod
+    def from_fhir(
+        cls,
+        payload: Mapping[str, Any] | list[Mapping[str, Any]],
+        *,
+        module_name: str = "fhir_import",
+        version: str | None = None,
+        medical_field: str | None = None,
+        author: str | None = None,
+        language: str | None = None,
+        strict: bool = True,
+    ) -> Self:
+        """Create a validated knowledge base from FHIR terminology resources."""
+        from lx_dtypes.models.knowledge_base.fhir_yaml import (
+            knowledge_base_from_fhir,
+        )
+
+        return cast(
+            Self,
+            knowledge_base_from_fhir(
+                payload,
+                module_name=module_name,
+                version=version,
+                medical_field=medical_field,
+                author=author,
+                language=language,
+                strict=strict,
+            ),
+        )
+
     def reported_findings_from_p_examination(
         self, p_examination: "PExamination"
-    ) -> List[Dict[str, Any]]:
-        reported_findings: List[Dict[str, Any]] = []
+    ) -> list[dict[str, Any]]:
+        reported_findings: list[dict[str, Any]] = []
 
         for p_finding in p_examination.patient_findings:
-            classifications_payload: List[Dict[str, Any]] = []
+            classifications_payload: list[dict[str, Any]] = []
             for classifications in p_finding.patient_finding_classifications:
                 for choice in classifications.patient_finding_classification_choices:
-                    base_payload: Dict[str, Any] = {
+                    base_payload: dict[str, Any] = {
                         "classification": choice.classification,
                         "classification_choice": choice.classification_choice,
                         "value": choice.classification_choice,
@@ -683,7 +761,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                     for (
                         descriptor
                     ) in choice.patient_finding_classification_choice_descriptors:
-                        descriptor_payload: Dict[str, Any] = {
+                        descriptor_payload: dict[str, Any] = {
                             "classification": choice.classification,
                             "value": descriptor.descriptor_value,
                         }
@@ -714,12 +792,12 @@ class KnowledgeBase(AppBaseModelUUIDTags):
 
     def reported_findings_from_ledger(
         self, ledger: "Ledger", patient_examination_uuid: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         p_examination = ledger.patient_examinations[patient_examination_uuid]
         return self.reported_findings_from_p_examination(p_examination)
 
     @staticmethod
-    def _names_as_list(value: str | List[str]) -> List[str]:
+    def _names_as_list(value: str | list[str]) -> list[str]:
         if isinstance(value, list):
             return [item for item in value if item]
         if value:
@@ -734,7 +812,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     ) -> None:
         def template_requirements_by_finding(
             resolved_template_name: str,
-        ) -> Dict[str, ReportTemplateFindingRequirement]:
+        ) -> dict[str, ReportTemplateFindingRequirement]:
             def ensure_requirement(finding_name: str) -> None:
                 requirements.setdefault(
                     finding_name,
@@ -795,7 +873,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                     collect_from_examination_validator(nested_exam_validator_name)
 
             template = self.get_report_template(resolved_template_name)
-            requirements: Dict[str, ReportTemplateFindingRequirement] = {}
+            requirements: dict[str, ReportTemplateFindingRequirement] = {}
             visited_exam_validators: set[str] = set()
             for section_name in template.report_sections:
                 section = self._lookup_optional(
@@ -857,7 +935,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 collect_from_examination_validator(examination_validator_name)
             return requirements
 
-        requirements_by_finding: Dict[str, ReportTemplateFindingRequirement]
+        requirements_by_finding: dict[str, ReportTemplateFindingRequirement]
         if template_name is not None:
             template = self.get_report_template(template_name)
             if template.examination != p_examination.examination:
@@ -1130,7 +1208,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         p_examination: "PExamination | None" = None,
         ledger: "Ledger | None" = None,
         patient_examination_uuid: str | None = None,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         if p_examination is not None:
             return self.reported_findings_from_p_examination(p_examination)
         if ledger is not None and patient_examination_uuid is not None:
@@ -1179,7 +1257,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         classification_validator_names.extend(
             [
                 validator_name
-                for validator_name in classification_validators.keys()
+                for validator_name in classification_validators
                 if validator_name not in classification_validator_names
             ]
         )
@@ -1188,6 +1266,23 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             ledger=ledger,
             patient_examination_uuid=patient_examination_uuid,
         )
+        reported_finding_names = {
+            str(finding.get("finding"))
+            for finding in normalized_reported_findings
+            if finding.get("finding")
+        }
+        explicit_classification_validators = set(
+            template.validators.classification_validators
+        )
+        classification_validator_names = [
+            validator_name
+            for validator_name in classification_validator_names
+            if (
+                validator_name in explicit_classification_validators
+                or classification_validators[validator_name].finding
+                in reported_finding_names
+            )
+        ]
         return evaluate_report_template_validators_runtime(
             template,
             classification_validators=classification_validators,
@@ -1359,12 +1454,39 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         )
         return result["examination_validators"][0]
 
+    def export_terminology_validated_fhir_observations(
+        self,
+        reported_findings: Sequence[Mapping[str, object]],
+        *,
+        base_url: str = "https://wg-lux.de/fhir",
+    ) -> FhirTerminologyValidatedFindingResultDataDict:
+        return export_terminology_validated_fhir_observations(
+            reported_findings,
+            findings=self.finding,
+            classifications=self.classification,
+            classification_choices=self.classification_choice,
+            units=self.unit,
+            base_url=base_url,
+        )
+
+    def import_terminology_validated_fhir_observations(
+        self,
+        observations: Sequence[Mapping[str, object]],
+    ) -> FhirTerminologyValidatedFindingResultDataDict:
+        return import_terminology_validated_fhir_observations(
+            observations,
+            findings=self.finding,
+            classifications=self.classification,
+            classification_choices=self.classification_choice,
+            units=self.unit,
+        )
+
     def get_report_template_classification_validators(
         self, name: str
-    ) -> Dict[str, ClassificationValidator]:
+    ) -> dict[str, ClassificationValidator]:
         template = self.get_report_template(name)
 
-        validators_by_name: Dict[str, ClassificationValidator] = {}
+        validators_by_name: dict[str, ClassificationValidator] = {}
         explicit_keys: set[tuple[str, str]] = set()
         for validator_name in template.validators.classification_validators:
             validator = self._lookup_optional(
@@ -1469,7 +1591,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         name = config.name
         # source_file = config.source_file
         # assert source_file is not None, "Config must have source_file set." # Can be removed?
-        kb_source_dict: Dict[str, Union["KnowledgeBaseConfig", Path]] = {
+        kb_source_dict: dict[str, KnowledgeBaseConfig | Path] = {
             "config": config,
             # "source_file": source_file,  # Can be removed?
         }
@@ -1482,7 +1604,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             registry_path = registry_path_for_module(
                 config.source_file.parent
             ).resolve()
-        seen_records: Dict[Tuple[str, str], Tuple[Path, int, int]] = {}
+        seen_records: dict[tuple[str, str], tuple[Path, int, int]] = {}
         data = config.data
         submodule_files = data.get_files_with_suffix(".yaml")
         for sm_file in submodule_files:
@@ -1513,7 +1635,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 )
                 if not hasattr(kb, model_name):
                     raise ValueError(f"KnowledgeBase has no attribute '{model_name}'")
-                model_dict: Dict[str, KB_MODELS] = getattr(kb, model_name)
+                model_dict: dict[str, KB_MODELS] = getattr(kb, model_name)
                 model_dict[object_name] = parsed_object
 
                 # set the updated dict back to the kb
@@ -1575,9 +1697,15 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 f"Unknown model type: {field_model_name}"
             )
             field_model_name = cast(KB_MODEL_NAMES_LITERAL, field_model_name)
-            TargetModel: type[KB_MODELS] = knowledge_base_models_lookup[
-                field_model_name
-            ]
+            target_model_value = knowledge_base_models_lookup[field_model_name]
+            if not isinstance(target_model_value, type) or not issubclass(
+                target_model_value, BaseModel
+            ):
+                raise TypeError(
+                    f"Knowledge-base lookup {field_model_name} is not a "
+                    "Pydantic model class"
+                )
+            TargetModel = target_model_value
 
             current_models = dict(getattr(self, field_name))
             other_models = getattr(other, field_name)
@@ -1613,7 +1741,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
 
     def kb_entries_by_module_name(
         self,
-    ) -> Dict[str, List[Tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]]]:
+    ) -> dict[str, list[tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]]]:
         """
         Group knowledge-base entries by their declaring module name.
 
@@ -1628,16 +1756,16 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         export_attrs = KB_MODEL_NAMES_ORDERED
         cfg = self.config
         module_names = cfg.modules
-        entries_by_module: Dict[
-            str, List[Tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]]
-        ] = {module_name: [] for module_name in module_names}
+        entries_by_module: dict[str, list[tuple[KB_MODEL_NAMES_LITERAL, KB_MODELS]]] = {
+            module_name: [] for module_name in module_names
+        }
 
         # entries_by_module[str_unknown_factory()] = []
 
         for attr in export_attrs:
             field_name = camel_to_snake(attr)
-            kb_dict: Dict[str, "KB_MODELS"] = getattr(self, field_name)
-            kb_entry_list: List["KB_MODELS"] = list(kb_dict.values())
+            kb_dict: dict[str, KB_MODELS] = getattr(self, field_name)
+            kb_entry_list: list[KB_MODELS] = list(kb_dict.values())
             assert isinstance(kb_entry_list, list)
             for entry in kb_entry_list:
                 module_name = entry.kb_module_name

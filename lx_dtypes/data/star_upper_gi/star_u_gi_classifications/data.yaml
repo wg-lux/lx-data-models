@@ -22,9 +22,11 @@
     - star_upper_gi_location_esophagus_distal
     - star_upper_gi_location_z_line
     - star_upper_gi_location_gastroesophageal_junction
+    - star_upper_gi_location_hiatus
     - star_upper_gi_location_stomach_fundus
     - star_upper_gi_location_stomach_corpus
     - star_upper_gi_location_stomach_antrum
+    - star_upper_gi_location_stomach_incisura
     - star_upper_gi_location_stomach_cardia
     - star_upper_gi_location_stomach_pylorus
     - star_upper_gi_location_duodenum_bulbus
@@ -69,11 +71,13 @@
     [
       "star_upper_gi_paris_Is",
       "star_upper_gi_paris_Ip",
+      "star_upper_gi_paris_Isp",
       "star_upper_gi_paris_IIa",
       "star_upper_gi_paris_IIb",
       "star_upper_gi_paris_IIc",
       "star_upper_gi_paris_III",
       "star_upper_gi_paris_IIa_IIc",
+      "star_upper_gi_paris_IIc_IIa",
       "star_upper_gi_paris_IIb_IIc",
     ]
 
@@ -86,3 +90,15 @@
     - star_upper_gi_forrest_IIb
     - star_upper_gi_forrest_IIc
     - star_upper_gi_forrest_III
+
+- model: classification
+  name: star_upper_gi_count
+  description: "Non-negative count used for varices, biopsies, vials, and images."
+  classification_choices:
+    - star_upper_gi_count_value
+
+- model: classification
+  name: star_upper_gi_duration_minutes
+  description: "Duration in minutes."
+  classification_choices:
+    - star_upper_gi_minutes_value

@@ -1,0 +1,456 @@
+schema_version: "1.0"
+title: "lx-dtypes concept map"
+snapshot_date: "2026-08-13"
+canonical_topic: "Current package-wide data-model structure"
+owner: "lx-data-models maintainers"
+scope:
+  includes:
+    - "Pydantic knowledge-base models"
+    - "Pydantic ledger models"
+    - "Cross-service contract families"
+    - "Metadata and state models"
+    - "FHIR, YAML, Django, and serialization boundaries"
+  excludes:
+    - "Application-specific database transactions and services"
+    - "Test fixtures and generated Sphinx output"
+  reading_rule: >-
+    A relation points from the model containing a field to the concept referenced
+    or nested by that field. Knowledge-base references are semantic names; ledger
+    identity is normally a UUID string or nested Pydantic object.
+
+field_groups:
+  person_fields:
+    - first_name
+    - last_name
+    - dob
+    - email
+    - gender
+    - phone
+    - street
+    - city
+    - state
+    - zip_code
+    - country
+  technical_metadata:
+    - video_hash
+    - processed_video_hash
+    - original_file_name
+    - fps
+    - duration
+    - frame_count
+    - width
+    - height
+    - suffix
+  storage_paths:
+    - storage_mode
+    - raw_streamable_relative_path
+    - processed_streamable_relative_path
+    - raw_file
+    - processed_file
+    - frame_dir
+
+levels:
+  - id: 0
+    name: "System overview"
+    concepts:
+      - id: knowledge_base
+        label: "Knowledge base"
+        purpose: "Defines the allowed clinical vocabulary and report rules."
+      - id: ledger
+        label: "Patient ledger"
+        purpose: "Records what happened for a patient using knowledge-base concepts."
+      - id: reports
+        label: "Reports"
+        purpose: "Selects, validates, drafts, and renders report content."
+      - id: media_documents
+        label: "Media and documents"
+        purpose: "Describes video, frames, segments, PDFs, and processing state."
+      - id: ai_data
+        label: "AI and datasets"
+        purpose: "Packages labels, predictions, training data, and model metadata."
+      - id: privacy_governance
+        label: "Privacy and governance"
+        purpose: "Carries sensitive metadata, anonymization, identity, authorization, and audit contracts."
+      - id: interoperability
+        label: "Interfaces and interoperability"
+        purpose: "Loads YAML, maps FHIR, adapts storage, and integrates Django hosts."
+    relations:
+      - [knowledge_base, "constrains", ledger]
+      - [knowledge_base, "configures", reports]
+      - [ledger, "provides clinical facts to", reports]
+      - [media_documents, "belongs to patient/examination", ledger]
+      - [media_documents, "supplies evidence to", reports]
+      - [media_documents, "supplies samples to", ai_data]
+      - [privacy_governance, "protects", ledger]
+      - [privacy_governance, "protects", media_documents]
+      - [interoperability, "translates and exposes", knowledge_base]
+      - [interoperability, "translates and exposes", ledger]
+
+  - id: 1
+    name: "Shared model structure"
+    inheritance:
+      - [AppBaseModel, AppBaseModelUUIDTags]
+      - [AppBaseModelUUIDTags, AppBaseModelNamesUUIDTags]
+      - [AppBaseModelNamesUUIDTags, KnowledgebaseBaseModel]
+      - [AppBaseModelUUIDTags, LedgerBaseModel]
+      - [AppBaseModelUUIDTags, MetaBaseModel]
+      - [AppBaseModelUUIDTags, StateBaseModel]
+    representations:
+      - name: Pydantic model
+        role: "Canonical runtime validation and behavior."
+      - name: DataDict
+        role: "Typed dictionary representation for serialization and compatibility."
+      - name: Serialized ledger model
+        role: "Flattens nested ledger objects to identifiers."
+      - name: Django model or host contract
+        role: "Optional persistence adapter; not every Pydantic model has one."
+    shared_fields:
+      AppBaseModel: [source_file, created_at]
+      AppBaseModelUUIDTags: [uuid, tags]
+      AppBaseModelNamesUUIDTags: [name, name_de, name_en, description]
+      KnowledgebaseBaseModel: [kb_module_name]
+      LedgerBaseModel: [external_ids]
+
+  - id: 2
+    name: "Knowledge-base terminology"
+    identity:
+      model: KnowledgeBaseIdentity
+      fields: [knowledge_base_module, knowledge_base_version]
+      canonical_form: "module@version"
+    concepts:
+      InformationSourceType: {kind: type}
+      InformationSource:
+        fields: [information_source_types]
+      Citation:
+        fields: [citation_key, title, authors, publication_year, doi, url, identifiers]
+      UnitType: {kind: type}
+      Unit:
+        fields: [abbreviation, unit_types]
+      ClassificationChoiceDescriptor:
+        fields:
+          - classification_choice_descriptor_type
+          - unit
+          - numeric_min
+          - numeric_max
+          - numeric_distribution
+          - numeric_distribution_params
+          - default_value_num
+          - selection_options
+          - selection_multiple
+          - selection_multiple_n_min
+          - selection_multiple_n_max
+          - selection_default_options
+          - default_value_bool
+          - text_max_length
+          - default_value_str
+      ClassificationChoice:
+        fields: [classification_choice_descriptors]
+      ClassificationType: {kind: type}
+      Classification:
+        fields: [classification_types, classification_choices]
+      InterventionType: {kind: type}
+      Intervention:
+        fields: [intervention_types]
+      FindingType: {kind: type}
+      Finding:
+        fields: [finding_types, classifications, interventions, caused_by_interventions]
+      IndicationType: {kind: type}
+      Indication:
+        fields: [indication_types, classifications, interventions]
+      ExaminationType: {kind: type}
+      Examination:
+        fields: [examination_types, findings, indications]
+    relations:
+      - [InformationSource, information_source_types, InformationSourceType]
+      - [Unit, unit_types, UnitType]
+      - [ClassificationChoiceDescriptor, unit, Unit]
+      - [ClassificationChoice, classification_choice_descriptors, ClassificationChoiceDescriptor]
+      - [Classification, classification_types, ClassificationType]
+      - [Classification, classification_choices, ClassificationChoice]
+      - [Intervention, intervention_types, InterventionType]
+      - [Finding, finding_types, FindingType]
+      - [Finding, classifications, Classification]
+      - [Finding, interventions, Intervention]
+      - [Finding, caused_by_interventions, Intervention]
+      - [Indication, indication_types, IndicationType]
+      - [Indication, classifications, Classification]
+      - [Indication, interventions, Intervention]
+      - [Examination, examination_types, ExaminationType]
+      - [Examination, findings, Finding]
+      - [Examination, indications, Indication]
+    snapshot_contract:
+      model: CoreConceptCollection
+      rule: >-
+        Exports an internally consistent terminology graph and rejects duplicate
+        names, shared UUIDs, dangling references, and half-specified identities.
+      descriptor_rule: >-
+        Canonical descriptor numbers are finite and their ranges, selection
+        cardinalities, default options, and probabilities are internally
+        consistent. Legacy knowledge-base infinities used to mean an unbounded
+        numeric range are exported as null at the JSON boundary.
+
+  - id: 3
+    name: "Patient ledger"
+    context_concepts:
+      Center: [name, examiners]
+      Examiner: [center, person_fields]
+      Patient: [center, person_fields]
+      Case: [case_id, patient, admission_date, leave_date, patient_examinations, report_ids]
+      PExamination:
+        - patient
+        - examiners
+        - date
+        - examination
+        - knowledge_base_module
+        - knowledge_base_version
+        - patient_findings
+        - patient_indications
+      Report:
+        - patient_examination
+        - template_name
+        - template_version
+        - template_hash
+        - status
+        - rendered_text
+        - editor_payload
+    finding_branch:
+      PFinding: [finding, patient_examination, patient_finding_classifications, patient_finding_interventions]
+      PFindingClassifications: [patient_finding, patient_finding_classification_choices]
+      PFindingClassificationChoice:
+        - classification
+        - classification_choice
+        - patient_finding_classifications
+        - patient_finding_classification_choice_descriptors
+      PFindingClassificationChoiceDescriptor:
+        - classification_choice_descriptor
+        - descriptor_value
+        - patient_finding_classification_choice
+      PFindingInterventions: [patient_finding, patient_finding_interventions]
+      PFindingIntervention: [patient_finding_interventions, intervention]
+    indication_branch:
+      PIndication: [indication, patient_examination, patient_indication_classifications]
+      PIndicationClassification:
+        - classification
+        - classification_choice
+        - patient_indication
+        - patient_indication_classification_descriptors
+      PIndicationClassificationDescriptor:
+        - classification_choice_descriptor
+        - descriptor_value
+        - patient_indication_classification
+    medical_branch:
+      PatientMedicalLedger: [diseases, events, lab_samples, lab_values, medications, medication_schedules]
+      PatientDisease: [disease, classification_choices, start_date, end_date, numerical_descriptors, subcategories]
+      PatientEvent: [event, date_start, date_end, classification_choice, subcategories, numerical_descriptors]
+      PatientLabSample: [sample_type, date, values]
+      PatientLabValue: [lab_value, value, value_str, sample, timestamp, normal_range, unit]
+      PatientMedication: [medication_indication, medication, intake_times, unit, dosage, active]
+      PatientMedicationSchedule: [medications, schedule_created_at, updated_at]
+    media_branch:
+      VideoFile: [center, processor, examination, patient, cases, video_meta, sensitive_meta, technical_metadata, storage_paths, sequences]
+      PatientVideoFile: [patient_video_segments, anonymization_state, sensitive_meta]
+    relation_rule: >-
+      P-prefixed models are patient-specific observations. Their terminology
+      fields point back to the unprefixed knowledge-base concepts.
+
+  - id: 4
+    name: "Reports and validation"
+    concepts:
+      ReportTemplate:
+        fields: [examination, version, guideline_references, coverage_version, coverage_concepts, report_sections, validators]
+      ReportTemplateSection:
+        fields: [title_de, title_en, position, types, section_kind, fields, findings]
+      ReportFinding:
+        fields:
+          - finding
+          - required
+          - multiple_allowed
+          - classifications
+          - concept_id
+          - applicability_rule
+          - applicability_status
+          - applicability_reason
+      validators:
+        - ExaminationValidator
+        - FindingsValidator
+        - ClassificationValidator
+        - InterventionValidator
+        - UnitValidator
+      validator_requirement:
+        model: ValidatorRequirementReference
+        kinds: [classification, classification_choice, finding, intervention, unit]
+      derived_structures:
+        - ReportTemplateGraph
+        - ReportConceptCoverage
+        - ReportTemplateStructureValidationResult
+        - ReportTemplateRuntimeValidationResultDataDict
+      runtime_contracts:
+        - PatientExaminationReportDraft
+        - PatientExaminationReportSubmissionPayload
+        - PatientExaminationReportMakeReportPayload
+        - ReportPersistedArtifactsPayload
+        - ReportContext
+    relations:
+      - [ReportTemplate, examination, Examination]
+      - [ReportTemplate, report_sections, ReportTemplateSection]
+      - [ReportTemplateSection, findings, ReportFinding]
+      - [ReportFinding, finding, Finding]
+      - [ReportFinding, classifications, Classification]
+      - [ReportTemplate, validators, "five validator families"]
+      - ["validator families", requirements, "Finding/Classification/Choice/Intervention/Unit"]
+      - [PatientExaminationReportDraft, template_identity, ReportTemplate]
+      - [PatientExaminationReportDraft, patient_examination, PExamination]
+
+  - id: 5
+    name: "Supporting contract families"
+    note: >-
+      Leaf request, response, TypedDict, enum, and helper types are grouped under
+      their owning public module so the map stays readable while retaining every
+      current contract area.
+    families:
+      contract_infrastructure:
+        - adapters
+        - json_types
+      clinical_and_terminology:
+        - assessment
+        - contraindication
+        - core_concepts
+        - event
+        - examination_indication
+        - examination_time
+        - examination_type
+        - fhir_clinical
+        - finding_classification
+        - finding_intervention
+        - finding_type
+        - information_source
+        - knowledge_base
+        - knowledge_base_graph
+        - lab_value
+        - numeric_value_distribution
+        - patient_examination
+        - patient_finding
+        - patient_finding_classification
+        - patient_finding_classification_runtime
+        - patient_finding_intervention
+        - patient_medication_schedule
+        - patient_view
+        - risk
+        - subcategory_validation
+        - terminology_catalog
+      reporting_and_documents:
+        - document_type
+        - patient_examination_report
+        - pdf_file
+        - pdf_meta
+        - pdf_redaction
+        - report
+        - report_anonymization
+        - report_context
+        - report_draft
+      video_and_media:
+        - endoscopy_processor
+        - export_annotated
+        - export_ready
+        - ffmpeg_metadata
+        - image_processing
+        - label_video_segment_serializer
+        - media_management
+        - media_streaming
+        - nginx_accel
+        - video_correction
+        - video_examination
+        - video_export
+        - video_file
+        - video_format
+        - video_frame
+        - video_frame_annotations
+        - video_frame_box_annotations
+        - video_frame_cache
+        - video_frame_export
+        - video_processing
+        - video_processing_history
+        - video_reimport
+        - video_segment_validation
+        - video_segments
+        - video_state
+        - video_stream_info
+        - video_temporal_inference
+        - video_text_metadata
+      ai_and_annotation:
+        - ai_dataset
+        - ai_model
+        - ai_prediction
+        - aidataset_export
+        - aidataset_frame_buckets
+        - frame_annotation
+        - hub_active_learning
+        - huggingface_model_meta
+        - llm_extractor
+        - llm_service
+        - model_meta
+        - model_meta_logic
+        - multilabel_classification
+        - video_ai_labels
+        - video_prediction_logic
+      privacy_identity_and_audit:
+        - anonymization
+        - anonymization_metrics
+        - anonymization_overview
+        - anonymization_quality
+        - audit_ledger
+        - authz
+        - case_resolution
+        - frame_anonymization
+        - pseudonymization
+        - sensitive_meta_update
+        - sensitive_patient_data
+        - text_anonymization
+        - text_detection
+        - validated_identity
+      transfer_configuration_and_operations:
+        - application_settings
+        - codemod_rename
+        - dicom_export
+        - django_settings
+        - dtypes_record_persistence
+        - fix_video_path_direct
+        - hub_ingest
+        - hub_transfer
+        - legacy_data_import
+        - lx_anonymizer_performance
+        - maintenance_repair
+        - management_command
+        - migrate_data_dir
+        - migrate_media_storage
+        - name_fixtures
+        - parse_and_generate_yaml
+        - permission_runtime
+        - sap_ish_import
+        - setup_config
+        - transfer_validation
+        - translation
+        - upload
+
+boundaries:
+  yaml:
+    entry_points: [DataLoader, KnowledgeBaseConfig, KnowledgeBase]
+    result: "Validated, versioned knowledge-base graph."
+  fhir:
+    terminology: "CodeSystem/Bundle import and export to knowledge-base collections."
+    clinical: "FHIR Patient, Observation, Condition, and DiagnosticReport contracts."
+  persistence:
+    canonical_contract: DtypesRecordPersistencePayload
+    django_role: "Optional adapter or explicit host-model contract."
+  serialization:
+    rule: "Nested ledger models can be flattened to UUID references; public API payloads use snake_case."
+
+source_locations:
+  bases: lx_dtypes/models/base
+  knowledge_base: lx_dtypes/models/knowledge_base
+  ledger: lx_dtypes/models/ledger
+  contracts: lx_dtypes/models/contracts
+  metadata: lx_dtypes/models/meta
+  interfaces: lx_dtypes/models/interface
+  django: lx_dtypes/django
+  serialization: lx_dtypes/serialization

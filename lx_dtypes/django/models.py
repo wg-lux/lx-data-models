@@ -66,6 +66,7 @@ from lx_dtypes.models.ledger.p_interventions.Django import (
     PFindingInterventionsDjango,
 )
 from lx_dtypes.models.ledger.patient.Django import PatientDjango
+from lx_dtypes.models.ledger.video_file.Django import VideoFileDjango
 
 __all__ = [
     "CenterDjango",
@@ -92,10 +93,11 @@ __all__ = [
     "PFindingDjango",
     "PFindingInterventionDjango",
     "PFindingInterventionsDjango",
-    "PatientDjango",
-    "PIndicationDjango",
-    "PIndicationClassificationDjango",
     "PIndicationClassificationDescriptorDjango",
+    "PIndicationClassificationDjango",
+    "PIndicationDjango",
+    "PatientDjango",
     "UnitDjango",
     "UnitTypeDjango",
+    "VideoFileDjango",
 ]

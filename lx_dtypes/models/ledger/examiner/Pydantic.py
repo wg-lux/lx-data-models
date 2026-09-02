@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
@@ -19,7 +17,7 @@ class Examiner(LedgerBaseModel[ExaminerDataDict], Person):
     center: str = Field(default_factory=str)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Return the field names used to identify list-type fields for this model.
 

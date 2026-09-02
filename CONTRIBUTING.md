@@ -5,27 +5,28 @@ project, from setting up your environment to preparing releases.
 
 ## Code of Conduct
 
-Participation is governed by the [MIT License](LICENSE) and the Lux Group
-community standards. Please be respectful and constructive in all interactions.
+Please be respectful and constructive in all interactions. The project does not
+currently publish a separate code of conduct; maintainers may moderate
+participation to keep the community safe and productive.
 
 ## Getting Started
 
-1. **Fork & Clone**
+1. **Fork and clone**
+
    ```bash
    git clone https://github.com/<your-username>/lx-data-models.git
    cd lx-data-models
    git remote add upstream https://github.com/wg-lux/lx-data-models.git
    ```
-2. **Create a Virtual Environment** (Python 3.12 only)
+
+2. **Install the development environment** (Python 3.12 only)
+
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate
+   uv sync --extra dev
    ```
-3. **Install Dependencies**
-   ```bash
-   pip install -e ".[dev]"
-   ```
-4. **Keep Your Branch Updated**
+
+3. **Keep your branch updated**
+
    ```bash
    git fetch upstream
    git rebase upstream/main
@@ -35,7 +36,8 @@ community standards. Please be respectful and constructive in all interactions.
 
 - **Coding style**: Use `ruff format` (or `black`) and `ruff check`. Configure
   IDEs to enforce 88-character lines.
-- **Static typing**: Run `mypy lx_dtypes` before submitting.
+- **Static typing**: Run `uv run pyright` before submitting. CI also checks the
+  package with mypy.
 - **Testing**: All changes must pass `pytest` with coverage ≥70% (configured via
   `pyproject.toml`).
 - **Docs**: If you change APIs or behavior, update the Sphinx docs in `docs/`
@@ -79,15 +81,14 @@ local run guarantees that CI will agree.
    make -C docs html
    make -C docs linkcheck
    ```
-3. Commit any updated Markdown/HTML assets under `docs/_build` **only** when
-   publishing to GitHub Pages; otherwise keep build artifacts out of the repo.
+3. Keep generated files under `docs/_build/` out of version control.
 
 ## Submitting Changes
 
 1. Ensure lint, type-checks, and tests pass:
    ```bash
    ruff check lx_dtypes tests
-   mypy lx_dtypes
+   pyright
    pytest
    ```
 2. Update `CHANGELOG.md` under `Unreleased`.
@@ -98,8 +99,7 @@ local run guarantees that CI will agree.
 ## Release Checklist
 
 1. Confirm `CHANGELOG.md` lists the new version and highlights key changes.
-2. Bump the version in `pyproject.toml` (and ensure `lx_dtypes.__version__`
-   reflects it).
+2. Bump the version in `pyproject.toml`.
 3. Tag the release (`git tag vX.Y.Z && git push origin vX.Y.Z`).
 4. Build artifacts and upload:
    ```bash
@@ -128,12 +128,6 @@ To provision a historical KB version for runtime lookup:
 ```bash
 lx-dtypes-kb-registry add-current /path/to/kb_registry.json --module report_template_examples
 ```
-
-## Specific Guides
-### Importer
-Based on the example in `lx_dtypes/importer/smartie`, you can create import modules for your own datasets. When requesting a pull request to add a new importer, please ensure that:
-- mock data or data samples are included for testing purposes under `tests/data/your_importer_name/`
-- appropriate tests are added under `tests/importer/test_your_importer_name.py`
 
 ## Need Help?
 

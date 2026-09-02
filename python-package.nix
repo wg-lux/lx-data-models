@@ -89,6 +89,17 @@ py.buildPythonPackage {
     "lx_dtypes.models.interface"
   ];
 
+  postInstall = ''
+    featureRoot="$out/share/lx-data-models/features"
+    mkdir -p "$featureRoot"
+    cp ${./features/PackagedKnowledgeBaseResources.yml} \
+      "$featureRoot/packaged_knowledge_base_resources.yml"
+    cp ${./features/FrameCleanerIntegration.yml} \
+      "$featureRoot/frame_cleaner_integration.yml"
+    cp ${./features/ReportReaderIntegration.yml} \
+      "$featureRoot/report_reader_integration.yml"
+  '';
+
   makeWrapperArgs = [
     "--prefix PATH : ${lib.makeBinPath runtime_tools}"
     "--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [

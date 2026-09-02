@@ -35,13 +35,13 @@ l_patient_ddicts = Union[PatientDataDict,]
 l_patient_django_models = Union[PatientDjango,]
 
 __all__ = [
+    "LPatientDjangoLookupType",
+    "LPatientLookupType",
     "Patient",
     "PatientDataDict",
-    "l_patient_django_models",
-    "l_patient_django_lookup",
-    "LPatientDjangoLookupType",
-    "l_patient_lookup",
-    "LPatientLookupType",
-    "l_patient_models",
     "l_patient_ddicts",
+    "l_patient_django_lookup",
+    "l_patient_django_models",
+    "l_patient_lookup",
+    "l_patient_models",
 ]

@@ -1,6 +1,6 @@
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, Optional, Self
+from typing import Any, Self
 
 import yaml
 
@@ -89,9 +89,9 @@ class DbInterface(AppBaseModelUUIDTags):
 
     def create_patient(
         self,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        dob: Optional[str | date] = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        dob: str | date | None = None,
     ) -> Patient:
         """
         Create a new Patient and store it in the in-memory ledger.
@@ -232,7 +232,7 @@ class DbInterface(AppBaseModelUUIDTags):
         patient_finding: PFinding | str,
         classification: Classification | str,
         classification_choice: ClassificationChoice | str,
-        patient_finding_classifications: Optional[PFindingClassifications | str] = None,
+        patient_finding_classifications: PFindingClassifications | str | None = None,
     ) -> PFindingClassificationChoice:
         # Patient Examination existence check
         """
@@ -350,7 +350,7 @@ class DbInterface(AppBaseModelUUIDTags):
         patient_examination: PExamination | str,
         patient_finding_classification_choice: PFindingClassificationChoice | str,
         classification_choice_descriptor: ClassificationChoiceDescriptor | str,
-        descriptor_data: Dict[str, Any],  # TODO
+        descriptor_data: dict[str, Any],  # TODO
     ) -> None:
         """
         Create a descriptor for a classification choice on a patient finding classification choice.

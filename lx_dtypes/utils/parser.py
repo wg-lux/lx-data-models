@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 import yaml
 from pydantic import ValidationError
@@ -12,7 +12,7 @@ from lx_dtypes.models.knowledge_base import (
     knowledge_base_models_lookup,
 )
 
-MODEL_NAME_ALIASES: Dict[str, str] = {
+MODEL_NAME_ALIASES: dict[str, str] = {
     "finding_validator": "findings_validator",
 }
 
@@ -29,7 +29,7 @@ class ParsedYamlObject:
 
 @dataclass(frozen=True)
 class _YamlItemWithLocation:
-    item: Dict[str, Any]
+    item: dict[str, Any]
     line: int
     column: int
 
@@ -64,7 +64,7 @@ def _yaml_error_with_location(file_path: Path, exc: yaml.YAMLError) -> ValueErro
     return ValueError(f"{file_path}:1:1: {exc}")
 
 
-def _load_yaml_items_with_locations(file_path: Path) -> List[_YamlItemWithLocation]:
+def _load_yaml_items_with_locations(file_path: Path) -> list[_YamlItemWithLocation]:
     raw_text = file_path.read_text(encoding="utf-8")
     try:
         loaded = yaml.safe_load(raw_text)
@@ -74,7 +74,7 @@ def _load_yaml_items_with_locations(file_path: Path) -> List[_YamlItemWithLocati
     if loaded is None:
         return []
     if not isinstance(loaded, list):
-        raise ValueError(f"{file_path}:1:1: YAML file must contain a list of objects.")
+        raise TypeError(f"{file_path}:1:1: YAML file must contain a list of objects.")
 
     try:
         composed = yaml.compose(raw_text)
@@ -84,15 +84,15 @@ def _load_yaml_items_with_locations(file_path: Path) -> List[_YamlItemWithLocati
     if composed is None:
         return []
     if not isinstance(composed, yaml.SequenceNode):
-        raise ValueError(f"{file_path}:1:1: YAML root must be a sequence.")
+        raise TypeError(f"{file_path}:1:1: YAML root must be a sequence.")
 
-    located_items: List[_YamlItemWithLocation] = []
+    located_items: list[_YamlItemWithLocation] = []
     for index, raw_item in enumerate(loaded):
         node = composed.value[index] if index < len(composed.value) else None
         line = int(node.start_mark.line) + 1 if node is not None else 1
         column = int(node.start_mark.column) + 1 if node is not None else 1
         if not isinstance(raw_item, dict):
-            raise ValueError(
+            raise TypeError(
                 f"{file_path}:{line}:{column}: Each item in the list must be a dictionary."
             )
         located_items.append(
@@ -106,7 +106,7 @@ def parse_shallow_object(
     kb_module_name: str = str_unknown_factory(),
     *,
     strict_model_aliases: bool = False,
-) -> List[KB_MODELS]:
+) -> list[KB_MODELS]:
     """
     This method parses YAML files and returns a List of KnowledgeBase models.
     This is achieved by matching for string keys and filling the List with the fitting models.
@@ -135,7 +135,7 @@ def parse_shallow_object_with_meta(
     kb_module_name: str = str_unknown_factory(),
     *,
     strict_model_aliases: bool = False,
-) -> List[ParsedYamlObject]:
+) -> list[ParsedYamlObject]:
     if not file_path.exists() or not file_path.is_file():
         raise ValueError(
             f"The provided path {file_path} does not exist or is not a file."
@@ -145,7 +145,7 @@ def parse_shallow_object_with_meta(
         raise ValueError(f"{file_path}:1:1: File must be a YAML file.")
 
     located_items = _load_yaml_items_with_locations(file_path)
-    results: List[ParsedYamlObject] = []
+    results: list[ParsedYamlObject] = []
 
     for located_item in located_items:
         item = dict(located_item.item)

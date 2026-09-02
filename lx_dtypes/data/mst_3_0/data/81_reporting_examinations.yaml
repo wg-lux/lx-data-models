@@ -1,0 +1,156 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Examination identities intentionally match lx-annotate/endoreg_db runtime names.
+# `gastroscopy`, `enteroscopy`, and `video_capsule_endoscopy` are explicit
+# interoperable identities for hosts that do not use the STAR upper-GI name.
+
+- &mst30_egd_examination
+  model: examination
+  name: star_upper_gi_endoscopy
+  name_de: Ösophagogastroduodenoskopie
+  name_en: Esophagogastroduodenoscopy
+  examination_types: [mst30_endoscopic_procedure]
+  findings:
+    - mst30_egd_documentation_status
+    - mst30_luminal_normal
+    - mst30_luminal_dilation
+    - mst30_luminal_stenosis
+    - mst30_luminal_compression
+    - mst30_luminal_diverticulum
+    - mst30_luminal_previous_surgery
+    - mst30_luminal_deformity
+    - mst30_luminal_ring_web
+    - mst30_luminal_hiatal_hernia
+    - mst30_luminal_z_line
+    - mst30_content_foreign_body
+    - mst30_content_blood
+    - mst30_content_food
+    - mst30_content_bezoar
+    - mst30_content_fluid
+    - mst30_content_parasites
+    - mst30_content_stent
+    - mst30_mucosa_erythematous
+    - mst30_mucosa_edematous
+    - mst30_mucosa_granular
+    - mst30_mucosa_nodular
+    - mst30_mucosa_friable
+    - mst30_mucosa_hemorrhagic
+    - mst30_mucosa_atrophic
+    - mst30_mucosa_sclerosis_scarring
+    - mst30_mucosa_barretts_esophagus
+    - mst30_mucosa_esophagitis
+    - mst30_mucosa_candidosis
+    - mst30_flat_angioectasia
+    - mst30_flat_dieulafoy_lesion
+    - mst30_flat_ectopic_gastric_mucosa
+    - mst30_flat_superficial_lesion
+    - mst30_protruding_nodule
+    - mst30_protruding_polyp
+    - mst30_protruding_tumor_mass
+    - mst30_protruding_varices
+    - mst30_protruding_enlarged_folds
+    - mst30_protruding_ectopic_pancreas
+    - mst30_protruding_enlarged_brunners_glands
+    - mst30_excavated_erosion
+    - mst30_excavated_depressed_superficial_lesion
+    - mst30_excavated_ulcer
+    - mst30_excavated_scar
+    - mst30_excavated_fistula
+    - mst30_excavated_perforation
+    - mst30_excavated_mallory_weiss_tear
+    - mst30_dx_upper_achalasia
+    - mst30_dx_upper_barretts_esophagus
+    - mst30_dx_upper_benign_stricture
+    - mst30_dx_upper_coeliac_disease
+    - mst30_dx_upper_duodenal_ulcer
+    - mst30_dx_upper_esophageal_cancer
+    - mst30_dx_upper_esophageal_varices
+    - mst30_dx_upper_gastric_cancer
+    - mst30_dx_upper_gastric_ulcer
+    - mst30_dx_upper_gastric_varices
+    - mst30_dx_upper_reflux_esophagitis
+    - mst30_luminal_procedure_summary
+    - mst30_event_intraprocedure_perforation
+    - mst30_event_intraprocedure_bleeding
+    - mst30_event_intraprocedure_cardiopulmonary
+    - mst30_event_intraprocedure_allergic_reaction
+    - mst30_event_postprocedure_abdominal_pain
+    - mst30_event_postprocedure_infection
+    - mst30_event_postprocedure_late_perforation
+    - mst30_event_postprocedure_late_bleeding
+  indications:
+    - mst30_upper_symptom_abdominal_distress_pain
+    - mst30_upper_symptom_dyspepsia
+    - mst30_upper_symptom_heartburn
+    - mst30_upper_symptom_dysphagia
+    - mst30_upper_symptom_odynophagia
+    - mst30_upper_symptom_vomiting
+    - mst30_upper_symptom_hematemesis
+    - mst30_upper_symptom_melena
+    - mst30_upper_symptom_nausea
+    - mst30_upper_symptom_weight_loss
+    - mst30_upper_symptom_anemia
+    - mst30_upper_symptom_diarrhea
+    - mst30_upper_disease_achalasia
+    - mst30_upper_disease_angioectasia
+    - mst30_upper_disease_barretts_esophagus
+    - mst30_upper_disease_celiac_disease
+    - mst30_upper_disease_duodenal_ulcer
+    - mst30_upper_disease_esophageal_stricture
+    - mst30_upper_disease_esophageal_varices
+    - mst30_upper_disease_foreign_body
+    - mst30_upper_disease_gastric_ulcer
+    - mst30_upper_disease_gastric_varices
+    - mst30_upper_disease_gerd
+    - mst30_upper_disease_polyp
+    - mst30_upper_disease_reflux_esophagitis
+    - mst30_upper_disease_superficial_neoplastic_lesion
+    - mst30_upper_disease_tumor_mass
+
+- model: examination
+  name: gastroscopy
+  name_de: Gastroskopie
+  name_en: Gastroscopy
+  description: "MST 3.0 EGD alias for hosts using the generic examination name. Uses the same report-template vocabulary as star_upper_gi_endoscopy."
+  examination_types: [mst30_endoscopic_procedure]
+  findings: [mst30_egd_documentation_status, mst30_luminal_normal, mst30_luminal_stenosis, mst30_luminal_diverticulum, mst30_luminal_hiatal_hernia, mst30_luminal_z_line, mst30_content_blood, mst30_mucosa_erythematous, mst30_mucosa_edematous, mst30_mucosa_hemorrhagic, mst30_mucosa_atrophic, mst30_mucosa_barretts_esophagus, mst30_mucosa_esophagitis, mst30_flat_angioectasia, mst30_flat_dieulafoy_lesion, mst30_flat_superficial_lesion, mst30_protruding_polyp, mst30_protruding_tumor_mass, mst30_protruding_varices, mst30_excavated_erosion, mst30_excavated_ulcer, mst30_dx_upper_achalasia, mst30_dx_upper_barretts_esophagus, mst30_dx_upper_benign_stricture, mst30_dx_upper_coeliac_disease, mst30_dx_upper_duodenal_ulcer, mst30_dx_upper_esophageal_cancer, mst30_dx_upper_esophageal_varices, mst30_dx_upper_gastric_cancer, mst30_dx_upper_gastric_ulcer, mst30_dx_upper_gastric_varices, mst30_dx_upper_reflux_esophagitis, mst30_luminal_procedure_summary, mst30_event_intraprocedure_perforation, mst30_event_intraprocedure_bleeding, mst30_event_intraprocedure_cardiopulmonary, mst30_event_postprocedure_abdominal_pain, mst30_event_postprocedure_infection, mst30_event_postprocedure_late_perforation, mst30_event_postprocedure_late_bleeding]
+  indications: [mst30_upper_symptom_abdominal_distress_pain, mst30_upper_symptom_dyspepsia, mst30_upper_symptom_heartburn, mst30_upper_symptom_dysphagia, mst30_upper_symptom_hematemesis, mst30_upper_symptom_melena, mst30_upper_symptom_anemia, mst30_upper_disease_barretts_esophagus, mst30_upper_disease_duodenal_ulcer, mst30_upper_disease_esophageal_stricture, mst30_upper_disease_esophageal_varices, mst30_upper_disease_gastric_ulcer, mst30_upper_disease_gerd, mst30_upper_disease_polyp, mst30_upper_disease_reflux_esophagitis, mst30_upper_disease_tumor_mass]
+
+- model: examination
+  name: colonoscopy
+  name_de: Koloskopie
+  name_en: Colonoscopy
+  examination_types: [mst30_endoscopic_procedure]
+  findings: [mst30_colonoscopy_documentation_status, mst30_luminal_normal, mst30_luminal_dilation, mst30_luminal_stenosis, mst30_luminal_compression, mst30_luminal_diverticulum, mst30_luminal_previous_surgery, mst30_content_foreign_body, mst30_content_blood, mst30_content_faeces, mst30_content_exudate, mst30_mucosa_erythematous, mst30_mucosa_edematous, mst30_mucosa_granular, mst30_mucosa_nodular, mst30_mucosa_friable, mst30_mucosa_hemorrhagic, mst30_mucosa_atrophic, mst30_mucosa_pseudomembranes, mst30_mucosa_melanosis, mst30_flat_angioectasia, mst30_flat_dieulafoy_lesion, mst30_flat_superficial_lesion, mst30_protruding_nodule, mst30_protruding_polyp, mst30_protruding_tumor_mass, mst30_protruding_hemorrhoids, mst30_protruding_condylomas, mst30_excavated_erosion, mst30_excavated_depressed_superficial_lesion, mst30_excavated_ulcer, mst30_excavated_scar, mst30_excavated_fistula, mst30_excavated_perforation, mst30_excavated_anal_fissure, mst30_dx_colon_angiodysplasia, mst30_dx_colon_colitis_ischemic, mst30_dx_colon_colitis_pseudomembranous, mst30_dx_colon_colorectal_cancer, mst30_dx_colon_colorectal_superficial_neoplasm, mst30_dx_colon_crohns_active, mst30_dx_colon_diverticulitis, mst30_dx_colon_diverticulosis, mst30_dx_colon_polyp, mst30_dx_colon_polyposis_syndrome, mst30_dx_colon_uc_active, mst30_luminal_procedure_summary, mst30_event_intraprocedure_perforation, mst30_event_intraprocedure_bleeding, mst30_event_intraprocedure_cardiopulmonary, mst30_event_postprocedure_abdominal_pain, mst30_event_postprocedure_infection, mst30_event_postprocedure_late_perforation, mst30_event_postprocedure_late_bleeding]
+  indications: [mst30_colon_symptom_hematochezia, mst30_colon_symptom_melena, mst30_colon_symptom_diarrhea, mst30_colon_symptom_abdominal_distress_pain, mst30_colon_symptom_altered_bowel_habits, mst30_colon_symptom_anemia, mst30_colon_symptom_weight_loss, mst30_colon_symptom_constipation, mst30_colon_symptom_defecation_disorder, mst30_colon_symptom_abdominal_mass, mst30_colon_disease_angioectasia, mst30_colon_disease_colonic_obstruction, mst30_colon_disease_colorectal_cancer, mst30_colon_disease_crohns_disease, mst30_colon_disease_diverticula, mst30_colon_disease_ischemic_colitis, mst30_colon_disease_other_colitis, mst30_colon_disease_polyps, mst30_colon_disease_pouchitis, mst30_colon_disease_pseudomembranous_colitis, mst30_colon_disease_superficial_neoplastic_lesion, mst30_colon_disease_ulcerative_colitis]
+
+- model: examination
+  name: enteroscopy
+  name_de: Enteroskopie
+  name_en: Enteroscopy
+  examination_types: [mst30_endoscopic_procedure]
+  findings: [mst30_enteroscopy_documentation_status, mst30_luminal_normal, mst30_luminal_dilation, mst30_luminal_stenosis, mst30_luminal_compression, mst30_luminal_diverticulum, mst30_content_foreign_body, mst30_content_blood, mst30_content_food, mst30_content_fluid, mst30_content_parasites, mst30_mucosa_erythematous, mst30_mucosa_edematous, mst30_mucosa_granular, mst30_mucosa_nodular, mst30_mucosa_friable, mst30_mucosa_hemorrhagic, mst30_mucosa_atrophic, mst30_mucosa_scalloping, mst30_flat_angioectasia, mst30_flat_dieulafoy_lesion, mst30_flat_superficial_lesion, mst30_protruding_nodule, mst30_protruding_polyp, mst30_protruding_tumor_mass, mst30_excavated_erosion, mst30_excavated_ulcer, mst30_excavated_fistula, mst30_excavated_perforation, mst30_dx_enteroscopy_angioectasia, mst30_dx_enteroscopy_bleeding_unknown_origin, mst30_dx_enteroscopy_celiac_disease, mst30_dx_enteroscopy_crohns_disease, mst30_dx_enteroscopy_gist, mst30_dx_enteroscopy_lymphoma, mst30_dx_enteroscopy_nsaid_enteropathy, mst30_dx_enteroscopy_polyps, mst30_dx_enteroscopy_small_bowel_benign_tumor, mst30_dx_enteroscopy_small_bowel_malignant_tumor, mst30_dx_enteroscopy_ulcer, mst30_luminal_procedure_summary, mst30_event_intraprocedure_perforation, mst30_event_intraprocedure_bleeding, mst30_event_postprocedure_abdominal_pain, mst30_event_postprocedure_infection]
+  indications: [mst30_enteroscopy_symptom_abdominal_distress_pain, mst30_enteroscopy_symptom_vomiting, mst30_enteroscopy_symptom_melena, mst30_enteroscopy_symptom_anemia, mst30_enteroscopy_symptom_diarrhea, mst30_enteroscopy_disease_angioectasia, mst30_enteroscopy_disease_celiac_disease, mst30_enteroscopy_disease_crohns_disease, mst30_enteroscopy_disease_hereditary_polyposis_syndrome, mst30_enteroscopy_disease_lymphoma, mst30_enteroscopy_disease_nsaid_enteropathy, mst30_enteroscopy_disease_polyps, mst30_enteroscopy_disease_stricture, mst30_enteroscopy_disease_mass]
+
+- model: examination
+  name: video_capsule_endoscopy
+  name_de: Videokapselendoskopie
+  name_en: Video capsule endoscopy
+  examination_types: [mst30_endoscopic_procedure]
+  findings: [mst30_vce_documentation_status, mst30_luminal_normal, mst30_luminal_dilation, mst30_luminal_stenosis, mst30_luminal_diverticulum, mst30_content_blood, mst30_content_food, mst30_content_fluid, mst30_content_parasites, mst30_mucosa_erythematous, mst30_mucosa_edematous, mst30_mucosa_granular, mst30_mucosa_nodular, mst30_mucosa_friable, mst30_mucosa_hemorrhagic, mst30_mucosa_atrophic, mst30_mucosa_scalloping, mst30_flat_angioectasia, mst30_flat_superficial_lesion, mst30_protruding_nodule, mst30_protruding_polyp, mst30_protruding_tumor_mass, mst30_excavated_erosion, mst30_excavated_ulcer, mst30_excavated_fistula, mst30_dx_enteroscopy_angioectasia, mst30_dx_enteroscopy_bleeding_unknown_origin, mst30_dx_enteroscopy_celiac_disease, mst30_dx_enteroscopy_crohns_disease, mst30_dx_enteroscopy_nsaid_enteropathy, mst30_dx_enteroscopy_polyps, mst30_dx_enteroscopy_small_bowel_benign_tumor, mst30_dx_enteroscopy_small_bowel_malignant_tumor, mst30_dx_enteroscopy_ulcer, mst30_event_postprocedure_abdominal_pain]
+  indications: [mst30_enteroscopy_symptom_abdominal_distress_pain, mst30_enteroscopy_symptom_melena, mst30_enteroscopy_symptom_anemia, mst30_enteroscopy_symptom_diarrhea, mst30_enteroscopy_disease_angioectasia, mst30_enteroscopy_disease_celiac_disease, mst30_enteroscopy_disease_crohns_disease, mst30_enteroscopy_disease_hereditary_polyposis_syndrome, mst30_enteroscopy_disease_lymphoma, mst30_enteroscopy_disease_nsaid_enteropathy, mst30_enteroscopy_disease_polyps, mst30_enteroscopy_disease_stricture, mst30_enteroscopy_disease_mass]
+
+- model: examination
+  name: ercp
+  name_de: ERCP
+  name_en: ERCP
+  examination_types: [mst30_endoscopic_procedure]
+  findings: [mst30_ercp_documentation_status, mst30_ercp_papillary_features, mst30_ercp_pancreas_divisum, mst30_ercp_pancreas_annulare, mst30_ercp_common_channel, mst30_ercp_cystic_duct_implant, mst30_ercp_hepatic_duct_anomaly, mst30_ercp_irregularity, mst30_ercp_dilation, mst30_ercp_stenosis, mst30_ercp_stone, mst30_ercp_tumor, mst30_ercp_cavity, mst30_ercp_fistula, mst30_ercp_leak, mst30_ercp_extravasation, mst30_ercp_parenchymal_filling, mst30_ercp_stent, mst30_ercp_filling_defects, mst30_ercp_previous_surgery, mst30_dx_ercp_abnormal_pancreatobiliary_junction, mst30_dx_ercp_biliary_fistula_leak, mst30_dx_ercp_biliary_stones, mst30_dx_ercp_biliary_stricture, mst30_dx_ercp_choledochal_cyst, mst30_dx_ercp_choledochocele, mst30_dx_ercp_pancreatic_duct_stricture, mst30_dx_ercp_pancreatic_stone, mst30_dx_ercp_pancreatic_tumor, mst30_dx_ercp_primary_sclerosing_cholangitis, mst30_ercp_procedure_summary, mst30_event_intraprocedure_perforation, mst30_event_intraprocedure_bleeding, mst30_event_intraprocedure_cardiopulmonary, mst30_event_postprocedure_infection, mst30_event_postprocedure_late_perforation, mst30_event_postprocedure_late_bleeding, mst30_event_postprocedure_pancreatitis]
+  indications: [mst30_ercp_symptom_jaundice, mst30_ercp_symptom_pancreatobiliary_pain, mst30_ercp_symptom_pruritus, mst30_ercp_disease_acute_pancreatitis, mst30_ercp_disease_ampullary_mass, mst30_ercp_disease_anastomotic_stricture, mst30_ercp_disease_bile_duct_injury, mst30_ercp_disease_bile_duct_leak, mst30_ercp_disease_bile_duct_stone, mst30_ercp_disease_bile_duct_stricture, mst30_ercp_disease_chronic_pancreatitis, mst30_ercp_disease_pancreatic_duct_leak, mst30_ercp_disease_pancreatic_pseudocyst, mst30_ercp_disease_pancreatic_stone, mst30_ercp_disease_pancreatic_mass, mst30_ercp_disease_primary_sclerosing_cholangitis, mst30_ercp_disease_purulent_cholangitis, mst30_ercp_disease_stent_dysfunction]
+
+- model: examination
+  name: endoscopic_ultrasound
+  name_de: Endosonographie
+  name_en: Endoscopic ultrasound
+  examination_types: [mst30_endoscopic_procedure]
+  findings: [mst30_eus_documentation_status, mst30_eus_intramural_lesion, mst30_eus_wall_thickening, mst30_eus_polyp, mst30_eus_mass, mst30_eus_lymph_nodes, mst30_eus_stricture, mst30_eus_extramural_mass, mst30_eus_varices, mst30_eus_collaterals, mst30_eus_pleural_effusion, mst30_eus_cardiac_effusion, mst30_eus_ascites, mst30_eus_cyst, mst30_eus_parenchymal_changes, mst30_eus_pancreatic_duct_changes, mst30_eus_calcification, mst30_eus_ventral_anlage, mst30_eus_pancreatic_stent, mst30_eus_bile_duct_changes, mst30_eus_cholelithiasis, mst30_eus_gallbladder_sludge, mst30_eus_biliary_stent, mst30_eus_pancreas_divisum, mst30_eus_perianal_fistula, mst30_eus_choledochocele, mst30_eus_other, mst30_dx_eus_bile_duct_stone, mst30_dx_eus_bile_duct_stricture, mst30_dx_eus_bile_duct_tumor, mst30_dx_eus_colorectal_cancer, mst30_dx_eus_duodenal_cancer, mst30_dx_eus_esophageal_cancer, mst30_dx_eus_gastric_cancer, mst30_dx_eus_gist_tumor, mst30_dx_eus_mediastinal_lymph_nodes, mst30_dx_eus_pancreatic_cancer, mst30_dx_eus_pancreatic_mass, mst30_dx_eus_pancreatic_pseudocyst, mst30_dx_eus_pancreatitis_chronic, mst30_eus_procedure_summary, mst30_event_intraprocedure_perforation, mst30_event_intraprocedure_bleeding, mst30_event_intraprocedure_cardiopulmonary, mst30_event_postprocedure_abdominal_pain, mst30_event_postprocedure_infection]
+  indications: [mst30_eus_symptom_abdominal_pain, mst30_eus_symptom_diarrhea, mst30_eus_symptom_jaundice, mst30_eus_symptom_pancreatobiliary_pain, mst30_eus_symptom_weight_loss, mst30_eus_disease_abdominal_mass, mst30_eus_disease_ampullary_mass, mst30_eus_disease_bile_duct_mass, mst30_eus_disease_bile_duct_stone, mst30_eus_disease_bile_duct_stricture, mst30_eus_disease_colorectal_intramural_lesion, mst30_eus_disease_colorectal_mass, mst30_eus_disease_duodenal_intramural_lesion, mst30_eus_disease_duodenal_mass, mst30_eus_disease_esophageal_intramural_lesion, mst30_eus_disease_esophageal_mass, mst30_eus_disease_gastric_intramural_lesion, mst30_eus_disease_gastric_mass, mst30_eus_disease_liver_mass, mst30_eus_disease_mediastinal_lymph_node_mass, mst30_eus_disease_pancreatic_cyst, mst30_eus_disease_pancreatic_mass, mst30_eus_disease_pancreatic_pseudocyst, mst30_eus_disease_pancreatic_stone, mst30_eus_disease_pancreatitis_acute, mst30_eus_disease_pancreatitis_chronic, mst30_eus_disease_perirectal_mass, mst30_eus_disease_pulmonary_mass]

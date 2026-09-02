@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Union, cast
+from collections.abc import Iterable
+from math import isfinite
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
@@ -14,11 +16,24 @@ class ReportTemplateCompiler:
         self.kb = kb
         self.tolerant = tolerant
 
-    def compile(self, template_name: str) -> Dict[str, Any]:
+    def compile(self, template_name: str) -> dict[str, Any]:
         template = self.kb.get_report_template(template_name)
 
         return {
             "name": template.name,
+            "name_de": template.name_de,
+            "name_en": template.name_en,
+            "description": template.description,
+            "version": template.version,
+            "guideline_references": [
+                reference.model_dump(mode="json")
+                for reference in template.guideline_references
+            ],
+            "coverage_version": template.coverage_version,
+            "coverage_concepts": [
+                concept.model_dump(mode="json")
+                for concept in template.coverage_concepts
+            ],
             "examination": template.examination,
             "report_sections": [
                 self._resolve_section(s) for s in template.report_sections
@@ -26,7 +41,7 @@ class ReportTemplateCompiler:
             "validators": self._resolve_all_validators(template),
         }
 
-    def _resolve_section(self, section_name: str) -> Dict[str, Any]:
+    def _resolve_section(self, section_name: str) -> dict[str, Any]:
         section = self.kb.report_template_section.get(section_name)
         if not section:
             if self.tolerant:
@@ -35,6 +50,8 @@ class ReportTemplateCompiler:
 
         return {
             "name": section.name,
+            "title_de": section.title_de,
+            "title_en": section.title_en,
             "position": section.position,
             "types": section.types,
             "section_kind": section.section_kind,
@@ -44,15 +61,84 @@ class ReportTemplateCompiler:
             ],
         }
 
-    def _resolve_finding_requirement(self, ref: Union[str, Any]) -> Dict[str, Any]:
+    def _resolve_finding_requirement(self, ref: str | Any) -> dict[str, Any]:
         # Handle the polymorphism: is it a string ID or a Requirement object?
         if isinstance(ref, str):
             if ref in self.kb.report_finding:
-                return self.kb.report_finding[ref].as_requirement().model_dump()
+                requirement = self.kb.report_finding[ref].as_requirement().model_dump()
+                return self._hydrate_finding_inputs(requirement)
             return {"finding": ref}  # Bare finding reference
-        return cast(Dict[str, Any], ref.model_dump())
+        requirement = cast(dict[str, Any], ref.model_dump())
+        return self._hydrate_finding_inputs(requirement)
 
-    def _resolve_all_validators(self, template: Any) -> Dict[str, List[Any]]:
+    def _hydrate_finding_inputs(self, requirement: dict[str, Any]) -> dict[str, Any]:
+        """Expose the KB-defined input contract for every requested classification."""
+
+        hydrated = dict(requirement)
+        raw_requirements = hydrated.get("classifications", [])
+        classification_requirements: list[dict[str, Any]] = []
+        for raw_requirement in raw_requirements:
+            item = dict(raw_requirement)
+            classification_name = str(item.get("classification", "")).strip()
+            classification = self.kb.classification.get(classification_name)
+            if classification is None:
+                classification_requirements.append(item)
+                continue
+
+            choices: list[dict[str, Any]] = []
+            raw_choice_names = classification.classification_choices
+            choice_names = (
+                [raw_choice_names]
+                if isinstance(raw_choice_names, str)
+                else raw_choice_names
+            )
+            for choice_name in choice_names:
+                choice = self.kb.classification_choice.get(choice_name)
+                if choice is None:
+                    continue
+                descriptors: list[dict[str, Any]] = []
+                raw_descriptor_names = choice.classification_choice_descriptors
+                descriptor_names = (
+                    [raw_descriptor_names]
+                    if isinstance(raw_descriptor_names, str)
+                    else raw_descriptor_names
+                )
+                for descriptor_name in descriptor_names:
+                    descriptor = self.kb.classification_choice_descriptor.get(
+                        descriptor_name
+                    )
+                    if descriptor is None:
+                        continue
+                    unit_name = descriptor.unit
+                    unit = self.kb.unit.get(unit_name)
+                    descriptor_type = descriptor.classification_choice_descriptor_type
+                    numeric_min = descriptor.numeric_min
+                    numeric_max = descriptor.numeric_max
+                    descriptors.append(
+                        {
+                            "name": descriptor.name,
+                            "type": getattr(descriptor_type, "value", descriptor_type),
+                            "unit": unit_name,
+                            "unit_abbreviation": (
+                                unit.abbreviation if unit is not None else None
+                            ),
+                            "numeric_min": (
+                                numeric_min if isfinite(numeric_min) else None
+                            ),
+                            "numeric_max": (
+                                numeric_max if isfinite(numeric_max) else None
+                            ),
+                        }
+                    )
+                choices.append({"name": choice.name, "descriptors": descriptors})
+
+            item["input"] = {"choices": choices}
+            classification_requirements.append(item)
+
+        hydrated["classifications"] = classification_requirements
+        return hydrated
+
+    def _resolve_all_validators(self, template: Any) -> dict[str, list[Any]]:
         v = template.validators
         return {
             "examination_validators": self._hydrate_list(
@@ -73,8 +159,8 @@ class ReportTemplateCompiler:
         }
 
     def _hydrate_list(
-        self, names: Iterable[str], registry: Dict[str, Any]
-    ) -> List[Any]:
+        self, names: Iterable[str], registry: dict[str, Any]
+    ) -> list[Any]:
         resolved = []
         for name in names:
             if name in registry:

@@ -1,6 +1,8 @@
+# ruff: noqa: UP040 - aliases must remain runtime-callable Django field classes
+
 import datetime
 import uuid as uuid_module
-from typing import TYPE_CHECKING, Any, Dict, TypeAlias
+from typing import TYPE_CHECKING, Any, TypeAlias
 
 from django.db import models
 
@@ -12,9 +14,9 @@ if TYPE_CHECKING:
     OptionalDateFieldType: TypeAlias = models.DateField[
         datetime.date | None, datetime.date | None
     ]
-    JSONFieldType: TypeAlias = models.JSONField[Dict[str, Any], Dict[str, Any]]
+    JSONFieldType: TypeAlias = models.JSONField[dict[str, Any], dict[str, Any]]
     OptionalJSONFieldType: TypeAlias = models.JSONField[
-        Dict[str, Any] | None, Dict[str, Any] | None
+        dict[str, Any] | None, dict[str, Any] | None
     ]
     DateTimeField: TypeAlias = models.DateTimeField[
         datetime.datetime, datetime.datetime
@@ -33,6 +35,7 @@ else:  # Runtime fallbacks keep Django field classes unsubscripted
     CharFieldType: TypeAlias = models.CharField
     OptionalEmailFieldType: TypeAlias = models.EmailField
     OptionalDateFieldType: TypeAlias = models.DateField
+    # These remain runtime-callable class aliases; PEP 695 aliases are not callable.
     JSONFieldType: TypeAlias = models.JSONField
     OptionalJSONFieldType: TypeAlias = models.JSONField
     DateTimeField: TypeAlias = models.DateTimeField

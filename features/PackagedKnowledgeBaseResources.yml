@@ -1,0 +1,98 @@
+schema_version: "1.0"
+id: packaged_knowledge_base_resources
+name: Packaged Knowledge Base Resources
+description: >-
+  Deliver immutable lx-dtypes knowledge-base YAML as package resources and
+  resolve built-in entries through stable provider descriptors.
+owners:
+  - lx-dtypes maintainers
+production_critical: true
+source_documents:
+  - path: docs/guides/knowledge-base-authoring.md
+    disposition: reference
+    note: Canonical package resource authoring and resolution contract.
+invariants:
+  - Persisted identities never contain checkout, virtualenv, site-packages, or Nix store paths.
+  - Provider and filesystem sources remain explicit and cannot fall back to one another.
+  - Catalog digests are verified before packaged knowledge is consumed.
+definition_of_done:
+  - id: wheel_resource_contract
+    category: requirements
+    title: lx-dtypes exposes immutable knowledge bases from its package
+    acceptance:
+      - The package contains the declared YAML resources and catalog.
+      - A typed public API resolves exact module versions and content digests.
+      - Resource identifiers are relative and independent of an installation path.
+    required: true
+    verification:
+      kind: manual
+      instructions: Build and inspect the package, then exercise the typed resource API.
+      timeout_seconds: 600
+  - id: provider_registry_resolution
+    category: security
+    title: Built-in registry entries remain valid across environment replacement
+    acceptance:
+      - Persisted built-in entries contain provider identity and content digest, not an installation path.
+      - Provider resolution verifies module version and content digest before loading.
+      - Filesystem-backed custom entries remain explicitly supported.
+    required: true
+    verification:
+      kind: manual
+      instructions: Run resolver and bootstrap regression tests across two installations.
+      timeout_seconds: 600
+  - id: consumer_bootstrap
+    category: testing
+    title: lx-dtypes provisions packaged reporting bundles idempotently
+    acceptance:
+      - The lx-dtypes CLI registers all supported reporting bundles through provider descriptors.
+      - Existing active selections remain unchanged.
+      - Re-running bootstrap does not rewrite an unchanged registry.
+    required: true
+    verification:
+      kind: command
+      command: [pytest, tests/unit/lx_dtypes/test_knowledge_base_registry_bootstrap.py, -q]
+      timeout_seconds: 600
+  - id: catalog_integrity
+    category: security
+    title: Catalog integrity is verified before packaged resources are used
+    acceptance:
+      - Every catalog entry has one exact module identity and a SHA-256 tree digest.
+      - Missing resources and digest mismatches fail loudly.
+    required: true
+    verification:
+      kind: manual
+      instructions: Run packaged resource tests including tamper and missing-resource cases.
+      timeout_seconds: 600
+  - id: filesystem_compatibility
+    category: functionality
+    title: Explicit deployment-owned filesystem sources remain compatible
+    acceptance:
+      - Existing input_dirs registry entries continue to resolve.
+      - Provider and filesystem entries are distinguished without ambiguous fallback.
+    required: true
+    verification:
+      kind: manual
+      instructions: Run knowledge-base resolver tests for filesystem and provider sources.
+      timeout_seconds: 600
+  - id: maintained_documentation
+    category: documentation
+    title: The delivery contract documents stable resource ownership
+    acceptance:
+      - Documentation distinguishes immutable package providers from mutable filesystem sources.
+      - Documentation prohibits persisting package installation paths.
+    required: true
+    verification:
+      kind: manual
+      instructions: Review the authoring guide against the implemented registry schema.
+      timeout_seconds: 300
+  - id: replacement_observability
+    category: operations
+    title: Environment replacement failures are explicit and diagnosable
+    acceptance:
+      - Missing providers, versions, and digest mismatches produce distinct errors.
+      - Bootstrap output retains the selected exact module identity.
+    required: true
+    verification:
+      kind: manual
+      instructions: Review focused failure-path tests and bootstrap event output.
+      timeout_seconds: 300

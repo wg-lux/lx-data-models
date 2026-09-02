@@ -1,33 +1,28 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.7
+    rev: v0.16.4
     hooks:
       - id: ruff
+        name: ruff lint
         args: ["--fix", "lx_dtypes", "tests"]
+        always_run: true
         pass_filenames: false
       - id: ruff-format
+        name: ruff format
         args: ["lx_dtypes", "tests"]
+        always_run: true
         pass_filenames: false
   - repo: local
     hooks:
       - id: kb-yaml-lint
         name: knowledge base yaml lint
-        entry: .devenv/state/venv/bin/python lx_dtypes/scripts/lint_kb_yaml.py
+        entry: python lx_dtypes/scripts/lint_kb_yaml.py
+        always_run: true
         language: system
         pass_filenames: false
       - id: mypy
         name: mypy type check
-        entry: .devenv/state/venv/bin/mypy --config-file pyproject.toml
-        language: system
-        types: [python]
-      - id: pytest-suite
-        name: pytest suite
-        entry: .devenv/state/venv/bin/pytest
-        language: system
-        pass_filenames: false
-        stages: [manual]
-      - id: findings-validator-operator-guard
-        name: findings validator operator guard
-        entry: .devenv/state/venv/bin/pytest -q lx_dtypes/models/interface/tests/test_findings_validator_operator_guard.py
+        entry: python -m mypy lx_dtypes
+        always_run: true
         language: system
         pass_filenames: false

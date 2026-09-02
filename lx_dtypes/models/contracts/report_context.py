@@ -21,7 +21,7 @@ class ReportContext(BaseModel):
 
     @field_validator("anonymized_text", mode="before")
     @classmethod
-    def normalize_text(cls, value: object) -> str:
+    def normalize_text(cls, value: str | float | bool | None) -> str:
         if value is None:
             return ""
         return str(value)

@@ -7,3 +7,10 @@
     - olympus_cv_180
     - olympus_cv_190
     - pentax_epk_i7000
+
+- model: classification
+  name: "endoscopy_hardware_serial_number"
+  name_de: "Seriennummer des verwendeten Endoskops"
+  name_en: "Serial number of the endoscope used"
+  classification_choices:
+    - endoscopy_hardware_serial_number_recorded

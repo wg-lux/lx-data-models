@@ -1,5 +1,5 @@
 import datetime
-from typing import List, NamedTuple, Optional, Union
+from typing import NamedTuple
 
 from pydantic import AwareDatetime, Field, field_validator
 
@@ -22,29 +22,26 @@ from .DataDict import (
     SerializedPExaminationDataDict,
 )
 
-PFindingClassificationChoiceLookupTuple = NamedTuple(
-    "PFindingClassificationChoiceLookupTuple",
-    [
-        ("p_examination_uuid", str),
-        ("p_finding_uuid", str),
-        ("p_finding_classifications_uuid", str),
-        ("p_finding_classification_choice", PFindingClassificationChoice),
-    ],
-)
+
+class PFindingClassificationChoiceLookupTuple(NamedTuple):
+    p_examination_uuid: str
+    p_finding_uuid: str
+    p_finding_classifications_uuid: str
+    p_finding_classification_choice: PFindingClassificationChoice
 
 
 class PExamination(LedgerBaseModel[PExaminationDataDict]):
-    patient: str
-    examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
-    date: Optional[AwareDatetime] = None
-    examination: str
-    knowledge_base_module: Optional[str] = None
-    knowledge_base_version: Optional[str] = None
-    patient_findings: List[PFinding] = Field(default_factory=list)
-    patient_indications: List[PIndication] = Field(default_factory=list)
+    patient: str = Field(min_length=1)
+    examiners: str | list[str] = Field(default_factory=list_of_str_factory)
+    date: AwareDatetime | None = None
+    examination: str = Field(min_length=1)
+    knowledge_base_module: str | None = Field(default=None, min_length=1)
+    knowledge_base_version: str | None = Field(default=None, min_length=1)
+    patient_findings: list[PFinding] = Field(default_factory=list)
+    patient_indications: list[PIndication] = Field(default_factory=list)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Identify model fields that should be treated as list types.
 
@@ -64,7 +61,7 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
         return PExaminationDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         """
         Return the list of model field names that should be treated as nested (serialized separately).
 
@@ -76,33 +73,24 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
     @field_validator("date", mode="before")
     @classmethod
     def validate_date(
-        cls, v: Optional[Union[str, datetime.date, datetime.datetime]]
-    ) -> Optional[AwareDatetime]:
+        cls, v: str | datetime.date | datetime.datetime | None
+    ) -> str | datetime.datetime | None:
         """
         Normalize a string/date/datetime input into an aware datetime or return None.
 
         Parameters:
             v (Optional[Union[str, datetime.date, datetime.datetime]]): Input value to normalize. Accepted forms:
-                - ISO 8601 datetime string: parsed to a datetime; returns None if parsing fails.
-                - datetime: returned with timezone set to UTC if it is naive; returned unchanged if tz-aware.
+                - ISO 8601 datetime string: validated by Pydantic as timezone-aware.
+                - datetime: returned unchanged and rejected by ``AwareDatetime`` if naive.
                 - date: converted to a datetime at midnight UTC.
-                - Any other value: returned unchanged.
+                - Any invalid or unsupported value is rejected by Pydantic.
 
         Returns:
-            Optional[AwareDatetime]: The resulting timezone-aware datetime in UTC for parsed/converted inputs, `None` when an ISO string fails to parse, or the original value for unsupported types.
+            Optional[str | datetime]: A value for strict ``AwareDatetime`` validation.
         """
-        if isinstance(v, str):
-            try:
-                return datetime.datetime.fromisoformat(v)
-            except ValueError:
-                return None
-        if isinstance(v, datetime.datetime):
-            if v.tzinfo is None:
-                return v.replace(tzinfo=datetime.timezone.utc)
-            return v
-        if isinstance(v, datetime.date):
+        if isinstance(v, datetime.date) and not isinstance(v, datetime.datetime):
             return datetime.datetime(
-                year=v.year, month=v.month, day=v.day, tzinfo=datetime.timezone.utc
+                year=v.year, month=v.month, day=v.day, tzinfo=datetime.UTC
             )
         return v
 
@@ -165,7 +153,7 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
         Raises:
             KeyError: If no matching finding classification choice UUID is found in this examination.
         """
-        lookup_tuple: Optional[PFindingClassificationChoiceLookupTuple] = None
+        lookup_tuple: PFindingClassificationChoiceLookupTuple | None = None
         for finding in self.patient_findings:
             for classifications_list in finding.patient_finding_classifications:
                 for (
@@ -191,17 +179,17 @@ class PExamination(LedgerBaseModel[PExaminationDataDict]):
 
 
 class SerializedPExamination(LedgerBaseModel[SerializedPExaminationDataDict]):
-    patient: str
-    examiners: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
-    date: Optional[AwareDatetime] = None
-    examination: str
-    knowledge_base_module: Optional[str] = None
-    knowledge_base_version: Optional[str] = None
+    patient: str = Field(min_length=1)
+    examiners: str | list[str] = Field(default_factory=list_of_str_factory)
+    date: AwareDatetime | None = None
+    examination: str = Field(min_length=1)
+    knowledge_base_module: str | None = Field(default=None, min_length=1)
+    knowledge_base_version: str | None = Field(default=None, min_length=1)
     patient_findings: str = ""
     patient_indications: str = ""
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Identify model fields that should be treated as list types.
 
@@ -221,7 +209,7 @@ class SerializedPExamination(LedgerBaseModel[SerializedPExaminationDataDict]):
         return SerializedPExaminationDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         """
         Provide the names of fields that should be treated as nested models during serialization.
 

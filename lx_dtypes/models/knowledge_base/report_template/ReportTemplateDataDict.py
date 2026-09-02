@@ -1,4 +1,5 @@
-from typing import List, TypedDict
+import datetime
+from typing import NotRequired, TypedDict
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
@@ -6,14 +7,28 @@ from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict i
 
 
 class ReportTemplateValidatorsDataDict(TypedDict):
-    examination_validators: List[str]
-    findings_validators: List[str]
-    classification_validators: List[str]
-    intervention_validators: List[str]
-    unit_validators: List[str]
+    examination_validators: list[str]
+    findings_validators: list[str]
+    classification_validators: list[str]
+    intervention_validators: list[str]
+    unit_validators: list[str]
+
+
+class ReportTemplateGuidelineReferenceDataDict(TypedDict):
+    guideline_id: str
+    title: str
+    issuing_organization: str
+    version: str
+    publication_date: datetime.date
+    canonical_url: str
+    cited_sections: list[str]
 
 
 class ReportTemplateDataDict(KnowledgebaseBaseModelDataDict):
     examination: str
-    report_sections: List[str]
+    version: NotRequired[str | None]
+    guideline_references: NotRequired[list[ReportTemplateGuidelineReferenceDataDict]]
+    coverage_version: NotRequired[str | None]
+    coverage_concepts: NotRequired[list[object]]
+    report_sections: list[str]
     validators: ReportTemplateValidatorsDataDict

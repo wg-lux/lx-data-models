@@ -1,0 +1,8 @@
+# Source for this device-identification field:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022), Statement 2.36:
+#   https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
+- model: classification_choice_descriptor
+  name: "endoscopy_hardware_serial_number_value"
+  description: "Herstellerseitige Seriennummer des für die Untersuchung verwendeten Endoskops."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 128

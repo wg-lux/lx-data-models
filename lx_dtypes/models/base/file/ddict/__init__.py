@@ -12,7 +12,7 @@ file_models_ddicts_lookup = FileModelsDDictsLookupType(
 )
 
 __all__ = [
-    "file_models_ddicts_lookup",
     "FileModelsDDictsLookupType",
     "FilesAndDirsDataDict",
+    "file_models_ddicts_lookup",
 ]

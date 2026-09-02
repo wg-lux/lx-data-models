@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Literal, Sequence
+from typing import Any, Literal
 
 import yaml
 
@@ -33,6 +34,9 @@ KNOWN_MODEL_NAMES: set[str] = {
     "report_template_section",
     "report_finding",
     "findings_validator",
+    "classification_validator",
+    "intervention_validator",
+    "unit_validator",
     "examination_validator",
     "report_template",
 }
@@ -60,7 +64,7 @@ class KbYamlLintIssue:
 
 @dataclass(frozen=True)
 class _YamlItem:
-    payload: Dict[str, Any]
+    payload: dict[str, Any]
     file: Path
     line: int
     column: int
@@ -229,6 +233,50 @@ def _discover_yaml_files_from_module_config(
     ) -> tuple[Path | None, list[KbYamlLintIssue]]:
         candidates = sorted(set(module_index.get(module_name, [])))
         if not candidates:
+            directory_candidates = sorted(
+                {
+                    candidate
+                    for indexed_configs in module_index.values()
+                    for candidate in indexed_configs
+                    if candidate.parent.name == module_name
+                }
+            )
+            if len(directory_candidates) == 1:
+                mismatched_config = directory_candidates[0]
+                mismatched_loaded = yaml.safe_load(
+                    mismatched_config.read_text(encoding="utf-8")
+                )
+                declared_name = (
+                    mismatched_loaded.get("name")
+                    if isinstance(mismatched_loaded, dict)
+                    else None
+                )
+                declared_modules = (
+                    mismatched_loaded.get("modules")
+                    if isinstance(mismatched_loaded, dict)
+                    else None
+                )
+                if (
+                    isinstance(declared_name, str)
+                    and declared_name.strip()
+                    and isinstance(declared_modules, list)
+                    and declared_modules
+                ):
+                    return None, [
+                        _issue(
+                            code="aggregator_name_directory_mismatch",
+                            severity="warning",
+                            file=config_path,
+                            line=1,
+                            column=1,
+                            message=(
+                                f"Referenced aggregator directory '{module_name}' "
+                                f"declares module name '{declared_name.strip()}'. "
+                                "Request the declared module name or align the two "
+                                "names."
+                            ),
+                        )
+                    ]
             return None, [
                 _issue(
                     code="missing_config_module",
@@ -244,7 +292,7 @@ def _discover_yaml_files_from_module_config(
 
         visited_matches = [c for c in candidates if c in visited_configs]
         if visited_matches:
-            selected = sorted(visited_matches)[0]
+            selected = min(visited_matches)
             return selected, []
 
         current_group = config_path.parent.parent.resolve()
@@ -460,6 +508,40 @@ def _load_yaml_items(file_path: Path) -> tuple[list[_YamlItem], list[KbYamlLintI
         )
         return [], issues
 
+    def _find_duplicate_mapping_keys(node: yaml.Node) -> None:
+        if isinstance(node, yaml.MappingNode):
+            seen_keys: dict[tuple[str, str], yaml.Node] = {}
+            for key_node, value_node in node.value:
+                if isinstance(key_node, yaml.ScalarNode):
+                    key_identity = (key_node.tag, key_node.value)
+                    previous = seen_keys.get(key_identity)
+                    if previous is not None:
+                        issues.append(
+                            _issue(
+                                code="duplicate_mapping_key",
+                                severity="error",
+                                file=file_path,
+                                line=int(key_node.start_mark.line) + 1,
+                                column=int(key_node.start_mark.column) + 1,
+                                message=(
+                                    f"Duplicate YAML mapping key '{key_node.value}'; "
+                                    "the earlier value at "
+                                    f"{file_path}:{int(previous.start_mark.line) + 1}:"
+                                    f"{int(previous.start_mark.column) + 1} would be "
+                                    "silently overwritten by standard YAML loading."
+                                ),
+                            )
+                        )
+                    else:
+                        seen_keys[key_identity] = key_node
+                _find_duplicate_mapping_keys(value_node)
+            return
+        if isinstance(node, yaml.SequenceNode):
+            for child_node in node.value:
+                _find_duplicate_mapping_keys(child_node)
+
+    _find_duplicate_mapping_keys(composed)
+
     items: list[_YamlItem] = []
     for idx, raw_item in enumerate(loaded):
         node = composed.value[idx] if idx < len(composed.value) else None
@@ -488,6 +570,337 @@ def _load_yaml_items(file_path: Path) -> tuple[list[_YamlItem], list[KbYamlLintI
     return items, issues
 
 
+def _string_list(value: object) -> list[str]:
+    if isinstance(value, str):
+        token = value.strip()
+        return [token] if token else []
+    if not isinstance(value, list):
+        return []
+    return [
+        token for item in value if isinstance(item, str) and (token := item.strip())
+    ]
+
+
+def _lint_incomplete_input_rules(
+    definitions: dict[tuple[str, str], _DefinitionLocation],
+    items_by_definition: dict[tuple[str, str], _YamlItem],
+) -> list[KbYamlLintIssue]:
+    """Find required input paths that cannot carry or evaluate a real value.
+
+    A descriptor-backed classification has two semantic values: the selected
+    classification-choice token and the descriptor value entered by the user.
+    Coverage rules default to evaluating the choice token. Such a rule is
+    incomplete when its selected choice owns descriptors but
+    ``concept_value_path`` does not point at ``descriptor_value``.
+    """
+
+    issues: list[KbYamlLintIssue] = []
+
+    def _definition(model: str, name: str) -> _YamlItem | None:
+        return items_by_definition.get((model, name))
+
+    # A finding exposed by a report template must carry enough help text for
+    # reporting clients to explain what the user is expected to enter.
+    template_finding_names: set[str] = set()
+    for (model_name, _template_name), template_item in items_by_definition.items():
+        if model_name != "report_template":
+            continue
+        for section_name in _string_list(template_item.payload.get("report_sections")):
+            section_item = _definition("report_template_section", section_name)
+            if section_item is None:
+                continue
+            raw_findings = section_item.payload.get("findings")
+            if not isinstance(raw_findings, list):
+                continue
+            for raw_finding in raw_findings:
+                if isinstance(raw_finding, dict):
+                    finding_name = raw_finding.get("finding")
+                    if isinstance(finding_name, str) and finding_name.strip():
+                        template_finding_names.add(finding_name.strip())
+                    continue
+                if not isinstance(raw_finding, str) or not raw_finding.strip():
+                    continue
+                finding_ref = raw_finding.strip()
+                report_finding_item = _definition("report_finding", finding_ref)
+                if report_finding_item is None:
+                    template_finding_names.add(finding_ref)
+                    continue
+                finding_name = report_finding_item.payload.get("finding")
+                if isinstance(finding_name, str) and finding_name.strip():
+                    template_finding_names.add(finding_name.strip())
+
+    for finding_name in sorted(template_finding_names):
+        finding_item = _definition("finding", finding_name)
+        if finding_item is None:
+            continue
+        description = finding_item.payload.get("description")
+        if isinstance(description, str) and description.strip():
+            continue
+        issues.append(
+            _issue(
+                code="template_finding_missing_description",
+                severity="warning",
+                file=finding_item.file,
+                line=finding_item.line,
+                column=finding_item.column,
+                message=(
+                    f"Finding '{finding_name}' is exposed by a report template "
+                    "but has no non-empty description, so reporting clients "
+                    "cannot explain the expected input."
+                ),
+            )
+        )
+
+    # Validate the complete classification -> choice -> descriptor input chain.
+    for (
+        model_name,
+        classification_name,
+    ), classification_item in items_by_definition.items():
+        if model_name != "classification":
+            continue
+
+        choice_names = _string_list(
+            classification_item.payload.get("classification_choices")
+        )
+        if not choice_names:
+            issues.append(
+                _issue(
+                    code="classification_has_no_enterable_values",
+                    severity="warning",
+                    file=classification_item.file,
+                    line=classification_item.line,
+                    column=classification_item.column,
+                    message=(
+                        f"Classification '{classification_name}' has no "
+                        "classification choices, so a rule requiring it cannot "
+                        "be satisfied with an entered value."
+                    ),
+                )
+            )
+            continue
+
+        for choice_name in choice_names:
+            choice_item = _definition("classification_choice", choice_name)
+            if choice_item is None:
+                issues.append(
+                    _issue(
+                        code="missing_classification_choice_reference",
+                        severity="warning",
+                        file=classification_item.file,
+                        line=classification_item.line,
+                        column=classification_item.column,
+                        message=(
+                            f"Classification '{classification_name}' references "
+                            f"missing classification choice '{choice_name}', "
+                            "leaving that input path unusable."
+                        ),
+                    )
+                )
+                continue
+
+            for descriptor_name in _string_list(
+                choice_item.payload.get("classification_choice_descriptors")
+            ):
+                if (
+                    "classification_choice_descriptor",
+                    descriptor_name,
+                ) in definitions:
+                    continue
+                issues.append(
+                    _issue(
+                        code="missing_choice_descriptor_reference",
+                        severity="warning",
+                        file=choice_item.file,
+                        line=choice_item.line,
+                        column=choice_item.column,
+                        message=(
+                            f"Classification choice '{choice_name}' references "
+                            f"missing descriptor '{descriptor_name}', so its value "
+                            "cannot be entered."
+                        ),
+                    )
+                )
+
+    # Coverage selectors evaluate classification_choice by default. Require an
+    # explicit descriptor-value path when the selected choice is only a carrier
+    # for numeric/text/boolean/selection descriptor input.
+    for (model_name, template_name), template_item in items_by_definition.items():
+        if model_name != "report_template":
+            continue
+        raw_concepts = template_item.payload.get("coverage_concepts")
+        if not isinstance(raw_concepts, list):
+            continue
+
+        for raw_concept in raw_concepts:
+            if not isinstance(raw_concept, dict):
+                continue
+            selector = raw_concept.get("finding_selector")
+            if not isinstance(selector, dict):
+                continue
+            selector_classification_name = selector.get("classification_name")
+            if (
+                not isinstance(selector_classification_name, str)
+                or not selector_classification_name
+            ):
+                continue
+
+            selector_classification_item = _definition(
+                "classification", selector_classification_name
+            )
+            if selector_classification_item is None:
+                continue
+            classification_choices = set(
+                _string_list(
+                    selector_classification_item.payload.get("classification_choices")
+                )
+            )
+
+            selected_choice = selector.get("classification_choice")
+            if isinstance(selected_choice, str) and selected_choice:
+                candidate_choices = {selected_choice}
+            else:
+                allowed_values = raw_concept.get("allowed_values")
+                candidate_choices = (
+                    {
+                        value
+                        for value in allowed_values
+                        if isinstance(value, str) and value in classification_choices
+                    }
+                    if isinstance(allowed_values, list)
+                    else set()
+                )
+                if not candidate_choices:
+                    # Numeric/text allowed values describe descriptor values rather
+                    # than classification-choice names. Inspect every possible
+                    # choice in that case.
+                    candidate_choices = classification_choices
+
+            descriptor_backed_choices: dict[str, list[str]] = {}
+            for choice_name in sorted(candidate_choices):
+                choice_item = _definition("classification_choice", choice_name)
+                if choice_item is None:
+                    continue
+                descriptor_names = _string_list(
+                    choice_item.payload.get("classification_choice_descriptors")
+                )
+                if descriptor_names:
+                    descriptor_backed_choices[choice_name] = descriptor_names
+
+            if not descriptor_backed_choices:
+                continue
+
+            value_path = _string_list(raw_concept.get("concept_value_path"))
+            evaluates_descriptor_value = (
+                "patient_finding_classification_choice_descriptors" in value_path
+                and bool(value_path)
+                and value_path[-1] == "descriptor_value"
+            )
+            if evaluates_descriptor_value:
+                continue
+
+            concept_id = raw_concept.get("concept_id", "<unnamed>")
+            choice_summary = ", ".join(
+                f"{choice} ({', '.join(descriptors)})"
+                for choice, descriptors in descriptor_backed_choices.items()
+            )
+            issues.append(
+                _issue(
+                    code="incomplete_descriptor_value_rule",
+                    severity="warning",
+                    file=template_item.file,
+                    line=template_item.line,
+                    column=template_item.column,
+                    message=(
+                        f"Coverage concept '{concept_id}' in template "
+                        f"'{template_name}' selects descriptor-backed choice(s) "
+                        f"{choice_summary} for classification "
+                        f"'{selector_classification_name}', but its value path "
+                        "evaluates "
+                        "only the choice token. The entered descriptor value "
+                        "cannot be evaluated; set concept_value_path to the "
+                        "choice descriptor's descriptor_value."
+                    ),
+                )
+            )
+
+    return issues
+
+
+def _lint_unresolved_model_references(
+    definitions: dict[tuple[str, str], _DefinitionLocation],
+    items_by_definition: dict[tuple[str, str], _YamlItem],
+) -> list[KbYamlLintIssue]:
+    """Reject typed references that cannot be resolved in the discovered module graph.
+
+    Descriptor units are validated by the runtime loader, but historically the
+    lightweight YAML linter stopped after syntax and local input-chain checks.
+    Keep this check model-aware so a literal such as ``unit: unknown`` cannot
+    pass ``ok`` and then fail during ``KnowledgeBase`` construction.
+    """
+
+    issues: list[KbYamlLintIssue] = []
+    for (model_name, descriptor_name), item in items_by_definition.items():
+        if model_name != "classification_choice_descriptor":
+            continue
+        raw_unit = item.payload.get("unit")
+        descriptor_type = item.payload.get("classification_choice_descriptor_type")
+        if raw_unit is None and descriptor_type == "numeric":
+            issues.append(
+                _issue(
+                    code="numeric_descriptor_missing_unit",
+                    severity="error",
+                    file=item.file,
+                    line=item.line,
+                    column=item.column,
+                    message=(
+                        f"Numeric classification choice descriptor "
+                        f"'{descriptor_name}' omits 'unit'; the runtime default "
+                        "would resolve to the sentinel 'unknown'. Define and "
+                        "reference an explicit unit, including for dimensionless "
+                        "counts."
+                    ),
+                )
+            )
+            continue
+        if raw_unit is None:
+            continue
+        if not isinstance(raw_unit, str) or not raw_unit.strip():
+            issues.append(
+                _issue(
+                    code="invalid_unit_reference",
+                    severity="error",
+                    file=item.file,
+                    line=item.line,
+                    column=item.column,
+                    message=(
+                        f"Classification choice descriptor '{descriptor_name}' "
+                        "must reference a unit by a non-empty string name."
+                    ),
+                )
+            )
+            continue
+
+        unit_name = raw_unit.strip()
+        if ("unit", unit_name) in definitions:
+            continue
+        issues.append(
+            _issue(
+                code="missing_unit_reference",
+                severity="error",
+                file=item.file,
+                line=item.line,
+                column=item.column,
+                message=(
+                    f"Classification choice descriptor '{descriptor_name}' "
+                    f"references missing unit '{unit_name}'. Define a unit with "
+                    "that exact name in this module or one of its configured "
+                    "dependencies."
+                ),
+            )
+        )
+    return issues
+
+
 def lint_kb_yaml_files(
     yaml_files: Iterable[Path],
     *,
@@ -496,8 +909,9 @@ def lint_kb_yaml_files(
 ) -> list[KbYamlLintIssue]:
     issues: list[KbYamlLintIssue] = []
     definitions: dict[tuple[str, str], _DefinitionLocation] = {}
+    items_by_definition: dict[tuple[str, str], _YamlItem] = {}
 
-    for file_path in sorted(set(path.resolve() for path in yaml_files)):
+    for file_path in sorted({path.resolve() for path in yaml_files}):
         if not file_path.exists():
             issues.append(
                 _issue(
@@ -595,6 +1009,7 @@ def lint_kb_yaml_files(
                     line=item.line,
                     column=item.column,
                 )
+                items_by_definition[definition_key] = item
 
             if model_name != "report_template_section":
                 continue
@@ -619,6 +1034,9 @@ def lint_kb_yaml_files(
                         ),
                     )
                 )
+
+    issues.extend(_lint_incomplete_input_rules(definitions, items_by_definition))
+    issues.extend(_lint_unresolved_model_references(definitions, items_by_definition))
 
     issues.sort(
         key=lambda issue: (

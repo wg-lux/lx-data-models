@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, Mapping, cast
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import BaseModel, Field
 
@@ -203,7 +204,7 @@ class ReportTemplatePropertyGraphAdapter:
         self,
         template: ReportTemplate,
         *,
-        sections: Mapping[str, "ReportTemplateSection"] | Mapping[str, Any],
+        sections: Mapping[str, ReportTemplateSection] | Mapping[str, Any],
         report_findings: Mapping[str, Any],
     ) -> PropertyGraph:
         graph = PropertyGraph()
@@ -404,7 +405,7 @@ def _section_fields(section: Any) -> list[Any]:
 def build_report_template_graph(
     template: ReportTemplate,
     *,
-    sections: Mapping[str, "ReportTemplateSection"] | Mapping[str, Any],
+    sections: Mapping[str, ReportTemplateSection] | Mapping[str, Any],
     report_findings: Mapping[str, Any],
 ) -> ReportTemplateGraph:
     property_graph = ReportTemplatePropertyGraphAdapter().build(
@@ -479,7 +480,7 @@ def build_report_template_graph(
 def validate_report_template_structure(
     template: ReportTemplate,
     *,
-    sections: Mapping[str, "ReportTemplateSection"] | Mapping[str, Any],
+    sections: Mapping[str, ReportTemplateSection] | Mapping[str, Any],
     report_findings: Mapping[str, Any],
     findings: Mapping[str, Any] | None = None,
 ) -> ReportTemplateStructureValidationResult:
@@ -729,12 +730,12 @@ def validate_report_template_knowledge_base(
 
 
 __all__ = [
-    "ReportTemplateGraphNode",
-    "ReportTemplateGraphEdge",
     "ReportTemplateGraph",
+    "ReportTemplateGraphEdge",
+    "ReportTemplateGraphNode",
     "ReportTemplateStructureIssue",
     "ReportTemplateStructureValidationResult",
     "build_report_template_graph",
-    "validate_report_template_structure",
     "validate_report_template_knowledge_base",
+    "validate_report_template_structure",
 ]

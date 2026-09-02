@@ -1,13 +1,11 @@
 from pathlib import Path
-from typing import List, Optional
 
-from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModel import AppBaseModel
 from lx_dtypes.utils.paths import get_files_from_dir_recursive
 
 from .PathMixIn import PathMixin
 
 
-class FilesAndDirsModel(PathMixin, AppBaseModel):
+class FilesAndDirsModel(PathMixin):
     def resolve_paths(self, base_dir: Path) -> None:
         """
         Normalize and replace the model's path attributes with absolute Path objects resolved relative to base_dir.
@@ -17,19 +15,40 @@ class FilesAndDirsModel(PathMixin, AppBaseModel):
         Parameters:
             base_dir (Path): Base directory used to resolve any relative paths.
         """
+        module_base_dir = base_dir.resolve()
 
         if self.file:
-            self.file = (base_dir / self.file).expanduser().resolve()
+            resolved = (module_base_dir / self.file).expanduser().resolve()
+            if not resolved.is_relative_to(module_base_dir):
+                raise ValueError(
+                    f"Unsafe file path for knowledge base data entry: {self.file}"
+                )
+            self.file = resolved
         if self.dir:
-            self.dir = (base_dir / self.dir).expanduser().resolve()
+            resolved = (module_base_dir / self.dir).expanduser().resolve()
+            if not resolved.is_relative_to(module_base_dir):
+                raise ValueError(
+                    f"Unsafe directory path for knowledge base data entry: {self.dir}"
+                )
+            self.dir = resolved
 
         for i, file_path in enumerate(self.files):
-            self.files[i] = (base_dir / file_path).expanduser().resolve()
+            resolved = (module_base_dir / file_path).expanduser().resolve()
+            if not resolved.is_relative_to(module_base_dir):
+                raise ValueError(
+                    f"Unsafe file path for knowledge base data entry: {file_path}"
+                )
+            self.files[i] = resolved
 
         for i, dir_path in enumerate(self.dirs):
-            self.dirs[i] = (base_dir / dir_path).expanduser().resolve()
+            resolved = (module_base_dir / dir_path).expanduser().resolve()
+            if not resolved.is_relative_to(module_base_dir):
+                raise ValueError(
+                    f"Unsafe directory path for knowledge base data entry: {dir_path}"
+                )
+            self.dirs[i] = resolved
 
-    def get_files_with_suffix(self, suffix: Optional[str]) -> List[Path]:
+    def get_files_with_suffix(self, suffix: str | None) -> list[Path]:
         """
         Collects files stored on the model and returns those whose suffix exactly matches the provided value.
 
@@ -47,9 +66,8 @@ class FilesAndDirsModel(PathMixin, AppBaseModel):
                 continue
             all_files += get_files_from_dir_recursive(directory)
 
-        if self.dir:
-            if self.dir.exists():
-                all_files += get_files_from_dir_recursive(self.dir)
+        if self.dir and self.dir.exists():
+            all_files += get_files_from_dir_recursive(self.dir)
 
         filtered_files = [file for file in all_files if file.suffix == suffix]
 

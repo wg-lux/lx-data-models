@@ -1,0 +1,25 @@
+# Sources for every record in this file:
+# - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
+# - DGVS S2k quality guideline (AWMF 021-022), findings documentation: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b200dfa8a/chapter_69f4b200e16c2/
+- model: finding
+  name: "endoscopy_medication_status"
+  name_de: "Medikationsstatus der Endoskopie"
+  name_en: "Endoscopy medication status"
+  description: "Explizite Dokumentation, ob im Zusammenhang mit der Untersuchung Medikamente verabreicht wurden."
+  finding_types:
+    - baseline
+  classifications:
+    - endoscopy_medication_documentation_status
+
+- model: finding
+  name: "endoscopy_medication_administration"
+  name_de: "Medikamentenverabreichung während der Endoskopie"
+  name_en: "Medication administration during endoscopy"
+  description: "Eine einzelne, untersuchungsbezogene Medikamentenverabreichung mit Präparat, tatsächlich verabreichter Dosis, Applikationsart, Verabreichungsform und Zeitpunkt. Bei Infusionen bezeichnet der Zeitpunkt den Beginn bzw. das Wirksamwerden der dokumentierten Flussrate; für weitere Medikamente, Boli oder Flussratenänderungen wird der Befund wiederholt."
+  finding_types:
+    - baseline
+  classifications:
+    - endoscopy_medication_product_and_dose
+    - medication_administration_route
+    - medication_administration_method
+    - medication_administration_time

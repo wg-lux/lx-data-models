@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
@@ -25,10 +23,10 @@ from .DataDict import (
 class PFinding(LedgerBaseModel[PFindingDataDict]):
     finding: str
     patient_examination: str
-    patient_finding_classifications: List[PFindingClassifications] = Field(
+    patient_finding_classifications: list[PFindingClassifications] = Field(
         default_factory=list
     )
-    patient_finding_interventions: List[PFindingInterventions] = Field(
+    patient_finding_interventions: list[PFindingInterventions] = Field(
         default_factory=list
     )
 
@@ -49,7 +47,7 @@ class PFinding(LedgerBaseModel[PFindingDataDict]):
         return max(self.patient_finding_classifications, key=lambda x: x.created_at)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Return the field names that should be treated as list types for this model.
 
@@ -69,7 +67,7 @@ class PFinding(LedgerBaseModel[PFindingDataDict]):
         return PFindingDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         """
         List nested field names for the PFinding model.
 
@@ -128,7 +126,7 @@ class SerializedPFinding(LedgerBaseModel[SerializedPFindingDataDict]):
     patient_finding_interventions: str = ""
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Return the field names that should be treated as list types for this model.
 
@@ -148,7 +146,7 @@ class SerializedPFinding(LedgerBaseModel[SerializedPFindingDataDict]):
         return SerializedPFindingDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         """
         Return the names of fields that are treated as nested (complex) types by the model.
 

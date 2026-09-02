@@ -12,6 +12,7 @@ modules:
 data:
   files:
     - "./main.yaml" # Contains the data fixture for gastroscopy
+    - "./report_template.yaml"
   dirs: # Subdirectories containing .yaml files for findings, classifications, etc.
     - "./star_u_gi_descriptors/"
     - "./star_u_gi_choices/"
