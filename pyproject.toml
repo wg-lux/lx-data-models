@@ -32,7 +32,6 @@ dependencies = [
   "scikit-learn>=1.8.0",
   "scipy>=1.16.1",
   "types-pyyaml>=6.0.12.20250915",
-  "lx-annotate==1.1.8",
 ]
 description = "Typed clinical data models, terminology, and interoperability contracts"
 keywords = [
@@ -50,7 +49,7 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.2.33"
+version = "0.2.34"
 
 [project.optional-dependencies]
 dev = [

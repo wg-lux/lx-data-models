@@ -26,6 +26,14 @@ UploadJobMonitoringStatus = Literal[
     "error",
     "lost",
 ]
+UploadJobIngestMode = Literal["api", "watcher"]
+UploadJobCleanupStatus = Literal[
+    "pending",
+    "eligible",
+    "deleting",
+    "completed",
+    "skipped",
+]
 ImportErrorCode = Literal[
     "",
     "dispatch_unavailable",
@@ -38,6 +46,14 @@ ImportErrorCode = Literal[
 ]
 HlsArtifactKind = Literal["raw", "processed"]
 HlsMaterializationStatus = Literal["queued", "materializing", "ready", "failed"]
+HlsMaterializationErrorCode = Literal[
+    "",
+    "dispatch_failed",
+    "inconsistent_artifact",
+    "materialization_failed",
+    "validation_failed",
+    "stale_attempt",
+]
 ImportMonitoringAction = Literal["safe_reimport", "delete"]
 
 
@@ -84,7 +100,7 @@ class OverviewHlsMaterializationData(TypedDict):
     source_generation_id: str
     target_generation_id: str
     segment_count: int
-    error_code: str
+    error_code: HlsMaterializationErrorCode
     created_at: str
     updated_at: str
 
@@ -92,12 +108,12 @@ class OverviewHlsMaterializationData(TypedDict):
 class OverviewUploadJobMonitoringData(TypedDict):
     id: str
     status: UploadJobMonitoringStatus
-    ingest_mode: str
+    ingest_mode: UploadJobIngestMode
     source_system: str
     source_center_key: str | None
     original_filename: str
     source_file_persisted: bool
-    cleanup_status: str
+    cleanup_status: UploadJobCleanupStatus
     allowed_actions: list[ImportMonitoringAction]
     error_code: ImportErrorCode
     error_detail: str
@@ -119,7 +135,7 @@ class OverviewHlsMaterializationPayload(BaseModel):
     source_generation_id: UUID
     target_generation_id: UUID
     segment_count: int = Field(ge=0)
-    error_code: str = ""
+    error_code: HlsMaterializationErrorCode = ""
     created_at: datetime
     updated_at: datetime
 
@@ -156,12 +172,12 @@ class OverviewUploadJobMonitoringPayload(BaseModel):
 
     id: UUID
     status: UploadJobMonitoringStatus
-    ingest_mode: str = Field(min_length=1)
+    ingest_mode: UploadJobIngestMode
     source_system: str = Field(min_length=1)
     source_center_key: str | None = None
     original_filename: str = ""
     source_file_persisted: bool
-    cleanup_status: str = Field(min_length=1)
+    cleanup_status: UploadJobCleanupStatus
     allowed_actions: list[ImportMonitoringAction] = Field(default_factory=list)
     error_code: ImportErrorCode = ""
     error_detail: str = ""
@@ -262,6 +278,7 @@ __all__ = [
     "AnonymizationStatusValue",
     "ClearProcessingLocksResponseData",
     "HlsArtifactKind",
+    "HlsMaterializationErrorCode",
     "HlsMaterializationStatus",
     "ImportErrorCode",
     "ImportMonitoringAction",
@@ -272,5 +289,7 @@ __all__ = [
     "OverviewUploadJobMonitoringPayload",
     "OverviewUploadJobPayload",
     "StartAnonymizationResponseData",
+    "UploadJobCleanupStatus",
+    "UploadJobIngestMode",
     "UploadJobMonitoringStatus",
 ]

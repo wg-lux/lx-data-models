@@ -104,3 +104,40 @@ def test_duplicate_import_forbids_destructive_actions() -> None:
 
     with pytest.raises(ValueError, match="allowed_actions"):
         OverviewUploadJobMonitoringPayload.model_validate(data)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("status", "unknown"),
+        ("ingest_mode", "manual"),
+        ("cleanup_status", "unknown"),
+        ("error_code", "raw_exception"),
+    ],
+)
+def test_upload_monitoring_rejects_unknown_contract_literals(
+    field: str, value: str
+) -> None:
+    data = _upload_payload()
+    data[field] = value
+
+    with pytest.raises(ValueError):
+        OverviewUploadJobMonitoringPayload.model_validate(data)
+
+
+def test_hls_monitoring_rejects_unknown_error_code() -> None:
+    now = _now()
+
+    with pytest.raises(ValueError):
+        OverviewHlsMaterializationPayload.model_validate(
+            {
+                "artifact_kind": "raw",
+                "status": "failed",
+                "source_generation_id": uuid4(),
+                "target_generation_id": uuid4(),
+                "segment_count": 0,
+                "error_code": "raw_exception",
+                "created_at": now,
+                "updated_at": now,
+            }
+        )
