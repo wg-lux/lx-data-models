@@ -21,6 +21,47 @@ type VideoSegmentsPayloadDict = dict[str, list[tuple[int, int]]]
 class VideoSegmentsPayload(RootModel[VideoSegmentsPayloadDict]):
     model_config = ConfigDict(strict=True)
 
+    @field_validator("root", mode="before")
+    @classmethod
+    def _normalize_json_frame_ranges(
+        cls, value: Mapping[object, object]
+    ) -> VideoSegmentsPayloadDict:
+        """Normalize JSON arrays while retaining strict coordinate validation."""
+        if not isinstance(value, Mapping):
+            raise ValueError(  # noqa: TRY004 - Pydantic validator contract
+                "Video segments payload must be a JSON object."
+            )
+
+        normalized: VideoSegmentsPayloadDict = {}
+        for raw_label, raw_ranges in value.items():
+            if not isinstance(raw_label, str):
+                raise ValueError(  # noqa: TRY004 - Pydantic validator contract
+                    "Video segment labels must be strings."
+                )
+            if not isinstance(raw_ranges, list):
+                raise ValueError(  # noqa: TRY004 - Pydantic validator contract
+                    f"Video segment ranges for '{raw_label}' must be a list."
+                )
+            ranges: list[tuple[int, int]] = []
+            for raw_range in raw_ranges:
+                if not isinstance(raw_range, (list, tuple)) or len(raw_range) != 2:
+                    raise ValueError(
+                        f"Video segment range for '{raw_label}' must contain two coordinates."
+                    )
+                start, end = raw_range
+                if (
+                    isinstance(start, bool)
+                    or isinstance(end, bool)
+                    or not isinstance(start, int)
+                    or not isinstance(end, int)
+                ):
+                    raise ValueError(  # noqa: TRY004 - Pydantic validator contract
+                        f"Video segment coordinates for '{raw_label}' must be integers."
+                    )
+                ranges.append((start, end))
+            normalized[raw_label] = ranges
+        return normalized
+
     @property
     def as_dict(self) -> VideoSegmentsPayloadDict:
         return self.root
@@ -61,7 +102,7 @@ class SegmentAnnotationInput(BaseModel):
 
 
 def validate_video_segments_payload(
-    value: VideoSegmentsPayloadDict | Mapping[str, list[tuple[int, int]]],
+    value: VideoSegmentsPayloadDict | Mapping[str, object],
 ) -> VideoSegmentsPayload:
     return VideoSegmentsPayload.model_validate(value)
 

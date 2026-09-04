@@ -10,7 +10,25 @@ from lx_dtypes.models.contracts import (
     parse_segment_annotation_input,
     validate_segment_annotation_ensure_payload,
     validate_segment_prediction_import_payload,
+    validate_video_segments_payload,
 )
+
+
+def test_video_segments_payload_accepts_json_array_frame_ranges() -> None:
+    payload = validate_video_segments_payload({"instrument": [[12, 34], [56, 78]]})
+
+    assert payload.as_dict == {"instrument": [(12, 34), (56, 78)]}
+
+
+@pytest.mark.parametrize(
+    "invalid_range",
+    ([12], [12, 34, 56], [12.5, 34], [True, 34]),
+)
+def test_video_segments_payload_rejects_invalid_json_ranges(
+    invalid_range: list[object],
+) -> None:
+    with pytest.raises(ValidationError):
+        validate_video_segments_payload({"instrument": [invalid_range]})
 
 
 def test_segment_crud_payload_normalizes_serializer_aliases() -> None:
