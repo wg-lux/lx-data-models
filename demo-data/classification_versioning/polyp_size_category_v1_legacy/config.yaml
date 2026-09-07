@@ -1,0 +1,19 @@
+name: polyp_size_category_v1_legacy
+description: |
+  Illustrative KnowledgeBaseConfig module for the manuscript's classification-
+  versioning example. Encodes a coarse, informally used binary polyp-size
+  split ("diminutive" vs "everything else") of the kind seen in some earlier
+  resect-and-discard proposals, kept here only as a contrasting *legacy*
+  version -- not itself an ESGE recommendation. Compare against
+  polyp_size_category_v2_esge2024 (Ferlitsch et al., Endoscopy 2024,
+  doi:10.1055/a-2304-3219) to see how the same raw millimeter measurement is
+  assigned a different, coarser category by an older/simpler classification
+  version than by the current guideline.
+version: 1.0.0
+medical_field: gastroenterology
+modules: []
+depends_on: []
+
+data:
+  files:
+    - "./data.yaml"

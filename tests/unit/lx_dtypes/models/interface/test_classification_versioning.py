@@ -33,6 +33,28 @@ from lx_dtypes.numeric_classification import (
 ROOT = Path(__file__).resolve().parents[5]
 
 
+@pytest.mark.parametrize(
+    ("module", "version", "choice_count"),
+    [
+        ("polyp_size_category_v1_legacy", "1.0.0", 2),
+        ("polyp_size_category_v2_esge2024", "2.0.0", 4),
+    ],
+)
+def test_original_demo_bundles_load(
+    module: str, version: str, choice_count: int
+) -> None:
+    kb = load_knowledge_base(
+        module,
+        version=version,
+        input_dirs=[ROOT / "demo-data/classification_versioning" / module],
+    )
+    assert kb.config.name == module
+    assert kb.config.version == version
+    assert "demo_polyp_size_category" in kb.classification
+    assert len(kb.classification_choice) == choice_count
+    kb.export_core_concepts()
+
+
 @pytest.fixture(autouse=True)
 def registry(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     modules: dict[str, dict[str, object]] = {}
