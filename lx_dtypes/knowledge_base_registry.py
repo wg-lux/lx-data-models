@@ -22,7 +22,9 @@ from lx_dtypes.models.interface.remote_data_roots import _atomic_write_file
 
 DEFAULT_PACKAGED_KNOWLEDGE_BASE = "star_upper_gi"
 PACKAGED_KNOWLEDGE_BASE_MODULES = tuple(
-    descriptor.module_name for descriptor in list_packaged_knowledge_bases()
+    dict.fromkeys(
+        descriptor.module_name for descriptor in list_packaged_knowledge_bases()
+    )
 )
 
 logger = logging.getLogger(__name__)
@@ -213,8 +215,7 @@ def _write_registry(registry: Path, payload: RegistryPayload) -> None:
 
 def _ensure_packaged_entries(payload: RegistryPayload) -> bool:
     changed = False
-    for requested_module in PACKAGED_KNOWLEDGE_BASE_MODULES:
-        descriptor = get_packaged_knowledge_base(requested_module)
+    for descriptor in list_packaged_knowledge_bases():
         expected = _packaged_registry_entry(descriptor)
         versions = payload.modules.setdefault(descriptor.module_name, {})
         existing = versions.get(descriptor.version)
@@ -235,6 +236,13 @@ def _ensure_packaged_entries(payload: RegistryPayload) -> bool:
 def _migrate_stale_active_packaged_identity(payload: RegistryPayload) -> bool:
     active = payload.active
     if active is None:
+        return False
+    try:
+        get_packaged_knowledge_base(active.module_name, active.version)
+    except LookupError:
+        pass
+    else:
+        # A retained historical release is intentional, not stale active state.
         return False
     try:
         descriptor = get_packaged_knowledge_base(active.module_name)
@@ -316,8 +324,7 @@ def bootstrap_packaged_knowledge_bases(
         _write_registry(registry, payload)
 
     packaged_identities: set[tuple[str, str]] = set()
-    for requested_module in PACKAGED_KNOWLEDGE_BASE_MODULES:
-        descriptor = get_packaged_knowledge_base(requested_module)
+    for descriptor in list_packaged_knowledge_bases():
         identity = descriptor.module_name, descriptor.version
         _validate_identity(registry, *identity)
         packaged_identities.add(identity)

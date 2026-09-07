@@ -1606,7 +1606,11 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             ).resolve()
         seen_records: dict[tuple[str, str], tuple[Path, int, int]] = {}
         data = config.data
-        submodule_files = data.get_files_with_suffix(".yaml")
+        submodule_files = sorted(
+            set(data.get_files_with_suffix(".yaml"))
+            | set(data.get_files_with_suffix(".yml")),
+            key=lambda path: (path.name, str(path)),
+        )
         for sm_file in submodule_files:
             if registry_path is not None and sm_file.resolve() == registry_path:
                 continue

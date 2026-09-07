@@ -1,4 +1,11 @@
 # Knowledge Base Data
+
+For executable numeric rules, historical releases, the STAR publication snapshot
+and manuscript reconciliation, follow the canonical
+[versioning workflow](../../docs/guides/knowledge-base-authoring.md#reproduce-and-maintain-versioned-numeric-classifications).
+`polyp_size_category/` contains the default classification release; retained
+releases are under `versions/` and selected through `catalog.json` and the registry.
+`numeric_rules.yml` is a validated sidecar, not a KB record list.
 This directory bundles the canonical data modules that ship with LX data models. Every subdirectory that contains a `config.yaml` is a loadable module and can declare dependencies on siblings so the loader can resolve an ordered data graph.
 
 *Content*

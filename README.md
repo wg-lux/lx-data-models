@@ -71,6 +71,7 @@ Start with the [documentation index](docs/index.md). Key guides include:
 - [Package boundaries](docs/guides/package_boundary.md)
 - [Data-model concept map](docs/guides/data-model-concept-map.md)
 - [Knowledge-base authoring](docs/guides/knowledge-base-authoring.md)
+- [Reproduce versioned classifications](docs/guides/knowledge-base-authoring.md#reproduce-and-maintain-versioned-numeric-classifications)
 - [Report-template infrastructure](docs/guides/report-template-infrastructure.md)
 - [FHIR to LXDM mapping](docs/guides/fhir-lxdm-mapping-diagrams.md)
 - [Django host integration](docs/guides/django-host-integration.md)

@@ -1,0 +1,18 @@
+- model: unit
+  name: millimeter
+  abbreviation: mm
+- model: classification
+  name: polyp_size_category
+  name_en: Polyp size category
+  description: Illustrative binary comparator; not an historical guideline release.
+  classification_choices:
+  - size_le_5
+  - size_gt_5
+- model: classification_choice
+  name: size_le_5
+  name_en: ≤5 mm
+  description: Illustrative binary comparator; not an historical guideline release.
+- model: classification_choice
+  name: size_gt_5
+  name_en: '>5 mm'
+  description: Illustrative binary comparator; not an historical guideline release.

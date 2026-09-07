@@ -1,0 +1,9 @@
+- model: classification_choice
+  name: distance_cm
+  classification_choice_descriptors:
+    - length_cm_descriptor
+
+- model: classification_choice
+  name: size_mm
+  classification_choice_descriptors:
+    - length_mm_descriptor

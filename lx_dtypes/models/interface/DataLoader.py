@@ -228,6 +228,18 @@ class DataLoader(AppBaseModel):
             matches = [path for path in root_matches if path in candidate_paths]
             if len(matches) == 1:
                 return [matches[0]]
+            if not matches:
+                # Historical bundles may contain their own scoped terminology.
+                # An unversioned authoring scan still has one canonical location.
+                terminology_matches = [
+                    (input_dir / "terminology" / module_name / "config.yaml").resolve()
+                    for input_dir in self.input_dirs
+                ]
+                canonical_matches = [
+                    path for path in terminology_matches if path in candidate_paths
+                ]
+                if len(canonical_matches) == 1:
+                    return canonical_matches
 
         return []
 

@@ -1,0 +1,18 @@
+- model: classification_choice
+  name: "star_upper_gi_forrest_Ia"
+  description: "Active spurting bleeding (Forrest Ia)."
+- model: classification_choice
+  name: "star_upper_gi_forrest_Ib"
+  description: "Active oozing bleeding (Forrest Ib)."
+- model: classification_choice
+  name: "star_upper_gi_forrest_IIa"
+  description: "Visible vessel, non-bleeding (Forrest IIa)."
+- model: classification_choice
+  name: "star_upper_gi_forrest_IIb"
+  description: "Adherent clot (Forrest IIb)."
+- model: classification_choice
+  name: "star_upper_gi_forrest_IIc"
+  description: "Hematin-covered lesion (Forrest IIc)."
+- model: classification_choice
+  name: "star_upper_gi_forrest_III"
+  description: "Lesion without bleeding; flat spot / Clean base (Forrest III)."

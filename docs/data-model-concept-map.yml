@@ -433,6 +433,12 @@ levels:
         - upload
 
 boundaries:
+  numeric_interpretation:
+    contracts: [NumericMeasurement, NumericClassificationRule, NumericClassificationRules, NumericClassificationResult]
+    source: lx_dtypes/models/contracts/numeric_classification.py
+    entry_points: [load_numeric_classification, classify_measurement, validate_measurement_source]
+    public_module: lx_dtypes.numeric_classification
+    result: "Derived choice with original source observation and KB identity, interpretation KB identity, and rule digest."
   yaml:
     entry_points: [DataLoader, KnowledgeBaseConfig, KnowledgeBase]
     result: "Validated, versioned knowledge-base graph."

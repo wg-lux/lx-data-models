@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, ClassVar, TypeVar
+from typing import Any, TypeVar
 
 import pytest
 from ninja.errors import HttpError
@@ -28,14 +28,13 @@ class _RouteRegistry:
 
 
 class _MinimalKnowledgeBase:
-    report_template: ClassVar[JsonObject] = {}
-    findings_validator: ClassVar[JsonObject] = {}
-    classification_validator: ClassVar[JsonObject] = {}
-    intervention_validator: ClassVar[JsonObject] = {}
-    unit_validator: ClassVar[JsonObject] = {}
-    examination_validator: ClassVar[JsonObject] = {}
-
     def __init__(self, *, module_name: str, version: str) -> None:
+        self.report_template: JsonObject = {}
+        self.findings_validator: JsonObject = {}
+        self.classification_validator: JsonObject = {}
+        self.intervention_validator: JsonObject = {}
+        self.unit_validator: JsonObject = {}
+        self.examination_validator: JsonObject = {}
         self.module_name = module_name
         self.version = version
 

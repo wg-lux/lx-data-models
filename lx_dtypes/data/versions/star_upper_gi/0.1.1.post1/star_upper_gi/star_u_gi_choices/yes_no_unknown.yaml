@@ -1,0 +1,6 @@
+- model: classification_choice
+  name: "yes"
+- model: classification_choice
+  name: "no"
+- model: classification_choice
+  name: "unknown"

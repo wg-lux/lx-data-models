@@ -6,12 +6,36 @@ from pathlib import Path
 
 import pytest
 
+from lx_dtypes import knowledge_base_registry as registry_module
 from lx_dtypes.knowledge_base_registry import PACKAGED_KNOWLEDGE_BASE_MODULES
 from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
     get_packaged_knowledge_base,
 )
 from lx_dtypes.scripts.kb_registry import main
+
+
+def test_bootstrap_preserves_retained_historical_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    validated: list[tuple[str, str]] = []
+
+    def record_validation(registry: Path, module: str, version: str) -> None:
+        del registry
+        validated.append((module, version))
+
+    monkeypatch.setattr(registry_module, "_validate_identity", record_validation)
+    path = tmp_path / "registry.json"
+    registry_module.bootstrap_packaged_knowledge_bases(path)
+    payload = json.loads(path.read_text())
+    payload["active"] = {"module_name": "polyp_size_category", "version": "1.0.0"}
+    path.write_text(json.dumps(payload))
+    registry_module.bootstrap_packaged_knowledge_bases(path)
+    assert json.loads(path.read_text())["active"] == payload["active"]
+    assert ("polyp_size_category", "1.0.0") in validated
+    assert ("polyp_size_category", "2.0.0") in validated
+    assert ("star_upper_gi", "0.1.1.post1") in validated
 
 
 def _write_custom_bundle(
@@ -63,6 +87,8 @@ def test_bootstrap_registers_and_validates_the_packaged_catalog(
         "version": "0.1.2",
     }
     assert set(payload["modules"]) == set(PACKAGED_KNOWLEDGE_BASE_MODULES)
+    assert set(payload["modules"]["polyp_size_category"]) == {"1.0.0", "2.0.0"}
+    assert "0.1.1.post1" in payload["modules"]["star_upper_gi"]
     for module_name in PACKAGED_KNOWLEDGE_BASE_MODULES:
         descriptor = get_packaged_knowledge_base(module_name)
         entry = payload["modules"][descriptor.module_name][descriptor.version]

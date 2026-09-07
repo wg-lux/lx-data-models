@@ -1,0 +1,64 @@
+# star_upper_gi_erefs_edema_none
+- model: classification_choice
+  name: star_upper_gi_erefs_edema_none
+  description: "No edema observed"
+
+# star_upper_gi_erefs_edema_present
+- model: classification_choice
+  name: star_upper_gi_erefs_edema_present
+  description: "Edema present"
+
+# star_upper_gi_erefs_rings_none
+- model: classification_choice
+  name: star_upper_gi_erefs_rings_none
+  description: "No rings observed"
+
+# star_upper_gi_erefs_rings_mild
+- model: classification_choice
+  name: star_upper_gi_erefs_rings_mild
+  description: "Mild rings observed (subtle circumferential ridges)"
+
+# star_upper_gi_erefs_rings_moderate
+- model: classification_choice
+  name: star_upper_gi_erefs_rings_moderate
+  description: "Moderate rings observed (distinct rings that do not impair passage of a standard adult endoscope [outer diameter 8–9.5 mm]"
+
+# star_upper_gi_erefs_rings_severe
+- model: classification_choice
+  name: star_upper_gi_erefs_rings_severe
+  description: "Severe rings observed"
+
+# star_upper_gi_erefs_strictures_none
+- model: classification_choice
+  name: star_upper_gi_erefs_strictures_none
+  description: "No strictures observed"
+
+# star_upper_gi_erefs_strictures_present
+- model: classification_choice
+  name: star_upper_gi_erefs_strictures_present
+  description: "Strictures present"
+
+# star_upper_gi_erefs_furrows_none
+- model: classification_choice
+  name: star_upper_gi_erefs_furrows_none
+  description: "No furrows observed"
+
+# star_upper_gi_erefs_furrows_present
+- model: classification_choice
+  name: star_upper_gi_erefs_furrows_present
+  description: "Furrows present"
+
+# star_upper_gi_erefs_exudates_none
+- model: classification_choice
+  name: star_upper_gi_erefs_exudates_none
+  description: "No exudates observed"
+
+# star_upper_gi_erefs_exudates_mild
+- model: classification_choice
+  name: star_upper_gi_erefs_exudates_mild
+  description: "Mild exudates observed (few white spots or plaques)"
+
+# star_upper_gi_erefs_exudates_severe
+- model: classification_choice
+  name: star_upper_gi_erefs_exudates_severe
+  description: "Severe exudates observed (confluent plaques covering large areas of the esophageal mucosa)"

@@ -211,6 +211,15 @@ The metadata branch adds three cross-cutting structures:
 
 ## External boundaries
 
+Numeric interpretation adds `NumericMeasurement`, `NumericClassificationRule`,
+`NumericClassificationRules`, and `NumericClassificationResult` in
+`models/contracts/numeric_classification.py`. The public
+`lx_dtypes.numeric_classification` module resolves an exact KB release and its
+strict YAML rule sidecar. A result retains the original measurement and source
+KB identity alongside the interpretation identity and rule digest. These are
+derived contracts; they do not add another ledger entity or KB registry model.
+See the [versioning workflow](knowledge-base-authoring.md#reproduce-and-maintain-versioned-numeric-classifications).
+
 | Boundary | Entry/result |
 |---|---|
 | YAML | `DataLoader`, `KnowledgeBaseConfig`, and `KnowledgeBase` produce a validated module graph |

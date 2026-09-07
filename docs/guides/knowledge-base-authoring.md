@@ -368,6 +368,204 @@ This verifies that:
 - Treat the registry entry written by the validated LX-Annotate import as the deployed filesystem handoff.
 - Treat the Nix-installed registry JSON as the deployable handoff artifact.
 
+## Reproduce and maintain versioned numeric classifications
+
+Owner: **lx_dtypes maintainers**. This section is the canonical workflow for
+the classification-versioning demonstration and publication reconciliation.
+The machine-readable [reconciliation inventory](../data-reconciliation.yml)
+records the compared PR commit, exact MST prefix hashes, counts, and STAR repairs.
+It is an artifact inventory, not a production-readiness assessment.
+
+### Run the example
+
+From the repository root, after installing the development environment:
+
+```bash
+export LX_DTYPES_KB_REGISTRY="$PWD/temp/generated_exports/classification_versioning/registry.json"
+uv run python -m lx_dtypes.scripts.kb_registry bootstrap
+uv run python -m lx_dtypes.models.interface.examples.demo_classification_versioning \
+  --measurements demo-data/classification_versioning/measurements.yml
+```
+
+Bootstrap provisions all catalog versions into this separate demo registry. It
+does not select a new classification scheme for existing patient records.
+An active release that is still in the catalog is preserved, including a
+nondefault historical release. Missing versions fail explicitly.
+
+The example verifies expected results before writing
+`temp/generated_exports/classification_versioning/table4.csv` and `results.yml`.
+The CSV compares the five synthetic measurements 4, 6, 8, 15 and 22 mm. The YAML
+contains ten interpretations with the complete source measurement, source KB
+identity, interpretation KB identity, classification, choice and rule digest.
+Repeating the command produces the same result content. Use `--output-dir` to
+choose another generated-output location; use `--help` for arguments.
+
+### Understand the boundaries
+
+```text
+NumericMeasurement: original value + unit + descriptor + source identity
+       │
+       ├── polyp_size_category@1.0.0 → derived choice + rule digest
+       └── polyp_size_category@2.0.0 → derived choice + rule digest
+```
+
+Both releases declare `name: polyp_size_category`. A directory label does not
+define clinical identity. `load_numeric_classification()` uses the existing
+registry/resolver and `DataLoader` to load the exact identity, then validates
+the associated `numeric_rules.yml` against its classification choices and unit.
+The two knowledge bases remain separate because their names overlap. Do not
+import them into one collection or overwrite an examination's original KB
+identity when computing a later interpretation.
+
+Version 1 is an **illustrative binary comparator**, not a historical ESGE release.
+Version 2 implements whole-number size groups described in the
+[ESGE 2024 guideline](https://www.esge.com/assets/downloads/pdfs/guidelines/2024_a-2304-3219.pdf).
+It computes size groups only. Treatment depends on additional clinical context;
+an upper-GI measurement is not evidence that a colorectal treatment rule applies.
+The 8 mm polyp in the existing STAR ledger is used in the preservation test.
+The existing 6 mm ledger finding is a diverticulum; Table 4 uses a separate,
+explicitly synthetic five-measurement fixture.
+
+| Input | 1.0.0 | 2.0.0 |
+|---|---|---|
+| 5 mm | `size_le_5` | `size_le_5` |
+| 6 or 9 mm | `size_gt_5` | `size_6_9` |
+| 10 or 19 mm | `size_gt_5` | `size_10_19` |
+| 20 mm | `size_gt_5` | `size_ge_20` |
+| 5.5 mm | `size_gt_5` | rejected; whole numbers required |
+| zero, negative, nonfinite, boolean or string input | rejected | rejected |
+
+No implicit rounding, unit conversion or guessing is performed. A future
+continuous interpretation must publish its fractional policy explicitly under
+a new version; do not silently fill gaps between integer guideline labels.
+
+### Author a release in YAML
+
+The current/default bundle is `lx_dtypes/data/polyp_size_category/`. Its historical
+release lives at
+`lx_dtypes/data/versions/polyp_size_category/1.0.0/polyp_size_category/`.
+Each release has these files:
+
+| File | Purpose |
+|---|---|
+| `config.yaml` | Stable logical name, release version and data file selection |
+| `data.yml` | Canonical classification, permitted choices and unit |
+| `numeric_rules.yml` | Strict executable numeric partition bound to that release |
+
+Keep the discovery filename `config.yaml`. Data payloads support both `.yaml`
+and `.yml`; files referenced both explicitly and through a directory are loaded
+once. The rules sidecar is **not** a KB record list, so do not include it in
+`data.files` or put it inside a directory selected by `data.dirs`.
+
+An excerpt from the legacy rules is:
+
+```yaml
+schema_version: 1
+knowledge_base:
+  knowledge_base_module: polyp_size_category
+  knowledge_base_version: 1.0.0
+classification: polyp_size_category
+input_descriptor: length_mm_descriptor
+unit: millimeter
+resolution: continuous
+source: Illustrative binary comparator; not a historical guideline release.
+rules:
+  - choice: size_le_5
+    lower: 0.0
+    upper: 5.0
+    lower_inclusive: false
+    upper_inclusive: true
+  - choice: size_gt_5
+    lower: 5.0
+    upper: null
+    lower_inclusive: false
+    upper_inclusive: false
+```
+
+The strict schema rejects unknown fields, duplicate mapping keys, nonfinite
+bounds, duplicate choices, empty/reversed intervals, gaps and overlaps. Rules
+are ordered and cover a domain from a finite lower bound to infinity; the last
+upper bound must be `null`. Every shared endpoint belongs to exactly one rule.
+This first schema intentionally does not represent multidimensional clinical
+decision rules or domains with an upper limit.
+
+For a new release:
+
+1. Preserve the previous bundle bytes and its dependencies. Copy into a separate
+   release root, retain the module name, and change `version` in both config and
+   rules. Use new choice names when their meanings change; preserve names for
+   unchanged meanings.
+2. Edit the clinical definitions and rule boundaries together. Keep citations
+   and applicability precise. Update the synthetic expected-result fixture when
+   intentionally extending the comparison.
+3. Register the new artifact for authoring using `kb-registry add` with an
+   `--input-dir` scoped to that release root. Broad roots containing several
+   versions of the same module are not a version-selection mechanism.
+4. Before packaging, add a distinct `(module_name, version)` entry to
+   `lx_dtypes/data/catalog.json`. Exactly one release per logical module has
+   `default: true`. Compute `content_sha256` using
+   `lx_dtypes.knowledge_bases.knowledge_base_content_sha256(Path(resource_root))`
+   with the actual local bundle directory. The digest includes YAML paths and
+   bytes, including the rules sidecar and dependencies nested inside the bundle.
+   Preserve historical catalog entries; never change their bytes in place.
+5. Bootstrap a separate test registry, run the example and the checks below,
+   and review the clinical changes independently of structural validity.
+
+The source STAR snapshot uses the supported opaque version string
+`0.1.1.post1` to identify a repair of the old demo; the resolver compares exact
+strings and does not sort releases. It includes scoped `lx_units@0.1.0.post1`.
+Its digest covers those nested unit files. The existing operational STAR
+`0.1.2` remains the default.
+
+### Validate before publication
+
+```bash
+uv run python scripts/lint_kb_yaml.py --config lx_dtypes/data/polyp_size_category/config.yaml
+uv run pytest tests/unit/lx_dtypes/models/interface/test_classification_versioning.py \
+  tests/unit/lx_dtypes/models/interface/test_mst_3_0.py \
+  tests/unit/lx_dtypes/test_knowledge_base_registry_bootstrap.py -q
+uv run pyright
+uv run pytest -q
+uv run make -C docs html
+uv run make -C docs linkcheck
+```
+
+The KB linter checks the selected concept files. The versioning tests separately
+validate the rules sidecar, real ledger preservation, boundaries, identity
+mismatches, unavailable versions and strict inputs. MST reconciliation verifies
+the PR additions byte-for-byte against the existing source prefixes and validates
+the full core graph. These checks establish software consistency, not a complete
+independent audit against every clinical source table.
+
+### Reconcile the manuscript
+
+The historical `demo-data/star_upper_gi` is retained unchanged as evidence; new
+examples should resolve a catalog artifact. Its 22 findings, 21 classifications
+and 71 choices contain dangling references. The repaired release retains the
+findings and classifications, adds the eight referenced mucosal choices, fixes
+two descriptor references and corrects the scoped millimeter unit. It therefore
+has **79 choices**, three descriptors and 41 units. Do not describe the original
+71-choice artifact as having passed full referential validation.
+
+The repaired snapshot retains 22 authoring-lint warnings for missing finding
+descriptions inherited from the demo. It is a reproducibility artifact, not an
+updated clinical reporting interface. These warnings do not affect core-reference
+validation or the numeric comparison; the operational STAR default remains 0.1.2.
+
+The two MST files in PR #32 are already present in this checkout. The complete
+`mst_3_0@3.0.0` has 357 findings, 39 classifications, 285 choices, 142 indications,
+40 interventions and 12 examinations. The draft's larger counts must not be
+reproduced by inventing additional concepts. In the
+[WEO source](https://www.worldendo.org/assets-craft/pdf/resources/mst-3-0.pdf),
+§7.3 on page 41 lists actions and outcomes; it does not contain the five-level
+severity table attributed to it in the draft. A separately sourced severity
+scheme would need its own provenance and explicit extension identity.
+
+The [editorial replacement specification](../manuscript-reconciliation.yml)
+and `scripts/revise_lxdm_manuscript.py` produce a separate revised DOCX with an
+audit of replacements. They never overwrite the original. Follow the command
+in that YAML file; review the resulting document before submitting it.
+
 ## Related Guides
 
 - KB linting details: `docs/guides/kb-yaml-linting.md`

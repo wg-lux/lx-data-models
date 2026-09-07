@@ -32,6 +32,30 @@
       "resource_root": "data/star_upper_gi",
       "content_sha256": "57769ae68496c974e1f2250317290c50d71d0db24a13827ee7d3b348c8e1a570",
       "default": true
+    },
+    {
+      "module_name": "polyp_size_category",
+      "version": "1.0.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/versions/polyp_size_category/1.0.0/polyp_size_category",
+      "content_sha256": "d9366e1f4f44d716b9c126b45088880f3260eb544a336368d01f14f95009c15f",
+      "default": false
+    },
+    {
+      "module_name": "polyp_size_category",
+      "version": "2.0.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/polyp_size_category",
+      "content_sha256": "41cf9e8258cb9864b8dd2d7b05953313e3942cda91138331046e01f95f14f9cf",
+      "default": true
+    },
+    {
+      "module_name": "star_upper_gi",
+      "version": "0.1.1.post1",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/versions/star_upper_gi/0.1.1.post1/star_upper_gi",
+      "content_sha256": "124b99237f5bcbe77a94f2e150863be08b6951bb7df043b212e460af9e8d1f4c",
+      "default": false
     }
   ]
 }
