@@ -332,3 +332,38 @@ def test_bootstrap_missing_packaged_module_fails_closed(
     event = json.loads(capsys.readouterr().err)
     assert event["status"] == "error"
     assert not registry.exists()
+
+
+def test_validation_runs_in_process_without_environment_mutation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import os
+    import subprocess
+
+    custom_root = tmp_path / "bundles"
+    _write_custom_bundle(custom_root)
+    registry = tmp_path / "registry.json"
+    registry.write_text(
+        json.dumps(
+            {
+                "modules": {
+                    "custom_reporting": {
+                        "7.4.0": {"input_dirs": [str(custom_root)]},
+                        "9.0.0": {"input_dirs": [str(custom_root)]},
+                    }
+                }
+            }
+        )
+    )
+    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(tmp_path / "unrelated.json"))
+    before = dict(os.environ)
+
+    def unexpected_process(*args: object, **kwargs: object) -> None:
+        raise AssertionError("Validation must not spawn subprocesses")
+
+    monkeypatch.setattr(subprocess, "run", unexpected_process)
+    registry_module._validate_identity(registry, "custom_reporting", "7.4.0")
+    with pytest.raises(ValueError, match="identity does not match"):
+        registry_module._validate_identity(registry, "custom_reporting", "9.0.0")
+    assert dict(os.environ) == before

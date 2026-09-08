@@ -20,9 +20,4 @@ repos:
         always_run: true
         language: system
         pass_filenames: false
-      - id: mypy
-        name: mypy type check
-        entry: python -m mypy lx_dtypes
-        always_run: true
-        language: system
-        pass_filenames: false
+

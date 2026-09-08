@@ -47,6 +47,9 @@ definition_of_done:
       - The lx-dtypes CLI registers all supported reporting bundles through provider descriptors.
       - Existing active selections remain unchanged.
       - Re-running bootstrap does not rewrite an unchanged registry.
+      - Bootstrap validates artifacts in-process without changing process environment or using stale runtime caches.
+      - Remote mutable refs use archive-content snapshots while full commit SHA refs reuse immutable caches.
+      - Incomplete cache entries are rebuilt without following symlink targets.
     required: true
     verification:
       kind: command

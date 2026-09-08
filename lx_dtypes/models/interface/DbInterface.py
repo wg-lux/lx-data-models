@@ -202,7 +202,10 @@ class DbInterface(AppBaseModelUUIDTags):
             raise ValueError(
                 f"Finding '{finding_name}' does not exist in the knowledge base."
             )
-        assert _finding_obj is not None
+        if _finding_obj is None:
+            raise ValueError(
+                f"Finding {finding_name!r} does not exist in the knowledge base."
+            )
         examination_obj = self.knowledge_base.get_examination(p_examination.examination)
 
         if finding_name not in examination_obj.findings:
@@ -252,7 +255,7 @@ class DbInterface(AppBaseModelUUIDTags):
 
         Raises:
             ValueError: If the patient examination, classification, or classification choice is not found in the ledger or knowledge base.
-            AssertionError: If the classification is not linked to the finding or the classification choice does not belong to the classification.
+            ValueError: If the classification is not linked to the finding or the classification choice does not belong to the classification.
         """
         if isinstance(patient_examination, PExamination):
             p_examination_uuid = str(patient_examination.uuid)
@@ -286,7 +289,10 @@ class DbInterface(AppBaseModelUUIDTags):
             )
 
         else:
-            assert patient_finding_classifications is None
+            if patient_finding_classifications is not None:
+                raise ValueError(
+                    "patient_finding_classifications must be an object, UUID string, or None"
+                )
             p_finding_classifications = p_finding.latest_classifications_obj
             p_finding_classifications_uuid = str(p_finding_classifications.uuid)
 
@@ -297,9 +303,10 @@ class DbInterface(AppBaseModelUUIDTags):
             classification_name = classification
         # Make sure classification is linked to finding
         finding_obj = self.knowledge_base.get_finding(p_finding.finding)
-        assert classification_name in finding_obj.classifications, (
-            f"Classification '{classification_name}' is not linked to Finding '{finding_obj.name}'."
-        )
+        if classification_name not in finding_obj.classifications:
+            raise ValueError(
+                f"Classification '{classification_name}' is not linked to Finding '{finding_obj.name}'."
+            )
 
         try:
             classification_obj = self.knowledge_base.get_classification(
@@ -326,11 +333,10 @@ class DbInterface(AppBaseModelUUIDTags):
             )
 
         # Make sure that the classification choice belongs to the classification
-        assert (
-            classification_choice_name in classification_obj.classification_choices
-        ), (
-            f"Classification Choice '{classification_choice_name}' does not belong to Classification '{classification_name}'."
-        )
+        if classification_choice_name not in classification_obj.classification_choices:
+            raise ValueError(
+                f"Classification Choice '{classification_choice_name}' does not belong to Classification '{classification_name}'."
+            )
 
         # create PFindingClassificationChoice
         p_finding_classification_choice = PFindingClassificationChoice(
@@ -352,70 +358,12 @@ class DbInterface(AppBaseModelUUIDTags):
         classification_choice_descriptor: ClassificationChoiceDescriptor | str,
         descriptor_data: dict[str, Any],  # TODO
     ) -> None:
-        """
-        Create a descriptor for a classification choice on a patient finding classification choice.
-
-        Resolves the provided identifiers or objects to their canonical forms, looks up the referenced
-        ClassificationChoiceDescriptor in the knowledge base and the PFindingClassificationChoice within
-        the given patient examination, and performs validation checks required before creating a descriptor.
-        The actual creation and storage of the descriptor is not implemented and this method currently raises
-        NotImplementedError.
-
-        Parameters:
-            patient_examination (PExamination | str): Patient examination instance or its UUID.
-            patient_finding_classification_choice (PFindingClassificationChoice | str):
-                PFindingClassificationChoice instance or its UUID to which the descriptor should be attached.
-            classification_choice_descriptor (ClassificationChoiceDescriptor | str):
-                ClassificationChoiceDescriptor instance or its name as defined in the knowledge base.
-            descriptor_data (Dict[str, Any]): Arbitrary data for the descriptor (implementation-specific).
+        """Reserved API; descriptor creation is not supported.
 
         Raises:
-            AssertionError: If required referenced objects (examination lookup result or descriptor) are missing.
-            NotImplementedError: Always raised because descriptor creation is not yet implemented.
+            NotImplementedError: Always, before resolving inputs or mutating state.
         """
-        if isinstance(patient_examination, PExamination):
-            p_examination_uuid = str(patient_examination.uuid)
-        else:
-            p_examination_uuid = patient_examination
-
-        p_examination = self.ledger.patient_examinations[p_examination_uuid]
-
-        if isinstance(
-            patient_finding_classification_choice, PFindingClassificationChoice
-        ):
-            p_finding_classification_choice_uuid = str(
-                patient_finding_classification_choice.uuid
-            )
-        else:
-            p_finding_classification_choice_uuid = patient_finding_classification_choice
-
-        if isinstance(classification_choice_descriptor, ClassificationChoiceDescriptor):
-            classification_choice_descriptor_name = (
-                classification_choice_descriptor.name
-            )
-        else:
-            classification_choice_descriptor_name = classification_choice_descriptor
-
-        _classification_choice_descriptor_obj = (
-            self.knowledge_base.get_classification_choice_descriptor(
-                classification_choice_descriptor_name
-            )
+        raise NotImplementedError(
+            "DbInterface.create_classification_choice_descriptor is unsupported; "
+            "descriptor creation and ledger attachment are not implemented."
         )
-
-        p_finding_classification_choice_lookup_tuple = (
-            p_examination.get_finding_classification_choice_by_uuid(
-                p_finding_classification_choice_uuid
-            )
-        )
-
-        assert p_finding_classification_choice_lookup_tuple is not None
-
-        _p_finding_classification_choice = (
-            p_finding_classification_choice_lookup_tuple.p_finding_classification_choice
-        )
-
-        # TODO Finish implementation of descriptor creation
-        assert _classification_choice_descriptor_obj is not None
-        assert _p_finding_classification_choice is not None
-
-        raise NotImplementedError("Descriptor creation not yet implemented.")

@@ -196,46 +196,109 @@ def test_materialization_publishes_from_same_parent_without_cross_device_fallbac
     assert len(move_calls) == 1
 
 
-def test_materialization_rejects_incomplete_existing_destination_and_removes_staging(
+@pytest.mark.parametrize(
+    "poison", ["empty", "file", "symlink", "nested_symlink", "nested_file"]
+)
+def test_materialization_repairs_invalid_cache(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    poison: str,
+) -> None:
+    destination = tmp_path / "cache" / "cache-key"
+    destination.parent.mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    sentinel = outside / "sentinel.txt"
+    sentinel.write_text("keep")
+    if poison == "symlink":
+        destination.symlink_to(outside, target_is_directory=True)
+    elif poison == "file":
+        destination.write_text("incomplete")
+    else:
+        destination.mkdir()
+        if poison == "nested_symlink":
+            (destination / "demo-data").symlink_to(outside, target_is_directory=True)
+        elif poison == "nested_file":
+            (destination / "demo-data").write_text("incomplete")
+    monkeypatch.setattr(
+        remote_data_roots, "_download_archive", lambda source: _archive_bytes()
+    )
+    assert (
+        remote_data_roots._cached_module_root(destination=destination, source=_SOURCE)
+        is None
+    )
+    result = remote_data_roots._materialize_archive(
+        source_url=_SOURCE_URL,
+        source=_SOURCE,
+        destination=destination,
+    )
+    assert (result / "remote_demo_module" / "config.yaml").is_file()
+    assert sentinel.read_text() == "keep"
+    assert not destination.is_symlink()
+    assert list(destination.parent.glob(f".{destination.name}.*")) == []
+
+
+def test_mutable_ref_uses_new_snapshot_when_content_changes(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    destination = tmp_path / "cache" / "cache-key"
-    destination.mkdir(parents=True)
-    sentinel = destination / "existing.txt"
-    sentinel.write_text("keep")
+    current_archive = _archive_bytes()
+    downloads: list[str] = []
 
-    def unexpected_move(**kwargs: Any) -> Path:
-        raise AssertionError(f"existing cache destination was moved over: {kwargs}")
+    def download(source: remote_data_roots.GitHubTreeSource) -> bytes:
+        downloads.append(source.ref)
+        return current_archive
 
-    monkeypatch.setattr(
-        remote_data_roots,
-        "_download_archive",
-        lambda source: _archive_bytes(),
+    monkeypatch.setattr(remote_data_roots, "_download_archive", download)
+    monkeypatch.setenv("LX_DTYPES_REMOTE_CACHE_ROOT", str(tmp_path))
+    first = remote_data_roots.resolve_remote_data_root(
+        _SOURCE_URL, module_name="remote_demo_module"
     )
-    monkeypatch.setattr(
-        remote_data_roots,
-        "_filesystem_operations",
-        lambda: remote_data_roots.FilesystemOperations(
-            atomic_move_path=unexpected_move,
-            atomic_write_file=_write_file,
-            ensure_directory=_ensure_directory,
-            safe_rmtree=_remove_tree,
-        ),
-    )
-
-    with pytest.raises(
-        remote_data_roots.RemoteDataRootError,
-        match="unsafe or incomplete",
-    ):
-        remote_data_roots._materialize_archive(
-            source_url=_SOURCE_URL,
-            source=_SOURCE,
-            destination=destination,
+    assert (
+        remote_data_roots.resolve_remote_data_root(
+            _SOURCE_URL, module_name="remote_demo_module"
         )
+        == first
+    )
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr(
+            "repo/demo-data/remote_demo_module/config.yaml",
+            "name: remote_demo_module\nversion: 0.2.0\n",
+        )
+    current_archive = buffer.getvalue()
+    second = remote_data_roots.resolve_remote_data_root(
+        _SOURCE_URL, module_name="remote_demo_module"
+    )
+    assert first != second
+    assert "0.2.0" in (second / "remote_demo_module/config.yaml").read_text()
+    assert "0.1.0" in (first / "remote_demo_module/config.yaml").read_text()
+    assert len(downloads) == 3
 
-    assert sentinel.read_text() == "keep"
-    assert list(destination.parent.glob(f".{destination.name}.*")) == []
+
+def test_commit_ref_reuses_cache_without_download(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("LX_DTYPES_REMOTE_CACHE_ROOT", str(tmp_path))
+    monkeypatch.setattr(
+        remote_data_roots, "_download_archive", lambda source: _archive_bytes()
+    )
+    url = _SOURCE_URL.replace("/main/", "/" + "a" * 40 + "/")
+    first = remote_data_roots.resolve_remote_data_root(
+        url, module_name="remote_demo_module"
+    )
+
+    def unexpected_download(source: remote_data_roots.GitHubTreeSource) -> bytes:
+        raise AssertionError("Immutable cache should be reused")
+
+    monkeypatch.setattr(remote_data_roots, "_download_archive", unexpected_download)
+    assert (
+        remote_data_roots.resolve_remote_data_root(
+            url, module_name="remote_demo_module"
+        )
+        == first
+    )
 
 
 def test_materialization_cleans_staging_when_atomic_write_fails(
@@ -367,3 +430,24 @@ def test_materialization_cleans_staging_after_publish_race_without_overwrite(
 
     assert (destination / "winner.txt").read_text() == "other process"
     assert list(destination.parent.glob(f".{destination.name}.*")) == []
+
+
+def test_failed_refresh_preserves_existing_cache(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "cache-key"
+    destination.mkdir()
+    sentinel = destination / "incomplete.txt"
+    sentinel.write_text("keep until a replacement is validated")
+    monkeypatch.setattr(
+        remote_data_roots, "_download_archive", lambda source: b"invalid zip"
+    )
+    with pytest.raises(remote_data_roots.RemoteDataRootError, match="valid ZIP"):
+        remote_data_roots._materialize_archive(
+            source_url=_SOURCE_URL,
+            source=_SOURCE,
+            destination=destination,
+        )
+    assert sentinel.read_text() == "keep until a replacement is validated"
+    assert list(tmp_path.glob(".cache-key.*")) == []

@@ -515,3 +515,63 @@ def test_cli_explicit_config_does_not_include_default_modules(
 
     assert args.paths == []
     assert args.config_paths == [config_file]
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "- model: unit\n  name: first\n  name: second\n",
+        "- model: unit\n  nested:\n    name: first\n    name: second\n",
+    ],
+)
+def test_runtime_rejects_duplicate_mapping_keys(tmp_path: Path, content: str) -> None:
+    data = tmp_path / "duplicate.yml"
+    data.write_text(content)
+    with pytest.raises(ValueError, match="Duplicate YAML mapping key 'name'") as error:
+        parse_shallow_object_with_meta(data)
+    assert str(data) in str(error.value)
+
+
+def test_discovery_scans_overlapping_roots_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from lx_dtypes.utils.kb_yaml_lint import discover_yaml_files
+
+    configs = [
+        tmp_path / "a/config.yaml",
+        tmp_path / "b/config.yaml",
+        tmp_path / "nested/c/config.yaml",
+    ]
+    for index, config in enumerate(configs):
+        config.parent.mkdir(parents=True)
+        config.write_text(f"name: module_{index}\nversion: 1.0.0\n")
+    scans: list[Path] = []
+    original = Path.rglob
+
+    def record_rglob(path: Path, pattern: str):
+        if pattern == "config.yaml":
+            scans.append(path)
+        return original(path, pattern)
+
+    monkeypatch.setattr(Path, "rglob", record_rglob)
+    discover_yaml_files(paths=[], config_paths=configs)
+    assert scans == [tmp_path]
+
+
+def test_runtime_preserves_aliases_merge_overrides_and_locations(
+    tmp_path: Path,
+) -> None:
+    from lx_dtypes.utils.parser import _load_yaml_items_with_locations
+
+    data = tmp_path / "aliases.yml"
+    data.write_text("- &base\n  name: first\n- <<: *base\n  name: second\n")
+    items = _load_yaml_items_with_locations(data)
+    assert [item.item["name"] for item in items] == ["first", "second"]
+    assert [(item.line, item.column) for item in items] == [(1, 3), (3, 3)]
+
+
+def test_runtime_reports_invalid_yaml_characters_with_file(tmp_path: Path) -> None:
+    data = tmp_path / "invalid.yml"
+    data.write_bytes(b"- name: invalid\x00\n")
+    with pytest.raises(ValueError, match="invalid.yml"):
+        parse_shallow_object_with_meta(data)

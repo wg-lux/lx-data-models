@@ -4,6 +4,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import shutil
 import stat
 import time
@@ -318,14 +319,19 @@ def _safe_archive_members(
 
 def _cached_module_root(*, destination: Path, source: GitHubTreeSource) -> Path | None:
     """Return a complete cache root only when every cache component is symlink-free."""
+    try:
+        if not stat.S_ISDIR(destination.lstat().st_mode):
+            return None
+    except FileNotFoundError:
+        return None
     current = destination
     for part in source.tree_path.parts:
         current = current / part
         try:
             path_mode = current.lstat().st_mode
-        except FileNotFoundError:
+        except (FileNotFoundError, NotADirectoryError):
             return None
-        if stat.S_ISLNK(path_mode):
+        if not stat.S_ISDIR(path_mode):
             return None
     config_path = current / "config.yaml"
     try:
@@ -342,8 +348,10 @@ def _materialize_archive(
     source_url: str,
     source: GitHubTreeSource,
     destination: Path,
+    archive_bytes: bytes | None = None,
 ) -> Path:
-    archive_bytes = _download_archive(source)
+    if archive_bytes is None:
+        archive_bytes = _download_archive(source)
     filesystem = _filesystem_operations()
     filesystem.ensure_directory(destination.parent, dir_mode=0o750)
     temporary_root = destination.parent / f".{destination.name}.{uuid.uuid4().hex}"
@@ -368,17 +376,19 @@ def _materialize_archive(
                 "The GitHub tree URL does not identify a knowledge-base module."
             )
         if destination.exists() or destination.is_symlink():
-            filesystem.safe_rmtree(temporary_root)
-            if _cached_module_root(destination=destination, source=source) is None:
-                raise RemoteDataRootError(
-                    "Existing remote knowledge-base cache is unsafe or incomplete."
-                )
-        else:
-            filesystem.atomic_move_path(
-                source=temporary_root,
-                destination=destination,
-                dir_mode=0o750,
-            )
+            if _cached_module_root(destination=destination, source=source) is not None:
+                filesystem.safe_rmtree(temporary_root)
+                return destination.joinpath(*source.tree_path.parent.parts)
+            # Unlink a poisoned cache entry itself; never follow its target.
+            if destination.is_symlink() or not destination.is_dir():
+                destination.unlink()
+            else:
+                filesystem.safe_rmtree(destination)
+        filesystem.atomic_move_path(
+            source=temporary_root,
+            destination=destination,
+            dir_mode=0o750,
+        )
         _emit_event(status="materialized", source_url=source_url)
     except Exception as exc:
         try:
@@ -405,7 +415,14 @@ def resolve_remote_data_root(source_url: str, *, module_name: str) -> Path:
         raise RemoteDataRootError(
             f"GitHub tree URL must end with the registered module name '{module_name}'."
         )
-    cache_key = hashlib.sha256(source_url.encode("utf-8")).hexdigest()
+    archive_bytes: bytes | None = None
+    cache_identity = source_url.encode("utf-8")
+    if re.fullmatch(r"[0-9a-fA-F]{40}", source.ref) is None:
+        # Branches and tags can move. Refresh their archive on resolution and
+        # retain separate immutable snapshots keyed by the downloaded content.
+        archive_bytes = _download_archive(source)
+        cache_identity += b"\0" + hashlib.sha256(archive_bytes).digest()
+    cache_key = hashlib.sha256(cache_identity).hexdigest()
     destination = _cache_root() / cache_key
     cached_root = _cached_module_root(destination=destination, source=source)
     if cached_root is not None:
@@ -414,6 +431,7 @@ def resolve_remote_data_root(source_url: str, *, module_name: str) -> Path:
         source_url=source_url,
         source=source,
         destination=destination,
+        archive_bytes=archive_bytes,
     )
 
 

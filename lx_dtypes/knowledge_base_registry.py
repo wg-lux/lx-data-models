@@ -5,8 +5,6 @@ from __future__ import annotations
 import json
 import logging
 import os
-import subprocess
-import sys
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -18,7 +16,11 @@ from lx_dtypes.knowledge_bases import (
     get_packaged_knowledge_base,
     list_packaged_knowledge_bases,
 )
-from lx_dtypes.models.interface.remote_data_roots import _atomic_write_file
+from lx_dtypes.models.interface.remote_data_roots import (
+    _atomic_write_file,
+    is_remote_data_root,
+    resolve_remote_data_root,
+)
 
 DEFAULT_PACKAGED_KNOWLEDGE_BASE = "star_upper_gi"
 PACKAGED_KNOWLEDGE_BASE_MODULES = tuple(
@@ -107,25 +109,6 @@ class KnowledgeBaseBootstrapResult(BaseModel):
     registry: Path
     module_name: str
     version: str
-
-
-_VALIDATE_IDENTITY_SCRIPT = """
-import sys
-
-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
-    load_knowledge_base,
-    load_module_config,
-)
-
-module_name, version = sys.argv[1:]
-config = load_module_config(module_name, version=version)
-if config.name != module_name or config.version != version:
-    raise SystemExit(
-        "knowledge-base identity does not match its module config: "
-        f"expected {module_name}@{version}, got {config.name}@{config.version}"
-    )
-load_knowledge_base(module_name, version=version)
-"""
 
 
 def configured_registry_path(value: Path | None = None) -> Path:
@@ -272,23 +255,35 @@ def _migrate_stale_active_packaged_identity(payload: RegistryPayload) -> bool:
 
 
 def _validate_identity(registry: Path, module_name: str, version: str) -> None:
-    environment = os.environ.copy()
-    environment["LX_DTYPES_KB_REGISTRY"] = str(registry)
-    environment.pop("DJANGO_SETTINGS_MODULE", None)
-    result = subprocess.run(
-        [sys.executable, "-c", _VALIDATE_IDENTITY_SCRIPT, module_name, version],
-        check=False,
-        capture_output=True,
-        text=True,
-        env=environment,
+    from lx_dtypes.models.interface.DataLoader import DataLoader
+    from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+        resolve_registry_entry_inputs,
     )
-    if result.returncode == 0:
-        return
-    detail = result.stderr.strip() or result.stdout.strip()
-    raise RuntimeError(
-        "knowledge-base identity validation exited with status "
-        f"{result.returncode}: {detail}",
+
+    entry = read_registry(registry).modules[module_name][version]
+    inputs = resolve_registry_entry_inputs(
+        module_name,
+        version,
+        entry.model_dump(exclude_none=True),
     )
+    # A fresh loader validates current artifacts without mutating process-wide
+    # environment variables or reusing mutable runtime resolver caches.
+    loader = DataLoader(
+        input_dirs=[
+            resolve_remote_data_root(value, module_name=module_name)
+            if is_remote_data_root(value)
+            else Path(value)
+            for value in inputs
+        ]
+    )
+    loader.load_module_configs()
+    config = loader.get_initialized_config(module_name)
+    if config.name != module_name or config.version != version:
+        raise ValueError(
+            "knowledge-base identity does not match its module config: "
+            f"expected {module_name}@{version}, got {config.name}@{config.version}"
+        )
+    loader.load_knowledge_base(module_name)
 
 
 def bootstrap_packaged_knowledge_bases(

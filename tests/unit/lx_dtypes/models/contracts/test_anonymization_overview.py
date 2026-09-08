@@ -106,6 +106,23 @@ def test_duplicate_import_forbids_destructive_actions() -> None:
         OverviewUploadJobMonitoringPayload.model_validate(data)
 
 
+@pytest.mark.parametrize("job_status", ["error", "lost"])
+@pytest.mark.parametrize("actions", [[], ["delete"], ["safe_reimport", "delete"]])
+def test_terminal_actions_can_be_restricted_by_the_endpoint(
+    job_status: str, actions: list[str]
+) -> None:
+    data = _upload_payload()
+    data.update(
+        status=job_status,
+        error_code="processing_failed",
+        retryable=False,
+        next_retry_at=None,
+        allowed_actions=actions,
+    )
+    result = OverviewUploadJobMonitoringPayload.model_validate(data)
+    assert result.to_data()["allowed_actions"] == actions
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [

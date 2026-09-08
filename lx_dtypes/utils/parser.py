@@ -64,27 +64,51 @@ def _yaml_error_with_location(file_path: Path, exc: yaml.YAMLError) -> ValueErro
     return ValueError(f"{file_path}:1:1: {exc}")
 
 
+def _reject_duplicate_keys(node: yaml.Node, visited: set[int]) -> None:
+    # Aliases may share nodes or form cycles.
+    if id(node) in visited:
+        return
+    visited.add(id(node))
+    if isinstance(node, yaml.MappingNode):
+        seen: set[tuple[str, str]] = set()
+        for key, value in node.value:
+            if isinstance(key, yaml.ScalarNode):
+                identity = (key.tag, key.value)
+                if identity in seen:
+                    raise yaml.constructor.ConstructorError(
+                        "while constructing a mapping",
+                        node.start_mark,
+                        f"Duplicate YAML mapping key '{key.value}'",
+                        key.start_mark,
+                    )
+                seen.add(identity)
+            _reject_duplicate_keys(key, visited)
+            _reject_duplicate_keys(value, visited)
+    elif isinstance(node, yaml.SequenceNode):
+        for child in node.value:
+            _reject_duplicate_keys(child, visited)
+
+
 def _load_yaml_items_with_locations(file_path: Path) -> list[_YamlItemWithLocation]:
     raw_text = file_path.read_text(encoding="utf-8")
+    loader: yaml.SafeLoader | None = None
     try:
-        loaded = yaml.safe_load(raw_text)
+        loader = yaml.SafeLoader(raw_text)
+        composed = loader.get_single_node()
+        if composed is None:
+            return []
+        _reject_duplicate_keys(composed, set())
+        loaded = loader.construct_document(composed)
     except yaml.YAMLError as exc:
-        raise _yaml_error_with_location(file_path, exc)
+        raise _yaml_error_with_location(file_path, exc) from exc
+    finally:
+        if loader is not None:
+            loader.dispose()
 
     if loaded is None:
         return []
-    if not isinstance(loaded, list):
+    if not isinstance(loaded, list) or not isinstance(composed, yaml.SequenceNode):
         raise TypeError(f"{file_path}:1:1: YAML file must contain a list of objects.")
-
-    try:
-        composed = yaml.compose(raw_text)
-    except yaml.YAMLError as exc:
-        raise _yaml_error_with_location(file_path, exc)
-
-    if composed is None:
-        return []
-    if not isinstance(composed, yaml.SequenceNode):
-        raise TypeError(f"{file_path}:1:1: YAML root must be a sequence.")
 
     located_items: list[_YamlItemWithLocation] = []
     for index, raw_item in enumerate(loaded):

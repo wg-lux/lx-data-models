@@ -1697,9 +1697,8 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 setattr(self, field_name, current_lifecycle)
                 continue
 
-            assert field_model_name in KB_MODEL_NAMES_ORDERED, (
-                f"Unknown model type: {field_model_name}"
-            )
+            if field_model_name not in KB_MODEL_NAMES_ORDERED:
+                raise ValueError(f"Unknown model type: {field_model_name}")
             field_model_name = cast(KB_MODEL_NAMES_LITERAL, field_model_name)
             target_model_value = knowledge_base_models_lookup[field_model_name]
             if not isinstance(target_model_value, type) or not issubclass(
@@ -1713,8 +1712,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
 
             current_models = dict(getattr(self, field_name))
             other_models = getattr(other, field_name)
-            assert isinstance(current_models, dict)
-            assert isinstance(other_models, dict)
+            if not isinstance(other_models, dict):
+                raise TypeError(
+                    f"Knowledge-base field {field_name!r} must be a dictionary"
+                )
 
             for key, value in other_models.items():
                 if key in current_models:
@@ -1770,7 +1771,6 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             field_name = camel_to_snake(attr)
             kb_dict: dict[str, KB_MODELS] = getattr(self, field_name)
             kb_entry_list: list[KB_MODELS] = list(kb_dict.values())
-            assert isinstance(kb_entry_list, list)
             for entry in kb_entry_list:
                 module_name = entry.kb_module_name
 

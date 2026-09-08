@@ -374,8 +374,16 @@ def discover_yaml_files(
             if isinstance(module_name, str) and module_name.strip():
                 module_index.setdefault(module_name.strip(), []).append(nested_resolved)
 
-    for config_path in config_paths:
-        _extend_module_index(config_path.resolve().parent.parent)
+    search_roots = sorted(
+        {path.resolve().parent.parent for path in config_paths},
+        key=lambda path: (len(path.parts), str(path)),
+    )
+    indexed_roots: list[Path] = []
+    for search_root in search_roots:
+        if any(search_root.is_relative_to(indexed) for indexed in indexed_roots):
+            continue
+        _extend_module_index(search_root)
+        indexed_roots.append(search_root)
 
     for config_path in config_paths:
         discovered, config_issues = _discover_yaml_files_from_module_config(

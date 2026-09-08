@@ -220,7 +220,11 @@ class OverviewUploadJobMonitoringPayload(BaseModel):
             expected_actions = ["safe_reimport", "delete"]
         else:
             expected_actions = []
-        if self.allowed_actions != expected_actions:
+        # State supplies an upper bound. Resource availability and the target
+        # endpoint may further restrict actions without granting new ones.
+        if any(
+            action not in expected_actions for action in self.allowed_actions
+        ) or len(self.allowed_actions) != len(set(self.allowed_actions)):
             raise ValueError("allowed_actions are inconsistent with upload job state")
         return self
 

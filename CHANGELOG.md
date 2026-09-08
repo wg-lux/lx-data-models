@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.36] - 2026-09-08
+
 ### Added
 - An independently versioned `coloreg` knowledge-base package with a published
   colonoscopy template and Paris/NICE-only polyps.
@@ -16,6 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   serialization and deterministic conflict responses.
 
 ### Changed
+- Runtime relationship and state checks now raise `ValueError` under normal and
+  optimized Python. Unsupported descriptor creation fails before input lookup.
+- Registry bootstrap validates artifacts in-process with fresh loaders.
+- Remote branches and tags are downloaded on resolution and cached by archive
+  content; full commit SHA URLs reuse cached snapshots without downloading.
+  Incomplete or unsafe cache entries are rebuilt after replacement validation.
+- Runtime YAML loading parses once and rejects duplicate mapping keys with source
+  locations. Lint discovery scans overlapping module roots once per invocation.
+- `serialization.model_lookup` remains importable as an empty compatibility module;
+  lookup ownership remains with `models.knowledge_base.knowledge_base_models_lookup`.
 - Django application import no longer performs implicit best-effort registry
   seeding; deployments must run the package-owned bootstrap command first.
 - Report-template reads and mutations now require an explicit knowledge-base
