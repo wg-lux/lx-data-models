@@ -1,0 +1,15 @@
+{
+  "active": {
+    "module_name": "star_upper_gi",
+    "version": "0.1.1"
+  },
+  "modules": {
+    "star_upper_gi": {
+      "0.1.1": {
+        "input_dirs": [
+          "/home/admin/lx-data-models/lx_dtypes/data"
+        ]
+      }
+    }
+  }
+}

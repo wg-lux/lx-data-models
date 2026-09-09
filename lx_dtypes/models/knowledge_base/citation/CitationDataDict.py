@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
 )
@@ -9,7 +7,7 @@ class CitationDataDict(KnowledgebaseBaseModelDataDict):
     citation_key: str
     title: str
     abstract: str | None
-    authors: List[str]
+    authors: list[str]
     publication_year: int | None
     publication_month: str | None
     journal: str | None
@@ -21,5 +19,5 @@ class CitationDataDict(KnowledgebaseBaseModelDataDict):
     url: str | None
     entry_type: str | None
     language: str | None
-    keywords: List[str]
-    identifiers: Dict[str, str]
+    keywords: list[str]
+    identifiers: dict[str, str]

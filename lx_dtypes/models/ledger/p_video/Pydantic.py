@@ -1,5 +1,3 @@
-from typing import Dict
-
 from pydantic import Field, model_validator
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
@@ -28,7 +26,7 @@ from .state import AnonymizationState
 
 
 class PatientVideoFile(PatientFileMixIn, LedgerBaseModel[PatientVideoFileDataDict]):
-    patient_video_segments: Dict[str, "PVideoSegment"] = Field(default_factory=dict)
+    patient_video_segments: dict[str, "PVideoSegment"] = Field(default_factory=dict)
     anonymization_state: AnonymizationState = Field(
         default=AnonymizationState.NOT_STARTED
     )

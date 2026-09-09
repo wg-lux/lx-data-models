@@ -6,10 +6,39 @@
 
 - model: classification_choice_descriptor
   name: "length_mm_descriptor"
-  unit: "millimeter"
+  unit: "milimeter"
   classification_choice_descriptor_type: numeric
   default_value_num: 0.0
 
 - model: classification_choice_descriptor
   name: "additional_text_info"
   classification_choice_descriptor_type: text
+  text_max_length: 4000
+
+- model: classification_choice_descriptor
+  name: "star_upper_gi_count_descriptor"
+  unit: "star_upper_gi_count"
+  classification_choice_descriptor_type: numeric
+  numeric_min: 0
+  numeric_max: 1000
+
+- model: classification_choice_descriptor
+  name: "star_upper_gi_minutes_descriptor"
+  unit: "minutes"
+  classification_choice_descriptor_type: numeric
+  numeric_min: 0
+  numeric_max: 1440
+
+- model: classification_choice_descriptor
+  name: "star_upper_gi_cleanliness_total_0_9_descriptor"
+  unit: "star_upper_gi_score"
+  classification_choice_descriptor_type: numeric
+  numeric_min: 0
+  numeric_max: 9
+
+- model: classification_choice_descriptor
+  name: "star_upper_gi_cleanliness_total_0_10_descriptor"
+  unit: "star_upper_gi_score"
+  classification_choice_descriptor_type: numeric
+  numeric_min: 0
+  numeric_max: 10

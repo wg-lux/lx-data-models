@@ -1,48 +1,88 @@
 # Esophagus
 - model: finding
   name: star_upper_gi_mucosa_esophagus_abnormal
+  description: "Dokumentierter Normalitäts- beziehungsweise Auffälligkeitsstatus der Ösophagusmukosa."
   classifications:
     - yes_no_unknown_classification
 
 - model: finding
+  name: star_upper_gi_mucosa_esophagus_status
+  description: "Structured normal, abnormal, or not-visualized status of the esophageal mucosa."
+  classifications:
+    - star_upper_gi_mucosal_status
+
+- model: finding
   name: star_upper_gi_location_esophagogastric_junction
+  description: "Endoskopisch bestimmte Distanz des gastroösophagealen Übergangs ab Zahnreihe."
   classifications:
     - distance_cm
 
 - model: finding
   name: star_upper_gi_location_hiatus
+  description: "Endoskopisch bestimmte Distanz des Hiatus ab Zahnreihe."
   classifications:
     - distance_cm
 
 - model: finding
   name: star_upper_gi_location_squamocolumnar_junction
+  description: "Endoskopisch bestimmte Distanz der Z-Linie ab Zahnreihe."
   classifications:
     - distance_cm
 
 - model: finding
   name: star_upper_gi_imaging_modality_esophagus
+  description: "Für die standardisierte Inspektion des Ösophagus eingesetzte Bildgebungsmodalität."
   classifications:
     - upper_gi_esophagus_imaging_modality_classification
 
 # Stomach
 - model: finding
   name: star_upper_gi_mucosa_stomach_abnormal
+  description: "Dokumentierter Normalitäts- beziehungsweise Auffälligkeitsstatus der Magenmukosa."
   classifications:
     - yes_no_unknown_classification
 
 - model: finding
+  name: star_upper_gi_mucosa_stomach_cardia_status
+  description: "Normal, abnormal, or not-visualized status of the cardia mucosa."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
+  name: star_upper_gi_mucosa_stomach_corpus_fundus_status
+  description: "Normal, abnormal, or not-visualized status of the corpus and fundus mucosa."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
+  name: star_upper_gi_mucosa_stomach_antrum_incisura_status
+  description: "Normal, abnormal, or not-visualized status of the antrum and incisura mucosa."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
   name: star_upper_gi_chromoendoscopy_stomach
+  description: "Whether dye-based or virtual chromoendoscopy was used in the stomach."
   classifications:
     - yes_no_unknown_classification
 
 # Duodenum
 - model: finding
   name: star_upper_gi_mucosa_duodenum_abnormal
+  description: "Dokumentierter Normalitäts- beziehungsweise Auffälligkeitsstatus der Duodenalmukosa."
   classifications:
     - yes_no_unknown_classification
 
 - model: finding
+  name: star_upper_gi_mucosa_duodenum_bulb_status
+  description: "Normal, abnormal, or not-visualized status of the duodenal bulb mucosa."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
+  name: star_upper_gi_mucosa_duodenum_second_portion_status
+  description: "Normal, abnormal, or not-visualized status of the second duodenal portion."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
   name: star_upper_gi_vili_duodenum_atrophic
+  description: "Whether the duodenal villi appear normal or atrophic."
   classifications:
     - yes_no_unknown_classification
 
@@ -50,6 +90,12 @@
   name: star_upper_gi_papilla_major_visualized
   classifications:
     - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_papilla_major_status
+  description: "Normal, suspected adenoma, or not-visualized status of the major papilla."
+  classifications:
+    - star_upper_gi_papilla_status
 
 - model: finding
   name: star_upper_gi_papilla_minor_visualized

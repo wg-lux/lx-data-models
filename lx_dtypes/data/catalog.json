@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "knowledge_bases": [
+    {
+      "module_name": "dgvs_reporting",
+      "version": "0.1.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/dgvs_reporting",
+      "content_sha256": "6cc8d27a57b86d8afefd2108de5df24252bdead400a82696c57783fc10581f0f",
+      "default": true
+    },
+    {
+      "module_name": "coloreg",
+      "version": "0.1.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/coloreg",
+      "content_sha256": "2797c304e322c7dcf1ce9d3b974dfefea443eb769065113edd41442ff2f9e09d",
+      "default": true
+    },
+    {
+      "module_name": "mst_3_0",
+      "version": "3.0.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/mst_3_0",
+      "content_sha256": "8bd98920624f91ab16bccf6fe68a7aab7fb9c7b81bea175b7d34958a17e940e8",
+      "default": true
+    },
+    {
+      "module_name": "star_upper_gi",
+      "version": "0.1.2",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/star_upper_gi",
+      "content_sha256": "57769ae68496c974e1f2250317290c50d71d0db24a13827ee7d3b348c8e1a570",
+      "default": true
+    },
+    {
+      "module_name": "polyp_size_category",
+      "version": "1.0.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/versions/polyp_size_category/1.0.0/polyp_size_category",
+      "content_sha256": "d9366e1f4f44d716b9c126b45088880f3260eb544a336368d01f14f95009c15f",
+      "default": false
+    },
+    {
+      "module_name": "polyp_size_category",
+      "version": "2.0.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/polyp_size_category",
+      "content_sha256": "41cf9e8258cb9864b8dd2d7b05953313e3942cda91138331046e01f95f14f9cf",
+      "default": true
+    },
+    {
+      "module_name": "star_upper_gi",
+      "version": "0.1.1.post1",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/versions/star_upper_gi/0.1.1.post1/star_upper_gi",
+      "content_sha256": "124b99237f5bcbe77a94f2e150863be08b6951bb7df043b212e460af9e8d1f4c",
+      "default": false
+    }
+  ]
+}

@@ -1,3 +1,32 @@
+- model: classification_choice
+  name: large
+
+- model: classification_choice
+  name: present
+
+- model: classification
+  name: size_mm
+  classification_choices:
+    - size_mm
+
+- model: classification
+  name: size_cat
+  classification_choices:
+    - large
+
+- model: classification
+  name: lst
+  classification_choices:
+    - present
+
+- model: finding
+  name: esophagus_polyp
+  description: Esophageal polyp used by the legacy report-template example.
+  classifications:
+    - size_mm
+    - size_cat
+    - lst
+
 - model: findings_validator
   name: polyp_has_lst_if_large
   finding: esophagus_polyp
@@ -25,6 +54,8 @@
 
 - model: report_template_section
   name: examination_baseline
+  title_de: Untersuchungsbasis
+  title_en: Examination baseline
   position: 0
   types: []
   findings:
@@ -34,12 +65,10 @@
       classifications:
         - classification: size_mm
           required: true
-
-- model: report_template_section
-  name: xx
-  position: 1
-  types: []
-  findings: []
+        - classification: size_cat
+          required: false
+        - classification: lst
+          required: false
 
 - model: findings_validator
   name: star_upper_gi_mucosa_esophagus_abnormal_reported
@@ -66,12 +95,295 @@
   examination: star_upper_gi_endoscopy
   report_sections:
     - examination_baseline
-    - xx
   validators:
     examination_validators:
       - gastroscopy_has_baseline_info
     findings_validators:
       - polyp_has_lst_if_large
+
+- model: findings_validator
+  name: upper_gi_stomach_mucosa_documented
+  finding: star_upper_gi_mucosa_stomach_abnormal
+  operator: exists
+  query:
+    finding: star_upper_gi_mucosa_stomach_abnormal
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_duodenum_mucosa_documented
+  finding: star_upper_gi_mucosa_duodenum_abnormal
+  operator: exists
+  query:
+    finding: star_upper_gi_mucosa_duodenum_abnormal
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_esophagogastric_junction_documented
+  finding: star_upper_gi_location_esophagogastric_junction
+  operator: exists
+  query:
+    finding: star_upper_gi_location_esophagogastric_junction
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_hiatus_documented
+  finding: star_upper_gi_location_hiatus
+  operator: exists
+  query:
+    finding: star_upper_gi_location_hiatus
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_squamocolumnar_junction_documented
+  finding: star_upper_gi_location_squamocolumnar_junction
+  operator: exists
+  query:
+    finding: star_upper_gi_location_squamocolumnar_junction
+    operator: exists
+
+- model: findings_validator
+  name: upper_gi_esophagus_imaging_modality_documented
+  finding: star_upper_gi_imaging_modality_esophagus
+  operator: exists
+  query:
+    finding: star_upper_gi_imaging_modality_esophagus
+    operator: exists
+
+- model: examination_validator
+  name: upper_gi_quality_2025_minimum_documentation
+  finding_validators:
+    - star_upper_gi_mucosa_esophagus_abnormal_reported
+    - upper_gi_stomach_mucosa_documented
+    - upper_gi_duodenum_mucosa_documented
+    - upper_gi_esophagogastric_junction_documented
+    - upper_gi_hiatus_documented
+    - upper_gi_squamocolumnar_junction_documented
+    - upper_gi_esophagus_imaging_modality_documented
+  examination_validators: []
+
+- model: report_finding
+  name: upper_gi_esophagus_mucosa_status
+  finding: star_upper_gi_mucosa_esophagus_abnormal
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: yes_no_unknown_classification
+      required: true
+
+- model: report_finding
+  name: upper_gi_stomach_mucosa_status
+  finding: star_upper_gi_mucosa_stomach_abnormal
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: yes_no_unknown_classification
+      required: true
+
+- model: report_finding
+  name: upper_gi_duodenum_mucosa_status
+  finding: star_upper_gi_mucosa_duodenum_abnormal
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: yes_no_unknown_classification
+      required: true
+
+- model: report_finding
+  name: upper_gi_esophagogastric_junction
+  finding: star_upper_gi_location_esophagogastric_junction
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: distance_cm
+      required: true
+
+- model: report_finding
+  name: upper_gi_hiatus
+  finding: star_upper_gi_location_hiatus
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: distance_cm
+      required: true
+
+- model: report_finding
+  name: upper_gi_squamocolumnar_junction
+  finding: star_upper_gi_location_squamocolumnar_junction
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: distance_cm
+      required: true
+
+- model: report_finding
+  name: upper_gi_esophagus_imaging_modality
+  finding: star_upper_gi_imaging_modality_esophagus
+  required: true
+  multiple_allowed: false
+  classifications:
+    - classification: upper_gi_esophagus_imaging_modality_classification
+      required: true
+
+- model: report_template_section
+  name: upper_gi_quality_2025_landmarks_and_completeness
+  title_de: Landmarken und Vollständigkeit
+  title_en: Landmarks and completeness
+  position: 0
+  types: [baseline]
+  findings:
+    - upper_gi_esophagus_mucosa_status
+    - upper_gi_stomach_mucosa_status
+    - upper_gi_duodenum_mucosa_status
+    - upper_gi_esophagogastric_junction
+    - upper_gi_hiatus
+    - upper_gi_squamocolumnar_junction
+    - upper_gi_esophagus_imaging_modality
+
+- model: report_template
+  name: upper_gi_quality_2025
+  name_de: "ÖGD – leitlinienbasierte Qualitätsdokumentation 2025"
+  name_en: "Upper GI endoscopy – guideline-based quality documentation 2025"
+  description: "Strukturierte ÖGD-Basisdokumentation mit vollständiger Inspektion von Ösophagus, Magen und Duodenum sowie standardisierten Landmarken nach der ESGE Quality Improvement Initiative 2025 und der DGVS-S2k-Leitlinie Version 2.1."
+  version: "ESGE-upper-GI-2025"
+  guideline_references:
+    - guideline_id: "ESGE-UGI-PM-2025"
+      title: "Performance measures for upper gastrointestinal endoscopy: ESGE Quality Improvement Initiative update 2025"
+      issuing_organization: "European Society of Gastrointestinal Endoscopy (ESGE)"
+      version: "2025 update"
+      publication_date: 2025-09-11
+      canonical_url: "https://www.esge.com/performance-measures-for-upper-gi-endoscopy-esge-quality-improvement-initiative-update-2025/"
+      cited_sections:
+        - "Complete examination of the esophagus, stomach, and duodenum"
+        - "Photodocumentation of anatomical landmarks and abnormal findings"
+        - "Use of standardized terminology and validated classifications"
+    - guideline_id: "ESGE-STAR-UGI-2025"
+      title: "STAndardization of Reports (STAR project) Upper gastrointestinal endoscopy"
+      issuing_organization: "European Society of Gastrointestinal Endoscopy (ESGE)"
+      version: "2025 position statement"
+      publication_date: 2025-08-20
+      canonical_url: "https://www.esge.com/assets/downloads/pdfs/guidelines/2025_a-2652-8941.pdf"
+      cited_sections:
+        - "Preprocedure report information"
+        - "Endoscopic findings: report structure, esophagus, stomach, and duodenum"
+        - "Postprocedure report information"
+    - guideline_id: "AWMF-021-022"
+      title: "S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie"
+      issuing_organization: "Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
+      version: "2.1"
+      publication_date: 2025-07-01
+      canonical_url: "https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf"
+      cited_sections:
+        - "Statement 2.36"
+        - "Kapitel 5.1 Ösophagogastroduodenoskopie"
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - concept_id: upper_gi.mucosa.esophagus_status
+      label: Mukosastatus Ösophagus
+      applicability_status: required
+      validator_names: [star_upper_gi_mucosa_esophagus_abnormal_reported]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_mucosa_esophagus_abnormal
+        classification_name: yes_no_unknown_classification
+      allowed_values: ["yes", "no", unknown]
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: complete examination of the esophagus"
+        - "ESGE-STAR-UGI-2025: endoscopic findings – esophagus"
+    - concept_id: upper_gi.mucosa.stomach_status
+      label: Mukosastatus Magen
+      applicability_status: required
+      validator_names: [upper_gi_stomach_mucosa_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_mucosa_stomach_abnormal
+        classification_name: yes_no_unknown_classification
+      allowed_values: ["yes", "no", unknown]
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: complete examination of the stomach"
+        - "ESGE-STAR-UGI-2025: endoscopic findings – stomach"
+    - concept_id: upper_gi.mucosa.duodenum_status
+      label: Mukosastatus Duodenum
+      applicability_status: required
+      validator_names: [upper_gi_duodenum_mucosa_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_mucosa_duodenum_abnormal
+        classification_name: yes_no_unknown_classification
+      allowed_values: ["yes", "no", unknown]
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: complete examination of the duodenum"
+        - "ESGE-STAR-UGI-2025: endoscopic findings – duodenum"
+    - concept_id: upper_gi.landmark.esophagogastric_junction_cm
+      label: Distanz des gastroösophagealen Übergangs
+      applicability_status: required
+      validator_names: [upper_gi_esophagogastric_junction_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_location_esophagogastric_junction
+        classification_name: distance_cm
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 100
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: anatomical landmark documentation"
+    - concept_id: upper_gi.landmark.hiatus_cm
+      label: Distanz des Hiatus
+      applicability_status: required
+      validator_names: [upper_gi_hiatus_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_location_hiatus
+        classification_name: distance_cm
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 100
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: anatomical landmark documentation"
+    - concept_id: upper_gi.landmark.squamocolumnar_junction_cm
+      label: Distanz der Z-Linie
+      applicability_status: required
+      validator_names: [upper_gi_squamocolumnar_junction_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_location_squamocolumnar_junction
+        classification_name: distance_cm
+      concept_value_path: [patient_finding_classification_choice_descriptors, "0", descriptor_value]
+      value_constraint: number_range
+      numeric_min: 0
+      numeric_max: 100
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: anatomical landmark documentation"
+    - concept_id: upper_gi.imaging.esophagus_modality
+      label: Bildgebungsmodalität im Ösophagus
+      applicability_status: required
+      validator_names: [upper_gi_esophagus_imaging_modality_documented]
+      evidence_path: [patient_findings]
+      finding_selector:
+        finding_name: star_upper_gi_imaging_modality_esophagus
+        classification_name: upper_gi_esophagus_imaging_modality_classification
+      allowed_values:
+        - star_upper_gi_imaging_modality_white_light
+        - star_upper_gi_imaging_modality_narrow_band_imaging
+        - star_upper_gi_imaging_modality_chromoendoscopy
+        - star_upper_gi_imaging_modality_acidic_staining
+      guideline_citations:
+        - "ESGE-UGI-PM-2025: standardized imaging and photodocumentation"
+  examination: star_upper_gi_endoscopy
+  report_sections:
+    - upper_gi_quality_2025_landmarks_and_completeness
+  validators:
+    examination_validators:
+      - upper_gi_quality_2025_minimum_documentation
+    findings_validators:
+      - star_upper_gi_mucosa_esophagus_abnormal_reported
+      - upper_gi_stomach_mucosa_documented
+      - upper_gi_duodenum_mucosa_documented
+      - upper_gi_esophagogastric_junction_documented
+      - upper_gi_hiatus_documented
+      - upper_gi_squamocolumnar_junction_documented
+      - upper_gi_esophagus_imaging_modality_documented
 
 - model: report_template
   name: ukw_gastroscopy
@@ -90,6 +402,8 @@
 
 - model: report_template_section
   name: base_required_section
+  title_de: Pflichtbefunde
+  title_en: Required findings
   position: 0
   types:
     - baseline
@@ -105,106 +419,343 @@
     examination_validators: []
     findings_validators: []
 
+# ERCP and EUS templates expose per-procedure documentation only. Population
+# performance rates and thresholds remain a separate aggregation contract.
 - model: findings_validator
-  name: colonoscopy_training_deepest_location_recorded
-  finding: colonoscopy_deepest_viewed_location
+  name: ercp_antibiotic_prophylaxis_documented
+  finding: ercp_antibiotic_prophylaxis
   operator: exists
-  query:
-    finding: colonoscopy_deepest_viewed_location
-    operator: exists
+  query: {finding: ercp_antibiotic_prophylaxis, operator: exists}
 
 - model: findings_validator
-  name: colonoscopy_training_polyp_recorded
-  finding: colon_polyp
+  name: ercp_bile_duct_cannulation_documented
+  finding: ercp_bile_duct_cannulation
   operator: exists
-  query:
-    finding: colon_polyp
-    operator: exists
+  query: {finding: ercp_bile_duct_cannulation, operator: exists}
+
+- model: findings_validator
+  name: ercp_biliary_stent_placement_documented
+  finding: ercp_biliary_stent_placement
+  operator: exists
+  query: {finding: ercp_biliary_stent_placement, operator: exists}
+
+- model: findings_validator
+  name: ercp_bile_duct_stone_extraction_documented
+  finding: ercp_bile_duct_stone_extraction
+  operator: exists
+  query: {finding: ercp_bile_duct_stone_extraction, operator: exists}
+
+- model: findings_validator
+  name: ercp_post_ercp_pancreatitis_documented
+  finding: ercp_post_ercp_pancreatitis
+  operator: exists
+  query: {finding: ercp_post_ercp_pancreatitis, operator: exists}
 
 - model: examination_validator
-  name: colonoscopy_training_minimum_documentation
+  name: ercp_quality_documentation_minimum
   finding_validators:
-    - colonoscopy_training_deepest_location_recorded
+    - ercp_antibiotic_prophylaxis_documented
+    - ercp_bile_duct_cannulation_documented
+    - ercp_biliary_stent_placement_documented
+    - ercp_bile_duct_stone_extraction_documented
+    - ercp_post_ercp_pancreatitis_documented
   examination_validators: []
 
 - model: report_finding
-  name: colonoscopy_training_bowel_prep_simplified
-  finding: bowel_preparation_simplified
+  name: ercp_quality_antibiotic_prophylaxis
+  finding: ercp_antibiotic_prophylaxis
   required: true
   multiple_allowed: false
   classifications:
-    - classification: bowel_prep_boston_simplified
-      required: true
+    - {classification: ercp_antibiotic_prophylaxis_status, required: true}
 
 - model: report_finding
-  name: colonoscopy_training_deepest_location
-  finding: colonoscopy_deepest_viewed_location
+  name: ercp_quality_bile_duct_cannulation
+  finding: ercp_bile_duct_cannulation
   required: true
   multiple_allowed: false
   classifications:
-    - classification: colonoscopy_location_default
-      required: true
-    - classification: colonoscopy_not_complete_reason
-      required: false
+    - {classification: ercp_bile_duct_cannulation_outcome, required: true}
 
 - model: report_finding
-  name: colonoscopy_training_withdrawal_time
-  finding: colonoscopy_withdrawal_time_minutes
+  name: ercp_quality_biliary_stent_placement
+  finding: ercp_biliary_stent_placement
   required: true
   multiple_allowed: false
   classifications:
-    - classification: time_minutes_generic
-      required: true
+    - {classification: ercp_biliary_stent_placement_outcome, required: true}
 
 - model: report_finding
-  name: colonoscopy_training_polyp
-  finding: colon_polyp
-  required: false
-  multiple_allowed: true
+  name: ercp_quality_bile_duct_stone_extraction
+  finding: ercp_bile_duct_stone_extraction
+  required: true
+  multiple_allowed: false
   classifications:
-    - classification: colonoscopy_location_default
-      required: true
-    - classification: lesion_size_mm
-      required: true
-    - classification: colon_lesion_paris
-      required: false
+    - {classification: ercp_bile_duct_stone_extraction_outcome, required: true}
 
 - model: report_finding
-  name: colonoscopy_training_diverticule
-  finding: colon_diverticule
-  required: false
-  multiple_allowed: true
+  name: ercp_quality_post_ercp_pancreatitis
+  finding: ercp_post_ercp_pancreatitis
+  required: true
+  multiple_allowed: false
   classifications:
-    - classification: colonoscopy_location_default
-      required: true
+    - {classification: ercp_post_ercp_pancreatitis_status, required: true}
 
 - model: report_template_section
-  name: colonoscopy_training_baseline
+  name: ercp_quality_documentation_2018
+  title_de: ERCP-Qualitätsdokumentation
+  title_en: ERCP quality documentation
   position: 0
-  types:
-    - baseline
+  types: [baseline]
   findings:
-    - colonoscopy_training_bowel_prep_simplified
-    - colonoscopy_training_deepest_location
-    - colonoscopy_training_withdrawal_time
-
-- model: report_template_section
-  name: colonoscopy_training_observations
-  position: 1
-  types:
-    - findings
-  findings:
-    - colonoscopy_training_polyp
-    - colonoscopy_training_diverticule
+    - ercp_quality_antibiotic_prophylaxis
+    - ercp_quality_bile_duct_cannulation
+    - ercp_quality_biliary_stent_placement
+    - ercp_quality_bile_duct_stone_extraction
+    - ercp_quality_post_ercp_pancreatitis
 
 - model: report_template
-  name: colonoscopy_training_basic
-  examination: colonoscopy
-  report_sections:
-    - colonoscopy_training_baseline
-    - colonoscopy_training_observations
+  name: ercp_quality_2018
+  name_de: "ERCP – leitlinienbasierte Qualitätsdokumentation"
+  name_en: "ERCP – guideline-based quality documentation"
+  description: "Patientenbezogene ERCP-Dokumentation der für die ESGE-Qualitätsindikatoren erforderlichen Kerndaten; populationsbezogene Raten werden getrennt aggregiert."
+  version: "ESGE-ERCP-PM-2018"
+  guideline_references:
+    - guideline_id: ESGE-ERCP-EUS-PM-2018
+      title: "Performance measures for ERCP and endoscopic ultrasound"
+      issuing_organization: "European Society of Gastrointestinal Endoscopy (ESGE)"
+      version: "2018"
+      publication_date: 2018-10-19
+      canonical_url: "https://www.esge.com/ercp-and-eus"
+      cited_sections:
+        - "Adequate antibiotic prophylaxis before ERCP"
+        - "Bile duct cannulation rate"
+        - "Appropriate biliary stent placement"
+        - "Bile duct stone extraction"
+        - "Post-ERCP pancreatitis"
+    - guideline_id: AWMF-021-022
+      title: "S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie"
+      issuing_organization: "Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
+      version: "2.1"
+      publication_date: 2025-07-01
+      canonical_url: "https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf"
+      cited_sections: ["Kapitel 7.1 ERCP", "Kapitel 7.1.5 Spezifische Qualitätsindikatoren"]
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - concept_id: ercp.antibiotic_prophylaxis
+      label: Antibiotikaprophylaxe
+      applicability_status: required
+      validator_names: [ercp_antibiotic_prophylaxis_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_antibiotic_prophylaxis, classification_name: ercp_antibiotic_prophylaxis_status}
+      allowed_values: [quality_adequate, quality_inadequate, quality_not_indicated, quality_unknown]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: adequate antibiotic prophylaxis before ERCP"]
+    - concept_id: ercp.bile_duct_cannulation
+      label: Selektive Gallengangskanülierung
+      applicability_status: required
+      validator_names: [ercp_bile_duct_cannulation_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_bile_duct_cannulation, classification_name: ercp_bile_duct_cannulation_outcome}
+      allowed_values: [quality_successful, quality_unsuccessful, quality_not_attempted]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: bile duct cannulation rate"]
+    - concept_id: ercp.biliary_stent_placement
+      label: Angemessenheit der biliären Stentimplantation
+      applicability_status: required
+      validator_names: [ercp_biliary_stent_placement_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_biliary_stent_placement, classification_name: ercp_biliary_stent_placement_outcome}
+      allowed_values: [quality_appropriate, quality_not_appropriate, quality_not_applicable]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: appropriate stent placement"]
+    - concept_id: ercp.bile_duct_stone_extraction
+      label: Vollständigkeit der Gallengangssteinextraktion
+      applicability_status: required
+      validator_names: [ercp_bile_duct_stone_extraction_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_bile_duct_stone_extraction, classification_name: ercp_bile_duct_stone_extraction_outcome}
+      allowed_values: [quality_complete, quality_incomplete, quality_not_applicable]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: bile duct stone extraction"]
+    - concept_id: ercp.post_ercp_pancreatitis
+      label: Post-ERCP-Pankreatitis
+      applicability_status: required
+      validator_names: [ercp_post_ercp_pancreatitis_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: ercp_post_ercp_pancreatitis, classification_name: ercp_post_ercp_pancreatitis_status}
+      allowed_values: [quality_absent, quality_present, quality_unknown]
+      guideline_citations: ["ESGE-ERCP-EUS-PM-2018: post-ERCP pancreatitis"]
+  examination: ercp
+  report_sections: [ercp_quality_documentation_2018]
   validators:
-    examination_validators:
-      - colonoscopy_training_minimum_documentation
+    examination_validators: [ercp_quality_documentation_minimum]
     findings_validators:
-      - colonoscopy_training_polyp_recorded
+      - ercp_antibiotic_prophylaxis_documented
+      - ercp_bile_duct_cannulation_documented
+      - ercp_biliary_stent_placement_documented
+      - ercp_bile_duct_stone_extraction_documented
+      - ercp_post_ercp_pancreatitis_documented
+
+- model: findings_validator
+  name: eus_informed_consent_documented
+  finding: eus_informed_consent
+  operator: exists
+  query: {finding: eus_informed_consent, operator: exists}
+
+- model: findings_validator
+  name: eus_landmarks_documented
+  finding: eus_landmark_documentation
+  operator: exists
+  query: {finding: eus_landmark_documentation, operator: exists}
+
+- model: findings_validator
+  name: eus_pancreatic_cyst_description_documented
+  finding: eus_pancreatic_cyst_description
+  operator: exists
+  query: {finding: eus_pancreatic_cyst_description, operator: exists}
+
+- model: findings_validator
+  name: eus_tissue_acquisition_documented
+  finding: eus_tissue_acquisition
+  operator: exists
+  query: {finding: eus_tissue_acquisition, operator: exists}
+
+- model: findings_validator
+  name: eus_adverse_events_documented
+  finding: eus_adverse_events
+  operator: exists
+  query: {finding: eus_adverse_events, operator: exists}
+
+- model: examination_validator
+  name: eus_quality_2025_minimum_documentation
+  finding_validators:
+    - eus_informed_consent_documented
+    - eus_landmarks_documented
+    - eus_pancreatic_cyst_description_documented
+    - eus_tissue_acquisition_documented
+    - eus_adverse_events_documented
+  examination_validators: []
+
+- model: report_finding
+  name: eus_quality_informed_consent
+  finding: eus_informed_consent
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_informed_consent_status, required: true}]
+
+- model: report_finding
+  name: eus_quality_landmarks
+  finding: eus_landmark_documentation
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_landmark_documentation_status, required: true}]
+
+- model: report_finding
+  name: eus_quality_pancreatic_cyst_description
+  finding: eus_pancreatic_cyst_description
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_pancreatic_cyst_description_status, required: true}]
+
+- model: report_finding
+  name: eus_quality_tissue_acquisition
+  finding: eus_tissue_acquisition
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_tissue_acquisition_result, required: true}]
+
+- model: report_finding
+  name: eus_quality_adverse_events
+  finding: eus_adverse_events
+  required: true
+  multiple_allowed: false
+  classifications: [{classification: eus_adverse_event_status, required: true}]
+
+- model: report_template_section
+  name: eus_quality_documentation_2025
+  title_de: EUS-Qualitätsdokumentation
+  title_en: EUS quality documentation
+  position: 0
+  types: [baseline]
+  findings:
+    - eus_quality_informed_consent
+    - eus_quality_landmarks
+    - eus_quality_pancreatic_cyst_description
+    - eus_quality_tissue_acquisition
+    - eus_quality_adverse_events
+
+- model: report_template
+  name: eus_quality_2025
+  name_de: "Endosonographie – leitlinienbasierte Qualitätsdokumentation 2025"
+  name_en: "Endoscopic ultrasound – guideline-based quality documentation 2025"
+  description: "Patientenbezogene EUS-Kerndokumentation zur späteren getrennten Berechnung der ESGE-Qualitätsindikatoren."
+  version: "ESGE-EUS-PM-update-2025"
+  guideline_references:
+    - guideline_id: ESGE-EUS-PM-2025
+      title: "Performance measures for endoscopic ultrasound: ESGE Quality Improvement Initiative – Update 2025"
+      issuing_organization: "European Society of Gastrointestinal Endoscopy (ESGE)"
+      version: "2025 update"
+      publication_date: 2025-11-12
+      canonical_url: "https://www.thieme-connect.com/products/ejournals/pdf/10.1055/a-2716-7763.pdf"
+      cited_sections:
+        - "Informed patient consent"
+        - "Adequate documentation of landmarks"
+        - "Standardized description of pancreatic cystic lesions"
+        - "Diagnostic tissue acquisition"
+        - "Adverse events"
+    - guideline_id: AWMF-021-022
+      title: "S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie"
+      issuing_organization: "Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
+      version: "2.1"
+      publication_date: 2025-07-01
+      canonical_url: "https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf"
+      cited_sections: ["Kapitel 7.4 Endosonographie"]
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - concept_id: eus.informed_consent
+      label: Informierte Einwilligung
+      applicability_status: required
+      validator_names: [eus_informed_consent_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_informed_consent, classification_name: eus_informed_consent_status}
+      allowed_values: [quality_obtained, quality_not_obtained]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 1: informed patient consent"]
+    - concept_id: eus.landmark_documentation
+      label: Standardisierte Landmarkendokumentation
+      applicability_status: required
+      validator_names: [eus_landmarks_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_landmark_documentation, classification_name: eus_landmark_documentation_status}
+      allowed_values: [quality_complete, quality_incomplete]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 2: adequate documentation of landmarks"]
+    - concept_id: eus.pancreatic_cyst_description
+      label: Standardisierte Beschreibung pankreatischer Zysten
+      applicability_status: required
+      validator_names: [eus_pancreatic_cyst_description_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_pancreatic_cyst_description, classification_name: eus_pancreatic_cyst_description_status}
+      allowed_values: [quality_complete, quality_incomplete, quality_not_applicable]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 4: standardized pancreatic cyst description"]
+    - concept_id: eus.tissue_acquisition
+      label: Diagnostische Gewebegewinnung
+      applicability_status: required
+      validator_names: [eus_tissue_acquisition_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_tissue_acquisition, classification_name: eus_tissue_acquisition_result}
+      allowed_values: [quality_diagnostic, quality_nondiagnostic, quality_not_applicable]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 5: diagnostic tissue acquisition"]
+    - concept_id: eus.adverse_events
+      label: Unerwünschte Ereignisse
+      applicability_status: required
+      validator_names: [eus_adverse_events_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: eus_adverse_events, classification_name: eus_adverse_event_status}
+      allowed_values: [quality_absent, quality_present, quality_unknown]
+      guideline_citations: ["ESGE-EUS-PM-2025 measure 6: adverse events"]
+  examination: endoscopic_ultrasound
+  report_sections: [eus_quality_documentation_2025]
+  validators:
+    examination_validators: [eus_quality_2025_minimum_documentation]
+    findings_validators:
+      - eus_informed_consent_documented
+      - eus_landmarks_documented
+      - eus_pancreatic_cyst_description_documented
+      - eus_tissue_acquisition_documented
+      - eus_adverse_events_documented

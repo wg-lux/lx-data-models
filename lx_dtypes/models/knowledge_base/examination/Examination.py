@@ -1,5 +1,3 @@
-from typing import List, Union
-
 from pydantic import Field
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
@@ -15,14 +13,12 @@ from lx_dtypes.names import (
 
 
 class Examination(KnowledgebaseBaseModel[ExaminationDataDict]):
-    findings: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
-    examination_types: Union[str, List[str]] = Field(
-        default_factory=list_of_str_factory
-    )
-    indications: Union[str, List[str]] = Field(default_factory=list_of_str_factory)
+    findings: str | list[str] = Field(default_factory=list_of_str_factory)
+    examination_types: str | list[str] = Field(default_factory=list_of_str_factory)
+    indications: str | list[str] = Field(default_factory=list_of_str_factory)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Identify the model attributes that should be treated as list-type fields.
 

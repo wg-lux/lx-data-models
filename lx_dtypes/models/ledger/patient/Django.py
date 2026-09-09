@@ -39,7 +39,7 @@ class PatientDjango(PersonDjango, LedgerBaseModelDjango[PatientDataDict]):
         on_delete=models.CASCADE,
     )
     if TYPE_CHECKING:
-        patient_examinations: models.Manager["PExaminationDjango"]
+        patient_examinations: models.Manager[PExaminationDjango]
 
     @property
     def ddict_class(self) -> type[PatientDataDict]:

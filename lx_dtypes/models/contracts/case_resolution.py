@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import (
     BaseModel,
@@ -26,7 +26,7 @@ class CaseResolutionNewPatient(BaseModel):
 
     @field_validator("first_name", "last_name", mode="before")
     @classmethod
-    def normalize_required_name(cls, value: Any) -> str:
+    def normalize_required_name(cls, value: str | float | None) -> str:
         normalized = str(value).strip()
         if not normalized:
             raise ValueError("value must not be empty")
@@ -34,7 +34,7 @@ class CaseResolutionNewPatient(BaseModel):
 
     @field_validator("gender", "center", "email", "phone", mode="before")
     @classmethod
-    def normalize_optional_str(cls, value: Any) -> str | None:
+    def normalize_optional_str(cls, value: str | float | None) -> str | None:
         if value in (None, ""):
             return None
         normalized = str(value).strip()
@@ -54,7 +54,7 @@ class CaseResolutionRequest(BaseModel):
 
     @field_validator("patient_examination_id", "patient_id", mode="before")
     @classmethod
-    def coerce_optional_positive_int(cls, value: Any) -> int | None:
+    def coerce_optional_positive_int(cls, value: int | str | None) -> int | None:
         if value in (None, ""):
             return None
         normalized = int(str(value))
@@ -64,14 +64,14 @@ class CaseResolutionRequest(BaseModel):
 
     @field_validator("examination_name", mode="before")
     @classmethod
-    def normalize_examination_name(cls, value: Any) -> str | None:
+    def normalize_examination_name(cls, value: str | float | None) -> str | None:
         if value in (None, ""):
             return None
         normalized = str(value).strip()
         return normalized or None
 
     @model_validator(mode="after")
-    def validate_action_requirements(self) -> "CaseResolutionRequest":
+    def validate_action_requirements(self) -> CaseResolutionRequest:
         if self.action == "attach":
             if self.patient_examination_id is None:
                 raise ValueError("patient_examination_id is required for attach action")

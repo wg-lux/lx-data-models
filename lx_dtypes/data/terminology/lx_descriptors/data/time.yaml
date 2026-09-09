@@ -1,5 +1,11 @@
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022), withdrawal-time documentation: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: classification_choice_descriptor
   name: "minutes_numeric_value"
-  description: "Numeric value representing minutes."
+  name_de: "Zeitwert (Minuten)"
+  name_en: "Time value (minutes)"
+  description: "Numerischer Zeitwert in Minuten."
   unit: "minutes"
   classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 180

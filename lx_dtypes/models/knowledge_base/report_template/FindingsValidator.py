@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import List, Literal, cast
+from typing import Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -279,7 +279,7 @@ class FindingsValidator(KnowledgebaseBaseModel[FindingsValidatorDataDict]):
         return self
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return []
 
     @property

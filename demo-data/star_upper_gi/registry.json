@@ -1,0 +1,11 @@
+{
+  "modules": {
+    "star_upper_gi": {
+      "0.1.1": {
+        "input_dirs": [
+          ""
+        ]
+      }
+    }
+  }
+}

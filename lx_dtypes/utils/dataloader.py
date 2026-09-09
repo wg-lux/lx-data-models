@@ -1,6 +1,8 @@
 from heapq import heappop, heappush
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Set, Tuple
+from typing import TYPE_CHECKING
+
+from lx_dtypes.models.interface.data_roots import default_data_roots
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBaseConfig import (
@@ -8,21 +10,21 @@ if TYPE_CHECKING:
     )
 
 
-def _default_dataloader_dirs_factory() -> List[Path]:
-    return [Path("./data/")]
+def _default_dataloader_dirs_factory() -> list[Path]:
+    return list(default_data_roots())
 
 
 def resolve_kb_module_load_order(
-    modules: Dict[str, "KnowledgeBaseConfig"],
-    preferred_order: List[str],
-) -> List[str]:
+    modules: dict[str, "KnowledgeBaseConfig"],
+    preferred_order: list[str],
+) -> list[str]:
     """Topologically sort modules while respecting preferred ordering when possible."""
 
     if not modules:
         return []
 
-    adjacency: Dict[str, Set[str]] = {name: set() for name in modules}
-    indegree: Dict[str, int] = {name: 0 for name in modules}
+    adjacency: dict[str, set[str]] = {name: set() for name in modules}
+    indegree: dict[str, int] = {name: 0 for name in modules}
 
     for module_name, module_config in modules.items():
         for dependency in module_config.depends_on:
@@ -38,12 +40,12 @@ def resolve_kb_module_load_order(
     def priority(name: str) -> tuple[int, str]:
         return (preferred_index.get(name, len(preferred_index)), name)
 
-    heap: List[Tuple[int, str]] = []
+    heap: list[tuple[int, str]] = []
     for name, degree in indegree.items():
         if degree == 0:
             heappush(heap, priority(name))
 
-    load_order: List[str] = []
+    load_order: list[str] = []
     while heap:
         _, node = heappop(heap)
         load_order.append(node)

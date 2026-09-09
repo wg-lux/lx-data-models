@@ -1,4 +1,4 @@
-from typing import List, Literal, TypedDict
+from typing import Literal, TypedDict
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
@@ -22,13 +22,13 @@ class InterventionValidatorConditionClauseDataDict(TypedDict, total=False):
     classification: str
     comparator: FindingsValidatorComparatorLiteral
     value: ValidationScalar
-    values: List[ValidationScalar]
+    values: list[ValidationScalar]
 
 
 class InterventionValidatorConditionDataDict(TypedDict, total=False):
-    any: List[InterventionValidatorConditionClauseDataDict]
-    all: List[InterventionValidatorConditionClauseDataDict]
-    then_requires: List[ValidatorRequirementReferenceDataDict]
+    any: list[InterventionValidatorConditionClauseDataDict]
+    all: list[InterventionValidatorConditionClauseDataDict]
+    then_requires: list[ValidatorRequirementReferenceDataDict]
 
 
 class InterventionValidatorQueryDataDict(TypedDict, total=False):
@@ -42,7 +42,7 @@ class InterventionValidatorQueryDataDict(TypedDict, total=False):
 class InterventionValidatorHintDataDict(TypedDict, total=False):
     intervention_name: str
     precedence: InterventionValidatorPrecedenceLiteral
-    intervention_types: List[str]
+    intervention_types: list[str]
 
 
 class InterventionValidatorDataDict(KnowledgebaseBaseModelDataDict):

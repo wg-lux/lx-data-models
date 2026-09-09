@@ -7,6 +7,6 @@ modules:
   - citations
   - lx_utils
   - lx_hardware
-  - example_terminology
+  - DGVS_Terminology
 
 data: { files: [], dirs: [] }

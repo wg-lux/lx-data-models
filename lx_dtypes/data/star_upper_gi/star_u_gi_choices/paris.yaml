@@ -1,23 +1,41 @@
 - model: classification_choice
   name: "star_upper_gi_paris_Is"
+  description: "Paris Is: sessile protruded lesion."
 
 - model: classification_choice
   name: "star_upper_gi_paris_Ip"
+  description: "Paris Ip: pedunculated protruded lesion."
+
+- model: classification_choice
+  name: "star_upper_gi_paris_Isp"
+  description: "Paris Isp: subpedunculated protruded lesion."
 
 - model: classification_choice
   name: "star_upper_gi_paris_IIa"
+  description: "Paris 0-IIa: flat elevated lesion."
 
 - model: classification_choice
   name: "star_upper_gi_paris_IIb"
+  description: "Paris 0-IIb: flat mucosal change."
 
 - model: classification_choice
   name: "star_upper_gi_paris_IIc"
+  description: "Paris 0-IIc: depressed lesion."
 
 - model: classification_choice
   name: "star_upper_gi_paris_III"
+  description: "Paris 0-III: excavated lesion; retained from the existing terminology."
 
 - model: classification_choice
   name: "star_upper_gi_paris_IIa_IIc"
-  
+  description: "Paris 0-IIa/IIc: flat elevation with central depression."
+
+- model: classification_choice
+  name: "star_upper_gi_paris_IIc_IIa"
+  description: "Paris 0-IIc/IIa: mucosal depression with a raised edge."
+
+# Retained for backward compatibility with existing stored data. This combined
+# form is not one of the shapes recommended by the STAR publication.
 - model: classification_choice
   name: "star_upper_gi_paris_IIb_IIc"
+  description: "Legacy combined Paris IIb/IIc choice."

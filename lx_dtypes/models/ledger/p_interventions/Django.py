@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 class PFindingInterventionsDjango(LedgerBaseModelDjango[PFindingInterventionsDataDict]):
     if TYPE_CHECKING:
-        patient_finding: models.ForeignKey[PFindingDjango, PFindingDjango]
+        patient_finding: models.ForeignKey[PFindingDjango]
 
     patient_finding = models.ForeignKey(
         "PFindingDjango",
@@ -36,7 +36,7 @@ class PFindingInterventionsDjango(LedgerBaseModelDjango[PFindingInterventionsDat
     )
 
     if TYPE_CHECKING:
-        patient_finding_interventions: models.Manager["PFindingInterventionDjango"]
+        patient_finding_interventions: models.Manager[PFindingInterventionDjango]
 
     @property
     def ddict_class(self) -> type[PFindingInterventionsDataDict]:

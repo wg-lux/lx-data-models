@@ -1,0 +1,16 @@
+# Sources for every record in this file:
+# - UCUM specification: https://ucum.org/ucum
+# - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
+- model: unit
+  name: "milligram"
+  abbreviation: "mg"
+  name_de: "Milligramm"
+  name_en: "Milligram"
+  description: "Mass unit used for medication doses."
+
+- model: unit
+  name: "milliliter_per_hour"
+  abbreviation: "ml/h"
+  name_de: "Milliliter pro Stunde"
+  name_en: "Millilitres per hour"
+  description: "Volumetric flow-rate unit used for medication infusions."

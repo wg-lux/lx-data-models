@@ -1,5 +1,3 @@
-from typing import List, Union
-
 from pydantic import Field
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
@@ -14,13 +12,11 @@ from .ClassificationDataDict import ClassificationDataDict
 class Classification(
     KnowledgebaseBaseModel[ClassificationDataDict],
 ):
-    classification_choices: Union[str, List[str]] = Field(
-        default_factory=list_of_str_factory
-    )
-    classification_types: Union[str, List[str]] = Field(default_factory=list)
+    classification_choices: str | list[str] = Field(default_factory=list_of_str_factory)
+    classification_types: str | list[str] = Field(default_factory=list)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Provide the names of model fields that should be treated as list types.
 

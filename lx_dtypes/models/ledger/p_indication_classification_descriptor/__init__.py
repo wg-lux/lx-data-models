@@ -42,13 +42,13 @@ l_p_indication_classification_descriptor_django_models = Union[
 ]
 
 __all__ = [
+    "LPIndicationClassificationDescriptorDjangoLookupType",
+    "LPIndicationClassificationDescriptorLookupType",
     "PIndicationClassificationDescriptor",
     "PIndicationClassificationDescriptorDataDict",
-    "l_p_indication_classification_descriptor_django_models",
-    "l_p_indication_classification_descriptor_django_lookup",
-    "LPIndicationClassificationDescriptorDjangoLookupType",
-    "l_p_indication_classification_descriptor_lookup",
-    "LPIndicationClassificationDescriptorLookupType",
-    "l_p_indication_classification_descriptor_models",
     "l_p_indication_classification_descriptor_ddicts",
+    "l_p_indication_classification_descriptor_django_lookup",
+    "l_p_indication_classification_descriptor_django_models",
+    "l_p_indication_classification_descriptor_lookup",
+    "l_p_indication_classification_descriptor_models",
 ]

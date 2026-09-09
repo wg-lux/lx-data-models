@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from pydantic import BaseModel, field_validator
 
@@ -9,25 +9,25 @@ from lx_dtypes.models.base.file.pydantic.FilesAndDirs import FilesAndDirsModel
 
 ########## DataDict
 class PatientFileMixInDataDict(TypedDict):
-    patient: Optional[str]  # UUID of the patient associated with the video
-    patient_examination: Optional[
-        str
-    ]  # UUID of the patient examination associated with the video
+    patient: str | None  # UUID of the patient associated with the video
+    patient_examination: (
+        str | None
+    )  # UUID of the patient examination associated with the video
     fnd: FilesAndDirsDataDict
 
 
 class SerializedPatientFileMixInDataDict(TypedDict):
-    patient: Optional[str]  # UUID of the patient associated with the video
-    patient_examination: Optional[
-        str
-    ]  # UUID of the patient examination associated with the video
+    patient: str | None  # UUID of the patient associated with the video
+    patient_examination: (
+        str | None
+    )  # UUID of the patient examination associated with the video
     file: str
 
 
 ########## Pydantic
 class PatientFileMixIn(BaseModel):
-    patient: Optional[str] = None  # UUID of the patient associated with the video
-    patient_examination: Optional[str] = (
+    patient: str | None = None  # UUID of the patient associated with the video
+    patient_examination: str | None = (
         None  # UUID of the patient examination associated with the video
     )
 
@@ -51,9 +51,7 @@ class PatientFileMixIn(BaseModel):
 
 
 class SerializedPatientFileMixIn(BaseModel):
-    patient: Optional[str] = None  # UUID of the patient associated with the video
-    patient_examination: Optional[
-        str  # UUID of the patient examination associated with the video
-    ] = None
+    patient: str | None = None  # UUID of the patient associated with the video
+    patient_examination: str | None = None
 
     file: Path

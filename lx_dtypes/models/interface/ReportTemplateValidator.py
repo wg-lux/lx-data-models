@@ -1,5 +1,6 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Tuple, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
+from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateGraph import (
     validate_report_template_structure,
 )
@@ -8,7 +9,6 @@ from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
     ReportTemplateReadinessIssue,
     ReportTemplateReadinessSummary,
 )
-from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
@@ -103,10 +103,10 @@ class ReportTemplateValidator:
         name: str,
         *,
         mode: Literal["preview", "publish", "production"] = "preview",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         template = self.kb.get_report_template(name)
         lifecycle_status = self.kb.get_report_template_lifecycle_status(name)
-        issues: List[ReportTemplateReadinessIssue] = []
+        issues: list[ReportTemplateReadinessIssue] = []
 
         if template.examination not in self.kb.examination:
             issues.append(
@@ -167,7 +167,7 @@ class ReportTemplateValidator:
                 )
             )
 
-        validator_checks: List[Tuple[str, str, List[str], Dict[str, Any]]] = [
+        validator_checks: list[tuple[str, str, list[str], dict[str, Any]]] = [
             (
                 "unknown_examination_validator_reference",
                 "examination_validator",
@@ -201,7 +201,7 @@ class ReportTemplateValidator:
         ]
         for code, label, names, registry in validator_checks:
             for validator_name in names:
-                registry_dict: Dict[str, Any] = registry
+                registry_dict: dict[str, Any] = registry
                 if validator_name in registry_dict:
                     continue
 

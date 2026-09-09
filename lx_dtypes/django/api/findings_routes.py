@@ -1,17 +1,12 @@
 from __future__ import annotations
 
-import os
+from collections.abc import Callable
 from functools import lru_cache
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Dict,
-    List,
     NoReturn,
-    Optional,
     Protocol,
-    Set,
     TypeVar,
     cast,
 )
@@ -56,19 +51,19 @@ class PatientFindingClassificationInput(Schema):
 class PatientFindingCreateRequest(Schema):
     patient_examination: int
     finding: int
-    classifications: List[PatientFindingClassificationInput] = Field(
+    classifications: list[PatientFindingClassificationInput] = Field(
         default_factory=list
     )
 
 
 class PatientFindingUpdateRequest(Schema):
-    finding: Optional[int] = None
-    is_active: Optional[bool] = None
-    classifications: Optional[List[PatientFindingClassificationInput]] = None
+    finding: int | None = None
+    is_active: bool | None = None
+    classifications: list[PatientFindingClassificationInput] | None = None
 
 
 class PatientFindingClassificationsRequest(Schema):
-    classifications: List[PatientFindingClassificationInput] = Field(
+    classifications: list[PatientFindingClassificationInput] = Field(
         default_factory=list
     )
     replace: bool = True
@@ -78,8 +73,8 @@ _LOAD_MODULE_KB: Callable[..., Any] | None = None
 
 
 def clear_findings_route_caches() -> None:
-    _kb_core_concepts.cache_clear()
-    _kb_lookup.cache_clear()
+    _kb_core_concepts_by_identity.cache_clear()
+    _kb_lookup_by_identity.cache_clear()
 
 
 def _set_load_module_kb(load_module_kb: Callable[..., Any]) -> None:
@@ -127,22 +122,132 @@ def _as_str_list_from_relation(relation: object) -> list[str]:
 
 
 def _findings_module_name() -> str:
-    return os.getenv("LX_DTYPES_FINDINGS_MODULE", "lx_knowledge_base")
+    """Resolve the active module only for legacy, non-examination discovery routes."""
+
+    from .terminology_routes import active_terminology_selection
+
+    active = active_terminology_selection()
+    if active is None:
+        raise RuntimeError("No active knowledge-base bundle is selected.")
+    return active[0]
 
 
-def _norm_name(value: Optional[str]) -> str:
+class PatientExaminationKnowledgeBaseIdentityError(RuntimeError):
+    """Raised when an examination-bound route has no complete persisted identity."""
+
+
+def _resolve_exam_kb_identity(patient_examination: Any) -> tuple[str, str]:
+    module_name = str(
+        getattr(patient_examination, "knowledge_base_module", "") or ""
+    ).strip()
+    version = str(
+        getattr(patient_examination, "knowledge_base_version", "") or ""
+    ).strip()
+    if bool(module_name) != bool(version):
+        raise PatientExaminationKnowledgeBaseIdentityError(
+            "PatientExamination knowledge-base identity is incomplete."
+        )
+    if module_name and version:
+        return module_name, version
+    raise PatientExaminationKnowledgeBaseIdentityError(
+        "PatientExamination requires an explicit knowledge-base identity."
+    )
+
+
+def _resolve_catalog_kb_identity(
+    module_name: str | None,
+    module_version: str | None,
+    orm_models: Callable[[], dict[str, Any]],
+    patient_examination_id: int | None,
+    api_error: Callable[[int, str, str], NoReturn],
+) -> tuple[str, str | None]:
+    requested_module_name = str(module_name or "").strip()
+    requested_module_version = str(module_version or "").strip()
+    if requested_module_name:
+        if not requested_module_version:
+            api_error(
+                409,
+                "knowledge-base-identity-required",
+                "module_version is required when module_name is supplied.",
+            )
+
+        if patient_examination_id is not None:
+            patient_examination_model = orm_models()["PatientExamination"]
+            patient_examination = patient_examination_model.objects.filter(
+                id=patient_examination_id
+            ).first()
+            if not patient_examination:
+                api_error(
+                    404,
+                    "not-found",
+                    f"PatientExamination '{patient_examination_id}' not found.",
+                )
+            assert patient_examination is not None
+            pinned_module = str(
+                getattr(patient_examination, "knowledge_base_module", "") or ""
+            ).strip()
+            pinned_version = str(
+                getattr(patient_examination, "knowledge_base_version", "") or ""
+            ).strip()
+            if (
+                pinned_module != requested_module_name
+                or pinned_version != requested_module_version
+            ):
+                api_error(
+                    409,
+                    "knowledge-base-identity-conflict",
+                    "Requested knowledge-base identity does not match the "
+                    f"PatientExamination '{patient_examination_id}' identity.",
+                )
+
+        return requested_module_name, requested_module_version
+
+    if requested_module_version:
+        api_error(
+            409,
+            "knowledge-base-identity-required",
+            "module_name is required when module_version is supplied.",
+        )
+
+    if patient_examination_id is not None:
+        patient_examination_model = orm_models()["PatientExamination"]
+        patient_examination = patient_examination_model.objects.filter(
+            id=patient_examination_id
+        ).first()
+        if not patient_examination:
+            api_error(
+                404,
+                "not-found",
+                f"PatientExamination '{patient_examination_id}' not found.",
+            )
+        assert patient_examination is not None
+        return _resolve_exam_kb_identity(patient_examination)
+
+    from .terminology_routes import active_terminology_selection
+
+    active = active_terminology_selection()
+    if active is None:
+        raise RuntimeError("No active knowledge-base bundle is selected.")
+    return active
+
+
+def _norm_name(value: str | None) -> str:
     return str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
 
 
 @lru_cache(maxsize=8)
-def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
+def _kb_core_concepts_by_identity(
+    module_name: str,
+    version: str,
+) -> dict[str, Any]:
     loader = _require_load_module_kb()
-    return cast(Dict[str, Any], loader(module_name).export_core_concepts())
+    return cast(
+        dict[str, Any],
+        loader(module_name, version=version).export_core_concepts(),
+    )
 
 
-@lru_cache(maxsize=8)
-def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
-    core = _kb_core_concepts(module_name)
+def _build_kb_lookup(core: dict[str, Any]) -> dict[str, dict[str, dict[str, Any]]]:
     examination_by_name = {
         _norm_name(item.get("name")): item for item in core.get("examination", [])
     }
@@ -156,16 +261,52 @@ def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
         _norm_name(item.get("name")): item
         for item in core.get("classification_choice", [])
     }
+    indication_by_name = {
+        _norm_name(item.get("name")): item for item in core.get("indication", [])
+    }
     return {
         "examination": examination_by_name,
         "finding": finding_by_name,
         "classification": classification_by_name,
         "classification_choice": choice_by_name,
+        "indication": indication_by_name,
     }
 
 
+def _kb_core_concepts(module_name: str) -> dict[str, Any]:
+    loader = _require_load_module_kb()
+    kb = loader(module_name)
+    version = str(getattr(getattr(kb, "config", None), "version", "") or "").strip()
+    if not version:
+        return cast(dict[str, Any], kb.export_core_concepts())
+    return _kb_core_concepts_by_identity(module_name, version)
+
+
+@lru_cache(maxsize=8)
+def _kb_lookup_by_identity(
+    module_name: str,
+    version: str,
+) -> dict[str, dict[str, dict[str, Any]]]:
+    core = _kb_core_concepts_by_identity(module_name, version)
+    return _build_kb_lookup(core)
+
+
+def _kb_lookup(
+    module_name: str, version: str | None = None
+) -> dict[str, dict[str, dict[str, Any]]]:
+    if version:
+        return _kb_lookup_by_identity(module_name, version)
+
+    loader = _require_load_module_kb()
+    kb = loader(module_name)
+    version = str(getattr(getattr(kb, "config", None), "version", "") or "").strip()
+    if not version:
+        return _build_kb_lookup(cast(dict[str, Any], kb.export_core_concepts()))
+    return _kb_lookup_by_identity(module_name, version)
+
+
 def _active_patient_findings_queryset(
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
 ) -> QuerySet[Any]:
     patient_finding_model = orm_models()["PatientFinding"]
     return cast(
@@ -180,7 +321,7 @@ def build_p_examination_payload_from_host_ledger(
     patient_examination: object,
     *,
     route_module_name: str,
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
     active_patient_findings_queryset: Callable[[], Any] | None = None,
 ) -> PExamination:
     patient_examination_id = getattr(patient_examination, "id", None)
@@ -258,10 +399,29 @@ def build_p_examination_payload_from_host_ledger(
                 }
             )
 
+        interventions_payload: list[dict[str, object]] = []
+        active_interventions = (
+            patient_finding.interventions.filter(is_active=True)
+            .select_related("intervention")
+            .all()
+        )
+        for item in active_interventions:
+            intervention_name = str(
+                getattr(item.intervention, "name", "") or ""
+            ).strip()
+            if not intervention_name:
+                continue
+            interventions_payload.append(
+                {
+                    "patient_finding_interventions": str(item.id),
+                    "intervention": intervention_name,
+                }
+            )
+
         patient_findings_payload.append(
             {
                 "finding": finding_name,
-                "patient_examination": str(patient_examination_id),
+                "patient_examination": examination_name,
                 "patient_finding_classifications": [
                     {
                         "patient_finding": str(patient_finding.id),
@@ -270,7 +430,14 @@ def build_p_examination_payload_from_host_ledger(
                 ]
                 if classifications_payload
                 else [],
-                "patient_finding_interventions": [],
+                "patient_finding_interventions": [
+                    {
+                        "patient_finding": str(patient_finding.id),
+                        "patient_finding_interventions": interventions_payload,
+                    }
+                ]
+                if interventions_payload
+                else [],
             }
         )
 
@@ -287,14 +454,7 @@ def build_p_examination_payload_from_host_ledger(
     return PExamination.model_validate(payload)
 
 
-def _request_user_if_authenticated(request: BaseRequest) -> Optional[Any]:
-    user = getattr(request, "user", None)
-    if getattr(user, "is_authenticated", False):
-        return user
-    return None
-
-
-def _serialize_choice(choice: Any) -> Dict[str, Any]:
+def _serialize_choice(choice: Any) -> dict[str, Any]:
     return {
         "id": choice.id,
         "name": choice.name,
@@ -306,7 +466,7 @@ def _serialize_choice(choice: Any) -> Dict[str, Any]:
 
 def _serialize_classification(
     classification: Any, *, required: bool = False
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     choices = classification.choices.all()
     classification_types = [
         _norm_name(c_type.name) for c_type in classification.classification_types.all()
@@ -322,10 +482,10 @@ def _serialize_classification(
 
 
 def _split_classifications(
-    classifications: List[Dict[str, Any]],
-) -> Dict[str, List[Dict[str, Any]]]:
-    location: List[Dict[str, Any]] = []
-    morphology: List[Dict[str, Any]] = []
+    classifications: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    location: list[dict[str, Any]] = []
+    morphology: list[dict[str, Any]] = []
     for classification in classifications:
         c_types = {
             _norm_name(v) for v in classification.get("classification_types", [])
@@ -343,16 +503,19 @@ def _split_classifications(
 def _serialize_finding(
     finding: Any,
     *,
-    allowed_classification_names: Optional[Set[str]] = None,
-    required_classification_names: Optional[Set[str]] = None,
-) -> Dict[str, Any]:
+    allowed_classification_names: set[str] | None = None,
+    required_classification_names: set[str] | None = None,
+) -> dict[str, Any]:
     all_classifications = finding.finding_classifications.all().prefetch_related(
         "choices", "classification_types"
     )
     selected_classifications = []
     for classification in all_classifications:
         c_name = _norm_name(classification.name)
-        if allowed_classification_names and c_name not in allowed_classification_names:
+        if (
+            allowed_classification_names is not None
+            and c_name not in allowed_classification_names
+        ):
             continue
         selected_classifications.append(
             _serialize_classification(
@@ -377,7 +540,7 @@ def _serialize_finding(
 
 def _serialize_patient_finding_classification(
     item: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return {
         "id": item.id,
         "classification": item.classification_id,
@@ -390,7 +553,7 @@ def _serialize_patient_finding_classification(
     }
 
 
-def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
+def _serialize_patient_finding(item: Any) -> dict[str, Any]:
     classifications = item.classifications.filter(is_active=True).select_related(
         "classification", "classification_choice"
     )
@@ -409,41 +572,41 @@ def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
 
 
 def _resolve_exam_kb_finding_names(
-    examination: Any, *, module_name: str
-) -> Optional[Set[str]]:
-    lookup = _kb_lookup(module_name)
+    examination: Any, *, module_name: str, version: str | None = None
+) -> set[str]:
+    lookup = _kb_lookup(module_name, version=version)
     exam_entry = lookup["examination"].get(_norm_name(examination.name))
     if not exam_entry:
-        return None
+        return set()
     finding_names = exam_entry.get("findings", [])
     if not isinstance(finding_names, list):
-        return None
+        return set()
     return {_norm_name(name) for name in finding_names}
 
 
 def _resolve_kb_finding_classification_names(
-    finding: Any, *, module_name: str
-) -> Optional[Set[str]]:
-    lookup = _kb_lookup(module_name)
+    finding: Any, *, module_name: str, version: str | None = None
+) -> set[str]:
+    lookup = _kb_lookup(module_name, version=version)
     finding_entry = lookup["finding"].get(_norm_name(finding.name))
     if not finding_entry:
-        return None
+        return set()
     classifications = finding_entry.get("classifications", [])
     if not isinstance(classifications, list):
-        return None
+        return set()
     return {_norm_name(name) for name in classifications}
 
 
 def _resolve_kb_classification_choice_names(
-    classification: Any, *, module_name: str
-) -> Optional[Set[str]]:
-    lookup = _kb_lookup(module_name)
+    classification: Any, *, module_name: str, version: str | None = None
+) -> set[str]:
+    lookup = _kb_lookup(module_name, version=version)
     classification_entry = lookup["classification"].get(_norm_name(classification.name))
     if not classification_entry:
-        return None
+        return set()
     choices = classification_entry.get("classification_choices", [])
     if not isinstance(choices, list):
-        return None
+        return set()
     return {_norm_name(name) for name in choices}
 
 
@@ -452,6 +615,7 @@ def _validate_finding_for_examination(
     patient_examination: Any,
     *,
     module_name: str,
+    version: str | None = None,
     api_error: Callable[[int, str, str], NoReturn],
 ) -> None:
     available_findings = patient_examination.examination_safe.get_available_findings()
@@ -463,12 +627,9 @@ def _validate_finding_for_examination(
         )
 
     kb_allowed_names = _resolve_exam_kb_finding_names(
-        patient_examination.examination_safe, module_name=module_name
+        patient_examination.examination_safe, module_name=module_name, version=version
     )
-    if (
-        kb_allowed_names is not None
-        and _norm_name(finding.name) not in kb_allowed_names
-    ):
+    if _norm_name(finding.name) not in kb_allowed_names:
         api_error(
             400,
             "invalid-finding",
@@ -482,6 +643,7 @@ def _validate_classification_payload(
     classification: Any,
     choice: Any,
     module_name: str,
+    version: str | None = None,
     api_error: Callable[[int, str, str], NoReturn],
 ) -> None:
     if not finding.finding_classifications.filter(id=classification.id).exists():
@@ -498,12 +660,9 @@ def _validate_classification_payload(
         )
 
     kb_classifications = _resolve_kb_finding_classification_names(
-        finding, module_name=module_name
+        finding, module_name=module_name, version=version
     )
-    if (
-        kb_classifications is not None
-        and _norm_name(classification.name) not in kb_classifications
-    ):
+    if _norm_name(classification.name) not in kb_classifications:
         api_error(
             400,
             "invalid-choice",
@@ -511,9 +670,9 @@ def _validate_classification_payload(
         )
 
     kb_choices = _resolve_kb_classification_choice_names(
-        classification, module_name=module_name
+        classification, module_name=module_name, version=version
     )
-    if kb_choices is not None and _norm_name(choice.name) not in kb_choices:
+    if _norm_name(choice.name) not in kb_choices:
         api_error(
             400,
             "invalid-choice",
@@ -523,10 +682,11 @@ def _validate_classification_payload(
 
 def _replace_patient_finding_classifications(
     patient_finding: Any,
-    entries: List[PatientFindingClassificationInput],
+    entries: list[PatientFindingClassificationInput],
     *,
     module_name: str,
-    orm_models: Callable[[], Dict[str, Any]],
+    version: str | None = None,
+    orm_models: Callable[[], dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
 ) -> None:
     patient_finding.classifications.all().delete()
@@ -559,6 +719,7 @@ def _replace_patient_finding_classifications(
             classification=classification,
             choice=choice,
             module_name=module_name,
+            version=version,
             api_error=api_error,
         )
         patient_finding_classification_model.objects.create(
@@ -569,53 +730,160 @@ def _replace_patient_finding_classifications(
         )
 
 
+def _get_or_create_active_patient_finding_classification(
+    patient_finding: Any,
+    *,
+    classification: Any,
+    choice: Any,
+    orm_models: Callable[[], dict[str, Any]],
+) -> Any:
+    existing = patient_finding.classifications.filter(
+        classification=classification,
+        classification_choice=choice,
+        is_active=True,
+    ).first()
+    if existing is not None:
+        return existing
+    patient_finding_classification_model = orm_models()["PatientFindingClassification"]
+    return patient_finding_classification_model.objects.create(
+        finding=patient_finding,
+        classification=classification,
+        classification_choice=choice,
+        is_active=True,
+    )
+
+
 def register_findings_routes(
     api: _TypedApi,
     *,
     load_module_kb: Callable[..., Any],
-    orm_models: Callable[[], Dict[str, Any]],
+    orm_models: Callable[[], dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
+    authenticate_request_user: Callable[[BaseRequest], Any | None],
+    patient_examination_access_allowed: Callable[[BaseRequest, object], bool],
+    patient_finding_access_allowed: Callable[[BaseRequest, object], bool],
+    patient_findings_queryset_for_request: Callable[[BaseRequest], Any],
+    build_p_examination_payload_from_host_ledger: Callable[..., PExamination]
+    | None = None,
+    persist_patient_examination_dtypes_record: Callable[
+        [object, PExamination], dict[str, Any]
+    ]
+    | None = None,
 ) -> None:
     _set_load_module_kb(load_module_kb)
+
+    def require_authenticated_actor(request: BaseRequest) -> Any:
+        actor = authenticate_request_user(request)
+        if actor is None:
+            api_error(401, "authentication-required", "Authentication is required.")
+        return actor
+
+    def require_patient_finding_access(
+        request: BaseRequest, patient_finding: object, patient_finding_id: int
+    ) -> None:
+        if not patient_finding_access_allowed(request, patient_finding):
+            api_error(
+                404,
+                "not-found",
+                f"Patient finding '{patient_finding_id}' not found.",
+            )
+
+    def refresh_patient_examination_dtypes_record(patient_examination: object) -> None:
+        if (
+            build_p_examination_payload_from_host_ledger is None
+            or persist_patient_examination_dtypes_record is None
+        ):
+            return
+        try:
+            module_name_for_record, _ = _resolve_exam_kb_identity(patient_examination)
+        except PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
+        payload = build_p_examination_payload_from_host_ledger(
+            patient_examination,
+            route_module_name=module_name_for_record,
+        )
+        persist_patient_examination_dtypes_record(patient_examination, payload)
 
     @api.get("/core-concepts/{module_name}")
     def core_concepts_by_module(
         request: BaseRequest, module_name: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Return canonical core concept payloads for one KB module.
         """
         del request
         kb = load_module_kb(module_name)
-        return cast(Dict[str, Any], kb.export_core_concepts())
+        payload = cast(dict[str, Any], kb.export_core_concepts())
+        config = getattr(kb, "config", None)
+        payload["knowledge_base_module"] = str(
+            getattr(config, "name", module_name) or module_name
+        ).strip()
+        payload["knowledge_base_version"] = (
+            str(getattr(config, "version", "") or "").strip() or None
+        )
+        return payload
 
     @api.get("/examinations/{examination_id}/findings/")
     def findings_by_examination(
-        request: BaseRequest, examination_id: int
-    ) -> List[Dict[str, Any]]:
+        request: BaseRequest,
+        examination_id: int,
+        module_name: str | None = None,
+        module_version: str | None = None,
+        patient_examination_id: int | None = None,
+    ) -> list[dict[str, Any]]:
         del request
-        module_name = _findings_module_name()
+        try:
+            module_name, resolved_version = _resolve_catalog_kb_identity(
+                module_name=module_name,
+                module_version=module_version,
+                orm_models=orm_models,
+                patient_examination_id=patient_examination_id,
+                api_error=api_error,
+            )
+        except PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
+        except RuntimeError as exc:
+            api_error(409, "no-active-knowledge-base", str(exc))
         examination_model = orm_models()["Examination"]
         examination = examination_model.objects.filter(id=examination_id).first()
         if not examination:
             api_error(404, "not-found", f"Examination '{examination_id}' not found.")
 
         assert examination is not None
+        if patient_examination_id is not None:
+            patient_examination_model = orm_models()["PatientExamination"]
+            patient_examination = patient_examination_model.objects.filter(
+                id=patient_examination_id
+            ).first()
+            if not patient_examination:
+                api_error(
+                    404,
+                    "not-found",
+                    f"PatientExamination '{patient_examination_id}' not found.",
+                )
+            assert patient_examination is not None
+            if patient_examination.examination_id != examination.id:
+                api_error(
+                    404,
+                    "not-found",
+                    "Patient examination "
+                    f"'{patient_examination_id}' does not belong to "
+                    f"examination '{examination_id}'.",
+                )
         findings = list(examination.get_available_findings())
         kb_allowed_finding_names = _resolve_exam_kb_finding_names(
-            examination, module_name=module_name
+            examination, module_name=module_name, version=resolved_version
         )
-        if kb_allowed_finding_names is not None:
-            findings = [
-                finding
-                for finding in findings
-                if _norm_name(finding.name) in kb_allowed_finding_names
-            ]
+        findings = [
+            finding
+            for finding in findings
+            if _norm_name(finding.name) in kb_allowed_finding_names
+        ]
 
         response = []
         for finding in findings:
             kb_allowed_classifications = _resolve_kb_finding_classification_names(
-                finding, module_name=module_name
+                finding, module_name=module_name, version=resolved_version
             )
             response.append(
                 _serialize_finding(
@@ -628,10 +896,25 @@ def register_findings_routes(
 
     @api.get("/findings/{finding_id}/classifications/")
     def classifications_by_finding(
-        request: BaseRequest, finding_id: int
-    ) -> List[Dict[str, Any]]:
+        request: BaseRequest,
+        finding_id: int,
+        module_name: str | None = None,
+        module_version: str | None = None,
+        patient_examination_id: int | None = None,
+    ) -> list[dict[str, Any]]:
         del request
-        module_name = _findings_module_name()
+        try:
+            module_name, resolved_version = _resolve_catalog_kb_identity(
+                module_name=module_name,
+                module_version=module_version,
+                orm_models=orm_models,
+                patient_examination_id=patient_examination_id,
+                api_error=api_error,
+            )
+        except PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
+        except RuntimeError as exc:
+            api_error(409, "no-active-knowledge-base", str(exc))
         finding_model = orm_models()["Finding"]
         finding = finding_model.objects.filter(id=finding_id).first()
         if not finding:
@@ -639,21 +922,36 @@ def register_findings_routes(
         assert finding is not None
 
         kb_allowed_classifications = _resolve_kb_finding_classification_names(
-            finding, module_name=module_name
+            finding, module_name=module_name, version=resolved_version
         )
         serialized = _serialize_finding(
             finding,
             allowed_classification_names=kb_allowed_classifications,
             required_classification_names=set(),
         )
-        return cast(List[Dict[str, Any]], serialized["classifications"])
+        return cast(list[dict[str, Any]], serialized["classifications"])
 
     @api.get("/classifications/{classification_id}/choices/")
     def choices_by_classification(
-        request: BaseRequest, classification_id: int
-    ) -> Dict[str, Any]:
+        request: BaseRequest,
+        classification_id: int,
+        module_name: str | None = None,
+        module_version: str | None = None,
+        patient_examination_id: int | None = None,
+    ) -> dict[str, Any]:
         del request
-        module_name = _findings_module_name()
+        try:
+            module_name, resolved_version = _resolve_catalog_kb_identity(
+                module_name=module_name,
+                module_version=module_version,
+                orm_models=orm_models,
+                patient_examination_id=patient_examination_id,
+                api_error=api_error,
+            )
+        except PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
+        except RuntimeError as exc:
+            api_error(409, "no-active-knowledge-base", str(exc))
         finding_classification_model = orm_models()["FindingClassification"]
         classification = finding_classification_model.objects.filter(
             id=classification_id
@@ -665,23 +963,22 @@ def register_findings_routes(
         assert classification is not None
 
         kb_allowed_choices = _resolve_kb_classification_choice_names(
-            classification, module_name=module_name
+            classification, module_name=module_name, version=resolved_version
         )
         all_choices = list(classification.choices.all())
-        if kb_allowed_choices is not None:
-            all_choices = [
-                choice
-                for choice in all_choices
-                if _norm_name(choice.name) in kb_allowed_choices
-            ]
+        all_choices = [
+            choice
+            for choice in all_choices
+            if _norm_name(choice.name) in kb_allowed_choices
+        ]
         return {"choices": [_serialize_choice(choice) for choice in all_choices]}
 
     @api.get("/patient-findings/")
     def list_patient_findings(
-        request: BaseRequest, patient_examination: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
-        del request
-        queryset = _active_patient_findings_queryset(orm_models)
+        request: BaseRequest, patient_examination: int | None = None
+    ) -> list[dict[str, Any]]:
+        require_authenticated_actor(request)
+        queryset = patient_findings_queryset_for_request(request)
         if patient_examination is not None:
             queryset = queryset.filter(patient_examination_id=patient_examination)
         return [_serialize_patient_finding(item) for item in queryset]
@@ -689,9 +986,8 @@ def register_findings_routes(
     @api.post("/patient-findings/")
     def create_patient_finding(
         request: BaseRequest, payload: PatientFindingCreateRequest
-    ) -> Dict[str, Any]:
-        del request
-        module_name = _findings_module_name()
+    ) -> dict[str, Any]:
+        require_authenticated_actor(request)
         patient_examination_model = orm_models()["PatientExamination"]
         finding_model = orm_models()["Finding"]
         patient_finding_model = orm_models()["PatientFinding"]
@@ -704,16 +1000,25 @@ def register_findings_routes(
                 "not-found",
                 f"PatientExamination '{payload.patient_examination}' not found.",
             )
+        assert patient_examination is not None
+        if not patient_examination_access_allowed(request, patient_examination):
+            api_error(
+                404,
+                "not-found",
+                f"PatientExamination '{payload.patient_examination}' not found.",
+            )
+        module_name, module_version = _resolve_exam_kb_identity(patient_examination)
+
         finding = finding_model.objects.filter(id=payload.finding).first()
         if not finding:
             api_error(404, "not-found", f"Finding '{payload.finding}' not found.")
-        assert patient_examination is not None
         assert finding is not None
 
         _validate_finding_for_examination(
             finding=finding,
             patient_examination=patient_examination,
             module_name=module_name,
+            version=module_version,
             api_error=api_error,
         )
 
@@ -728,9 +1033,11 @@ def register_findings_routes(
                         patient_finding,
                         payload.classifications,
                         module_name=module_name,
+                        version=module_version,
                         orm_models=orm_models,
                         api_error=api_error,
                     )
+                refresh_patient_examination_dtypes_record(patient_examination)
                 return _serialize_patient_finding(patient_finding)
         except IntegrityError as exc:
             if "unique_active_finding_per_examination" in str(exc):
@@ -760,10 +1067,10 @@ def register_findings_routes(
         request: BaseRequest,
         patient_finding_id: int,
         payload: PatientFindingUpdateRequest,
-    ) -> Dict[str, Any]:
-        module_name = _findings_module_name()
+    ) -> dict[str, Any]:
+        actor = require_authenticated_actor(request)
         patient_finding = (
-            _active_patient_findings_queryset(orm_models)
+            patient_findings_queryset_for_request(request)
             .filter(id=patient_finding_id)
             .first()
         )
@@ -772,6 +1079,10 @@ def register_findings_routes(
                 404, "not-found", f"Patient finding '{patient_finding_id}' not found."
             )
         assert patient_finding is not None
+        require_patient_finding_access(request, patient_finding, patient_finding_id)
+        module_name, module_version = _resolve_exam_kb_identity(
+            patient_finding.patient_examination
+        )
 
         with transaction.atomic():
             if payload.finding is not None:
@@ -786,6 +1097,7 @@ def register_findings_routes(
                     finding=finding,
                     patient_examination=patient_finding.patient_examination,
                     module_name=module_name,
+                    version=module_version,
                     api_error=api_error,
                 )
                 patient_finding.finding = finding
@@ -797,11 +1109,8 @@ def register_findings_routes(
                     patient_finding.deactivated_by = None
                 else:
                     patient_finding.is_active = False
-                    actor = _request_user_if_authenticated(request)
                     patient_finding.deactivated_by = actor
-                    patient_finding.deactivated_at = (
-                        timezone.now() if actor is not None else None
-                    )
+                    patient_finding.deactivated_at = timezone.now()
 
             patient_finding.save()
 
@@ -810,18 +1119,24 @@ def register_findings_routes(
                     patient_finding,
                     payload.classifications,
                     module_name=module_name,
+                    version=module_version,
                     orm_models=orm_models,
                     api_error=api_error,
                 )
+            refresh_patient_examination_dtypes_record(
+                patient_finding.patient_examination
+            )
 
         return _serialize_patient_finding(patient_finding)
 
     @api.delete("/patient-findings/{patient_finding_id}/")
     def delete_patient_finding(
         request: BaseRequest, patient_finding_id: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
+        actor = require_authenticated_actor(request)
+
         patient_finding = (
-            _active_patient_findings_queryset(orm_models)
+            patient_findings_queryset_for_request(request)
             .filter(id=patient_finding_id)
             .first()
         )
@@ -830,14 +1145,18 @@ def register_findings_routes(
                 404, "not-found", f"Patient finding '{patient_finding_id}' not found."
             )
         assert patient_finding is not None
+        require_patient_finding_access(request, patient_finding, patient_finding_id)
 
-        actor = _request_user_if_authenticated(request)
-        patient_finding.is_active = False
-        patient_finding.deactivated_by = actor
-        patient_finding.deactivated_at = timezone.now() if actor is not None else None
-        patient_finding.save(
-            update_fields=["is_active", "deactivated_at", "deactivated_by"]
-        )
+        with transaction.atomic():
+            patient_finding.is_active = False
+            patient_finding.deactivated_by = actor
+            patient_finding.deactivated_at = timezone.now()
+            patient_finding.save(
+                update_fields=["is_active", "deactivated_at", "deactivated_by"]
+            )
+            refresh_patient_examination_dtypes_record(
+                patient_finding.patient_examination
+            )
         return {"success": True, "id": patient_finding_id}
 
     @api.post("/patient-findings/{patient_finding_id}/classifications/")
@@ -845,11 +1164,10 @@ def register_findings_routes(
         request: BaseRequest,
         patient_finding_id: int,
         payload: PatientFindingClassificationsRequest,
-    ) -> Dict[str, Any]:
-        del request
-        module_name = _findings_module_name()
+    ) -> dict[str, Any]:
+        require_authenticated_actor(request)
         patient_finding = (
-            _active_patient_findings_queryset(orm_models)
+            patient_findings_queryset_for_request(request)
             .filter(id=patient_finding_id)
             .first()
         )
@@ -858,14 +1176,15 @@ def register_findings_routes(
                 404, "not-found", f"Patient finding '{patient_finding_id}' not found."
             )
         assert patient_finding is not None
+        require_patient_finding_access(request, patient_finding, patient_finding_id)
+        module_name, module_version = _resolve_exam_kb_identity(
+            patient_finding.patient_examination
+        )
 
         with transaction.atomic():
             finding_classification_model = orm_models()["FindingClassification"]
             finding_classification_choice_model = orm_models()[
                 "FindingClassificationChoice"
-            ]
-            patient_finding_classification_model = orm_models()[
-                "PatientFindingClassification"
             ]
             if payload.replace:
                 patient_finding.classifications.all().delete()
@@ -895,13 +1214,17 @@ def register_findings_routes(
                     classification=classification,
                     choice=choice,
                     module_name=module_name,
+                    version=module_version,
                     api_error=api_error,
                 )
-                patient_finding_classification_model.objects.create(
-                    finding=patient_finding,
+                _get_or_create_active_patient_finding_classification(
+                    patient_finding,
                     classification=classification,
-                    classification_choice=choice,
-                    is_active=True,
+                    choice=choice,
+                    orm_models=orm_models,
                 )
+            refresh_patient_examination_dtypes_record(
+                patient_finding.patient_examination
+            )
 
         return _serialize_patient_finding(patient_finding)

@@ -3,3 +3,4 @@
   description: "Endoscopy hardware used during the examination (e.g., endoscope, processor)"
   classifications:
     - endoscopy_hardware_endoscope_processor_model
+    - endoscopy_hardware_serial_number

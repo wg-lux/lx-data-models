@@ -4,7 +4,7 @@
 }:
 
 let
-  kbSource = ./demo-data/star_upper_gi;
+  kbSource = ./lx_dtypes/data/star_upper_gi;
   kbModuleName = builtins.baseNameOf (toString kbSource);
   pname = "lx-dtypes-kb-${lib.replaceStrings [ "_" ] [ "-" ] kbModuleName}";
   version = "0.1.1";

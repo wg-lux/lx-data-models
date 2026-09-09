@@ -1,0 +1,38 @@
+- model: unit
+  name: millimeter
+  abbreviation: mm
+- model: classification
+  name: polyp_size_category
+  name_en: Polyp size category
+  description: ESGE colorectal polypectomy guideline, Ferlitsch et al. 2024, doi:10.1055/a-2304-3219,
+    recommendations 1, 3, 4, 5. Size categories only; treatment also depends on lesion
+    context.
+  classification_choices:
+  - size_le_5
+  - size_6_9
+  - size_10_19
+  - size_ge_20
+- model: classification_choice
+  name: size_le_5
+  name_en: ≤5 mm
+  description: ESGE colorectal polypectomy guideline, Ferlitsch et al. 2024, doi:10.1055/a-2304-3219,
+    recommendations 1, 3, 4, 5. Size categories only; treatment also depends on lesion
+    context.
+- model: classification_choice
+  name: size_6_9
+  name_en: 6–9 mm
+  description: ESGE colorectal polypectomy guideline, Ferlitsch et al. 2024, doi:10.1055/a-2304-3219,
+    recommendations 1, 3, 4, 5. Size categories only; treatment also depends on lesion
+    context.
+- model: classification_choice
+  name: size_10_19
+  name_en: 10–19 mm
+  description: ESGE colorectal polypectomy guideline, Ferlitsch et al. 2024, doi:10.1055/a-2304-3219,
+    recommendations 1, 3, 4, 5. Size categories only; treatment also depends on lesion
+    context.
+- model: classification_choice
+  name: size_ge_20
+  name_en: ≥20 mm
+  description: ESGE colorectal polypectomy guideline, Ferlitsch et al. 2024, doi:10.1055/a-2304-3219,
+    recommendations 1, 3, 4, 5. Size categories only; treatment also depends on lesion
+    context.

@@ -29,13 +29,13 @@ l_p_examination_ddicts = Union[PExaminationDataDict,]
 l_p_examination_django_models = Union[PExaminationDjango,]
 
 __all__ = [
+    "LPExaminationDjangoLookupType",
+    "LPExaminationLookupType",
     "PExamination",
     "PExaminationDataDict",
-    "l_p_examination_django_models",
-    "l_p_examination_django_lookup",
-    "LPExaminationDjangoLookupType",
-    "l_p_examination_lookup",
-    "LPExaminationLookupType",
-    "l_p_examination_models",
     "l_p_examination_ddicts",
+    "l_p_examination_django_lookup",
+    "l_p_examination_django_models",
+    "l_p_examination_lookup",
+    "l_p_examination_models",
 ]

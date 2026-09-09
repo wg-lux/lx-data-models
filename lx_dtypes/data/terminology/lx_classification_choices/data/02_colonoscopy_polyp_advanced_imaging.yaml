@@ -1,37 +1,43 @@
 # JNET
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022), optical lesion characterization: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: classification_choice
 
   name: "colon_lesion_jnet_1"
+  name_de: "JNET Typ 1"
 
 - model: classification_choice
 
   name: "colon_lesion_jnet_2a"
+  name_de: "JNET Typ 2A"
 
 - model: classification_choice
 
   name: "colon_lesion_jnet_2b"
+  name_de: "JNET Typ 2B"
 
 - model: classification_choice
 
   name: "colon_lesion_jnet_3"
+  name_de: "JNET Typ 3"
 
 # NICE
 - model: classification_choice
 
   name: "colon_lesion_NICE_type_1"
-  # name_de: "Kolonläsion - NICE Typ 1"
+  name_de: "NICE Typ 1"
   # name_en: "Colon lesion - NICE type 1"
 
 - model: classification_choice
 
   name: "colon_lesion_NICE_type_2"
-  # name_de: "Kolonläsion - NICE Typ 2"
+  name_de: "NICE Typ 2"
   # name_en: "Colon lesion - NICE type 2"
 
 - model: classification_choice
 
   name: "colon_lesion_NICE_type_3"
-  # name_de: "Kolonläsion - NICE Typ 3"
+  name_de: "NICE Typ 3"
   # name_en: "Colon lesion - NICE type 3"
 
 # Kudo

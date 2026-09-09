@@ -1,6 +1,7 @@
 # Generic
 - model: finding
   name: star_upper_gi_polyp
+  description: "Polyp or suspected superficial lesion documented by location, size, and Paris morphology."
   classifications:
     - star_upper_gi_location_classification
     - star_upper_gi_location_esophagus_distance_z_line
@@ -12,14 +13,25 @@
 
 - model: finding
   name: star_upper_gi_ulcer
+  description: "Gastric or duodenal ulcer documented by location, size, and Forrest bleeding stigmata."
   classifications:
     - star_upper_gi_forrest
     - star_upper_gi_location_classification
+    - size_oval_mm
+    - additional_text_info
+
+- model: finding
+  name: star_upper_gi_submucosal_abnormality
+  description: "An abnormality arising in or presenting from the submucosal layer."
+  classifications:
+    - star_upper_gi_location_classification
+    - size_oval_mm
     - additional_text_info
 
 # Esophagus
 - model: finding
   name: star_upper_gi_esophagus_ectopic_mucosa
+  description: "Proximal ectopic esophageal mucosa (inlet patch), including distance from incisors and size."
   classifications:
     - distance_cm
     - size_oval_mm
@@ -27,6 +39,7 @@
 
 - model: finding
   name: star_upper_gi_esophagus_diverticulum
+  description: "Esophageal diverticulum, including distance from incisors and estimated size."
   classifications:
     - distance_cm
     - size_oval_mm
@@ -34,24 +47,31 @@
 
 - model: finding
   name: star_upper_gi_esophagus_barretts
+  description: "Suspected or known Barrett's esophagus with Prague C and M extents and enhanced-imaging details."
   classifications:
     - star_upper_gi_barrett_praque_classification
+    - upper_gi_esophagus_imaging_modality_classification
+    - yes_no_unknown_classification
     - additional_text_info
 
 - model: finding
   name: star_upper_gi_esophagus_varices
+  description: "Esophageal varices documented by count and Baveno small/large category."
   classifications:
     - star_upper_gi_esophagus_varices_baveno
+    - star_upper_gi_count
     - additional_text_info
 
 - model: finding
   name: star_upper_gi_esophagitis
+  description: "Reflux esophagitis graded according to the Los Angeles classification."
   classifications:
     - star_upper_gi_los_angeles_classification
     - additional_text_info
 
 - model: finding
   name: star_upper_gi_esophagitis_eosinophilic
+  description: "Suspected eosinophilic esophagitis documented with all five EREFS components."
   classifications:
     - star_upper_gi_erefs_edema
     - star_upper_gi_erefs_rings
@@ -62,6 +82,7 @@
 
 - model: finding
   name: star_upper_gi_esophagitis_caustic
+  description: "Caustic esophageal injury graded according to the Zargar classification."
   classifications:
     - star_upper_gi_zargar
     - additional_text_info
@@ -69,7 +90,15 @@
 # Stomach
 
 - model: finding
+  name: star_upper_gi_hiatal_hernia
+  description: "Hiatal hernia measured as separation of the esophagogastric junction and hiatus."
+  classifications:
+    - distance_cm
+    - additional_text_info
+
+- model: finding
   name: star_upper_gi_stomach_varices
+  description: "Gastric varices documented by location and Sarin classification."
   classifications:
     - star_upper_gi_stomach_varices_sarin
     - additional_text_info
@@ -77,7 +106,16 @@
 # Duodenum
 - model: finding
   name: star_upper_gi_duodenum_diverticulum
+  description: "Duodenal diverticulum documented by location and estimated size."
   classifications:
     - size_oval_mm
     - star_upper_gi_location_duodenum
+    - additional_text_info
+
+- model: finding
+  name: star_upper_gi_papilla_suspected_adenoma
+  description: "Visible major papilla with an appearance suspicious for adenoma."
+  classifications:
+    - star_upper_gi_location_duodenum
+    - size_oval_mm
     - additional_text_info

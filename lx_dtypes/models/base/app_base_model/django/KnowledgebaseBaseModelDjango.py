@@ -1,5 +1,5 @@
 import uuid as uuid_module
-from typing import ClassVar, Generic, List, Literal, Self, TypeVar
+from typing import ClassVar, Generic, Literal, Self, TypeVar
 
 from django.db import models
 
@@ -159,13 +159,12 @@ class KnowledgebaseBaseModelDjango(Generic[DDictT], AppBaseModelNamesUUIDTagsDja
                 data[field] = value
         # Align with pydantic model dump which includes created_at
         if "created_at" not in data and hasattr(self, "created_at"):
-            data["created_at"] = getattr(self, "created_at")
-        if "id" in data:
-            del data["id"]
+            data["created_at"] = self.created_at
+        data.pop("id", None)
         return self.ddict_class(**data)  # type: ignore
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         List field names that should be treated as list-types in the DataDict.
 

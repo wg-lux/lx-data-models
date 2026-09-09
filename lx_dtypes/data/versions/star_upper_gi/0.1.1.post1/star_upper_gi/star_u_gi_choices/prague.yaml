@@ -1,0 +1,9 @@
+- model: classification_choice
+  name: star_upper_gi_barrett_praque_c_value
+  classification_choice_descriptors:
+    - length_cm_descriptor
+
+- model: classification_choice
+  name: star_upper_gi_barrett_praque_m_value
+  classification_choice_descriptors:
+    - length_cm_descriptor

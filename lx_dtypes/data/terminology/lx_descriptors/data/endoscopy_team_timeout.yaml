@@ -1,0 +1,13 @@
+# Sources for every record in this file:
+# - DGVS S2k quality guideline (AWMF 021-022), team time-out: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b20056d03/chapter_69f4b200d1e40/
+- model: classification_choice_descriptor
+  name: "endoscopy_team_timeout_time_value"
+  description: "Uhrzeitgenauer Zeitpunkt des Team-Time-outs unmittelbar vor dem endoskopischen Eingriff."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "endoscopy_sign_out_time_value"
+  description: "Uhrzeitgenauer Zeitpunkt des Sign-outs unmittelbar nach dem endoskopischen Eingriff."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32

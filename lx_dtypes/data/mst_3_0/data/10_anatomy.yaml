@@ -1,0 +1,94 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Source: MST 3.0 sections 2.1, 2.2 and 2.4. Modifiers are retained in each
+# classification description; site choices preserve the standard's labels.
+- {model: classification, name: mst30_location_esophagus, name_en: Esophagus location, name_de: Esophagus location, classification_types: [mst30_location], description: "MST 3.0 §2.1. Modifiers: xx cm from incisors/nares.", classification_choices: [mst30_esophagus_esophagus, mst30_esophagus_cricopharynx, mst30_esophagus_upper_third, mst30_esophagus_middle_third, mst30_esophagus_lower_third, mst30_esophagus_z_line, mst30_esophagus_cardia, mst30_esophagus_whole_esophagus, mst30_esophagus_anastomosis]}
+- {model: classification, name: mst30_location_stomach, name_en: Stomach location, name_de: Stomach location, classification_types: [mst30_location], description: "MST 3.0 §2.1. Modifiers: greater/lesser curve; anterior/posterior wall; distance from incisors, GE junction, or pylorus.", classification_choices: [mst30_stomach_stomach, mst30_stomach_cardia, mst30_stomach_fundus, mst30_stomach_body, mst30_stomach_incisura_angulus, mst30_stomach_antrum, mst30_stomach_prepyloric_region, mst30_stomach_pylorus, mst30_stomach_whole_stomach, mst30_stomach_anastomosis, mst30_stomach_hiatal_hernia, mst30_stomach_diaphragma_orifice]}
+- {model: classification, name: mst30_location_duodenum, name_en: Duodenum location, name_de: Duodenum location, classification_types: [mst30_location], description: "MST 3.0 §2.1. Modifiers: proximal, distal, whole, whole examined.", classification_choices: [mst30_duodenum_duodenum, mst30_duodenum_bulb, mst30_duodenum_d2, mst30_duodenum_d3, mst30_duodenum_d4, mst30_duodenum_upper_knee, mst30_duodenum_ampullary_region, mst30_duodenum_major_papilla, mst30_duodenum_minor_papilla, mst30_duodenum_lower_knee, mst30_duodenum_anastomosis]}
+- {model: classification, name: mst30_location_jejunum, name_en: Jejunum location, name_de: Jejunum location, classification_types: [mst30_location], description: "MST 3.0 §2.1. Modifiers: distance from ligament of Treitz/pylorus; proximal, distal, whole, whole examined; type.", classification_choices: [mst30_jejunum_jejunum, mst30_jejunum_ligament_of_treitz, mst30_jejunum_afferent_loop, mst30_jejunum_efferent_loop, mst30_jejunum_jejunal_crest, mst30_jejunum_roux_y_limb, mst30_jejunum_anastomosis, mst30_jejunum_stoma]}
+- {model: classification, name: mst30_location_ileum, name_en: Ileum location, name_de: Ileum location, classification_types: [mst30_location], description: "MST 3.0 §2.1. Modifiers: distance from ileocecal valve/stoma; time from cecum; proximal, distal, whole, whole examined.", classification_choices: [mst30_ileum_ileum, mst30_ileum_stoma]}
+- {model: classification, name: mst30_location_colon, name_en: Colon location, name_de: Colon location, classification_types: [mst30_location], description: "MST 3.0 §2.1. Modifiers: distance from anus/stoma; proximal, mid, distal, whole, whole examined; anastomosis type.", classification_choices: [mst30_colon_colon, mst30_colon_anus, mst30_colon_rectum, mst30_colon_sigmoid, mst30_colon_descending, mst30_colon_splenic_flexure, mst30_colon_transverse, mst30_colon_hepatic_flexure, mst30_colon_ascending, mst30_colon_cecum, mst30_colon_ileocecal_valve, mst30_colon_anastomosis, mst30_colon_pouch, mst30_colon_stoma]}
+- {model: classification, name: mst30_location_biliary_tree, name_en: Biliary tree location, name_de: Biliary tree location, classification_types: [mst30_location], description: "MST 3.0 §2.2. Modifiers: whole, upper, mid, lower, terminal, distance from papilla, above/below, central/peripheral.", classification_choices: [mst30_biliary_major_papilla, mst30_biliary_whole_tree, mst30_biliary_common_bile_duct, mst30_biliary_cystic_duct, mst30_biliary_cystic_duct_takeoff, mst30_biliary_gallbladder, mst30_biliary_bifurcation_hilum, mst30_biliary_anastomosis, mst30_biliary_left_hepatic_duct, mst30_biliary_right_hepatic_duct, mst30_biliary_left_intrahepatic_branches, mst30_biliary_right_intrahepatic_branches, mst30_biliary_segment_branch]}
+- {model: classification, name: mst30_location_pancreatic_duct, name_en: Pancreatic duct location, name_de: Pancreatic duct location, classification_types: [mst30_location], description: "MST 3.0 §2.2. Modifiers: distance from papilla; whole, upstream/downstream, central/peripheral.", classification_choices: [mst30_pancreatic_major_papilla, mst30_pancreatic_minor_papilla, mst30_pancreatic_whole_duct, mst30_pancreatic_head, mst30_pancreatic_neck, mst30_pancreatic_body, mst30_pancreatic_tail, mst30_pancreatic_uncinate_process, mst30_pancreatic_ventral_duct, mst30_pancreatic_dorsal_duct, mst30_pancreatic_duct_of_santorini, mst30_pancreatic_duct_of_wirsung, mst30_pancreatic_side_branches]}
+
+- {model: classification_choice, name: mst30_esophagus_esophagus, name_en: Esophagus, name_de: Esophagus}
+- {model: classification_choice, name: mst30_esophagus_cricopharynx, name_en: Cricopharynx, name_de: Cricopharynx}
+- {model: classification_choice, name: mst30_esophagus_upper_third, name_en: Upper third, name_de: Upper third}
+- {model: classification_choice, name: mst30_esophagus_middle_third, name_en: Middle third, name_de: Middle third}
+- {model: classification_choice, name: mst30_esophagus_lower_third, name_en: Lower third, name_de: Lower third}
+- {model: classification_choice, name: mst30_esophagus_z_line, name_en: z-line, name_de: z-line}
+- {model: classification_choice, name: mst30_esophagus_cardia, name_en: Cardia, name_de: Cardia}
+- {model: classification_choice, name: mst30_esophagus_whole_esophagus, name_en: Whole esophagus, name_de: Whole esophagus}
+- {model: classification_choice, name: mst30_esophagus_anastomosis, name_en: Anastomosis, name_de: Anastomosis}
+- {model: classification_choice, name: mst30_stomach_stomach, name_en: Stomach, name_de: Stomach}
+- {model: classification_choice, name: mst30_stomach_cardia, name_en: Cardia, name_de: Cardia}
+- {model: classification_choice, name: mst30_stomach_fundus, name_en: Fundus, name_de: Fundus}
+- {model: classification_choice, name: mst30_stomach_body, name_en: Body, name_de: Body}
+- {model: classification_choice, name: mst30_stomach_incisura_angulus, name_en: Incisura/angulus, name_de: Incisura/angulus}
+- {model: classification_choice, name: mst30_stomach_antrum, name_en: Antrum, name_de: Antrum}
+- {model: classification_choice, name: mst30_stomach_prepyloric_region, name_en: Prepyloric region, name_de: Prepyloric region}
+- {model: classification_choice, name: mst30_stomach_pylorus, name_en: Pylorus, name_de: Pylorus}
+- {model: classification_choice, name: mst30_stomach_whole_stomach, name_en: Whole stomach, name_de: Whole stomach}
+- {model: classification_choice, name: mst30_stomach_anastomosis, name_en: Anastomosis, name_de: Anastomosis}
+- {model: classification_choice, name: mst30_stomach_hiatal_hernia, name_en: Hiatal hernia, name_de: Hiatal hernia}
+- {model: classification_choice, name: mst30_stomach_diaphragma_orifice, name_en: Diaphragma orifice, name_de: Diaphragma orifice}
+- {model: classification_choice, name: mst30_duodenum_duodenum, name_en: Duodenum, name_de: Duodenum}
+- {model: classification_choice, name: mst30_duodenum_bulb, name_en: Duodenal bulb, name_de: Duodenal bulb}
+- {model: classification_choice, name: mst30_duodenum_d2, name_en: D2 - 2nd part of duodenum, name_de: D2 - 2nd part of duodenum}
+- {model: classification_choice, name: mst30_duodenum_d3, name_en: D3 - 3rd part of duodenum, name_de: D3 - 3rd part of duodenum}
+- {model: classification_choice, name: mst30_duodenum_d4, name_en: D4 - 4th part of duodenum, name_de: D4 - 4th part of duodenum}
+- {model: classification_choice, name: mst30_duodenum_upper_knee, name_en: Upper duodenal knee/superior duodenal angulus, name_de: Upper duodenal knee/superior duodenal angulus}
+- {model: classification_choice, name: mst30_duodenum_ampullary_region, name_en: Ampullary region, name_de: Ampullary region}
+- {model: classification_choice, name: mst30_duodenum_major_papilla, name_en: Major papilla, name_de: Major papilla}
+- {model: classification_choice, name: mst30_duodenum_minor_papilla, name_en: Minor papilla, name_de: Minor papilla}
+- {model: classification_choice, name: mst30_duodenum_lower_knee, name_en: Lower duodenal knee/inferior duodenal angulus, name_de: Lower duodenal knee/inferior duodenal angulus}
+- {model: classification_choice, name: mst30_duodenum_anastomosis, name_en: Anastomosis, name_de: Anastomosis}
+- {model: classification_choice, name: mst30_jejunum_jejunum, name_en: Jejunum, name_de: Jejunum}
+- {model: classification_choice, name: mst30_jejunum_ligament_of_treitz, name_en: Ligament of Treitz, name_de: Ligament of Treitz}
+- {model: classification_choice, name: mst30_jejunum_afferent_loop, name_en: Afferent loop, name_de: Afferent loop}
+- {model: classification_choice, name: mst30_jejunum_efferent_loop, name_en: Efferent loop, name_de: Efferent loop}
+- {model: classification_choice, name: mst30_jejunum_jejunal_crest, name_en: Jejunal crest, name_de: Jejunal crest}
+- {model: classification_choice, name: mst30_jejunum_roux_y_limb, name_en: Roux-y-limb, name_de: Roux-y-limb}
+- {model: classification_choice, name: mst30_jejunum_anastomosis, name_en: anastomosis, name_de: anastomosis}
+- {model: classification_choice, name: mst30_jejunum_stoma, name_en: stoma, name_de: stoma}
+- {model: classification_choice, name: mst30_ileum_ileum, name_en: Ileum, name_de: Ileum}
+- {model: classification_choice, name: mst30_ileum_stoma, name_en: Stoma, name_de: Stoma}
+- {model: classification_choice, name: mst30_colon_colon, name_en: Colon, name_de: Colon}
+- {model: classification_choice, name: mst30_colon_anus, name_en: anus, name_de: anus}
+- {model: classification_choice, name: mst30_colon_rectum, name_en: rectum, name_de: rectum}
+- {model: classification_choice, name: mst30_colon_sigmoid, name_en: Sigmoid colon, name_de: Sigmoid colon}
+- {model: classification_choice, name: mst30_colon_descending, name_en: Descending colon, name_de: Descending colon}
+- {model: classification_choice, name: mst30_colon_splenic_flexure, name_en: Splenic flexure, name_de: Splenic flexure}
+- {model: classification_choice, name: mst30_colon_transverse, name_en: Transverse colon, name_de: Transverse colon}
+- {model: classification_choice, name: mst30_colon_hepatic_flexure, name_en: Hepatic flexure, name_de: Hepatic flexure}
+- {model: classification_choice, name: mst30_colon_ascending, name_en: Ascending colon, name_de: Ascending colon}
+- {model: classification_choice, name: mst30_colon_cecum, name_en: Cecum, name_de: Cecum}
+- {model: classification_choice, name: mst30_colon_ileocecal_valve, name_en: Ileocecal valve, name_de: Ileocecal valve}
+- {model: classification_choice, name: mst30_colon_anastomosis, name_en: Anastomosis, name_de: Anastomosis}
+- {model: classification_choice, name: mst30_colon_pouch, name_en: Pouch, name_de: Pouch}
+- {model: classification_choice, name: mst30_colon_stoma, name_en: Stoma, name_de: Stoma}
+- {model: classification_choice, name: mst30_biliary_major_papilla, name_en: Major papilla, name_de: Major papilla}
+- {model: classification_choice, name: mst30_biliary_whole_tree, name_en: Whole biliary tree, name_de: Whole biliary tree}
+- {model: classification_choice, name: mst30_biliary_common_bile_duct, name_en: Common bile duct, name_de: Common bile duct}
+- {model: classification_choice, name: mst30_biliary_cystic_duct, name_en: Cystic duct, name_de: Cystic duct}
+- {model: classification_choice, name: mst30_biliary_cystic_duct_takeoff, name_en: Cystic duct takeoff, name_de: Cystic duct takeoff}
+- {model: classification_choice, name: mst30_biliary_gallbladder, name_en: Gallbladder, name_de: Gallbladder}
+- {model: classification_choice, name: mst30_biliary_bifurcation_hilum, name_en: Bifurcation/Hilum, name_de: Bifurcation/Hilum}
+- {model: classification_choice, name: mst30_biliary_anastomosis, name_en: Anastomosis, name_de: Anastomosis}
+- {model: classification_choice, name: mst30_biliary_left_hepatic_duct, name_en: Left hepatic duct, name_de: Left hepatic duct}
+- {model: classification_choice, name: mst30_biliary_right_hepatic_duct, name_en: Right hepatic duct, name_de: Right hepatic duct}
+- {model: classification_choice, name: mst30_biliary_left_intrahepatic_branches, name_en: Left intrahepatic branches, name_de: Left intrahepatic branches}
+- {model: classification_choice, name: mst30_biliary_right_intrahepatic_branches, name_en: Right intrahepatic branches, name_de: Right intrahepatic branches}
+- {model: classification_choice, name: mst30_biliary_segment_branch, name_en: Segment xx branch, name_de: Segment xx branch}
+- {model: classification_choice, name: mst30_pancreatic_major_papilla, name_en: Major papilla, name_de: Major papilla}
+- {model: classification_choice, name: mst30_pancreatic_minor_papilla, name_en: Minor papilla, name_de: Minor papilla}
+- {model: classification_choice, name: mst30_pancreatic_whole_duct, name_en: Whole pancreatic duct, name_de: Whole pancreatic duct}
+- {model: classification_choice, name: mst30_pancreatic_head, name_en: Head, name_de: Head}
+- {model: classification_choice, name: mst30_pancreatic_neck, name_en: Neck, name_de: Neck}
+- {model: classification_choice, name: mst30_pancreatic_body, name_en: Body, name_de: Body}
+- {model: classification_choice, name: mst30_pancreatic_tail, name_en: Tail, name_de: Tail}
+- {model: classification_choice, name: mst30_pancreatic_uncinate_process, name_en: Uncinate process, name_de: Uncinate process}
+- {model: classification_choice, name: mst30_pancreatic_ventral_duct, name_en: Ventral duct, name_de: Ventral duct}
+- {model: classification_choice, name: mst30_pancreatic_dorsal_duct, name_en: Dorsal duct, name_de: Dorsal duct}
+- {model: classification_choice, name: mst30_pancreatic_duct_of_santorini, name_en: Duct of Santorini, name_de: Duct of Santorini}
+- {model: classification_choice, name: mst30_pancreatic_duct_of_wirsung, name_en: Duct of Wirsungi, name_de: Duct of Wirsungi}
+- {model: classification_choice, name: mst30_pancreatic_side_branches, name_en: Side branches, name_de: Side branches}

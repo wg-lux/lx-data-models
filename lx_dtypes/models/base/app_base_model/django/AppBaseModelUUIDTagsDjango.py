@@ -1,5 +1,5 @@
 import uuid as uuid_module
-from typing import Any, Dict, List, Self, Union
+from typing import Any, Self
 
 from django.db import models
 
@@ -22,7 +22,7 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
     tags: CharFieldType = models.CharField(max_length=1024, blank=True)
 
     @classmethod
-    def str_list_to_list(cls, value: Union[str, List[str], None]) -> List[str]:
+    def str_list_to_list(cls, value: str | list[str] | None) -> list[str]:
         """
         Normalize an input that may be None, a list, or a delimited string into a list of cleaned tag strings.
 
@@ -45,7 +45,7 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
             return []
 
         tokens = text.strip("[]")
-        items: List[str] = []
+        items: list[str] = []
         for token in tokens.split(","):
             cleaned = token.strip().strip("'\"")
             if cleaned:
@@ -54,7 +54,7 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
 
     def _to_ddict(
         self,
-    ) -> Dict[str, Any]:  # TODO DEPRECATED?
+    ) -> dict[str, Any]:  # TODO DEPRECATED?
         """
         Produce a serializable representation of the instance with normalized tags and a stringified uuid.
 
@@ -79,7 +79,7 @@ class AppBaseModelUUIDTagsDjango(AppBaseModelDjango):
         abstract = True
 
     @classmethod
-    def get_by_uuid(cls, uuid: Union[str, uuid_module.UUID]) -> Self:
+    def get_by_uuid(cls, uuid: str | uuid_module.UUID) -> Self:
         """
         Retrieve the model instance identified by the given UUID.
 

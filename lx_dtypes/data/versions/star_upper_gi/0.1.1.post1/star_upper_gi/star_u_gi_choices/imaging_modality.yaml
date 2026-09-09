@@ -1,0 +1,11 @@
+- model: classification_choice
+  name: "star_upper_gi_imaging_modality_white_light"
+
+- model: classification_choice
+  name: "star_upper_gi_imaging_modality_narrow_band_imaging"
+
+- model: classification_choice
+  name: "star_upper_gi_imaging_modality_chromoendoscopy"
+
+- model: classification_choice
+  name: "star_upper_gi_imaging_modality_acidic_staining"

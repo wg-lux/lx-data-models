@@ -1,7 +1,10 @@
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022), lesion and intervention documentation: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: finding
   name: "colon_polyp"
   name_de: "Kolonpolyp"
   name_en: "Colon Polyp"
+  description: "Kolonpolyp mit Lokalisation, Größe, Morphologie, Resektions-, Bergungs- und Histologiestatus."
   finding_types:
     - observation
   interventions:
@@ -48,6 +51,9 @@
     - colon_lesion_jnet
     - colon_lesion_kudo
     - colon_lesion_lst
+    - colonoscopy_specimen_retrieval_status
+    - colonoscopy_histology_submission_status
+    - colonoscopy_resection_technique_status
     ## histology
     - colonoscopy_polyp_histology
 
@@ -55,6 +61,7 @@
   name: "colon_diverticule"
   name_de: "Kolondivertikel"
   name_en: "Colon Diverticule"
+  description: "Kolondivertikel mit eindeutiger anatomischer Lokalisation."
   interventions:
     - endoscopy_hemoclip_generic
     - endoscopy_biopsy_grasper_generic
@@ -71,6 +78,7 @@
   name: "anal_hemorrhoids"
   name_de: "Hämorrhoiden"
   name_en: "hemorrhoids"
+  description: "Hämorrhoidenbefund mit Gradangabe."
   interventions: [] #TODO
   finding_types:
     - observation
@@ -90,6 +98,7 @@
   name: "colon_stenosis"
   name_de: "Kolonstenose"
   name_en: "Colon Stenosis"
+  description: "Stenose des Kolons mit anatomischer Lokalisation."
   interventions:
     - endoscopy_dilation_balloon #TODO
     - endoscopy_stent_generic #TODO
@@ -112,33 +121,57 @@
   name: "colon_tumor_mass"
   name_de: "Tumor"
   name_en: "Tumor"
-  interventions: []
+  description: "Tumorverdächtige Raumforderung mit Lokalisation, Größe und Ausdehnungsmerkmalen."
+  interventions:
+    - endoscopy_biopsy_grasper_generic
   finding_types:
     - observation
+  classifications:
+    - colonoscopy_location_default
+    - lesion_size_mm
+    - lesion_circularity_default
+    - lesion_surface_intact_default
 
 - model: finding
   name: "colon_inflammation"
   name_de: "Entzündung"
   name_en: "Inflammation"
-  interventions: []
+  description: "Entzündlicher Schleimhautbefund mit Lokalisation, Größe und Ausdehnung."
+  interventions:
+    - endoscopy_biopsy_grasper_generic
   finding_types:
     - observation
+  classifications:
+    - colonoscopy_location_default
+    - lesion_size_mm
+    - lesion_circularity_default
 
 - model: finding
   name: "colon_erosion"
   name_de: "Erosion"
   name_en: "Erosion"
-  interventions: []
+  description: "Erosion mit Lokalisation und Größenangabe."
+  interventions:
+    - endoscopy_biopsy_grasper_generic
   finding_types:
     - observation
+  classifications:
+    - colonoscopy_location_default
+    - lesion_size_mm
 
 - model: finding
   name: "colon_ulcer"
   name_de: "Ulcus"
   name_en: "Ulcer"
-  interventions: []
+  description: "Ulkus mit Lokalisation, Größe und Ausdehnung."
+  interventions:
+    - endoscopy_biopsy_grasper_generic
   finding_types:
     - observation
+  classifications:
+    - colonoscopy_location_default
+    - lesion_size_mm
+    - lesion_circularity_default
 
 - model: finding
   name: "colon_scar"

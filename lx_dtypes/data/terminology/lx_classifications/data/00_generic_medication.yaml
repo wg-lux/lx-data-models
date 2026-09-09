@@ -1,0 +1,49 @@
+# Sources for every record in this file:
+# - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
+# - DGVS S2k quality guideline (AWMF 021-022), findings documentation: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b200dfa8a/chapter_69f4b200e16c2/
+- model: classification
+  name: "endoscopy_medication_documentation_status"
+  name_de: "Dokumentationsstatus der Endoskopie-Medikation"
+  name_en: "Endoscopy medication documentation status"
+  description: "Explizite Angabe, ob während der Untersuchung Medikamente verabreicht wurden."
+  classification_types: []
+  classification_choices:
+    - documented_none
+    - documented_present
+    - documented_unknown
+
+- model: classification
+  name: "endoscopy_medication_product_and_dose"
+  name_de: "Medikament und verabreichte Dosis"
+  name_en: "Medication product and administered dose"
+  description: "Das verabreichte Medikament einschließlich der tatsächlich verabreichten numerischen Dosis."
+  classification_types: []
+  classification_choices:
+    - medication_propofol
+    - medication_midazolam
+    - medication_fentanyl
+    - medication_pethidine
+    - medication_butylscopolamine
+
+- model: classification
+  name: "medication_administration_route"
+  name_de: "Applikationsart"
+  name_en: "Route of administration"
+  description: "Applikationsart der Medikamentenverabreichung."
+  classification_types: []
+  classification_choices:
+    - medication_route_intravenous
+    - medication_route_oral
+    - medication_route_rectal
+    - medication_route_other
+
+- model: classification
+  name: "medication_administration_method"
+  name_de: "Verabreichungsform"
+  name_en: "Administration method"
+  description: "Form der Medikamentenverabreichung."
+  classification_types: []
+  classification_choices:
+    - medication_method_bolus
+    - medication_method_infusion
+    - medication_method_other

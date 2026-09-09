@@ -7,3 +7,23 @@
   name: size_mm
   classification_choice_descriptors:
     - length_mm_descriptor
+
+- model: classification_choice
+  name: star_upper_gi_count_value
+  classification_choice_descriptors:
+    - star_upper_gi_count_descriptor
+
+- model: classification_choice
+  name: star_upper_gi_minutes_value
+  classification_choice_descriptors:
+    - star_upper_gi_minutes_descriptor
+
+- model: classification_choice
+  name: star_upper_gi_cleanliness_total_0_9_value
+  classification_choice_descriptors:
+    - star_upper_gi_cleanliness_total_0_9_descriptor
+
+- model: classification_choice
+  name: star_upper_gi_cleanliness_total_0_10_value
+  classification_choice_descriptors:
+    - star_upper_gi_cleanliness_total_0_10_descriptor

@@ -28,13 +28,13 @@ l_p_indication_ddicts = Union[PIndicationDataDict,]
 l_p_indication_django_models = Union[PIndicationDjango,]
 
 __all__ = [
+    "LPIndicationDjangoLookupType",
+    "LPIndicationLookupType",
     "PIndication",
     "PIndicationDataDict",
-    "l_p_indication_django_models",
-    "l_p_indication_django_lookup",
-    "LPIndicationDjangoLookupType",
-    "l_p_indication_lookup",
-    "LPIndicationLookupType",
-    "l_p_indication_models",
     "l_p_indication_ddicts",
+    "l_p_indication_django_lookup",
+    "l_p_indication_django_models",
+    "l_p_indication_lookup",
+    "l_p_indication_models",
 ]

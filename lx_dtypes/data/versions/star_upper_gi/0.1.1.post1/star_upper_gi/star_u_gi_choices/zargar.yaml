@@ -1,0 +1,43 @@
+# Grade 0: Normal esophagus
+# ▪ Grade 1: Esophageal hyperemia
+# ▪ Grade 2a: Superficial ulceration, noncircumferential
+# ▪ Grade 2b: Deep, discrete, or circumferential ulceration
+# ▪ Grade 3a: Black, brown necrosis is noted with areas of
+# ulceration
+# ▪ Grade 3b: Extensive necrosis
+# ▪ Grade 4: Perforation.
+
+# star_upper_gi_zargar_grade_0
+- model: classification_choice
+  name: star_upper_gi_zargar_grade_0
+  description: "Normal esophagus with no signs of caustic injury."
+
+# star_upper_gi_zargar_grade_1
+- model: classification_choice
+  name: star_upper_gi_zargar_grade_1
+  description: "Esophageal hyperemia without ulceration."
+
+# star_upper_gi_zargar_grade_2a
+- model: classification_choice
+  name: star_upper_gi_zargar_grade_2a
+  description: "Superficial ulceration that is noncircumferential."
+
+# star_upper_gi_zargar_grade_2b
+- model: classification_choice
+  name: star_upper_gi_zargar_grade_2b
+  description: "Deep, discrete, or circumferential ulceration."
+
+# star_upper_gi_zargar_grade_3a
+- model: classification_choice
+  name: star_upper_gi_zargar_grade_3a
+  description: "Black or brown necrosis noted with areas of ulceration."
+
+# star_upper_gi_zargar_grade_3b
+- model: classification_choice
+  name: star_upper_gi_zargar_grade_3b
+  description: "Extensive necrosis of the esophageal tissue."
+
+# star_upper_gi_zargar_grade_4
+- model: classification_choice
+  name: star_upper_gi_zargar_grade_4
+  description: "Perforation of the esophagus due to caustic injury."

@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, List, Self
+from typing import Any, ClassVar, Self
 
 from django.db import models
 from django_stubs_ext.db.models import TypedModelMeta
@@ -16,24 +16,23 @@ class AppBaseModelDjango(models.Model):
         abstract = True
         app_label = "lx_dtypes_django"
 
-    def _to_ddict(self) -> Dict[str, Any]:
+    def _to_ddict(self) -> dict[str, Any]:
         """
         Produce a dictionary of the model instance's non-None field values, excluding the "id" key.
 
         Returns:
             Dict[str, Any]: Mapping of field names to their values for all fields whose value is not None, with "id" removed if present.
         """
-        data: Dict[str, Any] = {}
+        data: dict[str, Any] = {}
         for field in self._meta.fields:
             value = getattr(self, field.name)
             if value is not None:
                 data[field.name] = value
-        if "id" in data:
-            del data["id"]
+        data.pop("id", None)
         return data
 
     @classmethod
-    def m2m_fields(cls) -> List[str]:
+    def m2m_fields(cls) -> list[str]:
         """
         Return the names of all many-to-many relationship fields declared on the model.
 
@@ -44,7 +43,7 @@ class AppBaseModelDjango(models.Model):
         return [field.name for field in cls._meta.get_fields() if field.many_to_many]
 
     @classmethod
-    def fk_fields(cls) -> List[str]:
+    def fk_fields(cls) -> list[str]:
         """
         Return the names of the model's non-many-to-many relational fields (foreign keys).
 

@@ -1,27 +1,69 @@
 - model: examination
   name: "star_upper_gi_endoscopy"
   findings:
+    # Preprocedure information
+    - star_upper_gi_exam_date
+    - star_upper_gi_patient_name
+    - star_upper_gi_patient_date_of_birth
+    - star_upper_gi_exam_indication
+    - star_upper_gi_antithrombotic_use
+    - star_upper_gi_antithrombotic_agent
+    - star_upper_gi_antithrombotic_management
+    - star_upper_gi_fasting_solids
+    - star_upper_gi_fasting_liquids
+    - star_upper_gi_premedication
+
+    # Periprocedure information and cleanliness
+    - star_upper_gi_drugs_during_endoscopy
+    - star_upper_gi_endoscope_type
+    - star_upper_gi_cleanliness_assessment
+    - star_upper_gi_cleanliness_esophagus
+    - star_upper_gi_cleanliness_stomach
+    - star_upper_gi_cleanliness_gastric_fundus
+    - star_upper_gi_cleanliness_gastric_corpus
+    - star_upper_gi_cleanliness_gastric_antrum
+    - star_upper_gi_cleanliness_duodenum
+    - star_upper_gi_previous_surgery_reconstruction
+
+    # Normal and anatomical findings
     - star_upper_gi_mucosa_esophagus_abnormal
+    - star_upper_gi_mucosa_esophagus_status
     - star_upper_gi_location_esophagogastric_junction
     - star_upper_gi_location_hiatus
     - star_upper_gi_location_squamocolumnar_junction
     - star_upper_gi_imaging_modality_esophagus
     - star_upper_gi_mucosa_stomach_abnormal
+    - star_upper_gi_mucosa_stomach_cardia_status
+    - star_upper_gi_mucosa_stomach_corpus_fundus_status
+    - star_upper_gi_mucosa_stomach_antrum_incisura_status
     - star_upper_gi_chromoendoscopy_stomach
     - star_upper_gi_mucosa_duodenum_abnormal
+    - star_upper_gi_mucosa_duodenum_bulb_status
+    - star_upper_gi_mucosa_duodenum_second_portion_status
     - star_upper_gi_vili_duodenum_atrophic
     - star_upper_gi_papilla_major_visualized
+    - star_upper_gi_papilla_major_status
     - star_upper_gi_papilla_minor_visualized
     - star_upper_gi_polyp
     - star_upper_gi_ulcer
+    - star_upper_gi_submucosal_abnormality
     - star_upper_gi_esophagus_ectopic_mucosa
     - star_upper_gi_esophagus_barretts
     - star_upper_gi_esophagus_diverticulum
+    - star_upper_gi_hiatal_hernia
     - star_upper_gi_esophagus_varices
     - star_upper_gi_esophagitis
     - star_upper_gi_esophagitis_eosinophilic
     - star_upper_gi_esophagitis_caustic
     - star_upper_gi_stomach_varices
     - star_upper_gi_duodenum_diverticulum
+    - star_upper_gi_papilla_suspected_adenoma
+
+    # Postprocedure information
+    - star_upper_gi_biopsy_documentation
+    - star_upper_gi_histology_vials
+    - star_upper_gi_photodocumentation
+    - star_upper_gi_exam_duration
+    - star_upper_gi_staff_and_roles
 
   indications: []

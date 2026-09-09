@@ -1,0 +1,369 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Production-facing report templates for lx-annotate. Required completeness
+# anchors are local workflow extensions and do not claim that MST 3.0 mandates
+# a specific clinical completion policy.
+
+# Reusable required findings
+- model: report_finding
+  name: mst30_rf_egd_documentation_status
+  finding: mst30_egd_documentation_status
+  required: true
+  multiple_allowed: false
+  concept_id: mst30.egd.documentation_status
+  classifications: [{classification: mst30_attr_completeness, required: true, concept_id: mst30.egd.documentation_status.value}]
+- model: report_finding
+  name: mst30_rf_colonoscopy_documentation_status
+  finding: mst30_colonoscopy_documentation_status
+  required: true
+  multiple_allowed: false
+  concept_id: mst30.colonoscopy.documentation_status
+  classifications: [{classification: mst30_attr_completeness, required: true, concept_id: mst30.colonoscopy.documentation_status.value}]
+- model: report_finding
+  name: mst30_rf_enteroscopy_documentation_status
+  finding: mst30_enteroscopy_documentation_status
+  required: true
+  multiple_allowed: false
+  concept_id: mst30.enteroscopy.documentation_status
+  classifications: [{classification: mst30_attr_completeness, required: true, concept_id: mst30.enteroscopy.documentation_status.value}]
+- model: report_finding
+  name: mst30_rf_vce_documentation_status
+  finding: mst30_vce_documentation_status
+  required: true
+  multiple_allowed: false
+  concept_id: mst30.vce.documentation_status
+  classifications: [{classification: mst30_attr_completeness, required: true, concept_id: mst30.vce.documentation_status.value}]
+- model: report_finding
+  name: mst30_rf_ercp_documentation_status
+  finding: mst30_ercp_documentation_status
+  required: true
+  multiple_allowed: false
+  concept_id: mst30.ercp.documentation_status
+  classifications: [{classification: mst30_attr_completeness, required: true, concept_id: mst30.ercp.documentation_status.value}]
+- model: report_finding
+  name: mst30_rf_eus_documentation_status
+  finding: mst30_eus_documentation_status
+  required: true
+  multiple_allowed: false
+  concept_id: mst30.eus.documentation_status
+  classifications: [{classification: mst30_attr_completeness, required: true, concept_id: mst30.eus.documentation_status.value}]
+
+# Upper endoscopy sections
+- model: report_template_section
+  name: mst30_egd_overview
+  title_de: Untersuchungsübersicht
+  title_en: Examination overview
+  position: 0
+  types: [baseline]
+  findings:
+    - {finding: mst30_egd_documentation_status, required: true, multiple_allowed: false, concept_id: mst30.egd.documentation_status, classifications: [{classification: mst30_attr_completeness, required: true, concept_id: mst30.egd.documentation_status.value}]}
+    - {finding: mst30_luminal_normal, required: false, multiple_allowed: false, classifications: []}
+    - {finding: mst30_luminal_stenosis, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_appearance, required: false}, {classification: mst30_attr_length_cm, required: false}]}
+    - {finding: mst30_luminal_diverticulum, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_number_category, required: false}, {classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_type, required: false}]}
+    - {finding: mst30_luminal_hiatal_hernia, required: false, multiple_allowed: false, classifications: []}
+    - {finding: mst30_luminal_z_line, required: false, multiple_allowed: false, classifications: []}
+- model: report_template_section
+  name: mst30_egd_mucosa_and_lesions
+  title_de: Mukosa und Läsionen
+  title_en: Mucosa and lesions
+  position: 10
+  findings:
+    - {finding: mst30_mucosa_erythematous, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_distribution, required: false}]}
+    - {finding: mst30_mucosa_edematous, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_distribution, required: false}]}
+    - {finding: mst30_mucosa_hemorrhagic, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_distribution, required: false}]}
+    - {finding: mst30_mucosa_atrophic, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_distribution, required: false}]}
+    - {finding: mst30_mucosa_barretts_esophagus, required: false, multiple_allowed: false, classifications: [{classification: mst30_prague_cm, required: false}]}
+    - {finding: mst30_mucosa_esophagitis, required: false, multiple_allowed: false, classifications: [{classification: mst30_los_angeles, required: false}, {classification: mst30_attr_bleeding, required: false}]}
+    - {finding: mst30_flat_angioectasia, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_number_category, required: false}, {classification: mst30_attr_bleeding, required: false}]}
+    - {finding: mst30_flat_dieulafoy_lesion, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_number_category, required: false}, {classification: mst30_attr_bleeding, required: false}]}
+    - {finding: mst30_protruding_polyp, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_appearance, required: false}, {classification: mst30_paris, required: false}]}
+    - {finding: mst30_protruding_tumor_mass, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_appearance, required: false}, {classification: mst30_paris, required: false}]}
+    - {finding: mst30_protruding_varices, required: false, multiple_allowed: true, classifications: [{classification: mst30_esophageal_varices_size, required: false}, {classification: mst30_attr_bleeding, required: false}]}
+    - {finding: mst30_excavated_erosion, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_bleeding, required: false}]}
+    - {finding: mst30_excavated_ulcer, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_forrest, required: false}]}
+- model: report_template_section
+  name: mst30_egd_diagnoses
+  title_de: Endoskopische Diagnosen
+  title_en: Endoscopic diagnoses
+  position: 20
+  findings: [mst30_dx_upper_achalasia, mst30_dx_upper_barretts_esophagus, mst30_dx_upper_benign_stricture, mst30_dx_upper_coeliac_disease, mst30_dx_upper_duodenal_ulcer, mst30_dx_upper_esophageal_cancer, mst30_dx_upper_esophageal_varices, mst30_dx_upper_gastric_cancer, mst30_dx_upper_gastric_ulcer, mst30_dx_upper_gastric_varices, mst30_dx_upper_reflux_esophagitis]
+- model: report_template_section
+  name: mst30_egd_procedures_events
+  title_de: Maßnahmen und unerwünschte Ereignisse
+  title_en: Procedures and adverse events
+  position: 30
+  findings:
+    - {finding: mst30_luminal_procedure_summary, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_type, required: false}, {classification: mst30_attr_result, required: false}]}
+    - {finding: mst30_event_intraprocedure_perforation}
+    - {finding: mst30_event_intraprocedure_bleeding}
+    - {finding: mst30_event_intraprocedure_cardiopulmonary}
+    - {finding: mst30_event_postprocedure_abdominal_pain}
+    - {finding: mst30_event_postprocedure_infection}
+    - {finding: mst30_event_postprocedure_late_perforation}
+    - {finding: mst30_event_postprocedure_late_bleeding}
+
+# Colonoscopy sections
+- model: report_template_section
+  name: mst30_colonoscopy_overview
+  title_de: Untersuchungsübersicht
+  title_en: Examination overview
+  position: 0
+  findings:
+    - {finding: mst30_colonoscopy_documentation_status, required: true, multiple_allowed: false, concept_id: mst30.colonoscopy.documentation_status, classifications: [{classification: mst30_attr_completeness, required: true, concept_id: mst30.colonoscopy.documentation_status.value}]}
+    - {finding: mst30_luminal_normal}
+    - {finding: mst30_luminal_stenosis, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_appearance, required: false}, {classification: mst30_attr_length_cm, required: false}]}
+    - {finding: mst30_luminal_diverticulum, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_number_category, required: false}, {classification: mst30_attr_size_mm, required: false}]}
+    - {finding: mst30_content_blood, required: false, multiple_allowed: false, classifications: [{classification: mst30_attr_blood_type, required: false}]}
+- model: report_template_section
+  name: mst30_colonoscopy_mucosa_and_lesions
+  title_de: Mukosa und Läsionen
+  title_en: Mucosa and lesions
+  position: 10
+  findings:
+    - {finding: mst30_mucosa_erythematous, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_distribution, required: false}]}
+    - {finding: mst30_mucosa_edematous, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_distribution, required: false}]}
+    - {finding: mst30_mucosa_granular, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_distribution, required: false}]}
+    - {finding: mst30_mucosa_friable, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_distribution, required: false}]}
+    - {finding: mst30_flat_angioectasia, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_bleeding, required: false}]}
+    - {finding: mst30_protruding_polyp, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_kudo, required: false}, {classification: mst30_paris, required: false}]}
+    - {finding: mst30_protruding_tumor_mass, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_appearance, required: false}]}
+    - {finding: mst30_protruding_hemorrhoids, required: false, multiple_allowed: true, classifications: [{classification: mst30_goligher, required: false}]}
+    - {finding: mst30_excavated_erosion, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_bleeding, required: false}]}
+    - {finding: mst30_excavated_ulcer, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}]}
+- model: report_template_section
+  name: mst30_colonoscopy_diagnoses
+  title_de: Endoskopische Diagnosen
+  title_en: Endoscopic diagnoses
+  position: 20
+  findings: [mst30_dx_colon_angiodysplasia, mst30_dx_colon_colitis_ischemic, mst30_dx_colon_colitis_pseudomembranous, mst30_dx_colon_colorectal_cancer, mst30_dx_colon_colorectal_superficial_neoplasm, mst30_dx_colon_crohns_active, mst30_dx_colon_diverticulitis, mst30_dx_colon_diverticulosis, mst30_dx_colon_polyp, mst30_dx_colon_polyposis_syndrome, mst30_dx_colon_uc_active]
+- model: report_template_section
+  name: mst30_colonoscopy_procedures_events
+  title_de: Maßnahmen und unerwünschte Ereignisse
+  title_en: Procedures and adverse events
+  position: 30
+  findings: [mst30_luminal_procedure_summary, mst30_event_intraprocedure_perforation, mst30_event_intraprocedure_bleeding, mst30_event_intraprocedure_cardiopulmonary, mst30_event_postprocedure_abdominal_pain, mst30_event_postprocedure_infection, mst30_event_postprocedure_late_perforation, mst30_event_postprocedure_late_bleeding]
+
+# Enteroscopy and VCE sections
+- model: report_template_section
+  name: mst30_enteroscopy_overview
+  title_de: Untersuchungsübersicht
+  title_en: Examination overview
+  position: 0
+  findings: [mst30_rf_enteroscopy_documentation_status, mst30_luminal_normal, mst30_luminal_stenosis, mst30_luminal_diverticulum, mst30_content_blood]
+- model: report_template_section
+  name: mst30_enteroscopy_findings
+  title_de: Dünndarmbefunde
+  title_en: Small-bowel findings
+  position: 10
+  findings: [mst30_mucosa_erythematous, mst30_mucosa_edematous, mst30_mucosa_granular, mst30_mucosa_friable, mst30_mucosa_hemorrhagic, mst30_mucosa_atrophic, mst30_mucosa_scalloping, mst30_flat_angioectasia, mst30_protruding_polyp, mst30_protruding_tumor_mass, mst30_excavated_erosion, mst30_excavated_ulcer]
+- model: report_template_section
+  name: mst30_enteroscopy_diagnoses
+  title_de: Endoskopische Diagnosen
+  title_en: Endoscopic diagnoses
+  position: 20
+  findings: [mst30_dx_enteroscopy_angioectasia, mst30_dx_enteroscopy_bleeding_unknown_origin, mst30_dx_enteroscopy_celiac_disease, mst30_dx_enteroscopy_crohns_disease, mst30_dx_enteroscopy_gist, mst30_dx_enteroscopy_lymphoma, mst30_dx_enteroscopy_nsaid_enteropathy, mst30_dx_enteroscopy_polyps, mst30_dx_enteroscopy_small_bowel_benign_tumor, mst30_dx_enteroscopy_small_bowel_malignant_tumor, mst30_dx_enteroscopy_ulcer]
+- model: report_template_section
+  name: mst30_enteroscopy_procedures_events
+  title_de: Maßnahmen und unerwünschte Ereignisse
+  title_en: Procedures and adverse events
+  position: 30
+  findings: [mst30_luminal_procedure_summary, mst30_event_intraprocedure_perforation, mst30_event_intraprocedure_bleeding, mst30_event_postprocedure_abdominal_pain, mst30_event_postprocedure_infection]
+- model: report_template_section
+  name: mst30_vce_overview
+  title_de: Untersuchungsübersicht
+  title_en: Examination overview
+  position: 0
+  findings: [mst30_rf_vce_documentation_status, mst30_luminal_normal, mst30_luminal_stenosis, mst30_luminal_diverticulum, mst30_content_blood]
+- model: report_template_section
+  name: mst30_vce_findings
+  title_de: Kapselendoskopische Befunde
+  title_en: Capsule endoscopy findings
+  position: 10
+  findings: [mst30_mucosa_erythematous, mst30_mucosa_edematous, mst30_mucosa_granular, mst30_mucosa_friable, mst30_mucosa_hemorrhagic, mst30_mucosa_atrophic, mst30_mucosa_scalloping, mst30_flat_angioectasia, mst30_protruding_polyp, mst30_protruding_tumor_mass, mst30_excavated_erosion, mst30_excavated_ulcer]
+- model: report_template_section
+  name: mst30_vce_diagnoses
+  title_de: Endoskopische Diagnosen
+  title_en: Endoscopic diagnoses
+  position: 20
+  findings: [mst30_dx_enteroscopy_angioectasia, mst30_dx_enteroscopy_bleeding_unknown_origin, mst30_dx_enteroscopy_celiac_disease, mst30_dx_enteroscopy_crohns_disease, mst30_dx_enteroscopy_nsaid_enteropathy, mst30_dx_enteroscopy_polyps, mst30_dx_enteroscopy_small_bowel_benign_tumor, mst30_dx_enteroscopy_small_bowel_malignant_tumor, mst30_dx_enteroscopy_ulcer]
+
+# ERCP sections
+- model: report_template_section
+  name: mst30_ercp_overview
+  title_de: Untersuchungsübersicht
+  title_en: Examination overview
+  position: 0
+  findings: [mst30_rf_ercp_documentation_status, mst30_ercp_papillary_features, mst30_ercp_pancreas_divisum, mst30_ercp_pancreas_annulare, mst30_ercp_common_channel]
+- model: report_template_section
+  name: mst30_ercp_ductal_findings
+  title_de: Gangbefunde
+  title_en: Ductal findings
+  position: 10
+  findings:
+    - {finding: mst30_ercp_irregularity}
+    - {finding: mst30_ercp_dilation}
+    - {finding: mst30_ercp_stenosis, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_type, required: false}]}
+    - {finding: mst30_ercp_stone, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_number_category, required: false}, {classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_yes_no_unknown, required: false}]}
+    - {finding: mst30_ercp_tumor, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_type, required: false}, {classification: mst30_bismuth, required: false}]}
+    - {finding: mst30_ercp_cavity}
+    - {finding: mst30_ercp_fistula}
+    - {finding: mst30_ercp_leak}
+    - {finding: mst30_ercp_stent}
+    - {finding: mst30_ercp_filling_defects}
+- model: report_template_section
+  name: mst30_ercp_diagnoses
+  title_de: Endoskopische Diagnosen
+  title_en: Endoscopic diagnoses
+  position: 20
+  findings: [mst30_dx_ercp_abnormal_pancreatobiliary_junction, mst30_dx_ercp_biliary_fistula_leak, mst30_dx_ercp_biliary_stones, mst30_dx_ercp_biliary_stricture, mst30_dx_ercp_choledochal_cyst, mst30_dx_ercp_choledochocele, mst30_dx_ercp_pancreatic_duct_stricture, mst30_dx_ercp_pancreatic_stone, mst30_dx_ercp_pancreatic_tumor, mst30_dx_ercp_primary_sclerosing_cholangitis]
+- model: report_template_section
+  name: mst30_ercp_procedures_events
+  title_de: Maßnahmen und unerwünschte Ereignisse
+  title_en: Procedures and adverse events
+  position: 30
+  findings: [mst30_ercp_procedure_summary, mst30_event_intraprocedure_perforation, mst30_event_intraprocedure_bleeding, mst30_event_intraprocedure_cardiopulmonary, mst30_event_postprocedure_infection, mst30_event_postprocedure_late_perforation, mst30_event_postprocedure_late_bleeding, mst30_event_postprocedure_pancreatitis]
+
+# EUS sections
+- model: report_template_section
+  name: mst30_eus_overview
+  title_de: Untersuchungsübersicht
+  title_en: Examination overview
+  position: 0
+  findings: [mst30_rf_eus_documentation_status, mst30_eus_wall_thickening, mst30_eus_stricture, mst30_eus_ascites]
+- model: report_template_section
+  name: mst30_eus_lesions
+  title_de: Läsionen und Organbefunde
+  title_en: Lesions and organ findings
+  position: 10
+  findings:
+    - {finding: mst30_eus_intramural_lesion, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_type, required: false}]}
+    - {finding: mst30_eus_polyp, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}]}
+    - {finding: mst30_eus_mass, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_type, required: false}]}
+    - {finding: mst30_eus_lymph_nodes, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_count, required: false}, {classification: mst30_attr_type, required: false}]}
+    - {finding: mst30_eus_extramural_mass, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}]}
+    - {finding: mst30_eus_cyst, required: false, multiple_allowed: true, classifications: [{classification: mst30_attr_size_mm, required: false}, {classification: mst30_attr_type, required: false}]}
+    - {finding: mst30_eus_parenchymal_changes}
+    - {finding: mst30_eus_pancreatic_duct_changes}
+    - {finding: mst30_eus_bile_duct_changes}
+    - {finding: mst30_eus_cholelithiasis}
+- model: report_template_section
+  name: mst30_eus_diagnoses
+  title_de: Endoskopische Diagnosen
+  title_en: Endoscopic diagnoses
+  position: 20
+  findings: [mst30_dx_eus_bile_duct_stone, mst30_dx_eus_bile_duct_stricture, mst30_dx_eus_bile_duct_tumor, mst30_dx_eus_colorectal_cancer, mst30_dx_eus_duodenal_cancer, mst30_dx_eus_esophageal_cancer, mst30_dx_eus_gastric_cancer, mst30_dx_eus_gist_tumor, mst30_dx_eus_mediastinal_lymph_nodes, mst30_dx_eus_pancreatic_cancer, mst30_dx_eus_pancreatic_mass, mst30_dx_eus_pancreatic_pseudocyst, mst30_dx_eus_pancreatitis_chronic]
+- model: report_template_section
+  name: mst30_eus_procedures_events
+  title_de: Maßnahmen und unerwünschte Ereignisse
+  title_en: Procedures and adverse events
+  position: 30
+  findings: [mst30_eus_procedure_summary, mst30_event_intraprocedure_perforation, mst30_event_intraprocedure_bleeding, mst30_event_intraprocedure_cardiopulmonary, mst30_event_postprocedure_abdominal_pain, mst30_event_postprocedure_infection]
+
+# Runtime validators
+- {model: findings_validator, name: mst30_egd_documentation_status_documented, finding: mst30_egd_documentation_status, operator: exists, query: {finding: mst30_egd_documentation_status, operator: exists}}
+- {model: findings_validator, name: mst30_colonoscopy_documentation_status_documented, finding: mst30_colonoscopy_documentation_status, operator: exists, query: {finding: mst30_colonoscopy_documentation_status, operator: exists}}
+- {model: findings_validator, name: mst30_enteroscopy_documentation_status_documented, finding: mst30_enteroscopy_documentation_status, operator: exists, query: {finding: mst30_enteroscopy_documentation_status, operator: exists}}
+- {model: findings_validator, name: mst30_vce_documentation_status_documented, finding: mst30_vce_documentation_status, operator: exists, query: {finding: mst30_vce_documentation_status, operator: exists}}
+- {model: findings_validator, name: mst30_ercp_documentation_status_documented, finding: mst30_ercp_documentation_status, operator: exists, query: {finding: mst30_ercp_documentation_status, operator: exists}}
+- {model: findings_validator, name: mst30_eus_documentation_status_documented, finding: mst30_eus_documentation_status, operator: exists, query: {finding: mst30_eus_documentation_status, operator: exists}}
+- {model: examination_validator, name: mst30_egd_minimum_documentation, finding_validators: [mst30_egd_documentation_status_documented], examination_validators: []}
+- {model: examination_validator, name: mst30_colonoscopy_minimum_documentation, finding_validators: [mst30_colonoscopy_documentation_status_documented], examination_validators: []}
+- {model: examination_validator, name: mst30_enteroscopy_minimum_documentation, finding_validators: [mst30_enteroscopy_documentation_status_documented], examination_validators: []}
+- {model: examination_validator, name: mst30_vce_minimum_documentation, finding_validators: [mst30_vce_documentation_status_documented], examination_validators: []}
+- {model: examination_validator, name: mst30_ercp_minimum_documentation, finding_validators: [mst30_ercp_documentation_status_documented], examination_validators: []}
+- {model: examination_validator, name: mst30_eus_minimum_documentation, finding_validators: [mst30_eus_documentation_status_documented], examination_validators: []}
+
+# Published templates (absence of a lifecycle override means published package content).
+- &mst30_egd_template
+  model: report_template
+  name: mst30_egd_report
+  name_de: MST 3.0 – ÖGD-Bericht
+  name_en: MST 3.0 – EGD report
+  description: Strukturierte ÖGD-Dokumentation nach WEO MST 3.0.
+  version: "3.0"
+  examination: star_upper_gi_endoscopy
+  report_sections: [mst30_egd_overview, mst30_egd_mucosa_and_lesions, mst30_egd_diagnoses, mst30_egd_procedures_events]
+  validators:
+    examination_validators: [mst30_egd_minimum_documentation]
+    findings_validators: [mst30_egd_documentation_status_documented]
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - &mst30_egd_coverage
+      concept_id: mst30.egd.documentation_status
+      label: Vollständigkeit der MST-ÖGD-Dokumentation
+      applicability_status: required
+      validator_names: [mst30_egd_documentation_status_documented]
+      evidence_path: [patient_findings]
+      finding_selector: {finding_name: mst30_egd_documentation_status, classification_name: mst30_attr_completeness}
+      allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable]
+      guideline_citations: ["WEO MST 3.0 sections 2–7"]
+- model: report_template
+  name: mst30_gastroscopy_report
+  name_de: MST 3.0 – Gastroskopiebericht
+  name_en: MST 3.0 – Gastroscopy report
+  description: Strukturierte Gastroskopiedokumentation nach WEO MST 3.0.
+  version: "3.0"
+  examination: gastroscopy
+  report_sections: [mst30_egd_overview, mst30_egd_mucosa_and_lesions, mst30_egd_diagnoses, mst30_egd_procedures_events]
+  validators: {examination_validators: [mst30_egd_minimum_documentation], findings_validators: [mst30_egd_documentation_status_documented]}
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts: [*mst30_egd_coverage]
+- model: report_template
+  name: mst30_colonoscopy_report
+  name_de: MST 3.0 – Koloskopiebericht
+  name_en: MST 3.0 – Colonoscopy report
+  description: Strukturierte Koloskopiedokumentation nach WEO MST 3.0.
+  version: "3.0"
+  examination: colonoscopy
+  report_sections: [mst30_colonoscopy_overview, mst30_colonoscopy_mucosa_and_lesions, mst30_colonoscopy_diagnoses, mst30_colonoscopy_procedures_events]
+  validators: {examination_validators: [mst30_colonoscopy_minimum_documentation], findings_validators: [mst30_colonoscopy_documentation_status_documented]}
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - {concept_id: mst30.colonoscopy.documentation_status, label: Vollständigkeit der MST-Koloskopiedokumentation, applicability_status: required, validator_names: [mst30_colonoscopy_documentation_status_documented], evidence_path: [patient_findings], finding_selector: {finding_name: mst30_colonoscopy_documentation_status, classification_name: mst30_attr_completeness}, allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable], guideline_citations: ["WEO MST 3.0 sections 2–7"]}
+- model: report_template
+  name: mst30_enteroscopy_report
+  name_de: MST 3.0 – Enteroskopiebericht
+  name_en: MST 3.0 – Enteroscopy report
+  description: Strukturierte Enteroskopiedokumentation nach WEO MST 3.0.
+  version: "3.0"
+  examination: enteroscopy
+  report_sections: [mst30_enteroscopy_overview, mst30_enteroscopy_findings, mst30_enteroscopy_diagnoses, mst30_enteroscopy_procedures_events]
+  validators: {examination_validators: [mst30_enteroscopy_minimum_documentation], findings_validators: [mst30_enteroscopy_documentation_status_documented]}
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - {concept_id: mst30.enteroscopy.documentation_status, label: Vollständigkeit der MST-Enteroskopiedokumentation, applicability_status: required, validator_names: [mst30_enteroscopy_documentation_status_documented], evidence_path: [patient_findings], finding_selector: {finding_name: mst30_enteroscopy_documentation_status, classification_name: mst30_attr_completeness}, allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable], guideline_citations: ["WEO MST 3.0 sections 2–7"]}
+- model: report_template
+  name: mst30_vce_report
+  name_de: MST 3.0 – Kapselendoskopiebericht
+  name_en: MST 3.0 – VCE report
+  description: Strukturierte Videokapselendoskopie-Dokumentation nach WEO MST 3.0.
+  version: "3.0"
+  examination: video_capsule_endoscopy
+  report_sections: [mst30_vce_overview, mst30_vce_findings, mst30_vce_diagnoses]
+  validators: {examination_validators: [mst30_vce_minimum_documentation], findings_validators: [mst30_vce_documentation_status_documented]}
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - {concept_id: mst30.vce.documentation_status, label: Vollständigkeit der MST-Kapselendoskopiedokumentation, applicability_status: required, validator_names: [mst30_vce_documentation_status_documented], evidence_path: [patient_findings], finding_selector: {finding_name: mst30_vce_documentation_status, classification_name: mst30_attr_completeness}, allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable], guideline_citations: ["WEO MST 3.0 sections 2–7"]}
+- model: report_template
+  name: mst30_ercp_report
+  name_de: MST 3.0 – ERCP-Bericht
+  name_en: MST 3.0 – ERCP report
+  description: Strukturierte ERCP-Dokumentation nach WEO MST 3.0.
+  version: "3.0"
+  examination: ercp
+  report_sections: [mst30_ercp_overview, mst30_ercp_ductal_findings, mst30_ercp_diagnoses, mst30_ercp_procedures_events]
+  validators: {examination_validators: [mst30_ercp_minimum_documentation], findings_validators: [mst30_ercp_documentation_status_documented]}
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - {concept_id: mst30.ercp.documentation_status, label: Vollständigkeit der MST-ERCP-Dokumentation, applicability_status: required, validator_names: [mst30_ercp_documentation_status_documented], evidence_path: [patient_findings], finding_selector: {finding_name: mst30_ercp_documentation_status, classification_name: mst30_attr_completeness}, allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable], guideline_citations: ["WEO MST 3.0 sections 2–7"]}
+- model: report_template
+  name: mst30_eus_report
+  name_de: MST 3.0 – EUS-Bericht
+  name_en: MST 3.0 – EUS report
+  description: Strukturierte Endosonographie-Dokumentation nach WEO MST 3.0.
+  version: "3.0"
+  examination: endoscopic_ultrasound
+  report_sections: [mst30_eus_overview, mst30_eus_lesions, mst30_eus_diagnoses, mst30_eus_procedures_events]
+  validators: {examination_validators: [mst30_eus_minimum_documentation], findings_validators: [mst30_eus_documentation_status_documented]}
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - {concept_id: mst30.eus.documentation_status, label: Vollständigkeit der MST-EUS-Dokumentation, applicability_status: required, validator_names: [mst30_eus_documentation_status_documented], evidence_path: [patient_findings], finding_selector: {finding_name: mst30_eus_documentation_status, classification_name: mst30_attr_completeness}, allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable], guideline_citations: ["WEO MST 3.0 sections 2–7"]}

@@ -1,0 +1,22 @@
+name: lx-dtypes-fhir-test
+
+services:
+  hapi-fhir:
+    profiles:
+      - fhir-test
+    image: hapiproject/hapi:v8.10.0-2
+    ports:
+      - "${FHIR_TEST_PORT:-8090}:8080"
+    environment:
+      hapi.fhir.default_encoding: json
+    healthcheck:
+      test:
+        - CMD
+        - java
+        - -cp
+        - /app
+        - HealthCheck
+      interval: 10s
+      timeout: 10s
+      retries: 18
+      start_period: 60s

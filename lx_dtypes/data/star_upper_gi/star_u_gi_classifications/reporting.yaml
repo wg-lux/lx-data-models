@@ -1,0 +1,86 @@
+# STAR Upper GI 2025 report-level classifications.
+- model: classification
+  name: star_upper_gi_text
+  classification_choices:
+    - star_upper_gi_text_value
+
+- model: classification
+  name: star_upper_gi_antithrombotic_management
+  classification_choices:
+    - star_upper_gi_antithrombotic_active
+    - star_upper_gi_antithrombotic_interrupted
+
+- model: classification
+  name: star_upper_gi_biopsy_type
+  classification_choices:
+    - star_upper_gi_biopsy_random
+    - star_upper_gi_biopsy_targeted
+
+- model: classification
+  name: star_upper_gi_cleanliness_scale
+  classification_choices:
+    - star_upper_gi_cleanliness_grace
+    - star_upper_gi_cleanliness_peace
+    - star_upper_gi_cleanliness_barcelona
+
+- model: classification
+  name: star_upper_gi_grace_segment_score
+  classification_choices:
+    - star_upper_gi_grace_0
+    - star_upper_gi_grace_1
+    - star_upper_gi_grace_2
+    - star_upper_gi_grace_3
+
+- model: classification
+  name: star_upper_gi_peace_segment_score
+  classification_choices:
+    - star_upper_gi_peace_0
+    - star_upper_gi_peace_1
+    - star_upper_gi_peace_2
+    - star_upper_gi_peace_3
+
+- model: classification
+  name: star_upper_gi_barcelona_segment_score
+  classification_choices:
+    - star_upper_gi_barcelona_0
+    - star_upper_gi_barcelona_1
+    - star_upper_gi_barcelona_2
+
+- model: classification
+  name: star_upper_gi_cleanliness_total_0_9
+  classification_choices:
+    - star_upper_gi_cleanliness_total_0_9_value
+
+- model: classification
+  name: star_upper_gi_cleanliness_total_0_10
+  classification_choices:
+    - star_upper_gi_cleanliness_total_0_10_value
+
+- model: classification
+  name: star_upper_gi_mucosal_status
+  classification_choices:
+    - star_upper_gi_mucosa_normal
+    - star_upper_gi_mucosa_abnormal
+    - star_upper_gi_mucosa_not_visualized
+
+- model: classification
+  name: star_upper_gi_papilla_status
+  classification_choices:
+    - star_upper_gi_papilla_normal
+    - star_upper_gi_papilla_suspected_adenoma
+    - star_upper_gi_papilla_not_visualized
+
+- model: classification
+  name: star_upper_gi_photo_landmark
+  classification_choices:
+    - star_upper_gi_photo_proximal_esophagus
+    - star_upper_gi_photo_distal_esophagus
+    - star_upper_gi_photo_z_line_and_hiatus
+    - star_upper_gi_photo_duodenal_bulb
+    - star_upper_gi_photo_second_duodenum
+    - star_upper_gi_photo_antrum
+    - star_upper_gi_photo_cardia_fundus_retroflexion
+    - star_upper_gi_photo_corpus_lesser_curve
+    - star_upper_gi_photo_incisura
+    - star_upper_gi_photo_corpus_greater_curve
+    - star_upper_gi_photo_abnormal_finding

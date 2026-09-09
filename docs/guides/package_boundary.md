@@ -20,3 +20,12 @@ applications such as `endoreg-db`.
 - Tests should use `tmp_path` and assert on generated files there.
 - Golden fixtures, if intentionally committed, should live under explicit test
   data directories rather than package roots.
+
+## Test Layout
+
+- Unit tests mirror the production package beneath `tests/unit/lx_dtypes/`.
+- Python fixture providers and golden inputs live beneath `tests/fixtures/`.
+- Repository-wide integration and package-boundary tests live directly beneath
+  `tests/`.
+- Test-only Django settings and pytest configuration belong to `tests/`, never
+  to the distributable `lx_dtypes` package.

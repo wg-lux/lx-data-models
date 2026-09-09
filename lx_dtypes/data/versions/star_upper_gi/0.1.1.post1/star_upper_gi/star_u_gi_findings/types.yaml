@@ -1,0 +1,17 @@
+- model: finding_type
+  name: "preprocedure"
+
+- model: finding_type
+  name: "periprocedure"
+
+- model: finding_type
+  name: "postprocedure"
+
+- model: finding_type
+  name: mandatory
+
+- model: finding_type
+  name: optional
+
+- model: finding_type
+  name: conditonal

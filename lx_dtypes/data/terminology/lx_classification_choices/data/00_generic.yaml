@@ -1,16 +1,108 @@
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022): https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: classification_choice
   name: "yes"
+  name_de: "Ja"
+  name_en: "Yes"
 
 - model: classification_choice
   name: "no"
+  name_de: "Nein"
+  name_en: "No"
 
 - model: classification_choice
   name: "na"
+  name_de: "Nicht zutreffend"
+  name_en: "Not applicable"
 
 - model: classification_choice
   name: "unknown"
+  name_de: "Unbekannt"
+  name_en: "Unknown"
 
 - model: classification_choice
   name: "minutes_numeric_value"
+  name_de: "Minuten"
+  name_en: "Minutes"
   classification_choice_descriptors:
     - minutes_numeric_value
+
+- model: classification_choice
+  name: "documented_none"
+  name_de: "Keine"
+  name_en: "None documented"
+
+- model: classification_choice
+  name: "documented_present"
+  name_de: "Vorhanden"
+  name_en: "Present"
+
+- model: classification_choice
+  name: "documented_unknown"
+  name_de: "Nicht abschließend dokumentiert"
+  name_en: "Not conclusively documented"
+
+- model: classification_choice
+  name: "recommendation_no_follow_up"
+  name_de: "Keine endoskopische Verlaufskontrolle erforderlich"
+  name_en: "No endoscopic follow-up required"
+
+- model: classification_choice
+  name: "recommendation_follow_up"
+  name_de: "Endoskopische Verlaufskontrolle empfohlen"
+  name_en: "Endoscopic follow-up recommended"
+
+- model: classification_choice
+  name: "recommendation_clinical_follow_up"
+  name_de: "Andere klinische Weiterbehandlung empfohlen"
+  name_en: "Other clinical follow-up recommended"
+
+- model: classification_choice
+  name: "recommendation_pending_histology"
+  name_de: "Empfehlung nach Vorliegen der Histologie"
+  name_en: "Recommendation pending histology"
+
+- model: classification_choice
+  name: "repeat_within_one_year"
+  name_de: "Wiederholung innerhalb eines Jahres"
+  name_en: "Repeat within one year"
+
+- model: classification_choice
+  name: "repeat_exception_documented"
+  name_de: "Begründete Ausnahme von der frühen Wiederholung"
+  name_en: "Documented exception to early repeat"
+
+- model: classification_choice
+  name: "image_reference_documented"
+  name_de: "Bildreferenz dokumentiert"
+  name_en: "Image reference documented"
+
+- model: classification_choice
+  name: "withdrawal_time_exception_documented"
+  name_de: "Abweichung von sechs Minuten begründet"
+  name_en: "Deviation from six minutes documented"
+
+- model: classification_choice
+  name: "specimen_retrieved"
+  name_de: "Präparat geborgen"
+  name_en: "Specimen retrieved"
+
+- model: classification_choice
+  name: "specimen_not_retrieved_reason_documented"
+  name_de: "Nichtbergung begründet"
+  name_en: "Failure to retrieve documented"
+
+- model: classification_choice
+  name: "histology_submitted"
+  name_de: "Zur Histologie eingesandt"
+  name_en: "Submitted for histology"
+
+- model: classification_choice
+  name: "histology_not_applicable"
+  name_de: "Histologie nicht erforderlich"
+  name_en: "Histology not applicable"
+
+- model: classification_choice
+  name: "resection_technique_documented"
+  name_de: "Resektionstechnik dokumentiert"
+  name_en: "Resection technique documented"

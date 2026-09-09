@@ -1,8 +1,15 @@
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022), complication documentation: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: finding
   name: "complication_generic"
   name_de: "Komplikation (generisch)"
   name_en: "Complication (generic)"
+  description: "Strukturierte Komplikation mit Phase, Art, Schweregrad, Maßnahmen und Ausgang."
   finding_types:
     - complication
   classifications:
     - complication_generic_type
+    - colonoscopy_complication_phase
+    - colonoscopy_complication_severity
+    - colonoscopy_complication_management
+    - colonoscopy_complication_outcome

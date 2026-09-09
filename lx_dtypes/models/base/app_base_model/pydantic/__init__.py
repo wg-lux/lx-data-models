@@ -28,12 +28,12 @@ app_base_models_pydantic_lookup = AppBaseModelsPydanticLookup(
 )
 
 __all__ = [
-    "app_base_models_pydantic_lookup",
-    "AppBaseModelsPydanticLookup",
     "AppBaseModel",
     "AppBaseModelNamesUUIDTags",
     "AppBaseModelUUIDTags",
+    "AppBaseModelsPydanticLookup",
     "KnowledgebaseBaseModel",
+    "app_base_models_pydantic_lookup",
     # "LedgerBaseModel",
     # "PersonModel",
 ]

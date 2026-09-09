@@ -58,6 +58,12 @@ Current readiness:
 - Good enough for clinician plus engineer collaboration
 - Not good enough for unsupported editing by non-technical staff
 
+The copy installed from the `lx-dtypes` wheel is immutable release content.
+Runtime builder APIs must not edit files in `site-packages`. Import an editable,
+versioned terminology bundle before saving a new template or changing lifecycle
+state. Packaged templates are published by the protected package release
+workflow and verified from the built wheel.
+
 Why not:
 
 - exact string matching is required everywhere
@@ -73,6 +79,20 @@ Recommended workflow:
 4. The domain user reviews the resolved output and example validation results.
 
 If you want a true non-technical workflow later, build a constrained editor on top of these models instead of asking users to edit YAML directly.
+
+## Autoritative Konzeptabdeckung
+
+Produktionsfähige Vorlagen benötigen zusätzlich eine explizite
+`coverage_version` und `coverage_concepts`-Matrix. Diese Matrix ist keine
+Beschreibung aus freiem Text: Jede anwendbare Regel benötigt eine stabile
+Konzept-ID, einen Wertpfad oder Befund-Selector, eine autorisierte Wertemenge
+und die zugehörigen Validatornamen.
+
+Die Runtime liefert technische Coverage serverseitig. Eine Vorlage ohne diese
+Metadaten wird absichtlich abgewiesen; das Frontend darf fehlende Coverage nur
+als nicht autoritativen Fallback anzeigen. Die vollständige Authoring- und
+Freigabereferenz steht in
+[`docs/guides/report-concept-coverage.md`](../../../docs/guides/report-concept-coverage.md).
 
 ## What You Edit
 
@@ -426,12 +446,12 @@ python scripts/audit_fixture.py \
 
 Test API output:
 
-- `GET /base_api/report-templates/{module_name}/{template_name}`
-- `GET /base_api/report-templates/by-examination/{module_name}/{examination_name}`
+- `GET /base_api/report-templates/{module_name}/{template_name}?version={module_version}`
+- `GET /base_api/report-templates/by-examination/{module_name}/{examination_name}?version={module_version}`
 
 ## Historical Runtime Validation
 
-If you validate a historical `PExamination` payload, you can now include:
+Every historical `PExamination` validation payload must include:
 
 - `knowledge_base_module`
 - `knowledge_base_version`
@@ -440,18 +460,12 @@ Important:
 
 - `knowledge_base_version` only works when deployment has provisioned that version through `LX_DTYPES_KB_REGISTRY`
 - if the version is not available locally, runtime validation fails closed instead of silently using the current module version
-- route `module_name` is still present in the API for compatibility, but payload KB identity is authoritative when supplied
+- route module, required version query, and payload identity must agree exactly
 
 ## Mapping To `base_api` Requirement Objects
 
 When using the new requirement endpoints in `lx_dtypes/django/api/main.py`, requirement objects are projected directly from report templates and validators.
 
-Requirement set projection:
-- Endpoint: `GET /base_api/requirement-sets`
-- One requirement set == one `report_template`
-- `requirement_set.name` == `report_template.name`
-- `requirement_set.type` == `report_template.examination`
-- `requirement_set.id` == 1-based index over `sorted(report_template names)`
 
 Requirement projection inside each set:
 - Validators are flattened in this order:
@@ -460,17 +474,6 @@ Requirement projection inside each set:
 - `requirement.name` == validator name
 - `requirement.kind` == `findings_validator` or `examination_validator`
 - `requirement.id` == 1-based local index within that requirement set
-
-Evaluation projection:
-- Endpoint: `POST /base_api/evaluate-requirement-set`
-- Selected set ids resolve back to template names.
-- Runtime call per template:
-  - `kb.evaluate_report_template_validators(template_name, p_examination=...)`
-- Result row mapping:
-  - `requirement_name` -> runtime validator `name`
-  - `met` -> runtime validator `ok`
-  - `details` -> summary message built from validator issues
-  - `validator_result` -> full validator runtime object
 
 Notes:
 - These projected IDs are not persisted DB IDs.

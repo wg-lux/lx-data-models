@@ -1,0 +1,20 @@
+schema_version: 1
+knowledge_base:
+  knowledge_base_module: polyp_size_category
+  knowledge_base_version: 1.0.0
+classification: polyp_size_category
+input_descriptor: length_mm_descriptor
+unit: millimeter
+resolution: continuous
+source: Illustrative binary comparator; not an historical guideline release.
+rules:
+- choice: size_le_5
+  lower: 0.0
+  upper: 5.0
+  lower_inclusive: false
+  upper_inclusive: true
+- choice: size_gt_5
+  lower: 5.0
+  upper: null
+  lower_inclusive: false
+  upper_inclusive: false

@@ -1,0 +1,34 @@
+# star_upper_gi_esophagus_varices_baveno_none
+- model: classification_choice
+  name: star_upper_gi_esophagus_varices_baveno_none
+  description: "No esophageal varices observed"
+
+# star_upper_gi_esophagus_varices_baveno_small
+- model: classification_choice
+  name: star_upper_gi_esophagus_varices_baveno_small
+  description: "Small varices, minimally elevated (<5mm)"
+
+# # star_upper_gi_esophagus_varices_baveno_large
+- model: classification_choice
+  name: star_upper_gi_esophagus_varices_baveno_large
+  description: "Large varices, markedly elevated (>=5mm)"
+
+- model: classification_choice
+  name: star_upper_gi_stomach_varices_sarin_none
+  description: "No gastric varices observed"
+- model: classification_choice
+  name: star_upper_gi_stomach_varices_sarin_gov1
+  description: Gastroesophageal varices type 1 (GOV1)
+    Appear as continuations of esophageal varices and extend for 2 to 5 cm below the gastroesophageal junction, along the lesser curve of the stomach.
+- model: classification_choice
+  name: star_upper_gi_stomach_varices_sarin_gov2
+  description: Gastroesophageal varices type 2 (GOV2)
+    Extend beyond the gastroesophageal junction into the fundus of the stomach.
+- model: classification_choice
+  name: star_upper_gi_stomach_varices_sarin_igv1
+  description: Isolated gastric varices type 1 (IGV1)
+    Are located in the fundus of the stomach and fall short of the cardia by a few centimeters.
+- model: classification_choice
+  name: star_upper_gi_stomach_varices_sarin_igv2
+  description: Isolated gastric varices type 2 (IGV2)
+    Include isolated ectopic varices and can appear anywhere in the stomach, such as in the body, antrum, or pylorus.

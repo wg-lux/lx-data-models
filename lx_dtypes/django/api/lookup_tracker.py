@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import contextvars
-from typing import List
 
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
-_lookup_trackers: contextvars.ContextVar[List[KnowledgeBase] | None] = (
+_lookup_trackers: contextvars.ContextVar[list[KnowledgeBase] | None] = (
     contextvars.ContextVar("lx_lookup_trackers", default=None)
 )
 
@@ -27,7 +26,7 @@ def register_runtime_lookup_tracker(kb: KnowledgeBase) -> None:
         trackers.append(kb)
 
 
-def consume_runtime_lookup_trackers() -> List[KnowledgeBase]:
+def consume_runtime_lookup_trackers() -> list[KnowledgeBase]:
     """
     Return the list of registered KnowledgeBase instances and clear the slot.
     """

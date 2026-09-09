@@ -1,0 +1,11 @@
+name: dgvs_reporting
+description: "DGVS guideline-derived structured reporting templates."
+version: 0.1.0
+medical_field: gastroenterology
+modules: []
+depends_on:
+  - DGVS_Terminology
+
+data:
+  files:
+    - "./data/00_colonoscopy_reporting.yaml"

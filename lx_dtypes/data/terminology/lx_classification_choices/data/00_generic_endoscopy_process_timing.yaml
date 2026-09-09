@@ -1,0 +1,43 @@
+# Sources for every record in this file:
+# - DGVS S2k quality guideline (AWMF 021-022), findings documentation: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b200dfa8a/chapter_69f4b200e16c2/
+- model: classification_choice
+  name: "endoscopy_room_entry_time_recorded"
+  name_de: "Betreten des Untersuchungsraums dokumentiert"
+  name_en: "Endoscopy room entry recorded"
+  classification_choice_descriptors:
+    - endoscopy_room_entry_time_value
+
+- model: classification_choice
+  name: "endoscope_insertion_time_recorded"
+  name_de: "Einführen des Endoskops dokumentiert"
+  name_en: "Endoscope insertion recorded"
+  classification_choice_descriptors:
+    - endoscope_insertion_time_value
+
+- model: classification_choice
+  name: "colonoscopy_withdrawal_start_time_recorded"
+  name_de: "Beginn des Rückzuges dokumentiert"
+  name_en: "Colonoscope withdrawal start recorded"
+  classification_choice_descriptors:
+    - colonoscopy_withdrawal_start_time_value
+
+- model: classification_choice
+  name: "endoscope_removal_time_recorded"
+  name_de: "Entfernen des Endoskops dokumentiert"
+  name_en: "Endoscope removal recorded"
+  classification_choice_descriptors:
+    - endoscope_removal_time_value
+
+- model: classification_choice
+  name: "endoscopy_room_exit_time_recorded"
+  name_de: "Verlassen des Untersuchungsraums dokumentiert"
+  name_en: "Endoscopy room exit recorded"
+  classification_choice_descriptors:
+    - endoscopy_room_exit_time_value
+
+- model: classification_choice
+  name: "endoscopy_department_exit_time_recorded"
+  name_de: "Verlassen der Endoskopieabteilung dokumentiert"
+  name_en: "Endoscopy department exit recorded"
+  classification_choice_descriptors:
+    - endoscopy_department_exit_time_value

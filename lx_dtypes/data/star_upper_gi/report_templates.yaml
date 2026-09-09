@@ -1,0 +1,347 @@
+- model: report_template_section
+  name: upper_gi_mini_baseline
+  title_de: Basisbefunde
+  title_en: Baseline findings
+  position: 0
+  section_kind: findings
+  types:
+    - baseline
+  findings:
+    - finding: star_upper_gi_mucosa_esophagus_abnormal
+      required: true
+      multiple_allowed: false
+      classifications:
+        - classification: yes_no_unknown_classification
+          required: true
+
+- model: report_template
+  name: star_upper_gi_mini_report_template
+  name_de: "STAR Upper GI – Basismodul"
+  name_en: "STAR Upper GI – Basic Template"
+  description: "Minimal lauffähiges Template für star_upper_gi-Endoskopie mit gültiger Coverage-Definition."
+  version: "0.1.1"
+  examination: star_upper_gi_endoscopy
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - concept_id: upper_gi.baseline.esophagus_mucosa_status
+      label: Esophagussichtbefund
+      applicability_status: required
+      evidence_path:
+        - patient_findings
+      finding_selector:
+        finding_name: star_upper_gi_mucosa_esophagus_abnormal
+        classification_name: yes_no_unknown_classification
+      allowed_values:
+        - yes
+        - no
+        - unknown
+      guideline_citations:
+        - "Local baseline coverage reference"
+  report_sections:
+    - upper_gi_mini_baseline
+  validators:
+    examination_validators: []
+    findings_validators: []
+    classification_validators: []
+    intervention_validators: []
+    unit_validators: []
+
+# Complete concept surface from Esposito et al. 2025. Patient identity fields are
+# represented as host-sourced fields; the corresponding finding concepts remain
+# available for integrations that serialize them as findings.
+- model: report_template_section
+  name: star_upper_gi_standard_patient_and_exam
+  title_en: Patient and examination
+  title_de: Patient und Untersuchung
+  position: 0
+  section_kind: patient_data
+  fields:
+    - key: name
+      label: Patient name
+      source: patient
+      required: true
+    - key: date_of_birth
+      label: Date of birth
+      source: patient
+      required: true
+    - key: examination_date
+      label: Date of examination
+      source: patient_examination
+      required: true
+
+- model: report_template_section
+  name: star_upper_gi_standard_preprocedure
+  title_en: Preprocedure information
+  title_de: Präprozedurale Angaben
+  position: 1
+  section_kind: findings
+  findings:
+    - finding: star_upper_gi_exam_indication
+      required: true
+      classifications: [{classification: star_upper_gi_text, required: true}]
+    - finding: star_upper_gi_antithrombotic_use
+      required: true
+      classifications: [{classification: yes_no_unknown_classification, required: true}]
+    - finding: star_upper_gi_antithrombotic_agent
+      classifications: [{classification: star_upper_gi_text, required: true}]
+    - finding: star_upper_gi_antithrombotic_management
+      classifications:
+        - {classification: star_upper_gi_antithrombotic_management, required: true}
+        - {classification: star_upper_gi_text, required: false}
+    - finding: star_upper_gi_fasting_solids
+      required: true
+      classifications: [{classification: star_upper_gi_duration_minutes, required: true}]
+    - finding: star_upper_gi_fasting_liquids
+      required: true
+      classifications: [{classification: star_upper_gi_duration_minutes, required: true}]
+    - finding: star_upper_gi_premedication
+      required: true
+      multiple_allowed: true
+      classifications: [{classification: star_upper_gi_text, required: true}]
+
+- model: report_template_section
+  name: star_upper_gi_standard_periprocedure
+  title_en: Periprocedure information and cleanliness
+  title_de: Periprozedurale Angaben und Sauberkeit
+  position: 2
+  section_kind: findings
+  findings:
+    - finding: star_upper_gi_drugs_during_endoscopy
+      required: true
+      multiple_allowed: true
+      classifications: [{classification: star_upper_gi_text, required: true}]
+    - finding: star_upper_gi_endoscope_type
+      required: true
+      classifications: [{classification: star_upper_gi_text, required: true}]
+    - finding: star_upper_gi_cleanliness_assessment
+      required: true
+      classifications:
+        - {classification: star_upper_gi_cleanliness_scale, required: true}
+        - {classification: star_upper_gi_cleanliness_total_0_9, required: false}
+        - {classification: star_upper_gi_cleanliness_total_0_10, required: false}
+    - finding: star_upper_gi_cleanliness_esophagus
+      required: true
+      classifications:
+        - {classification: star_upper_gi_grace_segment_score, required: false}
+        - {classification: star_upper_gi_peace_segment_score, required: false}
+        - {classification: star_upper_gi_barcelona_segment_score, required: false}
+    - finding: star_upper_gi_cleanliness_stomach
+      classifications:
+        - {classification: star_upper_gi_grace_segment_score, required: false}
+        - {classification: star_upper_gi_peace_segment_score, required: false}
+    - finding: star_upper_gi_cleanliness_gastric_fundus
+      classifications: [{classification: star_upper_gi_barcelona_segment_score, required: false}]
+    - finding: star_upper_gi_cleanliness_gastric_corpus
+      classifications: [{classification: star_upper_gi_barcelona_segment_score, required: false}]
+    - finding: star_upper_gi_cleanliness_gastric_antrum
+      classifications: [{classification: star_upper_gi_barcelona_segment_score, required: false}]
+    - finding: star_upper_gi_cleanliness_duodenum
+      required: true
+      classifications:
+        - {classification: star_upper_gi_grace_segment_score, required: false}
+        - {classification: star_upper_gi_peace_segment_score, required: false}
+        - {classification: star_upper_gi_barcelona_segment_score, required: false}
+
+- model: report_template_section
+  name: star_upper_gi_standard_anatomy
+  title_en: Structured anatomical findings
+  title_de: Strukturierte anatomische Befunde
+  position: 3
+  section_kind: findings
+  findings:
+    - finding: star_upper_gi_previous_surgery_reconstruction
+      classifications: [{classification: star_upper_gi_text, required: true}]
+    - finding: star_upper_gi_mucosa_esophagus_status
+      required: true
+      classifications: [{classification: star_upper_gi_mucosal_status, required: true}]
+    - finding: star_upper_gi_location_esophagogastric_junction
+      required: true
+      classifications: [{classification: distance_cm, required: true}]
+    - finding: star_upper_gi_location_hiatus
+      required: true
+      classifications: [{classification: distance_cm, required: true}]
+    - finding: star_upper_gi_location_squamocolumnar_junction
+      required: true
+      classifications: [{classification: distance_cm, required: true}]
+    - finding: star_upper_gi_mucosa_stomach_cardia_status
+      required: true
+      classifications: [{classification: star_upper_gi_mucosal_status, required: true}]
+    - finding: star_upper_gi_mucosa_stomach_corpus_fundus_status
+      required: true
+      classifications: [{classification: star_upper_gi_mucosal_status, required: true}]
+    - finding: star_upper_gi_mucosa_stomach_antrum_incisura_status
+      required: true
+      classifications: [{classification: star_upper_gi_mucosal_status, required: true}]
+    - finding: star_upper_gi_chromoendoscopy_stomach
+      required: true
+      classifications: [{classification: yes_no_unknown_classification, required: true}]
+    - finding: star_upper_gi_mucosa_duodenum_bulb_status
+      required: true
+      classifications: [{classification: star_upper_gi_mucosal_status, required: true}]
+    - finding: star_upper_gi_mucosa_duodenum_second_portion_status
+      required: true
+      classifications: [{classification: star_upper_gi_mucosal_status, required: true}]
+    - finding: star_upper_gi_vili_duodenum_atrophic
+      required: true
+      classifications: [{classification: yes_no_unknown_classification, required: true}]
+    - finding: star_upper_gi_papilla_major_status
+      required: true
+      classifications: [{classification: star_upper_gi_papilla_status, required: true}]
+
+- model: report_template_section
+  name: star_upper_gi_standard_abnormalities
+  title_en: Abnormal findings
+  title_de: Pathologische Befunde
+  position: 4
+  section_kind: findings
+  findings:
+    - finding: star_upper_gi_submucosal_abnormality
+      multiple_allowed: true
+      classifications:
+        - {classification: star_upper_gi_location_classification, required: true}
+        - {classification: size_oval_mm, required: false}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_hiatal_hernia
+      classifications:
+        - {classification: distance_cm, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_esophagus_ectopic_mucosa
+      multiple_allowed: true
+      classifications:
+        - {classification: distance_cm, required: true}
+        - {classification: size_oval_mm, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_esophagus_diverticulum
+      multiple_allowed: true
+      classifications:
+        - {classification: distance_cm, required: true}
+        - {classification: size_oval_mm, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_esophagus_barretts
+      classifications:
+        - {classification: star_upper_gi_barrett_praque_classification, required: true}
+        - {classification: upper_gi_esophagus_imaging_modality_classification, required: false}
+        - {classification: yes_no_unknown_classification, required: false}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_esophagus_varices
+      multiple_allowed: true
+      classifications:
+        - {classification: star_upper_gi_esophagus_varices_baveno, required: true}
+        - {classification: star_upper_gi_count, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_esophagitis
+      classifications:
+        - {classification: star_upper_gi_los_angeles_classification, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_esophagitis_eosinophilic
+      classifications:
+        - {classification: star_upper_gi_erefs_edema, required: true}
+        - {classification: star_upper_gi_erefs_rings, required: true}
+        - {classification: star_upper_gi_erefs_exudates, required: true}
+        - {classification: star_upper_gi_erefs_furrows, required: true}
+        - {classification: star_upper_gi_erefs_strictures, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_esophagitis_caustic
+      classifications:
+        - {classification: star_upper_gi_zargar, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_polyp
+      multiple_allowed: true
+      classifications:
+        - {classification: star_upper_gi_location_classification, required: true}
+        - {classification: star_upper_gi_location_esophagus_distance_z_line, required: false}
+        - {classification: star_upper_gi_lesion_paris, required: true}
+        - {classification: size_oval_mm, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_ulcer
+      multiple_allowed: true
+      classifications:
+        - {classification: star_upper_gi_forrest, required: true}
+        - {classification: star_upper_gi_location_classification, required: true}
+        - {classification: size_oval_mm, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_stomach_varices
+      multiple_allowed: true
+      classifications:
+        - {classification: star_upper_gi_stomach_varices_sarin, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_duodenum_diverticulum
+      multiple_allowed: true
+      classifications:
+        - {classification: size_oval_mm, required: false}
+        - {classification: star_upper_gi_location_duodenum, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_papilla_suspected_adenoma
+      classifications:
+        - {classification: star_upper_gi_location_duodenum, required: true}
+        - {classification: size_oval_mm, required: false}
+        - {classification: additional_text_info, required: false}
+
+- model: report_template_section
+  name: star_upper_gi_standard_postprocedure
+  title_en: Postprocedure information
+  title_de: Postprozedurale Angaben
+  position: 5
+  section_kind: findings
+  findings:
+    - finding: star_upper_gi_biopsy_documentation
+      required: true
+      multiple_allowed: true
+      classifications:
+        - {classification: star_upper_gi_biopsy_type, required: true}
+        - {classification: star_upper_gi_location_classification, required: true}
+        - {classification: star_upper_gi_count, required: true}
+        - {classification: additional_text_info, required: false}
+    - finding: star_upper_gi_histology_vials
+      required: true
+      multiple_allowed: true
+      classifications:
+        - {classification: star_upper_gi_count, required: true}
+        - {classification: star_upper_gi_text, required: true}
+    - finding: star_upper_gi_photodocumentation
+      required: true
+      multiple_allowed: true
+      classifications:
+        - {classification: star_upper_gi_photo_landmark, required: true}
+        - {classification: star_upper_gi_count, required: true}
+    - finding: star_upper_gi_exam_duration
+      required: true
+      classifications: [{classification: star_upper_gi_duration_minutes, required: true}]
+    - finding: star_upper_gi_staff_and_roles
+      required: true
+      multiple_allowed: true
+      classifications: [{classification: star_upper_gi_text, required: true}]
+
+- model: report_template
+  name: star_upper_gi_standard_report_template
+  name_en: STAR Upper GI standardized report
+  name_de: Standardisierter STAR-ÖGD-Bericht
+  description: "Complete structured report concept set from the ESGE STAR Upper GI 2025 position statement."
+  version: "2025.1"
+  examination: star_upper_gi_endoscopy
+  guideline_references:
+    - guideline_id: ESGE-STAR-UGI-2025
+      title: "STAndardization of Reports (the STAR project) Upper gastrointestinal endoscopy"
+      issuing_organization: "European Society of Gastrointestinal Endoscopy (ESGE)"
+      version: "Endoscopy 2025;57:1298-1308"
+      publication_date: 2025-08-20
+      canonical_url: "https://doi.org/10.1055/a-2652-8941"
+      cited_sections:
+        - "Preprocedure information"
+        - "Periprocedure information"
+        - "Mucosal cleanliness assessment"
+        - "Endoscopic findings"
+        - "Postprocedure information"
+  report_sections:
+    - star_upper_gi_standard_patient_and_exam
+    - star_upper_gi_standard_preprocedure
+    - star_upper_gi_standard_periprocedure
+    - star_upper_gi_standard_anatomy
+    - star_upper_gi_standard_abnormalities
+    - star_upper_gi_standard_postprocedure
+  validators:
+    examination_validators: []
+    findings_validators: []
+    classification_validators: []
+    intervention_validators: []
+    unit_validators: []

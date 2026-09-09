@@ -1,5 +1,3 @@
-from typing import List
-
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
 )
@@ -18,7 +16,7 @@ class PFindingIntervention(LedgerBaseModel[PFindingInterventionDataDict]):
     intervention: str
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return P_INTERVENTIONS_MODEL_LIST_TYPE_FIELDS
 
     @property
@@ -26,5 +24,5 @@ class PFindingIntervention(LedgerBaseModel[PFindingInterventionDataDict]):
         return PFindingInterventionDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return P_INTERVENTIONS_MODEL_NESTED_FIELDS

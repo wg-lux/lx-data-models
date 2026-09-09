@@ -1,17 +1,49 @@
 - model: examination
   name: colonoscopy
+  name_de: Koloskopie
+  name_en: Colonoscopy
   description: Colonoscopy examination.
   findings:
+    # Sources for all guideline-derived colonoscopy findings below, including
+    # medication/sedation, process timing, team time-out/sign-out, risk
+    # assessment, BBPS, withdrawal time, cecal landmarks, technical quality,
+    # pathology/follow-up, polyp-quality data, and complications:
+    # - DGVS S2k quality guideline v2.1 (AWMF 021-022): https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
+    # - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
     # baseline
     - endoscopy_hardware_used
     - examination_setting
+    - sedation_endoscopy
+    - endoscopy_medication_status
+    - endoscopy_medication_administration
+    - endoscopy_sedation_monitoring_measurement
+    - endoscopy_supplemental_oxygen_administration
+    - endoscopy_intravenous_fluid_status
+    - endoscopy_intravenous_fluid_administration
+    - endoscopy_post_sedation_recovery_assessment
+    - endoscopy_post_sedation_discharge_or_transfer_assessment
+    - endoscopy_process_timestamps
+    - endoscopy_preprocedure_team_timeout
+    - endoscopy_postprocedure_sign_out
+    - endoscopy_preprocedure_risk_assessment_checklist
+    - endoscopy_preprocedure_asa_assessment
+    - endoscopy_preprocedure_airway_assessment
+    - endoscopy_preprocedure_physical_assessment
+    - endoscopy_preprocedure_last_oral_intake
     - bowel_preparation_lc
     - bowel_preparation_tc
     - bowel_preparation_rc
     - bowel_preparation_simplified
+    - bowel_preparation_bbps_total
     - colonoscopy_withdrawal_time_minutes
     - colonoscopy_deepest_viewed_location
+    - colonoscopy_cecal_landmarks_photodocumented
+    - colonoscopy_technical_quality
+    - colonoscopy_pathology_summary
+    - colonoscopy_follow_up_plan
+    - colonoscopy_early_repeat_plan
     # observations
+    - colonoscopy_complication_status
     - complication_generic
     - colon_polyp
     - colon_post_intervention_wound

@@ -1,0 +1,65 @@
+owner: lx_dtypes maintainers
+topic: PR 32 terminology reconciliation and publication inventory
+pr_url: https://github.com/wg-lux/lx-data-models/pull/32
+pr_head: 37c8ff4bc2b87a5cccd6051ce7444d3b6fc2562c
+baseline_commit: 93b0b62
+mst_pr_additions_already_present:
+- file: lx_dtypes/data/mst_3_0/data/10_anatomy.yaml
+  prefix_lines: 11
+  sha256: 275f1c62a883b1cf0e7f926694709016c1c1a5b675638888c7bf0bdb6143d861
+- file: lx_dtypes/data/mst_3_0/data/20_findings.yaml
+  prefix_lines: 7
+  sha256: 85269aa7aa9437f69a472b609b949af97dd83c6b38183a8a69dc59baedfced37
+mst_module: mst_3_0
+mst_version: 3.0.0
+mst_counts:
+  finding: 357
+  classification: 39
+  classification_choice: 285
+mst_draft_counts:
+  finding: 357
+  classification: 40
+  classification_choice: 290
+interpretation: PR 32 adds no missing MST concepts at this head. Counts describe this
+  executable artifact, not an independent re-audit of the published MST source. Do
+  not invent entries to match manuscript totals.
+star_original:
+  module: star_upper_gi
+  version: 0.1.1
+  root: demo-data/star_upper_gi
+  finding: 22
+  classification: 21
+  classification_choice: 71
+  classification_choice_descriptor: 3
+star_repaired:
+  module: star_upper_gi
+  version: 0.1.1.post1
+  finding: 22
+  classification: 21
+  classification_choice: 79
+  classification_choice_descriptor: 3
+  unit: 41
+star_repairs:
+- Add eight already-referenced mucosal appearance choices from packaged STAR 0.1.2.
+- Replace two location-choice descriptor references distance_cm with length_cm_descriptor.
+- Correct scoped unit milimeter to millimeter; identify scoped lx_units as 0.1.0.post1.
+- Preserve raw demo inputs unchanged; publish repairs under a distinct version.
+versioning:
+  module: polyp_size_category
+  versions:
+  - 1.0.0
+  - 2.0.0
+  legacy_scope: Illustrative binary comparator, not a historical ESGE release.
+  revised_scope: Whole-number size grouping; no treatment recommendation is computed.
+  fractional_policy: Version 1 accepts continuous positive values. Version 2 rejects
+    fractions without rounding.
+mst_source_check:
+  url: https://www.worldendo.org/assets-craft/pdf/resources/mst-3-0.pdf
+  section: '7.3, page 41 of 45, document dated 03.08.2016'
+  finding: Actions and outcomes are listed; the five-level severity table claimed in the draft is not present in this section.
+  scope: Targeted source check, not a complete independent terminology-fidelity audit.
+ledger_source_check:
+  file: lx_dtypes/models/interface/examples/demo_star_upper_gi.py
+  polyp_size_mm: 8
+  diverticulum_size_mm: 6
+  finding: The draft incorrectly describes both measurements as polyps; Table 4 uses explicit synthetic observations.

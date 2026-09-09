@@ -1,0 +1,84 @@
+- model: report_finding
+  name: coloreg_colonoscopy_polyp
+  name_de: ColoReg-Kolonpolyp
+  name_en: ColoReg colon polyp
+  description: Optional, repeatable ColoReg polyp entry limited to Paris and NICE classifications.
+  finding: colon_polyp
+  required: false
+  multiple_allowed: true
+  classifications:
+    - classification: colon_lesion_paris
+      required: true
+      concept_id: coloreg.polyp.paris
+      applicability_status: conditional
+      applicability_rule: Required for every documented colon polyp.
+    - classification: colon_lesion_nice
+      required: true
+      concept_id: coloreg.polyp.nice
+      applicability_status: conditional
+      applicability_rule: Required for every documented colon polyp.
+
+- model: report_template_section
+  name: coloreg_colonoscopy_polyps
+  title_de: Polypen
+  title_en: Polyps
+  position: 0
+  section_kind: findings
+  types:
+    - findings
+  fields: []
+  findings:
+    - coloreg_colonoscopy_polyp
+
+- model: report_template
+  name: coloreg_colonoscopy
+  name_de: ColoReg – Koloskopie
+  name_en: ColoReg – Colonoscopy
+  description: ColoReg colonoscopy template with optional polyps classified only by Paris and NICE.
+  version: 1.0.0
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+    - concept_id: coloreg.polyp.paris
+      label: Paris classification
+      applicability_status: conditional
+      applicability_rule: Applies to every documented colon polyp.
+      validator_names: []
+      evidence_path:
+        - patient_findings
+      finding_selector:
+        finding_name: colon_polyp
+        classification_name: colon_lesion_paris
+      allowed_values:
+        - colon_lesion_paris_Is
+        - colon_lesion_paris_Ip
+        - colon_lesion_paris_IIa
+        - colon_lesion_paris_IIb
+        - colon_lesion_paris_IIc
+        - colon_lesion_paris_III
+        - colon_lesion_paris_IIa_IIc
+        - colon_lesion_paris_IIb_IIc
+      guideline_citations: []
+    - concept_id: coloreg.polyp.nice
+      label: NICE classification
+      applicability_status: conditional
+      applicability_rule: Applies to every documented colon polyp.
+      validator_names: []
+      evidence_path:
+        - patient_findings
+      finding_selector:
+        finding_name: colon_polyp
+        classification_name: colon_lesion_nice
+      allowed_values:
+        - colon_lesion_NICE_type_1
+        - colon_lesion_NICE_type_2
+        - colon_lesion_NICE_type_3
+      guideline_citations: []
+  examination: colonoscopy
+  report_sections:
+    - coloreg_colonoscopy_polyps
+  validators:
+    examination_validators: []
+    classification_validators: []
+    intervention_validators: []
+    unit_validators: []
+    findings_validators: []

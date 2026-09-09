@@ -1,4 +1,6 @@
-from typing import TypedDict, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
 
 from lx_dtypes.models.knowledge_base.information_source.InformationSource import (
     InformationSource,
@@ -13,19 +15,9 @@ from lx_dtypes.models.knowledge_base.information_source.InformationSourceTypeDat
     InformationSourceTypeDataDict,
 )
 
-from .InformationSourceDjango import InformationSourceDjango
-from .InformationSourceTypeDjango import InformationSourceTypeDjango
-
-
-class KbInformationSourceDjangoLookupType(TypedDict):
-    InformationSource: type[InformationSourceDjango]
-    InformationSourceType: type[InformationSourceTypeDjango]
-
-
-kb_information_source_django_lookup = KbInformationSourceDjangoLookupType(
-    InformationSource=InformationSourceDjango,
-    InformationSourceType=InformationSourceTypeDjango,
-)
+if TYPE_CHECKING:
+    from .InformationSourceDjango import InformationSourceDjango
+    from .InformationSourceTypeDjango import InformationSourceTypeDjango
 
 
 class KbInformationSourceLookupType(TypedDict):
@@ -42,24 +34,65 @@ kb_information_source_lookup = KbInformationSourceLookupType(
     InformationSourceTypeDataDict=InformationSourceTypeDataDict,
 )
 
-kb_information_source_models = Union[InformationSource, InformationSourceType]
-kb_information_source_ddicts = Union[
+kb_information_source_models: TypeAlias = Union[
+    InformationSource, InformationSourceType
+]
+kb_information_source_ddicts: TypeAlias = Union[
     InformationSourceDataDict, InformationSourceTypeDataDict
 ]
-kb_information_source_django_models = Union[
-    InformationSourceDjango, InformationSourceTypeDjango
-]
+if TYPE_CHECKING:
+
+    class KbInformationSourceDjangoLookupType(TypedDict):
+        InformationSource: type[InformationSourceDjango]
+        InformationSourceType: type[InformationSourceTypeDjango]
+
+    kb_information_source_django_lookup: KbInformationSourceDjangoLookupType
+    kb_information_source_django_models: TypeAlias = Union[
+        InformationSourceDjango, InformationSourceTypeDjango
+    ]
 
 __all__ = [
     "InformationSource",
     "InformationSourceDataDict",
     "InformationSourceType",
     "InformationSourceTypeDataDict",
-    "kb_information_source_lookup",
+    "KbInformationSourceDjangoLookupType",
     "KbInformationSourceLookupType",
-    "kb_information_source_models",
     "kb_information_source_ddicts",
     "kb_information_source_django_lookup",
-    "KbInformationSourceDjangoLookupType",
     "kb_information_source_django_models",
+    "kb_information_source_lookup",
+    "kb_information_source_models",
 ]
+
+
+def __getattr__(name: str) -> Any:
+    if name not in {
+        "InformationSourceDjango",
+        "InformationSourceTypeDjango",
+        "KbInformationSourceDjangoLookupType",
+        "kb_information_source_django_lookup",
+        "kb_information_source_django_models",
+    }:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    from .InformationSourceDjango import InformationSourceDjango
+    from .InformationSourceTypeDjango import InformationSourceTypeDjango
+
+    class KbInformationSourceDjangoLookupType(TypedDict):
+        InformationSource: type[InformationSourceDjango]
+        InformationSourceType: type[InformationSourceTypeDjango]
+
+    exports = {
+        "InformationSourceDjango": InformationSourceDjango,
+        "InformationSourceTypeDjango": InformationSourceTypeDjango,
+        "KbInformationSourceDjangoLookupType": KbInformationSourceDjangoLookupType,
+        "kb_information_source_django_lookup": KbInformationSourceDjangoLookupType(
+            InformationSource=InformationSourceDjango,
+            InformationSourceType=InformationSourceTypeDjango,
+        ),
+        "kb_information_source_django_models": (
+            InformationSourceDjango | InformationSourceTypeDjango
+        ),
+    }
+    globals().update(exports)
+    return exports[name]

@@ -73,8 +73,8 @@ class PExaminationDjango(LedgerBaseModelDjango[PExaminationDataDict]):
     date: OptionalDateTimeField = models.DateTimeField(null=True, blank=True)
 
     if TYPE_CHECKING:
-        patient_findings: models.Manager["PFindingDjango"]
-        patient_indications: models.Manager["PIndicationDjango"]
+        patient_findings: models.Manager[PFindingDjango]
+        patient_indications: models.Manager[PIndicationDjango]
 
     @property
     def ddict_class(self) -> type[PExaminationDataDict]:
