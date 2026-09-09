@@ -40,12 +40,20 @@ class PatientExaminationReportSubmissionData(TypedDict):
     expected_version: NotRequired[int]
 
 
+class PreferredReportFrameData(TypedDict):
+    video_id: int
+    frame_number: int
+    timestamp: float
+
+
 class PatientExaminationReportMakeReportData(TypedDict):
     patient_examination_id: int
     knowledge_base_module: str
     knowledge_base_version: str
     patient: PatientReportIdentityData
     max_frames: int
+    preferred_frame: NotRequired[PreferredReportFrameData]
+    selected_frames: NotRequired[list[PreferredReportFrameData]]
     report_id: NotRequired[int]
 
 
@@ -125,10 +133,11 @@ class SegmentFrameSelectorResponseData(TypedDict):
 
 
 class ReportExportFrameDetailData(TypedDict):
-    segment_id: int
+    segment_id: int | None
     video_id: int
     frame_id: int
     frame_number: int
+    timestamp: NotRequired[float]
     label_name: str | None
     finding_name: str | None
     stream_url: str
@@ -250,6 +259,33 @@ class PatientExaminationReportSubmissionPayload(BaseModel):
         return self
 
 
+class PreferredReportFramePayload(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+
+    video_id: int = Field(ge=1, strict=True)
+    frame_number: int = Field(ge=0, strict=True)
+    timestamp: float = Field(ge=0)
+
+
+class ReportFrameCandidatesQuery(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    patient_examination_id: int = Field(ge=1)
+    label: str | None = Field(default=None, min_length=1, max_length=255)
+    offset: int = Field(default=0, ge=0)
+    limit: int = Field(default=24, ge=1, le=100)
+
+
+class ReportFrameCandidate(PreferredReportFramePayload):
+    labels: list[str]
+
+
+class ReportFrameCandidatesResponse(BaseModel):
+    frames: list[ReportFrameCandidate]
+    labels: list[str]
+    next_offset: int | None
+
+
 class PatientExaminationReportMakeReportPayload(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -259,11 +295,25 @@ class PatientExaminationReportMakeReportPayload(BaseModel):
     knowledge_base_version: str = Field(min_length=1)
     patient: PatientReportIdentityPayload
     max_frames: int = Field(default=12, ge=1, le=24)
+    preferred_frame: PreferredReportFramePayload | None = None
+    selected_frames: list[PreferredReportFramePayload] | None = Field(
+        default=None, max_length=24
+    )
 
     @model_validator(mode="after")
     def validate_knowledge_base_identity(
         self,
     ) -> PatientExaminationReportMakeReportPayload:
+        if self.selected_frames is not None:
+            if self.preferred_frame is not None:
+                raise ValueError("Use selected_frames or preferred_frame, not both")
+            identities = [
+                (frame.video_id, frame.frame_number) for frame in self.selected_frames
+            ]
+            if len(set(identities)) != len(identities):
+                raise ValueError("Selected report frames must be unique")
+            if len(self.selected_frames) > self.max_frames:
+                raise ValueError("Selected report frames exceed max_frames")
         KnowledgeBaseIdentity(
             knowledge_base_module=self.knowledge_base_module,
             knowledge_base_version=self.knowledge_base_version,
@@ -454,8 +504,13 @@ __all__ = [
     "PatientFindingInterventionSyncData",
     "PatientReportIdentityData",
     "PatientReportIdentityPayload",
+    "PreferredReportFrameData",
+    "PreferredReportFramePayload",
     "PreviousPatientExaminationHistoryData",
     "ReportExportFrameDetailData",
+    "ReportFrameCandidate",
+    "ReportFrameCandidatesQuery",
+    "ReportFrameCandidatesResponse",
     "ReportJsonObject",
     "ReportJsonValue",
     "ReportPersistedArtifactsData",

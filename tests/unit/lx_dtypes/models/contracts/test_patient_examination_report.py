@@ -8,12 +8,30 @@ from pydantic import ValidationError
 from lx_dtypes.models.contracts.patient_examination_report import (
     PatientExaminationReportMakeReportPayload,
     PatientExaminationReportSubmissionPayload,
+    PreferredReportFramePayload,
     ReportSegmentFrameSelectionPayload,
     dump_make_report_payload,
     dump_report_submission_payload,
     report_json_safe_dict,
     validate_segment_selection_map,
 )
+
+
+def test_preferred_report_frame_preserves_zero_and_exact_timestamp() -> None:
+    frame = PreferredReportFramePayload(
+        video_id=7, frame_number=0, timestamp=0.04000000000000001
+    )
+    assert frame.model_dump() == {
+        "video_id": 7,
+        "frame_number": 0,
+        "timestamp": 0.04000000000000001,
+    }
+
+
+@pytest.mark.parametrize("value", [-1, float("nan"), float("inf")])
+def test_preferred_report_frame_rejects_invalid_timestamp(value: float) -> None:
+    with pytest.raises(ValidationError):
+        PreferredReportFramePayload(video_id=7, frame_number=0, timestamp=value)
 
 
 def test_report_submission_payload_supplies_defaults() -> None:
@@ -120,3 +138,35 @@ def test_report_json_safe_dict_preserves_null_values() -> None:
         "nullable": None,
         "nested": {"inner": None},
     }
+
+
+@pytest.mark.parametrize(
+    "mode", ["multiple", "empty", "duplicate", "over_limit", "ambiguous"]
+)
+def test_report_explicit_frame_selection_contract(mode: str) -> None:
+    frame = {"video_id": 7, "frame_number": 0, "timestamp": 0.0}
+    frames = [frame, {**frame, "frame_number": 12, "timestamp": 0.48}]
+    data: dict[str, object] = {
+        "patient_examination_id": 9,
+        "knowledge_base_module": "reporting",
+        "knowledge_base_version": "1.2.3",
+        "patient": {"first_name": "Ada", "last_name": "Lovelace", "dob": "1815-12-10"},
+        "selected_frames": frames,
+    }
+    if mode == "empty":
+        data["selected_frames"] = []
+    if mode == "duplicate":
+        data["selected_frames"] = [frame, frame]
+    if mode == "over_limit":
+        data["max_frames"] = 1
+    if mode == "ambiguous":
+        data["preferred_frame"] = frame
+    if mode in {"multiple", "empty"}:
+        dumped = dump_make_report_payload(
+            PatientExaminationReportMakeReportPayload.model_validate(data)
+        )
+        assert "selected_frames" in dumped
+        assert dumped["selected_frames"] == data["selected_frames"]
+    else:
+        with pytest.raises(ValidationError):
+            PatientExaminationReportMakeReportPayload.model_validate(data)
