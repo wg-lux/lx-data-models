@@ -17,6 +17,7 @@ from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice 
 from lx_dtypes.models.knowledge_base.examination.Examination import Examination
 from lx_dtypes.models.knowledge_base.fhir import (
     DEFAULT_FHIR_BASE_URL,
+    export_fhir_terminology,
     import_fhir_terminology,
     infer_fhir_code_system_domain,
 )
@@ -421,7 +422,7 @@ def test_high_level_fhir_import_rejects_duplicate_codes() -> None:
         ],
     }
 
-    with pytest.raises(ValueError, match="Duplicate finding code 'polyp'"):
+    with pytest.raises(ValueError, match="concept codes must be unique"):
         knowledge_base_from_fhir(payload)
 
 
@@ -645,4 +646,41 @@ def test_fhir_import_rejects_invalid_language_tag() -> None:
         import_fhir_terminology(
             {"resourceType": "CodeSystem", "id": "lx-finding-cs"},
             language="not a language",
+        )
+
+
+@pytest.mark.parametrize("names", [("A B", "A-B"), ("日本語", "العربية")])
+def test_export_rejects_code_collisions_instead_of_merging_concepts(
+    names: tuple[str, str],
+) -> None:
+    kb = _sample_knowledge_base()
+    kb.finding.clear()
+    for name in names:
+        kb.finding[name] = Finding(name=name)
+    with pytest.raises(ValueError, match="duplicate concept codes"):
+        export_fhir_terminology(kb)
+
+
+@pytest.mark.parametrize(
+    "concepts",
+    [
+        "invalid",
+        [None],
+        [{"display": "missing code"}],
+        [{"code": "same"}, {"code": "same"}],
+    ],
+)
+def test_import_rejects_malformed_or_duplicate_concepts(concepts: object) -> None:
+    with pytest.raises(ValueError):
+        import_fhir_terminology(
+            {"resourceType": "CodeSystem", "id": "lx-finding-cs", "concept": concepts}
+        )
+
+
+def test_import_rejects_cyclic_python_concept_graph() -> None:
+    concept: dict[str, object] = {"code": "cycle"}
+    concept["concept"] = [concept]
+    with pytest.raises(ValueError, match="repeated objects"):
+        import_fhir_terminology(
+            {"resourceType": "CodeSystem", "id": "lx-finding-cs", "concept": [concept]}
         )

@@ -4,13 +4,33 @@ import builtins
 from datetime import datetime
 from typing import Annotated, Literal, Self, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictBool,
+    StrictInt,
+    model_validator,
+)
+
+FhirId = Annotated[str, Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9.-]+$")]
 
 
 class FhirModel(BaseModel):
     """Small, lossless FHIR R4 contract base for fixture-driven validation."""
 
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(
+        extra="allow", allow_inf_nan=False, hide_input_in_errors=True
+    )
+
+    @model_validator(mode="after")
+    def reject_unknown_modifiers(self) -> Self:
+        extra = self.model_extra or {}
+        if "modifierExtension" in extra or "implicitRules" in extra:
+            raise ValueError(
+                "FHIR modifiers and implicitRules require explicit profile support"
+            )
+        return self
 
 
 class FhirCoding(FhirModel):
@@ -30,7 +50,7 @@ class FhirReference(FhirModel):
 
 
 class FhirQuantity(FhirModel):
-    value: int | float
+    value: Annotated[int, Field(strict=True)] | Annotated[float, Field(strict=True)]
     unit: str | None = None
     system: str | None = None
     code: str | None = None
@@ -40,13 +60,14 @@ class FhirObservationComponent(FhirModel):
     code: FhirCodeableConcept
     valueQuantity: FhirQuantity | None = None
     valueString: str | None = None
-    valueBoolean: bool | None = None
-    valueInteger: int | None = None
-    valueDecimal: float | None = None
+    valueBoolean: StrictBool | None = None
+    valueInteger: Annotated[StrictInt, Field(ge=-(2**31), le=2**31 - 1)] | None = None
+    valueDecimal: Annotated[float, Field(strict=True)] | None = None
     valueCodeableConcept: FhirCodeableConcept | None = None
 
     @model_validator(mode="after")
     def validate_single_value(self) -> Self:
+        _reject_unrepresented_values(self)
         values = (
             self.valueQuantity,
             self.valueString,
@@ -62,12 +83,12 @@ class FhirObservationComponent(FhirModel):
 
 class FhirPatient(FhirModel):
     resourceType: Literal["Patient"]
-    id: str = Field(min_length=1)
+    id: FhirId
 
 
 class FhirObservation(FhirModel):
     resourceType: Literal["Observation"]
-    id: str = Field(min_length=1)
+    id: FhirId
     status: Literal[
         "registered",
         "preliminary",
@@ -83,14 +104,15 @@ class FhirObservation(FhirModel):
     effectiveDateTime: datetime | None = None
     valueQuantity: FhirQuantity | None = None
     valueString: str | None = None
-    valueBoolean: bool | None = None
-    valueInteger: int | None = None
-    valueDecimal: float | None = None
+    valueBoolean: StrictBool | None = None
+    valueInteger: Annotated[StrictInt, Field(ge=-(2**31), le=2**31 - 1)] | None = None
+    valueDecimal: Annotated[float, Field(strict=True)] | None = None
     valueCodeableConcept: FhirCodeableConcept | None = None
     component: list[FhirObservationComponent] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_result_value(self) -> Self:
+        _reject_unrepresented_values(self)
         values = (
             self.valueQuantity,
             self.valueString,
@@ -106,9 +128,18 @@ class FhirObservation(FhirModel):
         return self
 
 
+def _reject_unrepresented_values(model: FhirModel) -> None:
+    # Retaining an unsupported choice as an extra field would bypass value[x]
+    # cardinality checks and allow ambiguous clinical interpretation.
+    if any(key.startswith("value") for key in (model.model_extra or {})):
+        raise ValueError("Unsupported Observation value[x] in this clinical contract")
+    if (model.model_extra or {}).get("dataAbsentReason") is not None:
+        raise ValueError("dataAbsentReason requires a supported absent-result contract")
+
+
 class FhirCondition(FhirModel):
     resourceType: Literal["Condition"]
-    id: str = Field(min_length=1)
+    id: FhirId
     clinicalStatus: FhirCodeableConcept
     code: FhirCodeableConcept
     subject: FhirReference
@@ -117,7 +148,7 @@ class FhirCondition(FhirModel):
 
 class FhirDiagnosticReport(FhirModel):
     resourceType: Literal["DiagnosticReport"]
-    id: str = Field(min_length=1)
+    id: FhirId
     status: Literal[
         "registered",
         "partial",
@@ -179,9 +210,9 @@ class FhirClinicalBundle(FhirModel):
             keys = [f"{resource.resourceType}/{resource.id}"]
             if entry.fullUrl:
                 keys.append(entry.fullUrl)
-            for key in keys:
-                if key in index and index[key] is not resource:
-                    raise ValueError(f"Duplicate FHIR reference target {key!r}")
+            for key in set(keys):
+                if key in index:
+                    raise ValueError("Duplicate FHIR reference target")
                 index[key] = resource
         return index
 
@@ -190,45 +221,58 @@ class FhirClinicalBundle(FhirModel):
         reference: FhirReference,
         expected_type: builtins.type[ClinicalResourceT],
     ) -> ClinicalResourceT:
-        resource = self.resource_index().get(reference.reference)
+        return self._resolve_reference(self.resource_index(), reference, expected_type)
+
+    @staticmethod
+    def _resolve_reference(
+        index: dict[str, ClinicalFhirResource],
+        reference: FhirReference,
+        expected_type: builtins.type[ClinicalResourceT],
+    ) -> ClinicalResourceT:
+        resource = index.get(reference.reference)
         if resource is None:
-            raise ValueError(f"Unresolved FHIR reference {reference.reference!r}")
+            raise ValueError("Unresolved FHIR reference")
         if not isinstance(resource, expected_type):
             raise ValueError(  # noqa: TRY004 - invalid clinical reference target
-                f"FHIR reference {reference.reference!r} resolves to "
-                f"{resource.resourceType}, expected {expected_type.__name__}"
+                f"FHIR reference target has wrong type; expected {expected_type.__name__}"
             )
         return resource
 
     def validate_clinical_links(self) -> None:
+        self._validate_clinical_links(self.resource_index())
+
+    def _validate_clinical_links(self, index: dict[str, ClinicalFhirResource]) -> None:
         for entry in self.entry:
             resource = entry.resource
             if isinstance(resource, (FhirObservation, FhirCondition)):
-                self.resolve_reference(resource.subject, FhirPatient)
+                self._resolve_reference(index, resource.subject, FhirPatient)
             elif isinstance(resource, FhirDiagnosticReport):
-                patient = self.resolve_reference(resource.subject, FhirPatient)
+                patient = self._resolve_reference(index, resource.subject, FhirPatient)
                 for result in resource.result:
-                    observation = self.resolve_reference(result, FhirObservation)
-                    observation_patient = self.resolve_reference(
+                    observation = self._resolve_reference(
+                        index, result, FhirObservation
+                    )
+                    observation_patient = self._resolve_reference(
+                        index,
                         observation.subject,
                         FhirPatient,
                     )
-                    if observation_patient.id != patient.id:
+                    if observation_patient is not patient:
                         raise ValueError(
-                            f"DiagnosticReport/{resource.id} and "
-                            f"Observation/{observation.id} reference different patients"
+                            "DiagnosticReport and Observation reference different patients"
                         )
 
     def resolved_reports(self) -> list[ResolvedDiagnosticReport]:
-        self.validate_clinical_links()
+        index = self.resource_index()
+        self._validate_clinical_links(index)
         resolved: list[ResolvedDiagnosticReport] = []
         for entry in self.entry:
             report = entry.resource
             if not isinstance(report, FhirDiagnosticReport):
                 continue
-            patient = self.resolve_reference(report.subject, FhirPatient)
+            patient = self._resolve_reference(index, report.subject, FhirPatient)
             observations = [
-                self.resolve_reference(reference, FhirObservation)
+                self._resolve_reference(index, reference, FhirObservation)
                 for reference in report.result
             ]
             resolved.append(

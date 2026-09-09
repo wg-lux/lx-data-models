@@ -11,8 +11,21 @@ permissions:
   id-token: write
 
 jobs:
+  quality:
+    name: Release quality checks
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  documentation:
+    name: Release documentation checks
+    uses: ./.github/workflows/docs.yml
+    permissions:
+      contents: read
+
   build-artifacts:
     name: Build sdist and wheel
+    needs: [quality, documentation]
     runs-on: ubuntu-latest
 
     steps:

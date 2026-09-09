@@ -5,6 +5,42 @@ and `DiagnosticReport` resources without persistence or Django models. Unknown
 FHIR fields are retained so fixture parsing is lossless within the represented
 resources.
 
+## Supported boundary and compatibility
+
+These models represent a patient-linked subset of FHIR R4, not a complete FHIR
+validator or a claim of conformance to national implementation guides. Unknown
+ordinary fields are retained; uninterpreted `modifierExtension` and `implicitRules`
+are rejected because they may change clinical meaning. Unsupported Observation
+value choices and absent-result semantics require an explicit profile adapter.
+Do not treat retained extra fields as validated clinical content.
+
+Numeric and boolean result fields reject coercion, nonfinite numbers, and
+contradictory value choices. Bundle link resolution builds one index per operation,
+rejects duplicate or unresolved targets and cross-patient reports, and performs no
+network resolution. Relative identifiers and exact `fullUrl` aliases are supported;
+ambiguous identifiers across servers require a host adapter. Resolving a bundle
+does not establish consent, access rights, terminology validity, or clinical safety.
+
+The finding/classification bridge in `ValidatorRuntime` is a component projection,
+not a lossless round trip of complete clinical resources. It now rejects malformed
+components instead of substituting `True`. Unitless numeric exports use
+`valueQuantity`, a valid R4 choice; legacy `valueDecimal` remains accepted on input
+for compatibility and must not be mistaken for a standard R4 Observation choice.
+Exported Observation fragments now default to `preliminary`. Hosts with verified
+finalization may explicitly call
+`export_reported_findings_to_fhir_observations(..., status="final")`; they must
+supply patient identity and the remaining resource context themselves.
+
+Terminology export rejects names that map to duplicate normalized FHIR codes,
+including collisions involving non-Latin names. Import rejects duplicate codes,
+malformed concepts, and cyclic in-memory concept structures. Terminology domain
+inference remains heuristic and requires review before clinical use.
+
+See [the R4 Observation definition](https://hl7.org/fhir/R4/observation.html) for
+the supported standard value choices. The production-readiness evidence and
+remaining clinical acceptance gates are tracked in
+`features/ProductionApplicationFoundations.yml`.
+
 ## Fast fixture tests
 
 Run the database-free contract tests:

@@ -41,7 +41,10 @@ from .findings_routes import (
     build_p_examination_payload_from_host_ledger as _build_payload_from_host_ledger,
 )
 from .indications_routes import register_indications_routes
-from .knowledge_base_graph_routes import register_knowledge_base_graph_routes
+from .knowledge_base_graph_routes import (
+    KnowledgeBaseGraphRouteCache,
+    register_knowledge_base_graph_routes,
+)
 from .lookup_tracker import register_runtime_lookup_tracker
 from .report_template_builder import (
     ReportTemplateModuleLocation,
@@ -325,9 +328,13 @@ def _kb_loader() -> Any:
     return _knowledge_base_resolver
 
 
+_graph_route_cache = KnowledgeBaseGraphRouteCache()
+
+
 def _clear_kb_caches() -> None:
     clear_findings_route_caches()
     clear_knowledge_base_resolver_caches()
+    _graph_route_cache.clear()
 
 
 def _resolve_payload_kb_identity(
@@ -725,6 +732,7 @@ register_report_template_routes(
 
 register_knowledge_base_graph_routes(
     api,
+    graph_cache=_graph_route_cache,
     load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
 )
 

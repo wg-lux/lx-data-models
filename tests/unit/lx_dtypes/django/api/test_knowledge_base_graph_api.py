@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,7 @@ from uuid import uuid4
 import pytest
 from django.conf import settings
 from django.test import Client
+from pydantic import ValidationError
 
 from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api.lookup_tracker import consume_runtime_lookup_trackers
@@ -19,6 +21,9 @@ from lx_dtypes.knowledge_bases import (
 from lx_dtypes.models.contracts.core_concepts import CoreConceptCollection
 from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
 from lx_dtypes.models.contracts.knowledge_base_graph import (
+    ExaminationReportingContext,
+    KnowledgeBaseGraphResolver,
+    KnowledgeBaseGraphSnapshot,
     build_examination_reporting_context,
     build_knowledge_base_graph_snapshot,
 )
@@ -184,6 +189,98 @@ def test_graph_snapshot_is_deterministic_and_typed() -> None:
         and edge.target.name == "gastroscopy"
         for edge in first.edges
     )
+
+
+def test_snapshot_does_not_mutate_exporter_and_canonicalizes_record_order() -> None:
+    payload = _core_concepts()
+    payload["finding"][0]["id"] = 42
+    original = deepcopy(payload)
+
+    class SharedPayloadKb(_GraphKb):
+        def export_core_concepts(self) -> dict[str, Any]:
+            return payload
+
+    identity = KnowledgeBaseIdentity(
+        knowledge_base_module="demo_graph", knowledge_base_version="1.2.3"
+    )
+    first = build_knowledge_base_graph_snapshot(SharedPayloadKb(), identity=identity)
+    assert payload == original
+    payload["finding"].reverse()
+    second = build_knowledge_base_graph_snapshot(SharedPayloadKb(), identity=identity)
+    assert first.snapshot_id == second.snapshot_id
+
+
+@pytest.mark.parametrize(
+    "corruption",
+    [
+        "missing_edge",
+        "wrong_target",
+        "changed_content",
+        "draft_template",
+        "unknown_exam",
+    ],
+)
+def test_snapshot_rejects_corrupted_projection(corruption: str) -> None:
+    snapshot = build_knowledge_base_graph_snapshot(
+        _GraphKb(),
+        identity=KnowledgeBaseIdentity(
+            knowledge_base_module="demo_graph", knowledge_base_version="1.2.3"
+        ),
+    )
+    payload = snapshot.model_dump(mode="json")
+    if corruption == "missing_edge":
+        payload["edges"].pop()
+    elif corruption == "wrong_target":
+        payload["edges"][0]["target"]["name"] = "unknown"
+    elif corruption == "changed_content":
+        payload["concepts"]["finding"][0]["description"] = "changed"
+    elif corruption == "draft_template":
+        payload["report_templates"][0]["lifecycle_status"] = "draft"
+    else:
+        payload["report_templates"][0]["examination"] = "unknown"
+    with pytest.raises(ValidationError):
+        KnowledgeBaseGraphSnapshot.model_validate(payload)
+
+
+def test_context_checks_identity_and_detects_nested_snapshot_mutation() -> None:
+    snapshot = build_knowledge_base_graph_snapshot(
+        _GraphKb(),
+        identity=KnowledgeBaseIdentity(
+            knowledge_base_module="demo_graph", knowledge_base_version="1.2.3"
+        ),
+    )
+    context = build_examination_reporting_context(
+        snapshot, examination_name="gastroscopy"
+    )
+    payload = context.model_dump(mode="json")
+    payload["identity"]["knowledge_base_version"] = "9.9.9"
+    with pytest.raises(ValidationError, match="identity"):
+        ExaminationReportingContext.model_validate(payload)
+    snapshot.edges.clear()
+    with pytest.raises(ValidationError, match="relationships"):
+        build_examination_reporting_context(snapshot, examination_name="gastroscopy")
+
+
+def test_indexed_resolver_isolated_from_input_and_returned_context_mutation() -> None:
+    snapshot = build_knowledge_base_graph_snapshot(
+        _GraphKb(),
+        identity=KnowledgeBaseIdentity(
+            knowledge_base_module="demo_graph", knowledge_base_version="1.2.3"
+        ),
+    )
+    expected = build_examination_reporting_context(
+        snapshot, examination_name="gastroscopy"
+    )
+    resolver = KnowledgeBaseGraphResolver(snapshot)
+    snapshot.concepts.finding.clear()
+    snapshot.report_templates[0].name = "changed"
+    first = resolver.reporting_context("gastroscopy")
+    assert first == expected
+    first.concepts.finding.clear()
+    first.report_templates[0].name = "changed-again"
+    assert resolver.reporting_context("gastroscopy") == expected
+    with pytest.raises(KeyError):
+        resolver.reporting_context("unknown")
 
 
 def test_graph_projection_strips_template_source_file_paths() -> None:
@@ -421,3 +518,22 @@ def test_reporting_context_endpoint_rejects_unknown_examination(
 
     assert response.status_code == 404
     assert "unknown" in response.json()["detail"]
+
+
+def test_graph_api_does_not_echo_invalid_concept_content(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class InvalidGraphKb(_GraphKb):
+        def export_core_concepts(self) -> dict[str, Any]:
+            payload = _core_concepts()
+            payload["examination"][0]["findings"] = ["untrusted-content-marker"]
+            return payload
+
+    monkeypatch.setattr(
+        api_main, "load_knowledge_base", lambda *args, **kwargs: InvalidGraphKb()
+    )
+    response = Client().get(
+        "/base_api/knowledge-bases/demo_graph/1.2.3/graph", secure=True
+    )
+    assert response.status_code == 409
+    assert b"untrusted-content-marker" not in response.content

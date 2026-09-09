@@ -3,7 +3,13 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import Enum
+from math import isfinite
 from typing import Literal, TypedDict
+
+from lx_dtypes.models.contracts.fhir_clinical import (
+    FhirCodeableConcept,
+    FhirObservationComponent,
+)
 
 from ..classification.Classification import Classification
 from ..classification_choice.ClassificationChoice import ClassificationChoice
@@ -433,33 +439,20 @@ def _quantity_unit(value: object) -> str | None:
     return code or None
 
 
-def _quantity_value(value: object) -> ValidationScalar | None:
-    if not isinstance(value, Mapping):
-        return None
-    raw_value = value.get("value")
-    if isinstance(raw_value, (str, int, float, bool)):
-        return raw_value
-    return None
-
-
-def _observation_value(component: Mapping[str, object]) -> ValidationScalar:
-    if "valueCodeableConcept" in component:
-        return _first_coding_display(component.get("valueCodeableConcept"))
-    if "valueQuantity" in component:
-        quantity_value = _quantity_value(component.get("valueQuantity"))
-        return quantity_value if quantity_value is not None else True
-    if "valueString" in component:
-        return _normalize_identifier(component.get("valueString"))
-    if "valueBoolean" in component:
-        value = component.get("valueBoolean")
-        return value if isinstance(value, bool) else True
-    if "valueInteger" in component:
-        value = component.get("valueInteger")
-        return value if isinstance(value, int) else True
-    if "valueDecimal" in component:
-        value = component.get("valueDecimal")
-        return value if isinstance(value, (int, float)) else True
-    return True
+def _observation_value(component: FhirObservationComponent) -> ValidationScalar:
+    if component.valueCodeableConcept is not None:
+        return _first_coding_display(component.valueCodeableConcept.model_dump())
+    if component.valueQuantity is not None:
+        return component.valueQuantity.value
+    for value in (
+        component.valueString,
+        component.valueBoolean,
+        component.valueInteger,
+        component.valueDecimal,
+    ):
+        if value is not None:
+            return value
+    raise ValueError("Observation component requires a supported value[x]")
 
 
 def import_fhir_observations_to_reported_findings(
@@ -470,23 +463,27 @@ def import_fhir_observations_to_reported_findings(
     reported_findings: list[dict[str, object]] = []
     for observation in observations:
         if observation.get("resourceType") != "Observation":
-            continue
+            raise ValueError("Expected an Observation resource")
+        FhirCodeableConcept.model_validate(observation.get("code"))
         finding_name = _first_coding_display(observation.get("code"))
         if not finding_name:
             continue
 
         classifications: list[dict[str, object]] = []
         raw_components = observation.get("component", [])
-        components = raw_components if isinstance(raw_components, Sequence) else []
+        if not isinstance(raw_components, (list, tuple)):
+            raise TypeError("Observation.component must be an array")
+        components = raw_components
         for component in components:
             if not isinstance(component, Mapping):
-                continue
+                raise TypeError("Observation.component entries must be objects")
+            validated_component = FhirObservationComponent.model_validate(component)
             classification_name = _first_coding_display(component.get("code"))
             if not classification_name:
                 continue
             classification_payload: dict[str, object] = {
                 "classification": classification_name,
-                "value": _observation_value(component),
+                "value": _observation_value(validated_component),
             }
             unit = _quantity_unit(component.get("valueQuantity"))
             if unit:
@@ -510,6 +507,8 @@ def _component_value_for_classification(
     unit: str | None,
     base_url: str,
 ) -> dict[str, object]:
+    if isinstance(value, float) and not isfinite(value):
+        raise ValueError("Observation numeric values must be finite")
     if unit and isinstance(value, (int, float)) and not isinstance(value, bool):
         return {
             "valueQuantity": {
@@ -522,7 +521,9 @@ def _component_value_for_classification(
     if isinstance(value, bool):
         return {"valueBoolean": value}
     if isinstance(value, (int, float)):
-        return {"valueDecimal": value}
+        # R4 Observation has no valueDecimal choice. Unitless numbers are
+        # represented as Quantity so fractional values remain valid FHIR.
+        return {"valueQuantity": {"value": value}}
     value_text = _normalize_identifier(value)
     if not value_text:
         return {"valueBoolean": True}
@@ -544,9 +545,12 @@ def export_reported_findings_to_fhir_observations(
     reported_findings: Sequence[Mapping[str, object]],
     *,
     base_url: str = "https://wg-lux.de/fhir",
+    status: Literal["preliminary", "final"] = "preliminary",
 ) -> list[dict[str, object]]:
     """Convert runtime reported-finding payloads into FHIR Observation resources."""
 
+    if status not in {"preliminary", "final"}:
+        raise ValueError("Observation export status must be preliminary or final")
     observations: list[dict[str, object]] = []
     for occurrence in _normalize_reported_findings(reported_findings):
         finding_name = occurrence["finding"]
@@ -580,7 +584,7 @@ def export_reported_findings_to_fhir_observations(
         observations.append(
             {
                 "resourceType": "Observation",
-                "status": "final",
+                "status": status,
                 "code": {
                     "coding": [
                         _coding(

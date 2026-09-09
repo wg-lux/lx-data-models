@@ -501,12 +501,32 @@ def _contains_phrase(text: str, phrase: str) -> bool:
 
 def _iter_fhir_concepts(concepts: object) -> Iterator[Mapping[str, Any]]:
     if not isinstance(concepts, list):
-        return
-    for concept in concepts:
-        if not isinstance(concept, Mapping):
+        raise TypeError("FHIR CodeSystem.concept must be an array")
+    pending: list[Iterator[object]] = [iter(concepts)]
+    seen: set[int] = set()
+    codes: set[str] = set()
+    while pending:
+        try:
+            concept = next(pending[-1])
+        except StopIteration:
+            pending.pop()
             continue
+        if not isinstance(concept, Mapping):
+            raise TypeError("FHIR CodeSystem concepts must be objects")
+        if id(concept) in seen:
+            raise ValueError("FHIR CodeSystem concept graph contains repeated objects")
+        seen.add(id(concept))
+        code = concept.get("code")
+        if not isinstance(code, str) or not code.strip():
+            raise ValueError("FHIR CodeSystem concepts require a nonempty code")
+        if code in codes:
+            raise ValueError("FHIR CodeSystem concept codes must be unique")
+        codes.add(code)
+        children = concept.get("concept", [])
+        if not isinstance(children, list):
+            raise TypeError("FHIR CodeSystem.concept must be an array")
         yield concept
-        yield from _iter_fhir_concepts(concept.get("concept", []))
+        pending.append(iter(children))
 
 
 def _code_display_lookup_by_domain(
@@ -815,9 +835,18 @@ def _property_uri(base_url: str, code: str) -> str:
 
 
 def _code_lookup(records: list[object]) -> dict[str, str]:
-    return {
-        str(_read(record, "name")): _slug(_read(record, "name")) for record in records
-    }
+    lookup: dict[str, str] = {}
+    codes: set[str] = set()
+    for record in records:
+        name = _read(record, "name")
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("FHIR terminology export requires nonempty concept names")
+        code = _slug(name)
+        if name in lookup or code in codes:
+            raise ValueError("FHIR terminology export produces duplicate concept codes")
+        lookup[name] = code
+        codes.add(code)
+    return lookup
 
 
 def _common_properties(record: object) -> list[dict[str, str]]:

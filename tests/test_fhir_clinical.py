@@ -7,9 +7,11 @@ from pydantic import ValidationError
 
 from lx_dtypes.models.contracts.fhir_clinical import (
     FhirClinicalBundle,
+    FhirClinicalBundleEntry,
     FhirDiagnosticReport,
     FhirObservation,
     FhirObservationComponent,
+    FhirPatient,
 )
 from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     export_reported_findings_to_fhir_observations,
@@ -145,3 +147,160 @@ def test_clinical_link_validation_rejects_wrong_subject_type() -> None:
 
     with pytest.raises(ValueError, match="expected FhirPatient"):
         bundle.validate_clinical_links()
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        {"valueBoolean": "false"},
+        {"valueInteger": True},
+        {"valueInteger": 1.5},
+        {"valueInteger": 2**31},
+        {"valueQuantity": {"value": "12.3"}},
+        {"valueQuantity": {"value": True}},
+        {"valueQuantity": {"value": float("nan")}},
+        {"valueDecimal": float("inf")},
+        {"valueBoolean": False, "valueRange": {"low": {"value": 1}}},
+        {"valueBoolean": False, "dataAbsentReason": {"text": "unknown"}},
+    ],
+)
+def test_fhir_rejects_coerced_nonfinite_or_ambiguous_values(
+    value: dict[str, object],
+) -> None:
+    with pytest.raises(ValidationError):
+        FhirObservationComponent.model_validate(
+            {
+                "code": {"coding": [{"system": "urn:synthetic", "code": "result"}]},
+                **value,
+            }
+        )
+
+
+def test_duplicate_patient_only_bundle_is_rejected() -> None:
+    entry = FhirClinicalBundleEntry(
+        resource=FhirPatient(resourceType="Patient", id="synthetic")
+    )
+    bundle = FhirClinicalBundle(
+        resourceType="Bundle", type="collection", entry=[entry, entry]
+    )
+    with pytest.raises(ValueError, match="Duplicate FHIR reference"):
+        bundle.validate_clinical_links()
+
+
+def test_resolved_reports_indexes_once_and_does_not_cache_mutable_input(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls = 0
+    original = FhirClinicalBundle.resource_index
+
+    def counted(self: FhirClinicalBundle):
+        nonlocal calls
+        calls += 1
+        return original(self)
+
+    monkeypatch.setattr(FhirClinicalBundle, "resource_index", counted)
+    bundle = _fixture_bundle()
+    bundle.resolved_reports()
+    assert calls == 1
+    bundle.entry[1].resource.id = "changed"
+    bundle.entry[1].fullUrl = None
+    with pytest.raises(ValueError, match="Unresolved FHIR reference"):
+        bundle.resolved_reports()
+    assert calls == 2
+
+
+def test_fhir_import_rejects_invalid_values_instead_of_inventing_true() -> None:
+    payload = {
+        "resourceType": "Observation",
+        "code": {"coding": [{"system": "urn:synthetic", "code": "finding"}]},
+        "component": [
+            {
+                "code": {"coding": [{"system": "urn:synthetic", "code": "result"}]},
+                "valueBoolean": "invalid",
+            }
+        ],
+    }
+    with pytest.raises(ValidationError):
+        import_fhir_observations_to_reported_findings([payload])
+
+
+def test_unitless_numeric_export_uses_r4_quantity() -> None:
+    exported = export_reported_findings_to_fhir_observations(
+        [
+            {
+                "finding": "synthetic",
+                "classifications": [{"classification": "result", "value": 1.25}],
+            }
+        ]
+    )
+    assert exported[0]["status"] == "preliminary"
+    assert exported[0]["component"] == [
+        {
+            "code": {
+                "coding": [
+                    {
+                        "system": "https://wg-lux.de/fhir/CodeSystem/lx-classification-cs",
+                        "code": "result",
+                        "display": "result",
+                    }
+                ],
+                "text": "result",
+            },
+            "valueQuantity": {"value": 1.25},
+        }
+    ]
+    assert import_fhir_observations_to_reported_findings(exported)[0][
+        "classifications"
+    ] == [{"classification": "result", "value": 1.25}]
+
+
+@pytest.mark.parametrize(
+    "modifier",
+    [
+        {"modifierExtension": [{"url": "urn:unsupported", "valueBoolean": True}]},
+        {"implicitRules": "urn:unsupported"},
+    ],
+)
+def test_clinical_contract_rejects_uninterpreted_modifiers(
+    modifier: dict[str, object],
+) -> None:
+    with pytest.raises(ValidationError, match="explicit profile support"):
+        FhirPatient.model_validate(
+            {"resourceType": "Patient", "id": "synthetic", **modifier}
+        )
+
+
+def test_null_choice_does_not_override_valid_false_value_on_import() -> None:
+    findings = import_fhir_observations_to_reported_findings(
+        [
+            {
+                "resourceType": "Observation",
+                "code": {"coding": [{"system": "urn:synthetic", "code": "finding"}]},
+                "component": [
+                    {
+                        "code": {
+                            "coding": [{"system": "urn:synthetic", "code": "result"}]
+                        },
+                        "valueString": None,
+                        "valueBoolean": False,
+                    }
+                ],
+            }
+        ]
+    )
+    assert findings[0]["classifications"] == [
+        {"classification": "result", "value": False}
+    ]
+
+
+@pytest.mark.parametrize("identifier", ["bad/id", "with space", "x" * 65, ""])
+def test_fhir_resource_identifiers_reject_invalid_syntax(identifier: str) -> None:
+    with pytest.raises(ValidationError):
+        FhirPatient(resourceType="Patient", id=identifier)
+
+
+def test_final_observation_status_requires_explicit_request() -> None:
+    exported = export_reported_findings_to_fhir_observations(
+        [{"finding": "synthetic"}], status="final"
+    )
+    assert exported[0]["status"] == "final"

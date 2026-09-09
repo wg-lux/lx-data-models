@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from copy import deepcopy
 from datetime import date, datetime
 
 from pydantic import ConfigDict, RootModel
@@ -15,11 +16,13 @@ type SapIshImportPayload = dict[str, SapIshImportPayloadValue]
 
 
 class SapIshDropFilePayload(RootModel[dict[str, SapIshImportPayloadValue]]):
-    model_config = ConfigDict(frozen=True, strict=True)
+    model_config = ConfigDict(
+        frozen=True, strict=True, allow_inf_nan=False, hide_input_in_errors=True
+    )
 
     @property
     def as_dict(self) -> dict[str, SapIshImportPayloadValue]:
-        return dict(self.root)
+        return deepcopy(self.root)
 
 
 def dump_sap_ish_drop_file_payload(

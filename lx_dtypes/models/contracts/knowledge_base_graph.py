@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Mapping
+from copy import deepcopy
 from typing import Any, Literal, Protocol, cast
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -12,6 +13,7 @@ from .core_concepts import (
     ClassificationChoiceCore,
     ClassificationChoiceDescriptorCore,
     ClassificationCore,
+    CoreConceptBase,
     CoreConceptCollection,
     FindingCore,
     IndicationCore,
@@ -114,7 +116,11 @@ class KnowledgeBaseGraphSnapshot(BaseModel):
             raise ValueError("concept graph module does not match snapshot identity")
         if self.concepts.knowledge_base_version != self.identity.knowledge_base_version:
             raise ValueError("concept graph version does not match snapshot identity")
-        _validate_unique_edges(self.edges)
+        _validate_projection(self.concepts, self.report_templates, self.edges)
+        if self.snapshot_id != _content_hash(
+            self.model_dump(mode="json", exclude={"snapshot_id"})
+        ):
+            raise ValueError("graph snapshot content does not match snapshot_id")
         return self
 
 
@@ -134,6 +140,12 @@ class ExaminationReportingContext(BaseModel):
 
     @model_validator(mode="after")
     def validate_context(self) -> ExaminationReportingContext:
+        if (
+            self.concepts.knowledge_base_module != self.identity.knowledge_base_module
+            or self.concepts.knowledge_base_version
+            != self.identity.knowledge_base_version
+        ):
+            raise ValueError("reporting context concepts do not match identity")
         examination_names = {item.name for item in self.concepts.examination}
         if examination_names != {self.examination_name}:
             raise ValueError(
@@ -144,7 +156,11 @@ class ExaminationReportingContext(BaseModel):
             for template in self.report_templates
         ):
             raise ValueError("reporting context contains a template for another exam")
-        _validate_unique_edges(self.edges)
+        _validate_projection(self.concepts, self.report_templates, self.edges)
+        if self.context_id != _content_hash(
+            self.model_dump(mode="json", exclude={"context_id"})
+        ):
+            raise ValueError("reporting context content does not match context_id")
         return self
 
 
@@ -164,7 +180,7 @@ def build_knowledge_base_graph_snapshot(
     *,
     identity: KnowledgeBaseIdentity,
 ) -> KnowledgeBaseGraphSnapshot:
-    concepts_payload = kb.export_core_concepts()
+    concepts_payload = deepcopy(kb.export_core_concepts())
     for collection_name in _concept_collection_names():
         records = concepts_payload.get(collection_name, [])
         if not isinstance(records, list):
@@ -176,6 +192,8 @@ def build_knowledge_base_graph_snapshot(
                 record.pop("id", None)
                 record.pop("uuid", None)
     concepts = CoreConceptCollection.model_validate(concepts_payload)
+    for collection_name in _concept_collection_names():
+        getattr(concepts, collection_name).sort(key=lambda record: record.name)
     if concepts.knowledge_base_module != identity.knowledge_base_module:
         raise ValueError("loaded core concepts do not match requested module")
     if concepts.knowledge_base_version != identity.knowledge_base_version:
@@ -212,120 +230,148 @@ def build_examination_reporting_context(
     *,
     examination_name: str,
 ) -> ExaminationReportingContext:
-    source = snapshot.concepts
-    examinations = {examination.name: examination for examination in source.examination}
-    examination = examinations.get(examination_name)
-    if examination is None:
-        raise KeyError(examination_name)
+    return KnowledgeBaseGraphResolver(snapshot).reporting_context(examination_name)
 
-    selected: dict[str, set[str]] = {
-        name: set() for name in _concept_collection_names()
-    }
-    selected["examination"].add(examination_name)
-    selected["examination_type"].update(examination.examination_types)
-    selected["finding"].update(examination.findings)
-    selected["indication"].update(examination.indications)
 
-    records = {
-        collection_name: {
-            record.name: record for record in getattr(source, collection_name)
+class KnowledgeBaseGraphResolver:
+    """Host-owned index of one validated, isolated snapshot.
+
+    Reuse for repeated queries; construct a new resolver when the snapshot
+    changes. No global cache, network access, or predicted clinical edges.
+    """
+
+    def __init__(self, snapshot: KnowledgeBaseGraphSnapshot) -> None:
+        self._snapshot = KnowledgeBaseGraphSnapshot.model_validate(
+            snapshot.model_dump(mode="python")
+        )
+        self._records: dict[str, dict[str, CoreConceptBase]] = {
+            collection_name: {
+                record.name: record
+                for record in getattr(self._snapshot.concepts, collection_name)
+            }
+            for collection_name in _concept_collection_names()
         }
-        for collection_name in _concept_collection_names()
-    }
-
-    for finding_name in sorted(selected["finding"]):
-        finding = cast(FindingCore, records["finding"][finding_name])
-        selected["finding_type"].update(finding.finding_types)
-        selected["classification"].update(finding.classifications)
-        selected["intervention"].update(finding.interventions)
-        selected["intervention"].update(finding.caused_by_interventions)
-    for indication_name in sorted(selected["indication"]):
-        indication = cast(IndicationCore, records["indication"][indication_name])
-        selected["indication_type"].update(indication.indication_types)
-        selected["classification"].update(indication.classifications)
-        selected["intervention"].update(indication.interventions)
-    for classification_name in sorted(selected["classification"]):
-        classification = cast(
-            ClassificationCore, records["classification"][classification_name]
-        )
-        selected["classification_type"].update(classification.classification_types)
-        selected["classification_choice"].update(classification.classification_choices)
-    for choice_name in sorted(selected["classification_choice"]):
-        choice = cast(
-            ClassificationChoiceCore,
-            records["classification_choice"][choice_name],
-        )
-        selected["classification_choice_descriptor"].update(
-            choice.classification_choice_descriptors
-        )
-    for descriptor_name in sorted(selected["classification_choice_descriptor"]):
-        descriptor = cast(
-            ClassificationChoiceDescriptorCore,
-            records["classification_choice_descriptor"][descriptor_name],
-        )
-        if descriptor.unit is not None:
-            selected["unit"].add(descriptor.unit)
-    for unit_name in sorted(selected["unit"]):
-        unit = cast(UnitCore, records["unit"][unit_name])
-        selected["unit_type"].update(unit.unit_types)
-    for intervention_name in sorted(selected["intervention"]):
-        intervention = cast(
-            InterventionCore, records["intervention"][intervention_name]
-        )
-        selected["intervention_type"].update(intervention.intervention_types)
-
-    # Provenance records do not currently expose reverse concept references, so
-    # retain their complete small catalogs in the projection.
-    for collection_name in (
-        "information_source",
-        "information_source_type",
-        "citation",
-    ):
-        selected[collection_name].update(records[collection_name])
-
-    context_concepts = CoreConceptCollection.model_validate(
-        {
-            "module_name": source.module_name,
-            "knowledge_base_module": source.knowledge_base_module,
-            "knowledge_base_version": source.knowledge_base_version,
-            **{
-                collection_name: [
-                    records[collection_name][name].model_dump(mode="json")
-                    for name in sorted(selected[collection_name])
-                ]
-                for collection_name in _concept_collection_names()
-            },
+        self._examinations = {
+            record.name: record for record in self._snapshot.concepts.examination
         }
-    )
-    templates = [
-        template
-        for template in snapshot.report_templates
-        if template.examination == examination_name
-    ]
-    included_nodes = {
-        (cast(GraphNodeKind, collection_name), record.name)
-        for collection_name in _concept_collection_names()
-        for record in getattr(context_concepts, collection_name)
-    }
-    included_nodes.update(("report_template", item.name) for item in templates)
-    edges = [
-        edge
-        for edge in snapshot.edges
-        if (edge.source.kind, edge.source.name) in included_nodes
-        and (edge.target.kind, edge.target.name) in included_nodes
-    ]
-    content: dict[str, object] = {
-        "contract_version": KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION,
-        "identity": snapshot.identity.model_dump(mode="json"),
-        "graph_snapshot_id": snapshot.snapshot_id,
-        "examination_name": examination_name,
-        "concepts": context_concepts.model_dump(mode="json"),
-        "report_templates": [item.model_dump(mode="json") for item in templates],
-        "edges": [item.model_dump(mode="json") for item in edges],
-    }
-    return ExaminationReportingContext.model_validate(
-        {**content, "context_id": _content_hash(content)}
-    )
+        self._edges_by_source: dict[tuple[str, str], list[KnowledgeBaseGraphEdge]] = {}
+        for edge in self._snapshot.edges:
+            self._edges_by_source.setdefault(
+                (edge.source.kind, edge.source.name), []
+            ).append(edge)
+        self._templates: dict[str, list[ReportTemplateGraphProjection]] = {}
+        for template in self._snapshot.report_templates:
+            self._templates.setdefault(template.examination, []).append(template)
+
+    def reporting_context(self, examination_name: str) -> ExaminationReportingContext:
+        snapshot = self._snapshot
+        source = snapshot.concepts
+        examination = self._examinations.get(examination_name)
+        if examination is None:
+            raise KeyError(examination_name)
+
+        selected: dict[str, set[str]] = {
+            name: set() for name in _concept_collection_names()
+        }
+        selected["examination"].add(examination_name)
+        selected["examination_type"].update(examination.examination_types)
+        selected["finding"].update(examination.findings)
+        selected["indication"].update(examination.indications)
+
+        records = self._records
+
+        for finding_name in sorted(selected["finding"]):
+            finding = cast(FindingCore, records["finding"][finding_name])
+            selected["finding_type"].update(finding.finding_types)
+            selected["classification"].update(finding.classifications)
+            selected["intervention"].update(finding.interventions)
+            selected["intervention"].update(finding.caused_by_interventions)
+        for indication_name in sorted(selected["indication"]):
+            indication = cast(IndicationCore, records["indication"][indication_name])
+            selected["indication_type"].update(indication.indication_types)
+            selected["classification"].update(indication.classifications)
+            selected["intervention"].update(indication.interventions)
+        for classification_name in sorted(selected["classification"]):
+            classification = cast(
+                ClassificationCore, records["classification"][classification_name]
+            )
+            selected["classification_type"].update(classification.classification_types)
+            selected["classification_choice"].update(
+                classification.classification_choices
+            )
+        for choice_name in sorted(selected["classification_choice"]):
+            choice = cast(
+                ClassificationChoiceCore,
+                records["classification_choice"][choice_name],
+            )
+            selected["classification_choice_descriptor"].update(
+                choice.classification_choice_descriptors
+            )
+        for descriptor_name in sorted(selected["classification_choice_descriptor"]):
+            descriptor = cast(
+                ClassificationChoiceDescriptorCore,
+                records["classification_choice_descriptor"][descriptor_name],
+            )
+            if descriptor.unit is not None:
+                selected["unit"].add(descriptor.unit)
+        for unit_name in sorted(selected["unit"]):
+            unit = cast(UnitCore, records["unit"][unit_name])
+            selected["unit_type"].update(unit.unit_types)
+        for intervention_name in sorted(selected["intervention"]):
+            intervention = cast(
+                InterventionCore, records["intervention"][intervention_name]
+            )
+            selected["intervention_type"].update(intervention.intervention_types)
+
+        # Provenance records do not currently expose reverse concept references, so
+        # retain their complete small catalogs in the projection.
+        for collection_name in (
+            "information_source",
+            "information_source_type",
+            "citation",
+        ):
+            selected[collection_name].update(records[collection_name])
+
+        context_concepts = CoreConceptCollection.model_validate(
+            {
+                "module_name": source.module_name,
+                "knowledge_base_module": source.knowledge_base_module,
+                "knowledge_base_version": source.knowledge_base_version,
+                **{
+                    collection_name: [
+                        records[collection_name][name].model_dump(mode="json")
+                        for name in sorted(selected[collection_name])
+                    ]
+                    for collection_name in _concept_collection_names()
+                },
+            }
+        )
+        templates = self._templates.get(examination_name, [])
+        included_nodes = {
+            (cast(GraphNodeKind, collection_name), record.name)
+            for collection_name in _concept_collection_names()
+            for record in getattr(context_concepts, collection_name)
+        }
+        included_nodes.update(("report_template", item.name) for item in templates)
+        edges = [
+            edge
+            for node in sorted(included_nodes)
+            for edge in self._edges_by_source.get(node, ())
+            if (edge.target.kind, edge.target.name) in included_nodes
+        ]
+        edges.sort(key=_edge_key)
+        content: dict[str, object] = {
+            "contract_version": KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION,
+            "identity": snapshot.identity.model_dump(mode="json"),
+            "graph_snapshot_id": snapshot.snapshot_id,
+            "examination_name": examination_name,
+            "concepts": context_concepts.model_dump(mode="json"),
+            "report_templates": [item.model_dump(mode="json") for item in templates],
+            "edges": [item.model_dump(mode="json") for item in edges],
+        }
+        return ExaminationReportingContext.model_validate(
+            {**content, "context_id": _content_hash(content)}
+        )
 
 
 def _published_report_templates(
@@ -535,12 +581,43 @@ def _validate_unique_edges(edges: list[KnowledgeBaseGraphEdge]) -> None:
         raise ValueError("knowledge-base graph edges must be unique")
 
 
+def _validate_projection(
+    concepts: CoreConceptCollection,
+    templates: list[ReportTemplateGraphProjection],
+    edges: list[KnowledgeBaseGraphEdge],
+) -> None:
+    _validate_unique_edges(edges)
+    names = [template.name for template in templates]
+    if len(names) != len(set(names)):
+        raise ValueError("graph report template names must be unique")
+    examinations = {record.name for record in concepts.examination}
+    if any(template.examination not in examinations for template in templates):
+        raise ValueError("graph report template references an unknown examination")
+    if any(template.lifecycle_status != "published" for template in templates):
+        raise ValueError("graph report templates must be published")
+    expected = _build_edges(concepts, templates)
+
+    if {_edge_key(edge) for edge in edges} != {_edge_key(edge) for edge in expected}:
+        raise ValueError("graph edges do not match declared concept relationships")
+
+
+def _edge_key(edge: KnowledgeBaseGraphEdge) -> tuple[str, str, str, str, str]:
+    return (
+        edge.source.kind,
+        edge.source.name,
+        edge.relationship,
+        edge.target.kind,
+        edge.target.name,
+    )
+
+
 def _content_hash(payload: dict[str, object]) -> str:
     encoded = json.dumps(
         payload,
         ensure_ascii=False,
         separators=(",", ":"),
         sort_keys=True,
+        allow_nan=False,
     ).encode("utf-8")
     return f"sha256:{hashlib.sha256(encoded).hexdigest()}"
 
@@ -572,6 +649,7 @@ __all__ = [
     "ExaminationReportingContext",
     "KnowledgeBaseGraphEdge",
     "KnowledgeBaseGraphNodeRef",
+    "KnowledgeBaseGraphResolver",
     "KnowledgeBaseGraphSnapshot",
     "ReportTemplateGraphProjection",
     "build_examination_reporting_context",

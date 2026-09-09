@@ -161,7 +161,8 @@ def test_reporting_context_route_arranges_unknown_exam_and_asserts_http_404() ->
 
     # Assert
     assert error.value.status_code == 404
-    assert "colonoscopy" in str(error.value)
+    assert "unknown" in str(error.value)
+    assert "colonoscopy" not in str(error.value)
 
 
 def test_reporting_context_route_arranges_valid_exam_and_asserts_closed_identity() -> (
@@ -192,3 +193,212 @@ def test_reporting_context_route_arranges_valid_exam_and_asserts_closed_identity
         "gastroscopy"
     ]
     assert payload["context_id"].startswith("sha256:")
+
+
+class _CountingKnowledgeBase(_MinimalKnowledgeBase):
+    def __init__(self, *, version: str = "2.0.0") -> None:
+        super().__init__(module_name="clinical_reporting", version=version)
+        self.exports = 0
+        self.examination_name = "gastroscopy"
+
+    def export_core_concepts(self) -> JsonObject:
+        self.exports += 1
+        payload = super().export_core_concepts()
+        payload["examination"] = [{"name": self.examination_name}]
+        return payload
+
+
+_GRAPH = "/knowledge-bases/{module_name}/{version}/graph"
+_CONTEXT = (
+    "/knowledge-bases/{module_name}/{version}/examinations/"
+    "{examination_name}/reporting-context"
+)
+
+
+def test_http_graph_and_context_reuse_index_and_isolate_responses() -> None:
+    kb = _CountingKnowledgeBase()
+    loads = 0
+
+    def load(module_name: str, *, version: str) -> _MinimalKnowledgeBase:
+        nonlocal loads
+        loads += 1
+        return kb
+
+    routes = _registered_routes(load)
+    graph = routes.handlers[_GRAPH](None, kb.module_name, kb.version)
+    original_id = graph["snapshot_id"]
+    graph.clear()
+    context = routes.handlers[_CONTEXT](None, kb.module_name, kb.version, "gastroscopy")
+    assert context["graph_snapshot_id"] == original_id
+    context.clear()
+    assert (
+        routes.handlers[_CONTEXT](None, kb.module_name, kb.version, "gastroscopy")[
+            "graph_snapshot_id"
+        ]
+        == original_id
+    )
+    assert (
+        routes.handlers[_GRAPH](None, kb.module_name, kb.version)["snapshot_id"]
+        == original_id
+    )
+    assert kb.exports == 1
+    assert loads == 4
+
+
+def test_http_cache_replaces_source_and_never_masks_loader_failure() -> None:
+    kb = _CountingKnowledgeBase()
+    failure = False
+
+    def load(module_name: str, *, version: str) -> _MinimalKnowledgeBase:
+        if failure:
+            raise HttpError(409, "Unavailable version")
+        return kb
+
+    route = _registered_routes(load).handlers[_GRAPH]
+    first = route(None, kb.module_name, kb.version)
+    kb = _CountingKnowledgeBase()
+    kb.examination_name = "colonoscopy"
+    second = route(None, kb.module_name, kb.version)
+    assert first["snapshot_id"] != second["snapshot_id"]
+    failure = True
+    with pytest.raises(HttpError, match="Unavailable version"):
+        route(None, kb.module_name, kb.version)
+    failure = False
+    assert route(None, kb.module_name, kb.version) == second
+    assert kb.exports == 2  # A failed load evicts the formerly valid projection.
+    kb = _CountingKnowledgeBase(version="wrong-version")
+    with pytest.raises(HttpError, match="coherent graph snapshot"):
+        route(None, kb.module_name, "2.0.0")
+
+
+def test_http_cache_lru_bound_and_explicit_invalidation() -> None:
+    from lx_dtypes.django.api.knowledge_base_graph_routes import (
+        KnowledgeBaseGraphRouteCache,
+    )
+
+    sources = {v: _CountingKnowledgeBase(version=v) for v in ("1", "2", "3")}
+    cache = KnowledgeBaseGraphRouteCache(max_entries=2)
+    registry = _RouteRegistry()
+    register_knowledge_base_graph_routes(
+        registry,
+        graph_cache=cache,
+        load_module_kb=lambda module_name, *, version: sources[version],
+    )
+    route = registry.handlers[_GRAPH]
+    for version in ("1", "2", "1", "3", "1", "2"):
+        route(None, "clinical_reporting", version)
+    assert [sources[v].exports for v in ("1", "2", "3")] == [1, 2, 1]
+    sources["2"].examination_name = "colonoscopy"
+    cache.clear()
+    fresh = route(None, "clinical_reporting", "2")
+    assert sources["2"].exports == 3
+    assert (
+        registry.handlers[_CONTEXT](None, "clinical_reporting", "2", "colonoscopy")[
+            "graph_snapshot_id"
+        ]
+        == fresh["snapshot_id"]
+    )
+    with pytest.raises(HttpError) as error:
+        registry.handlers[_CONTEXT](None, "clinical_reporting", "2", "gastroscopy")
+    assert error.value.status_code == 404
+
+
+def test_concurrent_http_cold_requests_compile_once() -> None:
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    kb = _CountingKnowledgeBase()
+    route = _registered_routes(lambda *args, **kwargs: kb).handlers[_CONTEXT]
+    barrier = Barrier(8)
+
+    def request(_: int) -> dict[str, Any]:
+        barrier.wait(timeout=10)
+        return route(None, kb.module_name, kb.version, "gastroscopy")
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        responses = list(pool.map(request, range(8)))
+    assert all(response == responses[0] for response in responses)
+    assert kb.exports == 1
+
+
+def test_api_mutation_hook_invalidates_http_projection() -> None:
+    from lx_dtypes.django.api import main as api_main
+
+    kb = _CountingKnowledgeBase()
+    registry = _RouteRegistry()
+    register_knowledge_base_graph_routes(
+        registry,
+        graph_cache=api_main._graph_route_cache,
+        load_module_kb=lambda *args, **kwargs: kb,
+    )
+    api_main._clear_kb_caches()
+    try:
+        route = registry.handlers[_GRAPH]
+        original = route(None, kb.module_name, kb.version)
+        kb.examination_name = "colonoscopy"
+        api_main._clear_kb_caches()
+        assert (
+            route(None, kb.module_name, kb.version)["snapshot_id"]
+            != original["snapshot_id"]
+        )
+        assert kb.exports == 2
+    finally:
+        api_main._clear_kb_caches()
+
+
+@pytest.mark.parametrize("capacity", [0, -1])
+def test_http_cache_rejects_nonpositive_capacity(capacity: int) -> None:
+    from lx_dtypes.django.api.knowledge_base_graph_routes import (
+        KnowledgeBaseGraphRouteCache,
+    )
+
+    with pytest.raises(ValueError, match="positive"):
+        KnowledgeBaseGraphRouteCache(max_entries=capacity)
+
+
+def test_invalidation_waits_for_compilation_and_prevents_retaining_old_build() -> None:
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event
+
+    from lx_dtypes.django.api.knowledge_base_graph_routes import (
+        KnowledgeBaseGraphRouteCache,
+    )
+
+    compiling = Event()
+    release = Event()
+    clearing = Event()
+    cleared = Event()
+
+    class BlockingSource(_CountingKnowledgeBase):
+        def export_core_concepts(self) -> JsonObject:
+            compiling.set()
+            assert release.wait(timeout=10)
+            return super().export_core_concepts()
+
+    kb = BlockingSource()
+    cache = KnowledgeBaseGraphRouteCache()
+    registry = _RouteRegistry()
+    register_knowledge_base_graph_routes(
+        registry, graph_cache=cache, load_module_kb=lambda *args, **kwargs: kb
+    )
+    route = registry.handlers[_GRAPH]
+
+    def clear() -> None:
+        clearing.set()
+        cache.clear()
+        cleared.set()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        request = pool.submit(route, None, kb.module_name, kb.version)
+        try:
+            assert compiling.wait(timeout=10)
+            invalidation = pool.submit(clear)
+            assert clearing.wait(timeout=10)
+            assert not cleared.is_set()
+        finally:
+            release.set()
+        request.result(timeout=10)
+        invalidation.result(timeout=10)
+    kb.examination_name = "colonoscopy"
+    registry.handlers[_CONTEXT](None, kb.module_name, kb.version, "colonoscopy")
+    assert kb.exports == 2

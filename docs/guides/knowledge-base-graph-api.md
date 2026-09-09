@@ -62,6 +62,75 @@ detect stale context without comparing individual collections.
 An unknown examination returns `404`. An identity mismatch or graph that cannot
 be validated returns `409` rather than a partial response.
 
+## Repeated resolution and integrity
+
+Hosts performing repeated queries can retain an explicit index of one snapshot:
+
+```python
+from lx_dtypes.models.contracts import KnowledgeBaseGraphResolver
+
+resolver = KnowledgeBaseGraphResolver(snapshot)
+context = resolver.reporting_context("colonoscopy")
+```
+
+Construction validates and isolates the snapshot, including its content hash,
+concept relationships, and published template references. Returned contexts do
+not share mutable state with the resolver. Recreate the resolver when the source
+snapshot changes; cache lifetime, memory limits, authorization, and eviction
+belong to the host. There is no implicit global cache. The existing
+`build_examination_reporting_context` helper constructs a resolver for one call.
+The HTTP routes retain a separate `KnowledgeBaseGraphRouteCache` per route
+registration (eight identities by default). Graph and reporting-context requests
+share each validated snapshot and index; responses are serialized afresh.
+Every request still calls the knowledge-base loader. Reuse requires the same
+exact module/version and the same resolved source object. Replacement sources
+rebuild the projection; loader failures evict it and propagate without fallback.
+Hosts returning a fresh knowledge-base object on every load will rebuild each time.
+
+The standard API clears this cache through its existing template save/publication
+and terminology mutation hooks. Custom hosts can pass an explicitly owned cache:
+
+```python
+from lx_dtypes.django.api.knowledge_base_graph_routes import (
+    KnowledgeBaseGraphRouteCache,
+    register_knowledge_base_graph_routes,
+)
+
+cache = KnowledgeBaseGraphRouteCache(max_entries=4)
+register_knowledge_base_graph_routes(api, load_module_kb=loader, graph_cache=cache)
+# After changing source data and invalidating the host's loader cache:
+cache.clear()
+```
+
+Entries are evicted in least-recently-used order. The limit bounds entry count,
+not bytes: each entry retains its source, snapshot, and isolated resolver copy.
+Loading and cold compilation are serialized per cache, preventing duplicate cold
+builds and making `clear()` wait for active compilation before evicting it.
+Context traversal and serialization occur outside that lock. Requests already
+holding a projection may finish with that coherent snapshot after invalidation.
+Hosts requiring a stronger publication barrier must coordinate in-flight requests.
+
+Treat loaded sources as immutable between invalidations. In-place edits are not
+detected by object identity, and there is no filesystem watcher or TTL. External
+updates must invalidate both loader and graph caches in every worker (or reload
+those workers). The package does not implement cross-process invalidation or host
+authorization. Do not share a cache across differently authorized source views
+unless the loader enforces that boundary on every request.
+
+Index construction processes the full graph. Subsequent context queries traverse
+selected records and their edges, plus the retained provenance catalogs; output
+validation and serialization still scale with the returned context size.
+Run `python scripts/benchmark_graph_resolution.py` for deterministic synthetic
+fixtures and local timings. These timings do not establish a production SLA.
+
+Snapshot construction no longer mutates exporter-owned dictionaries and sorts
+concept collections by semantic name. This can change snapshot IDs for previously
+unsorted collections, so hosts must refresh cached contexts. Imported snapshots
+with stale hashes, missing or invented edges, duplicate templates, or unpublished
+templates now fail validation. Hashes establish content consistency, not trusted
+authorship or clinical validity. Predicted edges must remain separate proposals;
+the canonical graph accepts only declared terminology relationships.
+
 ## Frontend consumption
 
 For reporting, prefer the reporting-context endpoint over independently fetching
