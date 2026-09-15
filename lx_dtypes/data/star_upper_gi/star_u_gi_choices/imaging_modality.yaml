@@ -1,11 +1,15 @@
 - model: classification_choice
   name: "star_upper_gi_imaging_modality_white_light"
+  name_de: "Weißlichtendoskopie"
 
 - model: classification_choice
   name: "star_upper_gi_imaging_modality_narrow_band_imaging"
+  name_de: "Narrow-Band Imaging (NBI)"
 
 - model: classification_choice
   name: "star_upper_gi_imaging_modality_chromoendoscopy"
+  name_de: "Chromoendoskopie"
 
 - model: classification_choice
   name: "star_upper_gi_imaging_modality_acidic_staining"
+  name_de: "Säurefärbung"

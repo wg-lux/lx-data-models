@@ -1,5 +1,6 @@
 - model: examination
   name: "star_upper_gi_endoscopy"
+  name_de: "Ösophagogastroduodenoskopie"
   findings:
     # Preprocedure information
     - star_upper_gi_exam_date

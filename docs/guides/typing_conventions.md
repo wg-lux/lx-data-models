@@ -12,6 +12,20 @@ Do not use Django ORM models as transport contracts.
 
 ## Django ORM Rules
 
+Pyright resolves dependencies from the repository's `.venv`, including
+`django-stubs`. This prevents an unrelated active application environment from
+producing false missing-symbol errors for Django's public APIs. Initialize the
+environment and run the check with:
+
+```bash
+UV_PROJECT_ENVIRONMENT=.venv uv sync --extra dev --locked
+UV_PROJECT_ENVIRONMENT=.venv uv run --locked pyright
+```
+
+CI uses the same `.venv` layout. `tests/test_django_typing.py` exercises valid
+Django imports and rejects invalid field arguments and return-type assignments;
+it runs the real checker without disabling diagnostics or substituting stubs.
+
 - Always add `from __future__ import annotations` to Django model modules.
 - Prefer string model references in relation fields.
 - Keep relation field annotations safe for runtime import.
@@ -54,4 +68,3 @@ class Example(models.Model):
 2. Route cross-service payloads through contract models.
 3. Replace repeated domain strings with enums or value objects.
 4. Keep one typing style across `knowledge_base`, `ledger`, and `contracts`.
-

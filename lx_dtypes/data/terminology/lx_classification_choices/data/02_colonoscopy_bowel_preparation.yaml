@@ -64,20 +64,24 @@
 # Aronchick
 - model: classification_choice
   name: "bowel_prep_aronchick_0"
+  name_de: "Aronchick: 0"
   # name_de: "Inadäquat"
   # name_en: "Inadequate"
 
 - model: classification_choice
   name: "bowel_prep_aronchick_1"
+  name_de: "Aronchick: 1"
   # name_en: "Fair"
   # name_de: "Ausreichend"
 
 - model: classification_choice
   name: "bowel_prep_aronchick_2"
+  name_de: "Aronchick: 2"
   # name_en: "Good"
   # name_de: "Gut"
 
 - model: classification_choice
   name: "bowel_prep_aronchick_3"
+  name_de: "Aronchick: 3"
   # name_en: "Excellent"
   # name_de: "Exzellent"

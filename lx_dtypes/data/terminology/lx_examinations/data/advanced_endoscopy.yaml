@@ -1,5 +1,6 @@
 - model: examination
   name: ercp
+  name_de: Endoskopisch retrograde Cholangiopankreatikografie (ERCP)
   description: "Endoscopic retrograde cholangiopancreatography."
   examination_types: [endoscopic_procedure]
   findings:
@@ -12,6 +13,7 @@
 
 - model: examination
   name: endoscopic_ultrasound
+  name_de: Endosonografie (EUS)
   description: "Diagnostic or interventional endoscopic ultrasound examination."
   examination_types: [endoscopic_procedure]
   findings:

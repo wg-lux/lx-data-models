@@ -198,6 +198,7 @@
 #       required: true
 - model: classification_choice
   name: "left_colon"
+  name_de: "Linkes Kolon"
   # name_de: "linkes Kolon"
   # name_en: "Left Colon"
 #   subcategories:
@@ -218,6 +219,7 @@
 #       required: false
 - model: classification_choice
   name: "right_colon"
+  name_de: "Rechtes Kolon"
   # name_de: "rechtes Kolon"
   # name_en: "Right Colon"
 #   subcategories:

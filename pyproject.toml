@@ -49,7 +49,7 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.3.0"
+version = "0.3.2"
 
 [project.optional-dependencies]
 dev = [
@@ -66,6 +66,7 @@ dev = [
   "pytest-mypy-plugins>=3.2.0",
   "pytest-xdist>=3.8.0",
   "pytest-django>=4.11.1",
+  "pyright>=1.1.411",
   "radon>=6.0.1",
   "sphinx-autodoc-typehints>=3.5.2",
   "sphinx-copybutton>=0.5.2",
@@ -102,6 +103,9 @@ Repository = "https://github.com/wg-lux/lx-data-models"
 
 [tool.pyright]
 include = ["lx_dtypes", "scripts", "tests"]
+# Use this repository's dependencies even when launched from another project's shell.
+venvPath = "."
+venv = ".venv"
 stubPath = "typings"
 # These settings help fix the "Unknown" errors specifically
 # reportMissingTypeStubs = false

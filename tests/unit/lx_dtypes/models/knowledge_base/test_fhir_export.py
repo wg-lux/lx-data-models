@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -662,25 +663,57 @@ def test_export_rejects_code_collisions_instead_of_merging_concepts(
 
 
 @pytest.mark.parametrize(
-    "concepts",
+    ("concepts", "message"),
     [
-        "invalid",
-        [None],
-        [{"display": "missing code"}],
-        [{"code": "same"}, {"code": "same"}],
+        ("invalid", "must be an array"),
+        (None, "must be an array"),
+        ({"code": "parent"}, "must be an array"),
+        ([None], "must be objects"),
+        ([42], "must be objects"),
+        ([{"display": "missing code"}], "require a nonempty code"),
+        ([{"code": " "}], "require a nonempty code"),
+        ([{"code": "same"}, {"code": "same"}], "codes must be unique"),
+        ([{"code": "parent", "concept": None}], "must be an array"),
+        ([{"code": "parent", "concept": "invalid"}], "must be an array"),
+        ([{"code": "parent", "concept": [None]}], "must be objects"),
+        ([{"code": "parent", "concept": [{"code": "parent"}]}], "codes must be unique"),
     ],
 )
-def test_import_rejects_malformed_or_duplicate_concepts(concepts: object) -> None:
-    with pytest.raises(ValueError):
-        import_fhir_terminology(
-            {"resourceType": "CodeSystem", "id": "lx-finding-cs", "concept": concepts}
-        )
+def test_import_rejects_malformed_or_duplicate_concepts(
+    concepts: object, message: str
+) -> None:
+    # Arrange: malformed external data at the public import boundary.
+    payload = {"resourceType": "CodeSystem", "id": "lx-finding-cs", "concept": concepts}
+
+    # Act / Assert: all invalid concept shapes use the same validation exception.
+    with pytest.raises(ValueError, match=message):
+        import_fhir_terminology(payload)
 
 
 def test_import_rejects_cyclic_python_concept_graph() -> None:
+    # Arrange
     concept: dict[str, object] = {"code": "cycle"}
     concept["concept"] = [concept]
+
+    # Act / Assert
     with pytest.raises(ValueError, match="repeated objects"):
         import_fhir_terminology(
             {"resourceType": "CodeSystem", "id": "lx-finding-cs", "concept": [concept]}
         )
+
+
+def test_import_accepts_valid_nested_concepts_without_mutating_input() -> None:
+    # Arrange
+    payload = {
+        "resourceType": "CodeSystem",
+        "id": "lx-finding-cs",
+        "concept": [{"code": "parent", "concept": [{"code": "child"}]}],
+    }
+    original = deepcopy(payload)
+
+    # Act
+    imported = import_fhir_terminology(payload, identifier_mode="code")
+
+    # Assert
+    assert [finding["name"] for finding in imported["finding"]] == ["parent", "child"]
+    assert payload == original

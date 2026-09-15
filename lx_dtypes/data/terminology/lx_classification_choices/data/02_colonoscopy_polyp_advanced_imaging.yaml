@@ -44,39 +44,50 @@
 - model: classification_choice
 
   name: "colon_lesion_kudo_1"
+  name_de: "Kudo I"
 
 - model: classification_choice
 
   name: "colon_lesion_kudo_2"
+  name_de: "Kudo II"
 
 - model: classification_choice
 
   name: "colon_lesion_kudo_3s"
+  name_de: "Kudo IIIs"
 - model: classification_choice
 
   name: "colon_lesion_kudo_3l"
+  name_de: "Kudo IIIL"
 - model: classification_choice
 
   name: "colon_lesion_kudo_4"
+  name_de: "Kudo IV"
 - model: classification_choice
 
   name: "colon_lesion_kudo_5i"
+  name_de: "Kudo Vi"
 - model: classification_choice
 
   name: "colon_lesion_kudo_5n"
+  name_de: "Kudo Vn"
 
 # Sano
 - model: classification_choice
 
   name: "colon_lesion_sano_1"
+  name_de: "Sano I"
 
 - model: classification_choice
 
   name: "colon_lesion_sano_2"
+  name_de: "Sano II"
 
 - model: classification_choice
 
   name: "colon_lesion_sano_3a"
+  name_de: "Sano IIIa"
 - model: classification_choice
 
   name: "colon_lesion_sano_3b"
+  name_de: "Sano IIIb"

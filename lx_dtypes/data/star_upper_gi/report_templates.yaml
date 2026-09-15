@@ -15,6 +15,7 @@
           required: true
 
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: star_upper_gi_mini_report_template
   name_de: "STAR Upper GI – Basismodul"
   name_en: "STAR Upper GI – Basic Template"
@@ -57,15 +58,15 @@
   section_kind: patient_data
   fields:
     - key: name
-      label: Patient name
+      label: Patientenname
       source: patient
       required: true
     - key: date_of_birth
-      label: Date of birth
+      label: Geburtsdatum
       source: patient
       required: true
     - key: examination_date
-      label: Date of examination
+      label: Untersuchungsdatum
       source: patient_examination
       required: true
 
@@ -313,6 +314,7 @@
       classifications: [{classification: star_upper_gi_text, required: true}]
 
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: star_upper_gi_standard_report_template
   name_en: STAR Upper GI standardized report
   name_de: Standardisierter STAR-ÖGD-Bericht

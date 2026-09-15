@@ -1,5 +1,6 @@
 - model: classification
   name: "star_upper_gi_location_esophagus_distance_z_line"
+  name_de: "Abstand zur Z-Linie"
   description: |
     Classification of distance from Z-line in the esophagus during upper GI endoscopy.
     Distances proximal to the Z-line are negative, distances distal to the Z-line are positive.
@@ -8,6 +9,7 @@
 
 - model: classification
   name: "upper_gi_esophagus_imaging_modality_classification"
+  name_de: "Bildgebungsverfahren am Ösophagus"
   description: "Classification of imaging modalities used for esophagus during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_imaging_modality_white_light
@@ -17,6 +19,7 @@
 
 - model: classification
   name: star_upper_gi_barrett_praque_classification
+  name_de: "Prag-Klassifikation"
   description: "Classification of Barrett's esophagus praque types observed during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_barrett_praque_c_value
@@ -24,6 +27,7 @@
 
 - model: classification
   name: star_upper_gi_esophagus_varices_baveno
+  name_de: "Baveno-Klassifikation der Ösophagusvarizen"
   description: "Classification of esophageal varices according to Baveno criteria."
   classification_choices:
     - star_upper_gi_esophagus_varices_baveno_none
@@ -32,6 +36,7 @@
 
 - model: classification
   name: star_upper_gi_los_angeles_classification
+  name_de: "Los-Angeles-Klassifikation"
   description: "Los Angeles classification of esophagitis severity observed during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_los_angeles_classification_a
@@ -42,6 +47,7 @@
 # star_upper_gi_erefs_edema
 - model: classification
   name: star_upper_gi_erefs_edema
+  name_de: "EREFS: Ödem"
   description: "Classification of edema in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_edema_none
@@ -50,6 +56,7 @@
 # star_upper_gi_erefs_rings
 - model: classification
   name: star_upper_gi_erefs_rings
+  name_de: "EREFS: Ringe"
   description: "Classification of rings in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_rings_none
@@ -60,6 +67,7 @@
 # star_upper_gi_erefs_exudates
 - model: classification
   name: star_upper_gi_erefs_exudates
+  name_de: "EREFS: Exsudate"
   description: "Classification of exudates in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_exudates_none
@@ -68,6 +76,7 @@
 
 - model: classification
   name: star_upper_gi_erefs_furrows
+  name_de: "EREFS: Längsfurchen"
   description: "Classification of furrows in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_furrows_none
@@ -75,6 +84,7 @@
 
 - model: classification
   name: star_upper_gi_erefs_strictures
+  name_de: "EREFS: Strikturen"
   description: "Classification of strictures in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_strictures_none
@@ -83,6 +93,7 @@
   # star_upper_gi_zargar
 - model: classification
   name: star_upper_gi_zargar
+  name_de: "Zargar-Klassifikation"
   description: "Zargar classification of caustic esophagitis severity observed during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_zargar_grade_0
@@ -96,6 +107,7 @@
 # star_upper_gi_stomach_varices_sarin
 - model: classification
   name: star_upper_gi_stomach_varices_sarin
+  name_de: "Sarin-Klassifikation der Magenvarizen"
   description: "Classification of stomach varices according to Sarin criteria."
   classification_choices:
     - star_upper_gi_stomach_varices_sarin_none

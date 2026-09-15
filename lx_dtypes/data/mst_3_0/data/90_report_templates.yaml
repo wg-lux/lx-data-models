@@ -275,6 +275,7 @@
 # Published templates (absence of a lifecycle override means published package content).
 - &mst30_egd_template
   model: report_template
+  verbosity_options: [short, standard, detailed]
   name: mst30_egd_report
   name_de: MST 3.0 – ÖGD-Bericht
   name_en: MST 3.0 – EGD report
@@ -297,6 +298,7 @@
       allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable]
       guideline_citations: ["WEO MST 3.0 sections 2–7"]
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: mst30_gastroscopy_report
   name_de: MST 3.0 – Gastroskopiebericht
   name_en: MST 3.0 – Gastroscopy report
@@ -308,6 +310,7 @@
   coverage_version: report_concept_coverage_v1
   coverage_concepts: [*mst30_egd_coverage]
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: mst30_colonoscopy_report
   name_de: MST 3.0 – Koloskopiebericht
   name_en: MST 3.0 – Colonoscopy report
@@ -320,6 +323,7 @@
   coverage_concepts:
     - {concept_id: mst30.colonoscopy.documentation_status, label: Vollständigkeit der MST-Koloskopiedokumentation, applicability_status: required, validator_names: [mst30_colonoscopy_documentation_status_documented], evidence_path: [patient_findings], finding_selector: {finding_name: mst30_colonoscopy_documentation_status, classification_name: mst30_attr_completeness}, allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable], guideline_citations: ["WEO MST 3.0 sections 2–7"]}
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: mst30_enteroscopy_report
   name_de: MST 3.0 – Enteroskopiebericht
   name_en: MST 3.0 – Enteroscopy report
@@ -332,6 +336,7 @@
   coverage_concepts:
     - {concept_id: mst30.enteroscopy.documentation_status, label: Vollständigkeit der MST-Enteroskopiedokumentation, applicability_status: required, validator_names: [mst30_enteroscopy_documentation_status_documented], evidence_path: [patient_findings], finding_selector: {finding_name: mst30_enteroscopy_documentation_status, classification_name: mst30_attr_completeness}, allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable], guideline_citations: ["WEO MST 3.0 sections 2–7"]}
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: mst30_vce_report
   name_de: MST 3.0 – Kapselendoskopiebericht
   name_en: MST 3.0 – VCE report
@@ -344,6 +349,7 @@
   coverage_concepts:
     - {concept_id: mst30.vce.documentation_status, label: Vollständigkeit der MST-Kapselendoskopiedokumentation, applicability_status: required, validator_names: [mst30_vce_documentation_status_documented], evidence_path: [patient_findings], finding_selector: {finding_name: mst30_vce_documentation_status, classification_name: mst30_attr_completeness}, allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable], guideline_citations: ["WEO MST 3.0 sections 2–7"]}
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: mst30_ercp_report
   name_de: MST 3.0 – ERCP-Bericht
   name_en: MST 3.0 – ERCP report
@@ -356,6 +362,7 @@
   coverage_concepts:
     - {concept_id: mst30.ercp.documentation_status, label: Vollständigkeit der MST-ERCP-Dokumentation, applicability_status: required, validator_names: [mst30_ercp_documentation_status_documented], evidence_path: [patient_findings], finding_selector: {finding_name: mst30_ercp_documentation_status, classification_name: mst30_attr_completeness}, allowed_values: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable], guideline_citations: ["WEO MST 3.0 sections 2–7"]}
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: mst30_eus_report
   name_de: MST 3.0 – EUS-Bericht
   name_en: MST 3.0 – EUS report

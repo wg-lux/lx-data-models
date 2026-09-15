@@ -1,9 +1,11 @@
 import datetime
-from typing import NotRequired, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
 )
+
+ReportVerbosity = Literal["short", "standard", "detailed"]
 
 
 class ReportTemplateValidatorsDataDict(TypedDict):
@@ -26,6 +28,7 @@ class ReportTemplateGuidelineReferenceDataDict(TypedDict):
 
 class ReportTemplateDataDict(KnowledgebaseBaseModelDataDict):
     examination: str
+    verbosity_options: NotRequired[list[ReportVerbosity]]
     version: NotRequired[str | None]
     guideline_references: NotRequired[list[ReportTemplateGuidelineReferenceDataDict]]
     coverage_version: NotRequired[str | None]

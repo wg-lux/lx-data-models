@@ -22,6 +22,8 @@ UploadJobMonitoringStatus = Literal[
     "pending",
     "processing",
     "retrying",
+    "cancel_requested",
+    "cancelled",
     "anonymized",
     "error",
     "lost",
@@ -54,7 +56,7 @@ HlsMaterializationErrorCode = Literal[
     "validation_failed",
     "stale_attempt",
 ]
-ImportMonitoringAction = Literal["safe_reimport", "delete"]
+ImportMonitoringAction = Literal["safe_reimport", "delete", "cancel"]
 
 
 class AnonymizationStatusInfoData(TypedDict):
@@ -124,6 +126,12 @@ class OverviewUploadJobMonitoringData(TypedDict):
     last_attempt_at: str | None
     created_at: str
     updated_at: str
+
+
+class UploadJobCancellationResponseData(TypedDict):
+    upload_job: OverviewUploadJobMonitoringData
+    cancellation_requested: Literal[True]
+    source_preserved: Literal[True]
 
 
 class OverviewHlsMaterializationPayload(BaseModel):
@@ -207,12 +215,25 @@ class OverviewUploadJobMonitoringPayload(BaseModel):
 
         if self.status in {"error", "lost"} and not self.error_code:
             raise ValueError("terminal upload job failure requires an error_code")
-        if self.status not in {"retrying", "error", "lost"} and (
-            self.error_code or self.error_detail
-        ):
+        # Cancellation retains diagnostics from an earlier failed attempt.
+        if self.status not in {
+            "retrying",
+            "error",
+            "lost",
+            "cancel_requested",
+            "cancelled",
+        } and (self.error_code or self.error_detail):
             raise ValueError("non-failed upload job must not expose error state")
         expected_actions: list[ImportMonitoringAction]
-        if self.status == "anonymized":
+        if self.status in {"cancel_requested", "cancelled"} and (
+            self.cleanup_status not in {"pending", "skipped"}
+        ):
+            raise ValueError(
+                "cancelled upload source must not be scheduled for cleanup"
+            )
+        if self.status in {"pending", "processing", "retrying"}:
+            expected_actions = ["cancel"]
+        elif self.status == "anonymized":
             expected_actions = ["delete"]
         elif (
             self.status in {"error", "lost"} and self.error_code != "duplicate_content"
@@ -259,6 +280,31 @@ class OverviewUploadJobMonitoringPayload(BaseModel):
         )
 
 
+class UploadJobCancellationResponsePayload(BaseModel):
+    """Acknowledges cooperative cancellation without deleting the import source."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    upload_job: OverviewUploadJobMonitoringPayload
+    cancellation_requested: Literal[True] = True
+    source_preserved: Literal[True] = True
+
+    @model_validator(mode="after")
+    def validate_state(self) -> UploadJobCancellationResponsePayload:
+        if self.upload_job.status not in {"cancel_requested", "cancelled"}:
+            raise ValueError("cancellation response requires a cancellation state")
+        if not self.upload_job.source_file_persisted:
+            raise ValueError("cancellation response requires a preserved source")
+        return self
+
+    def to_data(self) -> UploadJobCancellationResponseData:
+        return UploadJobCancellationResponseData(
+            upload_job=self.upload_job.to_data(),
+            cancellation_requested=self.cancellation_requested,
+            source_preserved=self.source_preserved,
+        )
+
+
 class OverviewUploadJobPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
@@ -293,6 +339,8 @@ __all__ = [
     "OverviewUploadJobMonitoringPayload",
     "OverviewUploadJobPayload",
     "StartAnonymizationResponseData",
+    "UploadJobCancellationResponseData",
+    "UploadJobCancellationResponsePayload",
     "UploadJobCleanupStatus",
     "UploadJobIngestMode",
     "UploadJobMonitoringStatus",

@@ -1,19 +1,24 @@
 - model: classification_choice
   name: "histology_polyp_hyperplastic"
+  name_de: "Hyperplastischer Polyp"
   description: "Histology: Hyperplastic polyp"
 
 - model: classification_choice
   name: "histology_polyp_adenoma_tubular"
+  name_de: "Tubuläres Adenom"
   description: "Histology: Tubular adenoma"
 
 - model: classification_choice
   name: "histology_polyp_adenoma_tubulovillous"
+  name_de: "Tubulovillöses Adenom"
   description: "Histology: Tubulovillous adenoma"
 
 - model: classification_choice
   name: "histology_polyp_adenoma_villous"
+  name_de: "Villöses Adenom"
   description: "Histology: Villous adenoma"
 
 - model: classification_choice
   name: "histology_polyp_sessile_serrated_lesion"
+  name_de: "Sessile serratierte Läsion"
   description: "Histology: Sessile serrated lesion"

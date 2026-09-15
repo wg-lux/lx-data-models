@@ -49,6 +49,16 @@ def test_report_finding_as_requirement_preserves_fields() -> None:
     assert [c.required for c in req.classifications] == [True, False]
 
 
+@pytest.mark.parametrize(
+    "options", [[], ["short"], ["standard", "standard"], ["standard", "unknown"]]
+)
+def test_report_template_rejects_invalid_verbosity_options(options: list[str]) -> None:
+    with pytest.raises(ValidationError):
+        ReportTemplate.model_validate(
+            {"name": "t", "examination": "e", "verbosity_options": options}
+        )
+
+
 def test_report_template_accepts_string_report_sections_via_list_coercion() -> None:
     template = ReportTemplate.model_validate(
         {
@@ -59,6 +69,7 @@ def test_report_template_accepts_string_report_sections_via_list_coercion() -> N
         }
     )
     assert template.report_sections == ["baseline"]
+    assert template.verbosity_options == ["standard"]
     assert "report_sections" in ReportTemplate.list_type_fields()
 
 

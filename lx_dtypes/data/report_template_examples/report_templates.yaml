@@ -1,26 +1,32 @@
 - model: classification_choice
   name: large
+  name_de: "Groß"
 
 - model: classification_choice
   name: present
+  name_de: "Vorhanden"
 
 - model: classification
   name: size_mm
+  name_de: "Größe in Millimetern"
   classification_choices:
     - size_mm
 
 - model: classification
   name: size_cat
+  name_de: "Größenkategorie"
   classification_choices:
     - large
 
 - model: classification
   name: lst
+  name_de: "Lateral ausgedehnter Tumor (LST)"
   classification_choices:
     - present
 
 - model: finding
   name: esophagus_polyp
+  name_de: "Ösophaguspolyp"
   description: Esophageal polyp used by the legacy report-template example.
   classifications:
     - size_mm
@@ -91,7 +97,9 @@
   examination_validators: []
 
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: star_upper_gi_main
+  name_de: STAR-ÖGD – Basisbericht
   examination: star_upper_gi_endoscopy
   report_sections:
     - examination_baseline
@@ -240,6 +248,7 @@
     - upper_gi_esophagus_imaging_modality
 
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: upper_gi_quality_2025
   name_de: "ÖGD – leitlinienbasierte Qualitätsdokumentation 2025"
   name_en: "Upper GI endoscopy – guideline-based quality documentation 2025"
@@ -386,7 +395,9 @@
       - upper_gi_esophagus_imaging_modality_documented
 
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: ukw_gastroscopy
+  name_de: UKW – Gastroskopiebericht
   examination: star_upper_gi_endoscopy
   report_sections: []
   validators:
@@ -411,6 +422,7 @@
     - base_required_finding
 
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: base_report_template
   examination: generic_endoscopy
   report_sections:
@@ -515,6 +527,7 @@
     - ercp_quality_post_ercp_pancreatitis
 
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: ercp_quality_2018
   name_de: "ERCP – leitlinienbasierte Qualitätsdokumentation"
   name_en: "ERCP – guideline-based quality documentation"
@@ -682,6 +695,7 @@
     - eus_quality_adverse_events
 
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: eus_quality_2025
   name_de: "Endosonographie – leitlinienbasierte Qualitätsdokumentation 2025"
   name_en: "Endoscopic ultrasound – guideline-based quality documentation 2025"

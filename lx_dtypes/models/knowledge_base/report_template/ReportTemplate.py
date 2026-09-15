@@ -11,6 +11,7 @@ from lx_dtypes.models.knowledge_base.report_template.ReportTemplateCoverage impo
 )
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict import (
     ReportTemplateDataDict,
+    ReportVerbosity,
 )
 
 
@@ -45,6 +46,9 @@ class ReportTemplateGuidelineReference(BaseModel):
 
 class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):
     examination: str
+    verbosity_options: list[ReportVerbosity] = Field(
+        default_factory=lambda: ["standard"]
+    )
     version: str | None = None
     guideline_references: list[ReportTemplateGuidelineReference] = Field(
         default_factory=list
@@ -59,6 +63,15 @@ class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):
     @classmethod
     def list_type_fields(cls) -> list[str]:
         return ["report_sections"]
+
+    @field_validator("verbosity_options")
+    @classmethod
+    def validate_verbosity_options(
+        cls, value: list[ReportVerbosity]
+    ) -> list[ReportVerbosity]:
+        if "standard" not in value or len(set(value)) != len(value):
+            raise ValueError("verbosity_options must be unique and include standard")
+        return value
 
     @property
     def ddict_class(self) -> type[ReportTemplateDataDict]:

@@ -294,6 +294,9 @@ def import_fhir_terminology(
     The result mirrors the concept collection shape used by the existing KB
     adapters: keys such as ``examination`` and ``classification_choice`` contain
     lists of plain dictionaries that can be compared to YAML-derived concepts.
+
+    Malformed concept arrays, invalid concept objects, duplicate codes, and
+    cyclic concept graphs raise ValueError before a result is returned.
     """
     if identifier_mode not in {"display", "code"}:
         raise ValueError("identifier_mode must be 'display' or 'code'")
@@ -500,6 +503,7 @@ def _contains_phrase(text: str, phrase: str) -> bool:
 
 
 def _iter_fhir_concepts(concepts: object) -> Iterator[Mapping[str, Any]]:
+    """Reject malformed external concept data with a consistent ValueError."""
     if not isinstance(concepts, list):
         raise TypeError("FHIR CodeSystem.concept must be an array")
     pending: list[Iterator[object]] = [iter(concepts)]

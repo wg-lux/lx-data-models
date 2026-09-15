@@ -1,23 +1,27 @@
 # STAR Upper GI 2025 report-level classifications.
 - model: classification
   name: star_upper_gi_text
+  name_de: "Freitext"
   classification_choices:
     - star_upper_gi_text_value
 
 - model: classification
   name: star_upper_gi_antithrombotic_management
+  name_de: "Umgang mit antithrombotischer Medikation"
   classification_choices:
     - star_upper_gi_antithrombotic_active
     - star_upper_gi_antithrombotic_interrupted
 
 - model: classification
   name: star_upper_gi_biopsy_type
+  name_de: "Biopsieart"
   classification_choices:
     - star_upper_gi_biopsy_random
     - star_upper_gi_biopsy_targeted
 
 - model: classification
   name: star_upper_gi_cleanliness_scale
+  name_de: "Skala zur Schleimhautsauberkeit"
   classification_choices:
     - star_upper_gi_cleanliness_grace
     - star_upper_gi_cleanliness_peace
@@ -25,6 +29,7 @@
 
 - model: classification
   name: star_upper_gi_grace_segment_score
+  name_de: "GRACE-Segmentwert"
   classification_choices:
     - star_upper_gi_grace_0
     - star_upper_gi_grace_1
@@ -33,6 +38,7 @@
 
 - model: classification
   name: star_upper_gi_peace_segment_score
+  name_de: "PEACE-Segmentwert"
   classification_choices:
     - star_upper_gi_peace_0
     - star_upper_gi_peace_1
@@ -41,6 +47,7 @@
 
 - model: classification
   name: star_upper_gi_barcelona_segment_score
+  name_de: "Barcelona-Segmentwert"
   classification_choices:
     - star_upper_gi_barcelona_0
     - star_upper_gi_barcelona_1
@@ -48,16 +55,19 @@
 
 - model: classification
   name: star_upper_gi_cleanliness_total_0_9
+  name_de: "Gesamtwert der Sauberkeit (0–9)"
   classification_choices:
     - star_upper_gi_cleanliness_total_0_9_value
 
 - model: classification
   name: star_upper_gi_cleanliness_total_0_10
+  name_de: "Gesamtwert der Sauberkeit (0–10)"
   classification_choices:
     - star_upper_gi_cleanliness_total_0_10_value
 
 - model: classification
   name: star_upper_gi_mucosal_status
+  name_de: "Schleimhautstatus"
   classification_choices:
     - star_upper_gi_mucosa_normal
     - star_upper_gi_mucosa_abnormal
@@ -65,6 +75,7 @@
 
 - model: classification
   name: star_upper_gi_papilla_status
+  name_de: "Papillenbefund"
   classification_choices:
     - star_upper_gi_papilla_normal
     - star_upper_gi_papilla_suspected_adenoma
@@ -72,6 +83,7 @@
 
 - model: classification
   name: star_upper_gi_photo_landmark
+  name_de: "Fotografierte Landmarke"
   classification_choices:
     - star_upper_gi_photo_proximal_esophagus
     - star_upper_gi_photo_distal_esophagus

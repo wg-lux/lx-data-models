@@ -9,6 +9,10 @@ from typing import Any, Literal, Protocol, cast
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic_core import to_jsonable_python
 
+from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict import (
+    ReportVerbosity,
+)
+
 from .core_concepts import (
     ClassificationChoiceCore,
     ClassificationChoiceDescriptorCore,
@@ -87,6 +91,9 @@ class ReportTemplateGraphProjection(BaseModel):
     description: str | None = None
     version: str = Field(min_length=1)
     examination: str = Field(min_length=1)
+    verbosity_options: list[ReportVerbosity] = Field(
+        default_factory=lambda: ["standard"]
+    )
     guideline_references: list[JsonObject] = Field(default_factory=list)
     coverage_version: str | None = None
     coverage_concepts: list[JsonObject] = Field(default_factory=list)

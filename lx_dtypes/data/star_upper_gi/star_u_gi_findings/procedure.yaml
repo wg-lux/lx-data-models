@@ -1,59 +1,69 @@
 # Preprocedure information required by the STAR Upper GI 2025 position statement.
 - model: finding
   name: star_upper_gi_exam_date
+  name_de: "Untersuchungsdatum"
   finding_types: [preprocedure, mandatory]
   classifications: [star_upper_gi_text]
 
 - model: finding
   name: star_upper_gi_patient_name
+  name_de: "Patientenname"
   description: "Patient identity concept; host applications should source it from the typed patient record."
   finding_types: [preprocedure, mandatory]
   classifications: [star_upper_gi_text]
 
 - model: finding
   name: star_upper_gi_patient_date_of_birth
+  name_de: "Geburtsdatum"
   description: "Patient date-of-birth concept; host applications should source it from the typed patient record."
   finding_types: [preprocedure, mandatory]
   classifications: [star_upper_gi_text]
 
 - model: finding
   name: star_upper_gi_exam_indication
+  name_de: "Untersuchungsindikation"
   description: "Clinical indication for the upper gastrointestinal endoscopy."
   finding_types: [preprocedure, mandatory]
   classifications: [star_upper_gi_text]
 
 - model: finding
   name: star_upper_gi_antithrombotic_use
+  name_de: "Antithrombotische Medikation"
   description: "Whether the patient is taking antiplatelets, anticoagulants, or heparins."
   finding_types: [preprocedure, mandatory]
   classifications: [yes_no_unknown_classification]
 
 - model: finding
   name: star_upper_gi_antithrombotic_agent
+  name_de: "Antithrombotischer Wirkstoff"
   description: "Name of each antithrombotic agent taken by the patient."
   finding_types: [preprocedure, conditonal]
   classifications: [star_upper_gi_text]
 
 - model: finding
   name: star_upper_gi_antithrombotic_management
+  name_de: "Umgang mit antithrombotischer Medikation"
   description: "Whether antithrombotic therapy remained active or was interrupted, including when."
   finding_types: [preprocedure, conditonal]
   classifications: [star_upper_gi_antithrombotic_management, star_upper_gi_text]
 
 - model: finding
   name: star_upper_gi_fasting_solids
+  name_de: "Nüchternheit für feste Nahrung"
   description: "Fasting time for solid food, recorded in minutes."
   finding_types: [preprocedure, mandatory]
   classifications: [star_upper_gi_duration_minutes]
 
 - model: finding
   name: star_upper_gi_fasting_liquids
+  name_de: "Nüchternheit für Flüssigkeiten"
   description: "Fasting time for liquids, recorded in minutes."
   finding_types: [preprocedure, mandatory]
   classifications: [star_upper_gi_duration_minutes]
 
 - model: finding
   name: star_upper_gi_premedication
+  name_de: "Prämedikation"
   description: "Premedication such as simethicone, N-acetylcysteine, or another agent."
   finding_types: [preprocedure, mandatory]
   classifications: [star_upper_gi_text]
@@ -61,18 +71,21 @@
 # Periprocedure information and mucosal cleanliness.
 - model: finding
   name: star_upper_gi_drugs_during_endoscopy
+  name_de: "Medikation während der Endoskopie"
   description: "Drugs administered during endoscopy, including topical anesthesia, sedation, adjuncts, and reversal agents."
   finding_types: [periprocedure, mandatory]
   classifications: [star_upper_gi_text]
 
 - model: finding
   name: star_upper_gi_endoscope_type
+  name_de: "Endoskoptyp"
   description: "Endoscope type and relevant imaging technology or traceability identifier."
   finding_types: [periprocedure, mandatory]
   classifications: [star_upper_gi_text]
 
 - model: finding
   name: star_upper_gi_cleanliness_assessment
+  name_de: "Beurteilung der Schleimhautsauberkeit"
   description: "Named GRACE, PEACE, or Barcelona scale with segment and total scores."
   finding_types: [periprocedure, mandatory]
   classifications:
@@ -82,6 +95,7 @@
 
 - model: finding
   name: star_upper_gi_cleanliness_esophagus
+  name_de: "Sauberkeit des Ösophagus"
   description: "Mucosal cleanliness score for the esophagus."
   finding_types: [periprocedure, mandatory]
   classifications:
@@ -90,26 +104,31 @@
     - star_upper_gi_barcelona_segment_score
 - model: finding
   name: star_upper_gi_cleanliness_stomach
+  name_de: "Sauberkeit des Magens"
   description: "Combined mucosal cleanliness score for the stomach when GRACE or PEACE is used."
   finding_types: [periprocedure, mandatory]
   classifications: [star_upper_gi_grace_segment_score, star_upper_gi_peace_segment_score]
 - model: finding
   name: star_upper_gi_cleanliness_gastric_fundus
+  name_de: "Sauberkeit des Magenfundus"
   description: "Mucosal cleanliness score for the gastric fundus when the Barcelona scale is used."
   finding_types: [periprocedure, optional]
   classifications: [star_upper_gi_barcelona_segment_score]
 - model: finding
   name: star_upper_gi_cleanliness_gastric_corpus
+  name_de: "Sauberkeit des Magenkorpus"
   description: "Mucosal cleanliness score for the gastric corpus when the Barcelona scale is used."
   finding_types: [periprocedure, optional]
   classifications: [star_upper_gi_barcelona_segment_score]
 - model: finding
   name: star_upper_gi_cleanliness_gastric_antrum
+  name_de: "Sauberkeit des Magenantrums"
   description: "Mucosal cleanliness score for the gastric antrum when the Barcelona scale is used."
   finding_types: [periprocedure, optional]
   classifications: [star_upper_gi_barcelona_segment_score]
 - model: finding
   name: star_upper_gi_cleanliness_duodenum
+  name_de: "Sauberkeit des Duodenums"
   description: "Mucosal cleanliness score for the duodenum."
   finding_types: [periprocedure, mandatory]
   classifications:
@@ -119,12 +138,14 @@
 
 - model: finding
   name: star_upper_gi_previous_surgery_reconstruction
+  name_de: "Voroperationen und Rekonstruktionen"
   description: "Type of previous upper-GI surgery and reconstruction, when applicable."
   classifications: [star_upper_gi_text]
 
 # Postprocedure information.
 - model: finding
   name: star_upper_gi_biopsy_documentation
+  name_de: "Biopsiedokumentation"
   description: "Random or targeted biopsy with location and number of samples for each area."
   finding_types: [postprocedure, mandatory]
   classifications:
@@ -136,24 +157,28 @@
 
 - model: finding
   name: star_upper_gi_histology_vials
+  name_de: "Histologiegefäße"
   description: "Number of vials and specification of the specimens in each vial."
   finding_types: [postprocedure, mandatory]
   classifications: [star_upper_gi_count, star_upper_gi_text]
 
 - model: finding
   name: star_upper_gi_photodocumentation
+  name_de: "Fotodokumentation"
   description: "Photographs of normal landmarks and at least one image of every abnormal finding."
   finding_types: [postprocedure, mandatory]
   classifications: [star_upper_gi_photo_landmark, star_upper_gi_count]
 
 - model: finding
   name: star_upper_gi_exam_duration
+  name_de: "Untersuchungsdauer"
   description: "Total time from intubation to extubation."
   finding_types: [postprocedure, mandatory]
   classifications: [star_upper_gi_duration_minutes]
 
 - model: finding
   name: star_upper_gi_staff_and_roles
+  name_de: "Untersuchungsteam und Funktionen"
   description: "Names and roles of all staff involved in the procedure."
   finding_types: [postprocedure, mandatory]
   classifications: [star_upper_gi_text]

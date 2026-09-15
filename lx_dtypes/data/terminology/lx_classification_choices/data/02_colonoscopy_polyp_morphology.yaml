@@ -63,15 +63,19 @@
 - model: classification_choice
 
   name: "colon_lesion_lst_granular_homogeneous"
+  name_de: "Granulärer LST, homogen"
 
 - model: classification_choice
 
   name: "colon_lesion_lst_granular_nodular_mixed"
+  name_de: "Granulärer LST, nodulär gemischt"
 
 - model: classification_choice
 
   name: "colon_lesion_lst_non_granular_flat_elevated"
+  name_de: "Nicht granulärer LST, flach erhaben"
 
 - model: classification_choice
 
   name: "colon_lesion_lst_non_granular_pseudodepressed"
+  name_de: "Nicht granulärer LST, pseudodeprimiert"

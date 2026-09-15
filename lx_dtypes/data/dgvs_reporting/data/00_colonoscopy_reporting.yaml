@@ -1253,6 +1253,7 @@
   - koloskopie_sign_out
   - koloskopie_fruehe_wiederholung
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: colonoscopy_training_basic
   name_de: Koloskopie – leitlinienbasierte Qualitätsdokumentation
   name_en: Colonoscopy – guideline-based quality documentation

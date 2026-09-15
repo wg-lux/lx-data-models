@@ -29,6 +29,7 @@ class ReportTemplateCompiler:
                 reference.model_dump(mode="json")
                 for reference in template.guideline_references
             ],
+            "verbosity_options": template.verbosity_options,
             "coverage_version": template.coverage_version,
             "coverage_concepts": [
                 concept.model_dump(mode="json")
@@ -117,6 +118,8 @@ class ReportTemplateCompiler:
                     descriptors.append(
                         {
                             "name": descriptor.name,
+                            "name_de": descriptor.name_de,
+                            "name_en": descriptor.name_en,
                             "type": getattr(descriptor_type, "value", descriptor_type),
                             "unit": unit_name,
                             "unit_abbreviation": (

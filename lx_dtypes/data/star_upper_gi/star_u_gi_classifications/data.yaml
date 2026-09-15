@@ -1,21 +1,25 @@
 - model: classification
   name: "distance_cm"
+  name_de: "Abstand in Zentimetern"
   classification_choices:
     - distance_cm
 
 - model: classification
   name: "size_oval_mm"
+  name_de: "Größe in Millimetern"
   description: "Classification of size in millimeters."
   classification_choices:
     - size_mm
 
 - model: "classification"
   name: "additional_text_info"
+  name_de: "Zusätzliche Angaben"
   classification_choices:
     - additional_text_info
 
 - model: classification
   name: "star_upper_gi_location_classification"
+  name_de: "Lokalisation"
   description: "Classification of locations visualized during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_location_esophagus_proximal
@@ -36,6 +40,7 @@
 
 - model: classification
   name: "star_upper_gi_location_duodenum"
+  name_de: "Lokalisation im Duodenum"
   description: "Classification of duodenal locations visualized during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_location_duodenum_bulbus
@@ -45,6 +50,7 @@
 
 - model: classification
   name: star_upper_gi_mucosal_appearance_classification
+  name_de: "Schleimhautbeschaffenheit"
   description: "Classification of mucosal appearance observed during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_mucosal_appearance_normal
@@ -59,6 +65,7 @@
 # yes_no_unknown
 - model: classification
   name: yes_no_unknown_classification
+  name_de: "Ja / Nein / Unbekannt"
   description: "A simple yes/no/unknown classification."
   classification_choices:
     - "yes"
@@ -67,6 +74,7 @@
 
 - model: classification
   name: "star_upper_gi_lesion_paris"
+  name_de: "Paris-Klassifikation"
   classification_choices:
     [
       "star_upper_gi_paris_Is",
@@ -83,6 +91,7 @@
 
 - model: classification
   name: star_upper_gi_forrest
+  name_de: "Forrest-Klassifikation"
   classification_choices:
     - star_upper_gi_forrest_Ia
     - star_upper_gi_forrest_Ib
@@ -93,12 +102,14 @@
 
 - model: classification
   name: star_upper_gi_count
+  name_de: "Anzahl"
   description: "Non-negative count used for varices, biopsies, vials, and images."
   classification_choices:
     - star_upper_gi_count_value
 
 - model: classification
   name: star_upper_gi_duration_minutes
+  name_de: "Dauer in Minuten"
   description: "Duration in minutes."
   classification_choices:
     - star_upper_gi_minutes_value

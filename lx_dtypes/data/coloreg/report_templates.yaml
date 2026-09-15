@@ -31,6 +31,7 @@
     - coloreg_colonoscopy_polyp
 
 - model: report_template
+  verbosity_options: [short, standard, detailed]
   name: coloreg_colonoscopy
   name_de: ColoReg – Koloskopie
   name_en: ColoReg – Colonoscopy
@@ -39,7 +40,7 @@
   coverage_version: report_concept_coverage_v1
   coverage_concepts:
     - concept_id: coloreg.polyp.paris
-      label: Paris classification
+      label: Paris-Klassifikation
       applicability_status: conditional
       applicability_rule: Applies to every documented colon polyp.
       validator_names: []
@@ -59,7 +60,7 @@
         - colon_lesion_paris_IIb_IIc
       guideline_citations: []
     - concept_id: coloreg.polyp.nice
-      label: NICE classification
+      label: NICE-Klassifikation
       applicability_status: conditional
       applicability_rule: Applies to every documented colon polyp.
       validator_names: []
