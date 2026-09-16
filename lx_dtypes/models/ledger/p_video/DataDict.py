@@ -1,5 +1,3 @@
-from typing import Dict
-
 from lx_dtypes.models.base.app_base_model.ddict.LedgerBaseModelDataDict import (
     LedgerBaseModelDataDict,
 )
@@ -18,7 +16,7 @@ from .state import AnonymizationState
 class PatientVideoFileDataDict(PatientFileMixInDataDict, LedgerBaseModelDataDict):
     anonymization_state: AnonymizationState
     sensitive_meta: SensitiveMetaDataDict
-    patient_video_segments: Dict[str, "PVideoSegmentDataDict"]
+    patient_video_segments: dict[str, "PVideoSegmentDataDict"]
 
 
 class SerializedPatientVideoFileDataDict(

@@ -5,6 +5,7 @@ import pandas as pd
 from pandera.typing import DataFrame
 
 from .common import DatasetBaseModel
+from .excel import write_xlsx
 from .schemas.knowledge_base import (
     CitationDfSchema,
     ClassificationChoiceDescriptorDfSchema,
@@ -82,22 +83,15 @@ class LedgerDataset(DatasetBaseModel):
             file_path (Path): The path to the Excel file where data will be saved.
         """
 
-        def _strip_tz(df: pd.DataFrame) -> pd.DataFrame:
-            tz_cols = df.select_dtypes(include=["datetimetz"]).columns
-            if not len(tz_cols):
-                return df
-            df = df.copy()
-            for col in tz_cols:
-                df[col] = df[col].dt.tz_convert("UTC").dt.tz_localize(None)  # type: ignore
-            return df
-
-        with pd.ExcelWriter(file_path) as writer:
-            model_fields = self.model_fields_set
-            for field_name in model_fields:
-                df = getattr(self, field_name, None)
-                if not isinstance(df, pd.DataFrame):
-                    continue
-                _strip_tz(df).to_excel(writer, sheet_name=field_name, index=False)
+        write_xlsx(
+            file_path,
+            (
+                (field_name, getattr(self, field_name))
+                for field_name in sorted(self.model_fields_set)
+                if isinstance(getattr(self, field_name), pd.DataFrame)
+            ),
+            overwrite=True,
+        )
 
 
 class KnowledgeBaseDataset(DatasetBaseModel):
@@ -147,22 +141,15 @@ class KnowledgeBaseDataset(DatasetBaseModel):
             file_path (Path): The path to the Excel file where data will be saved.
         """
 
-        def _strip_tz(df: pd.DataFrame) -> pd.DataFrame:
-            tz_cols = df.select_dtypes(include=["datetimetz"]).columns
-            if not len(tz_cols):
-                return df
-            df = df.copy()
-            for col in tz_cols:
-                df[col] = df[col].dt.tz_convert("UTC").dt.tz_localize(None)  # type: ignore
-            return df
-
-        with pd.ExcelWriter(file_path) as writer:
-            model_fields = self.model_fields_set
-            for field_name in model_fields:
-                df = getattr(self, field_name, None)
-                if not isinstance(df, pd.DataFrame):
-                    continue
-                _strip_tz(df).to_excel(writer, sheet_name=field_name, index=False)
+        write_xlsx(
+            file_path,
+            (
+                (field_name, getattr(self, field_name))
+                for field_name in sorted(self.model_fields_set)
+                if isinstance(getattr(self, field_name), pd.DataFrame)
+            ),
+            overwrite=True,
+        )
 
 
 class InterfaceExportDataset(DatasetBaseModel):
@@ -189,43 +176,13 @@ class InterfaceExportDataset(DatasetBaseModel):
         Args:
             file_path (Path): The path to the Excel file where data will be saved.
         """
-        # abort if file_path.exists():
-        if file_path.exists() and not overwrite:
-            raise FileExistsError(f"File {file_path} already exists. Aborting export.")
-        elif file_path.exists() and overwrite:
-            file_path.unlink()
-        with pd.ExcelWriter(file_path) as writer:
-            # Export ledger dataframes
-            ledger_model_fields = self.ledger.model_fields_set
-            for field_name in ledger_model_fields:
-                df = getattr(self.ledger, field_name, None)
-                if not isinstance(df, pd.DataFrame):
-                    continue
-                sheet_name = f"l_{field_name}"[:31]  # Excel sheet name max length is 31
-                tz_cols = df.select_dtypes(include=["datetimetz"]).columns
-                export_df = df
-                if len(tz_cols):
-                    export_df = df.copy()
-                    for col in tz_cols:
-                        export_df[col] = (
-                            export_df[col].dt.tz_convert("UTC").dt.tz_localize(None)  # type: ignore
-                        )
-                export_df.to_excel(writer, sheet_name=sheet_name, index=False)
-
-            # Export knowledge base dataframes
-            kb_model_fields = self.knowledge_base.model_fields_set
-            for field_name in kb_model_fields:
-                df = getattr(self.knowledge_base, field_name, None)
-                if not isinstance(df, pd.DataFrame):
-                    continue
-                sheet_name = f"k_{field_name}"[:31]
-                # Excel cannot handle tz-aware datetimes; drop tz only for export.
-                tz_cols = df.select_dtypes(include=["datetimetz"]).columns
-                export_df = df
-                if len(tz_cols):
-                    export_df = df.copy()
-                    for col in tz_cols:
-                        export_df[col] = (
-                            export_df[col].dt.tz_convert("UTC").dt.tz_localize(None)  # type: ignore
-                        )
-                export_df.to_excel(writer, sheet_name=sheet_name, index=False)
+        write_xlsx(
+            file_path,
+            (
+                (f"{prefix}_{field_name}", getattr(dataset, field_name))
+                for prefix, dataset in (("l", self.ledger), ("k", self.knowledge_base))
+                for field_name in sorted(dataset.model_fields_set)
+                if isinstance(getattr(dataset, field_name), pd.DataFrame)
+            ),
+            overwrite=overwrite,
+        )

@@ -1,0 +1,19 @@
+{
+  "active": {
+    "module_name": "star_upper_gi",
+    "version": "0.1.2"
+  },
+  "modules": {
+    "star_upper_gi": {
+      "0.1.2": {
+        "sources": [
+          {
+            "content_sha256": "57769ae68496c974e1f2250317290c50d71d0db24a13827ee7d3b348c8e1a570",
+            "kind": "provider",
+            "provider": "lx_dtypes.builtin"
+          }
+        ]
+      }
+    }
+  }
+}

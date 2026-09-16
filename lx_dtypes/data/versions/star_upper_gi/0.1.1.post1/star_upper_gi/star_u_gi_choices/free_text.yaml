@@ -1,0 +1,4 @@
+- model: classification_choice
+  name: additional_text_info
+  classification_choice_descriptors:
+    - additional_text_info

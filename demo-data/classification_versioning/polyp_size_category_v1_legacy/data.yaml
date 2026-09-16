@@ -1,0 +1,5 @@
+# Illustrative "legacy" size-category scheme -- see config.yaml.
+- {model: classification_type, name: demo_size_category_type, name_en: Polyp size category type, name_de: Polyp size category type, description: "Classification type shared by all polyp-size-category classification versions in this demo."}
+- {model: classification, name: demo_polyp_size_category, name_en: "Polyp size category (legacy binary split, >5 mm)", name_de: "Polyp size category (legacy binary split, >5 mm)", classification_types: [demo_size_category_type], classification_choices: [demo_size_diminutive_or_less, demo_size_above_diminutive], description: "Illustrative coarse two-bin scheme applying a single >5 mm cut. Not an ESGE recommendation; included only to contrast against polyp_size_category_v2_esge2024."}
+- {model: classification_choice, name: demo_size_diminutive_or_less, name_en: "<=5 mm", name_de: "<=5 mm", description: "Boundary: raw size_oval_mm <= 5."}
+- {model: classification_choice, name: demo_size_above_diminutive, name_en: ">5 mm", name_de: ">5 mm", description: "Boundary: raw size_oval_mm > 5. A single bin covering small, large and large-nonpedunculated lesions alike."}

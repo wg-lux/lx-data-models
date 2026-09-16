@@ -17,16 +17,40 @@ The host project must configure:
 
 - `LX_DTYPES_HOST_MODELS_MODULE`
   Python import path to a module that exports the required Django ORM models.
-- `LX_DTYPES_FINDINGS_MODULE`
-  Optional knowledge-base module name used by the findings/classification API.
-  Defaults to `lx_knowledge_base`.
+- `LX_DTYPES_KB_REGISTRY`
+  Path to the versioned registry containing an explicit active module and
+  version. Findings, classifications, templates, and validation all resolve
+  through this identity.
+- `LX_DTYPES_TERMINOLOGY_IMPORT_ROOT` (optional)
+  Base path for uploaded KB ZIP extraction.
+  Defaults to `<registry parent>/terminology-packages`.
+
+Before starting Django, run the strict package-owned bootstrap boundary:
+
+```bash
+lx-dtypes-kb-registry bootstrap
+```
+
+The command reads `LX_DTYPES_KB_REGISTRY`, provisions every packaged provider
+identity, selects the packaged default only when no active identity exists, and
+fully loads every packaged bundle. Django startup does not silently seed or
+repair registry state. Bootstrap failure must block service startup.
+
+The registry's `active` field is a user-interface preference, not an evaluation
+identity. Reporting endpoints never infer a template version from it. Clients
+read the opaque `revision` returned by `GET /terminology/bundles` and must send
+it as `expected_revision` when calling `POST /terminology/bundles/select`.
+Selection is serialized with an inter-process lock and stale revisions return
+`409`, preventing silent last-writer-wins updates. Import registers a new bundle
+without changing `active`; activation is a separate compare-and-swap request.
 
 Example:
 
 ```python
 # settings.py
 LX_DTYPES_HOST_MODELS_MODULE = "endoreg_db.models"
-LX_DTYPES_FINDINGS_MODULE = "report_template_examples"
+LX_DTYPES_KB_REGISTRY = "/var/lib/host/terminology/registry.json"
+LX_DTYPES_TERMINOLOGY_IMPORT_ROOT = "/var/lib/host/terminology/terminology-packages"
 ```
 
 ## URL Mounting
@@ -58,7 +82,59 @@ The module referenced by `LX_DTYPES_HOST_MODELS_MODULE` must export these names:
 - `PatientFinding`
 - `PatientFindingClassification`
 
-If any are missing, API import or runtime requests will fail.
+If any required model export is missing, API import or runtime requests fail.
+
+For state-changing patient-finding routes it must also export:
+
+- `authenticate_request_user(request)`
+  Resolves an authenticated Django session principal or validates a Bearer token.
+  It must return `None` for missing or invalid credentials.
+- `patient_finding_access_allowed(request, patient_finding)`
+  Performs object-level authorization. It must return `False` for users without
+  a center assignment and for findings outside the user's center. Staff or
+  superusers may be granted cross-center access by the host policy.
+- `patient_examination_access_allowed(request, patient_examination)`
+  Applies the same object-level policy before a finding can be created for an
+  examination.
+- `patient_findings_queryset_for_request(request)`
+  Returns only active findings visible to the authenticated principal. It must
+  return an empty queryset for anonymous or unscoped users.
+
+Patient-finding list, create, patch, classification and delete routes require an
+authenticated principal and fail closed when the corresponding authorization
+callback is absent. Foreign-center objects return 404, while list responses are
+filtered to the caller's center. Deactivation records the authenticated actor
+and server timestamp. Each mutation refreshes the persisted LXDM record in the
+same database transaction.
+
+## Persisted LXDM Record Contract
+
+Hosts must treat
+`lx_dtypes.models.contracts.DtypesRecordPersistencePayload` as the canonical
+type for the JSON record attached to an examination. Import
+`parse_dtypes_record_persistence_payload` at input and storage boundaries and
+`dump_dtypes_record_persistence_payload` when writing a JSON field. Do not copy
+the schema into a host serializer or maintain a reduced dictionary shape.
+
+The contract is the complete `PExamination` ledger graph: patient and examiner
+references, examination identity, knowledge-base module/version, findings,
+classifications, choices and descriptors, interventions, and indications.
+Unknown fields are rejected at every nested level. Host-only database IDs and
+authorization data are not accepted from this payload; the host resolves those
+from the authenticated request and URL-scoped examination.
+
+Before persistence, the host must additionally verify that:
+
+- `payload.examination` equals the host examination name;
+- every finding's `patient_examination` equals the URL/model examination ID;
+- knowledge-base module/version are installed and supported by the deployment.
+
+The persistence contract is public starting with `lx-dtypes` 0.2.1. A host
+using the strict contract must require `lx-dtypes>=0.2.1,<0.3`. Patch releases
+may add helpers but do not add required JSON fields. A new required field,
+changed field meaning, or incompatible nested shape requires a minor release;
+hosts must reject unsupported versions until their adapter and backfill have
+been tested.
 
 ## Required Model Contract
 
@@ -198,6 +274,7 @@ The API assumes the host application owns persistence and business rules.
 Specifically:
 
 - `PatientFinding` lifecycle is implemented by the host model.
+- every patient-finding read or mutation is authenticated and host-scoped
 - uniqueness of active findings per examination is enforced by the host DB/model
 - `examination_safe` is preferred when present, then `examination`
 - active classifications are identified with `is_active=True`
@@ -219,6 +296,62 @@ The package does not validate:
 - your auth model
 - your custom auditing fields
 - your admin integration
+
+## EndoReg Patient Medical Ledger
+
+`lx_dtypes.models.ledger.medical` provides typed, persistence-independent
+ledger records for the patient-owned medical models in
+`endoreg_db.models.medical.patient`:
+
+- `PatientDisease`
+- `PatientEvent`
+- `PatientLabSample` and its nested `PatientLabValue` records
+- `PatientMedication`
+- `PatientMedicationSchedule` and its nested medications
+- `PatientMedicalLedger`, the aggregate patient medical graph
+
+The adapter functions accept loaded EndoReg model instances but deliberately
+do not import `endoreg_db`. EndoReg remains the owner of database fields,
+constraints, query planning, and lifecycle behavior; `lx_dtypes` owns only the
+validated cross-repository representation.
+
+Build the aggregate at a service boundary after loading the required
+relationships:
+
+```python
+from lx_dtypes.models.ledger.medical import build_patient_medical_ledger
+
+ledger = build_patient_medical_ledger(
+    patient,
+    diseases=patient.diseases.prefetch_related("classification_choices"),
+    events=patient.events.select_related("event", "classification_choice"),
+    lab_samples=patient.lab_samples.select_related("sample_type").prefetch_related(
+        "values__lab_value",
+        "values__unit",
+    ),
+    lab_values=patient.lab_values.select_related("lab_value", "sample", "unit"),
+    medications=patient.patientmedication_set.select_related(
+        "medication",
+        "medication_indication",
+        "unit",
+    ).prefetch_related("intake_times"),
+    medication_schedules=patient.patientmedicationschedule_set.prefetch_related(
+        "medication__medication",
+        "medication__medication_indication",
+        "medication__unit",
+        "medication__intake_times",
+    ),
+)
+```
+
+Adapters fail loudly for missing required relations, invalid dates/timestamps,
+or non-JSON clinical payloads. EndoReg primary keys are retained in
+`external_ids["endoreg_db"]`, and the corresponding ledger UUID is derived
+deterministically from the model name and primary key. Callers must load
+relations before conversion; the adapters do not issue or hide database
+queries. Patient and sample links use primary keys only; patient names and
+other identifying demographics are never copied into this medical ledger
+graph.
 
 ## Minimal Host Module Sketch
 
@@ -248,7 +381,7 @@ __all__ = [
 ## Integration Checklist
 
 - Set `LX_DTYPES_HOST_MODELS_MODULE`.
-- Optionally set `LX_DTYPES_FINDINGS_MODULE`.
+- Set `LX_DTYPES_KB_REGISTRY` and provision a loadable active identity.
 - Export the seven required ORM model names from that module.
 - Ensure `Examination.get_available_findings()` returns host `Finding` instances.
 - Ensure `PatientFinding.classifications` exposes active classification rows.

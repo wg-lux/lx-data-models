@@ -1,14 +1,26 @@
 - model: classification_choice
   name: "storz_image_1s"
+  name_de: "STORZ IMAGE1 S"
 
 - model: classification_choice
   name: "olympus_cv_170"
+  name_de: "Olympus CV-170"
 
 - model: classification_choice
   name: "olympus_cv_180"
+  name_de: "Olympus CV-180"
 
 - model: classification_choice
   name: "olympus_cv_190"
+  name_de: "Olympus CV-190"
 
 - model: classification_choice
   name: "pentax_epk_i7000"
+  name_de: "Pentax EPK-i7000"
+
+- model: classification_choice
+  name: "endoscopy_hardware_serial_number_recorded"
+  name_de: "Geräteseriennummer dokumentiert"
+  name_en: "Device serial number recorded"
+  classification_choice_descriptors:
+    - endoscopy_hardware_serial_number_value

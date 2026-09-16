@@ -1,5 +1,6 @@
 - model: classification
   name: "histology_dysplasia_default"
+  name_de: "Dysplasiegrad"
   classification_types:
     - histology
   classification_choices:
@@ -9,6 +10,7 @@
 
 - model: classification
   name: "histology_dignity_default"
+  name_de: "Dignität"
   classification_types:
     - histology
   classification_choices:
@@ -17,6 +19,7 @@
 
 - model: classification
   name: "histology_in_sano_default"
+  name_de: "Resektion im Gesunden"
   classification_types:
     - histology
   classification_choices:

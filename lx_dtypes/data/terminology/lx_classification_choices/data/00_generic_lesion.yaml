@@ -1,30 +1,37 @@
 # Planarity of lesions
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022): https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: classification_choice
   name: "lesion_planarity_flat"
+  name_de: "Flach"
   # name_de: "Planarität flach"
   # name_en: "planarity flat"
   description: "Category for flat lesions"
 
 - model: classification_choice
   name: "lesion_planarity_flat_elevated"
+  name_de: "Flach erhaben"
   # name_de: "Planarität flach-erhaben"
   # name_en: "planarity flat-elevated"
   description: "Category for flat-elevated lesions (surface +/- 2 mm)"
 
 - model: classification_choice
   name: "lesion_planarity_sessile"
+  name_de: "Sessil"
   # name_de: "Planarität sessil"
   # name_en: "planarity sessile"
   description: "Category for sessile lesions (surface > 2 mm)"
 
 - model: classification_choice
   name: "lesion_planarity_pedunculated"
+  name_de: "Gestielt"
   # name_de: "Planarität gestielt"
   # name_en: "planarity pedunculated"
   description: "Category for pedunculated lesions (surface on a stalk)"
 
 - model: classification_choice
   name: "lesion_planarity_excavated"
+  name_de: "Exkaviert"
   # name_de: "Planarität exkaviert"
   # name_en: "planarity excavated"
 #   description: "Category for excavated lesions (surface below surrounding mucosa)"
@@ -37,19 +44,20 @@
 - model: classification_choice
 
   name: "lesion_planarity_unknown"
+  name_de: "Unbekannt"
   # name_de: "Planarität unbekannt"
   # name_en: "planarity unknown"
 
 # Circularity of lesions
 - model: classification_choice
   name: "lesion_circularity_false"
-  # name_de: "Zirkularität"
+  name_de: "Nicht zirkulär"
   # name_en: "Circularity"
   description: "Category for non-circular lesions"
 
 - model: classification_choice
   name: "lesion_circularity_true"
-  # name_de: "Zirkularität"
+  name_de: "Zirkulär"
   # name_en: "Circularity"
 #   description: "Category for circular lesions"
 #   numerical_descriptors:
@@ -75,9 +83,11 @@
 # # Size of oval lesions
 - model: classification_choice
   name: "lesion_size_oval_mm"
-  # name_de: "Größe Ovaler Läsionen (mm)"
+  name_de: "Größter Durchmesser in Millimetern"
   # name_en: "Size of Oval Lesions (mm)"
   description: "oval lesions"
+  classification_choice_descriptors:
+    - lesion_size_mm_value
 #   numerical_descriptors:
 #     largest_diameter_mm:
 #       unit: "mm"
@@ -96,6 +106,7 @@
 #       required: false
 - model: classification_choice
   name: "lesion_length_mm"
+  name_de: "Läsionslänge in Millimetern"
   # name_de: "Länge Läsion (mm)"
   # name_en: "Length of lesions (mm)"
 #   description: "Length of lesions"
@@ -113,13 +124,13 @@
 # Surface of lesions
 - model: classification_choice
   name: "lesion_surface_intact"
-  # name_de: "Oberfläche intakt"
+  name_de: "Oberfläche intakt"
   # name_en: "surface intact"
   description: "Category for intact lesion surfaces"
 # eroded
 - model: classification_choice
   name: "lesion_surface_eroded"
-  # name_de: "Oberfläche erodiert"
+  name_de: "Oberfläche erodiert"
   # name_en: "surface eroded"
   description: "Category for eroded lesion surfaces"
   # subcategories:
@@ -132,7 +143,7 @@
 # ulcerated
 - model: classification_choice
   name: "lesion_surface_ulcerated"
-  # name_de: "Oberfläche ulzeriert"
+  name_de: "Oberfläche ulzeriert"
   # name_en: "surface ulcerated"
   description: "Category for ulcerated lesion surfaces"
   # subcategories:

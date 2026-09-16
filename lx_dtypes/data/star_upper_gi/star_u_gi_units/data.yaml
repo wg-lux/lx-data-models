@@ -1,0 +1,13 @@
+- model: unit
+  name: "star_upper_gi_count"
+  abbreviation: "count"
+  name_de: "Anzahl"
+  name_en: "Count"
+  description: "Dimensionless integer count used for varices, biopsies, vials, and images."
+
+- model: unit
+  name: "star_upper_gi_score"
+  abbreviation: "score"
+  name_de: "Punktwert"
+  name_en: "Score"
+  description: "Dimensionless score point used for STAR upper-GI cleanliness scale totals."

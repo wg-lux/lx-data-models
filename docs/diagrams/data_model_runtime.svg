@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-labelledby="title desc">
+  <title id="title">Patient ledger and reporting concept map</title>
+  <desc id="desc">Patient, examination, findings, indications, reports, media, and medical history, including the nested classification and intervention branches.</desc>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0 0v6l8-3z" fill="#536171"/></marker>
+    <style>.ttl{font-family:Arial,Helvetica,sans-serif;font-size:27px;font-weight:700;fill:#172033}.sub{font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:400;fill:#536171}.h{font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;fill:#172033}.s{font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:400;fill:#475569}.b{stroke-width:2;rx:11}.l{fill:none;stroke:#536171;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#a)}.d,.trunk{fill:none;stroke:#94a3b8;stroke-width:1.6;stroke-dasharray:6 5;stroke-linecap:round;stroke-linejoin:round}.d{marker-end:url(#a)}.e{font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:400;fill:#536171;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}.zone{font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:600;fill:#334155}</style>
+  </defs>
+  <rect width="1600" height="980" fill="#fff"/>
+  <text x="40" y="45" class="ttl">Levels 3–4 — Patient Ledger and Reporting</text>
+  <text x="40" y="72" class="sub">Blue nodes are patient-specific records. Green labels name the knowledge-base concepts they instantiate.</text>
+
+  <rect x="30" y="100" width="1040" height="840" rx="18" fill="#f8fbff" stroke="#cbd5e1"/>
+  <text x="55" y="132" class="zone">Patient Ledger</text>
+  <rect x="1100" y="100" width="470" height="840" rx="18" fill="#fffbef" stroke="#d6c59d"/>
+  <text x="1125" y="132" class="zone">Report Definition and Result</text>
+
+  <g><rect class="b" x="70" y="175" width="170" height="65" fill="#e8f1ff" stroke="#2f6fba"/><text x="95" y="204" class="h">Center</text><text x="95" y="226" class="s">organization context</text></g>
+  <g><rect class="b" x="285" y="175" width="170" height="65" fill="#e8f1ff" stroke="#2f6fba"/><text x="310" y="204" class="h">Examiner</text><text x="310" y="226" class="s">person + center</text></g>
+  <g><rect class="b" x="500" y="175" width="170" height="65" fill="#e8f1ff" stroke="#2f6fba"/><text x="525" y="204" class="h">Patient</text><text x="525" y="226" class="s">person + center</text></g>
+  <g><rect class="b" x="715" y="175" width="170" height="65" fill="#e8f1ff" stroke="#2f6fba"/><text x="740" y="204" class="h">Case</text><text x="740" y="226" class="s">visit/admission group</text></g>
+
+  <g><rect class="b" x="390" y="300" width="300" height="82" fill="#dcecff" stroke="#2f6fba"/><text x="420" y="331" class="h">Patient Examination</text><text x="420" y="354" class="s">Patient + examiner(s) + date</text><text x="420" y="373" class="s" fill="#2d7a46">KB: Examination · versioned module</text></g>
+  <path class="l" d="M585 240V295"/><text x="597" y="273" class="e">patient</text>
+  <path class="l" d="M405 240L485 295"/><text x="407" y="270" class="e">examiners</text>
+  <path class="l" d="M800 240L675 300"/><text x="718" y="268" class="e">contains</text>
+  <path class="l" d="M240 208H280"/>
+  <path class="d" d="M500 190 C430 135,260 135,160 170"/><text x="332" y="143" class="e">center affiliation</text>
+
+  <g><rect class="b" x="100" y="455" width="230" height="75" fill="#e8f1ff" stroke="#2f6fba"/><text x="125" y="485" class="h">Patient Indication</text><text x="125" y="508" class="s" fill="#2d7a46">KB: Indication</text></g>
+  <g><rect class="b" x="485" y="455" width="230" height="75" fill="#e8f1ff" stroke="#2f6fba"/><text x="510" y="485" class="h">Patient Finding</text><text x="510" y="508" class="s" fill="#2d7a46">KB: Finding</text></g>
+  <path class="l" d="M470 382L275 450"/><text x="328" y="409" class="e">patient indications</text>
+  <path class="l" d="M610 382V450"/><text x="622" y="419" class="e">patient findings</text>
+
+  <g><rect class="b" x="60" y="600" width="255" height="82" fill="#e8f1ff" stroke="#2f6fba"/><text x="83" y="630" class="h">Indication Classification</text><text x="83" y="653" class="s" fill="#2d7a46">KB: Classification + choice</text></g>
+  <g><rect class="b" x="365" y="600" width="255" height="82" fill="#e8f1ff" stroke="#2f6fba"/><text x="388" y="630" class="h">Finding Classifications</text><text x="388" y="653" class="s">Versioned choice group</text></g>
+  <g><rect class="b" x="700" y="600" width="255" height="82" fill="#e8f1ff" stroke="#2f6fba"/><text x="723" y="630" class="h">Finding Interventions</text><text x="723" y="653" class="s">Performed-action group</text></g>
+  <path class="l" d="M190 530V595"/><text x="202" y="568" class="e">classifications</text>
+  <path class="l" d="M565 530L505 595"/><text x="510" y="568" class="e">classifications</text>
+  <path class="l" d="M640 530L790 595"/><text x="687" y="564" class="e">interventions</text>
+
+  <g><rect class="b" x="55" y="760" width="265" height="86" fill="#e8f1ff" stroke="#2f6fba"/><text x="77" y="790" class="h">Indication Descriptor Value</text><text x="77" y="813" class="s" fill="#2d7a46">KB: Choice Descriptor</text><text x="77" y="831" class="s">String · number · boolean · list</text></g>
+  <g><rect class="b" x="350" y="760" width="275" height="86" fill="#e8f1ff" stroke="#2f6fba"/><text x="372" y="790" class="h">Finding Classification Choice</text><text x="372" y="813" class="s" fill="#2d7a46">KB: Classification + choice</text></g>
+  <g><rect class="b" x="660" y="760" width="245" height="86" fill="#e8f1ff" stroke="#2f6fba"/><text x="682" y="790" class="h">Finding Descriptor Value</text><text x="682" y="813" class="s" fill="#2d7a46">KB: Choice Descriptor</text></g>
+  <g><rect class="b" x="925" y="760" width="120" height="86" fill="#e8f1ff" stroke="#2f6fba"/><text x="943" y="790" class="h">Intervention</text><text x="943" y="813" class="s" fill="#2d7a46">KB concept</text></g>
+  <path class="l" d="M188 682V755"/><path class="l" d="M492 682V755"/><path class="l" d="M625 803H655"/><path class="l" d="M827 682L970 755"/>
+
+  <g><rect class="b" x="55" y="870" width="310" height="58" fill="#e5f8fb" stroke="#147d8d"/><text x="77" y="895" class="h">Media Records</text><text x="77" y="916" class="s">Video file · segments · metadata</text></g>
+  <g><rect class="b" x="390" y="875" width="600" height="48" fill="#f4e8ff" stroke="#7c3ea0"/><text x="412" y="905" class="h">Medical Ledger: Diseases · Events · Labs · Medications · Schedules</text></g>
+  <path class="trunk" d="M585 240 C930 240,1078 385,1078 815 C1078 840,1070 855,1055 855"/>
+  <path class="d" d="M1055 855 H210 V865"/>
+  <path class="d" d="M1055 855 H690 V870"/>
+  <text x="900" y="392" class="e">patient-linked supporting records</text>
+
+  <g><rect class="b" x="1160" y="180" width="345" height="90" fill="#fff0c9" stroke="#a16207"/><text x="1185" y="211" class="h">Report Template</text><text x="1185" y="235" class="s" fill="#2d7a46">KB: Examination · version · guidelines</text><text x="1185" y="254" class="s">Sections · coverage · validators</text></g>
+  <g><rect class="b" x="1160" y="335" width="345" height="82" fill="#fff0c9" stroke="#a16207"/><text x="1185" y="366" class="h">Report Template Section</text><text x="1185" y="390" class="s">Patient data · history · findings</text></g>
+  <g><rect class="b" x="1160" y="475" width="345" height="82" fill="#fff0c9" stroke="#a16207"/><text x="1185" y="506" class="h">Report Finding</text><text x="1185" y="530" class="s" fill="#2d7a46">KB: Finding + required classifications</text></g>
+  <g><rect class="b" x="1160" y="615" width="345" height="96" fill="#ffe8eb" stroke="#b4233d"/><text x="1185" y="646" class="h">Validator Families</text><text x="1185" y="670" class="s">Examination · finding · classification</text><text x="1185" y="690" class="s">Intervention · unit → requirements/issues</text></g>
+  <g><rect class="b" x="1160" y="785" width="345" height="100" fill="#eaf8ed" stroke="#2d7a46"/><text x="1185" y="816" class="h">Report Draft and Ledger Report</text><text x="1185" y="840" class="s">Template identity + examination context</text><text x="1185" y="860" class="s">Editor payload + rendered text + artifacts</text></g>
+  <path class="l" d="M1332 270V330"/><text x="1344" y="305" class="e">report sections</text>
+  <path class="l" d="M1332 417V470"/><text x="1344" y="449" class="e">findings</text>
+  <path class="l" d="M1332 557V610"/><text x="1344" y="589" class="e">validated by</text>
+  <path class="l" d="M1332 711V780"/><text x="1344" y="751" class="e">compiles to</text>
+  <path class="d" d="M690 340C950 270 1040 225 1155 225"/><text x="930" y="271" class="e">selects template</text>
+  <path class="d" d="M715 490C930 490 1050 510 1155 516"/><text x="900" y="476" class="e">supplies observations</text>
+</svg>

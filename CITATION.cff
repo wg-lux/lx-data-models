@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software in published work, please cite it as below."
+title: "lx-dtypes: Typed clinical data models and interoperability contracts"
+type: software
+authors:
+  - family-names: Lux
+    given-names: Thomas J.
+    email: lux_t1@ukw.de
+repository-code: "https://github.com/wg-lux/lx-data-models"
+url: "https://pypi.org/project/lx-dtypes/"
+license: MIT
+version: 0.2.20
+date-released: 2026-08-17

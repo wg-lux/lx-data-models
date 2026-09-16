@@ -4,6 +4,7 @@ version: 0.1.0
 modules: []
 depends_on:
   - lx_classifications
+  - lx_interventions
 data:
   dirs:
     - ./data

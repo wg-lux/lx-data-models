@@ -1,6 +1,6 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, Self
+from typing import Any, Self
 
 import yaml
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
@@ -12,7 +12,7 @@ class AppBaseModel(BaseModel):
     # Exclude from serialization everywhere (including nested models)
     source_file: Path | None = Field(default=None, exclude=True)
     created_at: AwareDatetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
     )
     model_config = ConfigDict(
         # 1. Strips leading/trailing whitespace automatically ("  val  " -> "val")
@@ -58,7 +58,7 @@ class AppBaseModel(BaseModel):
 
         return instance
 
-    def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+    def model_dump(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         """
         Serialize the model to a dictionary using the file-oriented default dump options.
 

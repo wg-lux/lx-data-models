@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900" viewBox="0 0 1500 900" role="img" aria-labelledby="title desc">
+  <title id="title">Knowledge-base terminology concept map</title>
+  <desc id="desc">Examination connects to findings and indications, which use classifications, choices, descriptors, units, and interventions. Type concepts categorize each main concept.</desc>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><path d="M0 0v6l8-3z" fill="#536171"/></marker>
+    <style>.ttl{font-family:Arial,Helvetica,sans-serif;font-size:27px;font-weight:700;fill:#172033}.sub{font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:400;fill:#536171}.h{font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:600;fill:#172033}.s{font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:400;fill:#475569}.b{stroke-width:2;rx:12}.l{fill:none;stroke:#536171;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#a)}.d{fill:none;stroke:#94a3b8;stroke-width:1.7;stroke-dasharray:6 5;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#a)}.e{font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:400;fill:#536171;paint-order:stroke;stroke:#fff;stroke-width:6px;stroke-linejoin:round}</style>
+  </defs>
+  <rect width="1500" height="900" fill="#fff"/>
+  <text x="45" y="46" class="ttl">Level 2 — Knowledge-Base Terminology</text>
+  <text x="45" y="73" class="sub">Solid arrows are semantic-name references. Dashed arrows point to categorizing “type” concepts.</text>
+
+  <g><rect class="b" x="610" y="115" width="280" height="86" fill="#e8f1ff" stroke="#2f6fba"/><text x="638" y="151" class="h">Examination</text><text x="638" y="177" class="s">what can be documented</text></g>
+  <g><rect class="b" x="270" y="300" width="250" height="86" fill="#eaf8ed" stroke="#2d7a46"/><text x="298" y="336" class="h">Finding</text><text x="298" y="362" class="s">an observed clinical fact</text></g>
+  <g><rect class="b" x="980" y="300" width="250" height="86" fill="#eaf8ed" stroke="#2d7a46"/><text x="1008" y="336" class="h">Indication</text><text x="1008" y="362" class="s">reason or clinical context</text></g>
+  <g><rect class="b" x="625" y="475" width="250" height="86" fill="#fff0c9" stroke="#a16207"/><text x="653" y="511" class="h">Classification</text><text x="653" y="537" class="s">structured dimension</text></g>
+  <g><rect class="b" x="175" y="475" width="250" height="86" fill="#f4e8ff" stroke="#7c3ea0"/><text x="203" y="511" class="h">Intervention</text><text x="203" y="537" class="s">allowed/performed action</text></g>
+  <g><rect class="b" x="625" y="635" width="250" height="86" fill="#fff0c9" stroke="#a16207"/><text x="653" y="671" class="h">Classification Choice</text><text x="653" y="697" class="s">Selected categorical value</text></g>
+  <g><rect class="b" x="600" y="790" width="300" height="86" fill="#fff0c9" stroke="#a16207"/><text x="628" y="826" class="h">Choice Descriptor</text><text x="628" y="852" class="s">Numeric · selection · boolean · text</text></g>
+  <g><rect class="b" x="1030" y="790" width="210" height="86" fill="#e5f8fb" stroke="#147d8d"/><text x="1058" y="826" class="h">Unit</text><text x="1058" y="852" class="s">measurement unit</text></g>
+
+  <g><rect class="b" x="1060" y="115" width="230" height="70" fill="#f8fafc" stroke="#94a3b8"/><text x="1085" y="157" class="h">Examination Type</text></g>
+  <g><rect class="b" x="35" y="300" width="185" height="70" fill="#f8fafc" stroke="#94a3b8"/><text x="60" y="342" class="h">Finding Type</text></g>
+  <g><rect class="b" x="1280" y="300" width="185" height="70" fill="#f8fafc" stroke="#94a3b8"/><text x="1304" y="342" class="h">Indication Type</text></g>
+  <g><rect class="b" x="10" y="483" width="155" height="70" fill="#f8fafc" stroke="#94a3b8"/><text x="22" y="525" class="h">Intervention Type</text></g>
+  <g><rect class="b" x="1025" y="483" width="230" height="70" fill="#f8fafc" stroke="#94a3b8"/><text x="1048" y="525" class="h">Classification Type</text></g>
+  <g><rect class="b" x="1280" y="798" width="175" height="70" fill="#f8fafc" stroke="#94a3b8"/><text x="1310" y="840" class="h">Unit Type</text></g>
+  <g><rect class="b" x="35" y="115" width="230" height="70" fill="#f8fafc" stroke="#94a3b8"/><text x="58" y="157" class="h">Information Source</text></g>
+  <g><rect class="b" x="315" y="115" width="170" height="70" fill="#f8fafc" stroke="#94a3b8"/><text x="345" y="157" class="h">Citation</text></g>
+
+  <path class="l" d="M665 201L450 295"/><text x="520" y="239" class="e">findings</text>
+  <path class="l" d="M835 201L1050 295"/><text x="930" y="239" class="e">indications</text>
+  <path class="l" d="M470 386L666 470"/><text x="530" y="416" class="e">classifications</text>
+  <path class="l" d="M1030 386L834 470"/><text x="878" y="416" class="e">classifications</text>
+  <path class="l" d="M350 386L315 470"/><text x="258" y="425" class="e">interventions</text>
+  <path class="l" d="M980 350C720 400 520 430 425 500"/><text x="666" y="407" class="e">interventions</text>
+  <path class="l" d="M750 561V630"/><text x="763" y="603" class="e">choices</text>
+  <path class="l" d="M750 721V785"/><text x="763" y="757" class="e">descriptors</text>
+  <path class="l" d="M900 833H1025"/><text x="935" y="817" class="e">unit</text>
+  <path class="d" d="M890 150H1055"/><text x="932" y="136" class="e">types</text>
+  <path class="d" d="M270 335H225"/>
+  <path class="d" d="M1230 335H1275"/>
+  <path class="d" d="M175 518H170"/>
+  <path class="d" d="M875 518H1020"/>
+  <path class="d" d="M1240 833H1275"/>
+
+  <rect x="1015" y="625" width="420" height="105" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="1040" y="656" class="h">Reference Semantics</text><text x="1040" y="683" class="s">YAML fields contain exact semantic names.</text><text x="1040" y="706" class="s">CoreConceptCollection validates the whole graph.</text>
+</svg>

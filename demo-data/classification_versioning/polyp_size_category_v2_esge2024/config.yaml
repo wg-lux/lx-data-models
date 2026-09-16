@@ -1,0 +1,20 @@
+name: polyp_size_category_v2_esge2024
+description: |
+  Illustrative KnowledgeBaseConfig module for the manuscript's classification-
+  versioning example. Encodes the four size-based management categories used
+  by the ESGE 2024 colorectal polypectomy and endoscopic mucosal resection
+  (EMR) guideline (Ferlitsch M, Hassan C, Bisschops R, et al. Colorectal
+  polypectomy and endoscopic mucosal resection: European Society of
+  Gastrointestinal Endoscopy (ESGE) Guideline - Update 2024. Endoscopy.
+  2024;56(7):516-545, doi:10.1055/a-2304-3219; Recommendations 1, 3, 4 and
+  5). Compare against polyp_size_category_v1_legacy to see how the same raw
+  millimeter measurement is assigned a different, finer category -- with a
+  distinct resection-technique recommendation -- by this current version.
+version: 2.0.0
+medical_field: gastroenterology
+modules: []
+depends_on: []
+
+data:
+  files:
+    - "./data.yaml"

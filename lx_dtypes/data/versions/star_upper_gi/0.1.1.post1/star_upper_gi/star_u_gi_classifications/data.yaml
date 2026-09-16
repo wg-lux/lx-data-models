@@ -1,0 +1,88 @@
+- model: classification
+  name: "distance_cm"
+  classification_choices:
+    - distance_cm
+
+- model: classification
+  name: "size_oval_mm"
+  description: "Classification of size in millimeters."
+  classification_choices:
+    - size_mm
+
+- model: "classification"
+  name: "additional_text_info"
+  classification_choices:
+    - additional_text_info
+
+- model: classification
+  name: "star_upper_gi_location_classification"
+  description: "Classification of locations visualized during upper GI endoscopy."
+  classification_choices:
+    - star_upper_gi_location_esophagus_proximal
+    - star_upper_gi_location_esophagus_distal
+    - star_upper_gi_location_z_line
+    - star_upper_gi_location_gastroesophageal_junction
+    - star_upper_gi_location_stomach_fundus
+    - star_upper_gi_location_stomach_corpus
+    - star_upper_gi_location_stomach_antrum
+    - star_upper_gi_location_stomach_cardia
+    - star_upper_gi_location_stomach_pylorus
+    - star_upper_gi_location_duodenum_bulbus
+    - star_upper_gi_location_duodenum_descending_part
+    - star_upper_gi_location_papilla_major
+    - star_upper_gi_location_papilla_minor
+
+- model: classification
+  name: "star_upper_gi_location_duodenum"
+  description: "Classification of duodenal locations visualized during upper GI endoscopy."
+  classification_choices:
+    - star_upper_gi_location_duodenum_bulbus
+    - star_upper_gi_location_duodenum_descending_part
+    - star_upper_gi_location_papilla_major
+    - star_upper_gi_location_papilla_minor
+
+- model: classification
+  name: star_upper_gi_mucosal_appearance_classification
+  description: "Classification of mucosal appearance observed during upper GI endoscopy."
+  classification_choices:
+    - star_upper_gi_mucosal_appearance_normal
+    - star_upper_gi_mucosal_appearance_inflammation
+    - star_upper_gi_mucosal_appearance_erosion
+    - star_upper_gi_mucosal_appearance_ulcer
+    - star_upper_gi_mucosal_appearance_bleeding
+    - star_upper_gi_mucosal_appearance_atrophy
+    - star_upper_gi_mucosal_appearance_metaplasia
+    - star_upper_gi_mucosal_appearance_dysplasia
+
+# yes_no_unknown
+- model: classification
+  name: yes_no_unknown_classification
+  description: "A simple yes/no/unknown classification."
+  classification_choices:
+    - "yes"
+    - "no"
+    - unknown
+
+- model: classification
+  name: "star_upper_gi_lesion_paris"
+  classification_choices:
+    [
+      "star_upper_gi_paris_Is",
+      "star_upper_gi_paris_Ip",
+      "star_upper_gi_paris_IIa",
+      "star_upper_gi_paris_IIb",
+      "star_upper_gi_paris_IIc",
+      "star_upper_gi_paris_III",
+      "star_upper_gi_paris_IIa_IIc",
+      "star_upper_gi_paris_IIb_IIc",
+    ]
+
+- model: classification
+  name: star_upper_gi_forrest
+  classification_choices:
+    - star_upper_gi_forrest_Ia
+    - star_upper_gi_forrest_Ib
+    - star_upper_gi_forrest_IIa
+    - star_upper_gi_forrest_IIb
+    - star_upper_gi_forrest_IIc
+    - star_upper_gi_forrest_III

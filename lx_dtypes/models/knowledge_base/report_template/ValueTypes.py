@@ -1,11 +1,9 @@
-from typing import TypeAlias
-
-ValidationScalar: TypeAlias = str | int | float | bool
-ValidationScalarList: TypeAlias = list[ValidationScalar]
-ValidationValue: TypeAlias = ValidationScalar | ValidationScalarList
-ValidationParams: TypeAlias = dict[str, ValidationValue]
-ValidationIssueScalar: TypeAlias = ValidationScalar | None
-ValidationIssueValue: TypeAlias = (
+type ValidationScalar = str | int | float | bool
+type ValidationScalarList = list[ValidationScalar]
+type ValidationValue = ValidationScalar | ValidationScalarList
+type ValidationParams = dict[str, ValidationValue]
+type ValidationIssueScalar = ValidationScalar | None
+type ValidationIssueValue = (
     ValidationIssueScalar | list[str] | list[int] | list[float] | list[bool]
 )
-ValidationIssueDetails: TypeAlias = dict[str, ValidationIssueValue]
+type ValidationIssueDetails = dict[str, ValidationIssueValue]

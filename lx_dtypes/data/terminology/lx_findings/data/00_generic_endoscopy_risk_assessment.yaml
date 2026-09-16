@@ -1,0 +1,68 @@
+# Sources for every record in this file:
+# - DGVS S2k quality guideline (AWMF 021-022), risk assessment: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b20056d03/chapter_69f4b200c4ff0/
+# - DGVS S3 sedation guideline (AWMF 021-014): https://www.dgvs.de/leitlinien/endoskopie-notfall/sedierung-in-der-gastrointestinalen-endoskopie/?digital=1
+- model: finding
+  name: "endoscopy_preprocedure_risk_assessment_checklist"
+  name_de: "Checkliste des standardisierten Risikoassessments"
+  name_en: "Standardized pre-procedure risk-assessment checklist"
+  description: "Dokumentiert Review- und Anwendbarkeitsstatus des standardisierten Sign-ins; klinische Diagnosen, Allergien, Medikamente, Laborwerte und Einwilligungsdokumente bleiben in ihren jeweiligen Primärquellen."
+  finding_types: [baseline]
+  classifications:
+    - endoscopy_risk_assessment_time
+    - risk_assessment_protocol_version
+    - patient_record_and_required_documents_review_status
+    - required_laboratory_and_prior_result_review_status
+    - procedure_preparation_review_status
+    - fasting_requirement_review_status
+    - asa_review_status
+    - airway_risk_review_status
+    - mallampati_review_status
+    - cardiopulmonary_risk_review_status
+    - medication_review_status
+    - antithrombotic_management_review_status
+    - antibiotic_prophylaxis_assessment_status
+    - allergy_review_status
+    - infection_review_status
+    - dental_status_review_status
+    - glaucoma_review_status
+
+- model: finding
+  name: "endoscopy_preprocedure_asa_assessment"
+  name_de: "ASA-Beurteilung vor der Endoskopie"
+  name_en: "Pre-procedure ASA assessment"
+  description: "Encounter-bezogene ASA-Klassifikation; bei dokumentierter Sedierung erforderlich, ohne daraus eine Behandlungsentscheidung abzuleiten."
+  finding_types: [baseline]
+  classifications: [asa_physical_status_classification]
+
+- model: finding
+  name: "endoscopy_preprocedure_airway_assessment"
+  name_de: "Atemwegsbeurteilung vor der Endoskopie"
+  name_en: "Pre-procedure airway assessment"
+  description: "Optionale encounter-bezogene Atemwegsbeurteilung mit Mallampati-Klasse; der verpflichtende Checklistenstatus bleibt davon getrennt."
+  finding_types: [baseline]
+  classifications: [mallampati_airway_classification]
+
+- model: finding
+  name: "endoscopy_preprocedure_physical_assessment"
+  name_de: "Körperliche Untersuchung vor der Sedierung"
+  name_en: "Pre-procedure physical assessment"
+  description: "Präprozedurale Vitalparameter sowie Herz- und Lungenauskultation gemäß S3-Sedierungsleitlinie 021-014."
+  finding_types: [baseline]
+  classifications:
+    - preprocedure_physical_assessment_time
+    - preprocedure_heart_rate
+    - preprocedure_systolic_blood_pressure
+    - preprocedure_diastolic_blood_pressure
+    - preprocedure_oxygen_saturation
+    - preprocedure_cardiac_auscultation_status
+    - preprocedure_pulmonary_auscultation_status
+
+- model: finding
+  name: "endoscopy_preprocedure_last_oral_intake"
+  name_de: "Letzte Nahrungs- oder Flüssigkeitsaufnahme"
+  name_en: "Pre-procedure last oral intake"
+  description: "Zeitpunkt und Art der letzten Nahrungs- oder Flüssigkeitsaufnahme als Bestandteil der strukturierten Sedierungsanamnese."
+  finding_types: [baseline]
+  classifications:
+    - last_oral_intake_time
+    - last_oral_intake_type

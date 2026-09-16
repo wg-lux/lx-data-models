@@ -1,0 +1,35 @@
+# units/data.yaml
+
+# femptolitre
+- model: unit
+
+  name: "femtoliter"
+  abbreviation: "fl"
+  name_de: "Femtoliter"
+  name_en: "Femtolitre"
+  description: "femtoliters"
+
+- model: unit
+
+  name: "mililiter"
+  abbreviation: "ml"
+  name_de: "mililiter"
+  name_en: "mililiter"
+  description: "mililiters"
+
+- model: unit
+
+  name: "liter"
+  abbreviation: "l"
+  name_de: "Liter"
+  name_en: "Liter"
+  description: "liters"
+
+# cubic_meter
+- model: unit
+
+  name: "cubic_meter"
+  abbreviation: "m³"
+  name_de: "Kubikmeter"
+  name_en: "Cubic Meter"
+  description: "cubic meters"
