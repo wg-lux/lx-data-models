@@ -70,7 +70,8 @@ ROOT_URLCONF = "lx_dtypes.django.urls"
 # API tests exercise the same explicit, versioned registry contract as a
 # deployment. They do not use checkout-relative or process-local KB overrides.
 _test_registry_dir = Path(tempfile.mkdtemp(prefix="lx_dtypes_test_registry_"))
-_test_registry_path = _test_registry_dir / "registry.json"
+TERMINOLOGY_ROOT = _test_registry_dir
+_test_registry_path = TERMINOLOGY_ROOT / "registry.json"
 _test_registry_path.write_text(
     json.dumps(
         {

@@ -18,6 +18,10 @@ from django.utils import timezone
 from pydantic import BaseModel, Field
 
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+from lx_dtypes.terminology.terminology_loader import (
+    active_kb_identity,
+    load_module_kb,
+)
 
 from .request_types import BaseRequest
 
@@ -69,23 +73,9 @@ class PatientFindingClassificationsRequest(Schema):
     replace: bool = True
 
 
-_LOAD_MODULE_KB: Callable[..., Any] | None = None
-
-
 def clear_findings_route_caches() -> None:
     _kb_core_concepts_by_identity.cache_clear()
     _kb_lookup_by_identity.cache_clear()
-
-
-def _set_load_module_kb(load_module_kb: Callable[..., Any]) -> None:
-    global _LOAD_MODULE_KB
-    _LOAD_MODULE_KB = load_module_kb
-
-
-def _require_load_module_kb() -> Callable[..., Any]:
-    if _LOAD_MODULE_KB is None:
-        raise RuntimeError("findings routes are not initialized with a KB loader")
-    return _LOAD_MODULE_KB
 
 
 def _runtime_descriptor_payloads_from_mapping(
@@ -121,17 +111,6 @@ def _as_str_list_from_relation(relation: object) -> list[str]:
     return [str(relation)]
 
 
-def _findings_module_name() -> str:
-    """Resolve the active module only for legacy, non-examination discovery routes."""
-
-    from .terminology_routes import active_terminology_selection
-
-    active = active_terminology_selection()
-    if active is None:
-        raise RuntimeError("No active knowledge-base bundle is selected.")
-    return active[0]
-
-
 class PatientExaminationKnowledgeBaseIdentityError(RuntimeError):
     """Raised when an examination-bound route has no complete persisted identity."""
 
@@ -160,7 +139,7 @@ def _resolve_catalog_kb_identity(
     orm_models: Callable[[], dict[str, Any]],
     patient_examination_id: int | None,
     api_error: Callable[[int, str, str], NoReturn],
-) -> tuple[str, str | None]:
+) -> tuple[str, str]:
     requested_module_name = str(module_name or "").strip()
     requested_module_version = str(module_version or "").strip()
     if requested_module_name:
@@ -223,12 +202,8 @@ def _resolve_catalog_kb_identity(
         assert patient_examination is not None
         return _resolve_exam_kb_identity(patient_examination)
 
-    from .terminology_routes import active_terminology_selection
-
-    active = active_terminology_selection()
-    if active is None:
-        raise RuntimeError("No active knowledge-base bundle is selected.")
-    return active
+    # Discovery uses the central provider; examination-bound calls return above.
+    return active_kb_identity()
 
 
 def _norm_name(value: str | None) -> str:
@@ -240,11 +215,12 @@ def _kb_core_concepts_by_identity(
     module_name: str,
     version: str,
 ) -> dict[str, Any]:
-    loader = _require_load_module_kb()
-    return cast(
-        dict[str, Any],
-        loader(module_name, version=version).export_core_concepts(),
-    )
+    """Cache only exact identities, never the currently active selection.
+
+    Same-identity edits must call clear_findings_route_caches().
+    """
+    kb = load_module_kb(module_name, version=version)
+    return dict(kb.export_core_concepts())
 
 
 def _build_kb_lookup(core: dict[str, Any]) -> dict[str, dict[str, dict[str, Any]]]:
@@ -273,13 +249,15 @@ def _build_kb_lookup(core: dict[str, Any]) -> dict[str, dict[str, dict[str, Any]
     }
 
 
-def _kb_core_concepts(module_name: str) -> dict[str, Any]:
-    loader = _require_load_module_kb()
-    kb = loader(module_name)
-    version = str(getattr(getattr(kb, "config", None), "version", "") or "").strip()
-    if not version:
-        return cast(dict[str, Any], kb.export_core_concepts())
-    return _kb_core_concepts_by_identity(module_name, version)
+def _kb_core_concepts(module_name: str, version: str | None = None) -> dict[str, Any]:
+    if version is not None:
+        # Empty versions are passed through, so the provider rejects them.
+        return _kb_core_concepts_by_identity(module_name.strip(), version.strip())
+
+    # The central provider owns the policy for an omitted version. Do not
+    # inspect config.version and reload, or cache this under a module-only key.
+    kb = load_module_kb(module_name)
+    return dict(kb.export_core_concepts())
 
 
 @lru_cache(maxsize=8)
@@ -294,15 +272,10 @@ def _kb_lookup_by_identity(
 def _kb_lookup(
     module_name: str, version: str | None = None
 ) -> dict[str, dict[str, dict[str, Any]]]:
-    if version:
-        return _kb_lookup_by_identity(module_name, version)
+    if version is not None:
+        return _kb_lookup_by_identity(module_name.strip(), version.strip())
 
-    loader = _require_load_module_kb()
-    kb = loader(module_name)
-    version = str(getattr(getattr(kb, "config", None), "version", "") or "").strip()
-    if not version:
-        return _build_kb_lookup(cast(dict[str, Any], kb.export_core_concepts()))
-    return _kb_lookup_by_identity(module_name, version)
+    return _build_kb_lookup(_kb_core_concepts(module_name))
 
 
 def _active_patient_findings_queryset(
@@ -756,7 +729,6 @@ def _get_or_create_active_patient_finding_classification(
 def register_findings_routes(
     api: _TypedApi,
     *,
-    load_module_kb: Callable[..., Any],
     orm_models: Callable[[], dict[str, Any]],
     api_error: Callable[[int, str, str], NoReturn],
     authenticate_request_user: Callable[[BaseRequest], Any | None],
@@ -770,8 +742,6 @@ def register_findings_routes(
     ]
     | None = None,
 ) -> None:
-    _set_load_module_kb(load_module_kb)
-
     def require_authenticated_actor(request: BaseRequest) -> Any:
         actor = authenticate_request_user(request)
         if actor is None:
@@ -788,16 +758,19 @@ def register_findings_routes(
                 f"Patient finding '{patient_finding_id}' not found.",
             )
 
+    def require_exam_kb_identity(patient_examination: object) -> tuple[str, str]:
+        try:
+            return _resolve_exam_kb_identity(patient_examination)
+        except PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
+
     def refresh_patient_examination_dtypes_record(patient_examination: object) -> None:
         if (
             build_p_examination_payload_from_host_ledger is None
             or persist_patient_examination_dtypes_record is None
         ):
             return
-        try:
-            module_name_for_record, _ = _resolve_exam_kb_identity(patient_examination)
-        except PatientExaminationKnowledgeBaseIdentityError as exc:
-            api_error(409, "knowledge-base-identity-required", str(exc))
+        module_name_for_record, _ = require_exam_kb_identity(patient_examination)
         payload = build_p_examination_payload_from_host_ledger(
             patient_examination,
             route_module_name=module_name_for_record,
@@ -806,14 +779,17 @@ def register_findings_routes(
 
     @api.get("/core-concepts/{module_name}")
     def core_concepts_by_module(
-        request: BaseRequest, module_name: str
+        request: BaseRequest,
+        module_name: str,
+        module_version: str | None = None,
     ) -> dict[str, Any]:
         """
         Return canonical core concept payloads for one KB module.
         """
         del request
-        kb = load_module_kb(module_name)
-        payload = cast(dict[str, Any], kb.export_core_concepts())
+        kb = load_module_kb(module_name, version=module_version)
+        # Do not add response metadata to the KB's own exported dictionary.
+        payload = dict(kb.export_core_concepts())
         config = getattr(kb, "config", None)
         payload["knowledge_base_module"] = str(
             getattr(config, "name", module_name) or module_name
@@ -842,8 +818,6 @@ def register_findings_routes(
             )
         except PatientExaminationKnowledgeBaseIdentityError as exc:
             api_error(409, "knowledge-base-identity-required", str(exc))
-        except RuntimeError as exc:
-            api_error(409, "no-active-knowledge-base", str(exc))
         examination_model = orm_models()["Examination"]
         examination = examination_model.objects.filter(id=examination_id).first()
         if not examination:
@@ -913,8 +887,6 @@ def register_findings_routes(
             )
         except PatientExaminationKnowledgeBaseIdentityError as exc:
             api_error(409, "knowledge-base-identity-required", str(exc))
-        except RuntimeError as exc:
-            api_error(409, "no-active-knowledge-base", str(exc))
         finding_model = orm_models()["Finding"]
         finding = finding_model.objects.filter(id=finding_id).first()
         if not finding:
@@ -950,8 +922,6 @@ def register_findings_routes(
             )
         except PatientExaminationKnowledgeBaseIdentityError as exc:
             api_error(409, "knowledge-base-identity-required", str(exc))
-        except RuntimeError as exc:
-            api_error(409, "no-active-knowledge-base", str(exc))
         finding_classification_model = orm_models()["FindingClassification"]
         classification = finding_classification_model.objects.filter(
             id=classification_id
@@ -1007,7 +977,7 @@ def register_findings_routes(
                 "not-found",
                 f"PatientExamination '{payload.patient_examination}' not found.",
             )
-        module_name, module_version = _resolve_exam_kb_identity(patient_examination)
+        module_name, module_version = require_exam_kb_identity(patient_examination)
 
         finding = finding_model.objects.filter(id=payload.finding).first()
         if not finding:
@@ -1080,7 +1050,7 @@ def register_findings_routes(
             )
         assert patient_finding is not None
         require_patient_finding_access(request, patient_finding, patient_finding_id)
-        module_name, module_version = _resolve_exam_kb_identity(
+        module_name, module_version = require_exam_kb_identity(
             patient_finding.patient_examination
         )
 
@@ -1177,7 +1147,7 @@ def register_findings_routes(
             )
         assert patient_finding is not None
         require_patient_finding_access(request, patient_finding, patient_finding_id)
-        module_name, module_version = _resolve_exam_kb_identity(
+        module_name, module_version = require_exam_kb_identity(
             patient_finding.patient_examination
         )
 

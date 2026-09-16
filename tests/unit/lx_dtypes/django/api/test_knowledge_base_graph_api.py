@@ -8,12 +8,10 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from django.conf import settings
 from django.test import Client
 from pydantic import ValidationError
 
 from lx_dtypes.django.api import main as api_main
-from lx_dtypes.django.api.lookup_tracker import consume_runtime_lookup_trackers
 from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
     get_packaged_knowledge_base,
@@ -28,9 +26,7 @@ from lx_dtypes.models.contracts.knowledge_base_graph import (
     build_knowledge_base_graph_snapshot,
 )
 from lx_dtypes.models.interface.DataLoader import DataLoader
-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
-    clear_knowledge_base_resolver_caches,
-)
+from lx_dtypes.terminology.lookup_tracker import consume_runtime_lookup_trackers
 
 
 @pytest.fixture(autouse=True)
@@ -381,11 +377,10 @@ def test_packaged_reporting_bundle_builds_versioned_graph_snapshot(
 
 
 def test_packaged_provider_registry_serves_full_dgvs_reporting_context(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
+    terminology_root: Path,
 ) -> None:
     descriptor = get_packaged_knowledge_base("dgvs_reporting", "0.1.0")
-    registry_path = tmp_path / "registry.json"
+    registry_path = terminology_root / "registry.json"
     registry_path.write_text(
         json.dumps(
             {
@@ -406,21 +401,11 @@ def test_packaged_provider_registry_serves_full_dgvs_reporting_context(
         ),
         encoding="utf-8",
     )
-    monkeypatch.setattr(
-        settings,
-        "LX_DTYPES_KB_REGISTRY",
-        str(registry_path),
-        raising=False,
+    response = Client().get(
+        "/base_api/knowledge-bases/dgvs_reporting/0.1.0/examinations/"
+        "colonoscopy/reporting-context",
+        secure=True,
     )
-    clear_knowledge_base_resolver_caches()
-    try:
-        response = Client().get(
-            "/base_api/knowledge-bases/dgvs_reporting/0.1.0/examinations/"
-            "colonoscopy/reporting-context",
-            secure=True,
-        )
-    finally:
-        clear_knowledge_base_resolver_caches()
 
     assert response.status_code == 200, response.content.decode()
     payload = response.json()
@@ -474,7 +459,7 @@ def test_graph_and_reporting_context_endpoints_use_exact_identity(
         captured.append((module_name, version))
         return _GraphKb()
 
-    monkeypatch.setattr(api_main, "load_knowledge_base", load)
+    monkeypatch.setattr(api_main, "resolve_module_kb", load)
     client = Client()
 
     graph_response = client.get(
@@ -506,7 +491,7 @@ def test_reporting_context_endpoint_rejects_unknown_examination(
 ) -> None:
     monkeypatch.setattr(
         api_main,
-        "load_knowledge_base",
+        "resolve_module_kb",
         lambda *args, **kwargs: _GraphKb(),
     )
 
@@ -530,7 +515,7 @@ def test_graph_api_does_not_echo_invalid_concept_content(
             return payload
 
     monkeypatch.setattr(
-        api_main, "load_knowledge_base", lambda *args, **kwargs: InvalidGraphKb()
+        api_main, "resolve_module_kb", lambda *args, **kwargs: InvalidGraphKb()
     )
     response = Client().get(
         "/base_api/knowledge-bases/demo_graph/1.2.3/graph", secure=True

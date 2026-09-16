@@ -2,29 +2,69 @@
 
 from __future__ import annotations
 
+import sys
 import zipfile
 from collections.abc import Iterator
 from io import BytesIO
 from pathlib import Path
+from types import ModuleType
+from uuid import uuid4
 
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
+from django.urls import clear_url_caches, path
+from ninja import NinjaAPI
+from pytest_django.fixtures import SettingsWrapper
 
-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
-    clear_knowledge_base_resolver_caches,
+from lx_dtypes.django.api.knowledge_base_graph_routes import (
+    KnowledgeBaseGraphRouteCache,
+    register_knowledge_base_graph_routes,
 )
+from lx_dtypes.django.api.terminology_routes import register_terminology_routes
+from lx_dtypes.terminology import terminology_loader as central
 
 
-@pytest.fixture(autouse=True)
-def _isolate_knowledge_base_registry(
+@pytest.fixture
+def editor_client(
+    terminology_root: Path,
     monkeypatch: pytest.MonkeyPatch,
-) -> Iterator[None]:
-    monkeypatch.delenv("LX_DTYPES_KB_REGISTRY", raising=False)
-    monkeypatch.delenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", raising=False)
-    clear_knowledge_base_resolver_caches()
-    yield
-    clear_knowledge_base_resolver_caches()
+    settings: SettingsWrapper,
+) -> Iterator[Client]:
+    """Register writes and graph reads against one isolated central service."""
+    service = central.get_terminology_service()
+    assert service.registry_path == terminology_root / "registry.json"
+    graph_cache = KnowledgeBaseGraphRouteCache()
+    api = NinjaAPI(
+        urls_namespace=f"editor-integration-{uuid4().hex}",
+        docs_url=None,
+        openapi_url=None,
+    )
+    register_terminology_routes(
+        api,
+        service=service,
+        clear_kb_caches=graph_cache.clear,
+        authenticate_request_user=lambda request: request.headers.get("X-Test-Actor"),
+        terminology_write_access_allowed=lambda actor: actor == "editor",
+    )
+    register_knowledge_base_graph_routes(
+        api,
+        graph_cache=graph_cache,
+        load_module_kb=central.load_module_kb,
+    )
+    module_name = f"_editor_integration_urls_{uuid4().hex}"
+    urlconf = ModuleType(module_name)
+    urlconf.urlpatterns = [path("base_api/", api.urls)]
+    monkeypatch.setitem(sys.modules, module_name, urlconf)
+    settings.ROOT_URLCONF = module_name
+    settings.ALLOWED_HOSTS = ["testserver"]
+    settings.MIDDLEWARE = []
+    clear_url_caches()
+    try:
+        yield Client()
+    finally:
+        clear_url_caches()
+        graph_cache.clear()
 
 
 def _editor_graph_bundle_zip() -> bytes:
@@ -104,15 +144,10 @@ def _editor_graph_bundle_zip() -> bytes:
 
 
 def test_editor_zip_import_is_immediately_available_through_graph_api(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
+    editor_client: Client,
+    terminology_root: Path,
 ) -> None:
-    registry_path = tmp_path / "kb_registry.json"
-    import_root = tmp_path / "terminology-packages"
-    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", str(import_root))
-
-    client = Client()
+    client = editor_client
     import_response = client.post(
         "/base_api/terminology/bundles/import",
         data={
@@ -123,9 +158,12 @@ def test_editor_zip_import_is_immediately_available_through_graph_api(
             )
         },
         secure=True,
+        headers={"X-Test-Actor": "editor"},
     )
 
-    assert import_response.status_code == 200
+    assert import_response.status_code == 200, import_response.content.decode()
+    assert (terminology_root / "registry.json").is_file()
+    assert central.get_terminology_service().active_identity() is None
     assert import_response.json()["imported"] == {
         "module_name": "editor_graph_bundle",
         "version": "1.2.3",
@@ -172,3 +210,25 @@ def test_editor_zip_import_is_immediately_available_through_graph_api(
     assert [item["name"] for item in context["concepts"]["finding"]] == [
         "editor_finding"
     ]
+
+
+def test_editor_zip_import_requires_an_authorized_actor(
+    editor_client: Client,
+    terminology_root: Path,
+) -> None:
+    for headers, expected_status in (({}, 401), ({"X-Test-Actor": "reader"}, 403)):
+        response = editor_client.post(
+            "/base_api/terminology/bundles/import",
+            data={
+                "file": SimpleUploadedFile(
+                    "editor_graph_bundle.zip",
+                    _editor_graph_bundle_zip(),
+                    content_type="application/zip",
+                )
+            },
+            secure=True,
+            headers=headers,
+        )
+        assert response.status_code == expected_status
+    assert not (terminology_root / "registry.json").exists()
+    assert not (terminology_root / "terminology-packages").exists()

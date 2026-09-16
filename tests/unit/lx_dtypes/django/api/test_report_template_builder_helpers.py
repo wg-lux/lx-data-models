@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -32,9 +33,9 @@ def test_module_dir_validates_unknown_module_and_resolves_existing(
     module_path = tmp_path / "demo_module"
     module_path.mkdir()
 
-    assert module_dir("demo module", modules_root=tmp_path) == module_path.resolve()
+    assert module_dir("demo_module", modules_root=tmp_path) == module_path.resolve()
 
-    with pytest.raises(ValueError, match="Unknown report-template module"):
+    with pytest.raises(ValueError, match="Unknown or unsafe report-template module"):
         module_dir("missing", modules_root=tmp_path)
 
 
@@ -152,11 +153,33 @@ def test_build_yaml_records_adds_default_patient_fields_and_condition_validator(
 
 def test_save_report_template_definition_rejects_duplicate_output_file(
     tmp_path: Path,
+    terminology_root: Path,
 ) -> None:
     module_path = tmp_path / "demo_module"
     module_path.mkdir()
     (module_path / "config.yaml").write_text(
-        yaml.safe_dump({"name": "demo_module", "data": {"dirs": []}}, sort_keys=False),
+        yaml.safe_dump(
+            {
+                "name": "demo_module",
+                "version": "1.0.0",
+                "modules": [],
+                "depends_on": [],
+                "data": {"dirs": []},
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    (terminology_root / "registry.json").write_text(
+        json.dumps(
+            {
+                "modules": {
+                    "demo_module": {
+                        "1.0.0": {"input_dirs": [str(tmp_path)]},
+                    }
+                }
+            }
+        ),
         encoding="utf-8",
     )
     generated_dir = module_path / GENERATED_DIR_NAME
@@ -181,3 +204,9 @@ def test_save_report_template_definition_rejects_duplicate_output_file(
         save_report_template_definition(
             payload, resolved_version="1.0.0", modules_root=tmp_path
         )
+
+
+def test_module_dir_does_not_alias_names_by_slugifying(tmp_path: Path) -> None:
+    (tmp_path / "demo_module").mkdir()
+    with pytest.raises(ValueError, match="Unknown or unsafe report-template module"):
+        module_dir("demo module", modules_root=tmp_path)

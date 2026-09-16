@@ -9,11 +9,7 @@ from django.test import Client
 from pytest import MonkeyPatch
 
 from lx_dtypes.django.api import main as api_main
-from lx_dtypes.django.api import report_template_builder
-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
-    clear_knowledge_base_resolver_caches,
-    load_knowledge_base,
-)
+from lx_dtypes.terminology import terminology_loader as central
 
 
 @pytest.fixture(autouse=True)
@@ -32,9 +28,9 @@ def builder_route_authorization(monkeypatch: MonkeyPatch) -> None:
 @pytest.fixture
 def builder_terminology_registry(
     tmp_path: Path,
-    monkeypatch: MonkeyPatch,
+    terminology_root: Path,
 ) -> Iterator[None]:
-    registry_path = tmp_path / "kb_registry.json"
+    registry_path = terminology_root / "registry.json"
     registry_path.write_text(
         json.dumps(
             {
@@ -51,15 +47,11 @@ def builder_terminology_registry(
         ),
         encoding="utf-8",
     )
-    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
-    clear_knowledge_base_resolver_caches()
     yield
-    clear_knowledge_base_resolver_caches()
 
 
 def test_builder_save_publish_and_unpublish_flow(
     tmp_path: Path,
-    monkeypatch: MonkeyPatch,
     builder_terminology_registry: None,
 ) -> None:
     del builder_terminology_registry
@@ -92,8 +84,6 @@ def test_builder_save_publish_and_unpublish_flow(
         ),
         encoding="utf-8",
     )
-
-    monkeypatch.setattr(report_template_builder, "MODULES_ROOT", tmp_path)
 
     client = Client()
     save_response = client.post(
@@ -183,8 +173,11 @@ def test_builder_save_publish_and_unpublish_flow(
 
 
 def test_builder_module_kb_loader_uses_resolved_version(
-    tmp_path: Path, monkeypatch: MonkeyPatch
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+    builder_terminology_registry: None,
 ) -> None:
+    del builder_terminology_registry
     module_dir = tmp_path / "builder_module"
     module_dir.mkdir(parents=True)
     (module_dir / "config.yaml").write_text(
@@ -217,18 +210,6 @@ def test_builder_module_kb_loader_uses_resolved_version(
 
     captured: dict[str, str | None] = {}
 
-    monkeypatch.setattr(
-        api_main,
-        "_resolve_report_template_module_location",
-        lambda module_name, version: (
-            report_template_builder.ReportTemplateModuleLocation(
-                module_name=module_name,
-                version=version,
-                modules_root=tmp_path,
-            )
-        ),
-    )
-
     def _fake_load_knowledge_base(
         module_name: str,
         *,
@@ -238,11 +219,11 @@ def test_builder_module_kb_loader_uses_resolved_version(
         del input_dirs
         captured["module_name"] = module_name
         captured["version"] = version
-        return load_knowledge_base(module_name, version=version, input_dirs=[tmp_path])
+        return central.load_module_kb(module_name, version=version)
 
     monkeypatch.setattr(
         api_main,
-        "_load_module_kb",
+        "resolve_module_kb",
         _fake_load_knowledge_base,
     )
 

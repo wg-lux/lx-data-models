@@ -55,6 +55,24 @@ def _lookup(
     }
 
 
+def _patch_lookups(
+    monkeypatch: pytest.MonkeyPatch,
+    lookup: dict[str, dict[str, dict[str, Any]]],
+) -> None:
+    monkeypatch.setattr(findings_routes, "_kb_lookup", lambda *args, **kwargs: lookup)
+    # Indications load through the central loader rather than findings' cache.
+    core = {
+        "examination": [
+            {"name": name, **record} for name, record in lookup["examination"].items()
+        ],
+    }
+    monkeypatch.setattr(
+        indications_routes,
+        "load_module_kb",
+        lambda *args, **kwargs: SimpleNamespace(export_core_concepts=lambda: core),
+    )
+
+
 @pytest.mark.parametrize(
     "resolver, record",
     [
@@ -85,9 +103,7 @@ def test_resolution_helpers_fail_closed_when_concept_is_missing(
     resolver: Any,
     record: SimpleNamespace,
 ) -> None:
-    monkeypatch.setattr(
-        findings_routes, "_kb_lookup", lambda *args, **kwargs: _lookup()
-    )
+    _patch_lookups(monkeypatch, _lookup())
 
     assert resolver(record, module_name="incompatible_module", version="1.0.0") == set()
 
@@ -130,11 +146,7 @@ def test_resolution_helpers_fail_closed_for_malformed_relation_collections(
     record_name: str,
     lookup: dict[str, dict[str, dict[str, Any]]],
 ) -> None:
-    monkeypatch.setattr(
-        findings_routes,
-        "_kb_lookup",
-        lambda *args, **kwargs: lookup,
-    )
+    _patch_lookups(monkeypatch, lookup)
 
     assert (
         resolver(
@@ -149,10 +161,9 @@ def test_resolution_helpers_fail_closed_for_malformed_relation_collections(
 def test_resolution_helpers_preserve_explicit_empty_and_populated_allowlists(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(
-        findings_routes,
-        "_kb_lookup",
-        lambda *args, **kwargs: _lookup(
+    _patch_lookups(
+        monkeypatch,
+        _lookup(
             examinations={
                 "colonoscopy": {
                     "findings": ["colon-polyp"],
@@ -276,3 +287,47 @@ def test_explicit_catalog_identity_accepts_matching_patient_examination() -> Non
         patient_examination_id=17,
         api_error=_api_error,
     ) == ("dgvs_reporting", "0.1.0")
+
+
+def test_indication_lookup_passes_exact_identity_to_central_loader(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: list[tuple[str, str | None]] = []
+
+    def load(module_name: str, *, version: str | None = None) -> Any:
+        captured.append((module_name, version))
+        return SimpleNamespace(
+            export_core_concepts=lambda: {
+                "examination": [{"name": "colonoscopy", "indications": ["screening"]}],
+            }
+        )
+
+    monkeypatch.setattr(indications_routes, "load_module_kb", load)
+    assert indications_routes._resolve_exam_kb_indication_names(
+        SimpleNamespace(name="colonoscopy"),
+        module_name="historical",
+        version="1.0.0",
+    ) == {"screening"}
+    assert captured == [("historical", "1.0.0")]
+
+
+def test_indication_helpers_reuse_supplied_empty_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unexpected_load(*args: object, **kwargs: object) -> NoReturn:
+        pytest.fail("A supplied lookup must not trigger another KB load")
+
+    monkeypatch.setattr(indications_routes, "load_module_kb", unexpected_load)
+    for resolver in (
+        indications_routes._resolve_kb_finding_names,
+        indications_routes._resolve_exam_kb_indication_names,
+    ):
+        assert (
+            resolver(
+                SimpleNamespace(name="colonoscopy"),
+                module_name="historical",
+                version="1.0.0",
+                lookup={},
+            )
+            == set()
+        )

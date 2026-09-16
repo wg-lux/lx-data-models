@@ -10,19 +10,16 @@ from ninja import File, NinjaAPI, Router
 from ninja.errors import HttpError
 from ninja.files import UploadedFile
 
-from lx_dtypes.terminology.lookup_tracker import register_runtime_lookup_tracker
-from lx_dtypes.terminology.terminology_schemas import (
+from lx_dtypes.django.api.request_types import BaseRequest
+
+from .lookup_tracker import register_runtime_lookup_tracker
+from .terminology_schemas import (
     ImportTerminologyBundleResponse,
     SelectTerminologyBundleRequest,
     SelectTerminologyBundleResponse,
     TerminologyBundleListResponse,
 )
-from lx_dtypes.terminology.terminology_service import (
-    TerminologyError,
-    TerminologyService,
-)
-
-from .request_types import BaseRequest
+from .terminology_service import TerminologyError, TerminologyService
 
 
 @contextmanager

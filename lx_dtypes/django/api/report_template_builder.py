@@ -11,11 +11,12 @@ from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
     ReportTemplateLifecycleStatusLiteral,
     ReportTemplateReadinessSummaryDataDict,
 )
+from lx_dtypes.terminology.terminology_loader import resolve_module_path
+from lx_dtypes.terminology.terminology_service import TerminologyError
 from lx_dtypes.utils.report_template_registry import (
     set_report_template_lifecycle_status,
 )
 
-MODULES_ROOT = Path(__file__).resolve().parents[2] / "data"
 GENERATED_DIR_NAME = "generated_templates"
 
 DEFAULT_PATIENT_INFO_FIELDS = [
@@ -152,15 +153,68 @@ class ReportTemplateModuleLocation(BaseModel):
     modules_root: Path
 
 
-def module_dir(module_name: str, *, modules_root: Path | None = None) -> Path:
-    modules_root = modules_root or MODULES_ROOT
-    safe_name = slugify_name(module_name)
-    resolved = (modules_root / safe_name).resolve()
-    root_resolved = modules_root.resolve()
-    if root_resolved not in resolved.parents and resolved != root_resolved:
-        raise ValueError("Invalid report-template module path.")
-    if not resolved.exists():
-        raise ValueError(f"Unknown report-template module '{module_name}'.")
+def module_dir(
+    module_name: str,
+    *,
+    modules_root: Path | None = None,
+    version: str | None = None,
+) -> Path:
+    """Resolve centrally by default; explicit roots are only used for path checks."""
+    name = module_name.strip()
+    if not name or name in {".", ".."} or any(c in name for c in "/\\\0"):
+        raise ValueError("Invalid report-template module name.")
+    if modules_root is None:
+        return resolve_module_path(name, version=version)
+    if not modules_root.is_absolute():
+        raise ValueError("Report-template module root must be absolute.")
+    root = modules_root.resolve()
+    resolved = (root / name).resolve()
+    if resolved.parent != root or not resolved.is_dir():
+        raise ValueError(f"Unknown or unsafe report-template module '{name}'.")
+    return resolved
+
+
+def resolve_report_template_module_location(
+    module_name: str,
+    version: str,
+) -> ReportTemplateModuleLocation:
+    """Use the same exact KB location as every other central-resolver consumer."""
+    name, version = module_name.strip(), version.strip()
+    if not name or not version:
+        raise ValueError(
+            "Report-template writes require an explicit module and version."
+        )
+    path = resolve_module_path(name, version=version, for_write=True)
+    return ReportTemplateModuleLocation(
+        module_name=name,
+        version=version,
+        modules_root=path.parent,
+    )
+
+
+def _write_module_path(
+    module_name: str,
+    version: str,
+    modules_root: Path | None,
+) -> Path:
+    location = resolve_report_template_module_location(module_name, version)
+    resolved = module_dir(location.module_name, modules_root=location.modules_root)
+    if (
+        modules_root is not None
+        and module_dir(
+            location.module_name,
+            modules_root=modules_root,
+        )
+        != resolved
+    ):
+        raise TerminologyError(
+            409, "Builder root conflicts with the centrally resolved module."
+        )
+    generated = resolved / GENERATED_DIR_NAME
+    if generated.resolve().parent != resolved:
+        raise ValueError("Generated template directory must remain inside its module.")
+    if (generated / "report_template_registry.yaml").is_symlink():
+        raise ValueError("Report-template registry must not be a symlink.")
     return resolved
 
 
@@ -356,7 +410,6 @@ def save_report_template_definition(
     resolved_version: str,
     modules_root: Path | None = None,
 ) -> SaveReportTemplateResponse:
-    modules_root = modules_root or MODULES_ROOT
     module_name = payload.module_name.strip()
     module_version = payload.module_version.strip()
     if not module_name or not module_version:
@@ -367,8 +420,7 @@ def save_report_template_definition(
         raise ValueError(
             "Resolved report-template module version does not match the request."
         )
-    module_path = module_dir(module_name, modules_root=modules_root)
-    ensure_module_config_supports_generated_templates(module_path)
+    module_path = _write_module_path(module_name, module_version, modules_root)
 
     output_path = (
         module_path / GENERATED_DIR_NAME / f"{slugify_name(payload.file_name)}.yaml"
@@ -377,10 +429,10 @@ def save_report_template_definition(
         raise FileExistsError(f"Template file already exists: {output_path.name}")
 
     records = build_yaml_records(payload)
-    output_path.write_text(
-        yaml.safe_dump(records, sort_keys=False, allow_unicode=True),
-        encoding="utf-8",
-    )
+    ensure_module_config_supports_generated_templates(module_path)
+    # Never overwrite a competing writer's file after the existence check.
+    with output_path.open("x", encoding="utf-8") as handle:
+        handle.write(yaml.safe_dump(records, sort_keys=False, allow_unicode=True))
     set_report_template_lifecycle_status(
         module_path, payload.template_name.strip(), "draft"
     )
@@ -404,8 +456,7 @@ def set_saved_report_template_lifecycle(
     lifecycle_status: ReportTemplateLifecycleStatusLiteral,
     modules_root: Path | None = None,
 ) -> PublishReportTemplateResponse:
-    modules_root = modules_root or MODULES_ROOT
-    module_path = module_dir(module_name, modules_root=modules_root)
+    module_path = _write_module_path(module_name, module_version, modules_root)
     set_report_template_lifecycle_status(module_path, template_name, lifecycle_status)
     return PublishReportTemplateResponse(
         module_name=module_name,

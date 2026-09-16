@@ -10,11 +10,12 @@ from typing import Any
 
 import pytest
 from django.test import Client
-from ninja.errors import HttpError
 
 from lx_dtypes.django.api import main as api_main
 from lx_dtypes.django.api import report_template_builder, report_template_routes
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+from lx_dtypes.terminology import terminology_loader as central
+from lx_dtypes.terminology.terminology_service import TerminologyError
 
 resolve_report_template_module_location = (
     api_main._resolve_report_template_module_location
@@ -95,8 +96,38 @@ def client() -> Client:
 
 
 @pytest.fixture(autouse=True)
-def builder_route_authorization(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Allow existing route behavior tests to reach their intended assertions."""
+def builder_route_authorization(
+    monkeypatch: pytest.MonkeyPatch,
+    terminology_root: Path,
+    tmp_path: Path,
+) -> None:
+    """Allow writes and register a real mutable source for path resolution."""
+    module_path = tmp_path / "modules" / "report_template_examples"
+    module_path.mkdir(parents=True)
+    (module_path / "config.yaml").write_text(
+        json.dumps(
+            {
+                "name": "report_template_examples",
+                "version": "0.1.0",
+                "modules": [],
+                "depends_on": [],
+                "data": {"files": []},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (terminology_root / "registry.json").write_text(
+        json.dumps(
+            {
+                "modules": {
+                    "report_template_examples": {
+                        "0.1.0": {"input_dirs": [str(module_path.parent)]},
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
     monkeypatch.setattr(
         api_main, "_authenticate_request_user", lambda request: object()
     )
@@ -104,17 +135,6 @@ def builder_route_authorization(monkeypatch: pytest.MonkeyPatch) -> None:
         api_main,
         "_report_template_access_allowed",
         lambda actor, capability: True,
-    )
-    monkeypatch.setattr(
-        api_main,
-        "_resolve_report_template_module_location",
-        lambda module_name, version: (
-            report_template_builder.ReportTemplateModuleLocation(
-                module_name=module_name,
-                version=version,
-                modules_root=report_template_builder.MODULES_ROOT,
-            )
-        ),
     )
 
 
@@ -159,7 +179,9 @@ def test_builder_routes_fail_closed_and_separate_read_from_write(
         secure=True,
         headers={"X-Test-Actor": "reader"},
     )
-    assert reader_read.status_code == 409
+    assert reader_read.status_code == 404
+    assert reader_read.json()["code"] == "terminology-error"
+    assert "example@1.0.0" in reader_read.json()["message"]
 
     writer_write = client.post(
         "/base_api/report-templates/builder/templates",
@@ -177,10 +199,14 @@ def test_builder_routes_fail_closed_and_separate_read_from_write(
         secure=True,
         headers={"X-Test-Actor": "writer"},
     )
-    assert writer_write.status_code == 400
+    assert writer_write.status_code == 404
+    assert writer_write.json()["code"] == "terminology-error"
+    assert "missing_module@1.0.0" in writer_write.json()["message"]
 
 
-def test_save_report_template_returns_400_for_unknown_module(client: Client) -> None:
+def test_save_report_template_returns_404_for_unregistered_module(
+    client: Client,
+) -> None:
     response = client.post(
         "/base_api/report-templates/builder/templates",
         data=json.dumps(
@@ -197,12 +223,17 @@ def test_save_report_template_returns_400_for_unknown_module(client: Client) -> 
         secure=True,
     )
 
-    assert response.status_code == 400
-    assert "Unknown report-template module" in response.content.decode()
+    assert response.status_code == 404
+    assert response.json()["code"] == "terminology-error"
+    assert "missing_module@1.0.0" in response.json()["message"]
+    assert "not registered" in response.json()["message"]
 
 
 def test_save_report_template_uses_resolved_mutable_module_location(
-    client: Client, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    client: Client,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    terminology_root: Path,
 ) -> None:
     captured: dict[str, Any] = {}
     module_dir = tmp_path / "builder_module"
@@ -236,16 +267,17 @@ def test_save_report_template_uses_resolved_mutable_module_location(
         return kb
 
     monkeypatch.setattr(api_main, "_load_module_kb", _fake_load_knowledge_base)
-    monkeypatch.setattr(
-        api_main,
-        "_resolve_report_template_module_location",
-        lambda module_name, version: (
-            report_template_builder.ReportTemplateModuleLocation(
-                module_name=module_name,
-                version=version,
-                modules_root=tmp_path,
-            )
+    (terminology_root / "registry.json").write_text(
+        json.dumps(
+            {
+                "modules": {
+                    "builder_module": {
+                        "1.0.0": {"input_dirs": [str(tmp_path)]},
+                    }
+                }
+            }
         ),
+        encoding="utf-8",
     )
     monkeypatch.setattr(
         report_template_routes,
@@ -275,6 +307,10 @@ def test_save_report_template_uses_resolved_mutable_module_location(
         "version": "1.0.0",
         "input_dirs": None,
     }
+    assert Path(response.json()["path"]).parent == (
+        module_dir / report_template_builder.GENERATED_DIR_NAME
+    )
+    assert (module_dir / "generated_templates" / "custom_template.yaml").is_file()
 
 
 def test_packaged_report_template_module_is_immutable(
@@ -286,19 +322,23 @@ def test_packaged_report_template_module_is_immutable(
     source_file = module_path / "config.yaml"
     source_file.write_text("name: report_template_examples\n", encoding="utf-8")
 
-    monkeypatch.setattr(api_main, "_resolve_active_version", lambda *args: "1.0.0")
     monkeypatch.setattr(
-        api_main,
-        "load_module_config",
+        central,
+        "load_module_kb",
         lambda *args, **kwargs: SimpleNamespace(
-            name="report_template_examples",
-            source_file=source_file,
+            config=SimpleNamespace(
+                name="report_template_examples",
+                version="1.0.0",
+                source_file=source_file,
+            )
         ),
     )
-    monkeypatch.setattr(api_main, "package_data_root", lambda: package_root)
+    monkeypatch.setattr(central, "package_data_root", lambda: package_root)
 
-    with pytest.raises(HttpError, match="Packaged report templates are immutable"):
+    with pytest.raises(TerminologyError, match="Shipped data is read-only") as exc_info:
         resolve_report_template_module_location("report_template_examples", "1.0.0")
+    assert exc_info.value.status == 409
+    assert not (module_path / "generated_templates").exists()
 
 
 def test_publish_report_template_returns_409_when_summary_blocks_publish(

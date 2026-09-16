@@ -32,6 +32,7 @@ dependencies = [
   "scikit-learn>=1.8.0",
   "scipy>=1.16.1",
   "types-pyyaml>=6.0.12.20250915",
+  "platformdirs>=4",
 ]
 description = "Typed clinical data models, terminology, and interoperability contracts"
 keywords = [

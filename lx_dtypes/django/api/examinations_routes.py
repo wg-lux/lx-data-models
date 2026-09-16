@@ -4,9 +4,9 @@ from collections.abc import Callable
 from typing import Any, NoReturn, Protocol, TypeVar
 
 from lx_dtypes.models.contracts.terminology_catalog import ExaminationCatalogDTO
+from lx_dtypes.terminology.terminology_loader import active_kb_identity
 
 from .findings_routes import (
-    _findings_module_name,
     _norm_name,
     _resolve_exam_kb_finding_names,
     _resolve_kb_finding_classification_names,
@@ -25,10 +25,12 @@ class _TypedApi(Protocol):
     def get(self, path: str, /) -> _RouteDecorator: ...
 
 
-def _serialize_examination(examination: Any, *, module_name: str) -> dict[str, Any]:
+def _serialize_examination(
+    examination: Any, *, module_name: str, version: str
+) -> dict[str, Any]:
     findings = list(examination.get_available_findings())
     kb_allowed_finding_names = _resolve_exam_kb_finding_names(
-        examination, module_name=module_name
+        examination, module_name=module_name, version=version
     )
     findings = [
         finding
@@ -55,7 +57,7 @@ def _serialize_examination(examination: Any, *, module_name: str) -> dict[str, A
                 _serialize_finding(
                     finding,
                     allowed_classification_names=_resolve_kb_finding_classification_names(
-                        finding, module_name=module_name
+                        finding, module_name=module_name, version=version
                     ),
                     required_classification_names=set(),
                 )
@@ -84,21 +86,30 @@ def register_examinations_routes(
     @api.get("/examinations/")
     def examinations_catalog(request: BaseRequest) -> list[dict[str, Any]]:
         del request
-        module_name = _findings_module_name()
+        # Keep the same module AND version throughout this response.
+        module_name, version = active_kb_identity()
         examination_model = orm_models()["Examination"]
         examinations = examination_model.objects.all().order_by("id")
         return [
-            _serialize_examination(examination, module_name=module_name)
+            _serialize_examination(
+                examination,
+                module_name=module_name,
+                version=version,
+            )
             for examination in examinations
         ]
 
     @api.get("/examinations/{examination_id}/")
     def examination_detail(request: BaseRequest, examination_id: int) -> dict[str, Any]:
         del request
-        module_name = _findings_module_name()
         examination_model = orm_models()["Examination"]
         examination = examination_model.objects.filter(id=examination_id).first()
-        if not examination:
+        if examination is None:
             api_error(404, "not-found", f"Examination '{examination_id}' not found.")
-        assert examination is not None
-        return _serialize_examination(examination, module_name=module_name)
+
+        module_name, version = active_kb_identity()
+        return _serialize_examination(
+            examination,
+            module_name=module_name,
+            version=version,
+        )

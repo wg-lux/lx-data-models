@@ -505,7 +505,9 @@ def _contains_phrase(text: str, phrase: str) -> bool:
 def _iter_fhir_concepts(concepts: object) -> Iterator[Mapping[str, Any]]:
     """Reject malformed external concept data with a consistent ValueError."""
     if not isinstance(concepts, list):
-        raise TypeError("FHIR CodeSystem.concept must be an array")
+        raise ValueError(  # noqa: TRY004 - external data validation contract
+            "FHIR CodeSystem.concept must be an array"
+        )
     pending: list[Iterator[object]] = [iter(concepts)]
     seen: set[int] = set()
     codes: set[str] = set()
@@ -516,7 +518,9 @@ def _iter_fhir_concepts(concepts: object) -> Iterator[Mapping[str, Any]]:
             pending.pop()
             continue
         if not isinstance(concept, Mapping):
-            raise TypeError("FHIR CodeSystem concepts must be objects")
+            raise ValueError(  # noqa: TRY004 - external data validation contract
+                "FHIR CodeSystem concepts must be objects"
+            )
         if id(concept) in seen:
             raise ValueError("FHIR CodeSystem concept graph contains repeated objects")
         seen.add(id(concept))
@@ -528,7 +532,9 @@ def _iter_fhir_concepts(concepts: object) -> Iterator[Mapping[str, Any]]:
         codes.add(code)
         children = concept.get("concept", [])
         if not isinstance(children, list):
-            raise TypeError("FHIR CodeSystem.concept must be an array")
+            raise ValueError(  # noqa: TRY004 - external data validation contract
+                "FHIR CodeSystem.concept must be an array"
+            )
         yield concept
         pending.append(iter(children))
 

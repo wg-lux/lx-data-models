@@ -6,9 +6,6 @@ import pytest
 from django.test import Client
 
 from lx_dtypes.django.api import main as api_main
-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
-    KnowledgeBaseVersionNotFoundError,
-)
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 
@@ -192,7 +189,7 @@ def test_report_template_runtime_validation_api(
 ) -> None:
     monkeypatch.setattr(
         api_main,
-        "load_knowledge_base",
+        "resolve_module_kb",
         lambda *args, **kwargs: _RuntimeValidationKb(),
     )
     client = Client()
@@ -275,7 +272,7 @@ def test_report_template_runtime_validation_api_uses_payload_kb_identity(
         captured["version"] = version
         return fallback_kb
 
-    monkeypatch.setattr(api_main, "load_knowledge_base", _fake_load_knowledge_base)
+    monkeypatch.setattr(api_main, "resolve_module_kb", _fake_load_knowledge_base)
 
     response = client.post(
         "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.0",
@@ -324,7 +321,7 @@ def test_report_template_runtime_validation_api_rejects_missing_payload_version(
         captured["version"] = version
         return fallback_kb
 
-    monkeypatch.setattr(api_main, "load_knowledge_base", _fake_load_knowledge_base)
+    monkeypatch.setattr(api_main, "resolve_module_kb", _fake_load_knowledge_base)
 
     response = client.post(
         "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.1",
@@ -372,7 +369,7 @@ def test_single_validator_runtime_validation_api(
 ) -> None:
     monkeypatch.setattr(
         api_main,
-        "load_knowledge_base",
+        "resolve_module_kb",
         lambda *args, **kwargs: _RuntimeValidationKb(),
     )
     client = Client()
@@ -472,15 +469,11 @@ def test_report_template_runtime_validation_api_rejects_payload_module_conflict(
     assert "does not match route module" in response.content.decode()
 
 
-def test_report_template_runtime_validation_api_rejects_unavailable_payload_version(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_report_template_runtime_validation_api_rejects_unavailable_payload_version() -> (
+    None
+):
+    # Exercise the central registry: 9.9.9 is not registered by tests.django_settings.
     client = Client()
-
-    def _missing_version(*args: Any, **kwargs: Any) -> Any:
-        raise KnowledgeBaseVersionNotFoundError("missing")
-
-    monkeypatch.setattr(api_main, "load_knowledge_base", _missing_version)
 
     response = client.post(
         "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=9.9.9",
@@ -495,8 +488,10 @@ def test_report_template_runtime_validation_api_rejects_unavailable_payload_vers
         content_type="application/json",
         secure=True,
     )
-    assert response.status_code == 409
-    assert "not provisioned locally" in response.content.decode()
+    assert response.status_code == 404
+    assert response.json()["code"] == "terminology-error"
+    assert "report_template_examples@9.9.9" in response.json()["message"]
+    assert "not registered" in response.json()["message"]
 
 
 def test_core_concepts_api() -> None:

@@ -4,7 +4,6 @@ import os
 from collections.abc import Callable
 from functools import lru_cache
 from importlib import import_module
-from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -20,44 +19,40 @@ from typing import (
 from django.conf import settings
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
-from lx_dtypes.models.contracts import KnowledgeBaseContract
-from lx_dtypes.models.interface import KnowledgeBaseResolver as _knowledge_base_resolver
-from lx_dtypes.models.interface.data_roots import package_data_root
-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
-    KnowledgeBaseVersionNotFoundError,
-    clear_knowledge_base_resolver_caches,
-    load_knowledge_base,
-    load_module_config,
-)
-from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
-
-from .examinations_routes import register_examinations_routes
-from .findings_routes import (
+from lx_dtypes.django.api.examinations_routes import register_examinations_routes
+from lx_dtypes.django.api.findings_routes import (
     PatientFindingClassificationInput,
     clear_findings_route_caches,
     register_findings_routes,
 )
-from .findings_routes import (
+from lx_dtypes.django.api.findings_routes import (
     build_p_examination_payload_from_host_ledger as _build_payload_from_host_ledger,
 )
-from .indications_routes import register_indications_routes
-from .knowledge_base_graph_routes import (
+from lx_dtypes.django.api.indications_routes import register_indications_routes
+from lx_dtypes.django.api.knowledge_base_graph_routes import (
     KnowledgeBaseGraphRouteCache,
     register_knowledge_base_graph_routes,
 )
-from .lookup_tracker import register_runtime_lookup_tracker
-from .report_template_builder import (
+from lx_dtypes.django.api.report_template_builder import (
     ReportTemplateModuleLocation,
+    resolve_report_template_module_location,
 )
-from .report_template_builder import (
-    module_dir as report_template_module_dir,
+from lx_dtypes.django.api.report_template_routes import register_report_template_routes
+from lx_dtypes.django.api.request_types import BaseRequest
+from lx_dtypes.django.api.terminology_routes import register_terminology_routes
+from lx_dtypes.models.contracts import KnowledgeBaseContract
+from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    clear_knowledge_base_resolver_caches,
 )
-from .report_template_routes import register_report_template_routes
-from .request_types import BaseRequest
-from .terminology_routes import (
-    active_terminology_selection,
-    register_terminology_routes,
+from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+from lx_dtypes.terminology.lookup_tracker import register_runtime_lookup_tracker
+from lx_dtypes.terminology.terminology_loader import (
+    get_terminology_service,
 )
+from lx_dtypes.terminology.terminology_loader import (
+    load_module_kb as resolve_module_kb,
+)
+from lx_dtypes.terminology.terminology_service import TerminologyError
 
 F = TypeVar("F", bound=Callable[..., Any])
 ReportLanguageCode = Literal["de", "en"]
@@ -95,6 +90,8 @@ class _TypedApi(Protocol):
 
 
 if TYPE_CHECKING:
+    from ninja import NinjaAPI
+
     api = cast(_TypedApi, object())
 else:
     from ninja import NinjaAPI
@@ -226,106 +223,34 @@ def handle_structured_api_error(request: Any, exc: StructuredApiError) -> Any:
     )
 
 
-def _resolve_active_version(module_name: str, version: str | None) -> str | None:
-    if version:
-        return version
-    active = active_terminology_selection()
-    if active is not None and active[0] == module_name:
-        return active[1]
-    if active is None:
-        raise HttpError(409, "No active knowledge-base bundle is selected.")
-    raise HttpError(
-        409,
-        f"Knowledge-base module '{module_name}' is not the active registered bundle.",
+@api.exception_handler(TerminologyError)
+def handle_terminology_error(request: Any, exc: TerminologyError) -> Any:
+    """Preserve the service status instead of relabeling every failure as a 404."""
+    return api.create_response(
+        request,
+        {"code": "terminology-error", "message": str(exc)},
+        status=exc.status,
     )
 
 
 def _load_module_kb(
     module_name: str, version: str | None = None
 ) -> KnowledgeBaseContract:
-    loader = _kb_loader()
-    resolved_version = (
-        _resolve_active_version(module_name, version)
-        if loader is _knowledge_base_resolver
-        else version
-    )
-    try:
-        if loader is _knowledge_base_resolver:
-            loaded_kb = load_knowledge_base(module_name, version=resolved_version)
-        else:
-            try:
-                loaded_kb = loader.load_knowledge_base(
-                    module_name, version=resolved_version
-                )
-            except TypeError:
-                loaded_kb = loader.load_knowledge_base(module_name)
-        kb = cast(
-            KnowledgeBaseContract,
-            loaded_kb,
-        )
-    except KnowledgeBaseVersionNotFoundError as exc:
-        raise HttpError(
-            409,
-            "Requested knowledge-base version is not provisioned locally for "
-            f"module '{module_name}' and version '{resolved_version}'.",
-        ) from exc
-    except ValueError as exc:
-        raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
-    register_runtime_lookup_tracker(cast(Any, kb))
-    return kb
+    """Keep the existing API callback, delegating all resolution to the provider."""
+    kb = resolve_module_kb(module_name, version=version)
+    register_runtime_lookup_tracker(kb)
+    return cast(KnowledgeBaseContract, kb)
 
 
 def _resolve_report_template_module_location(
     module_name: str,
     version: str,
 ) -> ReportTemplateModuleLocation:
-    version = version.strip()
-    if not version:
-        raise HttpError(
-            400,
-            "Report-template mutations require an explicit knowledge-base version.",
-        )
-    config = load_module_config(module_name, version=version)
-    source_file = config.source_file
-    if source_file is None:
-        raise HttpError(
-            409,
-            f"Knowledge-base module '{module_name}' has no attributable source file.",
-        )
-
-    module_path = Path(source_file).resolve().parent
-    modules_root = module_path.parent
-    if config.name != module_name:
-        raise HttpError(
-            409,
-            f"Resolved knowledge-base module '{config.name}' does not match '{module_name}'.",
-        )
+    """Preserve the callback API while the builder owns central path resolution."""
     try:
-        expected_module_path = report_template_module_dir(
-            module_name, modules_root=modules_root
-        )
+        return resolve_report_template_module_location(module_name, version)
     except ValueError as exc:
-        raise HttpError(409, str(exc)) from exc
-    if expected_module_path != module_path:
-        raise HttpError(
-            409,
-            f"Knowledge-base module '{module_name}' is not in its resolved module root.",
-        )
-    if modules_root.resolve() == package_data_root().resolve():
-        raise HttpError(
-            409,
-            "Packaged report templates are immutable. Import an editable terminology "
-            "bundle before saving or changing publication state.",
-        )
-    return ReportTemplateModuleLocation(
-        module_name=module_name,
-        version=version,
-        modules_root=modules_root,
-    )
-
-
-def _kb_loader() -> Any:
-    return _knowledge_base_resolver
+        raise HttpError(400, str(exc)) from exc
 
 
 _graph_route_cache = KnowledgeBaseGraphRouteCache()
@@ -400,14 +325,15 @@ def _norm_name(value: str | None) -> str:
     return str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
 
 
-@lru_cache(maxsize=8)
-def _kb_core_concepts(module_name: str) -> dict[str, Any]:
-    return _load_module_kb(module_name).export_core_concepts()
+def _kb_core_concepts(module_name: str, version: str | None = None) -> dict[str, Any]:
+    # Do not cache a module-only request: its active version can change.
+    return _load_module_kb(module_name, version=version).export_core_concepts()
 
 
-@lru_cache(maxsize=8)
-def _kb_lookup(module_name: str) -> dict[str, dict[str, dict[str, Any]]]:
-    core = _kb_core_concepts(module_name)
+def _kb_lookup(
+    module_name: str, version: str | None = None
+) -> dict[str, dict[str, dict[str, Any]]]:
+    core = _kb_core_concepts(module_name, version=version)
     examination_by_name = {
         _norm_name(item.get("name")): item for item in core.get("examination", [])
     }
@@ -738,7 +664,6 @@ register_knowledge_base_graph_routes(
 
 register_findings_routes(
     api,
-    load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
     orm_models=lambda: _orm_models(),
     api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
     authenticate_request_user=_authenticate_request_user,
@@ -766,7 +691,8 @@ register_examinations_routes(
 )
 
 register_terminology_routes(
-    api,
+    cast(NinjaAPI, api),
+    service=get_terminology_service(),
     clear_kb_caches=lambda: _clear_kb_caches(),
     authenticate_request_user=(
         _authenticate_request_user if _host_integration_is_configured() else None

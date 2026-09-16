@@ -7,6 +7,7 @@ from lx_dtypes.models.contracts.terminology_catalog import (
     IndicationCatalogDTO,
     LocalizedCatalogItem,
 )
+from lx_dtypes.terminology.terminology_loader import load_module_kb
 
 from . import findings_routes
 from .request_types import BaseRequest
@@ -63,30 +64,53 @@ def _serialize_indication(indication: Any) -> dict[str, Any]:
     ).model_dump(mode="json")
 
 
-def _resolve_kb_finding_names(
-    examination: Any, *, module_name: str, version: str | None = None
+def _examination_lookup(
+    module_name: str,
+    *,
+    version: str | None = None,
+) -> dict[str, dict[str, Any]]:
+    """Load once per response, not once per examination or relation."""
+    kb = load_module_kb(module_name, version=version)
+    return {
+        findings_routes._norm_name(item.get("name")): item
+        for item in kb.export_core_concepts().get("examination", [])
+    }
+
+
+def _relation_names(
+    examination: Any,
+    relation: str,
+    lookup: dict[str, dict[str, Any]],
 ) -> set[str]:
-    lookup = findings_routes._kb_lookup(module_name, version=version)
-    exam_entry = lookup["examination"].get(findings_routes._norm_name(examination.name))
-    if not exam_entry:
+    entry = lookup.get(findings_routes._norm_name(examination.name), {})
+    values = entry.get(relation, [])
+    if not isinstance(values, list):
         return set()
-    finding_names = exam_entry.get("findings", [])
-    if not isinstance(finding_names, list):
-        return set()
-    return {findings_routes._norm_name(name) for name in finding_names}
+    return {findings_routes._norm_name(name) for name in values}
+
+
+def _resolve_kb_finding_names(
+    examination: Any,
+    *,
+    module_name: str,
+    version: str | None = None,
+    lookup: dict[str, dict[str, Any]] | None = None,
+) -> set[str]:
+    if lookup is None:
+        lookup = _examination_lookup(module_name, version=version)
+    return _relation_names(examination, "findings", lookup)
 
 
 def _resolve_exam_kb_indication_names(
-    examination: Any, *, module_name: str, version: str | None = None
+    examination: Any,
+    *,
+    module_name: str,
+    version: str | None = None,
+    lookup: dict[str, dict[str, Any]] | None = None,
 ) -> set[str]:
-    lookup = findings_routes._kb_lookup(module_name, version=version)
-    exam_entry = lookup["examination"].get(findings_routes._norm_name(examination.name))
-    if not exam_entry:
-        return set()
-    indication_names = exam_entry.get("indications", [])
-    if not isinstance(indication_names, list):
-        return set()
-    return {findings_routes._norm_name(name) for name in indication_names}
+    if lookup is None:
+        lookup = _examination_lookup(module_name, version=version)
+    return _relation_names(examination, "indications", lookup)
 
 
 def _serialize_examination_node_for_indication_tree(
@@ -146,8 +170,8 @@ def register_indications_routes(
                     api_error=api_error,
                 )
             )
-        except RuntimeError as exc:
-            api_error(409, "no-active-knowledge-base", str(exc))
+        except findings_routes.PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
         examination_model = orm_models()["Examination"]
         examination = examination_model.objects.filter(id=examination_id).first()
         if not examination:
@@ -175,9 +199,13 @@ def register_indications_routes(
                     f"examination '{examination_id}'.",
                 )
 
+        lookup = _examination_lookup(module_name, version=resolved_version)
         indications = _relation_items(getattr(examination, "indications", None))
         kb_allowed_indication_names = _resolve_exam_kb_indication_names(
-            examination, module_name=module_name, version=resolved_version
+            examination,
+            module_name=module_name,
+            version=resolved_version,
+            lookup=lookup,
         )
         indications = [
             indication
@@ -205,8 +233,8 @@ def register_indications_routes(
                     api_error=api_error,
                 )
             )
-        except RuntimeError as exc:
-            api_error(409, "no-active-knowledge-base", str(exc))
+        except findings_routes.PatientExaminationKnowledgeBaseIdentityError as exc:
+            api_error(409, "knowledge-base-identity-required", str(exc))
 
         examination_model = orm_models()["Examination"]
         if patient_examination_id is not None:
@@ -231,15 +259,22 @@ def register_indications_routes(
         else:
             examinations = list(examination_model.objects.all())
 
+        lookup = _examination_lookup(module_name, version=resolved_version)
         indication_nodes: dict[int, dict[str, Any]] = {}
         for examination in examinations:
             if examination is None:
                 continue
             allowed_indication_names = _resolve_exam_kb_indication_names(
-                examination, module_name=module_name, version=resolved_version
+                examination,
+                module_name=module_name,
+                version=resolved_version,
+                lookup=lookup,
             )
             allowed_finding_names = _resolve_kb_finding_names(
-                examination, module_name=module_name, version=resolved_version
+                examination,
+                module_name=module_name,
+                version=resolved_version,
+                lookup=lookup,
             )
             examination_indications = _relation_items(
                 getattr(examination, "indications", None)

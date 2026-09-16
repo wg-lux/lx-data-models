@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from lx_dtypes.django.api.lookup_tracker import (
+from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
+from lx_dtypes.terminology.lookup_tracker import (
     consume_runtime_lookup_trackers,
     register_runtime_lookup_tracker,
 )
-from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
 
 def test_runtime_lookup_tracker_registers_deduplicates_and_clears(

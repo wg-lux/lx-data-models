@@ -593,7 +593,7 @@ wheels = [
 
 [[package]]
 name = "lx-dtypes"
-version = "0.3.2"
+version = "0.3.3"
 source = { editable = "." }
 dependencies = [
     { name = "bibtexparser", marker = "sys_platform == 'darwin' or sys_platform == 'linux' or sys_platform == 'win32'" },
@@ -608,6 +608,7 @@ dependencies = [
     { name = "pandas-stubs", marker = "sys_platform == 'darwin' or sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "pandera", extra = ["io", "mypy", "pandas"], marker = "sys_platform == 'darwin' or sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "pillow", marker = "sys_platform == 'darwin' or sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "platformdirs", marker = "sys_platform == 'darwin' or sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "pydantic", marker = "sys_platform == 'darwin' or sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "python-ffmpeg", marker = "sys_platform == 'darwin' or sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "pyyaml", marker = "sys_platform == 'darwin' or sys_platform == 'linux' or sys_platform == 'win32'" },
@@ -676,6 +677,7 @@ requires-dist = [
     { name = "pandera", extras = ["pandas", "io", "mypy"], specifier = ">=0.27.0" },
     { name = "pillow", specifier = ">=11.3.0" },
     { name = "pip", marker = "extra == 'dev'", specifier = ">=25.2" },
+    { name = "platformdirs", specifier = ">=4" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.5.0" },
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "pyright", marker = "extra == 'dev'", specifier = ">=1.1.411" },
