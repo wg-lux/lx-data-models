@@ -101,7 +101,9 @@ def terminology_api(
     )
     module_name = f"_terminology_test_urls_{uuid4().hex}"
     urlconf = ModuleType(module_name)
-    urlconf.urlpatterns = [path("base_api/", api.urls)]
+    monkeypatch.setattr(
+        urlconf, "urlpatterns", [path("base_api/", api.urls)], raising=False
+    )
     monkeypatch.setitem(sys.modules, module_name, urlconf)
     settings.ROOT_URLCONF = module_name
     # Middleware/host-RBAC integration has its own tests; this file tests the adapter.

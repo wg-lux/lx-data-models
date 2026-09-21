@@ -28,6 +28,7 @@ def test_invalid_roots_are_rejected(monkeypatch, value):
 def test_source_fallback_ignores_cwd(storage, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     kb = central.load_module_kb("star_upper_gi")
+    assert kb.config.source_file is not None
     assert kb.config.source_file.is_relative_to(storage)
     assert central.active_kb_identity() == ("star_upper_gi", "0.1.2")
 
@@ -35,9 +36,9 @@ def test_source_fallback_ignores_cwd(storage, tmp_path, monkeypatch):
 def test_legacy_environment_variables_do_not_control_loading(storage, monkeypatch):
     monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", "/nonexistent/wrong.json")
     monkeypatch.setenv("LOOKUP_DTYPES_DATA_ROOT", "/nonexistent/wrong-data")
-    assert central.load_module_kb("star_upper_gi").config.source_file.is_relative_to(
-        storage
-    )
+    source_file = central.load_module_kb("star_upper_gi").config.source_file
+    assert source_file is not None
+    assert source_file.is_relative_to(storage)
 
 
 def test_explicit_hydration_reads_current_setting_at_call_time(storage, monkeypatch):
@@ -95,6 +96,7 @@ def test_builder_saves_and_reloads_from_hydrated_copy(storage):
     assert "central_resolver_test" in kb.report_template
     central.hydrate_shipped_terminology()
     assert Path(saved.path).is_file()
+    assert kb.config.source_file is not None
     assert (
         yaml.safe_load(kb.config.source_file.read_text())["data"]["dirs"][-1]
         == "./generated_templates"

@@ -37,6 +37,7 @@ def test_actual_shipped_tree_copied_and_all_catalog_versions_load(seed):
         assert Path(inputs[0]).is_relative_to(seed)
         kb = service.load(d.module_name, d.version)
         assert (kb.config.name, kb.config.version) == (d.module_name, d.version)
+        assert kb.config.source_file is not None
         assert kb.config.source_file.is_relative_to(seed)
         d.verified_resource_directory()  # original bytes still match the catalog
     data = next((seed / "shipped").iterdir()) / "data"
@@ -47,6 +48,7 @@ def test_actual_shipped_tree_copied_and_all_catalog_versions_load(seed):
 def test_repeat_hydration_keeps_edited_copy_and_active(storage):
     service = central.get_terminology_service()
     kb = service.load("star_upper_gi", "0.1.2")
+    assert kb.config.source_file is not None
     target = kb.config.source_file.parent / "local_note.txt"
     target.write_text("keep this edit")
     payload = json.loads(service.registry_path.read_text())
@@ -124,12 +126,15 @@ def test_legacy_exact_package_path_is_migrated(storage):
     payload["modules"]["mst_3_0"]["3.0.0"] = {"input_dirs": [str(package_data_root())]}
     service.registry_path.write_text(json.dumps(payload))
     service.provision()
-    assert service.load("mst_3_0", "3.0.0").config.source_file.is_relative_to(storage)
+    source_file = service.load("mst_3_0", "3.0.0").config.source_file
+    assert source_file is not None
+    assert source_file.is_relative_to(storage)
 
 
 def test_missing_new_identity_is_added_without_overwriting_other_edits(storage):
     service = central.get_terminology_service()
     target = service.load("star_upper_gi", "0.1.2").config.source_file
+    assert target is not None
     config = yaml.safe_load(target.read_text())
     config["description"] = "local customization"
     target.write_text(yaml.safe_dump(config, sort_keys=False))
@@ -225,6 +230,7 @@ def test_copy_of_read_only_source_gets_owner_write_permission(tmp_path):
     service = TerminologyService(tmp_path / "destination/registry.json")
     hydrate_registry(service, source_root=source)
     target = service.load("star_upper_gi", "0.1.2").config.source_file
+    assert target is not None
     assert target.stat().st_mode & 0o200
     assert not original.stat().st_mode & 0o200
     assert target.read_bytes() == original.read_bytes()

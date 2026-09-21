@@ -74,11 +74,13 @@ def register_terminology_routes(
     @api.post("/terminology/bundles/import", response=ImportTerminologyBundleResponse)
     def import_terminology_bundle(
         request: BaseRequest,
-        file: UploadedFile = File(...),  # noqa: B008 - Ninja request marker
+        file: File[UploadedFile],
     ) -> ImportTerminologyBundleResponse:
         require_write_access(request)
         with _http_errors():
-            result = service.import_zip(file)
+            if file.file is None:
+                raise HttpError(400, "Uploaded file has no content stream.")
+            result = service.import_zip(file.file)
         clear_kb_caches()
         return result
 

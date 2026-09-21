@@ -171,9 +171,11 @@ class ExaminationReportingContext(BaseModel):
         return self
 
 
-class _KnowledgeBaseGraphSource(Protocol):
+class KnowledgeBaseGraphSource(Protocol):
+    """Read-only knowledge-base surface required to build a graph snapshot."""
+
     @property
-    def report_template(self) -> Mapping[str, Any]: ...
+    def report_template(self) -> Mapping[str, object]: ...
 
     def export_core_concepts(self) -> JsonObject: ...
 
@@ -183,7 +185,7 @@ class _KnowledgeBaseGraphSource(Protocol):
 
 
 def build_knowledge_base_graph_snapshot(
-    kb: _KnowledgeBaseGraphSource,
+    kb: KnowledgeBaseGraphSource,
     *,
     identity: KnowledgeBaseIdentity,
 ) -> KnowledgeBaseGraphSnapshot:
@@ -382,7 +384,7 @@ class KnowledgeBaseGraphResolver:
 
 
 def _published_report_templates(
-    kb: _KnowledgeBaseGraphSource,
+    kb: KnowledgeBaseGraphSource,
 ) -> list[ReportTemplateGraphProjection]:
     templates: list[ReportTemplateGraphProjection] = []
     for template_name in sorted(kb.report_template):
@@ -658,6 +660,7 @@ __all__ = [
     "KnowledgeBaseGraphNodeRef",
     "KnowledgeBaseGraphResolver",
     "KnowledgeBaseGraphSnapshot",
+    "KnowledgeBaseGraphSource",
     "ReportTemplateGraphProjection",
     "build_examination_reporting_context",
     "build_knowledge_base_graph_snapshot",

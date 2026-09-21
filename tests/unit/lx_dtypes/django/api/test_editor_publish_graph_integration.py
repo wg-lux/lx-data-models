@@ -54,7 +54,9 @@ def editor_client(
     )
     module_name = f"_editor_integration_urls_{uuid4().hex}"
     urlconf = ModuleType(module_name)
-    urlconf.urlpatterns = [path("base_api/", api.urls)]
+    monkeypatch.setattr(
+        urlconf, "urlpatterns", [path("base_api/", api.urls)], raising=False
+    )
     monkeypatch.setitem(sys.modules, module_name, urlconf)
     settings.ROOT_URLCONF = module_name
     settings.ALLOWED_HOSTS = ["testserver"]

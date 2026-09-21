@@ -4,18 +4,16 @@ from collections import OrderedDict
 from collections.abc import Callable
 from dataclasses import dataclass
 from threading import RLock
-from typing import Any, Protocol, TypeVar, cast
+from typing import Any, Protocol, TypeVar
 
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
-from lx_dtypes.models.contracts.knowledge_base import (
-    KnowledgeBaseContract,
-    KnowledgeBaseIdentity,
-)
+from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
 from lx_dtypes.models.contracts.knowledge_base_graph import (
     ExaminationReportingContext,
     KnowledgeBaseGraphResolver,
     KnowledgeBaseGraphSnapshot,
+    KnowledgeBaseGraphSource,
     build_knowledge_base_graph_snapshot,
 )
 
@@ -34,7 +32,7 @@ class _TypedApi(Protocol):
 
 @dataclass(frozen=True)
 class _ResolvedGraph:
-    source: KnowledgeBaseContract
+    source: KnowledgeBaseGraphSource
     snapshot: KnowledgeBaseGraphSnapshot
     resolver: KnowledgeBaseGraphResolver
 
@@ -60,7 +58,7 @@ class KnowledgeBaseGraphRouteCache:
         self,
         module_name: str,
         version: str,
-        load_module_kb: Callable[..., KnowledgeBaseContract],
+        load_module_kb: Callable[..., KnowledgeBaseGraphSource],
     ) -> _ResolvedGraph:
         # Serialize loading/compilation with invalidation. A failed refresh must
         # never fall back to a previously valid projection of the same identity.
@@ -76,9 +74,7 @@ class KnowledgeBaseGraphRouteCache:
                 if cached is not None and cached.source is kb:
                     self._entries.move_to_end(key)
                     return cached
-                snapshot = build_knowledge_base_graph_snapshot(
-                    cast(Any, kb), identity=identity
-                )
+                snapshot = build_knowledge_base_graph_snapshot(kb, identity=identity)
                 resolved = _ResolvedGraph(
                     kb, snapshot, KnowledgeBaseGraphResolver(snapshot)
                 )
@@ -95,7 +91,7 @@ class KnowledgeBaseGraphRouteCache:
 def register_knowledge_base_graph_routes(
     api: _TypedApi,
     *,
-    load_module_kb: Callable[..., KnowledgeBaseContract],
+    load_module_kb: Callable[..., KnowledgeBaseGraphSource],
     graph_cache: KnowledgeBaseGraphRouteCache | None = None,
 ) -> None:
     cache = graph_cache if graph_cache is not None else KnowledgeBaseGraphRouteCache()

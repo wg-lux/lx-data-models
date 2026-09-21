@@ -13,7 +13,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from types import ModuleType
 from types import SimpleNamespace as NS
-from typing import Literal
 from unittest.mock import Mock
 
 import pytest
@@ -223,6 +222,7 @@ def harness(monkeypatch):
     def load_route(name):
         qualified = f"route_harness.{name}"
         spec = importlib.util.spec_from_file_location(qualified, ROOT / f"{name}.py")
+        assert spec is not None and spec.loader is not None
         obj = importlib.util.module_from_spec(spec)
         monkeypatch.setitem(sys.modules, qualified, obj)
         spec.loader.exec_module(obj)
@@ -293,14 +293,16 @@ def harness(monkeypatch):
     }
     settings = NS(actor=NS(id=1), allow_exam=True, allow_finding=True)
     api = FakeApi()
-    kwargs = Literal(
-        orm_models=lambda: models,
-        api_error=api_error,
-        authenticate_request_user=lambda request: settings.actor,
-        patient_examination_access_allowed=lambda request, obj: settings.allow_exam,
-        patient_finding_access_allowed=lambda request, obj: settings.allow_finding,
-        patient_findings_queryset_for_request=lambda request: Query([patient_finding]),
-    )
+    kwargs = {
+        "orm_models": lambda: models,
+        "api_error": api_error,
+        "authenticate_request_user": lambda request: settings.actor,
+        "patient_examination_access_allowed": lambda request, obj: settings.allow_exam,
+        "patient_finding_access_allowed": lambda request, obj: settings.allow_finding,
+        "patient_findings_queryset_for_request": lambda request: Query(
+            [patient_finding]
+        ),
+    }
     findings.register_findings_routes(api, **kwargs)
     examinations.register_examinations_routes(
         api, orm_models=lambda: models, api_error=api_error
