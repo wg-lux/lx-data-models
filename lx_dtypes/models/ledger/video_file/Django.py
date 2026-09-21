@@ -44,7 +44,7 @@ class VideoFileDjango(LedgerBaseModelDjango[VideoFileDataDict]):
     sensitive_meta = models.CharField(max_length=255, blank=True, null=True)
 
     # Content and storage metadata
-    video_hash = models.CharField(max_length=255)
+    raw_video_hash = models.CharField(max_length=255)
     processed_video_hash = models.CharField(max_length=255, blank=True, null=True)
     original_file_name = models.CharField(max_length=255, blank=True, null=True)
     storage_mode = models.CharField(max_length=64, blank=True, null=True)

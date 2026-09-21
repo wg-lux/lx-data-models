@@ -27,7 +27,7 @@ class VideoFile(LedgerBaseModel[VideoFileDataDict]):
     state: str | None = None
     import_meta: str | None = None
     sensitive_meta: str | None = None
-    video_hash: str
+    raw_video_hash: str
     processed_video_hash: str | None = None
     original_file_name: str | None = None
     storage_mode: str = ""
@@ -104,7 +104,7 @@ class SerializedVideoFile(LedgerBaseModel[SerializedVideoFileDataDict]):
     state: str | None = None
     import_meta: str | None = None
     sensitive_meta: str | None = None
-    video_hash: str
+    raw_video_hash: str
     processed_video_hash: str | None = None
     original_file_name: str | None = None
     storage_mode: str = ""

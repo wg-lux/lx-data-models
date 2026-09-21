@@ -9,7 +9,7 @@ def _segment_payload() -> dict[str, object]:
     return {
         "source_node_key": "site-a",
         "source_segment_id": 42,
-        "video_hash": "video-hash",
+        "raw_video_hash": "video-hash",
         "start_frame_number": 10,
         "end_frame_number_exclusive": 20,
         "label_name": "polyp",
@@ -45,3 +45,11 @@ def test_hub_transfer_segment_allows_model_only_for_exported_prediction() -> Non
     payload.update({"source_kind": "prediction"})
     segment = HubTransferVideoSegmentPayload.model_validate(payload)
     assert segment.model_name == "temporal"
+
+
+def test_hub_transfer_segment_rejects_legacy_identity_name() -> None:
+    payload = _segment_payload()
+    payload["video_hash"] = payload.pop("raw_video_hash")
+
+    with pytest.raises(ValueError, match="raw_video_hash"):
+        HubTransferVideoSegmentPayload.model_validate(payload)

@@ -23,7 +23,7 @@ type VideoProcessingHistoryStatus = Literal[
 
 
 class VideoProcessingHistorySummaryData(TypedDict):
-    video_hash: str
+    raw_video_hash: str
     operation: VideoProcessingHistoryOperation
     status: VideoProcessingHistoryStatus
     output_file: str
@@ -37,7 +37,7 @@ class VideoProcessingHistorySummaryData(TypedDict):
 class VideoProcessingHistorySummaryPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
-    video_hash: str = Field(min_length=1)
+    raw_video_hash: str = Field(min_length=1)
     operation: VideoProcessingHistoryOperation
     status: VideoProcessingHistoryStatus
     output_file: str = ""
@@ -49,7 +49,7 @@ class VideoProcessingHistorySummaryPayload(BaseModel):
 
     def to_summary_data(self) -> VideoProcessingHistorySummaryData:
         return {
-            "video_hash": self.video_hash,
+            "raw_video_hash": self.raw_video_hash,
             "operation": self.operation,
             "status": self.status,
             "output_file": self.output_file,

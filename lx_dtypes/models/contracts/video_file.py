@@ -27,7 +27,7 @@ class VideoFileIdentityPayload(BaseModel):
 
     pk: int | None = Field(default=None, ge=1)
     id: int | None = Field(default=None, ge=1)
-    video_hash: str = Field(min_length=1)
+    raw_video_hash: str = Field(min_length=1)
     original_file_name: str | None = None
 
     @field_validator("id", mode="after")

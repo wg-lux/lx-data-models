@@ -19,7 +19,7 @@ class VideoFileDataDict(LedgerBaseModelDataDict):
     state: str | None
     import_meta: str | None
     sensitive_meta: str | None
-    video_hash: str
+    raw_video_hash: str
     processed_video_hash: str | None
     original_file_name: str | None
     storage_mode: str

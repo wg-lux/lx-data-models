@@ -26,7 +26,7 @@ type HubTransferSegmentValidationState = Literal["unvalidated", "validated"]
 
 
 class HubTransferVideoFilePayloadData(TypedDict):
-    video_hash: str
+    raw_video_hash: str
     processed_video_hash: str
     suffix: str | None
     fps: float | None
@@ -61,7 +61,7 @@ class HubTransferProcessingHistoryPayloadData(TypedDict):
 
 class HubTransferFrameAnnotationPayloadData(TypedDict):
     annotation_id: int | str
-    video_hash: str
+    raw_video_hash: str
     frame_number: int
     frame_relative_path: str
     frame_timestamp: float | None
@@ -78,7 +78,7 @@ class HubTransferSegmentProvenancePayloadData(TypedDict):
 class HubTransferVideoSegmentPayloadData(TypedDict):
     source_node_key: str
     source_segment_id: int | str
-    video_hash: str
+    raw_video_hash: str
     start_frame_number: int
     end_frame_number_exclusive: int
     label_name: str
@@ -186,7 +186,7 @@ class _StrictPayload(BaseModel):
 
 
 class HubTransferVideoFilePayload(_StrictPayload):
-    video_hash: str = Field(min_length=1)
+    raw_video_hash: str = Field(min_length=1)
     processed_video_hash: str = Field(min_length=1)
     suffix: str | None = None
     fps: float | None = Field(default=None, ge=0)
@@ -221,7 +221,7 @@ class HubTransferProcessingHistoryPayload(_StrictPayload):
 
 class HubTransferFrameAnnotationPayload(_StrictPayload):
     annotation_id: int | str
-    video_hash: str = Field(min_length=1)
+    raw_video_hash: str = Field(min_length=1)
     frame_number: int = Field(ge=0)
     frame_relative_path: str = Field(min_length=1)
     frame_timestamp: float | None = Field(default=None, ge=0)
@@ -238,7 +238,7 @@ class HubTransferSegmentProvenancePayload(_StrictPayload):
 class HubTransferVideoSegmentPayload(_StrictPayload):
     source_node_key: str = Field(min_length=1)
     source_segment_id: int | str
-    video_hash: str = Field(min_length=1)
+    raw_video_hash: str = Field(min_length=1)
     start_frame_number: int = Field(ge=0)
     end_frame_number_exclusive: int = Field(ge=1)
     label_name: str = Field(min_length=1)
@@ -360,13 +360,15 @@ class HubTransferVideoTransferPayload(_HubTransferPayload):
 
     @model_validator(mode="after")
     def _validate_resource_linkage(self) -> HubTransferVideoTransferPayload:
-        if self.resource_rows.video_file.video_hash != self.resource_hash:
-            raise ValueError("video_file.video_hash must match resource_hash")
+        if self.resource_rows.video_file.raw_video_hash != self.resource_hash:
+            raise ValueError("video_file.raw_video_hash must match resource_hash")
         for segment in self.resource_rows.video_segments:
             if segment.source_node_key != self.source_node_key:
                 raise ValueError("video segment source_node_key must match transfer")
-            if segment.video_hash != self.resource_hash:
-                raise ValueError("video segment video_hash must match resource_hash")
+            if segment.raw_video_hash != self.resource_hash:
+                raise ValueError(
+                    "video segment raw_video_hash must match resource_hash"
+                )
         return self
 
 

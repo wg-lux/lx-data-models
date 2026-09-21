@@ -29,3 +29,16 @@ applications such as `endoreg-db`.
   `tests/`.
 - Test-only Django settings and pytest configuration belong to `tests/`, never
   to the distributable `lx_dtypes` package.
+
+## Raw video identity
+
+Video identity is named `raw_video_hash` across ledger models, processing history,
+exports, and hub transfer contracts. Compute it from the original input before
+processing. Reimport resolves that same identity even after anonymization,
+transcoding, or other image operations change the processed artifact.
+`processed_video_hash` verifies a particular processed artifact; it must never
+replace the raw identity or determine the resource's transfer key.
+
+This is an intentional breaking field rename from `video_hash`. Payloads must use
+`raw_video_hash`; there is no legacy alias. Upgrade producers and consumers
+together. The Django RenameField migration preserves existing identity values.

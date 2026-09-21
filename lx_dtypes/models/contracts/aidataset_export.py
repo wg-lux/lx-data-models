@@ -29,7 +29,7 @@ class AIDataSetFrameAnnotationExport(BaseModel):
     patient_video_file_uuid: str
     video_id: int
     video_uuid: str
-    video_hash: str
+    raw_video_hash: str
     original_file_name: str | None = None
     label: AIDataSetFrameLabelExport
     value: bool
