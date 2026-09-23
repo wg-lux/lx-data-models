@@ -10,6 +10,7 @@ from typing import (
     TypeVar,
     cast,
 )
+from uuid import UUID
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
@@ -55,6 +56,7 @@ class PatientFindingClassificationInput(Schema):
 class PatientFindingCreateRequest(Schema):
     patient_examination: int
     finding: int
+    instance_id: UUID | None = None
     classifications: list[PatientFindingClassificationInput] = Field(
         default_factory=list
     )
@@ -393,11 +395,12 @@ def build_p_examination_payload_from_host_ledger(
 
         patient_findings_payload.append(
             {
+                "uuid": str(patient_finding.instance_id),
                 "finding": finding_name,
                 "patient_examination": examination_name,
                 "patient_finding_classifications": [
                     {
-                        "patient_finding": str(patient_finding.id),
+                        "patient_finding": str(patient_finding.instance_id),
                         "patient_finding_classification_choices": classifications_payload,
                     }
                 ]
@@ -405,7 +408,7 @@ def build_p_examination_payload_from_host_ledger(
                 else [],
                 "patient_finding_interventions": [
                     {
-                        "patient_finding": str(patient_finding.id),
+                        "patient_finding": str(patient_finding.instance_id),
                         "patient_finding_interventions": interventions_payload,
                     }
                 ]
@@ -532,6 +535,7 @@ def _serialize_patient_finding(item: Any) -> dict[str, Any]:
     )
     return {
         "id": item.id,
+        "instance_id": str(item.instance_id),
         "patient_examination": item.patient_examination_id,
         "finding": item.finding_id,
         "is_active": item.is_active,
@@ -994,9 +998,50 @@ def register_findings_routes(
 
         try:
             with transaction.atomic():
+                patient_examination_model.objects.select_for_update().get(
+                    pk=patient_examination.pk
+                )
+                patient_finding = None
+                if payload.instance_id is not None:
+                    patient_finding = patient_finding_model.objects.filter(
+                        instance_id=payload.instance_id
+                    ).first()
+                if patient_finding is not None:
+                    if (
+                        patient_finding.patient_examination_id != patient_examination.pk
+                        or patient_finding.finding_id != finding.pk
+                        or not patient_finding.is_active
+                    ):
+                        api_error(
+                            409,
+                            "finding-identity-conflict",
+                            "Finding instance belongs to another context or is inactive.",
+                        )
+                    current_choices = sorted(
+                        patient_finding.classifications.filter(
+                            is_active=True
+                        ).values_list("classification_id", "classification_choice_id")
+                    )
+                    requested_choices = sorted(
+                        (item.classification, item.choice)
+                        for item in payload.classifications
+                    )
+                    if current_choices != requested_choices:
+                        api_error(
+                            409,
+                            "finding-identity-conflict",
+                            "Repeated create differs from the stored finding; use PATCH to update it.",
+                        )
+                    return _serialize_patient_finding(patient_finding)
+                create_fields = (
+                    {"instance_id": payload.instance_id}
+                    if payload.instance_id is not None
+                    else {}
+                )
                 patient_finding = patient_finding_model.objects.create(
                     patient_examination=patient_examination,
                     finding=finding,
+                    **create_fields,
                 )
                 if payload.classifications:
                     _replace_patient_finding_classifications(

@@ -118,6 +118,7 @@ class SegmentFrameSelectorItemData(TypedDict):
     selected_frame: SegmentFramePreviewData | None
     controls: SegmentFrameControlsData
     attached_finding: SegmentAttachedFindingData | None
+    attached_findings: NotRequired[list[SegmentAttachedFindingData]]
     selection_meta: SegmentSelectionMetaData
 
 
@@ -166,6 +167,7 @@ class PatientFindingInterventionHistoryData(TypedDict):
 
 class PatientFindingHistoryData(TypedDict):
     patient_finding_id: int
+    instance_id: NotRequired[str]
     finding_id: int | None
     finding_name: str | None
     classifications: list[PatientFindingClassificationHistoryData]
@@ -217,6 +219,7 @@ class SegmentFrameSelectorPatchData(SegmentFrameSelectorQueryData, total=False):
     frame_number: int | None
     step: int
     finding_id: int | None
+    patient_finding_id: int | None
     template_name: str | None
 
 
@@ -374,6 +377,7 @@ class SegmentFrameSelectorPatchPayload(SegmentFrameSelectorQueryPayload):
     frame_number: int | None = Field(default=None, ge=0)
     step: int = 5
     finding_id: int | None = Field(default=None, ge=1)
+    patient_finding_id: int | None = Field(default=None, ge=1, strict=True)
     template_name: str | None = None
 
     @field_validator("action", mode="before")
