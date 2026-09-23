@@ -116,6 +116,7 @@ def test_build_p_examination_payload_uses_canonical_examination_reference(
 
     class _PatientFinding:
         id = 303
+        instance_id = 1
         finding = _Finding()
         classifications = _FakeRelation([])
         interventions = _FakeRelation([])
