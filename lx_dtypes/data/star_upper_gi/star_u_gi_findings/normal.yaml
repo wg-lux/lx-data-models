@@ -1,57 +1,121 @@
 # Esophagus
 - model: finding
   name: star_upper_gi_mucosa_esophagus_abnormal
+  name_de: "Auffälligkeit der Ösophagusschleimhaut"
+  description: "Dokumentierter Normalitäts- beziehungsweise Auffälligkeitsstatus der Ösophagusmukosa."
   classifications:
     - yes_no_unknown_classification
 
 - model: finding
+  name: star_upper_gi_mucosa_esophagus_status
+  name_de: "Schleimhautstatus des Ösophagus"
+  description: "Structured normal, abnormal, or not-visualized status of the esophageal mucosa."
+  classifications:
+    - star_upper_gi_mucosal_status
+
+- model: finding
   name: star_upper_gi_location_esophagogastric_junction
+  name_de: "Lage des gastroösophagealen Übergangs"
+  description: "Endoskopisch bestimmte Distanz des gastroösophagealen Übergangs ab Zahnreihe."
   classifications:
     - distance_cm
 
 - model: finding
   name: star_upper_gi_location_hiatus
+  name_de: "Lage des Hiatus"
+  description: "Endoskopisch bestimmte Distanz des Hiatus ab Zahnreihe."
   classifications:
     - distance_cm
 
 - model: finding
   name: star_upper_gi_location_squamocolumnar_junction
+  name_de: "Lage der Z-Linie"
+  description: "Endoskopisch bestimmte Distanz der Z-Linie ab Zahnreihe."
   classifications:
     - distance_cm
 
 - model: finding
   name: star_upper_gi_imaging_modality_esophagus
+  name_de: "Bildgebungsverfahren am Ösophagus"
+  description: "Für die standardisierte Inspektion des Ösophagus eingesetzte Bildgebungsmodalität."
   classifications:
     - upper_gi_esophagus_imaging_modality_classification
 
 # Stomach
 - model: finding
   name: star_upper_gi_mucosa_stomach_abnormal
+  name_de: "Auffälligkeit der Magenschleimhaut"
+  description: "Dokumentierter Normalitäts- beziehungsweise Auffälligkeitsstatus der Magenmukosa."
   classifications:
     - yes_no_unknown_classification
 
 - model: finding
+  name: star_upper_gi_mucosa_stomach_cardia_status
+  name_de: "Schleimhautstatus der Kardia"
+  description: "Normal, abnormal, or not-visualized status of the cardia mucosa."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
+  name: star_upper_gi_mucosa_stomach_corpus_fundus_status
+  name_de: "Schleimhautstatus von Korpus und Fundus"
+  description: "Normal, abnormal, or not-visualized status of the corpus and fundus mucosa."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
+  name: star_upper_gi_mucosa_stomach_antrum_incisura_status
+  name_de: "Schleimhautstatus von Antrum und Inzisur"
+  description: "Normal, abnormal, or not-visualized status of the antrum and incisura mucosa."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
   name: star_upper_gi_chromoendoscopy_stomach
+  name_de: "Chromoendoskopie des Magens"
+  description: "Whether dye-based or virtual chromoendoscopy was used in the stomach."
   classifications:
     - yes_no_unknown_classification
 
 # Duodenum
 - model: finding
   name: star_upper_gi_mucosa_duodenum_abnormal
+  name_de: "Auffälligkeit der Duodenalschleimhaut"
+  description: "Dokumentierter Normalitäts- beziehungsweise Auffälligkeitsstatus der Duodenalmukosa."
   classifications:
     - yes_no_unknown_classification
 
 - model: finding
+  name: star_upper_gi_mucosa_duodenum_bulb_status
+  name_de: "Schleimhautstatus des Bulbus duodeni"
+  description: "Normal, abnormal, or not-visualized status of the duodenal bulb mucosa."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
+  name: star_upper_gi_mucosa_duodenum_second_portion_status
+  name_de: "Schleimhautstatus der Pars descendens duodeni"
+  description: "Normal, abnormal, or not-visualized status of the second duodenal portion."
+  classifications: [star_upper_gi_mucosal_status]
+
+- model: finding
   name: star_upper_gi_vili_duodenum_atrophic
+  name_de: "Atrophie der Duodenalzotten"
+  description: "Whether the duodenal villi appear normal or atrophic."
   classifications:
     - yes_no_unknown_classification
 
 - model: finding
   name: star_upper_gi_papilla_major_visualized
+  name_de: "Papilla major eingesehen"
   classifications:
     - yes_no_unknown_classification
 
 - model: finding
+  name: star_upper_gi_papilla_major_status
+  name_de: "Befund der Papilla major"
+  description: "Normal, suspected adenoma, or not-visualized status of the major papilla."
+  classifications:
+    - star_upper_gi_papilla_status
+
+- model: finding
   name: star_upper_gi_papilla_minor_visualized
+  name_de: "Papilla minor eingesehen"
   classifications:
     - yes_no_unknown_classification

@@ -1,0 +1,9 @@
+name: polyp_size_category
+version: 1.0.0
+medical_field: gastroenterology
+description: Illustrative binary comparator; not an historical guideline release.
+modules: []
+depends_on: []
+data:
+  files:
+  - ./data.yml

@@ -35,7 +35,7 @@ l_p_video_ddicts = Union[
 ]  # Removed RawPatientVideoFileDataDict
 # l_p_video_django_models = Union[PatientVideoFileDjango, RawPatientVideoFileDjango] # TODO
 
-__all__ = [
+__all__ = [  # noqa: RUF022 - public exports are grouped by model layer
     "PatientVideoFile",
     # "RawPatientVideoFile",
     "PatientVideoFileDataDict",

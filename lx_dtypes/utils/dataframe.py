@@ -1,4 +1,4 @@
-from typing import Any, List, cast
+from typing import Any, cast
 
 import pandas as pd
 from pandera.api.pandas.model import DataFrameModel
@@ -46,7 +46,7 @@ from lx_dtypes.stats.schemas.ledger import (
 )
 
 
-def _validate_or_empty(schema: type[DataFrameModel], records: List[Any]) -> DataFrame:  # type: ignore # TODO mypy pandera typing issue
+def _validate_or_empty(schema: type[DataFrameModel], records: list[Any]) -> DataFrame:  # type: ignore # TODO mypy pandera typing issue
     """Validate records against schema; return empty typed frame when none."""
 
     schema_obj = schema.to_schema()

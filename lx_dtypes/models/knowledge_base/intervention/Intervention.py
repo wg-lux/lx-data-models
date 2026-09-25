@@ -1,5 +1,3 @@
-from typing import List, Union
-
 from pydantic import Field
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
@@ -13,12 +11,10 @@ from lx_dtypes.names import INTERVENTION_MODEL_LIST_TYPE_FIELDS
 
 
 class Intervention(KnowledgebaseBaseModel[InterventionDataDict]):
-    intervention_types: Union[str, List[str]] = Field(
-        default_factory=list_of_str_factory
-    )
+    intervention_types: str | list[str] = Field(default_factory=list_of_str_factory)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Provide the list of field names that represent list-typed fields for this model.
 

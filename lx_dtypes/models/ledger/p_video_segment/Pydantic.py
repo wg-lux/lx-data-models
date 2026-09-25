@@ -47,9 +47,10 @@ class PVideoSegment(LedgerBaseModel[PVideoSegmentDataDict]):
     @property
     def state(self) -> "PVideoSegmentState":
         state = self.patient_video_segment_state
-        assert state is not None, (
-            "patient_video_segment_state should never be None due to validator"
-        )
+        if state is None:
+            raise ValueError(
+                "patient_video_segment_state should never be None due to validator"
+            )
         return state
 
     # ensure each segment always has a valid state referencing its UUID

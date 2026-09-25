@@ -1,0 +1,105 @@
+- model: classification
+  name: "star_upper_gi_location_esophagus_distance_z_line"
+  description: |
+    Classification of distance from Z-line in the esophagus during upper GI endoscopy.
+    Distances proximal to the Z-line are negative, distances distal to the Z-line are positive.
+  classification_choices:
+    - distance_cm
+
+- model: classification
+  name: "upper_gi_esophagus_imaging_modality_classification"
+  description: "Classification of imaging modalities used for esophagus during upper GI endoscopy."
+  classification_choices:
+    - star_upper_gi_imaging_modality_white_light
+    - star_upper_gi_imaging_modality_narrow_band_imaging
+    - star_upper_gi_imaging_modality_chromoendoscopy
+    - star_upper_gi_imaging_modality_acidic_staining
+
+- model: classification
+  name: star_upper_gi_barrett_praque_classification
+  description: "Classification of Barrett's esophagus praque types observed during upper GI endoscopy."
+  classification_choices:
+    - star_upper_gi_barrett_praque_c_value
+    - star_upper_gi_barrett_praque_m_value
+
+- model: classification
+  name: star_upper_gi_esophagus_varices_baveno
+  description: "Classification of esophageal varices according to Baveno criteria."
+  classification_choices:
+    - star_upper_gi_esophagus_varices_baveno_none
+    - star_upper_gi_esophagus_varices_baveno_small
+    - star_upper_gi_esophagus_varices_baveno_large
+
+- model: classification
+  name: star_upper_gi_los_angeles_classification
+  description: "Los Angeles classification of esophagitis severity observed during upper GI endoscopy."
+  classification_choices:
+    - star_upper_gi_los_angeles_classification_a
+    - star_upper_gi_los_angeles_classification_b
+    - star_upper_gi_los_angeles_classification_c
+    - star_upper_gi_los_angeles_classification_d
+
+# star_upper_gi_erefs_edema
+- model: classification
+  name: star_upper_gi_erefs_edema
+  description: "Classification of edema in eosinophilic esophagitis according to EREFS criteria."
+  classification_choices:
+    - star_upper_gi_erefs_edema_none
+    - star_upper_gi_erefs_edema_present
+
+# star_upper_gi_erefs_rings
+- model: classification
+  name: star_upper_gi_erefs_rings
+  description: "Classification of rings in eosinophilic esophagitis according to EREFS criteria."
+  classification_choices:
+    - star_upper_gi_erefs_rings_none
+    - star_upper_gi_erefs_rings_mild
+    - star_upper_gi_erefs_rings_moderate
+    - star_upper_gi_erefs_rings_severe
+
+# star_upper_gi_erefs_exudates
+- model: classification
+  name: star_upper_gi_erefs_exudates
+  description: "Classification of exudates in eosinophilic esophagitis according to EREFS criteria."
+  classification_choices:
+    - star_upper_gi_erefs_exudates_none
+    - star_upper_gi_erefs_exudates_mild
+    - star_upper_gi_erefs_exudates_severe
+
+- model: classification
+  name: star_upper_gi_erefs_furrows
+  description: "Classification of furrows in eosinophilic esophagitis according to EREFS criteria."
+  classification_choices:
+    - star_upper_gi_erefs_furrows_none
+    - star_upper_gi_erefs_furrows_present
+
+- model: classification
+  name: star_upper_gi_erefs_strictures
+  description: "Classification of strictures in eosinophilic esophagitis according to EREFS criteria."
+  classification_choices:
+    - star_upper_gi_erefs_strictures_none
+    - star_upper_gi_erefs_strictures_present
+
+  # star_upper_gi_zargar
+- model: classification
+  name: star_upper_gi_zargar
+  description: "Zargar classification of caustic esophagitis severity observed during upper GI endoscopy."
+  classification_choices:
+    - star_upper_gi_zargar_grade_0
+    - star_upper_gi_zargar_grade_1
+    - star_upper_gi_zargar_grade_2a
+    - star_upper_gi_zargar_grade_2b
+    - star_upper_gi_zargar_grade_3a
+    - star_upper_gi_zargar_grade_3b
+    - star_upper_gi_zargar_grade_4
+
+# star_upper_gi_stomach_varices_sarin
+- model: classification
+  name: star_upper_gi_stomach_varices_sarin
+  description: "Classification of stomach varices according to Sarin criteria."
+  classification_choices:
+    - star_upper_gi_stomach_varices_sarin_none
+    - star_upper_gi_stomach_varices_sarin_gov1
+    - star_upper_gi_stomach_varices_sarin_gov2
+    - star_upper_gi_stomach_varices_sarin_igv1
+    - star_upper_gi_stomach_varices_sarin_igv2

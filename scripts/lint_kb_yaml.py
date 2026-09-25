@@ -15,4 +15,3 @@ from lx_dtypes.scripts.lint_kb_yaml import main  # noqa: E402
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
@@ -22,12 +20,12 @@ from .DataDict import (
 class PFindingInterventions(LedgerBaseModel[PFindingInterventionsDataDict]):
     patient_finding: str
 
-    patient_finding_interventions: List[PFindingIntervention] = Field(
+    patient_finding_interventions: list[PFindingIntervention] = Field(
         default_factory=list
     )
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return P_INTERVENTIONS_MODEL_LIST_TYPE_FIELDS
 
     @property
@@ -35,7 +33,7 @@ class PFindingInterventions(LedgerBaseModel[PFindingInterventionsDataDict]):
         return PFindingInterventionsDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return P_INTERVENTIONS_MODEL_NESTED_FIELDS
 
     @property
@@ -54,7 +52,7 @@ class SerializedPFindingInterventions(
     patient_finding_interventions: str = ""
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return P_INTERVENTIONS_MODEL_LIST_TYPE_FIELDS
 
     @property
@@ -62,5 +60,5 @@ class SerializedPFindingInterventions(
         return SerializedPFindingInterventionsDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return []

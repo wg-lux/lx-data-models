@@ -1,8 +1,8 @@
-from typing import List, Optional, TypedDict
+from typing import TypedDict
 
 
 class FilesAndDirsDataDict(TypedDict):
-    file: Optional[str]
-    dir: Optional[str]
-    files: List[str]
-    dirs: List[str]
+    file: str | None
+    dir: str | None
+    files: list[str]
+    dirs: list[str]

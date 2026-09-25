@@ -1,0 +1,10 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+name: mst_3_0
+description: "Minimal Standard Terminology for Gastrointestinal Endoscopy, version 3.0."
+version: 3.0.0
+medical_field: gastroenterology
+modules: []
+depends_on: []
+data:
+  dirs:
+    - ./data

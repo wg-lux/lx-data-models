@@ -1,5 +1,6 @@
 - model: classification #TODO Redundant with other file here?
   name: "endoscopy_hardware_endoscope_processor_model"
+  name_de: "Endoskop- und Prozessormodell"
   description: "Classification of different endoscopy processor models."
   classification_choices:
     - storz_image_1s
@@ -7,3 +8,10 @@
     - olympus_cv_180
     - olympus_cv_190
     - pentax_epk_i7000
+
+- model: classification
+  name: "endoscopy_hardware_serial_number"
+  name_de: "Seriennummer des verwendeten Endoskops"
+  name_en: "Serial number of the endoscope used"
+  classification_choices:
+    - endoscopy_hardware_serial_number_recorded

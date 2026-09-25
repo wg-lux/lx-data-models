@@ -6,3 +6,4 @@ modules: []
 data: { files: [], dirs: ["./data"] }
 depends_on:
   - lx_utils
+  - lx_units

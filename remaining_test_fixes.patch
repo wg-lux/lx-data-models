@@ -1,0 +1,881 @@
+diff --git a/lx_dtypes/models/knowledge_base/fhir.py b/lx_dtypes/models/knowledge_base/fhir.py
+index c3c8ce7..133301c 100644
+--- a/lx_dtypes/models/knowledge_base/fhir.py
++++ b/lx_dtypes/models/knowledge_base/fhir.py
+@@ -505,7 +505,9 @@ def _contains_phrase(text: str, phrase: str) -> bool:
+ def _iter_fhir_concepts(concepts: object) -> Iterator[Mapping[str, Any]]:
+     """Reject malformed external concept data with a consistent ValueError."""
+     if not isinstance(concepts, list):
+-        raise TypeError("FHIR CodeSystem.concept must be an array")
++        raise ValueError(  # noqa: TRY004 - external data validation contract
++            "FHIR CodeSystem.concept must be an array"
++        )
+     pending: list[Iterator[object]] = [iter(concepts)]
+     seen: set[int] = set()
+     codes: set[str] = set()
+@@ -516,7 +518,9 @@ def _iter_fhir_concepts(concepts: object) -> Iterator[Mapping[str, Any]]:
+             pending.pop()
+             continue
+         if not isinstance(concept, Mapping):
+-            raise TypeError("FHIR CodeSystem concepts must be objects")
++            raise ValueError(  # noqa: TRY004 - external data validation contract
++                "FHIR CodeSystem concepts must be objects"
++            )
+         if id(concept) in seen:
+             raise ValueError("FHIR CodeSystem concept graph contains repeated objects")
+         seen.add(id(concept))
+@@ -528,7 +532,9 @@ def _iter_fhir_concepts(concepts: object) -> Iterator[Mapping[str, Any]]:
+         codes.add(code)
+         children = concept.get("concept", [])
+         if not isinstance(children, list):
+-            raise TypeError("FHIR CodeSystem.concept must be an array")
++            raise ValueError(  # noqa: TRY004 - external data validation contract
++                "FHIR CodeSystem.concept must be an array"
++            )
+         yield concept
+         pending.append(iter(children))
+ 
+diff --git a/tests/django_settings.py b/tests/django_settings.py
+index f3e72c5..05c3549 100644
+--- a/tests/django_settings.py
++++ b/tests/django_settings.py
+@@ -70,7 +70,8 @@ ROOT_URLCONF = "lx_dtypes.django.urls"
+ # API tests exercise the same explicit, versioned registry contract as a
+ # deployment. They do not use checkout-relative or process-local KB overrides.
+ _test_registry_dir = Path(tempfile.mkdtemp(prefix="lx_dtypes_test_registry_"))
+-_test_registry_path = _test_registry_dir / "registry.json"
++TERMINOLOGY_ROOT = _test_registry_dir
++_test_registry_path = TERMINOLOGY_ROOT / "registry.json"
+ _test_registry_path.write_text(
+     json.dumps(
+         {
+diff --git a/tests/unit/lx_dtypes/django/api/conftest.py b/tests/unit/lx_dtypes/django/api/conftest.py
+new file mode 100644
+index 0000000..a87f9f1
+--- /dev/null
++++ b/tests/unit/lx_dtypes/django/api/conftest.py
+@@ -0,0 +1,34 @@
++"""Isolated storage for API tests that exercise the central terminology resolver."""
++from __future__ import annotations
++
++from collections.abc import Iterator
++from pathlib import Path
++
++import pytest
++from pytest_django.fixtures import SettingsWrapper
++
++from lx_dtypes.terminology import terminology_loader as central
++from lx_dtypes.terminology.lookup_tracker import consume_runtime_lookup_trackers
++
++
++@pytest.fixture
++def terminology_root(tmp_path: Path, settings: SettingsWrapper) -> Iterator[Path]:
++    """Configure a fresh root; each test supplies the registry/artifacts it needs.
++
++    This does not rebind services already captured by route registration. Tests
++    using terminology write routes must register a fresh API with this service.
++    """
++    from lx_dtypes.django.api import main as api_main
++
++    root = tmp_path / "terminology"
++    root.mkdir()
++    settings.TERMINOLOGY_ROOT = root
++    central.get_terminology_service.cache_clear()
++    api_main._clear_kb_caches()
++    consume_runtime_lookup_trackers()
++    try:
++        yield root
++    finally:
++        consume_runtime_lookup_trackers()
++        api_main._clear_kb_caches()
++        central.get_terminology_service.cache_clear()
+diff --git a/tests/unit/lx_dtypes/django/api/test_editor_publish_graph_integration.py b/tests/unit/lx_dtypes/django/api/test_editor_publish_graph_integration.py
+index 3106831..6a61fd9 100644
+--- a/tests/unit/lx_dtypes/django/api/test_editor_publish_graph_integration.py
++++ b/tests/unit/lx_dtypes/django/api/test_editor_publish_graph_integration.py
+@@ -2,29 +2,69 @@
+ 
+ from __future__ import annotations
+ 
++import sys
+ import zipfile
+ from collections.abc import Iterator
+ from io import BytesIO
+ from pathlib import Path
++from types import ModuleType
++from uuid import uuid4
+ 
+ import pytest
+ from django.core.files.uploadedfile import SimpleUploadedFile
+ from django.test import Client
++from django.urls import clear_url_caches, path
++from ninja import NinjaAPI
++from pytest_django.fixtures import SettingsWrapper
+ 
+-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+-    clear_knowledge_base_resolver_caches,
++from lx_dtypes.django.api.knowledge_base_graph_routes import (
++    KnowledgeBaseGraphRouteCache,
++    register_knowledge_base_graph_routes,
+ )
++from lx_dtypes.django.api.terminology_routes import register_terminology_routes
++from lx_dtypes.terminology import terminology_loader as central
+ 
+ 
+-@pytest.fixture(autouse=True)
+-def _isolate_knowledge_base_registry(
++@pytest.fixture
++def editor_client(
++    terminology_root: Path,
+     monkeypatch: pytest.MonkeyPatch,
+-) -> Iterator[None]:
+-    monkeypatch.delenv("LX_DTYPES_KB_REGISTRY", raising=False)
+-    monkeypatch.delenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", raising=False)
+-    clear_knowledge_base_resolver_caches()
+-    yield
+-    clear_knowledge_base_resolver_caches()
++    settings: SettingsWrapper,
++) -> Iterator[Client]:
++    """Register writes and graph reads against one isolated central service."""
++    service = central.get_terminology_service()
++    assert service.registry_path == terminology_root / "registry.json"
++    graph_cache = KnowledgeBaseGraphRouteCache()
++    api = NinjaAPI(
++        urls_namespace=f"editor-integration-{uuid4().hex}",
++        docs_url=None,
++        openapi_url=None,
++    )
++    register_terminology_routes(
++        api,
++        service=service,
++        clear_kb_caches=graph_cache.clear,
++        authenticate_request_user=lambda request: request.headers.get("X-Test-Actor"),
++        terminology_write_access_allowed=lambda actor: actor == "editor",
++    )
++    register_knowledge_base_graph_routes(
++        api,
++        graph_cache=graph_cache,
++        load_module_kb=central.load_module_kb,
++    )
++    module_name = f"_editor_integration_urls_{uuid4().hex}"
++    urlconf = ModuleType(module_name)
++    setattr(urlconf, "urlpatterns", [path("base_api/", api.urls)])
++    monkeypatch.setitem(sys.modules, module_name, urlconf)
++    settings.ROOT_URLCONF = module_name
++    settings.ALLOWED_HOSTS = ["testserver"]
++    settings.MIDDLEWARE = []
++    clear_url_caches()
++    try:
++        yield Client()
++    finally:
++        clear_url_caches()
++        graph_cache.clear()
+ 
+ 
+ def _editor_graph_bundle_zip() -> bytes:
+@@ -104,15 +144,10 @@ def _editor_graph_bundle_zip() -> bytes:
+ 
+ 
+ def test_editor_zip_import_is_immediately_available_through_graph_api(
+-    monkeypatch: pytest.MonkeyPatch,
+-    tmp_path: Path,
++    editor_client: Client,
++    terminology_root: Path,
+ ) -> None:
+-    registry_path = tmp_path / "kb_registry.json"
+-    import_root = tmp_path / "terminology-packages"
+-    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+-    monkeypatch.setenv("LX_DTYPES_TERMINOLOGY_IMPORT_ROOT", str(import_root))
+-
+-    client = Client()
++    client = editor_client
+     import_response = client.post(
+         "/base_api/terminology/bundles/import",
+         data={
+@@ -123,9 +158,12 @@ def test_editor_zip_import_is_immediately_available_through_graph_api(
+             )
+         },
+         secure=True,
++        headers={"X-Test-Actor": "editor"},
+     )
+ 
+-    assert import_response.status_code == 200
++    assert import_response.status_code == 200, import_response.content.decode()
++    assert (terminology_root / "registry.json").is_file()
++    assert central.get_terminology_service().active_identity() is None
+     assert import_response.json()["imported"] == {
+         "module_name": "editor_graph_bundle",
+         "version": "1.2.3",
+@@ -172,3 +210,25 @@ def test_editor_zip_import_is_immediately_available_through_graph_api(
+     assert [item["name"] for item in context["concepts"]["finding"]] == [
+         "editor_finding"
+     ]
++
++
++def test_editor_zip_import_requires_an_authorized_actor(
++    editor_client: Client,
++    terminology_root: Path,
++) -> None:
++    for headers, expected_status in (({}, 401), ({"X-Test-Actor": "reader"}, 403)):
++        response = editor_client.post(
++            "/base_api/terminology/bundles/import",
++            data={
++                "file": SimpleUploadedFile(
++                    "editor_graph_bundle.zip",
++                    _editor_graph_bundle_zip(),
++                    content_type="application/zip",
++                )
++            },
++            secure=True,
++            headers=headers,
++        )
++        assert response.status_code == expected_status
++    assert not (terminology_root / "registry.json").exists()
++    assert not (terminology_root / "terminology-packages").exists()
+diff --git a/tests/unit/lx_dtypes/django/api/test_findings_resolution_helpers.py b/tests/unit/lx_dtypes/django/api/test_findings_resolution_helpers.py
+index 67896b1..ea26c8d 100644
+--- a/tests/unit/lx_dtypes/django/api/test_findings_resolution_helpers.py
++++ b/tests/unit/lx_dtypes/django/api/test_findings_resolution_helpers.py
+@@ -55,6 +55,24 @@ def _lookup(
+     }
+ 
+ 
++def _patch_lookups(
++    monkeypatch: pytest.MonkeyPatch,
++    lookup: dict[str, dict[str, dict[str, Any]]],
++) -> None:
++    monkeypatch.setattr(findings_routes, "_kb_lookup", lambda *args, **kwargs: lookup)
++    # Indications load through the central loader rather than findings' cache.
++    core = {
++        "examination": [
++            {"name": name, **record} for name, record in lookup["examination"].items()
++        ],
++    }
++    monkeypatch.setattr(
++        indications_routes,
++        "load_module_kb",
++        lambda *args, **kwargs: SimpleNamespace(export_core_concepts=lambda: core),
++    )
++
++
+ @pytest.mark.parametrize(
+     "resolver, record",
+     [
+@@ -85,9 +103,7 @@ def test_resolution_helpers_fail_closed_when_concept_is_missing(
+     resolver: Any,
+     record: SimpleNamespace,
+ ) -> None:
+-    monkeypatch.setattr(
+-        findings_routes, "_kb_lookup", lambda *args, **kwargs: _lookup()
+-    )
++    _patch_lookups(monkeypatch, _lookup())
+ 
+     assert resolver(record, module_name="incompatible_module", version="1.0.0") == set()
+ 
+@@ -130,11 +146,7 @@ def test_resolution_helpers_fail_closed_for_malformed_relation_collections(
+     record_name: str,
+     lookup: dict[str, dict[str, dict[str, Any]]],
+ ) -> None:
+-    monkeypatch.setattr(
+-        findings_routes,
+-        "_kb_lookup",
+-        lambda *args, **kwargs: lookup,
+-    )
++    _patch_lookups(monkeypatch, lookup)
+ 
+     assert (
+         resolver(
+@@ -149,10 +161,9 @@ def test_resolution_helpers_fail_closed_for_malformed_relation_collections(
+ def test_resolution_helpers_preserve_explicit_empty_and_populated_allowlists(
+     monkeypatch: pytest.MonkeyPatch,
+ ) -> None:
+-    monkeypatch.setattr(
+-        findings_routes,
+-        "_kb_lookup",
+-        lambda *args, **kwargs: _lookup(
++    _patch_lookups(
++        monkeypatch,
++        _lookup(
+             examinations={
+                 "colonoscopy": {
+                     "findings": ["colon-polyp"],
+@@ -276,3 +287,47 @@ def test_explicit_catalog_identity_accepts_matching_patient_examination() -> Non
+         patient_examination_id=17,
+         api_error=_api_error,
+     ) == ("dgvs_reporting", "0.1.0")
++
++
++def test_indication_lookup_passes_exact_identity_to_central_loader(
++    monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    captured: list[tuple[str, str | None]] = []
++
++    def load(module_name: str, *, version: str | None = None) -> Any:
++        captured.append((module_name, version))
++        return SimpleNamespace(
++            export_core_concepts=lambda: {
++                "examination": [{"name": "colonoscopy", "indications": ["screening"]}],
++            }
++        )
++
++    monkeypatch.setattr(indications_routes, "load_module_kb", load)
++    assert indications_routes._resolve_exam_kb_indication_names(
++        SimpleNamespace(name="colonoscopy"),
++        module_name="historical",
++        version="1.0.0",
++    ) == {"screening"}
++    assert captured == [("historical", "1.0.0")]
++
++
++def test_indication_helpers_reuse_supplied_empty_lookup(
++    monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    def unexpected_load(*args: object, **kwargs: object) -> NoReturn:
++        pytest.fail("A supplied lookup must not trigger another KB load")
++
++    monkeypatch.setattr(indications_routes, "load_module_kb", unexpected_load)
++    for resolver in (
++        indications_routes._resolve_kb_finding_names,
++        indications_routes._resolve_exam_kb_indication_names,
++    ):
++        assert (
++            resolver(
++                SimpleNamespace(name="colonoscopy"),
++                module_name="historical",
++                version="1.0.0",
++                lookup={},
++            )
++            == set()
++        )
+diff --git a/tests/unit/lx_dtypes/django/api/test_knowledge_base_graph_api.py b/tests/unit/lx_dtypes/django/api/test_knowledge_base_graph_api.py
+index ca586fc..198cc06 100644
+--- a/tests/unit/lx_dtypes/django/api/test_knowledge_base_graph_api.py
++++ b/tests/unit/lx_dtypes/django/api/test_knowledge_base_graph_api.py
+@@ -8,7 +8,6 @@ from typing import Any
+ from uuid import uuid4
+ 
+ import pytest
+-from django.conf import settings
+ from django.test import Client
+ from pydantic import ValidationError
+ 
+@@ -28,9 +27,6 @@ from lx_dtypes.models.contracts.knowledge_base_graph import (
+     build_knowledge_base_graph_snapshot,
+ )
+ from lx_dtypes.models.interface.DataLoader import DataLoader
+-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+-    clear_knowledge_base_resolver_caches,
+-)
+ 
+ 
+ @pytest.fixture(autouse=True)
+@@ -381,11 +377,10 @@ def test_packaged_reporting_bundle_builds_versioned_graph_snapshot(
+ 
+ 
+ def test_packaged_provider_registry_serves_full_dgvs_reporting_context(
+-    monkeypatch: pytest.MonkeyPatch,
+-    tmp_path: Path,
++    terminology_root: Path,
+ ) -> None:
+     descriptor = get_packaged_knowledge_base("dgvs_reporting", "0.1.0")
+-    registry_path = tmp_path / "registry.json"
++    registry_path = terminology_root / "registry.json"
+     registry_path.write_text(
+         json.dumps(
+             {
+@@ -406,21 +401,11 @@ def test_packaged_provider_registry_serves_full_dgvs_reporting_context(
+         ),
+         encoding="utf-8",
+     )
+-    monkeypatch.setattr(
+-        settings,
+-        "LX_DTYPES_KB_REGISTRY",
+-        str(registry_path),
+-        raising=False,
++    response = Client().get(
++        "/base_api/knowledge-bases/dgvs_reporting/0.1.0/examinations/"
++        "colonoscopy/reporting-context",
++        secure=True,
+     )
+-    clear_knowledge_base_resolver_caches()
+-    try:
+-        response = Client().get(
+-            "/base_api/knowledge-bases/dgvs_reporting/0.1.0/examinations/"
+-            "colonoscopy/reporting-context",
+-            secure=True,
+-        )
+-    finally:
+-        clear_knowledge_base_resolver_caches()
+ 
+     assert response.status_code == 200, response.content.decode()
+     payload = response.json()
+@@ -474,7 +459,7 @@ def test_graph_and_reporting_context_endpoints_use_exact_identity(
+         captured.append((module_name, version))
+         return _GraphKb()
+ 
+-    monkeypatch.setattr(api_main, "load_knowledge_base", load)
++    monkeypatch.setattr(api_main, "resolve_module_kb", load)
+     client = Client()
+ 
+     graph_response = client.get(
+@@ -506,7 +491,7 @@ def test_reporting_context_endpoint_rejects_unknown_examination(
+ ) -> None:
+     monkeypatch.setattr(
+         api_main,
+-        "load_knowledge_base",
++        "resolve_module_kb",
+         lambda *args, **kwargs: _GraphKb(),
+     )
+ 
+@@ -530,7 +515,7 @@ def test_graph_api_does_not_echo_invalid_concept_content(
+             return payload
+ 
+     monkeypatch.setattr(
+-        api_main, "load_knowledge_base", lambda *args, **kwargs: InvalidGraphKb()
++        api_main, "resolve_module_kb", lambda *args, **kwargs: InvalidGraphKb()
+     )
+     response = Client().get(
+         "/base_api/knowledge-bases/demo_graph/1.2.3/graph", secure=True
+diff --git a/tests/unit/lx_dtypes/django/api/test_report_template_builder_helpers.py b/tests/unit/lx_dtypes/django/api/test_report_template_builder_helpers.py
+index 3ef02ad..0b228a4 100644
+--- a/tests/unit/lx_dtypes/django/api/test_report_template_builder_helpers.py
++++ b/tests/unit/lx_dtypes/django/api/test_report_template_builder_helpers.py
+@@ -1,5 +1,6 @@
+ from __future__ import annotations
+ 
++import json
+ from pathlib import Path
+ 
+ import pytest
+@@ -32,9 +33,9 @@ def test_module_dir_validates_unknown_module_and_resolves_existing(
+     module_path = tmp_path / "demo_module"
+     module_path.mkdir()
+ 
+-    assert module_dir("demo module", modules_root=tmp_path) == module_path.resolve()
++    assert module_dir("demo_module", modules_root=tmp_path) == module_path.resolve()
+ 
+-    with pytest.raises(ValueError, match="Unknown report-template module"):
++    with pytest.raises(ValueError, match="Unknown or unsafe report-template module"):
+         module_dir("missing", modules_root=tmp_path)
+ 
+ 
+@@ -152,11 +153,33 @@ def test_build_yaml_records_adds_default_patient_fields_and_condition_validator(
+ 
+ def test_save_report_template_definition_rejects_duplicate_output_file(
+     tmp_path: Path,
++    terminology_root: Path,
+ ) -> None:
+     module_path = tmp_path / "demo_module"
+     module_path.mkdir()
+     (module_path / "config.yaml").write_text(
+-        yaml.safe_dump({"name": "demo_module", "data": {"dirs": []}}, sort_keys=False),
++        yaml.safe_dump(
++            {
++                "name": "demo_module",
++                "version": "1.0.0",
++                "modules": [],
++                "depends_on": [],
++                "data": {"dirs": []},
++            },
++            sort_keys=False,
++        ),
++        encoding="utf-8",
++    )
++    (terminology_root / "registry.json").write_text(
++        json.dumps(
++            {
++                "modules": {
++                    "demo_module": {
++                        "1.0.0": {"input_dirs": [str(tmp_path)]},
++                    }
++                }
++            }
++        ),
+         encoding="utf-8",
+     )
+     generated_dir = module_path / GENERATED_DIR_NAME
+@@ -181,3 +204,9 @@ def test_save_report_template_definition_rejects_duplicate_output_file(
+         save_report_template_definition(
+             payload, resolved_version="1.0.0", modules_root=tmp_path
+         )
++
++
++def test_module_dir_does_not_alias_names_by_slugifying(tmp_path: Path) -> None:
++    (tmp_path / "demo_module").mkdir()
++    with pytest.raises(ValueError, match="Unknown or unsafe report-template module"):
++        module_dir("demo module", modules_root=tmp_path)
+diff --git a/tests/unit/lx_dtypes/django/api/test_report_template_builder_lifecycle_api.py b/tests/unit/lx_dtypes/django/api/test_report_template_builder_lifecycle_api.py
+index 8f6e451..df9d373 100644
+--- a/tests/unit/lx_dtypes/django/api/test_report_template_builder_lifecycle_api.py
++++ b/tests/unit/lx_dtypes/django/api/test_report_template_builder_lifecycle_api.py
+@@ -9,11 +9,7 @@ from django.test import Client
+ from pytest import MonkeyPatch
+ 
+ from lx_dtypes.django.api import main as api_main
+-from lx_dtypes.django.api import report_template_builder
+-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+-    clear_knowledge_base_resolver_caches,
+-    load_knowledge_base,
+-)
++from lx_dtypes.terminology import terminology_loader as central
+ 
+ 
+ @pytest.fixture(autouse=True)
+@@ -32,9 +28,9 @@ def builder_route_authorization(monkeypatch: MonkeyPatch) -> None:
+ @pytest.fixture
+ def builder_terminology_registry(
+     tmp_path: Path,
+-    monkeypatch: MonkeyPatch,
++    terminology_root: Path,
+ ) -> Iterator[None]:
+-    registry_path = tmp_path / "kb_registry.json"
++    registry_path = terminology_root / "registry.json"
+     registry_path.write_text(
+         json.dumps(
+             {
+@@ -51,15 +47,11 @@ def builder_terminology_registry(
+         ),
+         encoding="utf-8",
+     )
+-    monkeypatch.setenv("LX_DTYPES_KB_REGISTRY", str(registry_path))
+-    clear_knowledge_base_resolver_caches()
+     yield
+-    clear_knowledge_base_resolver_caches()
+ 
+ 
+ def test_builder_save_publish_and_unpublish_flow(
+     tmp_path: Path,
+-    monkeypatch: MonkeyPatch,
+     builder_terminology_registry: None,
+ ) -> None:
+     del builder_terminology_registry
+@@ -93,8 +85,6 @@ def test_builder_save_publish_and_unpublish_flow(
+         encoding="utf-8",
+     )
+ 
+-    monkeypatch.setattr(report_template_builder, "MODULES_ROOT", tmp_path)
+-
+     client = Client()
+     save_response = client.post(
+         "/base_api/report-templates/builder/templates",
+@@ -183,8 +173,11 @@ def test_builder_save_publish_and_unpublish_flow(
+ 
+ 
+ def test_builder_module_kb_loader_uses_resolved_version(
+-    tmp_path: Path, monkeypatch: MonkeyPatch
++    tmp_path: Path,
++    monkeypatch: MonkeyPatch,
++    builder_terminology_registry: None,
+ ) -> None:
++    del builder_terminology_registry
+     module_dir = tmp_path / "builder_module"
+     module_dir.mkdir(parents=True)
+     (module_dir / "config.yaml").write_text(
+@@ -217,18 +210,6 @@ def test_builder_module_kb_loader_uses_resolved_version(
+ 
+     captured: dict[str, str | None] = {}
+ 
+-    monkeypatch.setattr(
+-        api_main,
+-        "_resolve_report_template_module_location",
+-        lambda module_name, version: (
+-            report_template_builder.ReportTemplateModuleLocation(
+-                module_name=module_name,
+-                version=version,
+-                modules_root=tmp_path,
+-            )
+-        ),
+-    )
+-
+     def _fake_load_knowledge_base(
+         module_name: str,
+         *,
+@@ -238,11 +219,11 @@ def test_builder_module_kb_loader_uses_resolved_version(
+         del input_dirs
+         captured["module_name"] = module_name
+         captured["version"] = version
+-        return load_knowledge_base(module_name, version=version, input_dirs=[tmp_path])
++        return central.load_module_kb(module_name, version=version)
+ 
+     monkeypatch.setattr(
+         api_main,
+-        "_load_module_kb",
++        "resolve_module_kb",
+         _fake_load_knowledge_base,
+     )
+ 
+diff --git a/tests/unit/lx_dtypes/django/api/test_report_template_routes_extra.py b/tests/unit/lx_dtypes/django/api/test_report_template_routes_extra.py
+index 74f79f8..111c5cf 100644
+--- a/tests/unit/lx_dtypes/django/api/test_report_template_routes_extra.py
++++ b/tests/unit/lx_dtypes/django/api/test_report_template_routes_extra.py
+@@ -10,11 +10,12 @@ from typing import Any
+ 
+ import pytest
+ from django.test import Client
+-from ninja.errors import HttpError
+ 
+ from lx_dtypes.django.api import main as api_main
+ from lx_dtypes.django.api import report_template_builder, report_template_routes
+ from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
++from lx_dtypes.terminology import terminology_loader as central
++from lx_dtypes.terminology.terminology_service import TerminologyError
+ 
+ resolve_report_template_module_location = (
+     api_main._resolve_report_template_module_location
+@@ -95,8 +96,38 @@ def client() -> Client:
+ 
+ 
+ @pytest.fixture(autouse=True)
+-def builder_route_authorization(monkeypatch: pytest.MonkeyPatch) -> None:
+-    """Allow existing route behavior tests to reach their intended assertions."""
++def builder_route_authorization(
++    monkeypatch: pytest.MonkeyPatch,
++    terminology_root: Path,
++    tmp_path: Path,
++) -> None:
++    """Allow writes and register a real mutable source for path resolution."""
++    module_path = tmp_path / "modules" / "report_template_examples"
++    module_path.mkdir(parents=True)
++    (module_path / "config.yaml").write_text(
++        json.dumps(
++            {
++                "name": "report_template_examples",
++                "version": "0.1.0",
++                "modules": [],
++                "depends_on": [],
++                "data": {"files": []},
++            }
++        ),
++        encoding="utf-8",
++    )
++    (terminology_root / "registry.json").write_text(
++        json.dumps(
++            {
++                "modules": {
++                    "report_template_examples": {
++                        "0.1.0": {"input_dirs": [str(module_path.parent)]},
++                    }
++                }
++            }
++        ),
++        encoding="utf-8",
++    )
+     monkeypatch.setattr(
+         api_main, "_authenticate_request_user", lambda request: object()
+     )
+@@ -105,17 +136,6 @@ def builder_route_authorization(monkeypatch: pytest.MonkeyPatch) -> None:
+         "_report_template_access_allowed",
+         lambda actor, capability: True,
+     )
+-    monkeypatch.setattr(
+-        api_main,
+-        "_resolve_report_template_module_location",
+-        lambda module_name, version: (
+-            report_template_builder.ReportTemplateModuleLocation(
+-                module_name=module_name,
+-                version=version,
+-                modules_root=report_template_builder.module_dir,
+-            )
+-        ),
+-    )
+ 
+ 
+ def test_builder_routes_fail_closed_and_separate_read_from_write(
+@@ -159,7 +179,9 @@ def test_builder_routes_fail_closed_and_separate_read_from_write(
+         secure=True,
+         headers={"X-Test-Actor": "reader"},
+     )
+-    assert reader_read.status_code == 409
++    assert reader_read.status_code == 404
++    assert reader_read.json()["code"] == "terminology-error"
++    assert "example@1.0.0" in reader_read.json()["message"]
+ 
+     writer_write = client.post(
+         "/base_api/report-templates/builder/templates",
+@@ -177,10 +199,14 @@ def test_builder_routes_fail_closed_and_separate_read_from_write(
+         secure=True,
+         headers={"X-Test-Actor": "writer"},
+     )
+-    assert writer_write.status_code == 400
++    assert writer_write.status_code == 404
++    assert writer_write.json()["code"] == "terminology-error"
++    assert "missing_module@1.0.0" in writer_write.json()["message"]
+ 
+ 
+-def test_save_report_template_returns_400_for_unknown_module(client: Client) -> None:
++def test_save_report_template_returns_404_for_unregistered_module(
++    client: Client,
++) -> None:
+     response = client.post(
+         "/base_api/report-templates/builder/templates",
+         data=json.dumps(
+@@ -197,12 +223,17 @@ def test_save_report_template_returns_400_for_unknown_module(client: Client) ->
+         secure=True,
+     )
+ 
+-    assert response.status_code == 400
+-    assert "Unknown report-template module" in response.content.decode()
++    assert response.status_code == 404
++    assert response.json()["code"] == "terminology-error"
++    assert "missing_module@1.0.0" in response.json()["message"]
++    assert "not registered" in response.json()["message"]
+ 
+ 
+ def test_save_report_template_uses_resolved_mutable_module_location(
+-    client: Client, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
++    client: Client,
++    monkeypatch: pytest.MonkeyPatch,
++    tmp_path: Path,
++    terminology_root: Path,
+ ) -> None:
+     captured: dict[str, Any] = {}
+     module_dir = tmp_path / "builder_module"
+@@ -236,16 +267,17 @@ def test_save_report_template_uses_resolved_mutable_module_location(
+         return kb
+ 
+     monkeypatch.setattr(api_main, "_load_module_kb", _fake_load_knowledge_base)
+-    monkeypatch.setattr(
+-        api_main,
+-        "_resolve_report_template_module_location",
+-        lambda module_name, version: (
+-            report_template_builder.ReportTemplateModuleLocation(
+-                module_name=module_name,
+-                version=version,
+-                modules_root=tmp_path,
+-            )
++    (terminology_root / "registry.json").write_text(
++        json.dumps(
++            {
++                "modules": {
++                    "builder_module": {
++                        "1.0.0": {"input_dirs": [str(tmp_path)]},
++                    }
++                }
++            }
+         ),
++        encoding="utf-8",
+     )
+     monkeypatch.setattr(
+         report_template_routes,
+@@ -275,6 +307,10 @@ def test_save_report_template_uses_resolved_mutable_module_location(
+         "version": "1.0.0",
+         "input_dirs": None,
+     }
++    assert Path(response.json()["path"]).parent == (
++        module_dir / report_template_builder.GENERATED_DIR_NAME
++    )
++    assert (module_dir / "generated_templates" / "custom_template.yaml").is_file()
+ 
+ 
+ def test_packaged_report_template_module_is_immutable(
+@@ -286,19 +322,23 @@ def test_packaged_report_template_module_is_immutable(
+     source_file = module_path / "config.yaml"
+     source_file.write_text("name: report_template_examples\n", encoding="utf-8")
+ 
+-    monkeypatch.setattr(api_main, "_resolve_active_version", lambda *args: "1.0.0")
+     monkeypatch.setattr(
+-        api_main,
+-        "load_module_config",
++        central,
++        "load_module_kb",
+         lambda *args, **kwargs: SimpleNamespace(
+-            name="report_template_examples",
+-            source_file=source_file,
++            config=SimpleNamespace(
++                name="report_template_examples",
++                version="1.0.0",
++                source_file=source_file,
++            )
+         ),
+     )
+-    monkeypatch.setattr(api_main, "package_data_root", lambda: package_root)
++    monkeypatch.setattr(central, "package_data_root", lambda: package_root)
+ 
+-    with pytest.raises(HttpError, match="Packaged report templates are immutable"):
++    with pytest.raises(TerminologyError, match="Shipped data is read-only") as exc_info:
+         resolve_report_template_module_location("report_template_examples", "1.0.0")
++    assert exc_info.value.status == 409
++    assert not (module_path / "generated_templates").exists()
+ 
+ 
+ def test_publish_report_template_returns_409_when_summary_blocks_publish(
+diff --git a/tests/unit/lx_dtypes/django/api/test_report_templates_api.py b/tests/unit/lx_dtypes/django/api/test_report_templates_api.py
+index 5c2f630..50da3b3 100644
+--- a/tests/unit/lx_dtypes/django/api/test_report_templates_api.py
++++ b/tests/unit/lx_dtypes/django/api/test_report_templates_api.py
+@@ -6,9 +6,6 @@ import pytest
+ from django.test import Client
+ 
+ from lx_dtypes.django.api import main as api_main
+-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+-    KnowledgeBaseVersionNotFoundError,
+-)
+ from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+ 
+ 
+@@ -192,7 +189,7 @@ def test_report_template_runtime_validation_api(
+ ) -> None:
+     monkeypatch.setattr(
+         api_main,
+-        "load_knowledge_base",
++        "resolve_module_kb",
+         lambda *args, **kwargs: _RuntimeValidationKb(),
+     )
+     client = Client()
+@@ -275,7 +272,7 @@ def test_report_template_runtime_validation_api_uses_payload_kb_identity(
+         captured["version"] = version
+         return fallback_kb
+ 
+-    monkeypatch.setattr(api_main, "load_knowledge_base", _fake_load_knowledge_base)
++    monkeypatch.setattr(api_main, "resolve_module_kb", _fake_load_knowledge_base)
+ 
+     response = client.post(
+         "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.0",
+@@ -324,7 +321,7 @@ def test_report_template_runtime_validation_api_rejects_missing_payload_version(
+         captured["version"] = version
+         return fallback_kb
+ 
+-    monkeypatch.setattr(api_main, "load_knowledge_base", _fake_load_knowledge_base)
++    monkeypatch.setattr(api_main, "resolve_module_kb", _fake_load_knowledge_base)
+ 
+     response = client.post(
+         "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.1",
+@@ -372,7 +369,7 @@ def test_single_validator_runtime_validation_api(
+ ) -> None:
+     monkeypatch.setattr(
+         api_main,
+-        "load_knowledge_base",
++        "resolve_module_kb",
+         lambda *args, **kwargs: _RuntimeValidationKb(),
+     )
+     client = Client()
+@@ -473,15 +470,10 @@ def test_report_template_runtime_validation_api_rejects_payload_module_conflict(
+ 
+ 
+ def test_report_template_runtime_validation_api_rejects_unavailable_payload_version(
+-    monkeypatch: pytest.MonkeyPatch,
+ ) -> None:
++    # Exercise the central registry: 9.9.9 is not registered by tests.django_settings.
+     client = Client()
+ 
+-    def _missing_version(*args: Any, **kwargs: Any) -> Any:
+-        raise KnowledgeBaseVersionNotFoundError("missing")
+-
+-    monkeypatch.setattr(api_main, "load_knowledge_base", _missing_version)
+-
+     response = client.post(
+         "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=9.9.9",
+         data=json.dumps(
+@@ -495,8 +487,10 @@ def test_report_template_runtime_validation_api_rejects_unavailable_payload_vers
+         content_type="application/json",
+         secure=True,
+     )
+-    assert response.status_code == 409
+-    assert "not provisioned locally" in response.content.decode()
++    assert response.status_code == 404
++    assert response.json()["code"] == "terminology-error"
++    assert "report_template_examples@9.9.9" in response.json()["message"]
++    assert "not registered" in response.json()["message"]
+ 
+ 
+ def test_core_concepts_api() -> None:

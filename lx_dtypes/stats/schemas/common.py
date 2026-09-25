@@ -1,10 +1,11 @@
-from typing import Any, Callable, cast
+from collections.abc import Callable
+from typing import Any, cast
 
-import pandera.engines.pandas_engine as pandas_engine
+from pandera.engines import pandas_engine
 
 PANDERA_PYDANTIC_MODEL = cast(
     Callable[[type[Any]], Any],
-    getattr(pandas_engine, "PydanticModel"),
+    pandas_engine.PydanticModel,
 )
 
 COERCE = True

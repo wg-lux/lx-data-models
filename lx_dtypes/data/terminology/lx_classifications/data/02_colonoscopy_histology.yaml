@@ -1,5 +1,6 @@
 - model: classification
   name: "colonoscopy_polyp_histology"
+  name_de: "Polypenhistologie"
   classification_types:
     - histology
   classification_choices: [

@@ -1,0 +1,21 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Source: MST 3.0 (03.08.2016). Stable identifiers are an lx-dtypes extension;
+# source labels remain unchanged in name_en and every extension is prefixed mst30_.
+- {model: finding_type, name: mst30_luminal_finding, name_en: Luminal finding, description: "MST 3.0 section 3.1."}
+- {model: finding_type, name: mst30_ercp_finding, name_en: ERCP finding, description: "MST 3.0 section 3.3."}
+- {model: finding_type, name: mst30_eus_finding, name_en: EUS finding, description: "MST 3.0 section 3.5."}
+- {model: finding_type, name: mst30_diagnosis, name_en: Endoscopic diagnosis, description: "MST 3.0 section 5."}
+- {model: finding_type, name: mst30_adverse_event, name_en: Adverse event, description: "MST 3.0 section 7."}
+- {model: indication_type, name: mst30_symptom, name_en: Symptom, description: "MST 3.0 section 4 symptom."}
+- {model: indication_type, name: mst30_disease, name_en: Disease, description: "MST 3.0 section 4 disease."}
+- {model: intervention_type, name: mst30_luminal_procedure, name_en: Luminal procedure, description: "MST 3.0 section 6.1."}
+- {model: intervention_type, name: mst30_ercp_procedure, name_en: ERCP procedure, description: "MST 3.0 section 6.2."}
+- {model: intervention_type, name: mst30_eus_procedure, name_en: EUS procedure, description: "MST 3.0 section 6.3."}
+- {model: examination_type, name: mst30_endoscopic_procedure, name_en: Endoscopic procedure, description: "MST 3.0 procedure context."}
+- {model: classification_type, name: mst30_location, name_en: Location, description: "MST 3.0 section 2."}
+- {model: classification_type, name: mst30_standard_classification, name_en: MST classification, description: "MST 3.0 appendix 8.1."}
+- {model: examination, name: mst30_egd, name_en: EGD, examination_types: [mst30_endoscopic_procedure], description: "§2.3 relevant organs: Esophagus, Stomach, Duodenum, Jejunum."}
+- {model: examination, name: mst30_enteroscopy, name_en: Enteroscopy, examination_types: [mst30_endoscopic_procedure], description: "§2.3 relevant organs: Esophagus, Stomach, Duodenum, Jejunum, Ileum, Colon."}
+- {model: examination, name: mst30_vce, name_en: VCE, examination_types: [mst30_endoscopic_procedure], description: "§2.3 relevant organs: Esophagus, Stomach, Duodenum, Jejunum, Ileum, Colon."}
+- {model: examination, name: mst30_colonoscopy, name_en: Colonoscopy, examination_types: [mst30_endoscopic_procedure], description: "§2.3 relevant organs: Ileum, Colon."}
+- {model: examination, name: mst30_ercp, name_en: ERCP, examination_types: [mst30_endoscopic_procedure], description: "§2.3 relevant organs: Esophagus, Stomach, Duodenum, Jejunum, Biliary tree, Pancreatic duct."}
