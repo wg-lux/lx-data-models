@@ -1,0 +1,9 @@
+- model: reference_catalog
+  name: tag
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: reviewed
+      record_type: tag
+    - name: to be reviewed
+      record_type: tag

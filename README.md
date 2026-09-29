@@ -7,10 +7,11 @@
 [![codecov](https://codecov.io/github/wg-lux/lx-data-models/graph/badge.svg?token=132HVE8KSF)](https://codecov.io/github/wg-lux/lx-data-models)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-`lx-dtypes` is the reusable data-model package for Lux Group medical research
-projects. It provides typed Pydantic contracts, versioned clinical terminology,
-report-template validation, FHIR interoperability, and optional Django host
-integration.
+`lx-dtypes` validates research data against predefined study rules and versioned
+medical terminology. Applications can collect structured validation findings
+without interrupting data capture, while using strict typed contracts at storage
+and exchange boundaries. The package also provides FHIR interoperability and
+Django host integration.
 
 > [!IMPORTANT]
 > This project is research software. It is not a medical device and must not be
@@ -37,6 +38,25 @@ python -m pip install lx-dtypes
 ```
 
 ## Quick start
+
+Validate a study setup without raising for invalid input:
+
+```python
+from lx_dtypes.models.contracts.study_setup import StudySetupDefinition
+from lx_dtypes.validation import validate_contract
+
+result = validate_contract(StudySetupDefinition, {"schema_version": "1.0"})
+for issue in result.report.issues:
+    print(issue.code, issue.path, issue.message)
+
+# result.value contains the typed model only when the contract is valid.
+```
+
+For ledger data, `assess_examination(knowledge_base, payload,
+template_name="...")` checks terminology provenance and applies the selected
+template's study rules. Findings are advisory; the host decides when to require
+correction. See the [cross-layer validation guide](docs/guides/cross-layer-validation.md)
+for error codes, evaluation status, and strict persistence boundaries.
 
 Load a knowledge-base module shipped with the package:
 

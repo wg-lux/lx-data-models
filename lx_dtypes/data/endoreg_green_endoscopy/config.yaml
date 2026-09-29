@@ -1,0 +1,20 @@
+name: endoreg_green_endoscopy
+description: Versioned optional Green Endoscopy resource and product definitions.
+version: 1.0.0
+modules: []
+depends_on:
+- endoreg_reference
+data:
+  files:
+  - ./center_resource.yml
+  - ./center_waste.yml
+  - ./emission_factor.yml
+  - ./material.yml
+  - ./product.yml
+  - ./product_group.yml
+  - ./product_material.yml
+  - ./product_weight.yml
+  - ./reference_product.yml
+  - ./resource.yml
+  - ./transport_route.yml
+  - ./waste.yml

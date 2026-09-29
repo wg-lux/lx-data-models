@@ -16,6 +16,13 @@ logic into this repository.
    `/home/admin/endoreg-db/feature-tracking/`; do not create Markdown status or
    completion trackers here.
 
+## Authoring terminology packages
+
+Before generating or reviewing package YAML, read
+[Structure of a valid lx-dtypes package](docs/guides/dtypes-package-structure.md).
+Use its executable documentation example and agent checklist. A standard KB
+package, host preset projection, and dataset/cohort setup are separate contracts.
+
 ## Engineering rules
 
 - Prefer strict Pydantic models, explicit types, and validation at external

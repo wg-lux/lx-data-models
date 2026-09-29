@@ -1,0 +1,15 @@
+- model: reference_catalog
+  name: disease_classification
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: chronic_kidney_disease_kdigo
+      record_type: disease_classification
+      disease:
+        name: chronic_kidney_disease
+        version: null
+    - name: coronary_artery_disease_base_classification
+      record_type: disease_classification
+      disease:
+        name: coronary_artery_disease
+        version: null

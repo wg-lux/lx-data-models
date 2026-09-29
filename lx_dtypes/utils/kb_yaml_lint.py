@@ -6,6 +6,9 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
+from pydantic import ValidationError
+
+from lx_dtypes.models.contracts.reference_catalog import ReferenceCatalogPayload
 
 LintSeverity = Literal["error", "warning"]
 
@@ -14,6 +17,7 @@ MODEL_NAME_ALIASES: dict[str, str] = {
 }
 
 KNOWN_MODEL_NAMES: set[str] = {
+    "reference_catalog",
     "citation",
     "classification",
     "classification_type",
@@ -589,32 +593,25 @@ def _string_list(value: object) -> list[str]:
     ]
 
 
-def _lint_incomplete_input_rules(
-    definitions: dict[tuple[str, str], _DefinitionLocation],
+def _definition(
     items_by_definition: dict[tuple[str, str], _YamlItem],
-) -> list[KbYamlLintIssue]:
-    """Find required input paths that cannot carry or evaluate a real value.
+    model: str,
+    name: str,
+) -> _YamlItem | None:
+    return items_by_definition.get((model, name))
 
-    A descriptor-backed classification has two semantic values: the selected
-    classification-choice token and the descriptor value entered by the user.
-    Coverage rules default to evaluating the choice token. Such a rule is
-    incomplete when its selected choice owns descriptors but
-    ``concept_value_path`` does not point at ``descriptor_value``.
-    """
 
-    issues: list[KbYamlLintIssue] = []
-
-    def _definition(model: str, name: str) -> _YamlItem | None:
-        return items_by_definition.get((model, name))
-
-    # A finding exposed by a report template must carry enough help text for
-    # reporting clients to explain what the user is expected to enter.
+def _template_finding_names(
+    items_by_definition: dict[tuple[str, str], _YamlItem],
+) -> set[str]:
     template_finding_names: set[str] = set()
     for (model_name, _template_name), template_item in items_by_definition.items():
         if model_name != "report_template":
             continue
         for section_name in _string_list(template_item.payload.get("report_sections")):
-            section_item = _definition("report_template_section", section_name)
+            section_item = _definition(
+                items_by_definition, "report_template_section", section_name
+            )
             if section_item is None:
                 continue
             raw_findings = section_item.payload.get("findings")
@@ -629,16 +626,24 @@ def _lint_incomplete_input_rules(
                 if not isinstance(raw_finding, str) or not raw_finding.strip():
                     continue
                 finding_ref = raw_finding.strip()
-                report_finding_item = _definition("report_finding", finding_ref)
+                report_finding_item = _definition(
+                    items_by_definition, "report_finding", finding_ref
+                )
                 if report_finding_item is None:
                     template_finding_names.add(finding_ref)
                     continue
                 finding_name = report_finding_item.payload.get("finding")
                 if isinstance(finding_name, str) and finding_name.strip():
                     template_finding_names.add(finding_name.strip())
+    return template_finding_names
 
-    for finding_name in sorted(template_finding_names):
-        finding_item = _definition("finding", finding_name)
+
+def _lint_template_finding_descriptions(
+    items_by_definition: dict[tuple[str, str], _YamlItem],
+) -> list[KbYamlLintIssue]:
+    issues: list[KbYamlLintIssue] = []
+    for finding_name in sorted(_template_finding_names(items_by_definition)):
+        finding_item = _definition(items_by_definition, "finding", finding_name)
         if finding_item is None:
             continue
         description = finding_item.payload.get("description")
@@ -658,8 +663,14 @@ def _lint_incomplete_input_rules(
                 ),
             )
         )
+    return issues
 
-    # Validate the complete classification -> choice -> descriptor input chain.
+
+def _lint_classification_input_chains(
+    definitions: dict[tuple[str, str], _DefinitionLocation],
+    items_by_definition: dict[tuple[str, str], _YamlItem],
+) -> list[KbYamlLintIssue]:
+    issues: list[KbYamlLintIssue] = []
     for (
         model_name,
         classification_name,
@@ -688,7 +699,9 @@ def _lint_incomplete_input_rules(
             continue
 
         for choice_name in choice_names:
-            choice_item = _definition("classification_choice", choice_name)
+            choice_item = _definition(
+                items_by_definition, "classification_choice", choice_name
+            )
             if choice_item is None:
                 issues.append(
                     _issue(
@@ -728,6 +741,52 @@ def _lint_incomplete_input_rules(
                         ),
                     )
                 )
+    return issues
+
+
+def _candidate_coverage_choices(
+    raw_concept: dict[object, object],
+    selector: dict[object, object],
+    classification_choices: set[str],
+) -> set[str]:
+    selected_choice = selector.get("classification_choice")
+    if isinstance(selected_choice, str) and selected_choice:
+        return {selected_choice}
+
+    allowed_values = raw_concept.get("allowed_values")
+    if not isinstance(allowed_values, list):
+        return classification_choices
+    matching_choices = {
+        value
+        for value in allowed_values
+        if isinstance(value, str) and value in classification_choices
+    }
+    return matching_choices or classification_choices
+
+
+def _descriptor_backed_choices(
+    candidate_choices: set[str],
+    items_by_definition: dict[tuple[str, str], _YamlItem],
+) -> dict[str, list[str]]:
+    result: dict[str, list[str]] = {}
+    for choice_name in sorted(candidate_choices):
+        choice_item = _definition(
+            items_by_definition, "classification_choice", choice_name
+        )
+        if choice_item is None:
+            continue
+        descriptor_names = _string_list(
+            choice_item.payload.get("classification_choice_descriptors")
+        )
+        if descriptor_names:
+            result[choice_name] = descriptor_names
+    return result
+
+
+def _lint_descriptor_coverage_paths(
+    items_by_definition: dict[tuple[str, str], _YamlItem],
+) -> list[KbYamlLintIssue]:
+    issues: list[KbYamlLintIssue] = []
 
     # Coverage selectors evaluate classification_choice by default. Require an
     # explicit descriptor-value path when the selected choice is only a carrier
@@ -753,7 +812,9 @@ def _lint_incomplete_input_rules(
                 continue
 
             selector_classification_item = _definition(
-                "classification", selector_classification_name
+                items_by_definition,
+                "classification",
+                selector_classification_name,
             )
             if selector_classification_item is None:
                 continue
@@ -762,37 +823,12 @@ def _lint_incomplete_input_rules(
                     selector_classification_item.payload.get("classification_choices")
                 )
             )
-
-            selected_choice = selector.get("classification_choice")
-            if isinstance(selected_choice, str) and selected_choice:
-                candidate_choices = {selected_choice}
-            else:
-                allowed_values = raw_concept.get("allowed_values")
-                candidate_choices = (
-                    {
-                        value
-                        for value in allowed_values
-                        if isinstance(value, str) and value in classification_choices
-                    }
-                    if isinstance(allowed_values, list)
-                    else set()
-                )
-                if not candidate_choices:
-                    # Numeric/text allowed values describe descriptor values rather
-                    # than classification-choice names. Inspect every possible
-                    # choice in that case.
-                    candidate_choices = classification_choices
-
-            descriptor_backed_choices: dict[str, list[str]] = {}
-            for choice_name in sorted(candidate_choices):
-                choice_item = _definition("classification_choice", choice_name)
-                if choice_item is None:
-                    continue
-                descriptor_names = _string_list(
-                    choice_item.payload.get("classification_choice_descriptors")
-                )
-                if descriptor_names:
-                    descriptor_backed_choices[choice_name] = descriptor_names
+            candidate_choices = _candidate_coverage_choices(
+                raw_concept, selector, classification_choices
+            )
+            descriptor_backed_choices = _descriptor_backed_choices(
+                candidate_choices, items_by_definition
+            )
 
             if not descriptor_backed_choices:
                 continue
@@ -832,6 +868,26 @@ def _lint_incomplete_input_rules(
             )
 
     return issues
+
+
+def _lint_incomplete_input_rules(
+    definitions: dict[tuple[str, str], _DefinitionLocation],
+    items_by_definition: dict[tuple[str, str], _YamlItem],
+) -> list[KbYamlLintIssue]:
+    """Find required input paths that cannot carry or evaluate a real value.
+
+    A descriptor-backed classification has two semantic values: the selected
+    classification-choice token and the descriptor value entered by the user.
+    Coverage rules default to evaluating the choice token. Such a rule is
+    incomplete when its selected choice owns descriptors but
+    ``concept_value_path`` does not point at ``descriptor_value``.
+    """
+
+    return [
+        *_lint_template_finding_descriptions(items_by_definition),
+        *_lint_classification_input_chains(definitions, items_by_definition),
+        *_lint_descriptor_coverage_paths(items_by_definition),
+    ]
 
 
 def _lint_unresolved_model_references(
@@ -993,6 +1049,22 @@ def lint_kb_yaml_files(
                     )
                 )
                 continue
+
+            if model_name == "reference_catalog":
+                try:
+                    ReferenceCatalogPayload.model_validate(item.payload.get("payload"))
+                except ValidationError as exc:
+                    issues.append(
+                        _issue(
+                            code="invalid_reference_catalog",
+                            severity="error",
+                            file=item.file,
+                            line=item.line,
+                            column=item.column,
+                            message=str(exc),
+                        )
+                    )
+                    continue
 
             definition_key = (model_name, name.strip())
             existing = definitions.get(definition_key)

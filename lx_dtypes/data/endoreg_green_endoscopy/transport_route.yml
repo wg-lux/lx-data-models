@@ -1,0 +1,23 @@
+- model: reference_catalog
+  name: transport_route
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: transport_route
+      distance: 1000.0
+      name: generic_europe
+      emission_factor:
+        name: transport_product_emission_generic_europe
+        version: null
+      unit:
+        name: kilometer
+        version: null
+    - record_type: transport_route
+      distance: 10000.0
+      name: generic_overseas
+      emission_factor:
+        name: transport_product_emission_generic_overseas
+        version: null
+      unit:
+        name: kilometer
+        version: null

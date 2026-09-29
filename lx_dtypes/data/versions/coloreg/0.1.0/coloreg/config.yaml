@@ -1,0 +1,11 @@
+name: coloreg
+description: "ColoReg colonoscopy reporting and annotation-to-finding mappings."
+version: 0.1.0
+medical_field: gastroenterology
+modules: []
+depends_on:
+  - DGVS_Terminology
+
+data:
+  files:
+    - "./report_templates.yaml"

@@ -1,0 +1,22 @@
+- model: reference_catalog
+  name: shift
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: shift
+      name: endoscopy_base
+      description: This shift represents a basic, planned endoscopy shift (EGD, colonoscopy).
+      is_active: true
+      shift_types: []
+      required_qualifications:
+      - name: endoscopy_base
+        version: null
+    - record_type: shift
+      name: endoscopy_training
+      description: This shift represents a training endoscopy shift which is covered
+        1:1 with an experienced endoscopist.
+      is_active: true
+      shift_types: []
+      required_qualifications:
+      - name: endoscopy_supervised
+        version: null

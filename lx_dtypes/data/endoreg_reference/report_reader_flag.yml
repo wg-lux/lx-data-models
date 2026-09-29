@@ -1,0 +1,41 @@
+- model: reference_catalog
+  name: report_reader_flag
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: rkh-histology-generic-cut-off-below-line
+      record_type: report_reader_flag
+      value: Mitkollegialen Grüßen
+    - name: rkh-histology-generic-patient-info-line
+      record_type: report_reader_flag
+      value: 'Pat.: '
+    - name: ukw-endoscopy-histology-cut-off-below-line-flag-01
+      record_type: report_reader_flag
+      value: $$-3
+    - name: ukw-examination-generic-anamnese-info-line
+      record_type: report_reader_flag
+      value: 'Anamnese: '
+    - name: ukw-examination-generic-cut-off-below-line-01
+      record_type: report_reader_flag
+      value: ________________
+    - name: ukw-examination-generic-endoscope-info-line
+      record_type: report_reader_flag
+      value: 'Gerät: '
+    - name: ukw-examination-generic-examiner-info-line
+      record_type: report_reader_flag
+      value: '1. Unters.:'
+    - name: ukw-examination-generic-patient-info-line
+      record_type: report_reader_flag
+      value: 'Patient: '
+    - name: ukw-histology-generic-cut-off-below-line-01
+      record_type: report_reader_flag
+      value: $$-3
+    - name: ukw-histology-generic-endoscope-info-line
+      record_type: report_reader_flag
+      value: ''
+    - name: ukw-histology-generic-examiner-info-line
+      record_type: report_reader_flag
+      value: 'Eingang am:'
+    - name: ukw-histology-generic-patient-info-line
+      record_type: report_reader_flag
+      value: 'Patient:'

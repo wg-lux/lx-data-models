@@ -1,0 +1,153 @@
+# Sources for every record in this file:
+# - DGVS S2k quality guideline (AWMF 021-022), team time-out: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b20056d03/chapter_69f4b200d1e40/
+- model: classification
+  name: "endoscopy_team_timeout_time"
+  name_de: "Zeitpunkt des Team-Time-outs"
+  name_en: "Team time-out time"
+  classification_types: []
+  classification_choices:
+    - endoscopy_team_timeout_time_recorded
+
+- model: classification
+  name: "team_introduction_status"
+  name_de: "Status der Teamvorstellung"
+  name_en: "Team introduction status"
+  classification_types: []
+  classification_choices:
+    - team_introduction_confirmed
+    - team_introduction_not_applicable
+    - team_introduction_not_confirmed
+    - unknown
+
+- model: classification
+  name: "patient_identity_confirmation_status"
+  name_de: "Status der Patientenidentitätsbestätigung"
+  name_en: "Patient identity confirmation status"
+  classification_types: []
+  classification_choices:
+    - patient_identity_confirmed_against_identifiers
+    - patient_identity_not_confirmed
+    - unknown
+
+- model: classification
+  name: "patient_preparation_confirmation_status"
+  name_de: "Status der Patientenvorbereitung"
+  name_en: "Patient preparation confirmation status"
+  classification_types: []
+  classification_choices:
+    - patient_preparation_confirmed
+    - patient_preparation_not_confirmed
+    - unknown
+
+- model: classification
+  name: "planned_procedure_and_special_features_review_status"
+  name_de: "Status der Eingriffs- und Besonderheitenprüfung"
+  name_en: "Planned procedure and special-features review status"
+  classification_types: []
+  classification_choices:
+    - procedure_confirmed_no_special_features
+    - procedure_confirmed_special_features_discussed
+    - procedure_not_confirmed
+    - unknown
+
+- model: classification
+  name: "patient_specific_risk_and_special_medication_review_status"
+  name_de: "Status der Risiko- und Medikationsprüfung"
+  name_en: "Patient-specific risk and special-medication review status"
+  classification_types: []
+  classification_choices:
+    - risks_reviewed_none_identified
+    - risks_reviewed_present_and_communicated
+    - risks_not_reviewed
+    - unknown
+
+- model: classification
+  name: "required_documents_confirmation_status"
+  name_de: "Status der erforderlichen Dokumente"
+  name_en: "Required-documents confirmation status"
+  classification_types: []
+  classification_choices:
+    - required_documents_confirmed_complete
+    - required_documents_incomplete
+    - unknown
+
+- model: classification
+  name: "required_equipment_readiness_status"
+  name_de: "Bereitschaftsstatus des erforderlichen Equipments"
+  name_en: "Required-equipment readiness status"
+  classification_types: []
+  classification_choices:
+    - required_equipment_confirmed_ready
+    - required_equipment_not_ready
+    - unknown
+
+- model: classification
+  name: "required_personnel_readiness_status"
+  name_de: "Bereitschaftsstatus des erforderlichen Personals"
+  name_en: "Required-personnel readiness status"
+  classification_types: []
+  classification_choices:
+    - required_personnel_confirmed_ready
+    - required_personnel_not_ready
+    - unknown
+
+- model: classification
+  name: "endoscopy_sign_out_time"
+  name_de: "Zeitpunkt des Sign-outs"
+  name_en: "Sign-out time"
+  classification_types: []
+  classification_choices:
+    - endoscopy_sign_out_time_recorded
+
+- model: classification
+  name: "postprocedure_patient_condition_documentation_status"
+  name_de: "Dokumentationsstatus des Patientenzustands nach dem Eingriff"
+  name_en: "Post-procedure patient-condition documentation status"
+  classification_types: []
+  classification_choices:
+    - postprocedure_patient_condition_documented
+    - postprocedure_patient_condition_not_documented
+    - unknown
+
+- model: classification
+  name: "follow_up_measures_confirmation_status"
+  name_de: "Bestätigungsstatus der Nachsorgemaßnahmen"
+  name_en: "Follow-up measures confirmation status"
+  classification_types: []
+  classification_choices:
+    - follow_up_confirmed_no_special_measures
+    - follow_up_special_measures_documented_and_handed_over
+    - follow_up_not_confirmed
+    - unknown
+
+- model: classification
+  name: "specimen_handling_reconciliation_status"
+  name_de: "Abgleichstatus der Proben- und Resektatversorgung"
+  name_en: "Specimen-handling reconciliation status"
+  classification_types: []
+  classification_choices:
+    - specimen_handling_not_applicable
+    - specimen_handling_all_secured
+    - specimen_handling_unresolved
+    - unknown
+
+- model: classification
+  name: "procedure_problem_review_status"
+  name_de: "Prüfstatus von Problemen beim Eingriff"
+  name_en: "Procedure-problem review status"
+  classification_types: []
+  classification_choices:
+    - procedure_problems_reviewed_none
+    - procedure_problems_documented_and_communicated
+    - procedure_problems_not_reviewed
+    - unknown
+
+- model: classification
+  name: "report_documentation_completeness_status"
+  name_de: "Vollständigkeitsstatus der Befunddokumentation"
+  name_en: "Report-documentation completeness status"
+  classification_types: []
+  classification_choices:
+    - report_documentation_confirmed_complete
+    - report_documentation_incomplete
+    - unknown

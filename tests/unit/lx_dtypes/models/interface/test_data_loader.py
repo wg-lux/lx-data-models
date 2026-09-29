@@ -300,3 +300,7 @@ class TestDataLoader:
 
         assert "editor_millimeter" in kb.unit
         assert "canonical_centimeter" not in kb.unit
+        configs = loader.resolved_module_configs("editor_bundle")
+        units = next(config for config in configs if config.name == "lx_units")
+        assert units.source_file == editor_units_dir / "config.yaml"
+        assert configs[0].name == "editor_bundle"

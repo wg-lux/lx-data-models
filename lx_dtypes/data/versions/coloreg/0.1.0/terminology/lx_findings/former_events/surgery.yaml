@@ -1,0 +1,11 @@
+- model: finding
+  name: "hip_replacement_surgery"
+  description: "Hip replacement surgery"
+  tags:
+    - event
+
+- model: finding
+  name: "knee_replacement_surgery"
+  description: "Knee replacement surgery"
+  tags:
+    - event

@@ -1,0 +1,533 @@
+- model: reference_catalog
+  name: product_material
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: product_material
+      component: package
+      material:
+        name: cardboard
+        version: null
+      product:
+        name: peg_freka_15_ch
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.072
+    - record_type: product_material
+      component: package
+      material:
+        name: cardboard
+        version: null
+      product:
+        name: visiglide_2
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.108
+    - record_type: product_material
+      component: package
+      material:
+        name: paper
+        version: null
+      product:
+        name: biliary_stent_cotton_leung_sof_flex
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.014
+    - record_type: product_material
+      component: package
+      material:
+        name: paper
+        version: null
+      product:
+        name: biopsy_grasper_hot_radial_jaw_4
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.0085
+    - record_type: product_material
+      component: package
+      material:
+        name: paper
+        version: null
+      product:
+        name: bite_protector
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.001
+    - record_type: product_material
+      component: package
+      material:
+        name: paper
+        version: null
+      product:
+        name: extraction_balloon_escort_2
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.0095
+    - record_type: product_material
+      component: package
+      material:
+        name: paper
+        version: null
+      product:
+        name: nitinol_stent_aix_oel
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.106
+    - record_type: product_material
+      component: package
+      material:
+        name: paper
+        version: null
+      product:
+        name: peg_freka_15_ch
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.086
+    - record_type: product_material
+      component: package
+      material:
+        name: paper
+        version: null
+      product:
+        name: pressure_syringe_60_ml
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.004
+    - record_type: product_material
+      component: package
+      material:
+        name: paper
+        version: null
+      product:
+        name: visiglide_2
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.015
+    - record_type: product_material
+      component: package
+      material:
+        name: paper_coated
+        version: null
+      product:
+        name: esophageal_dilator
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.007
+    - record_type: product_material
+      component: package
+      material:
+        name: paper_coated
+        version: null
+      product:
+        name: visiglide_2
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.013
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: absorbant_pad
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.001
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: biliary_stent_cotton_leung_sof_flex
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.004
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: biopsy_grasper_hot_radial_jaw_4
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.0085
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: bite_protector
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.001
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: esophageal_dilator
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.007
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: extraction_balloon_escort_2
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.0225
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: foliodress_gown_standard
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.001
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: nitinol_stent_aix_oel
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.03
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: peg_freka_15_ch
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.033
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: pressure_syringe_60_ml
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.039
+    - record_type: product_material
+      component: package
+      material:
+        name: plastic
+        version: null
+      product:
+        name: visiglide_2
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.013
+    - record_type: product_material
+      component: product
+      material:
+        name: gold
+        version: null
+      product:
+        name: biliary_stent_cotton_leung_sof_flex
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.007
+    - record_type: product_material
+      component: product
+      material:
+        name: metal
+        version: null
+      product:
+        name: biopsy_grasper_hot_radial_jaw_4
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.0295
+    - record_type: product_material
+      component: product
+      material:
+        name: metal
+        version: null
+      product:
+        name: peg_freka_15_ch
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.0074
+    - record_type: product_material
+      component: product
+      material:
+        name: metal
+        version: null
+      product:
+        name: visiglide_2
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.045
+    - record_type: product_material
+      component: product
+      material:
+        name: nickel
+        version: null
+      product:
+        name: nitinol_stent_aix_oel
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.015
+    - record_type: product_material
+      component: product
+      material:
+        name: plastic
+        version: null
+      product:
+        name: biopsy_grasper_hot_radial_jaw_4
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.0295
+    - record_type: product_material
+      component: product
+      material:
+        name: plastic
+        version: null
+      product:
+        name: bite_protector
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.006
+    - record_type: product_material
+      component: product
+      material:
+        name: plastic
+        version: null
+      product:
+        name: extraction_balloon_escort_2
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.042
+    - record_type: product_material
+      component: product
+      material:
+        name: plastic
+        version: null
+      product:
+        name: foliodress_gown_standard
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.036
+    - record_type: product_material
+      component: product
+      material:
+        name: plastic
+        version: null
+      product:
+        name: nitinol_stent_aix_oel
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.024
+    - record_type: product_material
+      component: product
+      material:
+        name: plastic
+        version: null
+      product:
+        name: peg_freka_15_ch
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.0222
+    - record_type: product_material
+      component: product
+      material:
+        name: plastic
+        version: null
+      product:
+        name: pressure_syringe_60_ml
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.07
+    - record_type: product_material
+      component: product
+      material:
+        name: plastic_coated
+        version: null
+      product:
+        name: absorbant_pad
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.057
+    - record_type: product_material
+      component: product
+      material:
+        name: silicone
+        version: null
+      product:
+        name: esophageal_dilator
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.119
+    - record_type: product_material
+      component: product
+      material:
+        name: silicone
+        version: null
+      product:
+        name: nitinol_stent_aix_oel
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.003
+    - record_type: product_material
+      component: product
+      material:
+        name: silicone
+        version: null
+      product:
+        name: peg_freka_15_ch
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.0074
+    - record_type: product_material
+      component: product
+      material:
+        name: steel
+        version: null
+      product:
+        name: esophageal_dilator
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.001
+    - record_type: product_material
+      component: product
+      material:
+        name: steel
+        version: null
+      product:
+        name: pressure_syringe_60_ml
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.03
+    - record_type: product_material
+      component: product
+      material:
+        name: tantal
+        version: null
+      product:
+        name: nitinol_stent_aix_oel
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.003
+    - record_type: product_material
+      component: product
+      material:
+        name: textile
+        version: null
+      product:
+        name: bite_protector
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.005
+    - record_type: product_material
+      component: product
+      material:
+        name: titan
+        version: null
+      product:
+        name: nitinol_stent_aix_oel
+        version: null
+      unit:
+        name: kilogram
+        version: null
+      quantity: 0.015

@@ -1,0 +1,574 @@
+- model: reference_catalog
+  name: examination_indication
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: capsule_endoscopy_generic
+      record_type: examination_indication
+      description: Capsule endoscopy without further specification
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: colonoscopy_diagnostic_acute_symptomatic
+      record_type: examination_indication
+      description: Indication for colonoscopy examination for diagnostic purposes
+        in acute symptomatic patients.
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_diathermic_snare_resection_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      information_sources: []
+    - name: colonoscopy_diagnostic_chronic_symptomatic
+      record_type: examination_indication
+      description: Indication for colonoscopy examination for diagnostic purposes
+        in chronic symptomatic patients.
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_diathermic_snare_resection_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      information_sources: []
+    - name: colonoscopy_follow_up_post_eftr
+      record_type: examination_indication
+      description: Follow-up colonoscopy after previous endoscopic full-thickness
+        resection (EFTR) to assess clip site or recurrent lesion.
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_emr_colorectal
+        version: null
+      - name: endoscopy_cold_snare_polypectomy_colorectal
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_eftr_colorectal
+        version: null
+      - name: endoscopy_eftr_generic
+        version: null
+      - name: endoscopy_emr_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_hot_emr_colorectal
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      information_sources: []
+    - name: colonoscopy_follow_up_post_emr
+      record_type: examination_indication
+      description: Follow-up colonoscopy after previous endoscopic mucosal resection
+        (EMR) to assess for residual or recurrent lesion.
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_emr_colorectal
+        version: null
+      - name: endoscopy_cold_snare_polypectomy_colorectal
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_emr_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_hot_avulsion_colorectal
+        version: null
+      - name: endoscopy_hot_emr_colorectal
+        version: null
+      - name: endoscopy_margin_ablation_soft_coagulation_colorectal
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      information_sources: []
+    - name: colonoscopy_follow_up_post_esd
+      record_type: examination_indication
+      description: Follow-up colonoscopy after previous endoscopic submucosal dissection
+        (ESD) to assess healing or recurrent lesion.
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_emr_colorectal
+        version: null
+      - name: endoscopy_cold_snare_polypectomy_colorectal
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_emr_generic
+        version: null
+      - name: endoscopy_esd_colorectal
+        version: null
+      - name: endoscopy_esd_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_hot_avulsion_colorectal
+        version: null
+      - name: endoscopy_hot_emr_colorectal
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      information_sources: []
+    - name: colonoscopy_follow_up_residual_or_recurrent_lesion
+      record_type: examination_indication
+      description: Follow-up colonoscopy for suspected residual or recurrent colorectal
+        lesion after prior endoscopic therapy.
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_emr_colorectal
+        version: null
+      - name: endoscopy_cold_snare_polypectomy_colorectal
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_diathermic_snare_resection_generic
+        version: null
+      - name: endoscopy_eftr_colorectal
+        version: null
+      - name: endoscopy_eftr_generic
+        version: null
+      - name: endoscopy_emr_generic
+        version: null
+      - name: endoscopy_esd_colorectal
+        version: null
+      - name: endoscopy_esd_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_hot_avulsion_colorectal
+        version: null
+      - name: endoscopy_hot_emr_colorectal
+        version: null
+      - name: endoscopy_hot_snare_polypectomy_colorectal
+        version: null
+      - name: endoscopy_margin_ablation_soft_coagulation_colorectal
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      information_sources: []
+    - name: colonoscopy_generic
+      record_type: examination_indication
+      description: Generic indication for colonoscopy examination.
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: colonoscopy_lesion_removal_emr
+      record_type: examination_indication
+      description: Indication for colonoscopy examination for endoscopic mucosal resection
+        (EMR) of lesions.
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_cold_emr_colorectal
+        version: null
+      - name: endoscopy_emr_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_hot_avulsion_colorectal
+        version: null
+      - name: endoscopy_hot_emr_colorectal
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      - name: endoscopy_margin_ablation_soft_coagulation_colorectal
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      information_sources: []
+    - name: colonoscopy_lesion_removal_large
+      record_type: examination_indication
+      description: Indication for colonoscopy examination for removal of large lesions
+        (e.g., polyps).
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_cold_emr_colorectal
+        version: null
+      - name: endoscopy_eftr_colorectal
+        version: null
+      - name: endoscopy_eftr_generic
+        version: null
+      - name: endoscopy_emr_generic
+        version: null
+      - name: endoscopy_esd_colorectal
+        version: null
+      - name: endoscopy_esd_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_hot_avulsion_colorectal
+        version: null
+      - name: endoscopy_hot_emr_colorectal
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      - name: endoscopy_margin_ablation_soft_coagulation_colorectal
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      information_sources: []
+    - name: colonoscopy_lesion_removal_small
+      record_type: examination_indication
+      description: Indication for colonoscopy examination for removal of small lesions
+        (e.g., polyps).
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_snare_polypectomy_colorectal
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_diathermic_snare_resection_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_hot_snare_polypectomy_colorectal
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      information_sources: []
+    - name: colonoscopy_screening
+      record_type: examination_indication
+      description: Indication for colonoscopy examination for screening purposes.
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      information_sources: []
+    - name: colonoscopy_surveillance_cancer_history
+      record_type: examination_indication
+      description: Indication for colonoscopy examination for surveillance in patients
+        with a history of colorectal cancer
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      information_sources: []
+    - name: colonoscopy_surveillance_ibd
+      record_type: examination_indication
+      description: Indication for colonoscopy examination for surveillance in patients
+        with inflammatory bowel disease (IBD).
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      information_sources: []
+    - name: colonoscopy_surveillance_post_polypectomy
+      record_type: examination_indication
+      description: Indication for colonoscopy examination for surveillance following
+        polypectomy.
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      information_sources: []
+    - name: endosonography_lower_gi_invasive
+      record_type: examination_indication
+      description: Invasive endosonography of the lower GI tract
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: endosonography_lower_gi_non_invasive
+      record_type: examination_indication
+      description: Endosonography of the lower GI tract without planned intervention
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: endosonography_upper_gi_invasive
+      record_type: examination_indication
+      description: Invasive endosonography of the upper GI tract
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: endosonography_upper_gi_non_invasive
+      record_type: examination_indication
+      description: Endosonography of the upper GI tract without planned intervention
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: erc
+      record_type: examination_indication
+      description: ERC without further specification
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: erc_no_est
+      record_type: examination_indication
+      description: ERC without endoscopic sphincterotomy
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: ercp
+      record_type: examination_indication
+      description: ERCP without further specification
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: ercp_no_est
+      record_type: examination_indication
+      description: ERCP without endoscopic sphincterotomy
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: ercp_therapeutic_stenosis
+      record_type: examination_indication
+      description: ERC(P) for therapeutic purposes in patients with stenosis
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: gastroscopy_acute_bleeding
+      record_type: examination_indication
+      description: Gastroscopy for acute bleeding
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_ablation_argon_plasma_coagulation
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      - name: endoscopy_rubber_band_ligation_generic
+        version: null
+      - name: endoscopy_sclerotherapy_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_baseline
+      record_type: examination_indication
+      description: Baseline gastroscopy
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_diagnostic_acute_symptomatic
+      record_type: examination_indication
+      description: Gastroscopy for diagnostic purposes in acute symptomatic patients
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_diagnostic_elective
+      record_type: examination_indication
+      description: Gastroscopy for diagnostic purposes in elective patients
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_generic
+      record_type: examination_indication
+      description: Gastroscopy without further specification
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_lesion_removal_large
+      record_type: examination_indication
+      description: Elective gastroscopy for removal of large lesions (≥ 10 mm)
+      classifications: []
+      expected_interventions:
+      - name: egd_poem
+        version: null
+      - name: endoscopy_eftr_generic
+        version: null
+      - name: endoscopy_emr_generic
+        version: null
+      - name: endoscopy_esd_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_lesion_removal_small
+      record_type: examination_indication
+      description: Elective gastroscopy for removal of small lesions (< 10 mm)
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_biopsy_foreceps_resection_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_diathermic_snare_resection_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_obstruction_generic
+      record_type: examination_indication
+      description: Elective gastroscopy for patients with obstruction / dysphagia
+      classifications: []
+      expected_interventions:
+      - name: egd_esophagus_injection_botox
+        version: null
+      - name: egd_stepwise_biopsy
+        version: null
+      - name: endoscopy_ablation_cryotherapy
+        version: null
+      - name: endoscopy_ablation_laser
+        version: null
+      - name: endoscopy_ablation_radiofrequency
+        version: null
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_dilation_balloon
+        version: null
+      - name: endoscopy_dilation_bougie
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_stent_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_percutane_enterostomy
+      record_type: examination_indication
+      description: Gastroscopy for percutaneous enterostomy
+      classifications: []
+      expected_interventions:
+      - name: egd_percutaneous_gastroenterostomy
+        version: null
+      - name: egd_percutaneous_jejunostomy
+        version: null
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_therapeutic_varicosis_intestine
+      record_type: examination_indication
+      description: Elective gastroscopy for therapeutic purposes in elective patients
+        with varicosis of the intestine
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      - name: endoscopy_rubber_band_ligation_generic
+        version: null
+      - name: endoscopy_sclerotherapy_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_varicosis_therapeutic_esophagus
+      record_type: examination_indication
+      description: Elective gastroscopy for therapeutic purposes in elective patients
+        with varicosis of the esophagus
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      - name: endoscopy_rubber_band_ligation_generic
+        version: null
+      - name: endoscopy_sclerotherapy_generic
+        version: null
+      information_sources: []
+    - name: gastroscopy_varicosis_therapeutic_stomach
+      record_type: examination_indication
+      description: Elective gastroscopy for therapeutic purposes in elective patients
+        with varicosis of the stomach
+      classifications: []
+      expected_interventions:
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      - name: endoscopy_rubber_band_ligation_generic
+        version: null
+      - name: endoscopy_sclerotherapy_generic
+        version: null
+      information_sources: []
+    - name: percutaneous_transhepatic_biliary_drainage
+      record_type: examination_indication
+      description: Percutaneous transhepatic biliary drainage without further specification
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: percutaneous_transhepatic_cholangiography
+      record_type: examination_indication
+      description: Percutaneous transhepatic cholangiography without further specification
+      classifications: []
+      expected_interventions: []
+      information_sources: []
+    - name: small_bowel_endoscopy_generic
+      record_type: examination_indication
+      description: Small bowel endoscopy without further specification
+      classifications: []
+      expected_interventions: []
+      information_sources: []

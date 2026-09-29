@@ -1,5 +1,13 @@
 # Package Boundary Guide
 
+## Host presets and optional employees
+
+For the canonical package layout, field contracts, optional employees, and
+validation/import commands, see [Structure of a valid lx-dtypes package](dtypes-package-structure.md).
+That guide includes a loadable documentation example and an agent/reviewer
+checklist. Reuse the existing ledger `Center` and `Examiner`/`ExaminerDataDict`
+contracts; package parsing remains independent of Django setup.
+
 `lx-data-models` should be treated as a package boundary when used from sibling
 applications such as `endoreg-db`.
 

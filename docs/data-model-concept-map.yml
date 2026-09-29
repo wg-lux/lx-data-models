@@ -18,6 +18,68 @@ scope:
     or nested by that field. Knowledge-base references are semantic names; ledger
     identity is normally a UUID string or nested Pydantic object.
 
+cross_repository_reuse:
+  owner: "lx-data-models maintainers"
+  canonical_topic: "Shared contracts and intentional representation boundaries"
+  consumers:
+    endoreg-db: "Persistence adapters, API validation, datasets, and hub ingest"
+    lx-annotate: "Annotation workflows and outbound hub payload construction"
+    lx-anonymizer: "OCR, media processing, report extraction, and anonymization"
+  import_boundary:
+    contracts: >-
+      Public contract exports resolve on demand and retain their existing names.
+      Import a contract through its public domain module or the contracts package.
+      Importing OCR, hub transfer, video processing, or dataset export contracts
+      does not require Django settings or an installed consumer application.
+    ledger: >-
+      Individual patient-video contracts do not load the aggregate Django registry.
+      Accessing ledger registry exports still requires the appropriate host setup.
+    installation: >-
+      Import isolation does not change installation dependencies. The current
+      distribution still declares Django and scientific/media dependencies and
+      supports Python 3.12. Dependency extras require a separate packaging migration.
+  shared_implementations:
+    scored_active_learning_candidate:
+      canonical: "contracts.ai_dataset.AIDataSetScoredActiveLearningCandidateContract"
+      compatibility_alias: "contracts.ai_dataset.AIDataSetScoredActiveLearningCandidateContractContract"
+      note: >-
+        Both names now identify the same validated runtime model. Payload fields
+        are unchanged; the legacy name uses the canonical JSON Schema title and
+        class name. Consumers should use the canonical spelling for new code.
+    frame_cache_logging:
+      fields: "contracts._frame_cache (private implementation)"
+      public_modules: ["contracts.video_frame_cache", "contracts.json_types"]
+      note: >-
+        Manifest and validation fields share one definition. Public classes retain
+        their JSON Schemas, strict validation, serialization methods, and inheritance
+        from their respective manifest models. The Video-prefixed variants remain
+        frozen and require db_extracted_frame_count; the mutable validation variant
+        defaults that count to zero. Do not replace these variants with one alias.
+  intentional_separations:
+    - >-
+      Pydantic models, TypedDict representations, and Django adapters serve runtime
+      validation, static transport typing, and persistence respectively. Similar
+      fields alone do not make their classes interchangeable.
+    - >-
+      Named clinical concepts remain distinct even when their current fields match;
+      separate semantic identities and schema names are part of the public contract.
+    - >-
+      JSON value aliases must retain domain nullability and serialization behavior.
+      Similar recursive unions are not sufficient evidence for a breaking merge.
+  consumer_adapter_boundaries:
+    lx_annotate_hub:
+      source: "lx_annotate/hub/hub_export_payloads.py"
+      canonical: "contracts.hub_transfer"
+      note: >-
+        Local video, PDF, and sensitive-metadata TypedDicts repeat shared field
+        shapes but use total=False where canonical records require fields.
+        Frame and segment identifiers and provenance types also differ. The
+        producer already validates completed payloads through canonical validators.
+        Replacing builder types requires checking partially constructed records;
+        identical field names alone do not justify substituting canonical types.
+  regression_tests:
+    - "tests/unit/lx_dtypes/models/contracts/test_contract_reuse.py"
+
 field_groups:
   person_fields:
     - first_name
@@ -322,7 +384,6 @@ levels:
         - fhir_clinical
         - finding_classification
         - finding_intervention
-        - finding_type
         - information_source
         - knowledge_base
         - knowledge_base_graph
@@ -333,9 +394,7 @@ levels:
         - patient_finding_classification
         - patient_finding_classification_runtime
         - patient_finding_intervention
-        - patient_medication_schedule
         - patient_view
-        - risk
         - subcategory_validation
         - terminology_catalog
       reporting_and_documents:
@@ -374,7 +433,6 @@ levels:
         - video_segment_validation
         - video_segments
         - video_state
-        - video_stream_info
         - video_temporal_inference
         - video_text_metadata
       ai_and_annotation:
@@ -414,7 +472,6 @@ levels:
         - dicom_export
         - django_settings
         - dtypes_record_persistence
-        - fix_video_path_direct
         - hub_ingest
         - hub_transfer
         - legacy_data_import
@@ -424,7 +481,6 @@ levels:
         - migrate_data_dir
         - migrate_media_storage
         - name_fixtures
-        - parse_and_generate_yaml
         - permission_runtime
         - sap_ish_import
         - setup_config

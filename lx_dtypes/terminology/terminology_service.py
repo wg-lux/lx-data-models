@@ -12,7 +12,7 @@ import os
 import shutil
 import stat
 import zipfile
-from collections.abc import Callable, Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from hashlib import sha256
@@ -148,6 +148,68 @@ class TerminologyService:
         identity = module_name, version
         return self._load(identity, self._entry(payload, identity))
 
+    def register_local(
+        self,
+        module_name: str,
+        version: str,
+        *,
+        input_dirs: Sequence[Path],
+    ) -> TerminologyBundleVersion:
+        """Validate and register caller-owned directories without copying or activation.
+
+        Repeating the same registration is idempotent. An existing identity
+        cannot be redirected to another source. Paths must remain available to
+        every process using this registry; published contents must be versioned.
+        """
+        identity = (
+            _safe_identity(module_name, "name"),
+            _safe_identity(version, "version"),
+        )
+        if not input_dirs or any(not path.is_absolute() for path in input_dirs):
+            raise TerminologyError(
+                400, "Local package inputs must be absolute directories."
+            )
+        try:
+            paths = list(
+                dict.fromkeys(path.resolve(strict=True) for path in input_dirs)
+            )
+            if any(not path.is_dir() for path in paths):
+                raise ValueError("Input is not a directory")
+        except (OSError, ValueError, RuntimeError) as exc:
+            raise TerminologyError(
+                400, "Local package inputs must be existing directories."
+            ) from exc
+
+        # Registration is a validation boundary, including for edited authoring trees.
+        clear_knowledge_base_resolver_caches()
+        kb = self._load_paths(identity, paths)
+        entry = RegistryEntry.model_validate(
+            {
+                "sources": [
+                    {"kind": "filesystem", "input_dirs": [str(path) for path in paths]}
+                ],
+                "medical_field": self._medical_field(
+                    kb.config.medical_field, status=400
+                ),
+            }
+        )
+        with self._lock():
+            payload, _ = self._snapshot(allow_missing=True)
+            versions = payload.modules.setdefault(identity[0], {})
+            existing = versions.get(identity[1])
+            if existing is not None:
+                if existing.model_dump(exclude_none=True) != entry.model_dump(
+                    exclude_none=True
+                ):
+                    raise TerminologyError(
+                        409,
+                        "This bundle identity is already registered with different sources or metadata.",
+                    )
+            else:
+                versions[identity[1]] = entry
+                self._write(payload)
+            return self._bundle(identity, entry, self._active(payload))
+
     def export_fhir(self, identity: Identity | None = None) -> dict[str, Any]:
         payload, _ = self._snapshot()
         active = self._active(payload)
@@ -179,6 +241,7 @@ class TerminologyService:
         expected_revision: str,
         on_selected: Callable[[KnowledgeBase], object],
         clear_application_caches: Callable[[], None],
+        load_selected: Callable[[], KnowledgeBase] | None = None,
     ) -> SelectTerminologyBundleResponse:
         identity = module_name, version
         with self._lock():
@@ -188,7 +251,15 @@ class TerminologyService:
                     409, "Registry changed; reload bundles before selecting."
                 )
             entry = self._entry(payload, identity)
-            kb = self._load(identity, entry)
+            kb = (
+                self._load(identity, entry)
+                if load_selected is None
+                else load_selected()
+            )
+            if (kb.config.name, kb.config.version) != identity:
+                raise TerminologyError(
+                    409, "Selected bundle identity differs from the requested identity."
+                )
             bundle, counts = self._bundle(identity, entry, identity), _counts(kb)
             payload.active = RegistryActiveIdentity(
                 module_name=module_name, version=version
@@ -406,7 +477,28 @@ class TerminologyService:
                 "Registered bundle resources could not be resolved.",
             ) from exc
 
+    def source_paths(
+        self, module_name: str, version: str, *, allow_remote: bool = True
+    ) -> list[Path]:
+        """Resolve registered inputs without provisioning or selecting a bundle."""
+        payload, _ = self._snapshot()
+        identity = module_name, version
+        entry = self._entry(payload, identity)
+        if not allow_remote and any(
+            is_remote_data_root(value) for value in self._source_inputs(identity, entry)
+        ):
+            raise TerminologyError(
+                409,
+                "Deployment setup requires locally registered sources; provision remote artifacts first.",
+            )
+        return self._resolved_source_paths(identity, entry)
+
     def _load(self, identity: Identity, entry: RegistryEntry) -> KnowledgeBase:
+        return self._load_paths(identity, self._resolved_source_paths(identity, entry))
+
+    def _resolved_source_paths(
+        self, identity: Identity, entry: RegistryEntry
+    ) -> list[Path]:
         try:
             paths = [
                 resolve_remote_data_root(value, module_name=identity[0])
@@ -419,13 +511,17 @@ class TerminologyService:
                 409,
                 "Registered bundle resources could not be resolved.",
             ) from exc
-        return self._load_paths(identity, paths)
+        return paths
 
     @staticmethod
     def _load_paths(identity: Identity, paths: list[Path]) -> KnowledgeBase:
         if not paths or any(not path.is_absolute() for path in paths):
             raise TerminologyError(
                 500, "Bundle inputs must be explicit absolute paths."
+            )
+        if any(not path.is_dir() for path in paths):
+            raise TerminologyError(
+                409, "Registered bundle source directory is unavailable."
             )
         try:
             kb = load_knowledge_base(identity[0], version=identity[1], input_dirs=paths)

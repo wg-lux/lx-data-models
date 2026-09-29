@@ -200,6 +200,30 @@ def cmd_add_current(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_register_local(args: argparse.Namespace) -> int:
+    """Validate caller-owned resources before publishing their registry entry."""
+    from lx_dtypes.terminology.terminology_service import (
+        TerminologyError,
+        TerminologyService,
+    )
+
+    service = TerminologyService(registry_path=args.registry.expanduser().resolve())
+    try:
+        bundle = service.register_local(
+            args.module,
+            args.version,
+            input_dirs=[path.expanduser().resolve() for path in args.input_dir],
+        )
+    except TerminologyError as exc:
+        print(
+            json.dumps({"status": "error", "detail": str(exc)}, sort_keys=True),
+            file=sys.stderr,
+        )
+        return 1
+    print(bundle.model_dump_json())
+    return 0
+
+
 def cmd_bootstrap(args: argparse.Namespace) -> int:
     """Strictly provision and validate the installed packaged catalog."""
 
@@ -268,6 +292,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="One input directory to provision for this module/version. Repeatable.",
     )
     add_parser.set_defaults(func=cmd_add)
+
+    register_parser = subparsers.add_parser(
+        "register-local",
+        help="Validate and register existing package directories without copying or activation.",
+    )
+    register_parser.add_argument(
+        "registry", type=Path, help="Caller-owned registry JSON path."
+    )
+    register_parser.add_argument("--module", required=True)
+    register_parser.add_argument("--version", required=True)
+    register_parser.add_argument(
+        "--input-dir",
+        action="append",
+        required=True,
+        type=Path,
+        help="Package directory or source tree containing its dependency closure; repeatable.",
+    )
+    register_parser.set_defaults(func=cmd_register_local)
 
     add_current_parser = subparsers.add_parser(
         "add-current",

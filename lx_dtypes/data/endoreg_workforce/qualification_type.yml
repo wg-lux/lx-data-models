@@ -1,0 +1,25 @@
+- model: reference_catalog
+  name: qualification_type
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: qualification_type
+      name: endoscopy
+      description: null
+      is_active: true
+    - record_type: qualification_type
+      name: outpatient_clinic
+      description: null
+      is_active: true
+    - record_type: qualification_type
+      name: shift_requirement
+      description: null
+      is_active: true
+    - record_type: qualification_type
+      name: sonography
+      description: null
+      is_active: true
+    - record_type: qualification_type
+      name: ward_rounds
+      description: null
+      is_active: true

@@ -1,0 +1,12 @@
+# config.yaml is the required discovery filename; data files may use .yml.
+name: training_preset
+version: "1.0.0"
+description: Synthetic documentation example, not a clinical study definition.
+modules: []
+depends_on: []
+data:
+  files:
+    - data/preset.yml
+    - data/examinations.yml
+    # Optional: enable only when center-specific employee hints are wanted.
+    # - optional/employees.yml

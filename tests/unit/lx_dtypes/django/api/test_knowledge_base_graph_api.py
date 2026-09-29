@@ -333,6 +333,7 @@ def test_graph_projection_strips_template_source_file_paths() -> None:
             },
         ),
         ("coloreg", "0.1.0", {"coloreg_colonoscopy": "1.0.0"}),
+        ("coloreg", "0.2.0", {"coloreg_colonoscopy": "1.0.0"}),
         (
             "mst_3_0",
             "3.0.0",
@@ -361,7 +362,10 @@ def test_packaged_reporting_bundle_builds_versioned_graph_snapshot(
     module_version: str,
     expected_templates: dict[str, str],
 ) -> None:
-    kb = DataLoader().load_knowledge_base(module_name)
+    descriptor = get_packaged_knowledge_base(module_name, module_version)
+    kb = DataLoader(input_dirs=[descriptor.installed_data_root()]).load_knowledge_base(
+        module_name
+    )
 
     snapshot = build_knowledge_base_graph_snapshot(
         kb,

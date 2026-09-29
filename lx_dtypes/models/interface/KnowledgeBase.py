@@ -22,6 +22,10 @@ from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.interface.LookupTracker import KnowledgeBaseLookupTracker
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
+from lx_dtypes.models.knowledge_base.center.center_employee_list import (
+    CenterEmployeeList,
+    CenterEmployeeListDataDict,
+)
 from lx_dtypes.models.knowledge_base.citation.Citation import Citation
 from lx_dtypes.models.knowledge_base.citation.CitationDataDict import CitationDataDict
 from lx_dtypes.models.knowledge_base.classification.Classification import (
@@ -98,6 +102,10 @@ from lx_dtypes.models.knowledge_base.pydantic_main import (
     KB_MODELS,
     knowledge_base_models_lookup,
 )
+from lx_dtypes.models.knowledge_base.reference_catalog import (
+    ReferenceCatalog,
+    ReferenceCatalogDataDict,
+)
 from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
     ClassificationValidator,
 )
@@ -166,6 +174,10 @@ from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     export_terminology_validated_fhir_observations,
     import_terminology_validated_fhir_observations,
 )
+from lx_dtypes.models.knowledge_base.study_preset import (
+    StudyPreset,
+    StudyPresetDataDict,
+)
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 from lx_dtypes.models.knowledge_base.unit.UnitDataDict import UnitDataDict
 from lx_dtypes.models.knowledge_base.unit.UnitType import UnitType
@@ -183,9 +195,20 @@ from lx_dtypes.utils.report_template_registry import (
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.Ledger import Ledger
     from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+    from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
+    from lx_dtypes.models.ledger.p_finding_classification_choice.Pydantic import (
+        PFindingClassificationChoice,
+    )
+    from lx_dtypes.models.ledger.p_indication.Pydantic import PIndication
+    from lx_dtypes.models.ledger.p_indication_classification.Pydantic import (
+        PIndicationClassification,
+    )
 
 
 class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
+    study_preset: dict[str, StudyPresetDataDict]
+    reference_catalog: dict[str, ReferenceCatalogDataDict]
+    center_employee_list: dict[str, CenterEmployeeListDataDict]
     config: KnowledgeBaseConfig
     citation: dict[str, CitationDataDict]
     classification: dict[str, ClassificationDataDict]
@@ -227,6 +250,9 @@ YAML_IMPORT_SKIP_FIELDS = [
 
 
 class KnowledgeBaseRecordList(TypedDict):
+    study_presets: list[StudyPresetDataDict]
+    reference_catalogs: list[ReferenceCatalogDataDict]
+    center_employee_lists: list[CenterEmployeeListDataDict]
     citations: list[CitationDataDict]
     classifications: list[ClassificationDataDict]
     classification_types: list[ClassificationTypeDataDict]
@@ -261,6 +287,9 @@ class SemanticAdmissibilityError(ValueError):
 
 
 class KnowledgeBase(AppBaseModelUUIDTags):
+    study_preset: dict[str, StudyPreset] = Field(default_factory=dict)
+    reference_catalog: dict[str, ReferenceCatalog] = Field(default_factory=dict)
+    center_employee_list: dict[str, CenterEmployeeList] = Field(default_factory=dict)
     config: KnowledgeBaseConfig
     citation: dict[str, Citation] = Field(default_factory=dict)
     classification: dict[str, Classification] = Field(default_factory=dict)
@@ -804,138 +833,158 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             return [value]
         return []
 
-    def assert_examination_admissibility(
-        self,
-        p_examination: "PExamination",
-        *,
-        template_name: str | None = None,
+    @staticmethod
+    def _ensure_finding_requirement(
+        requirements: dict[str, ReportTemplateFindingRequirement],
+        finding_name: str,
     ) -> None:
-        def template_requirements_by_finding(
-            resolved_template_name: str,
-        ) -> dict[str, ReportTemplateFindingRequirement]:
-            def ensure_requirement(finding_name: str) -> None:
-                requirements.setdefault(
-                    finding_name,
-                    ReportTemplateFindingRequirement(finding=finding_name),
+        requirements.setdefault(
+            finding_name,
+            ReportTemplateFindingRequirement(finding=finding_name),
+        )
+
+    @classmethod
+    def _ensure_classification_requirement(
+        cls,
+        requirements: dict[str, ReportTemplateFindingRequirement],
+        finding_name: str,
+        classification_name: str,
+    ) -> None:
+        cls._ensure_finding_requirement(requirements, finding_name)
+        requirement = requirements[finding_name]
+        if any(
+            existing.classification == classification_name
+            for existing in requirement.classifications
+        ):
+            return
+        requirement.classifications.append(
+            ReportTemplateClassificationRequirement(classification=classification_name)
+        )
+
+    def _add_finding_validator_requirements(
+        self,
+        requirements: dict[str, ReportTemplateFindingRequirement],
+        finding_validator: FindingsValidator,
+    ) -> None:
+        self._ensure_finding_requirement(requirements, finding_validator.finding)
+        condition = finding_validator.query.condition
+        if condition is None:
+            return
+        for requirement_reference in condition.then_requires:
+            if requirement_reference.kind == "classification":
+                self._ensure_classification_requirement(
+                    requirements,
+                    finding_validator.finding,
+                    requirement_reference.classification or requirement_reference.name,
                 )
 
-            def ensure_classification_requirement(
-                finding_name: str,
-                classification_name: str,
-            ) -> None:
-                ensure_requirement(finding_name)
-                requirement = requirements[finding_name]
-                if any(
-                    existing.classification == classification_name
-                    for existing in requirement.classifications
-                ):
-                    return
-                requirement.classifications.append(
-                    ReportTemplateClassificationRequirement(
-                        classification=classification_name
-                    )
-                )
+    def _collect_examination_validator_requirements(
+        self,
+        requirements: dict[str, ReportTemplateFindingRequirement],
+        validator_name: str,
+        visited: set[str],
+    ) -> None:
+        if validator_name in visited:
+            return
+        visited.add(validator_name)
+        examination_validator = self._lookup_optional(
+            collection_name="examination_validator",
+            key=validator_name,
+            source="assert_examination_admissibility",
+        )
+        if examination_validator is None:
+            return
 
-            def collect_from_examination_validator(validator_name: str) -> None:
-                if validator_name in visited_exam_validators:
-                    return
-                visited_exam_validators.add(validator_name)
-                examination_validator = self._lookup_optional(
-                    collection_name="examination_validator",
-                    key=validator_name,
-                    source="assert_examination_admissibility",
+        for finding_validator_name in self._names_as_list(
+            examination_validator.finding_validators
+        ):
+            finding_validator = self._lookup_optional(
+                collection_name="findings_validator",
+                key=finding_validator_name,
+                source="assert_examination_admissibility",
+            )
+            if finding_validator is not None:
+                self._add_finding_validator_requirements(
+                    requirements, finding_validator
                 )
-                if examination_validator is None:
-                    return
-                for finding_validator_name in self._names_as_list(
-                    examination_validator.finding_validators
-                ):
-                    finding_validator = self._lookup_optional(
-                        collection_name="findings_validator",
-                        key=finding_validator_name,
+        for nested_name in self._names_as_list(
+            examination_validator.examination_validators
+        ):
+            self._collect_examination_validator_requirements(
+                requirements, nested_name, visited
+            )
+
+    def _template_requirements_by_finding(
+        self,
+        template_name: str,
+    ) -> dict[str, ReportTemplateFindingRequirement]:
+        template = self.get_report_template(template_name)
+        requirements: dict[str, ReportTemplateFindingRequirement] = {}
+
+        for section_name in template.report_sections:
+            section = self._lookup_optional(
+                collection_name="report_template_section",
+                key=section_name,
+                source="assert_examination_admissibility",
+            )
+            if section is None:
+                continue
+            for finding_ref in section.findings:
+                if isinstance(finding_ref, str):
+                    report_finding = self._lookup_optional(
+                        collection_name="report_finding",
+                        key=finding_ref,
                         source="assert_examination_admissibility",
                     )
-                    if finding_validator is not None:
-                        ensure_requirement(finding_validator.finding)
-                        if finding_validator.query.condition is not None:
-                            for (
-                                requirement_reference
-                            ) in finding_validator.query.condition.then_requires:
-                                if requirement_reference.kind == "classification":
-                                    ensure_classification_requirement(
-                                        finding_validator.finding,
-                                        requirement_reference.classification
-                                        or requirement_reference.name,
-                                    )
-                for nested_exam_validator_name in self._names_as_list(
-                    examination_validator.examination_validators
-                ):
-                    collect_from_examination_validator(nested_exam_validator_name)
+                    if report_finding is None:
+                        continue
+                    requirement = report_finding.as_requirement()
+                else:
+                    requirement = finding_ref
+                requirements[requirement.finding] = requirement
 
-            template = self.get_report_template(resolved_template_name)
-            requirements: dict[str, ReportTemplateFindingRequirement] = {}
-            visited_exam_validators: set[str] = set()
-            for section_name in template.report_sections:
-                section = self._lookup_optional(
-                    collection_name="report_template_section",
-                    key=section_name,
-                    source="assert_examination_admissibility",
+        for validator_name in self._names_as_list(
+            template.validators.findings_validators
+        ):
+            finding_validator = self._lookup_optional(
+                collection_name="findings_validator",
+                key=validator_name,
+                source="assert_examination_admissibility",
+            )
+            if finding_validator is not None:
+                self._add_finding_validator_requirements(
+                    requirements, finding_validator
                 )
-                if section is None:
-                    continue
-                for finding_ref in section.findings:
-                    if isinstance(finding_ref, str):
-                        report_finding = self._lookup_optional(
-                            collection_name="report_finding",
-                            key=finding_ref,
-                            source="assert_examination_admissibility",
-                        )
-                        if report_finding is None:
-                            continue
-                        requirement = report_finding.as_requirement()
-                    else:
-                        requirement = finding_ref
-                    requirements[requirement.finding] = requirement
-            for findings_validator_name in self._names_as_list(
-                template.validators.findings_validators
-            ):
-                finding_validator = self._lookup_optional(
-                    collection_name="findings_validator",
-                    key=findings_validator_name,
-                    source="assert_examination_admissibility",
-                )
-                if finding_validator is not None:
-                    ensure_requirement(finding_validator.finding)
-                    if finding_validator.query.condition is not None:
-                        for (
-                            requirement_reference
-                        ) in finding_validator.query.condition.then_requires:
-                            if requirement_reference.kind == "classification":
-                                ensure_classification_requirement(
-                                    finding_validator.finding,
-                                    requirement_reference.classification
-                                    or requirement_reference.name,
-                                )
-            for classification_validator_name in self._names_as_list(
-                template.validators.classification_validators
-            ):
-                classification_validator = self._lookup_optional(
-                    collection_name="classification_validator",
-                    key=classification_validator_name,
-                    source="assert_examination_admissibility",
-                )
-                if classification_validator is not None:
-                    ensure_classification_requirement(
-                        classification_validator.finding,
-                        classification_validator.classification,
-                    )
-            for examination_validator_name in self._names_as_list(
-                template.validators.examination_validators
-            ):
-                collect_from_examination_validator(examination_validator_name)
-            return requirements
 
-        requirements_by_finding: dict[str, ReportTemplateFindingRequirement]
+        for validator_name in self._names_as_list(
+            template.validators.classification_validators
+        ):
+            classification_validator = self._lookup_optional(
+                collection_name="classification_validator",
+                key=validator_name,
+                source="assert_examination_admissibility",
+            )
+            if classification_validator is not None:
+                self._ensure_classification_requirement(
+                    requirements,
+                    classification_validator.finding,
+                    classification_validator.classification,
+                )
+
+        visited: set[str] = set()
+        for validator_name in self._names_as_list(
+            template.validators.examination_validators
+        ):
+            self._collect_examination_validator_requirements(
+                requirements, validator_name, visited
+            )
+        return requirements
+
+    def _requirements_for_examination(
+        self,
+        p_examination: "PExamination",
+        template_name: str | None,
+    ) -> dict[str, ReportTemplateFindingRequirement]:
         if template_name is not None:
             template = self.get_report_template(template_name)
             if template.examination != p_examination.examination:
@@ -944,34 +993,246 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                     f"'{p_examination.examination}' does not match report template "
                     f"'{template_name}' examination '{template.examination}'."
                 )
-            requirements_by_finding = template_requirements_by_finding(template_name)
-        else:
-            requirements_by_finding = {}
-            examination = self._lookup_optional(
-                collection_name="examination",
-                key=p_examination.examination,
-                source="assert_examination_admissibility",
+            return self._template_requirements_by_finding(template_name)
+
+        requirements: dict[str, ReportTemplateFindingRequirement] = {}
+        examination = self._lookup_optional(
+            collection_name="examination",
+            key=p_examination.examination,
+            source="assert_examination_admissibility",
+        )
+        if examination is not None:
+            for finding_name in self._names_as_list(examination.findings):
+                self._ensure_finding_requirement(requirements, finding_name)
+
+        matching_templates = [
+            template
+            for template in self.report_template.values()
+            if template.examination == p_examination.examination
+        ]
+        for template in matching_templates:
+            requirements.update(self._template_requirements_by_finding(template.name))
+        if examination is None and not matching_templates:
+            raise SemanticAdmissibilityError(
+                f"Unknown examination '{p_examination.examination}'."
             )
-            if examination is not None:
-                for finding_name in self._names_as_list(examination.findings):
-                    requirements_by_finding.setdefault(
-                        finding_name,
-                        ReportTemplateFindingRequirement(finding=finding_name),
-                    )
-            for report_template in self.report_template.values():
-                if report_template.examination != p_examination.examination:
-                    continue
-                requirements_by_finding.update(
-                    template_requirements_by_finding(report_template.name)
-                )
-            if p_examination.examination not in self.examination and not any(
-                report_template.examination == p_examination.examination
-                for report_template in self.report_template.values()
+        return requirements
+
+    def _assert_finding_classification_choice(
+        self,
+        finding_name: str,
+        choice: "PFindingClassificationChoice",
+        allowed_classifications: set[str],
+    ) -> None:
+        kb_classification = self._lookup_optional(
+            collection_name="classification",
+            key=choice.classification,
+            source="assert_examination_admissibility",
+        )
+        if (
+            kb_classification is None
+            and choice.classification not in allowed_classifications
+        ):
+            raise SemanticAdmissibilityError(
+                f"Unknown classification '{choice.classification}'."
+            )
+        if choice.classification not in allowed_classifications:
+            raise SemanticAdmissibilityError(
+                f"Classification '{choice.classification}' is not permitted for "
+                f"finding '{finding_name}'."
+            )
+
+        allowed_choices = (
+            set(self._names_as_list(kb_classification.classification_choices))
+            if kb_classification is not None
+            else set()
+        )
+        kb_choice = self._lookup_optional(
+            collection_name="classification_choice",
+            key=choice.classification_choice,
+            source="assert_examination_admissibility",
+        )
+        if kb_choice is None and allowed_choices:
+            raise SemanticAdmissibilityError(
+                f"Unknown classification choice '{choice.classification_choice}'."
+            )
+        if allowed_choices and choice.classification_choice not in allowed_choices:
+            raise SemanticAdmissibilityError(
+                f"Classification choice '{choice.classification_choice}' is not "
+                f"permitted for classification '{choice.classification}'."
+            )
+
+        allowed_descriptors = (
+            set(self._names_as_list(kb_choice.classification_choice_descriptors))
+            if kb_choice is not None
+            else set()
+        )
+        for descriptor in choice.patient_finding_classification_choice_descriptors:
+            descriptor_name = descriptor.classification_choice_descriptor
+            if (
+                descriptor_name not in self.classification_choice_descriptor
+                and allowed_descriptors
             ):
                 raise SemanticAdmissibilityError(
-                    f"Unknown examination '{p_examination.examination}'."
+                    f"Unknown classification choice descriptor '{descriptor_name}'."
+                )
+            if allowed_descriptors and descriptor_name not in allowed_descriptors:
+                raise SemanticAdmissibilityError(
+                    f"Classification choice descriptor '{descriptor_name}' is not "
+                    "permitted for classification choice "
+                    f"'{choice.classification_choice}'."
                 )
 
+    def _assert_finding_admissibility(
+        self,
+        p_finding: "PFinding",
+        examination_name: str,
+        allowed_findings: set[str],
+        requirements: dict[str, ReportTemplateFindingRequirement],
+    ) -> None:
+        kb_finding = self._lookup_optional(
+            collection_name="finding",
+            key=p_finding.finding,
+            source="assert_examination_admissibility",
+        )
+        requirement = requirements.get(p_finding.finding)
+        if allowed_findings and p_finding.finding not in allowed_findings:
+            raise SemanticAdmissibilityError(
+                f"Finding '{p_finding.finding}' is not permitted for examination "
+                f"'{examination_name}'."
+            )
+        if kb_finding is None and requirement is None:
+            raise SemanticAdmissibilityError(f"Unknown finding '{p_finding.finding}'.")
+
+        allowed_classifications = (
+            set(self._names_as_list(kb_finding.classifications))
+            if kb_finding is not None
+            else set()
+        )
+        if requirement is not None:
+            allowed_classifications.update(
+                item.classification for item in requirement.classifications
+            )
+        allowed_interventions = (
+            set(self._names_as_list(kb_finding.interventions))
+            if kb_finding is not None
+            else set()
+        )
+
+        for classifications in p_finding.patient_finding_classifications:
+            for choice in classifications.patient_finding_classification_choices:
+                self._assert_finding_classification_choice(
+                    p_finding.finding, choice, allowed_classifications
+                )
+        for interventions in p_finding.patient_finding_interventions:
+            for intervention in interventions.patient_finding_interventions:
+                if intervention.intervention not in self.intervention:
+                    raise SemanticAdmissibilityError(
+                        f"Unknown intervention '{intervention.intervention}'."
+                    )
+                if intervention.intervention not in allowed_interventions:
+                    raise SemanticAdmissibilityError(
+                        f"Intervention '{intervention.intervention}' is not "
+                        f"permitted for finding '{p_finding.finding}'."
+                    )
+
+    def _assert_indication_classification(
+        self,
+        indication_name: str,
+        classification: "PIndicationClassification",
+        allowed_classifications: set[str],
+    ) -> None:
+        kb_classification = self.classification.get(classification.classification)
+        if (
+            kb_classification is None
+            and classification.classification not in allowed_classifications
+        ):
+            raise SemanticAdmissibilityError(
+                f"Unknown indication classification '{classification.classification}'."
+            )
+        if classification.classification not in allowed_classifications:
+            raise SemanticAdmissibilityError(
+                f"Classification '{classification.classification}' is not "
+                f"permitted for indication '{indication_name}'."
+            )
+
+        allowed_choices = (
+            set(self._names_as_list(kb_classification.classification_choices))
+            if kb_classification is not None
+            else set()
+        )
+        kb_choice = self.classification_choice.get(classification.classification_choice)
+        if kb_choice is None and allowed_choices:
+            raise SemanticAdmissibilityError(
+                "Unknown indication classification choice "
+                f"'{classification.classification_choice}'."
+            )
+        if (
+            allowed_choices
+            and classification.classification_choice not in allowed_choices
+        ):
+            raise SemanticAdmissibilityError(
+                f"Classification choice '{classification.classification_choice}' "
+                "is not permitted for classification "
+                f"'{classification.classification}'."
+            )
+
+        allowed_descriptors = (
+            set(self._names_as_list(kb_choice.classification_choice_descriptors))
+            if kb_choice is not None
+            else set()
+        )
+        for descriptor in classification.patient_indication_classification_descriptors:
+            descriptor_name = descriptor.classification_choice_descriptor
+            if (
+                descriptor_name not in self.classification_choice_descriptor
+                and allowed_descriptors
+            ):
+                raise SemanticAdmissibilityError(
+                    "Unknown indication classification choice descriptor "
+                    f"'{descriptor_name}'."
+                )
+            if allowed_descriptors and descriptor_name not in allowed_descriptors:
+                raise SemanticAdmissibilityError(
+                    f"Classification choice descriptor '{descriptor_name}' is not "
+                    "permitted for classification choice "
+                    f"'{classification.classification_choice}'."
+                )
+
+    def _assert_indication_admissibility(
+        self,
+        p_indication: "PIndication",
+        examination_name: str,
+        allowed_indications: set[str],
+    ) -> None:
+        kb_indication = self.indication.get(p_indication.indication)
+        if kb_indication is None:
+            raise SemanticAdmissibilityError(
+                f"Unknown indication '{p_indication.indication}'."
+            )
+        if allowed_indications and p_indication.indication not in allowed_indications:
+            raise SemanticAdmissibilityError(
+                f"Indication '{p_indication.indication}' is not permitted for "
+                f"examination '{examination_name}'."
+            )
+
+        allowed_classifications = set(
+            self._names_as_list(kb_indication.classifications)
+        )
+        for classification in p_indication.patient_indication_classifications:
+            self._assert_indication_classification(
+                p_indication.indication, classification, allowed_classifications
+            )
+
+    def assert_examination_admissibility(
+        self,
+        p_examination: "PExamination",
+        *,
+        template_name: str | None = None,
+    ) -> None:
+        requirements_by_finding = self._requirements_for_examination(
+            p_examination, template_name
+        )
         allowed_findings = set(requirements_by_finding.keys())
         examination = self.examination.get(p_examination.examination)
         allowed_indications = (
@@ -980,227 +1241,17 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             else set()
         )
         for p_finding in p_examination.patient_findings:
-            kb_finding = self._lookup_optional(
-                collection_name="finding",
-                key=p_finding.finding,
-                source="assert_examination_admissibility",
+            self._assert_finding_admissibility(
+                p_finding,
+                p_examination.examination,
+                allowed_findings,
+                requirements_by_finding,
             )
-            requirement = requirements_by_finding.get(p_finding.finding)
-            if allowed_findings and p_finding.finding not in allowed_findings:
-                raise SemanticAdmissibilityError(
-                    f"Finding '{p_finding.finding}' is not permitted for examination "
-                    f"'{p_examination.examination}'."
-                )
-            if kb_finding is None and requirement is None:
-                raise SemanticAdmissibilityError(
-                    f"Unknown finding '{p_finding.finding}'."
-                )
-
-            allowed_classifications = (
-                set(self._names_as_list(kb_finding.classifications))
-                if kb_finding is not None
-                else set()
-            )
-            if requirement is not None:
-                allowed_classifications.update(
-                    classification_requirement.classification
-                    for classification_requirement in requirement.classifications
-                )
-            allowed_interventions = (
-                set(self._names_as_list(kb_finding.interventions))
-                if kb_finding is not None
-                else set()
-            )
-
-            for classifications in p_finding.patient_finding_classifications:
-                for choice in classifications.patient_finding_classification_choices:
-                    kb_classification = self._lookup_optional(
-                        collection_name="classification",
-                        key=choice.classification,
-                        source="assert_examination_admissibility",
-                    )
-                    if (
-                        kb_classification is None
-                        and choice.classification not in allowed_classifications
-                    ):
-                        raise SemanticAdmissibilityError(
-                            f"Unknown classification '{choice.classification}'."
-                        )
-                    if choice.classification not in allowed_classifications:
-                        raise SemanticAdmissibilityError(
-                            f"Classification '{choice.classification}' is not "
-                            f"permitted for finding '{p_finding.finding}'."
-                        )
-
-                    allowed_choices = (
-                        set(
-                            self._names_as_list(
-                                kb_classification.classification_choices
-                            )
-                        )
-                        if kb_classification is not None
-                        else set()
-                    )
-                    kb_choice = self._lookup_optional(
-                        collection_name="classification_choice",
-                        key=choice.classification_choice,
-                        source="assert_examination_admissibility",
-                    )
-                    if kb_choice is None and allowed_choices:
-                        raise SemanticAdmissibilityError(
-                            f"Unknown classification choice "
-                            f"'{choice.classification_choice}'."
-                        )
-                    if (
-                        allowed_choices
-                        and choice.classification_choice not in allowed_choices
-                    ):
-                        raise SemanticAdmissibilityError(
-                            f"Classification choice '{choice.classification_choice}' is "
-                            f"not permitted for classification '{choice.classification}'."
-                        )
-
-                    allowed_descriptors = (
-                        set(
-                            self._names_as_list(
-                                kb_choice.classification_choice_descriptors
-                            )
-                        )
-                        if kb_choice is not None
-                        else set()
-                    )
-                    for (
-                        descriptor
-                    ) in choice.patient_finding_classification_choice_descriptors:
-                        if (
-                            descriptor.classification_choice_descriptor
-                            not in self.classification_choice_descriptor
-                            and allowed_descriptors
-                        ):
-                            raise SemanticAdmissibilityError(
-                                "Unknown classification choice descriptor "
-                                f"'{descriptor.classification_choice_descriptor}'."
-                            )
-                        if (
-                            allowed_descriptors
-                            and descriptor.classification_choice_descriptor
-                            not in allowed_descriptors
-                        ):
-                            raise SemanticAdmissibilityError(
-                                "Classification choice descriptor "
-                                f"'{descriptor.classification_choice_descriptor}' is "
-                                "not permitted for classification choice "
-                                f"'{choice.classification_choice}'."
-                            )
-
-            for interventions in p_finding.patient_finding_interventions:
-                for intervention in interventions.patient_finding_interventions:
-                    if intervention.intervention not in self.intervention:
-                        raise SemanticAdmissibilityError(
-                            f"Unknown intervention '{intervention.intervention}'."
-                        )
-                    if intervention.intervention not in allowed_interventions:
-                        raise SemanticAdmissibilityError(
-                            f"Intervention '{intervention.intervention}' is not "
-                            f"permitted for finding '{p_finding.finding}'."
-                        )
 
         for p_indication in p_examination.patient_indications:
-            kb_indication = self.indication.get(p_indication.indication)
-            if kb_indication is None:
-                raise SemanticAdmissibilityError(
-                    f"Unknown indication '{p_indication.indication}'."
-                )
-            if (
-                allowed_indications
-                and p_indication.indication not in allowed_indications
-            ):
-                raise SemanticAdmissibilityError(
-                    f"Indication '{p_indication.indication}' is not permitted for "
-                    f"examination '{p_examination.examination}'."
-                )
-
-            allowed_classifications = set(
-                self._names_as_list(kb_indication.classifications)
+            self._assert_indication_admissibility(
+                p_indication, p_examination.examination, allowed_indications
             )
-            for (
-                p_indication_classification
-            ) in p_indication.patient_indication_classifications:
-                kb_classification = self.classification.get(
-                    p_indication_classification.classification
-                )
-                if (
-                    kb_classification is None
-                    and p_indication_classification.classification
-                    not in allowed_classifications
-                ):
-                    raise SemanticAdmissibilityError(
-                        "Unknown indication classification "
-                        f"'{p_indication_classification.classification}'."
-                    )
-                if (
-                    p_indication_classification.classification
-                    not in allowed_classifications
-                ):
-                    raise SemanticAdmissibilityError(
-                        "Classification "
-                        f"'{p_indication_classification.classification}' is not "
-                        f"permitted for indication '{p_indication.indication}'."
-                    )
-
-                allowed_choices = (
-                    set(self._names_as_list(kb_classification.classification_choices))
-                    if kb_classification is not None
-                    else set()
-                )
-                kb_choice = self.classification_choice.get(
-                    p_indication_classification.classification_choice
-                )
-                if kb_choice is None and allowed_choices:
-                    raise SemanticAdmissibilityError(
-                        "Unknown indication classification choice "
-                        f"'{p_indication_classification.classification_choice}'."
-                    )
-                if (
-                    allowed_choices
-                    and p_indication_classification.classification_choice
-                    not in allowed_choices
-                ):
-                    raise SemanticAdmissibilityError(
-                        "Classification choice "
-                        f"'{p_indication_classification.classification_choice}' is "
-                        "not permitted for classification "
-                        f"'{p_indication_classification.classification}'."
-                    )
-
-                allowed_descriptors = (
-                    set(
-                        self._names_as_list(kb_choice.classification_choice_descriptors)
-                    )
-                    if kb_choice is not None
-                    else set()
-                )
-                for indication_descriptor in p_indication_classification.patient_indication_classification_descriptors:
-                    if (
-                        indication_descriptor.classification_choice_descriptor
-                        not in self.classification_choice_descriptor
-                        and allowed_descriptors
-                    ):
-                        raise SemanticAdmissibilityError(
-                            "Unknown indication classification choice descriptor "
-                            f"'{indication_descriptor.classification_choice_descriptor}'."
-                        )
-                    if (
-                        allowed_descriptors
-                        and indication_descriptor.classification_choice_descriptor
-                        not in allowed_descriptors
-                    ):
-                        raise SemanticAdmissibilityError(
-                            "Classification choice descriptor "
-                            f"'{indication_descriptor.classification_choice_descriptor}' is not "
-                            "permitted for classification choice "
-                            f"'{p_indication_classification.classification_choice}'."
-                        )
 
     def _normalized_runtime_findings_for_validation(
         self,
@@ -1787,6 +1838,13 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Collects each knowledge-base model into lists of their ddict (data-dictionary) representations and returns them grouped in a KnowledgeBaseRecordList.
         """
         return KnowledgeBaseRecordList(
+            study_presets=[record.ddict for record in self.study_preset.values()],
+            reference_catalogs=[
+                record.ddict for record in self.reference_catalog.values()
+            ],
+            center_employee_lists=[
+                record.ddict for record in self.center_employee_list.values()
+            ],
             citations=[record.ddict for record in self.citation.values()],
             classifications=[record.ddict for record in self.classification.values()],
             classification_types=[

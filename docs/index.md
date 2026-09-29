@@ -27,6 +27,8 @@ guides/fhir-clinical-testing
 guides/fhir-lxdm-mapping-diagrams
 guides/konzept-verknuepfungen
 guides/knowledge-base-authoring
+guides/terminology
+guides/dtypes-package-structure
 guides/kb-yaml-linting
 guides/knowledge-base-contract-migration
 guides/knowledge-base-graph-api

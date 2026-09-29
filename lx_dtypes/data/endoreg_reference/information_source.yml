@@ -1,0 +1,95 @@
+- model: reference_catalog
+  name: information_source
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: annotation
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: default_annotation
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: default_prediction
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+      record_type: information_source
+      url: null
+      description: null
+      date: '2024-04-28'
+      abbreviation: null
+    - name: family_anamnestic
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: guideline_quality_in_gi
+      record_type: information_source
+      url: null
+      description: null
+      date: '2025-01-01'
+      abbreviation: null
+    - name: lx_anonymizer_evaluation
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: patient_anamnestic
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: physical_examination
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: physical_measurement
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: physicians_note_anamnestic
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: prediction
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: treating_physician
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: treating_physician_anamnestic
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null
+    - name: unknown
+      record_type: information_source
+      url: null
+      description: null
+      date: null
+      abbreviation: null

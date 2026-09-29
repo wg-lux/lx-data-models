@@ -1,0 +1,57 @@
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022): https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
+# - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
+- model: classification
+  name: "visualized"
+  classification_types:
+    - inferrable
+  classification_choices:
+    - "yes"
+    - "no"
+
+- model: classification
+  name: "examination_setting_generic_location"
+  classification_types: []
+  classification_choices:
+    - examination_setting_generic_location_inpatient
+    - examination_setting_generic_location_outpatient
+
+- model: classification
+  name: "sedation_performed"
+  name_de: "Sedierung durchgeführt"
+  name_en: "Sedation performed"
+  classification_types: []
+  classification_choices:
+    - "yes"
+    - "no"
+    - "unknown"
+
+- model: classification
+  name: "examination_setting_generic_sedation"
+  name_de: "Sedierungsverfahren"
+  name_en: "Sedation method"
+  classification_types: []
+  classification_choices:
+    - "sedation_propofol"
+    - "sedation_midazolam"
+    - "sedation_propofol_midazolam"
+    - "sedation_other"
+
+- model: classification
+  name: "complication_generic_type"
+  name_de: "Art der Komplikation"
+  name_en: "Type of complication"
+  classification_types: []
+  classification_choices:
+    - complication_generic_type_cardiorespiratory
+    - complication_generic_type_bleeding
+    - complication_generic_type_perforation
+    - complication_generic_type_other
+
+- model: classification
+  name: "time_minutes_generic"
+  name_de: "Zeit in Minuten"
+  name_en: "Time in minutes"
+  classification_types: []
+  classification_choices:
+    - minutes_numeric_value

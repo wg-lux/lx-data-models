@@ -1,0 +1,95 @@
+- model: reference_catalog
+  name: center_waste
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: center_waste
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      year: 2020
+      waste:
+        name: general_waste
+        version: null
+      quantity: 10156.3857142857
+      unit:
+        name: kilogram
+        version: null
+      emission_factor:
+        name: waste_emission_general
+        version: null
+    - record_type: center_waste
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      year: 2021
+      waste:
+        name: general_waste
+        version: null
+      quantity: 10156.3857142857
+      unit:
+        name: kilogram
+        version: null
+      emission_factor:
+        name: waste_emission_general
+        version: null
+    - record_type: center_waste
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      year: 2022
+      waste:
+        name: general_waste
+        version: null
+      quantity: 10156.3857142857
+      unit:
+        name: kilogram
+        version: null
+      emission_factor:
+        name: waste_emission_general
+        version: null
+    - record_type: center_waste
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      year: 2020
+      waste:
+        name: medical_waste
+        version: null
+      quantity: 15699.9014285714
+      unit:
+        name: kilogram
+        version: null
+      emission_factor:
+        name: waste_emission_medical
+        version: null
+    - record_type: center_waste
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      year: 2021
+      waste:
+        name: medical_waste
+        version: null
+      quantity: 15699.9014285714
+      unit:
+        name: kilogram
+        version: null
+      emission_factor:
+        name: waste_emission_medical
+        version: null
+    - record_type: center_waste
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      year: 2022
+      waste:
+        name: medical_waste
+        version: null
+      quantity: 15699.9014285714
+      unit:
+        name: kilogram
+        version: null
+      emission_factor:
+        name: waste_emission_medical
+        version: null

@@ -1,0 +1,59 @@
+name: endoreg_reference
+description: Versioned EndoReg reference catalogue preserving legacy clinical definitions
+  and host provisioning.
+version: 1.0.0
+medical_field: gastroenterology
+modules: []
+depends_on: []
+data:
+  files:
+  - ./ai_model.yml
+  - ./center.yml
+  - ./contraindication.yml
+  - ./date_value_distribution.yml
+  - ./disease.yml
+  - ./disease_classification.yml
+  - ./disease_classification_choice.yml
+  - ./endoscope.yml
+  - ./endoscope_type.yml
+  - ./endoscopy_processor.yml
+  - ./event.yml
+  - ./examination.yml
+  - ./examination_indication.yml
+  - ./examination_indication_classification.yml
+  - ./examination_indication_classification_choice.yml
+  - ./examination_time.yml
+  - ./examination_time_type.yml
+  - ./examination_type.yml
+  - ./finding.yml
+  - ./finding_classification.yml
+  - ./finding_classification_choice.yml
+  - ./finding_classification_type.yml
+  - ./finding_intervention.yml
+  - ./finding_intervention_type.yml
+  - ./finding_type.yml
+  - ./gender.yml
+  - ./information_source.yml
+  - ./information_source_type.yml
+  - ./lab_value.yml
+  - ./label.yml
+  - ./label_set.yml
+  - ./label_type.yml
+  - ./medication.yml
+  - ./medication_indication.yml
+  - ./medication_indication_type.yml
+  - ./medication_intake_time.yml
+  - ./medication_schedule.yml
+  - ./model_type.yml
+  - ./numeric_value_distribution.yml
+  - ./organ.yml
+  - ./patient_lab_sample_type.yml
+  - ./pdf_type.yml
+  - ./report_reader_flag.yml
+  - ./risk.yml
+  - ./risk_type.yml
+  - ./single_categorical_value_distribution.yml
+  - ./tag.yml
+  - ./unit.yml
+  - ./video_segmentation_label.yml
+  - ./video_segmentation_label_set.yml

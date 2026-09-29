@@ -38,25 +38,32 @@ class DataLoader(AppBaseModel):
         """
         from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
+        configs = self.resolved_module_configs(module_name)
+        kb = KnowledgeBase.create_from_config(configs[0])
+        for config in configs[1:]:
+            kb.import_knowledge_base(KnowledgeBase.create_from_config(config))
+        return kb
+
+    def resolved_module_configs(
+        self, module_name: str
+    ) -> tuple["KnowledgeBaseConfig", ...]:
+        """Return the exact configurations consumed by loading, root first.
+
+        Keep this shared with load_knowledge_base: dependency traversal alone
+        is insufficient when a bundle scopes a module also available globally.
+        """
         if not self.module_configs:
             self.load_module_configs()
-
-        kb_config = self._get_initialized_config(module_name)
-        # Load root module data from YAML so the base KB is populated even when
-        # there are no submodules.
-        kb = KnowledgeBase.create_from_config(kb_config)
-
-        ordered_submodules = kb_config.modules
-
-        for sm_name in ordered_submodules:
-            sm_config = self._get_initialized_config(
-                sm_name,
-                context_config=kb_config,
-                relation="module",
-            )
-            sm_kb = KnowledgeBase.create_from_config(sm_config)
-            kb.import_knowledge_base(sm_kb)
-        return kb
+        root = self._get_initialized_config(module_name)
+        return (
+            root,
+            *(
+                self._get_initialized_config(
+                    name, context_config=root, relation="module"
+                )
+                for name in root.modules
+            ),
+        )
 
     def fetch_config_yamls(self) -> list[Path]:
         """Screens the input directories to ensure they exist.
@@ -213,7 +220,21 @@ class DataLoader(AppBaseModel):
                 (input_dir / "terminology" / module_name / "config.yaml").resolve()
                 for input_dir in self.input_dirs
             ]
-            return [*contextual_paths, *canonical_paths]
+            # Some grouped packages declare their semantic module name in the
+            # terminology/config.yaml manifest (for example DGVS_Terminology).
+            # Matching still requires this exact path among that name's configs.
+            grouped_paths = [
+                (context_dir.parent / "terminology" / "config.yaml").resolve(),
+                *[
+                    (input_dir / "terminology" / "config.yaml").resolve()
+                    for input_dir in self.input_dirs
+                ],
+            ]
+            root_paths = [
+                (input_dir / module_name / "config.yaml").resolve()
+                for input_dir in self.input_dirs
+            ]
+            return [*contextual_paths, *canonical_paths, *root_paths, *grouped_paths]
 
         if relation == "root":
             root_matches = [
@@ -235,6 +256,10 @@ class DataLoader(AppBaseModel):
                     (input_dir / "terminology" / module_name / "config.yaml").resolve()
                     for input_dir in self.input_dirs
                 ]
+                terminology_matches.extend(
+                    (input_dir / "terminology" / "config.yaml").resolve()
+                    for input_dir in self.input_dirs
+                )
                 canonical_matches = [
                     path for path in terminology_matches if path in candidate_paths
                 ]

@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=./deployment_setup.schema.json
+# Review the site identity and package selection before planning.
+schema_version: '1.0'
+site:
+  center_key: local-center
+  name: Local Center
+reference_packages:
+- module: endoreg_reference
+  version: 1.0.0
+study_packages:
+- module: coloreg
+  version: 0.2.0
+  activate: false
+adopt_existing: false

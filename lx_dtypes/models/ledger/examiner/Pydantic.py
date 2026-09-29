@@ -17,6 +17,10 @@ class Examiner(LedgerBaseModel[ExaminerDataDict], Person):
     center: str = Field(default_factory=str)
 
     @classmethod
+    def nested_fields(cls) -> list[str]:
+        return []
+
+    @classmethod
     def list_type_fields(cls) -> list[str]:
         """
         Return the field names used to identify list-type fields for this model.

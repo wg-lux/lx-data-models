@@ -1,0 +1,8 @@
+name: lx_interventions
+description: ""
+version: 0.1.0
+modules: []
+data:
+  dirs:
+    - ./data
+    - ./intervention_types

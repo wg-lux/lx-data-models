@@ -1,0 +1,126 @@
+- model: reference_catalog
+  name: reference_product
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: reference_product
+      name: reference_absorbant-pad_wuerzburg
+      product:
+        name: absorbant_pad
+        version: null
+      product_group:
+        name: Absorbant-Pad
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_balloon_wuerzburg
+      product:
+        name: extraction_balloon_escort_2
+        version: null
+      product_group:
+        name: Balloon
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_bougie_wuerzburg
+      product:
+        name: esophageal_dilator
+        version: null
+      product_group:
+        name: Bougie
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_coat_wuerzburg
+      product:
+        name: foliodress_gown_standard
+        version: null
+      product_group:
+        name: Coat
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_instrument_wuerzburg
+      product:
+        name: biopsy_grasper_hot_radial_jaw_4
+        version: null
+      product_group:
+        name: Instrument
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_metalstent_wuerzburg
+      product:
+        name: nitinol_stent_aix_oel
+        version: null
+      product_group:
+        name: Metal-Stent
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_peg_wuerzburg
+      product:
+        name: peg_freka_15_ch
+        version: null
+      product_group:
+        name: PEG
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_plastic-large_wuerzburg
+      product:
+        name: pressure_syringe_60_ml
+        version: null
+      product_group:
+        name: Plastic-Large
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_plastic_wuerzburg
+      product:
+        name: bite_protector
+        version: null
+      product_group:
+        name: Plastic
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_plasticstent_wuerzburg
+      product:
+        name: biliary_stent_cotton_leung_sof_flex
+        version: null
+      product_group:
+        name: Plastic-Stent
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null
+    - record_type: reference_product
+      name: reference_wire_wuerzburg
+      product:
+        name: visiglide_2
+        version: null
+      product_group:
+        name: Wire
+        version: null
+      emission_factor_total: null
+      emission_factor_package: null
+      emission_factor_product: null

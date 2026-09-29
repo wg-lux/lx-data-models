@@ -1,3 +1,9 @@
+from .reference_catalog import (
+    KbReferenceCatalogLookupType,
+    ReferenceCatalog,
+    ReferenceCatalogDataDict,
+)
+
 """Pydantic-only knowledge-base model aggregation.
 
 This module deliberately excludes every Django model so consumers can import the
@@ -6,6 +12,11 @@ official :class:`KnowledgeBase` type without configuring Django settings.
 
 from typing import Literal, TypeAlias, Union
 
+from .center.center_employee_list import (
+    CenterEmployeeList,
+    CenterEmployeeListDataDict,
+    KbCenterEmployeeListLookupType,
+)
 from .citation import (
     KbCitationLookupType,
     kb_citation_ddicts,
@@ -66,6 +77,7 @@ from .report_template import (
     kb_report_template_lookup,
     kb_report_template_models,
 )
+from .study_preset import KbStudyPresetLookupType, StudyPreset, StudyPresetDataDict
 from .unit import (
     KbUnitLookupType,
     kb_unit_ddicts,
@@ -75,6 +87,9 @@ from .unit import (
 
 
 class KnowledgeBaseModelsLookupType(
+    KbCenterEmployeeListLookupType,
+    KbStudyPresetLookupType,
+    KbReferenceCatalogLookupType,
     KbClassificationLookupType,
     KbClassificationChoiceLookupType,
     KbClassificationChoiceDescriptorLookupType,
@@ -91,6 +106,9 @@ class KnowledgeBaseModelsLookupType(
 
 
 knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
+    CenterEmployeeList=CenterEmployeeList,
+    StudyPreset=StudyPreset,
+    ReferenceCatalog=ReferenceCatalog,
     **kb_classification_lookup,
     **kb_classification_choice_lookup,
     **kb_classification_choice_descriptor_lookup,
@@ -105,6 +123,9 @@ knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
 )
 
 KB_MODELS: TypeAlias = Union[
+    StudyPreset,
+    ReferenceCatalog,
+    CenterEmployeeList,
     kb_classification_models,
     kb_classification_choice_models,
     kb_classification_choice_descriptor_models,
@@ -119,6 +140,9 @@ KB_MODELS: TypeAlias = Union[
 ]
 
 KB_DDICTS: TypeAlias = Union[
+    StudyPresetDataDict,
+    ReferenceCatalogDataDict,
+    CenterEmployeeListDataDict,
     kb_classification_ddicts,
     kb_classification_choice_ddicts,
     kb_classification_choice_descriptor_ddicts,
@@ -133,6 +157,9 @@ KB_DDICTS: TypeAlias = Union[
 ]
 
 KB_MODEL_NAMES_LITERAL = Literal[
+    "CenterEmployeeList",
+    "StudyPreset",
+    "ReferenceCatalog",
     "UnitType",
     "Unit",
     "ClassificationChoiceDescriptor",
@@ -161,6 +188,9 @@ KB_MODEL_NAMES_LITERAL = Literal[
 ]
 
 KB_MODEL_NAMES_ORDERED: list[KB_MODEL_NAMES_LITERAL] = [
+    "CenterEmployeeList",
+    "StudyPreset",
+    "ReferenceCatalog",
     "InformationSourceType",
     "InformationSource",
     "Citation",

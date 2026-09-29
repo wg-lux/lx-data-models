@@ -1,0 +1,9 @@
+name: lx_descriptors
+description: ""
+version: 0.1.0
+modules: []
+depends_on:
+  - lx_units
+data:
+  dirs:
+    - ./data

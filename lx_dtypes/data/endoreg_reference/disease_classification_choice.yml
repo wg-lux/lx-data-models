@@ -1,0 +1,50 @@
+- model: reference_catalog
+  name: disease_classification_choice
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: ckd_kdigo_1
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_2
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_3a
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_3b
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_4
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_5
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: khk_1_ge
+      record_type: disease_classification_choice
+      disease_classification:
+        name: coronary_artery_disease_base_classification
+        version: null
+    - name: khk_2_ge
+      record_type: disease_classification_choice
+      disease_classification:
+        name: coronary_artery_disease_base_classification
+        version: null
+    - name: khk_3_ge
+      record_type: disease_classification_choice
+      disease_classification:
+        name: coronary_artery_disease_base_classification
+        version: null

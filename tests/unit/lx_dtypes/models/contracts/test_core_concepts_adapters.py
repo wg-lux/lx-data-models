@@ -7,6 +7,7 @@ from typing import Any, cast
 import pytest
 from pydantic import ValidationError
 
+from lx_dtypes.knowledge_bases import list_packaged_knowledge_bases
 from lx_dtypes.models.contracts import (
     ClassificationChoiceDescriptorCore,
     CoreConceptCollection,
@@ -490,12 +491,12 @@ def test_kb_snapshot_normalizes_unbounded_descriptor_sentinels() -> None:
 
 
 def test_packaged_snapshot_contains_only_finite_descriptor_numbers() -> None:
-    package_data_dir = PACKAGE_ROOT / "data"
-    loader = DataLoader(input_dirs=[package_data_dir])
-    loader.load_module_configs()
-
-    for module_name in sorted(loader.module_configs):
-        snapshot = kb_to_core_concepts_payload(loader.load_knowledge_base(module_name))
+    for descriptor in list_packaged_knowledge_bases():
+        loader = DataLoader(input_dirs=[descriptor.installed_data_root()])
+        snapshot = kb_to_core_concepts_payload(
+            loader.load_knowledge_base(descriptor.module_name)
+        )
+        assert snapshot.knowledge_base_version == descriptor.version
         for descriptor in snapshot.classification_choice_descriptor:
             scalar_values = (
                 descriptor.numeric_min,

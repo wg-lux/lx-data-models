@@ -24,7 +24,7 @@ def module(name: str, **values: object) -> types.ModuleType:
     return value
 
 
-settings = SimpleNamespace(TERMINOLOGY_ROOT=None)
+settings = SimpleNamespace(configured=True, TERMINOLOGY_ROOT=None)
 module("django")
 module("django.conf", settings=settings)
 module("django.core")

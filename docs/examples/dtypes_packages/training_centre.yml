@@ -1,0 +1,12 @@
+# Synthetic deployment exercise, not an approved clinical study.
+# Keep this outside the package's selected data files.
+schema_version: '1.0'
+site:
+  center_key: training-centre-01
+  name: Training Centre 01
+reference_packages: []
+study_packages:
+  - module: training_preset
+    version: '1.0.0'
+    activate: false
+adopt_existing: false

@@ -1,0 +1,14 @@
+- model: finding
+  name: "coro_des_implantation"
+  tags:
+    - event
+
+- model: finding
+  name: "coro_bms_implantation"
+  tags:
+    - event
+
+- model: finding
+  name: "complication_coro_stent_thrombosis"
+  tags:
+    - event

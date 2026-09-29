@@ -1,0 +1,32 @@
+- model: reference_catalog
+  name: profession
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: profession
+      name: endoscopy-nurse
+      description: Endoscopy nurse
+    - record_type: profession
+      name: nurse
+      description: Not further specified nurse
+    - record_type: profession
+      name: physician
+      description: Not further specified doctor
+    - record_type: profession
+      name: physician-gastroenterology
+      description: Physician (Gastroenterology)
+    - record_type: profession
+      name: physician-general-surgery
+      description: Physician (General Surgery)
+    - record_type: profession
+      name: physician-in-training-gastroenterology
+      description: Physician in training (gastroenterology)
+    - record_type: profession
+      name: physician-in-training-general-surgery
+      description: Physician in training (general surgery)
+    - record_type: profession
+      name: physician-in-training-internal-medicine
+      description: Physician in training (internal medicine)
+    - record_type: profession
+      name: physician-internal-medicine
+      description: Physician (Internal Medicine)

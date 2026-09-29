@@ -5,12 +5,79 @@ ledger payloads, persistence adapters, and frontend applications. A consumer
 should receive one canonical, validated shape rather than reconstructing domain
 rules from loose dictionaries.
 
+This contract is maintained by the `lx_dtypes` maintainers and is the canonical
+guide to advisory validation and strict boundary validation.
+
+## Advisory validation during data capture
+
+Use `lx_dtypes.validation` when incomplete or inconsistent input should produce
+feedback without interrupting the caller:
+
+```python
+from lx_dtypes import load_knowledge_base
+from lx_dtypes.validation import assess_examination
+
+kb = load_knowledge_base("report_template_examples")
+report = assess_examination(
+    kb,
+    {
+        "patient": "synthetic_patient",
+        "examination": "star_upper_gi_endoscopy",
+        **kb.config.knowledge_base_identity.model_dump(),
+    },
+    template_name="star_upper_gi_main",
+)
+print(report.model_dump(mode="json"))
+```
+
+The knowledge base owns terminology and predefined study rules. The ledger owns
+observations and their terminology provenance. Contracts own the exchange shape.
+`assess_examination` connects these layers without writing data or changing the
+input. It reuses the existing semantic admissibility and report-template engines,
+including conditional requirements, classifications, interventions, and units.
+
+`validate_contract(Model, payload)` supports any owning Pydantic contract,
+including `StudySetupDefinition`. It returns a typed `value` on success and a
+`ValidationReport` on both success and failure. It retains the owning model's
+strictness; it does not make a permissive model strict. Mutable model instances
+are reparsed. Study setup definitions select datasets and cohorts; report-template
+validators define runtime study rules. These are distinct contracts.
+
+Reports have a versioned shape (`schema_version="1.0"`) and ordered issues with
+`code`, `message`, `level`, `source`, `path`, and optional `validator_name`.
+Consumers branch on codes, display messages, and use paths to identify contract
+fields. `ok` means no error-level findings; warnings remain visible. It is not
+authorization to persist or a statement of clinical correctness.
+
+Boundary messages are centralized in `lx_dtypes/validation_messages.yml`.
+Contract issue codes retain Pydantic's error type with a `contract.` prefix.
+Unknown error types use a generic constraint message; submitted values and
+custom exception context are excluded. Study issue codes and messages come
+directly from the existing runtime engine, so hosts need no second rule or
+message implementation. Study messages may contain terminology names.
+
+| Condition | Result |
+| --- | --- |
+| Malformed ledger payload | Contract issues; no terminology or study evaluation |
+| Missing or incomplete legacy KB identity | Warning; evaluation may continue |
+| Any supplied KB identity component conflicts | Error; no study evaluation |
+| Unknown template | Error; no study evaluation |
+| Inadmissible terminology relationship | Error; no study evaluation |
+| Valid terminology with unmet study rules | Study findings; `study_evaluated=true` |
+
+`study_evaluated=false` must not be displayed as a passed study. With no template,
+the API checks semantic admissibility only. Semantic validation currently reports
+the first failure from the strict engine; runtime study evaluation collects its
+available findings. Loading a broken knowledge base and programming errors still
+raise: the advisory API catches expected payload and semantic validation failures
+only. Existing strict APIs retain their behavior.
+
 ## Boundary rule
 
 - Parse YAML and other external data into the owning `lx_dtypes` model once.
 - Pass the validated model inward; do not retain the original mapping as a
   parallel representation.
-- Reject unknown fields, empty semantic names, duplicate identities, invalid
+- At persistence and exchange boundaries, reject unknown fields, empty semantic names, duplicate identities, invalid
   values, and dangling terminology references before persistence or UI state
   mutation.
 - Serialize public payloads with snake_case field names. Frontends may convert

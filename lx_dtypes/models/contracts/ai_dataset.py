@@ -121,22 +121,10 @@ class AIDataSetActiveLearningCandidateContractContract(BaseModel):
         return value
 
 
-class AIDataSetScoredActiveLearningCandidateContractContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    sample_index: int
-    video_id: int
-    frame_number: int
-    frame_id: int
-    timestamp: float
-    segment_id: int
-    probs: list[float]
-    quality_score: float
-    uncertainty: float
-    diversity: float
-    rarity: float
-    quality_gate: float
-    frame_score: float
+# Preserve the historical spelling while sharing one runtime model identity.
+AIDataSetScoredActiveLearningCandidateContractContract = (
+    AIDataSetScoredActiveLearningCandidateContract
+)
 
 
 class AIDataSetActiveLearningSelectionContract(BaseModel):

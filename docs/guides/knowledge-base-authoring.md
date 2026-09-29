@@ -11,6 +11,10 @@ It ties together three parts of the workflow:
 
 ## Read This First
 
+For the exact folder layout and complete preset, examination, and optional
+employee examples, start with [Structure of a valid lx-dtypes package](dtypes-package-structure.md).
+The same schema applies to humans, coding agents, and editor-generated packages.
+
 Use these documents in this order:
 
 1. `lx-terminology-editor/README.md`
@@ -129,19 +133,15 @@ python -m django migrate --noinput
 
 The backend import endpoint is `POST /terminology/bundles/import`.
 
-1. The API parses the ZIP (`_read_zip_file_map`) and normalizes a single-root ZIP
-   layout.
-2. It reads root `config.yaml` (`_read_bundle_identity`) to get
-   `module_name`, `version`, and optional `medical_field`.
-3. It resolves an import destination:
-   - `LX_DTYPES_TERMINOLOGY_IMPORT_ROOT` if set, otherwise
-     `<registry parent>/terminology-packages`.
-4. Files are written to
-   `<import root>/<module>/<version>/.tmp/<module>-<uuid>/...`, then atomically
-   moved to `<import root>/<module>/<version>`.
-5. `_register_imported_bundle()` stores a typed `filesystem` source containing
-   the absolute `input_dirs` path for that version and marks it active when
-   imported through the endpoint.
+1. `TerminologyService.import_zip` parses the ZIP and normalizes a single-root
+   ZIP layout.
+2. It reads root `config.yaml` for `name`, `version`, and optional `medical_field`.
+3. It uses `<registry parent>/terminology-packages` as its managed import root.
+4. It validates the complete staged package and moves it into an identity-derived
+   destination beneath that root. Consumers resolve the location through the registry.
+5. It registers a typed `filesystem` source without changing the active selection.
+   Selecting the active package is a separate operation. Existing identities
+   are rejected rather than overwritten by ZIP import.
 
 Because paths are now registry-driven, moving a KB version directory changes only
 registry state; `config.yaml` remains stable and local.
@@ -195,7 +195,7 @@ POST /dtypes-api/terminology/bundles/import
 
 The server strips the editor ZIP's single outer directory, reads the root
 `config.yaml`, validates the full module graph, installs the artifact, writes a
-filesystem source to the governed registry, and activates the imported identity.
+filesystem source to the governed registry. Select the active identity separately.
 An existing module/version is rejected instead of overwritten.
 
 The successful identity is immediately addressable through the stable graph API:
@@ -222,7 +222,7 @@ lx-dtypes-prototype-kb-smoke --module my_module --version 1.0.0
 
 This keeps both supported handoffs deterministic because:
 
-- the editor remains the single authoring surface
+- editor-generated and hand-written artifacts use the same package schema
 - `lx_dtypes` resolves the module through the normal versioned registry path
 - the requested module and version are explicit and deterministic
 
@@ -571,3 +571,48 @@ in that YAML file; review the resulting document before submitting it.
 - KB linting details: `docs/guides/kb-yaml-linting.md`
 - Terminology editor workflow: `lx-terminology-editor/README.md`
 - Monorepo overview of local publication: `/home/admin/endoreg-db/README.md`
+
+## Dataset and live-cohort setup templates
+
+The packaged [`research.yml`](../../lx_dtypes/data/study_setup/research.yml)
+defines image/video datasets and saved live cohort definitions. It is a separate
+versioned contract from clinical knowledge-base bundles. Its canonical scope and
+readiness record is `endoreg-db/feature-tracking/DtypesStudyDefinitions.yml`.
+
+Validate without database access:
+
+```python
+from importlib.resources import files
+from lx_dtypes.utils.study_setup_yaml import parse_study_setup_yaml
+from lx_dtypes.models.contracts.study_setup import StudySetupDefinition
+
+raw = files("lx_dtypes").joinpath("data/study_setup/research.yml").read_text()
+setup = parse_study_setup_yaml(raw)
+schema = StudySetupDefinition.model_json_schema()
+```
+
+Use quoted dates (`'2026-01-01'`), native booleans (`false`), snake_case keys,
+and stable `definition_id` values. `schema_version` selects the contract;
+`definition_version` identifies the authored document revision. Display names
+are editable labels, never reference keys. Dataset and cohort identifiers must
+be unique across the document; `dataset_refs` resolve only to its dataset
+definitions. Several cohorts can share datasets. Every cohort requires a
+nonblank hypothesis. Cohort inputs share the same Pydantic contracts as the
+lx-annotate saved-cohort HTTP interface; dates must use YYYY-MM-DD.
+
+The parser rejects unknown fields, duplicate keys, aliases, merge keys,
+unsupported tags, incompatible dataset/model combinations and dangling references.
+Limits are 1 MiB UTF-8, 32 nesting levels, 50,000 parser events and 500 definitions
+of each kind. Hosts must bound reads before calling the parser. JSON Schema is
+available through `model_json_schema()`; cross-reference and date-range rules
+also require the Pydantic validator. Do not log raw validation inputs.
+
+Definitions contain no patient records, ownership, permissions, credentials or
+host paths. Empty dataset selection means the current authorized examination
+scope. Membership is evaluated against current authorized records; `limit` only
+bounds the preview. Creating a definition is separate from attaching annotations,
+selecting an active dataset, training, or taking a reviewed export snapshot.
+`load_base_db_data` remains the clinical/operational bootstrap entry point.
+Validation does not provision database rows. Authorized dry-run/import, immutable
+owner-scoped provenance and concurrency protection are separate host requirements
+tracked in the feature YAML; this parser does not provide those operations.

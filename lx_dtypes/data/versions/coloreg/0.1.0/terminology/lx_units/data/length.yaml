@@ -1,0 +1,31 @@
+- model: unit
+
+  name: "milimeter"
+  abbreviation: "mm"
+  name_de: "milimeter"
+  name_en: "milimeter"
+  description: "milimeters"
+
+- model: unit
+
+  name: "centimeter"
+  abbreviation: "cm"
+  name_de: "Zentimeter"
+  name_en: "Centimeter"
+  description: "centimeters"
+
+- model: unit
+
+  name: "meter"
+  abbreviation: "m"
+  name_de: "Meter"
+  name_en: "Meter"
+  description: "meters"
+
+- model: unit
+
+  name: "kilometer"
+  abbreviation: "km"
+  name_de: "Kilometer"
+  name_en: "Kilometer"
+  description: "kilometers"

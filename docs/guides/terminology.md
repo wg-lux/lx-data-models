@@ -1,8 +1,11 @@
-## Terminology configuration and usage
+# Terminology configuration and usage
+
+The `lx_dtypes` maintainers own this guide to runtime terminology configuration.
+For package authoring, see [Knowledge-Base Authoring](knowledge-base-authoring.md).
 
 Terminology is addressed by a **module name and version**. The central resolver reads the registry for that identity and loads the registered resources. Application code uses `lx_dtypes.terminology.terminology_loader` rather than constructing paths to individual knowledge-base folders.
 
-### Initialize and load terminology
+## Initialize and load terminology
 
 Initialize the runtime registry explicitly before loading terminology for the first time:
 
@@ -28,7 +31,7 @@ print(kb.config.source_file)
 
 `get_terminology_service()` only constructs and caches the configured service. It does not create the registry, copy resources, or choose an active bundle.
 
-### Choose the storage directory
+## Choose the storage directory
 
 The runtime directory is selected in this order:
 
@@ -60,7 +63,7 @@ print(get_terminology_service().registry_path)
 
 **An explicit hydration path is not a global configuration override.** Calling `hydrate_shipped_terminology(other_root)` prepares that location but does not redirect later calls to `get_terminology_service()`, `active_kb_identity()`, or `load_module_kb()`. For application-wide use, configure `TERMINOLOGY_ROOT` before obtaining the shared service.
 
-### Understand the source and runtime data
+## Understand the source and runtime data
 
 Hydration reads the data directory belonging to the imported `lx_dtypes` package. When the package is imported from a `./lx-data-models` checkout, the source is `./lx-data-models/lx_dtypes/data`. An installed package uses its own data directory. The source is not selected from the process's current working directory.
 
@@ -89,7 +92,7 @@ Hydration validates the catalog identities and content for entries it needs to s
 
 The source-tree digest identifies the original shipped tree. It is not a guarantee that an editable runtime copy still has those original contents.
 
-### Load active or explicitly versioned knowledge bases
+## Load active or explicitly versioned knowledge bases
 
 Use a complete identity throughout each request or operation:
 
@@ -112,7 +115,7 @@ The version argument is optional only for the active module. `load_module_kb(mod
 
 The root fallback only selects a storage directory. It does not silently replace a missing registry, unknown version, or invalid bundle with package data.
 
-### Resolve a module directory for the report builder
+## Resolve a module directory for the report builder
 
 Use the central path resolver when an operation genuinely needs a filesystem directory:
 
@@ -134,7 +137,7 @@ The result is the directory containing the resolved module's `config.yaml`, not 
 
 This check does not grant filesystem permissions or application authorization. Perform edits through the report-builder workflow and preserve its validation and cache-handling requirements.
 
-### Use an isolated registry directly
+## Use an isolated registry directly
 
 For tests or utilities that need an independent location without changing application configuration, construct a service with an explicit **registry file path**:
 
@@ -158,11 +161,22 @@ with TemporaryDirectory(prefix="lx-dtypes-terminology-") as directory:
     # Complete operations using this registry inside the context.
 ```
 
-Use this service consistently for the isolated operation. Global loader functions continue to use the application-configured or standalone default service.
+Use this service consistently for the isolated operation. The shared helpers
+`active_kb_identity`, `load_module_kb`, and `resolve_module_path` accept the
+keyword argument `service=service`. When supplied, they use only that service's
+registry. Calls without it continue to use the application-configured or
+standalone default service.
+
+For a caller-owned release directory, `service.register_local(module_name,
+version, input_dirs=[absolute_source_path])` validates and registers the exact
+package without copying files, hydrating shipped data, or selecting an active
+bundle. It preserves existing registrations and rejects identity collisions.
+See the [study package guide](dtypes-package-structure.md) for the CLI workflow,
+storage layout, and multi-centre deployment responsibilities.
 
 API tests must configure their test root before importing modules that register routes and capture a service. Clearing `get_terminology_service.cache_clear()` allows a later factory call to read changed settings, but does not replace a service already retained by a route.
 
-### Runtime behaviour and errors
+## Runtime behaviour and errors
 
 The shared factory caches service configuration, not the active identity. All processes intended to share terminology must use the same registry and have access to its registered resources. A matching path string on separate filesystems is not shared storage.
 

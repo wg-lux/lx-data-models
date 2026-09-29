@@ -74,19 +74,28 @@ def get_terminology_service() -> TerminologyService:
     )
 
 
-def active_kb_identity() -> tuple[str, str]:
-    identity = get_terminology_service().active_identity()
+def active_kb_identity(*, service: TerminologyService | None = None) -> tuple[str, str]:
+    """Read selection from an explicit caller service or the configured host."""
+    selected_service = service if service is not None else get_terminology_service()
+    identity = selected_service.active_identity()
     if identity is None:
         raise TerminologyError(409, "No active knowledge-base bundle is selected.")
     return identity
 
 
-def load_module_kb(module_name: str, *, version: str | None = None) -> KnowledgeBase:
+def load_module_kb(
+    module_name: str,
+    *,
+    version: str | None = None,
+    service: TerminologyService | None = None,
+) -> KnowledgeBase:
+    """Load from one caller-owned registry without changing global settings."""
+    selected_service = service if service is not None else get_terminology_service()
     module_name = module_name.strip()
     if not module_name:
         raise TerminologyError(409, "A knowledge-base module name is required.")
     if version is None:
-        active_module, active_version = active_kb_identity()
+        active_module, active_version = active_kb_identity(service=selected_service)
         if module_name != active_module:
             raise TerminologyError(
                 409,
@@ -97,7 +106,7 @@ def load_module_kb(module_name: str, *, version: str | None = None) -> Knowledge
         version = version.strip()
         if not version:
             raise TerminologyError(409, "Knowledge-base version must not be empty.")
-    return get_terminology_service().load(module_name, version)
+    return selected_service.load(module_name, version)
 
 
 def resolve_module_path(
@@ -105,10 +114,11 @@ def resolve_module_path(
     *,
     version: str | None = None,
     for_write: bool = False,
+    service: TerminologyService | None = None,
 ) -> Path:
     """Resolve the source directory of the exact KB, never an unrelated default."""
     module_name = module_name.strip()
-    kb = load_module_kb(module_name, version=version)
+    kb = load_module_kb(module_name, version=version, service=service)
     config = kb.config
     if (
         config is None

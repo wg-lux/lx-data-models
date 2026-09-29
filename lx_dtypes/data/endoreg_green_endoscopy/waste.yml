@@ -1,0 +1,9 @@
+- model: reference_catalog
+  name: waste
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: waste
+      name: general_waste
+    - record_type: waste
+      name: medical_waste

@@ -1,0 +1,479 @@
+- model: reference_catalog
+  name: finding_classification
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: bowel_prep_aronchick
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: bowel_prep_aronchick_0
+        version: null
+      - name: bowel_prep_aronchick_1
+        version: null
+      - name: bowel_prep_aronchick_2
+        version: null
+      - name: bowel_prep_aronchick_3
+        version: null
+      classification_types:
+      - name: bowel_prep
+        version: null
+      information_sources: []
+    - name: bowel_prep_boston
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: bowel_prep_boston_0
+        version: null
+      - name: bowel_prep_boston_1
+        version: null
+      - name: bowel_prep_boston_2
+        version: null
+      - name: bowel_prep_boston_3
+        version: null
+      classification_types:
+      - name: bowel_prep
+        version: null
+      information_sources: []
+    - name: bowel_prep_boston_simplified
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: bowel_prep_boston_0
+        version: null
+      - name: bowel_prep_boston_1
+        version: null
+      - name: bowel_prep_boston_2
+        version: null
+      - name: bowel_prep_boston_3
+        version: null
+      classification_types:
+      - name: bowel_prep
+        version: null
+      information_sources: []
+    - name: colon_lesion_jnet
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: colon_lesion_jnet_1
+        version: null
+      - name: colon_lesion_jnet_2a
+        version: null
+      - name: colon_lesion_jnet_2b
+        version: null
+      - name: colon_lesion_jnet_3
+        version: null
+      classification_types:
+      - name: colon_lesion_advanced_imaging
+        version: null
+      - name: morphology
+        version: null
+      information_sources: []
+    - name: colon_lesion_kudo
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: colon_lesion_kudo_1
+        version: null
+      - name: colon_lesion_kudo_2
+        version: null
+      - name: colon_lesion_kudo_3l
+        version: null
+      - name: colon_lesion_kudo_3s
+        version: null
+      - name: colon_lesion_kudo_4
+        version: null
+      - name: colon_lesion_kudo_5i
+        version: null
+      - name: colon_lesion_kudo_5n
+        version: null
+      classification_types:
+      - name: colon_lesion_advanced_imaging
+        version: null
+      - name: morphology
+        version: null
+      information_sources: []
+    - name: colon_lesion_lst
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: colon_lesion_lst_granular_homogeneous
+        version: null
+      - name: colon_lesion_lst_granular_nodular_mixed
+        version: null
+      - name: colon_lesion_lst_non_granular_flat_elevated
+        version: null
+      - name: colon_lesion_lst_non_granular_pseudodepressed
+        version: null
+      classification_types:
+      - name: morphology
+        version: null
+      - name: shape
+        version: null
+      information_sources: []
+    - name: colon_lesion_nice
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: colon_lesion_NICE_type_1
+        version: null
+      - name: colon_lesion_NICE_type_2
+        version: null
+      - name: colon_lesion_NICE_type_3
+        version: null
+      classification_types:
+      - name: colon_lesion_advanced_imaging
+        version: null
+      - name: morphology
+        version: null
+      information_sources: []
+    - name: colon_lesion_paris
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: colon_lesion_paris_III
+        version: null
+      - name: colon_lesion_paris_IIa
+        version: null
+      - name: colon_lesion_paris_IIa_IIc
+        version: null
+      - name: colon_lesion_paris_IIb
+        version: null
+      - name: colon_lesion_paris_IIb_IIc
+        version: null
+      - name: colon_lesion_paris_IIc
+        version: null
+      - name: colon_lesion_paris_Ip
+        version: null
+      - name: colon_lesion_paris_Is
+        version: null
+      classification_types:
+      - name: morphology
+        version: null
+      - name: shape
+        version: null
+      information_sources: []
+    - name: colon_lesion_sano
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: colon_lesion_sano_1
+        version: null
+      - name: colon_lesion_sano_2
+        version: null
+      - name: colon_lesion_sano_3a
+        version: null
+      - name: colon_lesion_sano_3b
+        version: null
+      classification_types:
+      - name: capillary_pattern
+        version: null
+      - name: morphology
+        version: null
+      information_sources: []
+    - name: colon_lesion_size_categorical
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: colon_lesion_size_categorical_diminutive
+        version: null
+      - name: colon_lesion_size_categorical_large
+        version: null
+      - name: colon_lesion_size_categorical_medium
+        version: null
+      - name: colon_lesion_size_categorical_small
+        version: null
+      classification_types:
+      - name: morphology
+        version: null
+      - name: size
+        version: null
+      information_sources: []
+    - name: colonoscopy_location_coarse
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: left_colon
+        version: null
+      - name: rectum
+        version: null
+      - name: right_colon
+        version: null
+      classification_types:
+      - name: location
+        version: null
+      information_sources: []
+    - name: colonoscopy_location_default
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: anal_canal
+        version: null
+      - name: ascending_colon
+        version: null
+      - name: cecum
+        version: null
+      - name: descending_colon
+        version: null
+      - name: left_flexure
+        version: null
+      - name: rectum
+        version: null
+      - name: right_flexure
+        version: null
+      - name: sigmoid_colon
+        version: null
+      - name: terminal_ileum
+        version: null
+      - name: transverse_colon
+        version: null
+      classification_types:
+      - name: location
+        version: null
+      information_sources: []
+    - name: colonoscopy_not_complete_reason
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: colonoscopy_incomplete_complication
+        version: null
+      - name: colonoscopy_incomplete_insufficient_preparation
+        version: null
+      - name: colonoscopy_incomplete_other
+        version: null
+      - name: colonoscopy_incomplete_pain
+        version: null
+      - name: colonoscopy_incomplete_stenosis
+        version: null
+      classification_types: []
+      information_sources: []
+    - name: colonoscopy_polyp_histology
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: histology_polyp_adenoma_tubular
+        version: null
+      - name: histology_polyp_adenoma_tubulovillous
+        version: null
+      - name: histology_polyp_adenoma_villous
+        version: null
+      - name: histology_polyp_hyperplastic
+        version: null
+      - name: histology_polyp_sessile_serrated_lesion
+        version: null
+      classification_types:
+      - name: histology
+        version: null
+      information_sources: []
+    - name: complication_generic_type
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: complication_generic_type_bleeding
+        version: null
+      - name: complication_generic_type_cardiorespiratory
+        version: null
+      - name: complication_generic_type_other
+        version: null
+      - name: complication_generic_type_perforation
+        version: null
+      classification_types: []
+      information_sources: []
+    - name: examination_setting_generic_location
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: examination_setting_generic_location_inpatient
+        version: null
+      - name: examination_setting_generic_location_outpatient
+        version: null
+      classification_types: []
+      information_sources: []
+    - name: examination_setting_generic_sedation
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: sedation_midazolam
+        version: null
+      - name: sedation_other
+        version: null
+      - name: sedation_propofol
+        version: null
+      - name: sedation_propofol_midazolam
+        version: null
+      classification_types: []
+      information_sources: []
+    - name: hemorrhoids_grade
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: hemorrhoids_grade_0_no_hemorrhoids
+        version: null
+      - name: hemorrhoids_grade_1
+        version: null
+      - name: hemorrhoids_grade_2
+        version: null
+      - name: hemorrhoids_grade_3
+        version: null
+      - name: hemorrhoids_grade_4
+        version: null
+      classification_types: []
+      information_sources: []
+    - name: histology_dignity_default
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: histology_dignity_benign
+        version: null
+      - name: histology_dignity_malign
+        version: null
+      classification_types:
+      - name: histology
+        version: null
+      information_sources: []
+    - name: histology_dysplasia_default
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: histology_dysplasia_high_grade
+        version: null
+      - name: histology_dysplasia_low_grade
+        version: null
+      - name: histology_dysplasia_none
+        version: null
+      classification_types:
+      - name: histology
+        version: null
+      information_sources: []
+    - name: histology_in_sano_default
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: na
+        version: null
+      - name: 'no'
+        version: null
+      - name: 'yes'
+        version: null
+      classification_types:
+      - name: histology
+        version: null
+      information_sources: []
+    - name: lesion_circularity_default
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: lesion_circularity_false
+        version: null
+      - name: lesion_circularity_true
+        version: null
+      classification_types:
+      - name: morphology
+        version: null
+      information_sources: []
+    - name: lesion_length_mm
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: lesion_length_mm
+        version: null
+      classification_types:
+      - name: size
+        version: null
+      information_sources: []
+    - name: lesion_planarity_default
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: lesion_planarity_excavated
+        version: null
+      - name: lesion_planarity_flat
+        version: null
+      - name: lesion_planarity_flat_elevated
+        version: null
+      - name: lesion_planarity_pedunculated
+        version: null
+      - name: lesion_planarity_sessile
+        version: null
+      - name: lesion_planarity_unknown
+        version: null
+      classification_types:
+      - name: morphology
+        version: null
+      - name: planarity
+        version: null
+      information_sources: []
+    - name: lesion_size_mm
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: lesion_size_oval_mm
+        version: null
+      classification_types:
+      - name: size
+        version: null
+      information_sources: []
+    - name: lesion_surface_intact_default
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: lesion_surface_eroded
+        version: null
+      - name: lesion_surface_intact
+        version: null
+      - name: lesion_surface_ulcerated
+        version: null
+      classification_types:
+      - name: morphology
+        version: null
+      information_sources: []
+    - name: sedation_performed
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: 'no'
+        version: null
+      - name: 'yes'
+        version: null
+      classification_types: []
+      information_sources: []
+    - name: visualized
+      record_type: finding_classification
+      description: ''
+      finding_types: []
+      choices:
+      - name: 'no'
+        version: null
+      - name: 'yes'
+        version: null
+      classification_types:
+      - name: inferrable
+        version: null
+      information_sources: []

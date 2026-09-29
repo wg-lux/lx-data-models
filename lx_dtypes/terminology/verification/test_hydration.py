@@ -28,7 +28,13 @@ def test_actual_shipped_tree_copied_and_all_catalog_versions_load(seed):
     service = TerminologyService(seed / "registry.json")
     payload = json.loads(service.registry_path.read_text())
     descriptors = list_packaged_knowledge_bases()
-    assert len(descriptors) == 7
+    assert {(item.module_name, item.version) for item in descriptors} >= {
+        ("coloreg", "0.1.0"),
+        ("coloreg", "0.2.0"),
+        ("endoreg_reference", "1.0.0"),
+        ("endoreg_workforce", "1.0.0"),
+        ("endoreg_green_endoscopy", "1.0.0"),
+    }
     assert service.active_identity() == ("star_upper_gi", "0.1.2")
     for d in descriptors:
         entry = payload["modules"][d.module_name][d.version]

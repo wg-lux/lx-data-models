@@ -1,0 +1,7 @@
+# Synthetic names; this file is deliberately not selected by config.yaml.
+- model: center_employee_list
+  name: training_staff
+  examiners:
+    - center: training_center
+      first_name: Example
+      last_name: Clinician

@@ -13,9 +13,9 @@
       "module_name": "coloreg",
       "version": "0.1.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/coloreg",
+      "resource_root": "data/versions/coloreg/0.1.0/coloreg",
       "content_sha256": "5a22b2cffd0d11c152d96ac4cd83a5a03704e871149af103a65212463127ba59",
-      "default": true
+      "default": false
     },
     {
       "module_name": "mst_3_0",
@@ -56,6 +56,36 @@
       "resource_root": "data/versions/star_upper_gi/0.1.1.post1/star_upper_gi",
       "content_sha256": "124b99237f5bcbe77a94f2e150863be08b6951bb7df043b212e460af9e8d1f4c",
       "default": false
+    },
+    {
+      "module_name": "endoreg_reference",
+      "version": "1.0.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/endoreg_reference",
+      "content_sha256": "ab9327125c9788b96c0a3717fcb640ada1c88d190cc84221cb9ac84f385b89ea",
+      "default": true
+    },
+    {
+      "module_name": "coloreg",
+      "version": "0.2.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/coloreg",
+      "content_sha256": "e3c8444570369fa4af50ed307d290ba588a606584b30bae31bbf9fc2157d9838",
+      "default": true
+    },
+    {
+      "module_name": "endoreg_workforce",
+      "version": "1.0.0",
+      "resource_root": "data/endoreg_workforce",
+      "content_sha256": "cb12ee8350cd049902580f47d1fadb5436a8c892483fc93162880b7c05106545",
+      "default": true
+    },
+    {
+      "module_name": "endoreg_green_endoscopy",
+      "version": "1.0.0",
+      "resource_root": "data/endoreg_green_endoscopy",
+      "content_sha256": "6593488a35b8a88f796ca5644f4e938678a5208545a409fe70232e84c75f9c4d",
+      "default": true
     }
   ]
 }
