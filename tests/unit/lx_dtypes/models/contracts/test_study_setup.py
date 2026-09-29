@@ -9,7 +9,7 @@ from lx_dtypes.utils.study_setup_yaml import parse_study_setup_yaml
 
 
 def template() -> str:
-    return files("lx_dtypes").joinpath("data/study_setup/research.yml").read_text()
+    return files("lx_dtypes").joinpath("data/study_metadata/research.yml").read_text()
 
 
 def test_template_preserves_live_definition_semantics_and_shared_contracts() -> None:

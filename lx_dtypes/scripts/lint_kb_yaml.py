@@ -15,7 +15,7 @@ from lx_dtypes.utils.kb_yaml_lint import (
 
 def parse_args() -> argparse.Namespace:
     project_root = Path(__file__).resolve().parents[2]
-    default_data_path = project_root / "lx_dtypes" / "data"
+    default_data_path = project_root / "lx_dtypes" / "data" / "terminology"
     default_config_paths = [
         default_data_path / "sample_knowledge_base" / "config.yaml",
         default_data_path / "report_template_examples" / "config.yaml",

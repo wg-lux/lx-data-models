@@ -7,6 +7,8 @@ from typing import Annotated, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from .study_metadata import StudyMetadata
+
 PositiveId = Annotated[int, Field(strict=True, gt=0)]
 
 
@@ -51,6 +53,7 @@ class CohortDefinitionFields(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     hypothesis: str = Field(min_length=1, max_length=10000)
     filters: CohortFilters = Field(default_factory=CohortFilters)
+    study_metadata: StudyMetadata = Field(default_factory=StudyMetadata)
 
 
 class CohortDefinition(CohortDefinitionFields):

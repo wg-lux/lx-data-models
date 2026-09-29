@@ -1,0 +1,857 @@
+- model: reference_catalog
+  name: finding_classification_choice
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: anal_canal
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - proximal
+          - distal
+          default: unspecified
+          required: false
+          probability:
+          - 0.5
+          - 0.3
+          - 0.2
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: true
+          min: 0.0
+          max: 3.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: ascending_colon
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - proximal
+          - distal
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.3
+          - 0.2
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: false
+          min: 40.0
+          max: 100.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: bowel_prep_aronchick_0
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: bowel_prep_aronchick_1
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: bowel_prep_aronchick_2
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: bowel_prep_aronchick_3
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: bowel_prep_boston_0
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: bowel_prep_boston_1
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: bowel_prep_boston_2
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: bowel_prep_boston_3
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: cecum
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - ileocecal-valve
+          - peri-appendicular
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.3
+          - 0.2
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: false
+          min: 60.0
+          max: 140.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: colon_lesion_NICE_type_1
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_NICE_type_2
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_NICE_type_3
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_jnet_1
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_jnet_2a
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_jnet_2b
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_jnet_3
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_kudo_1
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_kudo_2
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_kudo_3l
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_kudo_3s
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_kudo_4
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_kudo_5i
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_kudo_5n
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_lst_granular_homogeneous
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_lst_granular_nodular_mixed
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_lst_non_granular_flat_elevated
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_lst_non_granular_pseudodepressed
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_paris_III
+      record_type: finding_classification_choice
+      description: Shape classification for colon lesions (Paris III)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_paris_IIa
+      record_type: finding_classification_choice
+      description: Shape classification for colon lesions (Paris IIa)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_paris_IIa_IIc
+      record_type: finding_classification_choice
+      description: Shape classification for colon lesions (Paris IIa+IIc)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_paris_IIb
+      record_type: finding_classification_choice
+      description: Shape classification for colon lesions (Paris IIb)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_paris_IIb_IIc
+      record_type: finding_classification_choice
+      description: Shape classification for colon lesions (Paris IIb+IIc)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_paris_IIc
+      record_type: finding_classification_choice
+      description: Shape classification for colon lesions (Paris IIc)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_paris_Ip
+      record_type: finding_classification_choice
+      description: Shape classification for colon lesions (Paris Ip)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_paris_Is
+      record_type: finding_classification_choice
+      description: Shape classification for colon lesions (Paris Is)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_sano_1
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_sano_2
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_sano_3a
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_sano_3b
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_size_categorical_diminutive
+      record_type: finding_classification_choice
+      description: Diminutive (< 6 mm)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_size_categorical_large
+      record_type: finding_classification_choice
+      description: Large (> 19 mm)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_size_categorical_medium
+      record_type: finding_classification_choice
+      description: Medium (10 - 19 mm)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colon_lesion_size_categorical_small
+      record_type: finding_classification_choice
+      description: Small (6 - 9 mm)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colonoscopy_incomplete_complication
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colonoscopy_incomplete_insufficient_preparation
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colonoscopy_incomplete_other
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colonoscopy_incomplete_pain
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: colonoscopy_incomplete_stenosis
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: complication_generic_type_bleeding
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: complication_generic_type_cardiorespiratory
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: complication_generic_type_other
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: complication_generic_type_perforation
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: descending_colon
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - proximal
+          - distal
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.3
+          - 0.2
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: false
+          min: 35.0
+          max: 70.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: examination_setting_generic_location_inpatient
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: examination_setting_generic_location_outpatient
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: hemorrhoids_grade_0_no_hemorrhoids
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: hemorrhoids_grade_1
+      record_type: finding_classification_choice
+      description: Mucosal hemorrhoids that do not prolapse
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: hemorrhoids_grade_2
+      record_type: finding_classification_choice
+      description: Hemorrhoids that prolapse during straining but reduce spontaneously
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: hemorrhoids_grade_3
+      record_type: finding_classification_choice
+      description: Hemorrhoids that prolapse during straining and require manual reduction
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: hemorrhoids_grade_4
+      record_type: finding_classification_choice
+      description: Irreducible prolapsed hemorrhoids
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_dignity_benign
+      record_type: finding_classification_choice
+      description: 'Histology: Benign'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_dignity_malign
+      record_type: finding_classification_choice
+      description: 'Histology: Malign'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_dysplasia_high_grade
+      record_type: finding_classification_choice
+      description: 'Histology: High-grade dysplasia'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_dysplasia_low_grade
+      record_type: finding_classification_choice
+      description: 'Histology: Low-grade dysplasia'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_dysplasia_none
+      record_type: finding_classification_choice
+      description: 'Histology: No dysplasia'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_polyp_adenoma_tubular
+      record_type: finding_classification_choice
+      description: 'Histology: Tubular adenoma'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_polyp_adenoma_tubulovillous
+      record_type: finding_classification_choice
+      description: 'Histology: Tubulovillous adenoma'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_polyp_adenoma_villous
+      record_type: finding_classification_choice
+      description: 'Histology: Villous adenoma'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_polyp_hyperplastic
+      record_type: finding_classification_choice
+      description: 'Histology: Hyperplastic polyp'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: histology_polyp_sessile_serrated_lesion
+      record_type: finding_classification_choice
+      description: 'Histology: Sessile serrated lesion'
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: left_colon
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - proximal
+          - distal
+          default: proximal
+          required: true
+          probability:
+          - 0.3
+          - 0.3
+          - 0.3
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: false
+          min: 0.0
+          max: 180.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: left_flexure
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - proximal
+          - distal
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.3
+          - 0.2
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: false
+          min: 80.0
+          max: 180.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: lesion_circularity_false
+      record_type: finding_classification_choice
+      description: Category for non-circular lesions
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: lesion_circularity_true
+      record_type: finding_classification_choice
+      description: Category for circular lesions
+      subcategories: {}
+      numerical_descriptors:
+        length:
+          unit: milimeter
+          required: true
+          min: 0.0
+          max: 100.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Length of the lesion in mm
+        circumference:
+          unit: percent
+          required: true
+          min: 33.0
+          max: 100.0
+          mean: 50.0
+          std: 10.0
+          default: null
+          distribution: normal
+          description: Circumference of the lesion in %
+    - name: lesion_length_mm
+      record_type: finding_classification_choice
+      description: Length of lesions
+      subcategories: {}
+      numerical_descriptors:
+        value:
+          unit: mm
+          required: true
+          min: 0.0
+          max: 100.0
+          mean: 5.0
+          std: 3.0
+          default: null
+          distribution: normal
+          description: Largest diameter of the lesion in mm
+    - name: lesion_planarity_excavated
+      record_type: finding_classification_choice
+      description: Category for excavated lesions (surface below surrounding mucosa)
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - focal
+          - diffuse
+          - total
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.2
+          - 0.2
+          - 0.1
+          description: null
+      numerical_descriptors: {}
+    - name: lesion_planarity_flat
+      record_type: finding_classification_choice
+      description: Category for flat lesions
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: lesion_planarity_flat_elevated
+      record_type: finding_classification_choice
+      description: Category for flat-elevated lesions (surface +/- 2 mm)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: lesion_planarity_pedunculated
+      record_type: finding_classification_choice
+      description: Category for pedunculated lesions (surface on a stalk)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: lesion_planarity_sessile
+      record_type: finding_classification_choice
+      description: Category for sessile lesions (surface > 2 mm)
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: lesion_planarity_unknown
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: lesion_size_oval_mm
+      record_type: finding_classification_choice
+      description: oval lesions
+      subcategories: {}
+      numerical_descriptors:
+        largest_diameter_mm:
+          unit: mm
+          required: true
+          min: 0.0
+          max: 35.0
+          mean: 5.0
+          std: 3.0
+          default: null
+          distribution: normal
+          description: Largest diameter of the lesion in mm
+        perpendicular_diameter_mm:
+          unit: mm
+          required: false
+          min: 0.0
+          max: 35.0
+          mean: null
+          std: null
+          default: null
+          distribution: null
+          description: Perpendicular diameter of the lesion in mm
+    - name: lesion_surface_eroded
+      record_type: finding_classification_choice
+      description: Category for eroded lesion surfaces
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - focal
+          - diffuse
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.2
+          - 0.3
+          description: null
+      numerical_descriptors: {}
+    - name: lesion_surface_intact
+      record_type: finding_classification_choice
+      description: Category for intact lesion surfaces
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: lesion_surface_ulcerated
+      record_type: finding_classification_choice
+      description: Category for ulcerated lesion surfaces
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - focal
+          - diffuse
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.2
+          - 0.3
+          description: null
+      numerical_descriptors: {}
+    - name: na
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: 'no'
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: rectum
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - 1/3
+          - 2/3
+          - 3/3
+          default: 3/3
+          required: true
+          probability:
+          - 0.3
+          - 0.3
+          - 0.4
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: true
+          min: 5.0
+          max: 20.0
+          mean: null
+          std: null
+          default: null
+          distribution: null
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: right_colon
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - proximal
+          - distal
+          default: proximal
+          required: true
+          probability:
+          - 0.3
+          - 0.3
+          - 0.3
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: false
+          min: 0.0
+          max: 180.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: right_flexure
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - proximal
+          - distal
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.3
+          - 0.2
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: false
+          min: 80.0
+          max: 180.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: sedation_midazolam
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: sedation_other
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: sedation_propofol
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: sedation_propofol_midazolam
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: sigmoid_colon
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - proximal
+          - distal
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.3
+          - 0.2
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: true
+          min: 20.0
+          max: 50.0
+          mean: null
+          std: null
+          default: null
+          distribution: null
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: terminal_ileum
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          default: null
+          required: false
+          probability: null
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: false
+          min: 0.0
+          max: 180.0
+          mean: null
+          std: null
+          default: null
+          distribution: null
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: transverse_colon
+      record_type: finding_classification_choice
+      description: ''
+      subcategories:
+        description:
+          choices:
+          - unspecified
+          - proximal
+          - distal
+          default: unspecified
+          required: true
+          probability:
+          - 0.5
+          - 0.3
+          - 0.2
+          description: null
+      numerical_descriptors:
+        cm_rectified:
+          unit: centimeter
+          required: false
+          min: 40.0
+          max: 80.0
+          mean: null
+          std: null
+          default: null
+          distribution: uniform
+          description: Insertion depth of the colonoscope in cm (rectified)
+    - name: unknown
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: 'yes'
+      record_type: finding_classification_choice
+      description: ''
+      subcategories: {}
+      numerical_descriptors: {}

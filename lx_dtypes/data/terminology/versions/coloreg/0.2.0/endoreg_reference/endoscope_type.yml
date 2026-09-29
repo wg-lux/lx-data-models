@@ -1,0 +1,9 @@
+- model: reference_catalog
+  name: endoscope_type
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: colonoscope
+      record_type: endoscope_type
+    - name: gastroscope
+      record_type: endoscope_type

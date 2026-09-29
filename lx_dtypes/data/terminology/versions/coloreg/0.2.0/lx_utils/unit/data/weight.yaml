@@ -1,0 +1,38 @@
+- model: unit
+
+  name: "picogram"
+  abbreviation: "pg"
+  name_de: "Picogramm"
+  name_en: "Picogram"
+
+- model: unit
+
+  name: "microgram"
+  abbreviation: "µg"
+  name_de: "Mikrogramm"
+  name_en: "Microgram"
+  description: "micrograms"
+
+- model: unit
+
+  name: "miligram"
+  abbreviation: "mg"
+  name_de: "miligramm"
+  name_en: "miligram"
+  description: "miligrams"
+
+- model: unit
+
+  name: "gram"
+  abbreviation: "g"
+  name_de: "Gramm"
+  name_en: "Gram"
+  description: "grams"
+
+- model: unit
+
+  name: "kilogram"
+  abbreviation: "kg"
+  name_de: "Kilogramm"
+  name_en: "Kilogram"
+  description: "kilograms"

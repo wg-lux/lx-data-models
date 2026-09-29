@@ -1,0 +1,8 @@
+- model: reference_catalog
+  name: patient_lab_sample_type
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: generic
+      record_type: patient_lab_sample_type
+      description: Generische Laborprobe

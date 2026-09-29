@@ -1,0 +1,35 @@
+- model: reference_catalog
+  name: finding_type
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: anatomy
+      record_type: finding_type
+      description: null
+    - name: baseline
+      record_type: finding_type
+      description: null
+    - name: complication
+      record_type: finding_type
+      description: null
+    - name: hidden
+      record_type: finding_type
+      description: null
+    - name: iatrogenic
+      record_type: finding_type
+      description: null
+    - name: observation
+      record_type: finding_type
+      description: null
+    - name: persisting
+      record_type: finding_type
+      description: null
+    - name: postinterventional_delayed
+      record_type: finding_type
+      description: null
+    - name: postinterventional_immediate
+      record_type: finding_type
+      description: null
+    - name: summary
+      record_type: finding_type
+      description: null

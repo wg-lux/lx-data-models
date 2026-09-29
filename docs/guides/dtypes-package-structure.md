@@ -481,7 +481,7 @@ versioned label sets use both name and integer version.
         description: 'An explicitly authored contraindication definition.'
 ```
 
-A complete executable package is shipped at `lx_dtypes/data/endoreg_reference`.
+A complete executable package is shipped at `lx_dtypes/data/terminology/endoreg_reference`.
 Its `config.yaml` explicitly selects 50 `.yml` files. It preserves the previous
 EndoReg bootstrap catalogue as `endoreg_reference@1.0.0`, including clinical
 categories that do not fit the existing findings graph: diseases, medications,
@@ -555,5 +555,14 @@ identity is rejected.
 | Edited installed files do not appear | Publish/register a new version instead of relying on mutation of cached package content. |
 
 Dataset/cohort YAML using `StudySetupDefinition` is a separate document contract.
+Both cohorts and `StudyPreset` can carry validated `study_metadata` for participating
+centers, age groups, exact terminology dependencies, and inclusion criteria. See
+[the shared metadata contract](study-metadata.yml) for fields and host evaluation
+semantics. Metadata does not grant patient access or activate terminology.
 Do not put it in a KB data directory or wrap it in `model: study_preset`. Follow
 the study-setup section of the authoring guide for that workflow.
+
+For the ColoReg resection study, see the [endpoint and linkage specification](coloreg-resection-study.yml).
+Its [study document](../../lx_dtypes/data/study_metadata/coloreg_resection.yml) uses
+`StudySetupDefinition`; lesion-size filtering and longitudinal analysis remain
+explicit host operations.

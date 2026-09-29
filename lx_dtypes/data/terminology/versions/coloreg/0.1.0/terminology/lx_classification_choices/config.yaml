@@ -1,0 +1,8 @@
+name: lx_classification_choices
+description: ""
+version: 0.1.0
+depends_on:
+  - lx_descriptors
+data:
+  dirs:
+    - ./data

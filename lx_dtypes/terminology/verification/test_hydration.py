@@ -126,10 +126,13 @@ def test_bad_provider_digest_fails_without_resetting_registry(storage):
     assert service.registry_path.read_bytes() == before
 
 
-def test_legacy_exact_package_path_is_migrated(storage):
+@pytest.mark.parametrize("relative_root", [".", "terminology"])
+def test_legacy_exact_package_path_is_migrated(storage, relative_root):
     service = central.get_terminology_service()
     payload = json.loads(service.registry_path.read_text())
-    payload["modules"]["mst_3_0"]["3.0.0"] = {"input_dirs": [str(package_data_root())]}
+    payload["modules"]["mst_3_0"]["3.0.0"] = {
+        "input_dirs": [str(package_data_root() / relative_root)]
+    }
     service.registry_path.write_text(json.dumps(payload))
     service.provision()
     source_file = service.load("mst_3_0", "3.0.0").config.source_file
@@ -155,7 +158,7 @@ def test_missing_new_identity_is_added_without_overwriting_other_edits(storage):
 def test_bad_source_digest_is_not_published(tmp_path):
     source = tmp_path / "source"
     shutil.copytree(package_data_root(), source)
-    (source / "mst_3_0/data/bad.yaml").write_text("[]")
+    (source / "terminology/mst_3_0/data/bad.yaml").write_text("[]")
     service = TerminologyService(tmp_path / "destination/registry.json")
     with pytest.raises(TerminologyError, match="digest mismatch"):
         hydrate_registry(service, source_root=source)
@@ -231,7 +234,7 @@ def test_two_processes_provision_one_consistent_registry(tmp_path):
 def test_copy_of_read_only_source_gets_owner_write_permission(tmp_path):
     source = tmp_path / "source"
     shutil.copytree(package_data_root(), source)
-    original = source / "star_upper_gi/config.yaml"
+    original = source / "terminology/star_upper_gi/config.yaml"
     original.chmod(0o444)
     service = TerminologyService(tmp_path / "destination/registry.json")
     hydrate_registry(service, source_root=source)

@@ -5,7 +5,7 @@ from pytest import fixture
 from tests.paths import PACKAGE_ROOT
 
 DATA_ROOT = PACKAGE_ROOT / "data"
-LOG_DIR = DATA_ROOT / "logs"
+LOG_DIR = Path(__file__).resolve().parents[2] / "logs"
 YAML_REPOSITORY_DIRS = [
     DATA_ROOT,
 ]
@@ -29,9 +29,11 @@ def sample_information_source_yaml_filepath() -> Path:
     Provide the filesystem path to the sample information source YAML file.
 
     Returns:
-        Path: Path to "./lx_dtypes/data/information_source_data/data/unknown.yaml".
+        Path: Path to "./lx_dtypes/data/terminology/information_source_data/data/unknown.yaml".
     """
-    return DATA_ROOT / "information_source_data" / "data" / "unknown.yaml"
+    return (
+        DATA_ROOT / "terminology" / "information_source_data" / "data" / "unknown.yaml"
+    )
 
 
 @fixture(scope="session")
@@ -40,9 +42,9 @@ def sample_citations_yaml_filepath() -> Path:
     Provide the filesystem path to the sample citations YAML file used by tests.
 
     Returns:
-        Path: Path pointing to "./lx_dtypes/data/citations/data/sample_references.yaml"
+        Path: Path pointing to "./lx_dtypes/data/terminology/citations/data/sample_references.yaml"
     """
-    return DATA_ROOT / "citations" / "data" / "sample_references.yaml"
+    return DATA_ROOT / "terminology" / "citations" / "data" / "sample_references.yaml"
 
 
 @fixture(scope="session")

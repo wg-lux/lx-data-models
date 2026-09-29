@@ -1,0 +1,10 @@
+- model: reference_catalog
+  name: single_categorical_value_distribution
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: gender_random
+      record_type: single_categorical_value_distribution
+      categories:
+        male: 0.5
+        female: 0.5

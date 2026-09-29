@@ -4,10 +4,10 @@ pr_url: https://github.com/wg-lux/lx-data-models/pull/32
 pr_head: 37c8ff4bc2b87a5cccd6051ce7444d3b6fc2562c
 baseline_commit: 93b0b62
 mst_pr_additions_already_present:
-- file: lx_dtypes/data/mst_3_0/data/10_anatomy.yaml
+- file: lx_dtypes/data/terminology/mst_3_0/data/10_anatomy.yaml
   prefix_lines: 11
   sha256: 275f1c62a883b1cf0e7f926694709016c1c1a5b675638888c7bf0bdb6143d861
-- file: lx_dtypes/data/mst_3_0/data/20_findings.yaml
+- file: lx_dtypes/data/terminology/mst_3_0/data/20_findings.yaml
   prefix_lines: 7
   sha256: 85269aa7aa9437f69a472b609b949af97dd83c6b38183a8a69dc59baedfced37
 mst_module: mst_3_0

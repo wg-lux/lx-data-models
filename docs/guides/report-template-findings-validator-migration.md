@@ -4,7 +4,7 @@ This guide is a focused migration note for persisted findings-validator data.
 
 Read this after:
 
-1. `lx_dtypes/data/report_template_examples/README.md`
+1. `lx_dtypes/data/terminology/report_template_examples/README.md`
 2. `docs/guides/report-template-infrastructure.md`
 
 As of March 16, 2026, findings-validator operators use a canonical namespace with three runtime-supported values:
@@ -137,4 +137,4 @@ migration and validator authoring remain technical maintenance tasks.
 
 - System overview and validator runtime semantics: `docs/guides/report-template-infrastructure.md`
 - Graph-specific validation: `docs/guides/report-template-graph-validation.md`
-- Beginner authoring guide: `lx_dtypes/data/report_template_examples/README.md`
+- Beginner authoring guide: `lx_dtypes/data/terminology/report_template_examples/README.md`

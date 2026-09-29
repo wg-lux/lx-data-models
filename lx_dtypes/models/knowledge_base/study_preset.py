@@ -10,6 +10,10 @@ from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict i
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
 )
+from lx_dtypes.models.contracts.study_metadata import (
+    StudyMetadata,
+    StudyMetadataDataDict,
+)
 from lx_dtypes.models.ledger.center.DataDict import CenterDataDict
 from lx_dtypes.models.ledger.center.Pydantic import Center
 
@@ -57,6 +61,7 @@ class PresetLabelSetDataDict(PresetLabelTypeDataDict):
 
 
 class StudyPresetDataDict(KnowledgebaseBaseModelDataDict):
+    study_metadata: StudyMetadataDataDict
     centers: list[CenterDataDict]
     genders: list[PresetGenderDataDict]
     label_types: list[PresetLabelTypeDataDict]
@@ -68,6 +73,7 @@ class StudyPreset(KnowledgebaseBaseModel[StudyPresetDataDict]):
     """Center names are stable host center keys; employees remain separate and optional."""
 
     centers: list[Center] = Field(default_factory=list)
+    study_metadata: StudyMetadata = Field(default_factory=StudyMetadata)
     genders: list[PresetGender] = Field(default_factory=list)
     label_types: list[PresetLabelType] = Field(default_factory=list)
     labels: list[PresetLabel] = Field(default_factory=list)

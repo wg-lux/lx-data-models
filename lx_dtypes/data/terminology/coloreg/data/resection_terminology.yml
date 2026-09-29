@@ -1,0 +1,648 @@
+# ColoReg study-authored capture terminology. No treatment recommendations or default outcomes.
+- model: classification_choice_descriptor
+  name: coloreg_case_id_value
+  name_de: Pseudonyme Fallkennung
+  name_en: Pseudonymous case identifier
+  description: Stable pseudonymous study case key. No patient name or date of birth; hosts resolve authorized
+    patient linkage.
+  classification_choice_descriptor_type: text
+  text_max_length: 255
+  default_value_str: ''
+- model: classification_choice
+  name: coloreg_case_id_documented
+  name_de: Pseudonyme Fallkennung
+  name_en: Pseudonymous case identifier
+  description: Stable pseudonymous study case key. No patient name or date of birth; hosts resolve authorized
+    patient linkage.
+  classification_choice_descriptors:
+  - coloreg_case_id_value
+- model: classification
+  name: coloreg_case_id
+  name_de: Pseudonyme Fallkennung
+  name_en: Pseudonymous case identifier
+  description: Stable pseudonymous study case key. No patient name or date of birth; hosts resolve authorized
+    patient linkage.
+  classification_types: []
+  classification_choices:
+  - coloreg_case_id_documented
+- model: classification_choice_descriptor
+  name: coloreg_lesion_id_value
+  name_de: Stabile Läsionskennung
+  name_en: Stable lesion identifier
+  description: Stable lesion key within the study case, reused at every follow-up. Different polyps must
+    never share this key.
+  classification_choice_descriptor_type: text
+  text_max_length: 255
+  default_value_str: ''
+- model: classification_choice
+  name: coloreg_lesion_id_documented
+  name_de: Stabile Läsionskennung
+  name_en: Stable lesion identifier
+  description: Stable lesion key within the study case, reused at every follow-up. Different polyps must
+    never share this key.
+  classification_choice_descriptors:
+  - coloreg_lesion_id_value
+- model: classification
+  name: coloreg_lesion_id
+  name_de: Stabile Läsionskennung
+  name_en: Stable lesion identifier
+  description: Stable lesion key within the study case, reused at every follow-up. Different polyps must
+    never share this key.
+  classification_types: []
+  classification_choices:
+  - coloreg_lesion_id_documented
+- model: classification_choice_descriptor
+  name: coloreg_index_examination_id_value
+  name_de: Referenz zur Indexuntersuchung
+  name_en: Index examination reference
+  description: Host examination UUID for the index resection. Resolve and validate against the same authorized
+    patient.
+  classification_choice_descriptor_type: text
+  text_max_length: 255
+  default_value_str: ''
+- model: classification_choice
+  name: coloreg_index_examination_id_documented
+  name_de: Referenz zur Indexuntersuchung
+  name_en: Index examination reference
+  description: Host examination UUID for the index resection. Resolve and validate against the same authorized
+    patient.
+  classification_choice_descriptors:
+  - coloreg_index_examination_id_value
+- model: classification
+  name: coloreg_index_examination_id
+  name_de: Referenz zur Indexuntersuchung
+  name_en: Index examination reference
+  description: Host examination UUID for the index resection. Resolve and validate against the same authorized
+    patient.
+  classification_types: []
+  classification_choices:
+  - coloreg_index_examination_id_documented
+- model: classification_choice_descriptor
+  name: coloreg_index_polyp_finding_id_value
+  name_de: Referenz zum Indexpolypen
+  name_en: Index polyp finding reference
+  description: UUID of the original colon_polyp finding in the index examination; links size, Paris and
+    NICE to this lesion.
+  classification_choice_descriptor_type: text
+  text_max_length: 255
+  default_value_str: ''
+- model: classification_choice
+  name: coloreg_index_polyp_finding_id_documented
+  name_de: Referenz zum Indexpolypen
+  name_en: Index polyp finding reference
+  description: UUID of the original colon_polyp finding in the index examination; links size, Paris and
+    NICE to this lesion.
+  classification_choice_descriptors:
+  - coloreg_index_polyp_finding_id_value
+- model: classification
+  name: coloreg_index_polyp_finding_id
+  name_de: Referenz zum Indexpolypen
+  name_en: Index polyp finding reference
+  description: UUID of the original colon_polyp finding in the index examination; links size, Paris and
+    NICE to this lesion.
+  classification_types: []
+  classification_choices:
+  - coloreg_index_polyp_finding_id_documented
+- model: classification_choice_descriptor
+  name: coloreg_index_resection_finding_id_value
+  name_de: Referenz zur Indexresektion
+  name_en: Index resection finding reference
+  description: UUID of the coloreg_polyp_resection finding. Follow-ups retain the original technique and
+    outcomes through this reference.
+  classification_choice_descriptor_type: text
+  text_max_length: 255
+  default_value_str: ''
+- model: classification_choice
+  name: coloreg_index_resection_finding_id_documented
+  name_de: Referenz zur Indexresektion
+  name_en: Index resection finding reference
+  description: UUID of the coloreg_polyp_resection finding. Follow-ups retain the original technique and
+    outcomes through this reference.
+  classification_choice_descriptors:
+  - coloreg_index_resection_finding_id_value
+- model: classification
+  name: coloreg_index_resection_finding_id
+  name_de: Referenz zur Indexresektion
+  name_en: Index resection finding reference
+  description: UUID of the coloreg_polyp_resection finding. Follow-ups retain the original technique and
+    outcomes through this reference.
+  classification_types: []
+  classification_choices:
+  - coloreg_index_resection_finding_id_documented
+- model: classification_choice_descriptor
+  name: coloreg_previous_follow_up_examination_id_value
+  name_de: Vorherige Nachsorgeuntersuchung
+  name_en: Previous follow-up examination reference
+  description: UUID of the preceding follow-up examination of this same lesion. Required for subsequent
+    follow-ups; not the current examination or the index examination.
+  classification_choice_descriptor_type: text
+  text_max_length: 255
+  default_value_str: ''
+- model: classification_choice
+  name: coloreg_previous_follow_up_examination_id_documented
+  name_de: Vorherige Nachsorgeuntersuchung
+  name_en: Previous follow-up examination reference
+  description: UUID of the preceding follow-up examination of this same lesion. Required for subsequent
+    follow-ups; not the current examination or the index examination.
+  classification_choice_descriptors:
+  - coloreg_previous_follow_up_examination_id_value
+- model: classification
+  name: coloreg_previous_follow_up_examination_id
+  name_de: Vorherige Nachsorgeuntersuchung
+  name_en: Previous follow-up examination reference
+  description: UUID of the preceding follow-up examination of this same lesion. Required for subsequent
+    follow-ups; not the current examination or the index examination.
+  classification_types: []
+  classification_choices:
+  - coloreg_previous_follow_up_examination_id_documented
+- model: classification_choice_descriptor
+  name: coloreg_primary_success_protocol_value
+  name_de: Protokoll für primären Erfolg
+  name_en: Primary success protocol
+  description: Identifier and version of the protocol defining primary success. No default definition
+    is supplied.
+  classification_choice_descriptor_type: text
+  text_max_length: 255
+  default_value_str: ''
+- model: classification_choice
+  name: coloreg_primary_success_protocol_documented
+  name_de: Protokoll für primären Erfolg
+  name_en: Primary success protocol
+  description: Identifier and version of the protocol defining primary success. No default definition
+    is supplied.
+  classification_choice_descriptors:
+  - coloreg_primary_success_protocol_value
+- model: classification
+  name: coloreg_primary_success_protocol
+  name_de: Protokoll für primären Erfolg
+  name_en: Primary success protocol
+  description: Identifier and version of the protocol defining primary success. No default definition
+    is supplied.
+  classification_types: []
+  classification_choices:
+  - coloreg_primary_success_protocol_documented
+- model: classification_choice
+  name: coloreg_technique_emr
+  name_de: EMR
+  name_en: EMR
+  description: Endoscopic mucosal resection.
+- model: classification_choice
+  name: coloreg_technique_esd
+  name_de: ESD
+  name_en: ESD
+  description: Endoscopic submucosal dissection.
+- model: classification_choice
+  name: coloreg_technique_eftr
+  name_de: EFTR
+  name_en: EFTR
+  description: Endoscopic full-thickness resection.
+- model: classification
+  name: coloreg_resection_technique
+  name_de: Primäre Abtragungstechnik
+  name_en: Primary attempted resection technique
+  description: Primary attempted technique for the index lesion. Retain this assignment after crossover;
+    document the completion technique separately.
+  classification_types: []
+  classification_choices:
+  - coloreg_technique_emr
+  - coloreg_technique_esd
+  - coloreg_technique_eftr
+- model: classification_choice
+  name: coloreg_resection_not_completed
+  name_de: Nicht abgeschlossen
+  name_en: Not completed
+  description: Not completed
+- model: classification
+  name: coloreg_completion_technique
+  name_de: Abschließende Abtragungstechnik
+  name_en: Completion technique
+  description: Technique used to finish resection; records crossover without replacing the primary attempted
+    technique.
+  classification_types: []
+  classification_choices:
+  - coloreg_technique_emr
+  - coloreg_technique_esd
+  - coloreg_technique_eftr
+  - coloreg_resection_not_completed
+  - unknown
+- model: classification_choice
+  name: coloreg_snare_cold
+  name_de: Kalte Schlinge
+  name_en: Cold snare
+  description: Mechanical snare without electrosurgical current.
+- model: classification_choice
+  name: coloreg_snare_diathermic
+  name_de: Diathermische Schlinge
+  name_en: Diathermic snare
+  description: Snare used with electrosurgical current; record the actual generator settings.
+- model: classification_choice
+  name: coloreg_snare_both
+  name_de: Kalte und diathermische Schlinge
+  name_en: Cold and diathermic snares
+  description: Both snare types used for this lesion; record electrosurgical settings.
+- model: classification_choice
+  name: coloreg_snare_not_used
+  name_de: Keine Schlinge verwendet
+  name_en: No snare used
+  description: No snare used, for example a dissection performed with another instrument.
+- model: classification_choice
+  name: coloreg_snare_unknown
+  name_de: Unbekannt
+  name_en: Unknown
+  description: Instrument use is unknown, not absent.
+- model: classification
+  name: coloreg_snare_type
+  name_de: Verwendete Schlinge
+  name_en: Snare used
+  description: Record snare use independently of technique. EMR/ESD/EFTR alone never determines snare
+    use.
+  classification_types: []
+  classification_choices:
+  - coloreg_snare_cold
+  - coloreg_snare_diathermic
+  - coloreg_snare_both
+  - coloreg_snare_not_used
+  - coloreg_snare_unknown
+- model: classification_choice_descriptor
+  name: coloreg_electrosurgery_generator_value
+  name_de: Generatorhersteller und -modell
+  name_en: Generator manufacturer and model
+  description: Actual generator manufacturer and model used.
+  classification_choice_descriptor_type: text
+  text_max_length: 255
+  default_value_str: ''
+- model: classification_choice_descriptor
+  name: coloreg_electrosurgery_mode_value
+  name_de: Strommodus
+  name_en: Current mode
+  description: Actual manufacturer-labelled current mode used; no recommended mode or default.
+  classification_choice_descriptor_type: text
+  text_max_length: 255
+  default_value_str: ''
+- model: classification_choice_descriptor
+  name: coloreg_electrosurgery_settings_value
+  name_de: Verwendete Stromeinstellungen
+  name_en: Actual electricity settings
+  description: Record the actual effect level, cutting duration/interval and power in watts if exposed
+    by this mode, with their labels and units. Explicitly note settings not exposed by the generator.
+    No recommended preset.
+  classification_choice_descriptor_type: text
+  text_max_length: 2000
+  default_value_str: ''
+- model: classification_choice
+  name: coloreg_electrosurgery_documented
+  name_de: Stromeinstellungen dokumentiert
+  name_en: Electrosurgical settings documented
+  description: Electrosurgical settings documented
+  classification_choice_descriptors:
+  - coloreg_electrosurgery_generator_value
+  - coloreg_electrosurgery_mode_value
+  - coloreg_electrosurgery_settings_value
+- model: classification
+  name: coloreg_electrosurgery_settings
+  name_de: Stromeinstellungen
+  name_en: Electrosurgical settings
+  description: Required when a diathermic snare was used. Capture actual settings, never infer them from
+    technique.
+  classification_types: []
+  classification_choices:
+  - coloreg_electrosurgery_documented
+- model: classification
+  name: coloreg_primary_success
+  name_de: Primär erfolgreiche Abtragung laut Protokoll
+  name_en: Protocol-defined primary success
+  description: Adjudicated primary success under the explicitly named protocol. Never derive this from
+    R0, en-bloc status, or technique alone. Unknown is not a negative result; there is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification
+  name: coloreg_macroscopic_complete
+  name_de: Makroskopisch vollständige Abtragung
+  name_en: Macroscopic complete resection
+  description: Visible completeness at the end of the index resection, recorded independently of histology
+    and primary success. Unknown is not a negative result; there is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification
+  name: coloreg_conversion_to_surgery
+  name_de: Konversion zur Operation
+  name_en: Conversion to surgery
+  description: Whether the index endoscopic attempt required conversion to surgery. Unknown is not a negative
+    result; there is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification_choice
+  name: coloreg_mode_en_bloc
+  name_de: En bloc
+  name_en: En bloc
+  description: Resection as one piece.
+- model: classification_choice
+  name: coloreg_mode_piecemeal
+  name_de: Piecemeal
+  name_en: Piecemeal
+  description: Resection in multiple pieces.
+- model: classification_choice
+  name: coloreg_mode_aborted
+  name_de: Abgebrochen / nicht durchgeführt
+  name_en: Aborted / not performed
+  description: Attempted resection not carried out or aborted.
+- model: classification_choice
+  name: coloreg_mode_unknown
+  name_de: Unbekannt
+  name_en: Unknown
+  description: Resection mode not known.
+- model: classification
+  name: coloreg_resection_mode
+  name_de: Resektionsmodus
+  name_en: Resection mode
+  description: Record en-bloc or piecemeal removal separately from complete resection and histological
+    margins.
+  classification_types: []
+  classification_choices:
+  - coloreg_mode_en_bloc
+  - coloreg_mode_piecemeal
+  - coloreg_mode_aborted
+  - coloreg_mode_unknown
+- model: classification_choice
+  name: coloreg_margin_r0
+  name_de: R0
+  name_en: R0
+  description: Histologically tumor-free assessed resection margins; do not infer from apparent complete
+    removal.
+- model: classification_choice
+  name: coloreg_margin_r1
+  name_de: R1
+  name_en: R1
+  description: Microscopically involved resection margin.
+- model: classification_choice
+  name: coloreg_margin_rx
+  name_de: Rx / nicht beurteilbar
+  name_en: Rx / not assessable
+  description: Margins cannot be assessed, including non-assessable fragmented specimens. Not R0.
+- model: classification_choice
+  name: coloreg_margin_pending
+  name_de: Histologie ausstehend
+  name_en: Histology pending
+  description: Histological assessment is pending, not negative.
+- model: classification_choice
+  name: coloreg_margin_no_specimen
+  name_de: Kein Präparat verfügbar
+  name_en: No specimen available
+  description: No specimen available for margin assessment.
+- model: classification_choice
+  name: coloreg_margin_unknown
+  name_de: Unbekannt
+  name_en: Unknown
+  description: Margin status not documented.
+- model: classification
+  name: coloreg_histological_margin_status
+  name_de: Histologischer Resektionsstatus
+  name_en: Histological resection margin status
+  description: Histological R0 status is independent of en-bloc removal. Preserve pending, non-assessable
+    and missing outcomes.
+  classification_types: []
+  classification_choices:
+  - coloreg_margin_r0
+  - coloreg_margin_r1
+  - coloreg_margin_rx
+  - coloreg_margin_pending
+  - coloreg_margin_no_specimen
+  - coloreg_margin_unknown
+- model: classification
+  name: coloreg_index_perforation
+  name_de: Perforation bei Indexresektion
+  name_en: Perforation during index resection
+  description: Perforation associated with the index resection. Unknown is not a negative result; there
+    is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification
+  name: coloreg_index_uncontrolled_bleeding
+  name_de: Endoskopisch nicht kontrollierbare Blutung
+  name_en: Endoscopically uncontrollable bleeding at index resection
+  description: Bleeding during the index resection that could not be controlled endoscopically. Do not
+    classify every bleeding or successfully treated bleeding as this endpoint. Unknown is not a negative
+    result; there is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification
+  name: coloreg_interval_bleeding
+  name_de: Intervallblutung
+  name_en: Interval bleeding
+  description: Bleeding since the preceding assessment, after the index resection and attributable to
+    the same lesion/resection. Unknown is not a negative result; there is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification
+  name: coloreg_interval_uncontrolled_bleeding
+  name_de: Endoskopisch nicht kontrollierbare Intervallblutung
+  name_en: Endoscopically uncontrollable interval bleeding
+  description: Interval bleeding that could not be controlled endoscopically; record separately from any
+    interval bleeding. Unknown is not a negative result; there is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification
+  name: coloreg_interval_perforation
+  name_de: Intervallperforation
+  name_en: Interval perforation
+  description: Perforation since the preceding assessment attributable to this lesion/resection. Unknown
+    is not a negative result; there is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification
+  name: coloreg_repeat_required_bleeding
+  name_de: Erneute Untersuchung wegen Intervallblutung erforderlich
+  name_en: Repeat examination required for interval bleeding
+  description: Clinical need for an additional examination due to interval bleeding, whether or not that
+    examination has already occurred. Unknown is not a negative result; there is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification
+  name: coloreg_repeat_required_perforation
+  name_de: Erneute Untersuchung wegen Intervallperforation erforderlich
+  name_en: Repeat examination required for interval perforation
+  description: Clinical need for an additional examination due to interval perforation, whether or not
+    already performed. Unknown is not a negative result; there is no default outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification
+  name: coloreg_nonpassable_stenosis
+  name_de: Nicht passierbare Stenose in der Nachsorge
+  name_en: Non-passable stenosis at follow-up
+  description: Post-resection luminal narrowing at this lesion site that cannot be traversed with the
+    examining endoscope. Unknown is not no stenosis. Unknown is not a negative result; there is no default
+    outcome.
+  classification_types: []
+  classification_choices:
+  - 'yes'
+  - 'no'
+  - unknown
+- model: classification_choice
+  name: coloreg_follow_up_unremarkable
+  name_de: Unauffällig
+  name_en: Unremarkable
+  description: Explicitly assessed and documented unremarkable resection-site follow-up.
+- model: classification_choice
+  name: coloreg_follow_up_abnormal
+  name_de: Auffällig
+  name_en: Abnormal
+  description: Follow-up assessment is abnormal.
+- model: classification_choice
+  name: coloreg_follow_up_not_assessable
+  name_de: Nicht beurteilbar
+  name_en: Not assessable
+  description: Follow-up performed but the treated site could not be adequately assessed.
+- model: classification_choice
+  name: coloreg_follow_up_not_performed
+  name_de: Nicht durchgeführt
+  name_en: Not performed
+  description: Follow-up has not been performed; not an unremarkable result.
+- model: classification_choice
+  name: coloreg_follow_up_unknown
+  name_de: Unbekannt
+  name_en: Unknown
+  description: Follow-up result unknown.
+- model: classification
+  name: coloreg_follow_up_result
+  name_de: Nachsorgebefund der Resektionsstelle
+  name_en: Follow-up assessment of the resection site
+  description: Outcome of this visit, not the earlier qualifying visit. Absence of a report never means
+    an unremarkable follow-up.
+  classification_types: []
+  classification_choices:
+  - coloreg_follow_up_unremarkable
+  - coloreg_follow_up_abnormal
+  - coloreg_follow_up_not_assessable
+  - coloreg_follow_up_not_performed
+  - coloreg_follow_up_unknown
+- model: classification_choice
+  name: coloreg_follow_up_first
+  name_de: Erste Nachsorge
+  name_en: First follow-up
+  description: First follow-up after the index resection.
+- model: classification_choice
+  name: coloreg_follow_up_subsequent
+  name_de: Weitere Nachsorge
+  name_en: Subsequent follow-up
+  description: A previous follow-up exists and must be linked.
+- model: classification
+  name: coloreg_follow_up_sequence
+  name_de: Nachsorgesequenz
+  name_en: Follow-up sequence
+  description: Allows analysis to distinguish the first follow-up from later visits; the host orders examinations
+    by actual examination date/time.
+  classification_types: []
+  classification_choices:
+  - coloreg_follow_up_first
+  - coloreg_follow_up_subsequent
+- model: classification_choice_descriptor
+  name: coloreg_days_since_index_value
+  name_de: Tage seit Indexresektion
+  name_en: Days since index resection
+  description: Elapsed days from the index procedure; the host verifies against examination dates. This
+    is not a recommended follow-up interval.
+  classification_choice_descriptor_type: numeric
+  unit: days
+  numeric_min: 0
+- model: classification_choice
+  name: coloreg_days_since_index_documented
+  name_de: Intervall dokumentiert
+  name_en: Interval documented
+  description: Interval documented
+  classification_choice_descriptors:
+  - coloreg_days_since_index_value
+- model: classification
+  name: coloreg_days_since_index
+  name_de: Tage seit Indexresektion
+  name_en: Days since index resection
+  description: Actual interval; the study protocol defines its analysis window.
+  classification_types: []
+  classification_choices:
+  - coloreg_days_since_index_documented
+- model: finding
+  name: coloreg_polyp_resection
+  name_de: Polypenresektion
+  name_en: Polyp resection
+  description: One attempted index resection per lesion, including failed or aborted attempts. Link to
+    the original polyp; size is the pre-resection maximum diameter.
+  finding_types:
+  - observation
+  classifications:
+  - coloreg_case_id
+  - coloreg_lesion_id
+  - coloreg_index_examination_id
+  - coloreg_index_polyp_finding_id
+  - lesion_size_mm
+  - coloreg_resection_technique
+  - coloreg_completion_technique
+  - coloreg_snare_type
+  - coloreg_electrosurgery_settings
+  - coloreg_primary_success
+  - coloreg_primary_success_protocol
+  - coloreg_macroscopic_complete
+  - coloreg_conversion_to_surgery
+  - coloreg_resection_mode
+  - coloreg_histological_margin_status
+  - coloreg_index_perforation
+  - coloreg_index_uncontrolled_bleeding
+  interventions:
+  - endoscopy_emr_generic
+  - endoscopy_esd_generic
+  - endoscopy_eftr_generic
+  - endoscopy_cold_snare_resection_generic
+  - endoscopy_diathermic_snare_resection_generic
+- model: finding
+  name: coloreg_polyp_follow_up
+  name_de: Resektionsnachsorge
+  name_en: Resection follow-up
+  description: One follow-up assessment per lesion and examination; a healed site does not require inventing
+    a current polyp. Link all visits to the index resection and preceding follow-up.
+  finding_types:
+  - observation
+  classifications:
+  - coloreg_case_id
+  - coloreg_lesion_id
+  - coloreg_index_examination_id
+  - coloreg_index_polyp_finding_id
+  - coloreg_index_resection_finding_id
+  - coloreg_follow_up_sequence
+  - coloreg_previous_follow_up_examination_id
+  - coloreg_days_since_index
+  - coloreg_follow_up_result
+  - coloreg_interval_bleeding
+  - coloreg_interval_uncontrolled_bleeding
+  - coloreg_interval_perforation
+  - coloreg_repeat_required_bleeding
+  - coloreg_repeat_required_perforation
+  - coloreg_nonpassable_stenosis
+  interventions: []

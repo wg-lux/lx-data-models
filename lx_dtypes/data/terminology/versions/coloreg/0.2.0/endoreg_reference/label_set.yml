@@ -1,0 +1,126 @@
+- model: reference_catalog
+  name: label_set
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: endoscopy_nice_classification
+      record_type: label_set
+      description: null
+      version: 1
+      labels:
+      - name: nice_1
+        version: null
+      - name: nice_2a
+        version: null
+      - name: nice_2b
+        version: null
+      - name: nice_3
+        version: null
+    - name: endoscopy_paris_classification
+      record_type: label_set
+      description: null
+      version: 1
+      labels:
+      - name: paris_1p
+        version: null
+      - name: paris_1s
+        version: null
+      - name: paris_2a
+        version: null
+      - name: paris_2b
+        version: null
+      - name: paris_2c
+        version: null
+      - name: paris_3
+        version: null
+    - name: multilabel_classification_colonoscopy_default
+      record_type: label_set
+      description: null
+      version: 1
+      labels:
+      - name: appendix
+        version: null
+      - name: blood
+        version: null
+      - name: bubbles
+        version: null
+      - name: cold_snare
+        version: null
+      - name: diverticule
+        version: null
+      - name: grasper
+        version: null
+      - name: hot_snare
+        version: null
+      - name: ileocaecalvalve
+        version: null
+      - name: ileum
+        version: null
+      - name: low_quality
+        version: null
+      - name: nbi
+        version: null
+      - name: needle
+        version: null
+      - name: outside
+        version: null
+      - name: polyp
+        version: null
+      - name: smoke
+        version: null
+      - name: snare
+        version: null
+      - name: tissue_on_snare
+        version: null
+      - name: water_jet
+        version: null
+      - name: wound
+        version: null
+    - name: multilabel_classification_colonoscopy_default
+      record_type: label_set
+      description: null
+      version: 2
+      labels:
+      - name: appendix
+        version: null
+      - name: blood
+        version: null
+      - name: digital_chromo_endoscopy
+        version: null
+      - name: ileocaecalvalve
+        version: null
+      - name: ileum
+        version: null
+      - name: instrument
+        version: null
+      - name: low_quality
+        version: null
+      - name: outside
+        version: null
+      - name: polyp
+        version: null
+      - name: water_jet
+        version: null
+      - name: wound
+        version: null
+    - name: multilabel_classification_colonoscopy_subset
+      record_type: label_set
+      description: null
+      version: 1
+      labels:
+      - name: clip
+        version: null
+      - name: grasper
+        version: null
+      - name: ileum
+        version: null
+      - name: nbi
+        version: null
+      - name: needle
+        version: null
+      - name: outside
+        version: null
+      - name: snare
+        version: null
+      - name: water_jet
+        version: null

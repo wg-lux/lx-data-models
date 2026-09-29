@@ -1,0 +1,35 @@
+- model: reference_catalog
+  name: examination_time
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: cecum-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []
+    - name: colonoscopy-intervention-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []
+    - name: colonoscopy-total-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []
+    - name: intubation-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []
+    - name: withdrawal-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []

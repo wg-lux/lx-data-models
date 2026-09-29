@@ -1,0 +1,35 @@
+- model: reference_catalog
+  name: event
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: complication_coro_stent_thrombosis
+      record_type: event
+      description: null
+    - name: coro_bms_implantation
+      record_type: event
+      description: null
+    - name: coro_des_implantation
+      record_type: event
+      description: null
+    - name: deep_vein_thrombosis
+      record_type: event
+      description: Deep Vein Thrombosis
+    - name: hip_replacement_surgery
+      record_type: event
+      description: Hip replacement surgery
+    - name: knee_replacement_surgery
+      record_type: event
+      description: Knee replacement surgery
+    - name: pulmonary_embolism
+      record_type: event
+      description: Pulmonary Embolism
+    - name: recurrent_thrombembolism
+      record_type: event
+      description: Recurrent Thrombembolism
+    - name: stroke
+      record_type: event
+      description: null
+    - name: transient_ischemic_attack
+      record_type: event
+      description: null

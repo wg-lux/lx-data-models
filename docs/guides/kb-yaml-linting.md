@@ -10,13 +10,13 @@ Recommended reading order:
 ## Command
 
 ```bash
-python scripts/lint_kb_yaml.py --config lx_dtypes/data/report_template_examples/config.yaml
+python scripts/lint_kb_yaml.py --config lx_dtypes/data/terminology/report_template_examples/config.yaml
 ```
 
 You can also lint files/directories directly:
 
 ```bash
-python scripts/lint_kb_yaml.py lx_dtypes/data/report_template_examples/data
+python scripts/lint_kb_yaml.py lx_dtypes/data/terminology/report_template_examples/data
 ```
 
 ## What It Checks
@@ -40,7 +40,7 @@ must resolve every configured module reference.
 
 ```bash
 python scripts/lint_kb_yaml.py \
-  --config lx_dtypes/data/report_template_examples/config.yaml \
+  --config lx_dtypes/data/terminology/report_template_examples/config.yaml \
   --strict-aliases \
   --strict-mixed-styles \
   --fail-on-warnings

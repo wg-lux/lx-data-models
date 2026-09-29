@@ -1005,10 +1005,14 @@ def _missing_requirement_references(
             continue
         if requirement.kind == "classification_choice":
             choice_names = list(dict.fromkeys([*requirement.names, requirement.name]))
+            classifications = occurrence["classifications"]
+            value_groups = (
+                [classifications.get(requirement.classification, [])]
+                if requirement.classification is not None
+                else classifications.values()
+            )
             reported_values = [
-                str(value)
-                for values in occurrence["classifications"].values()
-                for value in values
+                str(value) for values in value_groups for value in values
             ]
             if any(choice_name in reported_values for choice_name in choice_names):
                 continue

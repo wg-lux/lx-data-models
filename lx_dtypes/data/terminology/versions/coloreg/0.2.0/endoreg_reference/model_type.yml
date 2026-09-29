@@ -1,0 +1,11 @@
+- model: reference_catalog
+  name: model_type
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: multilabel_classification
+      record_type: model_type
+      description: null
+    - name: object_detection
+      record_type: model_type
+      description: null

@@ -14,9 +14,9 @@ from bibtexparser.customization import convert_to_unicode  # type: ignore[import
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = (
-    REPO_ROOT / "lx_dtypes" / "data" / "citations" / "sample_references.bib"
+    REPO_ROOT / "lx_dtypes" / "data" / "terminology" / "citations" / "sample_references.bib"
 )
-DEFAULT_TARGET_DIR = REPO_ROOT / "lx_dtypes" / "data" / "citations" / "data"
+DEFAULT_TARGET_DIR = REPO_ROOT / "lx_dtypes" / "data" / "terminology" / "citations" / "data"
 DEFAULT_OUTPUT_NAME = "sample_references.yaml"
 
 MONTH_LOOKUP = {

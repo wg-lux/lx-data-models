@@ -1,0 +1,225 @@
+- model: findings_validator
+  name: coloreg_hot_snare_requires_settings
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_snare_type
+        comparator: in
+        values:
+        - coloreg_snare_diathermic
+        - coloreg_snare_both
+      then_requires:
+      - kind: classification
+        name: coloreg_electrosurgery_settings
+- model: findings_validator
+  name: coloreg_primary_success_requires_protocol
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_primary_success
+        comparator: in
+        values:
+        - 'yes'
+        - 'no'
+      then_requires:
+      - kind: classification
+        name: coloreg_primary_success_protocol
+- model: findings_validator
+  name: coloreg_subsequent_follow_up_requires_previous
+  finding: coloreg_polyp_follow_up
+  operator: condition
+  query:
+    finding: coloreg_polyp_follow_up
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_follow_up_sequence
+        comparator: in
+        values:
+        - coloreg_follow_up_subsequent
+      then_requires:
+      - kind: classification
+        name: coloreg_previous_follow_up_examination_id
+- model: findings_validator
+  name: coloreg_technique_emr_requires_intervention
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_resection_technique
+        comparator: in
+        values:
+        - coloreg_technique_emr
+      then_requires:
+      - kind: intervention
+        name: endoscopy_emr_generic
+- model: findings_validator
+  name: coloreg_technique_esd_requires_intervention
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_resection_technique
+        comparator: in
+        values:
+        - coloreg_technique_esd
+      then_requires:
+      - kind: intervention
+        name: endoscopy_esd_generic
+- model: findings_validator
+  name: coloreg_technique_eftr_requires_intervention
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_resection_technique
+        comparator: in
+        values:
+        - coloreg_technique_eftr
+      then_requires:
+      - kind: intervention
+        name: endoscopy_eftr_generic
+- model: findings_validator
+  name: coloreg_snare_cold_requires_intervention
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_snare_type
+        comparator: in
+        values:
+        - coloreg_snare_cold
+        - coloreg_snare_both
+      then_requires:
+      - kind: intervention
+        name: endoscopy_cold_snare_resection_generic
+- model: findings_validator
+  name: coloreg_snare_diathermic_requires_intervention
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_snare_type
+        comparator: in
+        values:
+        - coloreg_snare_diathermic
+        - coloreg_snare_both
+      then_requires:
+      - kind: intervention
+        name: endoscopy_diathermic_snare_resection_generic
+- model: findings_validator
+  name: coloreg_completion_emr_requires_intervention
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_completion_technique
+        comparator: eq
+        value: coloreg_technique_emr
+      then_requires:
+      - kind: intervention
+        name: endoscopy_emr_generic
+- model: findings_validator
+  name: coloreg_completion_esd_requires_intervention
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_completion_technique
+        comparator: eq
+        value: coloreg_technique_esd
+      then_requires:
+      - kind: intervention
+        name: endoscopy_esd_generic
+- model: findings_validator
+  name: coloreg_completion_eftr_requires_intervention
+  finding: coloreg_polyp_resection
+  operator: condition
+  query:
+    finding: coloreg_polyp_resection
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_completion_technique
+        comparator: eq
+        value: coloreg_technique_eftr
+      then_requires:
+      - kind: intervention
+        name: endoscopy_eftr_generic
+- model: findings_validator
+  name: coloreg_interval_uncontrolled_bleeding_requires_event
+  finding: coloreg_polyp_follow_up
+  operator: condition
+  query:
+    finding: coloreg_polyp_follow_up
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_interval_uncontrolled_bleeding
+        comparator: eq
+        value: 'yes'
+      then_requires:
+      - kind: classification_choice
+        name: 'yes'
+        classification: coloreg_interval_bleeding
+- model: findings_validator
+  name: coloreg_repeat_required_bleeding_requires_event
+  finding: coloreg_polyp_follow_up
+  operator: condition
+  query:
+    finding: coloreg_polyp_follow_up
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_repeat_required_bleeding
+        comparator: eq
+        value: 'yes'
+      then_requires:
+      - kind: classification_choice
+        name: 'yes'
+        classification: coloreg_interval_bleeding
+- model: findings_validator
+  name: coloreg_repeat_required_perforation_requires_event
+  finding: coloreg_polyp_follow_up
+  operator: condition
+  query:
+    finding: coloreg_polyp_follow_up
+    operator: condition
+    condition:
+      any:
+      - classification: coloreg_repeat_required_perforation
+        comparator: eq
+        value: 'yes'
+      then_requires:
+      - kind: classification_choice
+        name: 'yes'
+        classification: coloreg_interval_perforation

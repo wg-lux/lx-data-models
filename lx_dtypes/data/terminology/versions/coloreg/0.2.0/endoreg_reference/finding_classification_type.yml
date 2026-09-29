@@ -1,0 +1,47 @@
+- model: reference_catalog
+  name: finding_classification_type
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: bowel_prep
+      record_type: finding_classification_type
+      description: ''
+    - name: capillary_pattern
+      record_type: finding_classification_type
+      description: ''
+    - name: circularity
+      record_type: finding_classification_type
+      description: ''
+    - name: colon_lesion_advanced_imaging
+      record_type: finding_classification_type
+      description: ''
+    - name: colonoscopy_advanced_imaging
+      record_type: finding_classification_type
+      description: ''
+    - name: colonoscopy_bowel_prep
+      record_type: finding_classification_type
+      description: ''
+    - name: histology
+      record_type: finding_classification_type
+      description: ''
+    - name: inferrable
+      record_type: finding_classification_type
+      description: ''
+    - name: location
+      record_type: finding_classification_type
+      description: ''
+    - name: morphology
+      record_type: finding_classification_type
+      description: ''
+    - name: planarity
+      record_type: finding_classification_type
+      description: ''
+    - name: shape
+      record_type: finding_classification_type
+      description: ''
+    - name: size
+      record_type: finding_classification_type
+      description: ''
+    - name: surface_integrity
+      record_type: finding_classification_type
+      description: ''

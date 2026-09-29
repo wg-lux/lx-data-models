@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 
 MAIN_KNOWLEDGE_BASE_CONFIG_FILE_PATH = Path(
-    "./lx_dtypes/data/sample_knowledge_base/config.yaml"
+    "./lx_dtypes/data/terminology/sample_knowledge_base/config.yaml"
 )
 
 

@@ -59,7 +59,12 @@ def test_write_project_version_does_not_rewrite_kb_module_versions(
     pyproject_path = project_root / "pyproject.toml"
     pyproject_path.write_text('[project]\nname = "lx-dtypes"\nversion = "0.1.1"\n')
     kb_config_path = (
-        project_root / "lx_dtypes" / "data" / "star_upper_gi" / "config.yaml"
+        project_root
+        / "lx_dtypes"
+        / "data"
+        / "terminology"
+        / "star_upper_gi"
+        / "config.yaml"
     )
     kb_config_path.parent.mkdir(parents=True)
     kb_config_path.write_text("name: star_upper_gi\nversion: 0.1.1\n")
@@ -157,7 +162,9 @@ def _write_release_artifacts(
     migration_path.write_bytes(migration_contents)
     (migration_root / "max_migration.txt").write_text("0001_initial\n")
     packaged_migration_contents = artifact_migration_contents or migration_contents
-    knowledge_base_root = root / "lx_dtypes" / "data" / "report_template_examples"
+    knowledge_base_root = (
+        root / "lx_dtypes" / "data" / "terminology" / "report_template_examples"
+    )
     knowledge_base_root.mkdir(parents=True)
     knowledge_base_contents = b"name: report_template_examples\nversion: 0.1.0\n"
     (knowledge_base_root / "config.yaml").write_bytes(knowledge_base_contents)
@@ -178,7 +185,7 @@ def _write_release_artifacts(
         )
         if include_knowledge_base:
             archive.writestr(
-                "lx_dtypes/data/report_template_examples/config.yaml",
+                "lx_dtypes/data/terminology/report_template_examples/config.yaml",
                 packaged_knowledge_base_contents,
             )
 
@@ -192,7 +199,7 @@ def _write_release_artifacts(
                 packaged_migration_contents
             )
         if include_knowledge_base:
-            files["lx_dtypes/data/report_template_examples/config.yaml"] = (
+            files["lx_dtypes/data/terminology/report_template_examples/config.yaml"] = (
                 packaged_knowledge_base_contents
             )
         for relative_path, contents in files.items():

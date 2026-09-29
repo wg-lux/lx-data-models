@@ -15,7 +15,7 @@ def mst_3_0() -> KnowledgeBase:
     return load_knowledge_base(
         "mst_3_0",
         version="3.0.0",
-        input_dirs=[ROOT / "lx_dtypes/data/mst_3_0"],
+        input_dirs=[ROOT / "lx_dtypes/data/terminology/mst_3_0"],
     )
 
 

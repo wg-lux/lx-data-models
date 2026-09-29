@@ -1,0 +1,12 @@
+name: lx_examinations
+description: ""
+version: 0.1.0
+modules: []
+depends_on:
+  - lx_findings
+  - lx_indications
+  - lx_interventions
+  - lx_hardware
+data:
+  dirs:
+    - ./data

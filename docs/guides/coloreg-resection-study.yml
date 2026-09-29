@@ -1,0 +1,147 @@
+title: 'ColoReg resection comparison: capture and analysis contract'
+owner: ColoReg study authors; lx-dtypes maintainers own structural validation
+canonical_topic: coloreg_resection_comparison
+terminology:
+  module: coloreg
+  version: 0.3.0
+  template: coloreg_colonoscopy
+  template_version: 2.0.0
+study_document: lx_dtypes/data/study_metadata/coloreg_resection.yml
+scope: Authored study specification, not executable cohort filtering or a statistical analysis implementation.
+population:
+  unit: Index attempted resection of one lesion; keep different lesions and repeat visits distinct.
+  size:
+    classification: lesion_size_mm
+    choice: lesion_size_oval_mm
+    descriptor: lesion_size_mm_value
+    unit: milimeter
+    minimum_inclusive: 20
+    notes: Use maximum pre-resection diameter at the index examination. Do not select on recurrent-lesion
+      size or the categorical large-polyp label. milimeter is the existing canonical unit identifier.
+    finding: colon_polyp referenced by coloreg_index_polyp_finding_id
+    resection_copy: Verify that lesion_size_mm on the linked resection agrees with the original polyp
+      measurement; unresolved discrepancies are not silently resolved.
+  comparison:
+    classification: coloreg_resection_technique
+    groups:
+    - coloreg_technique_emr
+    - coloreg_technique_esd
+    excluded_from_primary_contrast:
+    - coloreg_technique_eftr
+    notes: EFTR remains collectable. Retain primary attempted technique after crossover; report completion
+      technique separately and prespecify assignment for analysis.
+  candidate_filters: StudySetupDefinition cannot express size thresholds, technique groups, or longitudinal
+    joins. Hosts must apply these explicitly to the captured observations.
+linkage:
+  case: coloreg_case_id
+  lesion: coloreg_lesion_id
+  index_examination: coloreg_index_examination_id
+  index_polyp: coloreg_index_polyp_finding_id
+  index_resection: coloreg_index_resection_finding_id
+  preceding_follow_up: coloreg_previous_follow_up_examination_id
+  requirements:
+  - Resolve every identifier within existing patient authorization; pseudonymous keys do not grant access.
+  - Verify the index polyp finding belongs to the referenced index examination, case and patient.
+  - Verify the index resection references that same polyp and lesion; never join solely by technique,
+    finding name, or examination.
+  - Verify preceding follow-up belongs to the same lesion/case and precedes the current examination; reject
+    self-links and cycles.
+  - Use examination timestamps and actual days since index, not report entry order, to order visits.
+  - The same case can contain multiple lesions and each lesion multiple examinations; avoid patient-level
+    or examination-level Cartesian joins.
+  - Text descriptors capture identifiers; referential integrity, date ordering and follow-up assembly
+    are host responsibilities.
+  - Interpret historical observations using their examination-recorded terminology module/version. Do
+    not infer missing historical study fields from the current active package.
+capture:
+  technique: EMR, ESD or EFTR, with a separate completion technique and not-completed state.
+  instruments: Cold snare, diathermic snare, both, no snare, or unknown. ESD need not use a snare.
+  electricity: Record actual generator/model, current mode, and manufacturer-labelled settings (effect,
+    duration, interval, power with units where exposed). No recommended settings or assumed defaults.
+  success: Primary success is an adjudicated yes/no/unknown plus required protocol identifier when adjudicated.
+    Macroscopic completeness, conversion to surgery and en-bloc/piecemeal/aborted removal are separate
+    observations.
+  histology: R0, R1, Rx/not assessable, pending, no specimen, or unknown. Do not infer R0 from en-bloc
+    or apparent completeness.
+  complications:
+  - Index perforation
+  - Index endoscopically uncontrollable bleeding
+  - Interval bleeding and its endoscopic controllability
+  - Interval perforation
+  - Repeat examination required because of interval bleeding
+  - Repeat examination required because of interval perforation
+  - Non-passable post-resection stenosis at follow-up
+  follow_up: Unremarkable, abnormal, not assessable, not performed or unknown, with first/subsequent visit
+    and explicit previous-visit reference.
+endpoints:
+  primary_success:
+    classification: coloreg_primary_success
+    positive: 'yes'
+    negative: 'no'
+    definition: Protocol-defined; no default operational definition.
+    protocol_reference: coloreg_primary_success_protocol
+  r0:
+    classification: coloreg_histological_margin_status
+    positive: coloreg_margin_r0
+    negative_assessable: coloreg_margin_r1
+    separate_states:
+    - coloreg_margin_rx
+    - coloreg_margin_pending
+    - coloreg_margin_no_specimen
+    - coloreg_margin_unknown
+  follow_up:
+    classification: coloreg_follow_up_result
+    positive: coloreg_follow_up_unremarkable
+    negative: coloreg_follow_up_abnormal
+    conditioning: An earlier follow-up was unremarkable; compare the next evaluable visit. Do not preselect
+      the outcome visit to be unremarkable.
+    history: Resolve index resection and all preceding examinations of this lesion; derive the earlier
+      result from the linked historical record.
+  complications:
+    index:
+    - coloreg_index_uncontrolled_bleeding
+    - coloreg_index_perforation
+    interval:
+    - coloreg_interval_uncontrolled_bleeding
+    - coloreg_interval_perforation
+    positive: 'yes'
+    negative: 'no'
+    aggregation: Report bleeding and perforation individually and their OR composite per index lesion
+      across the protocol observation window; do not double-count a re-documented event.
+analysis_requirements:
+- Require one primary attempted technique per index lesion; reject conflicting technique selections or
+  unresolved case/lesion links before analysis.
+- Before analysis, define primary-success criteria, ascertainment rules, follow-up horizon and eligible
+  follow-up visits; these are deliberately not invented here.
+- Prespecify denominators for attempted resections, histologically assessable margins and evaluable follow-up;
+  report missingness, Rx, pending results and losses separately.
+- No follow-up or unknown outcome is never an unremarkable result or absence of complications.
+- Keep actual eligibility calculations separate from broad candidate cohorts. Publish numerator, denominator
+  and exclusions per endpoint and technique.
+- Account for correlated lesions within a patient and repeated visits; repeated reports are not independent
+  new resections.
+- H0 is equal rates and H1 is different rates; these are authored comparisons, not evidence that techniques
+  differ.
+- Host projection, frontend controls, longitudinal querying and statistical estimation require downstream
+  integration; package loading alone does not implement them.
+references:
+- title: ESGE colorectal polypectomy and EMR guideline, update 2024
+  url: https://www.esge.com/assets/downloads/pdfs/guidelines/2024_a-2304-3219.pdf
+  use: Terminology distinction between resection techniques, en-bloc removal, histological R0 and delayed
+    adverse events; not a definition of this study primary-success endpoint.
+original_hypotheses_de:
+- 'H0: Bei Polypen >= 20 mm unterscheidet sich die Rate an primär erfolgreichen endoskopischen Abtragungen
+  zwischen den Abtragungstechniken EMR und ESD'
+- H0 Bei Polypen >= 20 mm unterscheidet sich die Rate an R0 Resektionen zwischen den Abtragunfstechniken
+  "EMR und "ESD"
+- H0 (bei unauffälligem Follow-Up) Bei Polypen >= 20 mm unterscheidet sich die Rate an unauffälligen Nachsorgeuntersuchungen
+  zwischen den Abtragungstechiken "EMR" und "ESD" (Diese Hypothese muss vorherige Untersuchungen desselben
+  Falles in die Analyse einschließen)
+- 'H0: Bei Polypen >= 20 mm unterscheidet sich die Rate an endoskopisch nicht kontrollierbaren Blutunngen
+  sowie Perforationen zwischen den Abtragungstecchniken "EMR" und "ESD"'
+protocol_decisions:
+  null_hypothesis: Author confirmed standard H0 (equal rates) and H1 (different rates).
+  primary_success: Author requested protocol-defined primary success; do not supply an automatic definition.
+  follow_up_conditioning: 'Working interpretation: an earlier unremarkable follow-up qualifies the next
+    evaluable visit. Author confirmation remains pending; capture supports either this analysis or all
+    evaluable follow-ups.'

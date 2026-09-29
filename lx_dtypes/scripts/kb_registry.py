@@ -40,6 +40,8 @@ def get_current_knowledge_base_identity(module_name: str) -> tuple[str, str]:
 
     config_path = data_root / module_name / "config.yaml"
     if not config_path.exists():
+        config_path = data_root / "terminology" / module_name / "config.yaml"
+    if not config_path.exists():
         raise SystemExit(
             f"Could not find config.yaml for module '{module_name}' at {config_path}."
         )
@@ -66,6 +68,8 @@ def get_current_knowledge_base_medical_field(module_name: str) -> str | None:
         raise SystemExit("Could not resolve a default lx-dtypes data root.")
 
     config_path = data_root / module_name / "config.yaml"
+    if not config_path.exists():
+        config_path = data_root / "terminology" / module_name / "config.yaml"
     if not config_path.exists():
         raise SystemExit(
             f"Could not find config.yaml for module '{module_name}' at {config_path}."

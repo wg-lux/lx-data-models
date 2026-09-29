@@ -5,7 +5,7 @@
       "module_name": "dgvs_reporting",
       "version": "0.1.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/dgvs_reporting",
+      "resource_root": "data/terminology/dgvs_reporting",
       "content_sha256": "0937e53f8109573fe0cf6a0b7bb2bc77f03b485d5d470bdb819162355a90ad66",
       "default": true
     },
@@ -13,7 +13,7 @@
       "module_name": "coloreg",
       "version": "0.1.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/versions/coloreg/0.1.0/coloreg",
+      "resource_root": "data/terminology/versions/coloreg/0.1.0/coloreg",
       "content_sha256": "5a22b2cffd0d11c152d96ac4cd83a5a03704e871149af103a65212463127ba59",
       "default": false
     },
@@ -21,7 +21,7 @@
       "module_name": "mst_3_0",
       "version": "3.0.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/mst_3_0",
+      "resource_root": "data/terminology/mst_3_0",
       "content_sha256": "e58079f76b44898f339de1440541befb10b0edd4991fd82005cfb6d6df5948b5",
       "default": true
     },
@@ -29,7 +29,7 @@
       "module_name": "star_upper_gi",
       "version": "0.1.2",
       "medical_field": "gastroenterology",
-      "resource_root": "data/star_upper_gi",
+      "resource_root": "data/terminology/star_upper_gi",
       "content_sha256": "7974043f2ed138d8d5b1c22cf8e6191a07372a8c1c360b4ce2a700bea1794982",
       "default": true
     },
@@ -37,7 +37,7 @@
       "module_name": "polyp_size_category",
       "version": "1.0.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/versions/polyp_size_category/1.0.0/polyp_size_category",
+      "resource_root": "data/terminology/versions/polyp_size_category/1.0.0/polyp_size_category",
       "content_sha256": "d9366e1f4f44d716b9c126b45088880f3260eb544a336368d01f14f95009c15f",
       "default": false
     },
@@ -45,7 +45,7 @@
       "module_name": "polyp_size_category",
       "version": "2.0.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/polyp_size_category",
+      "resource_root": "data/terminology/polyp_size_category",
       "content_sha256": "41cf9e8258cb9864b8dd2d7b05953313e3942cda91138331046e01f95f14f9cf",
       "default": true
     },
@@ -53,7 +53,7 @@
       "module_name": "star_upper_gi",
       "version": "0.1.1.post1",
       "medical_field": "gastroenterology",
-      "resource_root": "data/versions/star_upper_gi/0.1.1.post1/star_upper_gi",
+      "resource_root": "data/terminology/versions/star_upper_gi/0.1.1.post1/star_upper_gi",
       "content_sha256": "124b99237f5bcbe77a94f2e150863be08b6951bb7df043b212e460af9e8d1f4c",
       "default": false
     },
@@ -61,7 +61,7 @@
       "module_name": "endoreg_reference",
       "version": "1.0.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/endoreg_reference",
+      "resource_root": "data/terminology/endoreg_reference",
       "content_sha256": "ab9327125c9788b96c0a3717fcb640ada1c88d190cc84221cb9ac84f385b89ea",
       "default": true
     },
@@ -69,22 +69,30 @@
       "module_name": "coloreg",
       "version": "0.2.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/coloreg",
+      "resource_root": "data/terminology/versions/coloreg/0.2.0/coloreg",
       "content_sha256": "e3c8444570369fa4af50ed307d290ba588a606584b30bae31bbf9fc2157d9838",
-      "default": true
+      "default": false
     },
     {
       "module_name": "endoreg_workforce",
       "version": "1.0.0",
-      "resource_root": "data/endoreg_workforce",
+      "resource_root": "data/terminology/endoreg_workforce",
       "content_sha256": "cb12ee8350cd049902580f47d1fadb5436a8c892483fc93162880b7c05106545",
       "default": true
     },
     {
       "module_name": "endoreg_green_endoscopy",
       "version": "1.0.0",
-      "resource_root": "data/endoreg_green_endoscopy",
+      "resource_root": "data/terminology/endoreg_green_endoscopy",
       "content_sha256": "6593488a35b8a88f796ca5644f4e938678a5208545a409fe70232e84c75f9c4d",
+      "default": true
+    },
+    {
+      "module_name": "coloreg",
+      "version": "0.3.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/terminology/coloreg",
+      "content_sha256": "b04458fd9b0b98b6feaa3bc5bb55d5252b205c81fbb8c71a8b7991fcb53d6717",
       "default": true
     }
   ]

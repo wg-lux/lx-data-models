@@ -334,6 +334,7 @@ def test_graph_projection_strips_template_source_file_paths() -> None:
         ),
         ("coloreg", "0.1.0", {"coloreg_colonoscopy": "1.0.0"}),
         ("coloreg", "0.2.0", {"coloreg_colonoscopy": "1.0.0"}),
+        ("coloreg", "0.3.0", {"coloreg_colonoscopy": "2.0.0"}),
         (
             "mst_3_0",
             "3.0.0",

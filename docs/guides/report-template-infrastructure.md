@@ -3,7 +3,7 @@
 This guide explains how report-template YAML is loaded, validated, exported, and evaluated at runtime in this repository.
 
 Start here for a beginner authoring guide:
-- `lx_dtypes/data/report_template_examples/README.md`
+- `lx_dtypes/data/terminology/report_template_examples/README.md`
 This is the main system overview for report templates in this repository.
 
 It explains how report-template YAML is:
@@ -16,7 +16,7 @@ It explains how report-template YAML is:
 
 Read the guides in this order:
 
-1. Beginner authoring guide: `lx_dtypes/data/report_template_examples/README.md`
+1. Beginner authoring guide: `lx_dtypes/data/terminology/report_template_examples/README.md`
 2. `docs/guides/django-host-integration.md`
 3. This infrastructure guide
 4. `docs/guides/report-template-graph-validation.md`
@@ -134,8 +134,8 @@ In short:
 
 ## Important Files
 
-- Example module config: `lx_dtypes/data/report_template_examples/config.yaml`
-- Example template YAML: `lx_dtypes/data/report_template_examples/report_templates.yaml`
+- Example module config: `lx_dtypes/data/terminology/report_template_examples/config.yaml`
+- Example template YAML: `lx_dtypes/data/terminology/report_template_examples/report_templates.yaml`
 - New model package: `lx_dtypes/models/knowledge_base/report_template/`
 - Global KB model registry: `lx_dtypes/models/knowledge_base/main.py`
 - YAML parser: `lx_dtypes/utils/parser.py`
@@ -708,7 +708,7 @@ Expected registry shape:
 
 ## Related Guides
 
-- Beginner authoring: `lx_dtypes/data/report_template_examples/README.md`
+- Beginner authoring: `lx_dtypes/data/terminology/report_template_examples/README.md`
 - Graph-specific validation: `docs/guides/report-template-graph-validation.md`
 - Operator migration for persisted validator data: `docs/guides/report-template-findings-validator-migration.md`
 - Intentionally broken audit fixture: `docs/guides/fixtures/report-template-chaos/README.md`

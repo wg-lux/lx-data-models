@@ -1,0 +1,58 @@
+- model: reference_catalog
+  name: examination_indication_classification
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: capsule_endoscopy
+      record_type: examination_indication_classification
+      description: Capsule Endoscopy without further specification
+      choices: []
+    - name: endoscopy_colonoscopy
+      record_type: examination_indication_classification
+      description: Colonoscopy without further specification
+      choices: []
+    - name: endoscopy_colonoscopy_acute
+      record_type: examination_indication_classification
+      description: Colonoscopy for acute indications
+      choices: []
+    - name: endoscopy_colonoscopy_elective
+      record_type: examination_indication_classification
+      description: Colonoscopy for elective indications
+      choices: []
+    - name: endoscopy_ercp
+      record_type: examination_indication_classification
+      description: Endoscopic Retrograde Cholangiopancreatography without further
+        specification
+      choices: []
+    - name: endoscopy_gastroscopy
+      record_type: examination_indication_classification
+      description: Gastroscopy without further specification
+      choices: []
+    - name: endoscopy_gastroscopy_acute
+      record_type: examination_indication_classification
+      description: Gastroscopy for acute indications
+      choices: []
+    - name: endoscopy_gastroscopy_elective
+      record_type: examination_indication_classification
+      description: Gastroscopy for elective indications
+      choices: []
+    - name: endosonography_lower_gi
+      record_type: examination_indication_classification
+      description: Endosonography Lower GI Tract without further specification
+      choices: []
+    - name: endosonography_upper_gi
+      record_type: examination_indication_classification
+      description: Endosonography Upper GI Tract without further specification
+      choices: []
+    - name: small_bowel_endoscopy
+      record_type: examination_indication_classification
+      description: Small Bowel Endoscopy without further specification
+      choices: []
+    - name: sonography_guided
+      record_type: examination_indication_classification
+      description: Sonography guided procedures
+      choices: []
+    - name: xray_guided
+      record_type: examination_indication_classification
+      description: X-ray guided procedures
+      choices: []

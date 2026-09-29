@@ -1,0 +1,7 @@
+name: information_source_data
+description: ""
+version: 0.1.0
+modules: []
+data:
+  dirs:
+    - ./data

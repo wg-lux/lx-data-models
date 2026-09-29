@@ -1,0 +1,731 @@
+- model: reference_catalog
+  name: finding
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: anal_fissure
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: anal_hemorrhoids
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: hemorrhoids_grade
+        version: null
+      information_sources: []
+    - name: appendiceal_orifice
+      record_type: finding
+      description: 'Anatomical structure: Appendiceal orifice'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: ascending_colon
+      record_type: finding
+      description: 'Anatomical structure: Ascending colon'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: bowel_preparation_lc
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: bowel_prep_aronchick
+        version: null
+      - name: bowel_prep_boston
+        version: null
+      information_sources: []
+    - name: bowel_preparation_rc
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: bowel_prep_aronchick
+        version: null
+      - name: bowel_prep_boston
+        version: null
+      information_sources: []
+    - name: bowel_preparation_simplified
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: bowel_prep_boston_simplified
+        version: null
+      information_sources: []
+    - name: bowel_preparation_tc
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: bowel_prep_aronchick
+        version: null
+      - name: bowel_prep_boston
+        version: null
+      information_sources: []
+    - name: cecum
+      record_type: finding
+      description: 'Anatomical structure: Cecum'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: colon_diverticule
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions:
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      caused_by_interventions: []
+      finding_classifications:
+      - name: colonoscopy_location_coarse
+        version: null
+      - name: colonoscopy_location_default
+        version: null
+      information_sources: []
+    - name: colon_erosion
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: colon_inflammation
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: colon_polyp
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions:
+      - name: endoscopy_biopsy_foreceps_resection_generic
+        version: null
+      - name: endoscopy_biopsy_grasper_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_diathermic_snare_resection_generic
+        version: null
+      - name: endoscopy_eftr_generic
+        version: null
+      - name: endoscopy_emr_generic
+        version: null
+      - name: endoscopy_esd_generic
+        version: null
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_liftup
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      caused_by_interventions: []
+      finding_classifications:
+      - name: colon_lesion_jnet
+        version: null
+      - name: colon_lesion_kudo
+        version: null
+      - name: colon_lesion_lst
+        version: null
+      - name: colon_lesion_nice
+        version: null
+      - name: colon_lesion_paris
+        version: null
+      - name: colon_lesion_size_categorical
+        version: null
+      - name: colonoscopy_location_coarse
+        version: null
+      - name: colonoscopy_location_default
+        version: null
+      - name: colonoscopy_polyp_histology
+        version: null
+      - name: histology_dignity_default
+        version: null
+      - name: histology_dysplasia_default
+        version: null
+      - name: histology_in_sano_default
+        version: null
+      - name: lesion_circularity_default
+        version: null
+      - name: lesion_planarity_default
+        version: null
+      - name: lesion_size_mm
+        version: null
+      - name: lesion_surface_intact_default
+        version: null
+      information_sources: []
+    - name: colon_post_intervention_wound
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions:
+      - name: endoscopy_hemoclip_generic
+        version: null
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: colon_scar
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: colon_stenosis
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions:
+      - name: endoscopy_dilation_balloon
+        version: null
+      - name: endoscopy_stent_generic
+        version: null
+      caused_by_interventions: []
+      finding_classifications:
+      - name: colonoscopy_location_coarse
+        version: null
+      - name: colonoscopy_location_default
+        version: null
+      - name: lesion_circularity_default
+        version: null
+      information_sources: []
+    - name: colon_tumor_mass
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: colon_ulcer
+      record_type: finding
+      description: null
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: colonoscopy_deepest_viewed_location
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: colonoscopy_location_default
+        version: null
+      - name: colonoscopy_not_complete_reason
+        version: null
+      information_sources: []
+    - name: complication_generic
+      record_type: finding
+      description: null
+      finding_types:
+      - name: complication
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: complication_generic_type
+        version: null
+      information_sources: []
+    - name: descending_colon
+      record_type: finding
+      description: 'Anatomical structure: Descending colon'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: examination_setting
+      record_type: finding
+      description: Settings related to the examination environment and conditions.
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: examination_setting_generic_location
+        version: null
+      information_sources: []
+    - name: gastroscopy_angulus_flexure_mucosa
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_antrum_mucosa
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_bleeding
+      record_type: finding
+      description: Bleeding
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_corpus_mucosa
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_diverticulum_duodenum
+      record_type: finding
+      description: Divertikel (Duodenum)
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_diverticulum_esophagus
+      record_type: finding
+      description: Divertikel (Ösophagus)
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_duodenum_bulbus_mucosa
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_duodenum_mucosa
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_ectopic_gastric_mucosa
+      record_type: finding
+      description: Ectopic Gastric Mucosa
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_ectopic_pancreatic_tissue
+      record_type: finding
+      description: Ectopic Pancreatic Tissue
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_erythema
+      record_type: finding
+      description: Erythema
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_esophagus_mucosa
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_fundus_mucosa
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_gastroesophageal_junction
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_obstruction_generic
+      record_type: finding
+      description: Generic Obstruction
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_polyp
+      record_type: finding
+      description: Polyp
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_pylorus
+      record_type: finding
+      description: null
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_scar
+      record_type: finding
+      description: Scar
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_stenosis
+      record_type: finding
+      description: Stenosis
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_subepithelial_tumor
+      record_type: finding
+      description: Subepithelial Tumor
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_ulcer
+      record_type: finding
+      description: Ulcer
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_varices_duodenal
+      record_type: finding
+      description: Duodenal Varices
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_varices_esophageal
+      record_type: finding
+      description: Esophageal Varices
+      finding_types:
+      - name: observation
+        version: null
+      - name: persisting
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: gastroscopy_varices_gastric
+      record_type: finding
+      description: Gastric Varices
+      finding_types:
+      - name: observation
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications: []
+      information_sources: []
+    - name: ileocecal_valve
+      record_type: finding
+      description: 'Anatomical structure: Ileocecal valve'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: left_flexure
+      record_type: finding
+      description: 'Anatomical structure: Left flexure'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: post_resection_wound
+      record_type: finding
+      description: Postresection Wound
+      finding_types:
+      - name: iatrogenic
+        version: null
+      - name: observation
+        version: null
+      finding_interventions:
+      - name: endoscopy_hemoclip_generic
+        version: null
+      - name: endoscopy_injection_vasoactive
+        version: null
+      - name: endoscopy_over_the_scope_clip_generic
+        version: null
+      caused_by_interventions:
+      - name: endoscopy_biopsy_foreceps_resection_generic
+        version: null
+      - name: endoscopy_cold_snare_resection_generic
+        version: null
+      - name: endoscopy_diathermic_snare_resection_generic
+        version: null
+      finding_classifications: []
+      information_sources: []
+    - name: rectum
+      record_type: finding
+      description: 'Anatomical structure: Rectum'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: rectum_anus
+      record_type: finding
+      description: 'Anatomical structure: Rectum and anus'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: right_flexure
+      record_type: finding
+      description: 'Anatomical structure: Right flexure'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: sedation_endoscopy
+      record_type: finding
+      description: Sedation during an examination
+      finding_types:
+      - name: baseline
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: examination_setting_generic_sedation
+        version: null
+      - name: sedation_performed
+        version: null
+      information_sources: []
+    - name: sigmoid_colon
+      record_type: finding
+      description: 'Anatomical structure: Sigmoid colon'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: terminal_ileum
+      record_type: finding
+      description: 'Anatomical structure: Terminal ileum'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []
+    - name: transverse_colon
+      record_type: finding
+      description: 'Anatomical structure: Transverse colon'
+      finding_types:
+      - name: anatomy
+        version: null
+      - name: hidden
+        version: null
+      finding_interventions: []
+      caused_by_interventions: []
+      finding_classifications:
+      - name: visualized
+        version: null
+      information_sources: []

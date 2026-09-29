@@ -199,7 +199,7 @@ def test_rules_are_bound_to_resolved_bundle(
     message: str,
 ) -> None:
     root = tmp_path / "bundle"
-    shutil.copytree(ROOT / "lx_dtypes/data/polyp_size_category", root)
+    shutil.copytree(ROOT / "lx_dtypes/data/terminology/polyp_size_category", root)
     path = root / "numeric_rules.yml"
     path.write_text(path.read_text().replace(before, after))
     registry_path = tmp_path / "custom.json"

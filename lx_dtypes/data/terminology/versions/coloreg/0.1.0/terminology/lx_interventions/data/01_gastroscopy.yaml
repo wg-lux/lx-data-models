@@ -1,0 +1,14 @@
+- model: intervention
+  name: egd_percutaneous_gastroenterostomy
+
+- model: intervention
+  name: egd_percutaneous_jejunostomy
+
+- model: intervention
+  name: egd_poem
+
+- model: intervention
+  name: egd_stepwise_biopsy
+
+- model: intervention
+  name: egd_esophagus_injection_botox

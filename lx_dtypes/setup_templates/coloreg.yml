@@ -9,6 +9,6 @@ reference_packages:
   version: 1.0.0
 study_packages:
 - module: coloreg
-  version: 0.2.0
+  version: 0.3.0
   activate: false
 adopt_existing: false

@@ -1,0 +1,29 @@
+- model: reference_catalog
+  name: center
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: bbk_regensburg
+      record_type: center
+      center_key: bbk_regensburg
+      display_name: bbk_regensburg
+    - name: endoreg_db_demo
+      record_type: center
+      center_key: endoreg_db_demo
+      display_name: endoreg_db_demo
+    - name: rbk_stuttgart
+      record_type: center
+      center_key: rbk_stuttgart
+      display_name: rbk_stuttgart
+    - name: rkh_ludwigsburg
+      record_type: center
+      center_key: rkh_ludwigsburg
+      display_name: rkh_ludwigsburg
+    - name: uke_hamburg
+      record_type: center
+      center_key: uke_hamburg
+      display_name: uke_hamburg
+    - name: university_hospital_wuerzburg
+      record_type: center
+      center_key: university_hospital_wuerzburg
+      display_name: university_hospital_wuerzburg

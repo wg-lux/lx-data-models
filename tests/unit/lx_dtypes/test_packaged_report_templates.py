@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from lx_dtypes.knowledge_bases import get_packaged_knowledge_base
 from lx_dtypes.scripts import verify_packaged_report_templates as verifier_module
 from lx_dtypes.scripts.verify_packaged_report_templates import (
     REQUIRED_PACKAGED_REPORT_TEMPLATES,
@@ -85,9 +86,13 @@ def test_packaged_report_template_verifier_requires_multiple_templates() -> None
         verify_packaged_report_templates(["upper_gi_quality_2025"])
 
 
-def test_coloreg_template_exposes_only_conditional_paris_and_nice_polyps() -> None:
+def test_historical_coloreg_preserves_conditional_paris_and_nice_polyps() -> None:
     payload = (
-        verifier_module.DataLoader()
+        verifier_module.DataLoader(
+            input_dirs=[
+                get_packaged_knowledge_base("coloreg", "0.2.0").installed_data_root()
+            ]
+        )
         .load_knowledge_base("coloreg")
         .export_report_template("coloreg_colonoscopy")
     )

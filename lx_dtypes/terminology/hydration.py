@@ -111,10 +111,15 @@ def _needs_copy(
     # Migrate an explicit path into THIS installation's shipped data only.
     # Other filesystem sources, including older hydrated trees, stay authoritative.
     expected = (source / _module_relative_path(descriptor)).parent
+    expected_roots = {expected}
+    if expected == source / "terminology":
+        # Before the layout split, current packages were direct children of
+        # data/. Preserve migration of registries pointing at that exact root.
+        expected_roots.add(source)
     return (
         len(inputs) == 1
         and Path(inputs[0]).is_absolute()
-        and Path(inputs[0]).resolve() == expected
+        and Path(inputs[0]).resolve() in expected_roots
     )
 
 

@@ -56,7 +56,7 @@ module directory, for example:
         "sources": [{
           "kind": "filesystem",
           "input_dirs": [
-            "https://github.com/wg-lux/lx-data-models/tree/main/lx_dtypes/data/star_upper_gi"
+            "https://github.com/wg-lux/lx-data-models/tree/main/lx_dtypes/data/terminology/star_upper_gi"
           ]
         }]
       }
@@ -234,7 +234,7 @@ tree used by `lx-data-models`.
 The current Nix example package in `package.nix` packages:
 
 ```text
-lx_dtypes/data/star_upper_gi/
+lx_dtypes/data/terminology/star_upper_gi/
 ```
 
 That means the module folder name is currently part of the packaging contract.
@@ -245,7 +245,7 @@ Important naming rule:
 
 In the current package definition:
 
-- `kbSource = ./lx_dtypes/data/star_upper_gi;`
+- `kbSource = ./lx_dtypes/data/terminology/star_upper_gi;`
 - `kbModuleName = builtins.baseNameOf (toString kbSource);`
 - the Nix package name is derived from that folder name
 
@@ -256,20 +256,20 @@ If you change the published module name, update the packaged source folder to ma
 Run the KB linter against the module config or data directory:
 
 ```bash
-python scripts/lint_kb_yaml.py --config lx_dtypes/data/star_upper_gi/config.yaml
+python scripts/lint_kb_yaml.py --config lx_dtypes/data/terminology/star_upper_gi/config.yaml
 ```
 
 or:
 
 ```bash
-python scripts/lint_kb_yaml.py lx_dtypes/data/star_upper_gi
+python scripts/lint_kb_yaml.py lx_dtypes/data/terminology/star_upper_gi
 ```
 
 Use strict mode when you want authoring governance checks as part of CI:
 
 ```bash
 python scripts/lint_kb_yaml.py \
-  --config lx_dtypes/data/star_upper_gi/config.yaml \
+  --config lx_dtypes/data/terminology/star_upper_gi/config.yaml \
   --strict-aliases \
   --strict-mixed-styles \
   --fail-on-warnings
@@ -441,9 +441,9 @@ a new version; do not silently fill gaps between integer guideline labels.
 
 ### Author a release in YAML
 
-The current/default bundle is `lx_dtypes/data/polyp_size_category/`. Its historical
+The current/default bundle is `lx_dtypes/data/terminology/polyp_size_category/`. Its historical
 release lives at
-`lx_dtypes/data/versions/polyp_size_category/1.0.0/polyp_size_category/`.
+`lx_dtypes/data/terminology/versions/polyp_size_category/1.0.0/polyp_size_category/`.
 Each release has these files:
 
 | File | Purpose |
@@ -520,7 +520,7 @@ Its digest covers those nested unit files. The existing operational STAR
 ### Validate before publication
 
 ```bash
-uv run python scripts/lint_kb_yaml.py --config lx_dtypes/data/polyp_size_category/config.yaml
+uv run python scripts/lint_kb_yaml.py --config lx_dtypes/data/terminology/polyp_size_category/config.yaml
 uv run pytest tests/unit/lx_dtypes/models/interface/test_classification_versioning.py \
   tests/unit/lx_dtypes/models/interface/test_mst_3_0.py \
   tests/unit/lx_dtypes/test_knowledge_base_registry_bootstrap.py -q
@@ -574,7 +574,7 @@ in that YAML file; review the resulting document before submitting it.
 
 ## Dataset and live-cohort setup templates
 
-The packaged [`research.yml`](../../lx_dtypes/data/study_setup/research.yml)
+The packaged [`research.yml`](../../lx_dtypes/data/study_metadata/research.yml)
 defines image/video datasets and saved live cohort definitions. It is a separate
 versioned contract from clinical knowledge-base bundles. Its canonical scope and
 readiness record is `endoreg-db/feature-tracking/DtypesStudyDefinitions.yml`.
@@ -586,7 +586,7 @@ from importlib.resources import files
 from lx_dtypes.utils.study_setup_yaml import parse_study_setup_yaml
 from lx_dtypes.models.contracts.study_setup import StudySetupDefinition
 
-raw = files("lx_dtypes").joinpath("data/study_setup/research.yml").read_text()
+raw = files("lx_dtypes").joinpath("data/study_metadata/research.yml").read_text()
 setup = parse_study_setup_yaml(raw)
 schema = StudySetupDefinition.model_json_schema()
 ```

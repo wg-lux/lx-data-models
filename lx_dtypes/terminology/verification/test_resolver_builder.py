@@ -84,12 +84,14 @@ def payload(**kwargs):
 
 
 def test_builder_saves_and_reloads_from_hydrated_copy(storage):
-    source_before = (package_data_root() / "star_upper_gi/config.yaml").read_bytes()
+    source_before = (
+        package_data_root() / "terminology/star_upper_gi/config.yaml"
+    ).read_bytes()
     saved = builder.save_report_template_definition(payload(), resolved_version="0.1.2")
     assert Path(saved.path).is_relative_to(storage)
     assert Path(saved.path).is_file()
     assert (
-        package_data_root() / "star_upper_gi/config.yaml"
+        package_data_root() / "terminology/star_upper_gi/config.yaml"
     ).read_bytes() == source_before
     clear_knowledge_base_resolver_caches()
     kb = central.load_module_kb("star_upper_gi", version="0.1.2")
@@ -140,7 +142,9 @@ def test_builder_version_mismatch_prevents_writes(storage):
 def test_builder_override_cannot_redirect_writes(storage):
     with pytest.raises(TerminologyError, match="root conflicts"):
         builder.save_report_template_definition(
-            payload(), resolved_version="0.1.2", modules_root=package_data_root()
+            payload(),
+            resolved_version="0.1.2",
+            modules_root=package_data_root() / "terminology",
         )
 
 

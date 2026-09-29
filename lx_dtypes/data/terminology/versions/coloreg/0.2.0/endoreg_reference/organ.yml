@@ -1,0 +1,20 @@
+- model: reference_catalog
+  name: organ
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: anal_canal
+      record_type: organ
+      description: null
+    - name: colon
+      record_type: organ
+      description: null
+    - name: ileum
+      record_type: organ
+      description: null
+    - name: rectum
+      record_type: organ
+      description: null
+    - name: small_bowel
+      record_type: organ
+      description: null

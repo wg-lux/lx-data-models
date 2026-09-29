@@ -1,0 +1,18 @@
+- model: reference_catalog
+  name: date_value_distribution
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: age-screening_colo_population
+      record_type: date_value_distribution
+      description: null
+      distribution_type: uniform
+      mode: timedelta
+      date_min: null
+      date_max: null
+      date_mean: null
+      date_std_dev: null
+      timedelta_days_min: 18250
+      timedelta_days_max: 32485
+      timedelta_days_mean: null
+      timedelta_days_std_dev: null

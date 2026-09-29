@@ -1,0 +1,8 @@
+- model: reference_catalog
+  name: examination_time_type
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: colonoscopy-time
+      record_type: examination_time_type
+      examinations: []

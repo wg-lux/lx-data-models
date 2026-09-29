@@ -1,0 +1,161 @@
+- model: reference_catalog
+  name: medication_schedule
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: apixaban-2.5mg-twice_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: null
+      dose: 2.5
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-2.5mg-twice_daily_10d
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 10.0
+      dose: 2.5
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-2.5mg-twice_daily_32d
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 32.0
+      dose: 2.5
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-5g-twice_daily_3mo
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 90.0
+      dose: 5.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-5g-twice_daily_6mo
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 180.0
+      dose: 5.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-5g-twice_daily_7d
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 7.0
+      dose: 5.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-5mg-twice_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: null
+      dose: 5.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: ass-100mg-once_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: aspirin
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: -1.0
+      dose: 100.0
+      intake_times:
+      - name: daily-morning
+        version: null
+    - name: enoxaparin-40mg-one_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: enoxaparin
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: -1.0
+      dose: 40.0
+      intake_times:
+      - name: daily-morning
+        version: null
+    - name: enoxaparin-80mg-twice_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: enoxaparin
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: -1.0
+      dose: 80.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null

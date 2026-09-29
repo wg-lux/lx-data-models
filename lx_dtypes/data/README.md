@@ -1,56 +1,51 @@
-# Knowledge Base Data
+# Packaged definitions
 
-For executable numeric rules, historical releases, the STAR publication snapshot
-and manuscript reconciliation, follow the canonical
-[versioning workflow](../../docs/guides/knowledge-base-authoring.md#reproduce-and-maintain-versioned-numeric-classifications).
-`polyp_size_category/` contains the default classification release; retained
-releases are under `versions/` and selected through `catalog.json` and the registry.
-`numeric_rules.yml` is a validated sidecar, not a KB record list.
-This directory bundles the canonical data modules that ship with LX data models. Every subdirectory that contains a `config.yaml` is a loadable module and can declare dependencies on siblings so the loader can resolve an ordered data graph.
+Maintained by the lx-dtypes maintainers. The structural contract is documented in
+[Structure of a valid lx-dtypes package](../../docs/guides/dtypes-package-structure.md).
+The machine-readable inventory is [definitions.yml](definitions.yml).
 
-*Content*
-- [1. Module Overview](#1-module-overview)
-- [2. Detailed Module Notes](#2-detailed-module-notes)
-- [3. Extending Or Overriding](#3-extending-or-overriding)
+- **`study_metadata/`** contains portable study documents. `research.yml` uses
+  `StudySetupDefinition`: datasets, cohorts and study eligibility metadata belong
+  here. Validate it with `parse_study_setup_yaml`; do not pass it to the KB loader.
+- **`terminology/`** contains versioned knowledge-base packages: concepts, units,
+  classifications, examinations, report templates and reference catalogues.
+  Each package selects its records through `config.yaml`. Module identity is its
+  declared name and version, independent of the enclosing directory.
+- **`catalog.json`** selects published terminology releases and records their
+  integrity digests. Historical releases remain under `terminology/versions/`.
 
-## 1. Module Overview
-| Module Path | Purpose | Key Data | Depends On |
-| --- | --- | --- | --- |
-| `sample_knowledge_base/` (`lx_knowledge_base`) | Top-level package that mirrors the current working knowledge base. Aggregates all core modules through `modules` field. | Pulls in everything below; no direct data files. | `information_source_data`, `citations`, `lx_utils`, `lx_hardware`, `DGVS_Terminology` |
-| `information_source_data/` | Seeds canonical information sources so downstream modules can reference consistent IDs. | `data/unknown.yaml`. | None |
-| `citations/` | Bibliography references shared across models. | `data/sample_references.yaml`, `sample_references.bib`. | None |
-| `lx_utils/` | Cross-cutting utility enumerations (genders, tags, units, etc.). | Nested `gender/`, `tag/`, `unit/` submodules each with `default.yaml`. | `information_source_data` |
-| `lx_hardware/` | Placeholder hardware knowledge base; currently empty but structured for overrides. | Declares empty `files`/`dirs`. | `lx_utils` |
-| `terminology/` (`DGVS_Terminology`) | Grouping module that wires up the clinical terminology stack. | Delegates to `lx_*` submodules listed below. | None |
-| `terminology/lx_units/` | Canonical units referenced by descriptors. | `data/`. | None |
-| `terminology/lx_descriptors/` | Descriptor vocabulary with localized labels and metadata. | `data/`. | `lx_units` |
-| `terminology/lx_classification_choices/` | Atomic choices used by classifications. | `data/`. | `lx_descriptors` |
-| `terminology/lx_classifications/` | Classification definitions and types. | `data/`, `classification_types/`. | `lx_classification_choices` |
-| `terminology/lx_interventions/` | Intervention catalog and type data. | `data/`, `intervention_types/`. | None |
-| `terminology/lx_findings/` | Finding catalog plus finding/former_event/type folders. | `data/`, `finding_types/`, `former_events/`. | `lx_classifications` |
-| `terminology/lx_indications/` | Indication catalog plus types. | `data/`, `indication_types/`. | `lx_interventions`, `lx_classifications` |
-| `terminology/lx_examinations/` | Examination definitions that stitch findings, indications, interventions. | `data/`. | `lx_findings`, `lx_indications`, `lx_interventions` |
-| `logs/` | Golden log snapshots for tests, grouped by suite. | `tests/` with dated YAML logs, `scripts/` placeholder. | None (test fixture only) |
-| `endoreg/` | Placeholder for center-specific overrides. | Empty `center/` folder. | None |
-| `mock/` | Reserved for ad-hoc mock data during development. | Currently empty. | None |
+Report templates and executable numeric rules are terminology contracts, even
+when authored for a particular study. Host reference catalogues such as workforce
+and sustainability definitions are also terminology; they are not cohort metadata.
+Annotation mappings and numeric rules are separate sidecars, not ordinary KB lists.
+Study metadata must not be added to a terminology manifest's selected data files.
+No participating centres, age limits or eligibility rules should be inferred from
+clinical concept names; these require an authored study protocol.
 
-The dependency column mirrors the `depends_on` stanza in each module's `config.yaml`. Load order is depth-first according to those relationships, so higher-level packs such as `lx_knowledge_base` or `DGVS_Terminology` are thin orchestrators.
+Legacy CSV exports have moved to `demo-data/legacy_exports/`; they are not packaged
+reference definitions. Unfinished authoring examples live under `demo-data/drafts/`.
+Log scaffolding lives under `tests/fixtures/lx_dtypes/logs/`.
 
-## 2. Detailed Module Notes
-- **Configuration contracts**: Every module root carries a `config.yaml` that at minimum defines `name`, `version`, and optional `modules`, `depends_on`, and `data` entries. Relative `data.dirs` paths are resolved from the module directory, and folders are scanned recursively in ascending filename order.
-- **Sample knowledge base**: `sample_knowledge_base/config.yaml` lists the exact module order used in tests. Add custom modules by appending to its `modules` array or by creating a new top-level module that depends on this one.
-- **Utility submodules**: Under `lx_utils/`, each child (`gender`, `tag`, `unit`) is an independent module so that downstream packs can cherry-pick only the enumerations they need. Their `config.yaml` files omit `depends_on` unless coupling is required.
-- **Terminology stack**: `terminology/config.yaml` declares `DGVS_Terminology`, which subsequently imports the six `lx_*` terminology modules. This indirection allows you to swap entire terminology bundles by changing a single module reference.
-- **Logs as fixtures**: The `logs/tests/` tree stores YAML exports generated by the automated suites (`TestKnowledgebaseBaseModel`, `TestLogWriter`, `TestParser`, etc.). While not consumed by the knowledge base loader, keeping them under `data/` simplifies packaging when fixtures must accompany deployments.
-- **Placeholders**: `endoreg/` and `mock/` intentionally ship empty so integrators can copy the directory layout when creating client-specific overrides without touching the shared modules.
+## Path migration
 
-## 3. Extending Or Overriding
-To extend this corpus, create a new module directory beside the existing ones:
+Former `data/<package>/` paths are now `data/terminology/<package>/`.
+The former `data/terminology/config.yaml` aggregator is now
+`data/terminology/DGVS_Terminology/config.yaml`; its existing child packages retain
+their paths. `data/study_setup/research.yml` is now
+`data/study_metadata/research.yml`. Update filesystem/resource consumers to these
+paths. Public Python imports, module identities, release versions and catalogued
+package digests are unchanged. Existing registry copies are not moved automatically.
 
-1. Add a `config.yaml` that declares `depends_on` entries for every module you need (for instance, `$new_module` might depend on `sample_knowledge_base`).
-2. Point `data.dirs` at the folders that contain your YAML payloads. Use the same folder conventions (`data/`, `*_types/`, etc.) to stay compatible with the loader.
-3. Register the module by either
-	- referencing it from another module's `modules` array (e.g., append to `sample_knowledge_base/config.yaml`), or
-	- loading it explicitly when constructing the knowledge base in code.
+A package that loads is structurally supported; this does not establish clinical
+approval or successful downstream database projection. For registration and
+publication, follow the [authoring guide](../../docs/guides/knowledge-base-authoring.md).
 
-Because dependencies are DAG-based and processed in order, later modules can override IDs defined by earlier ones. For example, placing `$custom_findings` after `terminology/lx_findings` allows you to tweak a subset of findings without copying the entire catalog.
+## ColoReg resection study
+
+`coloreg@0.3.0` supplies reporting template `coloreg_colonoscopy@2.0.0` for
+lesion-linked resection and longitudinal follow-up. The published `0.2.0` package
+and its dependency closure remain under `terminology/versions/coloreg/0.2.0/`.
+The [study document](study_metadata/coloreg_resection.yml) stores the four
+comparison hypotheses separately from terminology. The canonical
+[endpoint and linkage specification](../../docs/guides/coloreg-resection-study.yml)
+explains protocol-defined primary success, denominators and host responsibilities.

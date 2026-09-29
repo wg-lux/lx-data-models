@@ -1,0 +1,20 @@
+- model: reference_catalog
+  name: finding_intervention_type
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: diagnostic
+      record_type: finding_intervention_type
+      description: null
+    - name: foreign_body
+      record_type: finding_intervention_type
+      description: null
+    - name: histology_sampling
+      record_type: finding_intervention_type
+      description: null
+    - name: invasive
+      record_type: finding_intervention_type
+      description: null
+    - name: therapeutic
+      record_type: finding_intervention_type
+      description: null

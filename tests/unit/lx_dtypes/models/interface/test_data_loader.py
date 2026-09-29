@@ -233,7 +233,7 @@ class TestDataLoader:
         default_config = default_loader.get_initialized_config("star_upper_gi")
         assert default_config.source_file is not None
         assert default_config.source_file.as_posix().endswith(
-            "lx_dtypes/data/star_upper_gi/config.yaml"
+            "lx_dtypes/data/terminology/star_upper_gi/config.yaml"
         )
 
         explicit_root = tmp_path / "custom-loader-root"

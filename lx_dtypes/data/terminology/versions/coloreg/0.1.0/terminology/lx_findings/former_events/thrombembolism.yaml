@@ -1,0 +1,17 @@
+- model: finding
+  name: "deep_vein_thrombosis"
+  description: "Deep Vein Thrombosis"
+  tags:
+    - event
+
+- model: finding
+  name: "pulmonary_embolism"
+  description: "Pulmonary Embolism"
+  tags:
+    - event
+
+- model: finding
+  name: "recurrent_thrombembolism"
+  description: "Recurrent Thrombembolism"
+  tags:
+    - event

@@ -1,0 +1,116 @@
+# Owner: ColoReg study authors; structural contract: StudySetupDefinition.
+# H0/H1 wording agreed with the author; primary success intentionally remains protocol-defined.
+# Canonical endpoint and linkage specification: docs/guides/coloreg-resection-study.yml.
+# These cohorts select candidate examinations, not an automatically evaluated >=20 mm analysis population.
+# Empty dataset_refs preserves the existing authorized scope; it does not grant access.
+schema_version: '1.0'
+definition_id: coloreg_resection_comparison
+definition_version: 1.0.0
+datasets: []
+cohorts:
+- definition_id: coloreg_primary_success
+  name: Primärer Resektionserfolg
+  hypothesis: 'H0: Bei Polypen mit einem maximalen Ausgangsdurchmesser >= 20 mm sind die Raten an primär
+    erfolgreichen endoskopischen Abtragungen zwischen EMR und ESD gleich. H1: Die Raten unterscheiden
+    sich zwischen EMR und ESD. Die Definition des primären Erfolgs bleibt protokollabhängig; Protokollkennung
+    und Version müssen vor Auswertung festgelegt sein.'
+  dataset_refs: []
+  filters:
+    examination_name: colonoscopy
+  study_metadata:
+    terminology_requirements:
+    - module: coloreg
+      version: 0.3.0
+    inclusion_criteria:
+    - name: coloreg_resection_or_follow_up
+      description: Candidate examinations only. The analysis layer joins lesion histories and applies
+        the numeric size threshold and EMR/ESD comparison; these are not executable cohort filters.
+      concepts:
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_resection
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_follow_up
+- definition_id: coloreg_r0
+  name: Histologischer R0-Resektionsstatus
+  hypothesis: 'H0: Bei Polypen mit einem maximalen Ausgangsdurchmesser >= 20 mm sind die Raten an histologisch
+    bestätigten R0-Resektionen zwischen EMR und ESD gleich. H1: Die Raten unterscheiden sich zwischen
+    EMR und ESD. R0 wird ausschließlich aus dem histologischen Resektionsstatus abgeleitet, nicht aus
+    En-bloc-Resektion oder makroskopischer Vollständigkeit. Rx, ausstehend und unbekannt separat ausweisen.'
+  dataset_refs: []
+  filters:
+    examination_name: colonoscopy
+  study_metadata:
+    terminology_requirements:
+    - module: coloreg
+      version: 0.3.0
+    inclusion_criteria:
+    - name: coloreg_resection_or_follow_up
+      description: Candidate examinations only. The analysis layer joins lesion histories and applies
+        the numeric size threshold and EMR/ESD comparison; these are not executable cohort filters.
+      concepts:
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_resection
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_follow_up
+- definition_id: coloreg_follow_up
+  name: Longitudinale Nachsorge
+  hypothesis: 'H0: Bei Polypen mit einem maximalen Ausgangsdurchmesser >= 20 mm sind die Raten an unauffälligen
+    Nachsorgeuntersuchungen zwischen EMR und ESD gleich. H1: Die Raten unterscheiden sich zwischen EMR
+    und ESD. Vorherige Untersuchungen desselben Falles und derselben Läsion einschließen. Nach unauffälliger
+    früherer Nachsorge wird die nächste auswertbare Nachsorge verglichen; deren Ergebnis darf auffällig
+    oder unauffällig sein.'
+  dataset_refs: []
+  filters:
+    examination_name: colonoscopy
+  study_metadata:
+    terminology_requirements:
+    - module: coloreg
+      version: 0.3.0
+    inclusion_criteria:
+    - name: coloreg_resection_or_follow_up
+      description: Candidate examinations only. The analysis layer joins lesion histories and applies
+        the numeric size threshold and EMR/ESD comparison; these are not executable cohort filters.
+      concepts:
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_resection
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_follow_up
+- definition_id: coloreg_complications
+  name: Blutungen und Perforationen
+  hypothesis: 'H0: Bei Polypen mit einem maximalen Ausgangsdurchmesser >= 20 mm sind die Raten an endoskopisch
+    nicht kontrollierbaren Blutungen oder Perforationen zwischen EMR und ESD gleich. H1: Die Raten unterscheiden
+    sich zwischen EMR und ESD. Blutung und Perforation sowohl separat als auch als zusammengesetzten Endpunkt
+    ausweisen. Index- und Intervallereignisse innerhalb eines vorab definierten Beobachtungsfensters derselben
+    Läsion zuordnen.'
+  dataset_refs: []
+  filters:
+    examination_name: colonoscopy
+  study_metadata:
+    terminology_requirements:
+    - module: coloreg
+      version: 0.3.0
+    inclusion_criteria:
+    - name: coloreg_resection_or_follow_up
+      description: Candidate examinations only. The analysis layer joins lesion histories and applies
+        the numeric size threshold and EMR/ESD comparison; these are not executable cohort filters.
+      concepts:
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_resection
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_follow_up
