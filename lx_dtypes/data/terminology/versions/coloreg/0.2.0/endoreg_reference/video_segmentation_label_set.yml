@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: video_segmentation_label_set
+  name_de: "Videosegmentierungs-Kennzeichnungssätze"
   payload:
     schema_version: '1.0'
     records:

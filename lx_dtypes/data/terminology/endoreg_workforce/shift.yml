@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: shift
+  name_de: "Schichten"
   payload:
     schema_version: '1.0'
     records:

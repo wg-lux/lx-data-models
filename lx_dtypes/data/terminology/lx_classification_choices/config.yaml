@@ -1,4 +1,5 @@
 name: lx_classification_choices
+name_de: "LX Klassifikation Auswahlmöglichkeiten"
 description: ""
 version: 0.1.0
 depends_on:

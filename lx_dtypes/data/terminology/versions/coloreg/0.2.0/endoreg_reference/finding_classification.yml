@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: finding_classification
+  name_de: "Befundklassifikationen"
   payload:
     schema_version: '1.0'
     records:

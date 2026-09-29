@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: model_type
+  name_de: "Modelltypen"
   payload:
     schema_version: '1.0'
     records:

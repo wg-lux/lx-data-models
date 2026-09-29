@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: product_weight
+  name_de: "Produktgewichte"
   payload:
     schema_version: '1.0'
     records:

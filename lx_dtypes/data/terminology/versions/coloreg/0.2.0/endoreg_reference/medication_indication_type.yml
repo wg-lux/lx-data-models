@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: medication_indication_type
+  name_de: "Medikationsindikationstypen"
   payload:
     schema_version: '1.0'
     records:

@@ -1,4 +1,5 @@
 name: endoreg_reference
+name_de: "EndoReg Referenz"
 description: Versioned EndoReg reference catalogue preserving legacy clinical definitions
   and host provisioning.
 version: 1.0.0

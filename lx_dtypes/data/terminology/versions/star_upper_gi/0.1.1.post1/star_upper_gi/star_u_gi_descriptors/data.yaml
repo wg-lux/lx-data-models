@@ -1,15 +1,18 @@
 - model: classification_choice_descriptor
   name: "length_cm_descriptor"
+  name_de: "Länge in Zentimetern"
   unit: "centimeter"
   classification_choice_descriptor_type: numeric
   default_value_num: 0.0
 
 - model: classification_choice_descriptor
   name: "length_mm_descriptor"
+  name_de: "Länge in Millimetern"
   unit: "millimeter"
   classification_choice_descriptor_type: numeric
   default_value_num: 0.0
 
 - model: classification_choice_descriptor
   name: "additional_text_info"
+  name_de: "Zusätzliche Angaben"
   classification_choice_descriptor_type: text

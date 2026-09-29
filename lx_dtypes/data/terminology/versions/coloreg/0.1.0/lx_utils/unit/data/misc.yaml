@@ -9,12 +9,12 @@
 
   name: "ratio"
   abbreviation: ""
-  name_de: "Ratio"
+  name_de: "Verhältnis"
   name_en: "ratio"
 
 - model: unit
 
   name: "dose"
-  name_de: "Dosierung(en)"
+  name_de: "Dosis"
   name_en: "dose(s)"
   abbreviation: ""

@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: event
+  name_de: "Ereignisse"
   payload:
     schema_version: '1.0'
     records:

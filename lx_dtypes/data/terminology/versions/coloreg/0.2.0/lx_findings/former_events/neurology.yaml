@@ -1,9 +1,11 @@
 - model: finding
   name: "stroke"
+  name_de: "Schlaganfall"
   tags:
     - event
 
 - model: finding
   name: "transient_ischemic_attack"
+  name_de: "Transitorische ischämische Attacke"
   tags:
     - event

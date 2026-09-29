@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: material
+  name_de: "Materialien"
   payload:
     schema_version: '1.0'
     records:

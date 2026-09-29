@@ -6,6 +6,7 @@
 # https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
 - model: findings_validator
   name: koloskopie_sedierung_dokumentiert
+  name_de: "Dokumentation: Sedierung bei der Endoskopie"
   finding: sedation_endoscopy
   operator: exists
   query:
@@ -13,6 +14,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_medikationsstatus_dokumentiert
+  name_de: "Dokumentation: Medikationsstatus der Endoskopie"
   finding: endoscopy_medication_status
   operator: exists
   query:
@@ -20,6 +22,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_hardware_dokumentiert
+  name_de: "Dokumentation: Verwendete Endoskopieausrüstung"
   finding: endoscopy_hardware_used
   operator: exists
   query:
@@ -27,18 +30,21 @@
     operator: exists
 - model: classification_validator
   name: koloskopie_hardware_modell_vollstaendig
+  name_de: "Vollständigkeit: Verwendete Endoskopieausrüstung – Endoskop- und Prozessormodell"
   finding: endoscopy_hardware_used
   classification: endoscopy_hardware_endoscope_processor_model
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_hardware_seriennummer_vollstaendig
+  name_de: "Vollständigkeit: Verwendete Endoskopieausrüstung – Seriennummer des verwendeten Endoskops"
   finding: endoscopy_hardware_used
   classification: endoscopy_hardware_serial_number
   operator: exists
   precedence: required
 - model: findings_validator
   name: koloskopie_prozesszeitstempel_dokumentiert
+  name_de: "Dokumentation: Zeitstempel des Untersuchungs- und Eingriffsprozesses"
   finding: endoscopy_process_timestamps
   operator: exists
   query:
@@ -46,6 +52,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_team_timeout_dokumentiert
+  name_de: "Dokumentation: Team-Time-out vor der Endoskopie"
   finding: endoscopy_preprocedure_team_timeout
   operator: exists
   query:
@@ -53,6 +60,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_sign_out_dokumentiert
+  name_de: "Dokumentation: Sign-out nach der Endoskopie"
   finding: endoscopy_postprocedure_sign_out
   operator: exists
   query:
@@ -60,6 +68,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_risikoassessment_checkliste_dokumentiert
+  name_de: "Dokumentation: Checkliste des standardisierten Risikoassessments"
   finding: endoscopy_preprocedure_risk_assessment_checklist
   operator: exists
   query:
@@ -67,6 +76,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_asa_wenn_sediert
+  name_de: "Koloskopie – ASA-Beurteilung bei Sedierung erforderlich"
   finding: sedation_endoscopy
   operator: condition
   query:
@@ -86,6 +96,7 @@
         name: endoscopy_preprocedure_last_oral_intake
 - model: findings_validator
   name: koloskopie_medikationsgabe_wenn_verabreicht
+  name_de: "Koloskopie – Verabreichte Medikamente dokumentieren"
   finding: endoscopy_medication_status
   operator: condition
   query:
@@ -101,300 +112,350 @@
         name: endoscopy_medication_administration
 - model: classification_validator
   name: koloskopie_medikament_und_dosis_vollstaendig
+  name_de: "Vollständigkeit: Medikamentenverabreichung während der Endoskopie – Medikament und verabreichte Dosis"
   finding: endoscopy_medication_administration
   classification: endoscopy_medication_product_and_dose
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_medikament_applikationsart_vollstaendig
+  name_de: "Vollständigkeit: Medikamentenverabreichung während der Endoskopie – Applikationsart"
   finding: endoscopy_medication_administration
   classification: medication_administration_route
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_medikament_verabreichungsform_vollstaendig
+  name_de: "Vollständigkeit: Medikamentenverabreichung während der Endoskopie – Verabreichungsform"
   finding: endoscopy_medication_administration
   classification: medication_administration_method
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_medikament_zeitpunkt_vollstaendig
+  name_de: "Vollständigkeit: Medikamentenverabreichung während der Endoskopie – Zeitpunkt der Medikamentengabe"
   finding: endoscopy_medication_administration
   classification: medication_administration_time
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_sedierungsmonitoring_zeitpunkt_vollstaendig
+  name_de: "Vollständigkeit: Vitalparametermessung während der Sedierung – Zeitpunkt der Vitalparametermessung"
   finding: endoscopy_sedation_monitoring_measurement
   classification: sedation_monitoring_time
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_sedierungsmonitoring_herzfrequenz_vollstaendig
+  name_de: "Vollständigkeit: Vitalparametermessung während der Sedierung – Herzfrequenz"
   finding: endoscopy_sedation_monitoring_measurement
   classification: sedation_heart_rate
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_sedierungsmonitoring_systolisch_vollstaendig
+  name_de: "Vollständigkeit: Vitalparametermessung während der Sedierung – Systolischer Blutdruck"
   finding: endoscopy_sedation_monitoring_measurement
   classification: sedation_systolic_blood_pressure
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_sedierungsmonitoring_diastolisch_vollstaendig
+  name_de: "Vollständigkeit: Vitalparametermessung während der Sedierung – Diastolischer Blutdruck"
   finding: endoscopy_sedation_monitoring_measurement
   classification: sedation_diastolic_blood_pressure
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_sedierungsmonitoring_sauerstoffsaettigung_vollstaendig
+  name_de: "Vollständigkeit: Vitalparametermessung während der Sedierung – Sauerstoffsättigung"
   finding: endoscopy_sedation_monitoring_measurement
   classification: sedation_oxygen_saturation
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_sauerstoffgabe_vollstaendig
+  name_de: "Vollständigkeit: Sauerstoffgabe während der Endoskopie – Sauerstoffapplikation und Flussrate"
   finding: endoscopy_supplemental_oxygen_administration
   classification: supplemental_oxygen_delivery_and_flow
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_intravenoese_fluessigkeit_status_vollstaendig
+  name_de: "Vollständigkeit: Status intravenöser Flüssigkeitsgabe – Dokumentationsstatus intravenöser Flüssigkeit"
   finding: endoscopy_intravenous_fluid_status
   classification: intravenous_fluid_documentation_status
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_intravenoese_fluessigkeit_art_und_volumen_vollstaendig
+  name_de: "Vollständigkeit: Intravenöse Flüssigkeitsgabe während der Endoskopie – Intravenöse Flüssigkeit und Volumen"
   finding: endoscopy_intravenous_fluid_administration
   classification: intravenous_fluid_type_and_volume
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_intravenoese_fluessigkeit_zeitpunkt_vollstaendig
+  name_de: "Vollständigkeit: Intravenöse Flüssigkeitsgabe während der Endoskopie – Zeitpunkt der intravenösen Flüssigkeitsgabe"
   finding: endoscopy_intravenous_fluid_administration
   classification: intravenous_fluid_administration_time
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_erholungsbeurteilung_zeitpunkt_vollstaendig
+  name_de: "Vollständigkeit: Erholungsbeurteilung nach Sedierung – Zeitpunkt der Vitalparametermessung"
   finding: endoscopy_post_sedation_recovery_assessment
   classification: sedation_monitoring_time
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_erholungsbeurteilung_herzfrequenz_vollstaendig
+  name_de: "Vollständigkeit: Erholungsbeurteilung nach Sedierung – Herzfrequenz"
   finding: endoscopy_post_sedation_recovery_assessment
   classification: sedation_heart_rate
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_erholungsbeurteilung_systolisch_vollstaendig
+  name_de: "Vollständigkeit: Erholungsbeurteilung nach Sedierung – Systolischer Blutdruck"
   finding: endoscopy_post_sedation_recovery_assessment
   classification: sedation_systolic_blood_pressure
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_erholungsbeurteilung_diastolisch_vollstaendig
+  name_de: "Vollständigkeit: Erholungsbeurteilung nach Sedierung – Diastolischer Blutdruck"
   finding: endoscopy_post_sedation_recovery_assessment
   classification: sedation_diastolic_blood_pressure
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_erholungsbeurteilung_sauerstoffsaettigung_vollstaendig
+  name_de: "Vollständigkeit: Erholungsbeurteilung nach Sedierung – Sauerstoffsättigung"
   finding: endoscopy_post_sedation_recovery_assessment
   classification: sedation_oxygen_saturation
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_erholungsbeurteilung_orientierung_vollstaendig
+  name_de: "Vollständigkeit: Erholungsbeurteilung nach Sedierung – Orientierungsstatus nach Sedierung"
   finding: endoscopy_post_sedation_recovery_assessment
   classification: post_sedation_orientation_status
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_abschlussbeurteilung_zeitpunkt_vollstaendig
+  name_de: "Vollständigkeit: Abschlussbeurteilung vor Entlassung oder Übergabe nach Sedierung – Zeitpunkt der Vitalparametermessung"
   finding: endoscopy_post_sedation_discharge_or_transfer_assessment
   classification: sedation_monitoring_time
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_abschlussbeurteilung_herzfrequenz_vollstaendig
+  name_de: "Vollständigkeit: Abschlussbeurteilung vor Entlassung oder Übergabe nach Sedierung – Herzfrequenz"
   finding: endoscopy_post_sedation_discharge_or_transfer_assessment
   classification: sedation_heart_rate
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_abschlussbeurteilung_systolisch_vollstaendig
+  name_de: "Vollständigkeit: Abschlussbeurteilung vor Entlassung oder Übergabe nach Sedierung – Systolischer Blutdruck"
   finding: endoscopy_post_sedation_discharge_or_transfer_assessment
   classification: sedation_systolic_blood_pressure
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_abschlussbeurteilung_diastolisch_vollstaendig
+  name_de: "Vollständigkeit: Abschlussbeurteilung vor Entlassung oder Übergabe nach Sedierung – Diastolischer Blutdruck"
   finding: endoscopy_post_sedation_discharge_or_transfer_assessment
   classification: sedation_diastolic_blood_pressure
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_abschlussbeurteilung_sauerstoffsaettigung_vollstaendig
+  name_de: "Vollständigkeit: Abschlussbeurteilung vor Entlassung oder Übergabe nach Sedierung – Sauerstoffsättigung"
   finding: endoscopy_post_sedation_discharge_or_transfer_assessment
   classification: sedation_oxygen_saturation
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_abschlussbeurteilung_orientierung_vollstaendig
+  name_de: "Vollständigkeit: Abschlussbeurteilung vor Entlassung oder Übergabe nach Sedierung – Orientierungsstatus nach Sedierung"
   finding: endoscopy_post_sedation_discharge_or_transfer_assessment
   classification: post_sedation_orientation_status
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_abschlussbeurteilung_disposition_vollstaendig
+  name_de: "Vollständigkeit: Abschlussbeurteilung vor Entlassung oder Übergabe nach Sedierung – Disposition nach Sedierung"
   finding: endoscopy_post_sedation_discharge_or_transfer_assessment
   classification: post_sedation_disposition
   operator: exists
   precedence: optional
 - model: classification_validator
   name: koloskopie_prozesszeit_raum_betreten_vollstaendig
+  name_de: "Vollständigkeit: Zeitstempel des Untersuchungs- und Eingriffsprozesses – Zeitpunkt Betreten des Untersuchungsraums"
   finding: endoscopy_process_timestamps
   classification: endoscopy_room_entry_time
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_prozesszeit_endoskop_eingefuehrt_vollstaendig
+  name_de: "Vollständigkeit: Zeitstempel des Untersuchungs- und Eingriffsprozesses – Zeitpunkt Einführen des Endoskops"
   finding: endoscopy_process_timestamps
   classification: endoscope_insertion_time
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_prozesszeit_rueckzug_begonnen_vollstaendig
+  name_de: "Vollständigkeit: Zeitstempel des Untersuchungs- und Eingriffsprozesses – Zeitpunkt Beginn des Rückzuges"
   finding: endoscopy_process_timestamps
   classification: colonoscopy_withdrawal_start_time
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_prozesszeit_endoskop_entfernt_vollstaendig
+  name_de: "Vollständigkeit: Zeitstempel des Untersuchungs- und Eingriffsprozesses – Zeitpunkt Entfernen des Endoskops"
   finding: endoscopy_process_timestamps
   classification: endoscope_removal_time
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_prozesszeit_raum_verlassen_vollstaendig
+  name_de: "Vollständigkeit: Zeitstempel des Untersuchungs- und Eingriffsprozesses – Zeitpunkt Verlassen des Untersuchungsraums"
   finding: endoscopy_process_timestamps
   classification: endoscopy_room_exit_time
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_prozesszeit_abteilung_verlassen_vollstaendig
+  name_de: "Vollständigkeit: Zeitstempel des Untersuchungs- und Eingriffsprozesses – Zeitpunkt Verlassen der Endoskopieabteilung"
   finding: endoscopy_process_timestamps
   classification: endoscopy_department_exit_time
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_team_timeout_zeitpunkt_vollstaendig
+  name_de: "Vollständigkeit: Team-Time-out vor der Endoskopie – Zeitpunkt des Team-Time-outs"
   finding: endoscopy_preprocedure_team_timeout
   classification: endoscopy_team_timeout_time
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_team_timeout_teamvorstellung_vollstaendig
+  name_de: "Vollständigkeit: Team-Time-out vor der Endoskopie – Status der Teamvorstellung"
   finding: endoscopy_preprocedure_team_timeout
   classification: team_introduction_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_team_timeout_patientenidentitaet_vollstaendig
+  name_de: "Vollständigkeit: Team-Time-out vor der Endoskopie – Status der Patientenidentitätsbestätigung"
   finding: endoscopy_preprocedure_team_timeout
   classification: patient_identity_confirmation_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_team_timeout_patientenvorbereitung_vollstaendig
+  name_de: "Vollständigkeit: Team-Time-out vor der Endoskopie – Status der Patientenvorbereitung"
   finding: endoscopy_preprocedure_team_timeout
   classification: patient_preparation_confirmation_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_team_timeout_risiken_vollstaendig
+  name_de: "Vollständigkeit: Team-Time-out vor der Endoskopie – Status der Risiko- und Medikationsprüfung"
   finding: endoscopy_preprocedure_team_timeout
   classification: patient_specific_risk_and_special_medication_review_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_team_timeout_dokumente_vollstaendig
+  name_de: "Vollständigkeit: Team-Time-out vor der Endoskopie – Status der erforderlichen Dokumente"
   finding: endoscopy_preprocedure_team_timeout
   classification: required_documents_confirmation_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_team_timeout_eingriff_vollstaendig
+  name_de: "Vollständigkeit: Team-Time-out vor der Endoskopie – Status der Eingriffs- und Besonderheitenprüfung"
   finding: endoscopy_preprocedure_team_timeout
   classification: planned_procedure_and_special_features_review_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_team_timeout_instrumente_vollstaendig
+  name_de: "Vollständigkeit: Team-Time-out vor der Endoskopie – Bereitschaftsstatus des erforderlichen Equipments"
   finding: endoscopy_preprocedure_team_timeout
   classification: required_equipment_readiness_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_team_timeout_personal_vollstaendig
+  name_de: "Vollständigkeit: Team-Time-out vor der Endoskopie – Bereitschaftsstatus des erforderlichen Personals"
   finding: endoscopy_preprocedure_team_timeout
   classification: required_personnel_readiness_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_sign_out_zeitpunkt_vollstaendig
+  name_de: "Vollständigkeit: Sign-out nach der Endoskopie – Zeitpunkt des Sign-outs"
   finding: endoscopy_postprocedure_sign_out
   classification: endoscopy_sign_out_time
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_sign_out_patientenzustand_vollstaendig
+  name_de: "Vollständigkeit: Sign-out nach der Endoskopie – Dokumentationsstatus des Patientenzustands nach dem Eingriff"
   finding: endoscopy_postprocedure_sign_out
   classification: postprocedure_patient_condition_documentation_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_sign_out_nachsorge_vollstaendig
+  name_de: "Vollständigkeit: Sign-out nach der Endoskopie – Bestätigungsstatus der Nachsorgemaßnahmen"
   finding: endoscopy_postprocedure_sign_out
   classification: follow_up_measures_confirmation_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_sign_out_proben_vollstaendig
+  name_de: "Vollständigkeit: Sign-out nach der Endoskopie – Abgleichstatus der Proben- und Resektatversorgung"
   finding: endoscopy_postprocedure_sign_out
   classification: specimen_handling_reconciliation_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_sign_out_probleme_vollstaendig
+  name_de: "Vollständigkeit: Sign-out nach der Endoskopie – Prüfstatus von Problemen beim Eingriff"
   finding: endoscopy_postprocedure_sign_out
   classification: procedure_problem_review_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_sign_out_dokumentation_vollstaendig
+  name_de: "Vollständigkeit: Sign-out nach der Endoskopie – Vollständigkeitsstatus der Befunddokumentation"
   finding: endoscopy_postprocedure_sign_out
   classification: report_documentation_completeness_status
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_risikoassessment_zeitpunkt_vollstaendig
+  name_de: "Vollständigkeit: Checkliste des standardisierten Risikoassessments – Zeitpunkt des Risikoassessments"
   finding: endoscopy_preprocedure_risk_assessment_checklist
   classification: endoscopy_risk_assessment_time
   operator: exists
   precedence: required
 - model: classification_validator
   name: koloskopie_risikoassessment_protokoll_vollstaendig
+  name_de: "Vollständigkeit: Checkliste des standardisierten Risikoassessments – Checkliste oder Verfahrensversion"
   finding: endoscopy_preprocedure_risk_assessment_checklist
   classification: risk_assessment_protocol_version
   operator: exists
   precedence: required
 - model: findings_validator
   name: koloskopie_darmvorbereitung_linkes_kolon_dokumentiert
+  name_de: "Dokumentation: Darmvorbereitung (Linkes Kolon)"
   finding: bowel_preparation_lc
   operator: exists
   query:
@@ -402,6 +463,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_darmvorbereitung_transversum_dokumentiert
+  name_de: "Dokumentation: Darmvorbereitung (Kolon Transversum)"
   finding: bowel_preparation_tc
   operator: exists
   query:
@@ -409,6 +471,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_darmvorbereitung_rechtes_kolon_dokumentiert
+  name_de: "Dokumentation: Darmvorbereitung (Rechtes Kolon)"
   finding: bowel_preparation_rc
   operator: exists
   query:
@@ -416,6 +479,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_maximale_eindringtiefe_dokumentiert
+  name_de: "Dokumentation: Tiefste betrachtete Stelle während einer Koloskopie"
   finding: colonoscopy_deepest_viewed_location
   operator: exists
   query:
@@ -423,6 +487,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_rueckzugszeit_dokumentiert
+  name_de: "Dokumentation: Mukosainspektionszeit beim Rückzug"
   finding: colonoscopy_withdrawal_time_minutes
   operator: exists
   query:
@@ -430,6 +495,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_zoekum_landmarken_fotodokumentiert
+  name_de: "Koloskopie – Fotodokumentation der Zökumlandmarken"
   finding: colonoscopy_cecal_landmarks_photodocumented
   operator: exists
   query:
@@ -437,6 +503,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_technische_qualitaet_dokumentiert
+  name_de: "Dokumentation: Technische Untersuchungsqualität"
   finding: colonoscopy_technical_quality
   operator: exists
   query:
@@ -444,6 +511,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_komplikationsstatus_dokumentiert
+  name_de: "Dokumentation: Komplikationsstatus der Koloskopie"
   finding: colonoscopy_complication_status
   operator: exists
   query:
@@ -451,6 +519,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_inkomplettheitsgrund_erforderlich
+  name_de: "Koloskopie – Grund für unvollständige Untersuchung erforderlich"
   finding: colonoscopy_deepest_viewed_location
   operator: condition
   query:
@@ -468,6 +537,7 @@
       - classification: colonoscopy_not_complete_reason
 - model: findings_validator
   name: koloskopie_rueckzugszeit_mindestens_sechs_minuten_oder_begruendet
+  name_de: "Koloskopie – Rückzugszeit mindestens sechs Minuten oder begründet"
   finding: colonoscopy_withdrawal_time_minutes
   operator: condition
   query:
@@ -482,6 +552,7 @@
       - classification: withdrawal_time_quality_exception
 - model: findings_validator
   name: koloskopie_bbps_gesamtwert_dokumentiert
+  name_de: "Dokumentation: BBPS-Gesamtwert"
   finding: bowel_preparation_bbps_total
   operator: exists
   query:
@@ -489,6 +560,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_inadaequate_vorbereitung_fruehe_wiederholung
+  name_de: "Koloskopie – Frühe Wiederholung bei unzureichender Darmvorbereitung"
   finding: bowel_preparation_bbps_total
   operator: condition
   query:
@@ -510,6 +582,7 @@
         name: colonoscopy_early_repeat_plan
 - model: findings_validator
   name: koloskopie_pathologiestatus_dokumentiert
+  name_de: "Dokumentation: Zusammenfassung pathologischer Befunde"
   finding: colonoscopy_pathology_summary
   operator: exists
   query:
@@ -517,6 +590,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_verlaufsempfehlung_dokumentiert
+  name_de: "Dokumentation: Empfehlung zur Weiterbehandlung und Verlaufskontrolle"
   finding: colonoscopy_follow_up_plan
   operator: exists
   query:
@@ -524,6 +598,7 @@
     operator: exists
 - model: findings_validator
   name: koloskopie_zoekum_landmarken_bildreferenzen
+  name_de: "Koloskopie – Bildreferenzen der Zökumlandmarken"
   finding: colonoscopy_cecal_landmarks_photodocumented
   operator: condition
   query:
@@ -542,6 +617,7 @@
       - classification: ileocecal_valve_image_reference
 - model: findings_validator
   name: koloskopie_polyp_groesser_fuenf_mm_qualitaetsdaten
+  name_de: "Koloskopie – Qualitätsdaten bei Polypen über 5 mm"
   finding: colon_polyp
   operator: condition
   query:
@@ -559,6 +635,7 @@
       - classification: colonoscopy_resection_technique_status
 - model: findings_validator
   name: koloskopie_sedierungsverfahren_wenn_sediert
+  name_de: "Koloskopie – Sedierungsverfahren bei Sedierung dokumentieren"
   finding: sedation_endoscopy
   operator: condition
   query:
@@ -573,6 +650,7 @@
       - classification: examination_setting_generic_sedation
 - model: findings_validator
   name: koloskopie_sedierungsdokumentation_wenn_sediert
+  name_de: "Koloskopie – Vollständige Dokumentation bei Sedierung"
   finding: sedation_endoscopy
   operator: condition
   query:
@@ -596,6 +674,7 @@
         name: endoscopy_post_sedation_discharge_or_transfer_assessment
 - model: findings_validator
   name: koloskopie_intravenoese_fluessigkeitsgabe_wenn_verabreicht
+  name_de: "Koloskopie – Verabreichte intravenöse Flüssigkeit dokumentieren"
   finding: endoscopy_intravenous_fluid_status
   operator: condition
   query:
@@ -611,6 +690,7 @@
         name: endoscopy_intravenous_fluid_administration
 - model: findings_validator
   name: koloskopie_komplikationsdetails_wenn_aufgetreten
+  name_de: "Koloskopie – Aufgetretene Komplikationen detailliert dokumentieren"
   finding: colonoscopy_complication_status
   operator: condition
   query:
@@ -626,6 +706,7 @@
         name: complication_generic
 - model: examination_validator
   name: koloskopie_mindestdokumentation
+  name_de: "Koloskopie – Mindestdokumentation"
   finding_validators:
   - koloskopie_hardware_dokumentiert
   - koloskopie_sedierung_dokumentiert
@@ -659,6 +740,7 @@
   examination_validators: []
 - model: report_finding
   name: koloskopie_hardware
+  name_de: "Verwendete Endoskopieausrüstung"
   finding: endoscopy_hardware_used
   required: true
   multiple_allowed: false
@@ -669,6 +751,7 @@
     required: true
 - model: report_finding
   name: koloskopie_sedierung
+  name_de: "Sedierung bei der Endoskopie"
   finding: sedation_endoscopy
   required: true
   multiple_allowed: false
@@ -679,6 +762,7 @@
     required: false
 - model: report_finding
   name: koloskopie_prozesszeitstempel
+  name_de: "Zeitstempel des Untersuchungs- und Eingriffsprozesses"
   finding: endoscopy_process_timestamps
   required: true
   multiple_allowed: false
@@ -697,6 +781,7 @@
     required: true
 - model: report_finding
   name: koloskopie_team_timeout
+  name_de: "Team-Time-out vor der Endoskopie"
   finding: endoscopy_preprocedure_team_timeout
   required: true
   multiple_allowed: false
@@ -721,6 +806,7 @@
     required: true
 - model: report_finding
   name: koloskopie_sign_out
+  name_de: "Sign-out nach der Endoskopie"
   finding: endoscopy_postprocedure_sign_out
   required: true
   multiple_allowed: false
@@ -739,6 +825,7 @@
     required: true
 - model: report_finding
   name: koloskopie_risikoassessment_checkliste
+  name_de: "Checkliste des standardisierten Risikoassessments"
   finding: endoscopy_preprocedure_risk_assessment_checklist
   required: true
   multiple_allowed: false
@@ -779,6 +866,7 @@
     required: true
 - model: report_finding
   name: koloskopie_asa_beurteilung
+  name_de: "ASA-Beurteilung vor der Endoskopie"
   finding: endoscopy_preprocedure_asa_assessment
   required: false
   multiple_allowed: false
@@ -787,6 +875,7 @@
     required: true
 - model: report_finding
   name: koloskopie_atemwegsbeurteilung
+  name_de: "Atemwegsbeurteilung vor der Endoskopie"
   finding: endoscopy_preprocedure_airway_assessment
   required: false
   multiple_allowed: false
@@ -795,6 +884,7 @@
     required: true
 - model: report_finding
   name: koloskopie_koerperliche_untersuchung_vor_sedierung
+  name_de: "Körperliche Untersuchung vor der Sedierung"
   finding: endoscopy_preprocedure_physical_assessment
   required: false
   multiple_allowed: false
@@ -815,6 +905,7 @@
     required: true
 - model: report_finding
   name: koloskopie_letzte_orale_aufnahme
+  name_de: "Letzte Nahrungs- oder Flüssigkeitsaufnahme"
   finding: endoscopy_preprocedure_last_oral_intake
   required: false
   multiple_allowed: false
@@ -825,6 +916,7 @@
     required: true
 - model: report_finding
   name: koloskopie_medikationsstatus
+  name_de: "Medikationsstatus der Endoskopie"
   finding: endoscopy_medication_status
   required: true
   multiple_allowed: false
@@ -833,6 +925,7 @@
     required: true
 - model: report_finding
   name: koloskopie_medikamentengabe
+  name_de: "Medikamentenverabreichung während der Endoskopie"
   finding: endoscopy_medication_administration
   required: false
   multiple_allowed: true
@@ -847,6 +940,7 @@
     required: true
 - model: report_finding
   name: koloskopie_sedierungsmonitoring
+  name_de: "Vitalparametermessung während der Sedierung"
   finding: endoscopy_sedation_monitoring_measurement
   required: false
   multiple_allowed: true
@@ -863,6 +957,7 @@
     required: true
 - model: report_finding
   name: koloskopie_sauerstoffgabe
+  name_de: "Sauerstoffgabe während der Endoskopie"
   finding: endoscopy_supplemental_oxygen_administration
   required: false
   multiple_allowed: false
@@ -871,6 +966,7 @@
     required: true
 - model: report_finding
   name: koloskopie_intravenoese_fluessigkeit_status
+  name_de: "Status intravenöser Flüssigkeitsgabe"
   finding: endoscopy_intravenous_fluid_status
   required: false
   multiple_allowed: false
@@ -879,6 +975,7 @@
     required: true
 - model: report_finding
   name: koloskopie_intravenoese_fluessigkeitsgabe
+  name_de: "Intravenöse Flüssigkeitsgabe während der Endoskopie"
   finding: endoscopy_intravenous_fluid_administration
   required: false
   multiple_allowed: true
@@ -889,6 +986,7 @@
     required: true
 - model: report_finding
   name: koloskopie_erholungsbeurteilung_nach_sedierung
+  name_de: "Erholungsbeurteilung nach Sedierung"
   finding: endoscopy_post_sedation_recovery_assessment
   required: false
   multiple_allowed: true
@@ -907,6 +1005,7 @@
     required: true
 - model: report_finding
   name: koloskopie_abschlussbeurteilung_nach_sedierung
+  name_de: "Abschlussbeurteilung vor Entlassung oder Übergabe nach Sedierung"
   finding: endoscopy_post_sedation_discharge_or_transfer_assessment
   required: false
   multiple_allowed: false
@@ -927,6 +1026,7 @@
     required: true
 - model: report_finding
   name: koloskopie_darmvorbereitung_linkes_kolon
+  name_de: "Darmvorbereitung (Linkes Kolon)"
   finding: bowel_preparation_lc
   required: true
   multiple_allowed: false
@@ -935,6 +1035,7 @@
     required: true
 - model: report_finding
   name: koloskopie_darmvorbereitung_transversum
+  name_de: "Darmvorbereitung (Kolon Transversum)"
   finding: bowel_preparation_tc
   required: true
   multiple_allowed: false
@@ -943,6 +1044,7 @@
     required: true
 - model: report_finding
   name: koloskopie_darmvorbereitung_rechtes_kolon
+  name_de: "Darmvorbereitung (Rechtes Kolon)"
   finding: bowel_preparation_rc
   required: true
   multiple_allowed: false
@@ -951,6 +1053,7 @@
     required: true
 - model: report_finding
   name: koloskopie_bbps_gesamtwert
+  name_de: "BBPS-Gesamtwert"
   finding: bowel_preparation_bbps_total
   required: true
   multiple_allowed: false
@@ -959,6 +1062,7 @@
     required: true
 - model: report_finding
   name: koloskopie_maximale_eindringtiefe
+  name_de: "Tiefste betrachtete Stelle während einer Koloskopie"
   finding: colonoscopy_deepest_viewed_location
   required: true
   multiple_allowed: false
@@ -969,6 +1073,7 @@
     required: false
 - model: report_finding
   name: koloskopie_rueckzugszeit
+  name_de: "Mukosainspektionszeit beim Rückzug"
   finding: colonoscopy_withdrawal_time_minutes
   required: true
   multiple_allowed: false
@@ -979,6 +1084,7 @@
     required: false
 - model: report_finding
   name: koloskopie_zoekum_landmarken
+  name_de: "Fotodokumentation der Zökum-Landmarken"
   finding: colonoscopy_cecal_landmarks_photodocumented
   required: true
   multiple_allowed: false
@@ -993,6 +1099,7 @@
     required: false
 - model: report_finding
   name: koloskopie_technische_qualitaet
+  name_de: "Technische Untersuchungsqualität"
   finding: colonoscopy_technical_quality
   required: true
   multiple_allowed: false
@@ -1003,6 +1110,7 @@
     required: true
 - model: report_finding
   name: koloskopie_komplikationsstatus
+  name_de: "Komplikationsstatus der Koloskopie"
   finding: colonoscopy_complication_status
   required: true
   multiple_allowed: false
@@ -1011,6 +1119,7 @@
     required: true
 - model: report_finding
   name: koloskopie_pathologiestatus
+  name_de: "Zusammenfassung pathologischer Befunde"
   finding: colonoscopy_pathology_summary
   required: true
   multiple_allowed: false
@@ -1019,6 +1128,7 @@
     required: true
 - model: report_finding
   name: koloskopie_verlaufsempfehlung
+  name_de: "Empfehlung zur Weiterbehandlung und Verlaufskontrolle"
   finding: colonoscopy_follow_up_plan
   required: true
   multiple_allowed: false
@@ -1027,6 +1137,7 @@
     required: true
 - model: report_finding
   name: koloskopie_fruehe_wiederholung
+  name_de: "Frühe Wiederholungsplanung bei inadäquater Darmvorbereitung"
   finding: colonoscopy_early_repeat_plan
   required: false
   multiple_allowed: false
@@ -1035,6 +1146,7 @@
     required: true
 - model: report_finding
   name: koloskopie_polyp
+  name_de: "Kolonpolyp"
   finding: colon_polyp
   required: false
   multiple_allowed: true
@@ -1057,6 +1169,7 @@
     required: false
 - model: report_finding
   name: koloskopie_divertikel
+  name_de: "Kolondivertikel"
   finding: colon_diverticule
   required: false
   multiple_allowed: true
@@ -1065,6 +1178,7 @@
     required: true
 - model: report_finding
   name: koloskopie_stenose
+  name_de: "Kolonstenose"
   finding: colon_stenosis
   required: false
   multiple_allowed: true
@@ -1073,6 +1187,7 @@
     required: true
 - model: report_finding
   name: koloskopie_tumor
+  name_de: "Tumor"
   finding: colon_tumor_mass
   required: false
   multiple_allowed: true
@@ -1087,6 +1202,7 @@
     required: false
 - model: report_finding
   name: koloskopie_entzuendung
+  name_de: "Entzündung"
   finding: colon_inflammation
   required: false
   multiple_allowed: true
@@ -1099,6 +1215,7 @@
     required: false
 - model: report_finding
   name: koloskopie_erosion
+  name_de: "Erosion"
   finding: colon_erosion
   required: false
   multiple_allowed: true
@@ -1109,6 +1226,7 @@
     required: true
 - model: report_finding
   name: koloskopie_ulkus
+  name_de: "Ulcus"
   finding: colon_ulcer
   required: false
   multiple_allowed: true
@@ -1121,6 +1239,7 @@
     required: false
 - model: report_finding
   name: koloskopie_haemorrhoiden
+  name_de: "Hämorrhoiden"
   finding: anal_hemorrhoids
   required: false
   multiple_allowed: false
@@ -1129,6 +1248,7 @@
     required: true
 - model: report_finding
   name: koloskopie_komplikation
+  name_de: "Komplikation (generisch)"
   finding: complication_generic
   required: false
   multiple_allowed: true
@@ -1145,6 +1265,7 @@
     required: true
 - model: report_template_section
   name: patienten_und_untersuchungskontext
+  name_de: "Patienten- und Untersuchungskontext"
   title_de: Patienten- und Untersuchungskontext
   title_en: Patient and examination context
   position: 0
@@ -1175,6 +1296,7 @@
   findings: []
 - model: report_template_section
   name: indikation_und_sedierung
+  name_de: "Indikation und Sedierung"
   title_de: Indikation und Sedierung
   title_en: Indication and sedation
   position: 1
@@ -1200,6 +1322,7 @@
   - koloskopie_technische_qualitaet
 - model: report_template_section
   name: darmvorbereitung_nach_bbps
+  name_de: "Darmvorbereitung nach BBPS"
   title_de: Darmvorbereitung nach BBPS
   title_en: Bowel preparation by BBPS
   position: 2
@@ -1212,6 +1335,7 @@
   - koloskopie_bbps_gesamtwert
 - model: report_template_section
   name: untersuchungsqualitaet_und_reichweite
+  name_de: "Untersuchungsqualität und Reichweite"
   title_de: Untersuchungsqualität und Reichweite
   title_en: Examination quality and extent
   position: 3
@@ -1224,6 +1348,7 @@
   - koloskopie_zoekum_landmarken
 - model: report_template_section
   name: pathologische_befunde_und_interventionen
+  name_de: "Pathologische Befunde und Interventionen"
   title_de: Pathologische Befunde und Interventionen
   title_en: Pathological findings and interventions
   position: 4
@@ -1241,6 +1366,7 @@
   - koloskopie_haemorrhoiden
 - model: report_template_section
   name: komplikationen_und_empfehlungen
+  name_de: "Komplikationen und Empfehlungen"
   title_de: Komplikationen und Empfehlungen
   title_en: Complications and recommendations
   position: 5

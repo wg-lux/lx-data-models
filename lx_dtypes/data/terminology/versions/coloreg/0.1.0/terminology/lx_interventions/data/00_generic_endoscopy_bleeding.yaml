@@ -1,5 +1,6 @@
 - model: intervention
   name: endoscopy_injection_vasoactive
+  name_de: "Endoskopische Injektion vasoaktiver Substanzen"
   description: Vasoactive injection is a technique used to reduce bleeding from
     a lesion in the colon. It is performed by injecting a solution into the lesion
     that causes the blood vessels to constrict, reducing the flow of blood to the
@@ -11,6 +12,7 @@
 
 - model: intervention
   name: endoscopy_hemoclip_generic
+  name_de: "Endoskopische Hämostaseclip-Applikation"
   description:
     Clip closure is a technique used to close a defect in the colon wall
     after a polyp has been removed. It is performed by placing a small metal clip
@@ -23,6 +25,7 @@
 
 - model: intervention
   name: endoscopy_sclerotherapy_generic
+  name_de: "Endoskopische Sklerotherapie"
   description: Sclerotherapy is a technique used to treat bleeding lesions.
   intervention_types:
     - therapeutic
@@ -30,6 +33,7 @@
 
 - model: intervention
   name: endoscopy_rubber_band_ligation_generic
+  name_de: "Endoskopische Gummibandligatur"
   description:
     Rubber band ligation is a technique used to treat bleeding lesions
     in the colon.
@@ -40,6 +44,7 @@
 
 - model: intervention
   name: endoscopy_over_the_scope_clip_generic
+  name_de: "Endoskopische OTSC-Applikation"
   description:
     Over-the-scope clip (OTSC) is a clipping system used to close defects
     in the GI tract.

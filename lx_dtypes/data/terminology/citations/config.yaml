@@ -1,4 +1,5 @@
 name: citations
+name_de: "Literaturreferenzen"
 description: "Bibliographic references for LX data models"
 version: 0.1.0
 modules: []

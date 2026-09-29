@@ -347,7 +347,7 @@
   description: Resection as one piece.
 - model: classification_choice
   name: coloreg_mode_piecemeal
-  name_de: Piecemeal
+  name_de: "In mehreren Teilen"
   name_en: Piecemeal
   description: Resection in multiple pieces.
 - model: classification_choice

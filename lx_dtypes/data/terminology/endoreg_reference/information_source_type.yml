@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: information_source_type
+  name_de: "Informationsquellentypen"
   payload:
     schema_version: '1.0'
     records:

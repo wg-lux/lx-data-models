@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: center_waste
+  name_de: "Abfall der Zentren"
   payload:
     schema_version: '1.0'
     records:

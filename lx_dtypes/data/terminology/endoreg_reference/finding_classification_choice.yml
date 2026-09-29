@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: finding_classification_choice
+  name_de: "Auswahlwerte für Befundklassifikationen"
   payload:
     schema_version: '1.0'
     records:

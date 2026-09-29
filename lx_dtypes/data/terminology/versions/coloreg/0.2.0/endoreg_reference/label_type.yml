@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: label_type
+  name_de: "Kennzeichnungstypen"
   payload:
     schema_version: '1.0'
     records:

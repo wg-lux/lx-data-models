@@ -1,5 +1,6 @@
 - model: intervention
   name: endoscopy_dilation_balloon
+  name_de: "Endoskopische Ballondilatation"
   description: Balloon dilation is a technique used to widen a narrowed area
     in the colon.
   intervention_types:
@@ -8,6 +9,7 @@
 
 - model: intervention
   name: endoscopy_dilation_bougie
+  name_de: "Endoskopische Bougierung"
   description: Bougie dilation is a technique used to widen a narrowed area
     in the colon.
   intervention_types:

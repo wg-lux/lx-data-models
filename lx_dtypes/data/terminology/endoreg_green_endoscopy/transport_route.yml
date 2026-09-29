@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: transport_route
+  name_de: "Transportwege"
   payload:
     schema_version: '1.0'
     records:

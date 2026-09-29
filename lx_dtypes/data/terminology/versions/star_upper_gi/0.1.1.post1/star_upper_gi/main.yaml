@@ -1,5 +1,6 @@
 - model: examination
   name: "star_upper_gi_endoscopy"
+  name_de: "Ösophagogastroduodenoskopie"
   findings:
     - star_upper_gi_mucosa_esophagus_abnormal
     - star_upper_gi_location_esophagogastric_junction

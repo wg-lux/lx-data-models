@@ -1,5 +1,6 @@
 - model: finding
   name: "gastroscopy_polyp"
+  name_de: "Polyp bei Gastroskopie"
   description: "Polyp"
   finding_types:
     - observation
@@ -7,30 +8,35 @@
 
 - model: finding
   name: "gastroscopy_ulcer"
+  name_de: "Ulkus bei Gastroskopie"
   description: "Ulcer"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_erythema"
+  name_de: "Erythem bei Gastroskopie"
   description: "Erythema"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_subepithelial_tumor"
+  name_de: "Subepithelialer Tumor bei Gastroskopie"
   description: "Subepithelial Tumor"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_stenosis"
+  name_de: "Stenose bei Gastroskopie"
   description: "Stenosis"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_varices_esophageal"
+  name_de: "Ösophagusvarizen"
   description: "Esophageal Varices"
   finding_types:
     - observation
@@ -38,54 +44,63 @@
 
 - model: finding
   name: "gastroscopy_varices_gastric"
+  name_de: "Magenvarizen"
   description: "Gastric Varices"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_varices_duodenal"
+  name_de: "Duodenalvarizen"
   description: "Duodenal Varices"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_scar"
+  name_de: "Narbe bei Gastroskopie"
   description: "Scar"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_bleeding"
+  name_de: "Blutung bei Gastroskopie"
   description: "Bleeding"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_ectopic_gastric_mucosa"
+  name_de: "Ektope Magenschleimhaut"
   description: "Ectopic Gastric Mucosa"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_diverticulum_esophagus"
+  name_de: "Ösophagusdivertikel"
   description: "Divertikel (Ösophagus)"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_diverticulum_duodenum"
+  name_de: "Duodenaldivertikel"
   description: "Divertikel (Duodenum)"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_ectopic_pancreatic_tissue"
+  name_de: "Ektopes Pankreasgewebe"
   description: "Ectopic Pancreatic Tissue"
   finding_types:
     - observation
 
 - model: finding
   name: "gastroscopy_obstruction_generic"
+  name_de: "Obstruktion bei Gastroskopie"
   description: "Generic Obstruction"
   finding_types:
     - observation

@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: ai_model
+  name_de: "KI-Modelle"
   payload:
     schema_version: '1.0'
     records:

@@ -1,5 +1,6 @@
 - model: report_template_section
   name: star_upper_gi_esophagus
+  name_de: "Ösophagus"
   position: 0
   types:
     - findings
@@ -19,6 +20,7 @@
 
 - model: report_template_section
   name: star_upper_gi_stomach
+  name_de: "Magen"
   position: 1
   types:
     - findings
@@ -31,6 +33,7 @@
 
 - model: report_template_section
   name: star_upper_gi_duodenum
+  name_de: "Duodenum"
   position: 2
   types:
     - findings
@@ -43,6 +46,7 @@
 
 - model: report_template
   name: star_upper_gi_main
+  name_de: "STAR-ÖGD – Basisbericht"
   examination: star_upper_gi_endoscopy
   report_sections:
     - star_upper_gi_esophagus

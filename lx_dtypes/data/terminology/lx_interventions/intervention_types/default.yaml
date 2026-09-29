@@ -1,17 +1,23 @@
 - model: intervention_type
   name: "default_intervention_type"
+  name_de: "Standard-Interventionstyp"
 
 - model: intervention_type
   name: "therapeutic"
+  name_de: "Therapeutisch"
 
 - model: intervention_type
   name: "diagnostic"
+  name_de: "Diagnostisch"
 
 - model: intervention_type
   name: "invasive"
+  name_de: "Invasiv"
 
 - model: intervention_type
   name: "foreign_body"
+  name_de: "Fremdkörper"
 
 - model: intervention_type
   name: "histology_sampling"
+  name_de: "Histologische Probenentnahme"

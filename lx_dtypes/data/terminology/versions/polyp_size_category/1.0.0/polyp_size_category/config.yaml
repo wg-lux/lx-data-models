@@ -1,4 +1,5 @@
 name: polyp_size_category
+name_de: "Polyp Größe Kategorie"
 version: 1.0.0
 medical_field: gastroenterology
 description: Illustrative binary comparator; not an historical guideline release.

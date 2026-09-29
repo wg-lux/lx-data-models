@@ -1,5 +1,6 @@
 - model: findings_validator
   name: coloreg_hot_snare_requires_settings
+  name_de: "ColoReg – Heißschlingenresektion erfordert Elektrochirurgie-Einstellungen"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -17,6 +18,7 @@
         name: coloreg_electrosurgery_settings
 - model: findings_validator
   name: coloreg_primary_success_requires_protocol
+  name_de: "ColoReg – Primärer Erfolg erfordert Protokollangabe"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -34,6 +36,7 @@
         name: coloreg_primary_success_protocol
 - model: findings_validator
   name: coloreg_subsequent_follow_up_requires_previous
+  name_de: "ColoReg – Weitere Nachsorge erfordert vorherige Nachsorgeuntersuchung"
   finding: coloreg_polyp_follow_up
   operator: condition
   query:
@@ -50,6 +53,7 @@
         name: coloreg_previous_follow_up_examination_id
 - model: findings_validator
   name: coloreg_technique_emr_requires_intervention
+  name_de: "ColoReg – EMR-Technik erfordert EMR-Intervention"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -66,6 +70,7 @@
         name: endoscopy_emr_generic
 - model: findings_validator
   name: coloreg_technique_esd_requires_intervention
+  name_de: "ColoReg – ESD-Technik erfordert ESD-Intervention"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -82,6 +87,7 @@
         name: endoscopy_esd_generic
 - model: findings_validator
   name: coloreg_technique_eftr_requires_intervention
+  name_de: "ColoReg – EFTR-Technik erfordert EFTR-Intervention"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -98,6 +104,7 @@
         name: endoscopy_eftr_generic
 - model: findings_validator
   name: coloreg_snare_cold_requires_intervention
+  name_de: "ColoReg – Kaltschlinge erfordert Kaltschlingenintervention"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -115,6 +122,7 @@
         name: endoscopy_cold_snare_resection_generic
 - model: findings_validator
   name: coloreg_snare_diathermic_requires_intervention
+  name_de: "ColoReg – Diathermische Schlinge erfordert entsprechende Intervention"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -132,6 +140,7 @@
         name: endoscopy_diathermic_snare_resection_generic
 - model: findings_validator
   name: coloreg_completion_emr_requires_intervention
+  name_de: "ColoReg – EMR-Komplettierung erfordert EMR-Intervention"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -147,6 +156,7 @@
         name: endoscopy_emr_generic
 - model: findings_validator
   name: coloreg_completion_esd_requires_intervention
+  name_de: "ColoReg – ESD-Komplettierung erfordert ESD-Intervention"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -162,6 +172,7 @@
         name: endoscopy_esd_generic
 - model: findings_validator
   name: coloreg_completion_eftr_requires_intervention
+  name_de: "ColoReg – EFTR-Komplettierung erfordert EFTR-Intervention"
   finding: coloreg_polyp_resection
   operator: condition
   query:
@@ -177,6 +188,7 @@
         name: endoscopy_eftr_generic
 - model: findings_validator
   name: coloreg_interval_uncontrolled_bleeding_requires_event
+  name_de: "ColoReg – Unkontrollierte Intervallblutung erfordert Ereignisdokumentation"
   finding: coloreg_polyp_follow_up
   operator: condition
   query:
@@ -193,6 +205,7 @@
         classification: coloreg_interval_bleeding
 - model: findings_validator
   name: coloreg_repeat_required_bleeding_requires_event
+  name_de: "ColoReg – Wiederholung wegen Blutung erfordert Ereignisdokumentation"
   finding: coloreg_polyp_follow_up
   operator: condition
   query:
@@ -209,6 +222,7 @@
         classification: coloreg_interval_bleeding
 - model: findings_validator
   name: coloreg_repeat_required_perforation_requires_event
+  name_de: "ColoReg – Wiederholung wegen Perforation erfordert Ereignisdokumentation"
   finding: coloreg_polyp_follow_up
   operator: condition
   query:

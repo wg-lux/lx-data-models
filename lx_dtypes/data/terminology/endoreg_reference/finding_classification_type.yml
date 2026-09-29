@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: finding_classification_type
+  name_de: "Befundklassifikationstypen"
   payload:
     schema_version: '1.0'
     records:

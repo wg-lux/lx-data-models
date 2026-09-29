@@ -1,4 +1,5 @@
 - model: classification_choice
   name: additional_text_info
+  name_de: "Zusätzliche Angaben"
   classification_choice_descriptors:
     - additional_text_info

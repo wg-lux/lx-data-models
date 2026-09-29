@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: waste
+  name_de: "Abfall"
   payload:
     schema_version: '1.0'
     records:

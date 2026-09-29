@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: examination_indication
+  name_de: "Untersuchungsindikationen"
   payload:
     schema_version: '1.0'
     records:

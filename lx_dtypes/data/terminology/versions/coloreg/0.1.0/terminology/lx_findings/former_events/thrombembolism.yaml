@@ -1,17 +1,20 @@
 - model: finding
   name: "deep_vein_thrombosis"
+  name_de: "Tiefe Venenthrombose"
   description: "Deep Vein Thrombosis"
   tags:
     - event
 
 - model: finding
   name: "pulmonary_embolism"
+  name_de: "Lungenembolie"
   description: "Pulmonary Embolism"
   tags:
     - event
 
 - model: finding
   name: "recurrent_thrombembolism"
+  name_de: "Rezidivierende Thromboembolie"
   description: "Recurrent Thrombembolism"
   tags:
     - event

@@ -1,2 +1,3 @@
 - model: intervention
   name: ercp_sphincterotomy
+  name_de: "Endoskopische Sphinkterotomie bei ERCP"

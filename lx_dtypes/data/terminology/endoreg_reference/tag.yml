@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: tag
+  name_de: "Schlagwörter"
   payload:
     schema_version: '1.0'
     records:

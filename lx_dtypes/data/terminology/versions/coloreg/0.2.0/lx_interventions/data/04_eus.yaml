@@ -1,29 +1,39 @@
 - model: intervention
   name: endosonography_solid_lesion_fna
+  name_de: "Endosonographische Feinnadelaspiration einer soliden Läsion"
 
 - model: intervention
   name: endosonography_lymph_node_fna
+  name_de: "Endosonographische Feinnadelaspiration eines Lymphknotens"
 
 - model: intervention
   name: endosonography_cyst_fna
+  name_de: "Endosonographische Feinnadelaspiration einer Zyste"
 
 - model: intervention
   name: endosonography_pseudocyst_fna
+  name_de: "Endosonographische Feinnadelaspiration einer Pseudozyste"
 
 - model: intervention
   name: endosonography_biliary_drainage
+  name_de: "Endosonographische Gallenwegsdrainage"
 
 - model: intervention
   name: endosonography_pancreatic_drainage
+  name_de: "Endosonographische Pankreasdrainage"
 
 - model: intervention
   name: endosonography_cyst_gastrostomy
+  name_de: "Endosonographische Zystogastrostomie"
 
 - model: intervention
   name: endosonography_pancreaticogastrostomy
+  name_de: "Endosonographische Pankreatikogastrostomie"
 
 - model: intervention
   name: endosonography_cholangioduodenostomy
+  name_de: "Endosonographische Cholangioduodenostomie"
 
 - model: intervention
   name: endosonography_pancreaticoduodenostomy
+  name_de: "Endosonographische Pankreatikoduodenostomie"

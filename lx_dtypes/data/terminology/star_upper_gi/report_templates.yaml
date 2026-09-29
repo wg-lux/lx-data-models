@@ -1,5 +1,6 @@
 - model: report_template_section
   name: upper_gi_mini_baseline
+  name_de: "Kompakte Basisangaben zur oberen GI-Endoskopie"
   title_de: Basisbefunde
   title_en: Baseline findings
   position: 0
@@ -52,6 +53,7 @@
 # available for integrations that serialize them as findings.
 - model: report_template_section
   name: star_upper_gi_standard_patient_and_exam
+  name_de: "Patienten- und Untersuchungsangaben"
   title_en: Patient and examination
   title_de: Patient und Untersuchung
   position: 0
@@ -72,6 +74,7 @@
 
 - model: report_template_section
   name: star_upper_gi_standard_preprocedure
+  name_de: "Vor dem Eingriff"
   title_en: Preprocedure information
   title_de: Präprozedurale Angaben
   position: 1
@@ -102,6 +105,7 @@
 
 - model: report_template_section
   name: star_upper_gi_standard_periprocedure
+  name_de: "Während des Eingriffs"
   title_en: Periprocedure information and cleanliness
   title_de: Periprozedurale Angaben und Sauberkeit
   position: 2
@@ -145,6 +149,7 @@
 
 - model: report_template_section
   name: star_upper_gi_standard_anatomy
+  name_de: "Anatomie"
   title_en: Structured anatomical findings
   title_de: Strukturierte anatomische Befunde
   position: 3
@@ -191,6 +196,7 @@
 
 - model: report_template_section
   name: star_upper_gi_standard_abnormalities
+  name_de: "Pathologische Befunde"
   title_en: Abnormal findings
   title_de: Pathologische Befunde
   position: 4
@@ -280,6 +286,7 @@
 
 - model: report_template_section
   name: star_upper_gi_standard_postprocedure
+  name_de: "Nach dem Eingriff"
   title_en: Postprocedure information
   title_de: Postprozedurale Angaben
   position: 5

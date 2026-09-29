@@ -1,5 +1,6 @@
 - model: citation
   name: ahmad_evaluation_2023
+  name_de: "Bewertung eines Echtzeitsystems zur computergestützten Polypenerkennung bei der Vorsorgekoloskopie: AI-DETECT-Studie"
   citation_key: ahmad_evaluation_2023
   title: 'Evaluation of a real-time computer-aided polyp detection system during screening
     colonoscopy: AI-DETECT study'
@@ -84,6 +85,7 @@
       screening colonoscopy
 - model: citation
   name: aniwan_computer-aided_2023
+  name_de: "Computergestützte Erkennung, Schleimhautexpositionshilfe, ihre Kombination und Standardkoloskopie zur Adenomerkennung: randomisierte kontrollierte Studie"
   citation_key: aniwan_computer-aided_2023
   title: 'Computer-aided detection, mucosal exposure device, their combination, and
     standard colonoscopy for adenoma detection: a randomized controlled trial'
@@ -183,6 +185,7 @@
       and standard colonoscopy for adenoma detection
 - model: citation
   name: antonelli_current_2023
+  name_de: "Aktuelle und zukünftige Bedeutung künstlicher Intelligenz in der Koloskopie"
   citation_key: antonelli_current_2023
   title: Current and future implications of artificial intelligence in colonoscopy
   abstract: Gastrointestinal endoscopy has proved to be a perfect context for the
@@ -239,6 +242,7 @@
     pmcid: PMC9932855
 - model: citation
   name: aronchick_validation_1999
+  name_de: "Validierung eines Instruments zur Beurteilung der Darmreinigung"
   citation_key: aronchick_validation_1999
   title: Validation of an instrument to assess colon cleansing
   authors:
@@ -251,6 +255,7 @@
     note: 'Pages: 2667 Publication Title: Am. J. Gastroenterol. Volume: 94'
 - model: citation
   name: bagaric_checklisten_2025
+  name_de: "Checklisten Intensivpflege"
   citation_key: bagaric_checklisten_2025
   title: Checklisten Intensivpflege
   abstract: Alles Wichtige auf einen Blick Die Checklisten Intensivpflege bieten eine
@@ -293,6 +298,7 @@
     note: 'Google-Books-ID: BTUzEQAAQBAJ'
 - model: citation
   name: barclay_colonoscopic_2006
+  name_de: "Rückzugszeiten und Adenomerkennung bei der Vorsorgekoloskopie"
   citation_key: barclay_colonoscopic_2006
   title: Colonoscopic Withdrawal Times and Adenoma Detection during Screening Colonoscopy
   abstract: In this study of 12 experienced gastroenterologists who performed colonoscopic
@@ -325,6 +331,7 @@
     note: 'publisher: Massachusetts Medical Society _eprint: https://doi.org/10.1056/NEJMoa055498'
 - model: citation
   name: bisschops_basic_2018
+  name_de: "BASIC-Klassifikation zur Charakterisierung kolorektaler Polypen mittels Blaulichtbildgebung"
   citation_key: bisschops_basic_2018
   title: BASIC (BLI Adenoma Serrated International Classification) classification
     for colorectal polyp characterization with blue light imaging
@@ -364,6 +371,7 @@
     urldate: '2025-10-27'
 - model: citation
   name: blatchford_risk_2000
+  name_de: "Risikoscore zur Vorhersage des Behandlungsbedarfs bei oberer gastrointestinaler Blutung"
   citation_key: blatchford_risk_2000
   title: A risk score to predict need for treatment for uppergastrointestinal haemorrhage
   authors:
@@ -387,6 +395,7 @@
     note: 'Publisher: Elsevier'
 - model: citation
   name: brand_development_2022
+  name_de: "Entwicklung und Bewertung eines Deep-Learning-Modells zur Verbesserung der Nutzbarkeit von Polypenerkennungssystemen während Interventionen"
   citation_key: brand_development_2022
   title: Development and evaluation of a deep learning model to improve the usability
     of polyp detection systems during interventions
@@ -482,6 +491,7 @@
     note: '_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1002/ueg2.12235'
 - model: citation
   name: braun_intensivtherapie_2024
+  name_de: "Intensivtherapie bei akuten gastrointestinalen Blutungen"
   citation_key: braun_intensivtherapie_2024
   title: Intensivtherapie bei akuten gastrointestinalen Blutungen
   abstract: Man unterscheidet obere (OGIB), mittlere (MGIB) und untere gastrointestinale
@@ -520,6 +530,7 @@
     urldate: '2025-10-12'
 - model: citation
   name: brenner_effect_2014
+  name_de: "Einfluss von Vorsorgesigmoidoskopie und Vorsorgekoloskopie auf Inzidenz und Mortalität kolorektaler Karzinome: systematische Übersicht und Metaanalyse randomisierter kontrollierter Studien und Beobachtungsstudien"
   citation_key: brenner_effect_2014
   title: 'Effect of screening sigmoidoscopy and screening colonoscopy on colorectal
     cancer incidence and mortality: systematic review and meta-analysis of randomised
@@ -622,6 +633,7 @@
     note: 'publisher: British Medical Journal Publishing Group section: Research'
 - model: citation
   name: brenner_trends_2015
+  name_de: "Entwicklung der Adenomdetektionsraten in den ersten zehn Jahren des deutschen Vorsorgekoloskopieprogramms"
   citation_key: brenner_trends_2015
   title: Trends in Adenoma Detection Rates During the First 10 Years of the German
     Screening Colonoscopy Program
@@ -701,6 +713,7 @@
     pmid: '25911510'
 - model: citation
   name: bretthauer_effect_2022
+  name_de: "Einfluss der Vorsorgekoloskopie auf das Risiko für kolorektale Karzinome und damit verbundene Todesfälle"
   citation_key: bretthauer_effect_2022
   title: Effect of Colonoscopy Screening on Risks of Colorectal Cancer and Related
     Death
@@ -740,6 +753,7 @@
     note: 'publisher: Massachusetts Medical Society _eprint: https://doi.org/10.1056/NEJMoa2208375'
 - model: citation
   name: bretthauer_use_2025
+  name_de: "Einsatz computergestützter Erkennung (CADe) bei der Koloskopie zur Darmkrebsvorsorge und Nachsorge: ESGE-Positionspapier"
   citation_key: bretthauer_use_2025
   title: 'Use of computer-assisted detection (CADe) colonoscopy in colorectal cancer
     screening and surveillance: European Society of Gastrointestinal Endoscopy (ESGE)
@@ -801,6 +815,7 @@
       cancer screening and surveillance
 - model: citation
   name: brule_colorectal_2022
+  name_de: "CONECCT-Klassifikation zur Identifikation großer lateral ausbreitender Läsionen ohne submuköses Karzinom: prospektive Studie mit 663 Läsionen"
   citation_key: brule_colorectal_2022
   title: 'The COlorectal NEoplasia Endoscopic Classification to Choose the Treatment
     classification for identification of large laterally spreading lesions lacking
@@ -924,6 +939,7 @@
       submucosal carcinomas
 - model: citation
   name: budzyn_endoscopist_2025
+  name_de: "Risiko eines Kompetenzverlusts bei Endoskopierenden nach Einsatz künstlicher Intelligenz in der Koloskopie: multizentrische Beobachtungsstudie"
   citation_key: budzyn_endoscopist_2025
   title: 'Endoscopist deskilling risk after exposure to artificial intelligence in
     colonoscopy: a multicentre, observational study'
@@ -974,6 +990,7 @@
       in colonoscopy
 - model: citation
   name: buendgens_weakly_2022
+  name_de: "Schwach überwachtes Ende-zu-Ende-Lernen mit künstlicher Intelligenz in der gastrointestinalen Endoskopie"
   citation_key: buendgens_weakly_2022
   title: Weakly supervised end-to-end artificial intelligence in gastrointestinal
     endoscopy
@@ -1062,6 +1079,7 @@
     note: 'Publisher: Nature Publishing Group'
 - model: citation
   name: chino_performance_2023
+  name_de: "Leistungsbewertung eines computergestützten Polypenerkennungssystems mit künstlicher Intelligenz für die Koloskopie"
   citation_key: chino_performance_2023
   title: Performance evaluation of a computer‐aided polyp detection system with artificial
     intelligence for colonoscopy
@@ -1087,6 +1105,7 @@
     issn: 0915-5635, 1443-1661
 - model: citation
   name: corley_adenoma_2014
+  name_de: "Adenomdetektionsrate und Risiko für kolorektale Karzinome und Tod"
   citation_key: corley_adenoma_2014
   title: Adenoma detection rate and risk of colorectal cancer and death
   abstract: 'BACKGROUND: The proportion of screening colonoscopic examinations performed
@@ -1201,6 +1220,7 @@
     pmcid: PMC4036494
 - model: citation
   name: dannhauser_antinociceptive_2020
+  name_de: "Antinozizeptive Modulation durch den Adhäsions-GPCR CIRL fördert die Unterscheidung mechanosensorischer Signale"
   citation_key: dannhauser_antinociceptive_2020
   title: Antinociceptive modulation by the adhesion GPCR CIRL promotes mechanosensory
     signal discrimination
@@ -1271,6 +1291,7 @@
     note: 'Publisher: eLife Sciences Publications, Ltd'
 - model: citation
   name: denzer_s2k-leitlinie_nodate
+  name_de: "S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie der Deutschen Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
   citation_key: denzer_s2k-leitlinie_nodate
   title: S2k-Leitlinie Qualitätsanforderungen in der gastrointestinalen Endoskopie
     der Deutschen Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten
@@ -1289,6 +1310,7 @@
     urldate: '2025-10-15'
 - model: citation
   name: denzer_s2k_2015
+  name_de: "S2k-Leitlinie: Qualitätsanforderungen in der gastrointestinalen Endoskopie, AWMF-Registernummer 021-022"
   citation_key: denzer_s2k_2015
   title: '[S2k guideline: quality requirements for gastrointestinal endoscopy, AWMF
     registry no. 021-022]'
@@ -1347,6 +1369,7 @@
     shorttitle: '[S2k guideline'
 - model: citation
   name: desai_use_2024
+  name_de: "Ein neuartiges KI-System erhöht die Zahl erkannter Adenome bei Vorsorge- und Nachsorgekoloskopien: Ergebnisse einer großen prospektiven multizentrischen randomisierten klinischen Studie in den USA"
   citation_key: desai_use_2024
   title: 'Use of a Novel Artificial Intelligence System Leads to the Detection of
     Significantly Higher Number of Adenomas During Screening and Surveillance Colonoscopy:
@@ -1470,6 +1493,7 @@
       Colonoscopy
 - model: citation
   name: fitzpatrick-lewis_screening_2016
+  name_de: "Darmkrebsvorsorge: systematische Übersicht und Metaanalyse"
   citation_key: fitzpatrick-lewis_screening_2016
   title: 'Screening for Colorectal Cancer: A Systematic Review and Meta-Analysis'
   authors:
@@ -1493,6 +1517,7 @@
     shorttitle: Screening for Colorectal Cancer
 - model: citation
   name: foroutan_computer_2025
+  name_de: "Computergestützte Erkennung und Diagnose von Polypen bei Erwachsenen während der Koloskopie: fortlaufend aktualisierte klinische Leitlinie"
   citation_key: foroutan_computer_2025
   title: 'Computer aided detection and diagnosis of polyps in adult patients undergoing
     colonoscopy: a living clinical practice guideline'
@@ -1688,6 +1713,7 @@
       undergoing colonoscopy
 - model: citation
   name: gattrell_accord_2024
+  name_de: "ACCORD: mittels modifiziertem Delphi-Verfahren entwickelte Berichtsleitlinie für Konsensmethoden in der Biomedizin"
   citation_key: gattrell_accord_2024
   title: 'ACCORD (ACcurate COnsensus Reporting Document): A reporting guideline for
     consensus methods in biomedicine developed via a modified Delphi'
@@ -1794,6 +1820,7 @@
     note: 'Publisher: Public Library of Science'
 - model: citation
   name: gimeno-garcia_usefulness_2023
+  name_de: "Nutzen eines neuartigen computergestützten Erkennungssystems für kolorektale Neoplasien: randomisierte kontrollierte Studie"
   citation_key: gimeno-garcia_usefulness_2023
   title: 'Usefulness of a novel computer-aided detection system for colorectal neoplasia:
     a randomized controlled trial'
@@ -1884,6 +1911,7 @@
       neoplasia
 - model: citation
   name: gong_detection_2020
+  name_de: "Erkennung kolorektaler Adenome mit einem computergestützten Echtzeitsystem (ENDOANGEL): randomisierte kontrollierte Studie"
   citation_key: gong_detection_2020
   title: 'Detection of colorectal adenomas with a real-time computer-aided system
     (ENDOANGEL): a randomised controlled study'
@@ -2023,6 +2051,7 @@
       (ENDOANGEL)
 - model: citation
   name: gottschalk_klassifikation_2021
+  name_de: "Klassifikation Magenulkus und Magenblutung"
   citation_key: gottschalk_klassifikation_2021
   title: Klassifikation Magenulkus und Magenblutung
   abstract: Thieme E-Books & E-Journals
@@ -2052,6 +2081,7 @@
     note: 'Publisher: Georg Thieme Verlag KG'
 - model: citation
   name: gotz_addendum_2022
+  name_de: "Addendum zur S2k-Leitlinie Gastrointestinale Blutungen der Deutschen Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)"
   citation_key: gotz_addendum_2022
   title: Addendum zur S2k-Leitlinie Gastrointestinale Blutungen der Deutschen Gesellschaft
     für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS)
@@ -2098,6 +2128,7 @@
     note: 'Publisher: Georg Thieme Verlag KG'
 - model: citation
   name: gotz_s2k-leitlinie_2017
+  name_de: "S2k-Leitlinie Gastrointestinale Blutung"
   citation_key: gotz_s2k-leitlinie_2017
   title: S2k-Leitlinie Gastrointestinale Blutung
   abstract: Thieme E-Books & E-Journals
@@ -2153,6 +2184,7 @@
       © Georg Thieme Verlag KG'
 - model: citation
   name: halvorsen_benefits_2025
+  name_de: "Nutzen, Belastung und Schäden der KI-gestützten Polypenerkennung in der Darmkrebsvorsorge: Mikrosimulationsstudie"
   citation_key: halvorsen_benefits_2025
   title: 'Benefits, burden, and harms of computer aided polyp detection with artificial
     intelligence in colorectal cancer screening: microsimulation modelling study'
@@ -2311,6 +2343,7 @@
     copyright: http://creativecommons.org/licenses/by-nc/4.0/
 - model: citation
   name: hassan_new_2020
+  name_de: "Neues KI-System: erste Validierungsstudie zur kolorektalen Polypenerkennung im Vergleich mit erfahrenen Endoskopierenden"
   citation_key: hassan_new_2020
   title: 'New artificial intelligence system: first validation study versus experienced
     endoscopists for colorectal polyp detection'
@@ -2337,6 +2370,7 @@
     shorttitle: New artificial intelligence system
 - model: citation
   name: hassan_real-time_2023
+  name_de: "Computergestützte Echtzeiterkennung kolorektaler Neoplasien während der Koloskopie: systematische Übersicht und Metaanalyse"
   citation_key: hassan_real-time_2023
   title: 'Real-Time Computer-Aided Detection of Colorectal Neoplasia During Colonoscopy
     : A Systematic Review and Meta-analysis'
@@ -2468,6 +2502,7 @@
       Colonoscopy
 - model: citation
   name: henniger_assessment_2023
+  name_de: "Erfassung der jährlichen CO₂-Emissionen einer gastrointestinalen Endoskopieeinheit"
   citation_key: henniger_assessment_2023
   title: Assessment of the yearly carbon emission of a gastrointestinal endoscopy
     unit
@@ -2496,6 +2531,7 @@
     note: 'Publisher: BMJ'
 - model: citation
   name: henniger_reducing_2023
+  name_de: "Reduktion von Scope-3-CO₂-Emissionen in der gastrointestinalen Endoskopie: Ergebnisse der prospektiven Studie des Green Endoscopy Project Würzburg"
   citation_key: henniger_reducing_2023
   title: 'Reducing scope 3 carbon emissions in gastrointestinal endoscopy: results
     of the prospective study of the ‘Green Endoscopy Project Würzburg’'
@@ -2575,6 +2611,7 @@
     note: 'Publisher: BMJ'
 - model: citation
   name: herrlinger_einteilung_2010
+  name_de: "Einteilung und Management der oberen gastrointestinalen Blutung"
   citation_key: herrlinger_einteilung_2010
   title: Einteilung und Management der oberen gastrointestinalen Blutung
   abstract: Immer noch ist die obere gastrointestinale Blutung die häufigste Notfallsituation
@@ -2630,6 +2667,7 @@
     urldate: '2025-10-12'
 - model: citation
   name: kamba_reducing_2021
+  name_de: "Verringerung der Adenomübersehensrate bei KI-gestützter Koloskopie: multizentrische randomisierte kontrollierte Studie"
   citation_key: kamba_reducing_2021
   title: 'Reducing adenoma miss rate of colonoscopy assisted by artificial intelligence:
     a multicenter randomized controlled trial'
@@ -2673,6 +2711,7 @@
     shorttitle: Reducing adenoma miss rate of colonoscopy assisted by artificial intelligence
 - model: citation
   name: kaminski_performance_2017
+  name_de: "Qualitätskennzahlen für die untere gastrointestinale Endoskopie: ESGE-Initiative zur Qualitätsverbesserung"
   citation_key: kaminski_performance_2017
   title: 'Performance measures for lower gastrointestinal endoscopy: a European Society
     of Gastrointestinal Endoscopy (ESGE) Quality Improvement Initiative'
@@ -2754,6 +2793,7 @@
     note: 'Publisher: © Georg Thieme Verlag KG'
 - model: citation
   name: kaminski_quality_2010
+  name_de: "Qualitätsindikatoren der Koloskopie und das Risiko für Intervallkarzinome"
   citation_key: kaminski_quality_2010
   title: Quality indicators for colonoscopy and the risk of interval cancer
   abstract: 'BACKGROUND: Although rates of detection of adenomatous lesions (tumors
@@ -2869,6 +2909,7 @@
     pmid: '20463339'
 - model: citation
   name: klare_gastrointestinale_2022
+  name_de: "Gastrointestinale Blutung"
   citation_key: klare_gastrointestinale_2022
   title: Gastrointestinale Blutung
   abstract: Die gastrointestinale Blutung ist eine der wichtigsten Notfallsituationen
@@ -2901,6 +2942,7 @@
     urldate: '2025-10-12'
 - model: citation
   name: kobayashi_diagnostic_2019
+  name_de: "Diagnostische Ausbeute der JNET-Klassifikation bei oberflächlichen kolorektalen Neoplasien in einer großen klinischen Praxisdatenbank"
   citation_key: kobayashi_diagnostic_2019
   title: Diagnostic yield of the Japan NBI Expert Team (JNET) classification for endoscopic
     diagnosis of superficial colorectal neoplasms in a large-scale clinical practice
@@ -3004,6 +3046,7 @@
     urldate: '2025-07-25'
 - model: citation
   name: koch_ursachen_2013
+  name_de: "Ursachen, patientenspezifische Risikofaktoren und prognostische Indikatoren bei akuter gastrointestinaler Blutung und intensivmedizinischer Therapieindikation"
   citation_key: koch_ursachen_2013
   title: Ursachen, patientenspezifische Risikofaktoren und prognostische Indikatoren
     bei akuter gastrointestinaler Blutung und intensivmedizinischer Therapieindikation
@@ -3066,6 +3109,7 @@
     urldate: '2025-10-12'
 - model: citation
   name: kroner_artificial_2021
+  name_de: "Künstliche Intelligenz in der Gastroenterologie: Übersicht zum aktuellen Stand"
   citation_key: kroner_artificial_2021
   title: 'Artificial intelligence in gastroenterology: A state-of-the-art review'
   abstract: The development of artificial intelligence (AI) has increased dramatically
@@ -3130,6 +3174,7 @@
     shorttitle: Artificial intelligence in gastroenterology
 - model: citation
   name: kumar_adenoma_2017
+  name_de: "Adenomübersehensraten bei drei gegenüber sechs Minuten Rückzugszeit während der Koloskopie: prospektive randomisierte Studie"
   citation_key: kumar_adenoma_2017
   title: 'Adenoma miss rates associated with a 3-minute versus 6-minute colonoscopy
     withdrawal time: a prospective, randomized trial'
@@ -3237,6 +3282,7 @@
       withdrawal time
 - model: citation
   name: ladabaum_computer-aided_2023
+  name_de: "Computergestützte Polypenerkennung verbessert die Leistung Koloskopierender in einer pragmatischen Implementierungsstudie nicht"
   citation_key: ladabaum_computer-aided_2023
   title: Computer-aided Detection of Polyps Does Not Improve Colonoscopist Performance
     in a Pragmatic Implementation Trial
@@ -3261,6 +3307,7 @@
     pmid: '36528131'
 - model: citation
   name: lau_effect_2024
+  name_de: "Einfluss eines Echtzeit-Polypenerkennungssystems (ENDO-AID) auf die Adenomerkennung bei Endoskopierenden in Weiterbildung: randomisierte Studie"
   citation_key: lau_effect_2024
   title: 'Effect of Real-Time Computer-Aided Polyp Detection System (ENDO-AID) on
     Adenoma Detection in Endoscopists-in-Training: A Randomized Trial'
@@ -3370,6 +3417,7 @@
       on Adenoma Detection in Endoscopists-in-Training
 - model: citation
   name: levy_artificial_2022
+  name_de: "KI-gestützte Koloskopie erhöht die Adenomdetektionsrate im klinischen Alltag nicht"
   citation_key: levy_artificial_2022
   title: Artificial Intelligence-Aided Colonoscopy Does Not Increase Adenoma Detection
     Rate in Routine Clinical Practice
@@ -3413,6 +3461,7 @@
     important questions on AI-human interactions in medicine.'
 - model: citation
   name: liu_single-monitor_2020
+  name_de: "Ein-Monitor-Studie: Ein integriertes CADe-System steigert die Adenomerkennung während der Koloskopie – prospektive randomisierte Studie"
   citation_key: liu_single-monitor_2020
   title: 'The single-monitor trial: an embedded CADe system increased adenoma detection
     during colonoscopy: a prospective randomized study'
@@ -3499,6 +3548,7 @@
     shorttitle: The single-monitor trial
 - model: citation
   name: liu_study_2020
+  name_de: "Studie zur Detektionsrate von Polypen und Adenomen bei KI-gestützter Koloskopie"
   citation_key: liu_study_2020
   title: Study on detection rate of polyps and adenomas in artificial-intelligence-aided
     colonoscopy
@@ -3560,6 +3610,7 @@
     pmcid: PMC7045775
 - model: citation
   name: lux_assisted_2023
+  name_de: "Assistierte Dokumentation als neuer Schwerpunkt künstlicher Intelligenz in der Endoskopie: verlässliche Rückzugszeit- und Bilddokumentation als Vorbild"
   citation_key: lux_assisted_2023
   title: 'Assisted documentation as a new focus for artificial intelligence in endoscopy:
     the precedent of reliable withdrawal time and image reporting'
@@ -3601,6 +3652,7 @@
     note: 'Publisher: Georg Thieme Verlag KG'
 - model: citation
   name: lux_closing_2024
+  name_de: "Die Lücke schließen: kritische Untersuchung von Leitlinientreue, Inkonsistenzen und Verbesserungen in der Koloskopiebefundung"
   citation_key: lux_closing_2024
   title: 'Closing the Gap: A Critical Examination of Adherence, Inconsistency, and
     Improvements in Colonoscopy Reporting Practices'
@@ -3677,6 +3729,7 @@
     shorttitle: Closing the Gap
 - model: citation
   name: lux_endoscopic_2023
+  name_de: "Endoskopische Behandlung eines lumenobstruierenden Kolontumors im Zusammenhang mit Morbus Fabry"
   citation_key: lux_endoscopic_2023
   title: Endoscopic treatment of a Fabry disease‐related, lumen‐obstructing colonic
     tumor
@@ -3699,6 +3752,7 @@
     urldate: '2025-07-15'
 - model: citation
   name: lux_pilot_2022
+  name_de: "Pilotstudie eines neuen frei verfügbaren computergestützten Polypenerkennungssystems im klinischen Alltag"
   citation_key: lux_pilot_2022
   title: Pilot study of a new freely available computer-aided polyp detection system
     in clinical practice
@@ -3775,6 +3829,7 @@
     note: 'Publisher: Springer Science and Business Media LLC'
 - model: citation
   name: lux_pilot_2022-1
+  name_de: "Pilotstudie eines neuen frei verfügbaren computergestützten Polypenerkennungssystems im klinischen Alltag"
   citation_key: lux_pilot_2022-1
   title: Pilot study of a new freely available computer-aided polyp detection system
     in clinical practice
@@ -3814,6 +3869,7 @@
     urldate: '2022-05-13'
 - model: citation
   name: lux_regional_2019
+  name_de: "Regionale Unterschiede der Tight-Junction-Proteinexpression in der Blut-Spinalganglion-Schranke und Veränderungen nach traumatischer Nervenverletzung bei Ratten"
   citation_key: lux_regional_2019
   title: Regional Differences in Tight Junction Protein Expression in the Blood–DRG
     Barrier and Their Alterations after Nerve Traumatic Injury in Rats
@@ -3881,6 +3937,7 @@
     note: 'Publisher: MDPI AG'
 - model: citation
   name: malik_sop_2023
+  name_de: "SOP Erstversorgung bei einer gastrointestinalen Blutung"
   citation_key: malik_sop_2023
   title: SOP Erstversorgung bei einer gastrointestinalen Blutung
   abstract: 'Eine gastrointestinale Blutung ist ein medizinischer Notfall, der rasch
@@ -3934,6 +3991,7 @@
     note: 'Publisher: Georg Thieme Verlag KG'
 - model: citation
   name: misawa_development_2021
+  name_de: "Entwicklung eines computergestützten Erkennungssystems für die Koloskopie und einer öffentlich zugänglichen großen Koloskopievideodatenbank (mit Video)"
   citation_key: misawa_development_2021
   title: Development of a computer-aided detection system for colonoscopy and a publicly
     accessible large colonoscopy video database (with video)
@@ -4017,6 +4075,7 @@
     pmid: '32745531'
 - model: citation
   name: nielsen_impact_2017
+  name_de: "Einfluss von Rückmeldung und Überwachung auf koloskopische Rückzugszeiten und Polypendetektionsraten"
   citation_key: nielsen_impact_2017
   title: Impact of feedback and monitoring on colonoscopy withdrawal times and polyp
     detection rates
@@ -4080,6 +4139,7 @@
     note: 'Publisher: BMJ Publishing Group Ltd'
 - model: citation
   name: noauthor_german_2019
+  name_de: "Leitlinienprogramm Onkologie: S3-Leitlinie Kolorektales Karzinom, Langversion 2.1, 2019, AWMF-Registernummer 021-007OL"
   citation_key: noauthor_german_2019
   title: 'German Guideline Program in Oncology (German Cancer Society, German Cancer
     Aid, AWMF): S3-Guideline Colorectal Cancer, long version 2.1, 2019, AWMF registrationnumber:
@@ -4090,6 +4150,7 @@
   language: en
 - model: citation
   name: noauthor_german_nodate
+  name_de: "Leitlinienprogramm Onkologie: S3-Leitlinie Kolorektales Karzinom, Langversion 2.1, 2019, AWMF-Registernummer 021-007OL (abgerufen am 15.07.2024)"
   citation_key: noauthor_german_nodate
   title: 'German Guideline Program in Oncology (German Cancer Society, German Cancer
     Aid, AWMF): S3-Guideline Colorectal Cancer, long version 2.1, 2019, AWMF registrationnumber:
@@ -4099,6 +4160,7 @@
   language: de
 - model: citation
   name: oka_therapeutic_2009
+  name_de: "Therapeutische Strategie bei kolorektalen lateral ausbreitenden Tumoren"
   citation_key: oka_therapeutic_2009
   title: Therapeutic strategy for colorectal laterally spreading tumor
   abstract: Most colorectal tumors larger than 20 mm in diameter are called laterally
@@ -4167,6 +4229,7 @@
     pmid: '19691733'
 - model: citation
   name: penz_association_2024
+  name_de: "Zusammenhang zwischen Adenomdetektionsrate und Erkennung serratierter Polypen: retrospektive Analyse von über 200.000 Vorsorgekoloskopien"
   citation_key: penz_association_2024
   title: 'Association between endoscopist adenoma detection rate and serrated polyp
     detection: Retrospective analysis of over 200,000 screening colonoscopies'
@@ -4253,6 +4316,7 @@
     note: 'publisher: Georg Thieme Verlag KG'
 - model: citation
   name: penz_impact_2020
+  name_de: "Einfluss der Adenomdetektionsrate auf die Erkennung fortgeschrittener Adenome und endoskopische unerwünschte Ereignisse bei über 200.000 Vorsorgekoloskopien"
   citation_key: penz_impact_2020
   title: Impact of adenoma detection rate on detection of advanced adenomas and endoscopic
     adverse events in a study of over 200,000 screening colonoscopies
@@ -4360,6 +4424,7 @@
     urldate: '2025-09-07'
 - model: citation
   name: praktiknjo_osophagusvarizenblutung_2022
+  name_de: "Ösophagusvarizenblutung: medikamentöse, endoskopische, interventionelle Therapie"
   citation_key: praktiknjo_osophagusvarizenblutung_2022
   title: 'Ösophagusvarizenblutung: medikamentöse, endoskopische, interventionelle
     Therapie'
@@ -4414,6 +4479,7 @@
     note: 'Publisher: Georg Thieme Verlag KG'
 - model: citation
   name: prosenz_areas_2024
+  name_de: "Verbesserungspotenziale der Darmkrebsvorsorge: Ergebnisse einer Vorsorgeinitiative für 10.000 Beschäftigte im österreichischen Gesundheitswesen"
   citation_key: prosenz_areas_2024
   title: 'Areas of improvement for colorectal cancer screening: Results of a screening
     initiative for 10,000 health care employees in Austria'
@@ -4508,6 +4574,7 @@
     note: 'Publisher: Georg Thieme Verlag KG'
 - model: citation
   name: reinhold_quantitative_2018
+  name_de: "Quantitative und mikrostrukturelle Veränderungen der Blut-Nerven-Schranke bei peripherer Neuropathie"
   citation_key: reinhold_quantitative_2018
   title: Quantitative and Microstructural Changes of the Blood-Nerve Barrier in Peripheral
     Neuropathy
@@ -4585,6 +4652,7 @@
     note: 'Publisher: Frontiers'
 - model: citation
   name: repici_artificial_2022
+  name_de: "Künstliche Intelligenz und Koloskopieerfahrung: Erkenntnisse aus zwei randomisierten Studien"
   citation_key: repici_artificial_2022
   title: 'Artificial intelligence and colonoscopy experience: lessons from two randomised
     trials'
@@ -4695,6 +4763,7 @@
     note: 'publisher: BMJ Publishing Group section: Artificial intelligence'
 - model: citation
   name: repici_efficacy_2020
+  name_de: "Wirksamkeit computergestützter Echtzeiterkennung kolorektaler Neoplasien in einer randomisierten Studie"
   citation_key: repici_efficacy_2020
   title: Efficacy of Real-Time Computer-Aided Detection of Colorectal Neoplasia in
     a Randomized Trial
@@ -4815,6 +4884,7 @@
     pmid: '32371116'
 - model: citation
   name: schweizer_therapie_2019
+  name_de: "Therapie der nichtvarikösen oberen gastrointestinalen Blutung: endoluminal – endovaskulär – chirurgisch"
   citation_key: schweizer_therapie_2019
   title: 'Therapie der nichtvarikösen oberen gastrointestinalen Blutung: endoluminal
     – endovaskulär – chirurgisch'
@@ -4868,6 +4938,7 @@
     shorttitle: Therapie der nichtvarikösen oberen gastrointestinalen Blutung
 - model: citation
   name: seager_polyp_2024
+  name_de: "Polypenerkennung mit dem KI-Endoskopiemodul GI Genius gegenüber Standardkoloskopie im Alltag (COLO-DETECT): multizentrische offene pragmatische randomisierte kontrollierte Parallelgruppenstudie"
   citation_key: seager_polyp_2024
   title: 'Polyp detection with colonoscopy assisted by the GI Genius artificial intelligence
     endoscopy module compared with standard colonoscopy in routine colonoscopy practice
@@ -4907,6 +4978,7 @@
     note: 'publisher: Elsevier'
 - model: citation
   name: shaukat_acg_2021
+  name_de: "Klinische ACG-Leitlinie zur Darmkrebsvorsorge 2021"
   citation_key: shaukat_acg_2021
   title: 'ACG Clinical Guidelines: Colorectal Cancer Screening 2021'
   abstract: Colorectal cancer (CRC) is the third most common cancer in men and women
@@ -4968,6 +5040,7 @@
     shorttitle: ACG Clinical Guidelines
 - model: citation
   name: shaukat_computer-aided_2022
+  name_de: "Computergestützte Erkennung erhöht die Adenomzahl pro Vorsorge- und Nachsorgekoloskopie: randomisierte Studie"
   citation_key: shaukat_computer-aided_2022
   title: 'Computer-Aided Detection Improves Adenomas per Colonoscopy for Screening
     and Surveillance Colonoscopy: A Randomized Trial'
@@ -5066,6 +5139,7 @@
       and Surveillance Colonoscopy
 - model: citation
   name: shaukat_longer_2015
+  name_de: "Längere Rückzugszeit ist mit geringerer Inzidenz von Intervallkarzinomen nach Vorsorgekoloskopie verbunden"
   citation_key: shaukat_longer_2015
   title: Longer Withdrawal Time Is Associated With a Reduced Incidence of Interval
     Cancer After Screening Colonoscopy
@@ -5090,6 +5164,7 @@
     issn: 00165085
 - model: citation
   name: soleymanjahi_artificial_2024
+  name_de: "KI-gestützte Koloskopie zur Polypenerkennung: systematische Übersicht und Metaanalyse"
   citation_key: soleymanjahi_artificial_2024
   title: 'Artificial Intelligence–Assisted Colonoscopy for Polyp Detection: A Systematic
     Review and Meta-analysis'
@@ -5122,6 +5197,7 @@
     copyright: https://www.acpjournals.org/journal/aim/text-and-data-mining
 - model: citation
   name: soleymanjahi_artificial_2024-1
+  name_de: "KI-gestützte Koloskopie zur Polypenerkennung"
   citation_key: soleymanjahi_artificial_2024-1
   title: Artificial Intelligence–Assisted Colonoscopy for Polyp Detection
   abstract: 'Background:Randomized clinical trials (RCTs) of computer-aided detection
@@ -5204,6 +5280,7 @@
     note: 'publisher: American College of Physicians'
 - model: citation
   name: spadaccini_artificial_2025
+  name_de: "Künstliche Intelligenz und Erkennung kolorektaler Neoplasien bei positivem immunochemischem Stuhltest: Metaanalyse und systematische Übersicht"
   citation_key: spadaccini_artificial_2025
   title: 'Artificial intelligence and colorectal neoplasia detection performances
     in patients with positive fecal immunochemical test: Meta-analysis and systematic
@@ -5305,6 +5382,7 @@
     note: '_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1111/den.15034'
 - model: citation
   name: su_impact_2020
+  name_de: "Einfluss eines automatischen Echtzeit-Qualitätskontrollsystems auf die Erkennung kolorektaler Polypen und Adenome: prospektive randomisierte kontrollierte Studie (mit Videos)"
   citation_key: su_impact_2020
   title: 'Impact of a real-time automatic quality control system on colorectal polyp
     and adenoma detection: a prospective randomized controlled study (with videos)'
@@ -5405,6 +5483,7 @@
       polyp and adenoma detection
 - model: citation
   name: sudarevic_artificial_2023
+  name_de: "KI-basierte Messung der Polypengröße in der gastrointestinalen Endoskopie mit dem zusätzlichen Wasserstrahl als Referenz"
   citation_key: sudarevic_artificial_2023
   title: Artificial intelligence-based polyp size measurement in gastrointestinal
     endoscopy using the auxiliary waterjet as a reference
@@ -5447,6 +5526,7 @@
     note: 'Publisher: Georg Thieme Verlag KG'
 - model: citation
   name: sultan_aga_2025
+  name_de: "Fortlaufend aktualisierte klinische AGA-Leitlinie zur Koloskopie mit computergestützter Erkennung"
   citation_key: sultan_aga_2025
   title: AGA Living Clinical Practice Guideline on Computer-Aided Detection–Assisted
     Colonoscopy
@@ -5476,6 +5556,7 @@
     urldate: '2025-09-07'
 - model: citation
   name: sung_global_2021
+  name_de: "Globale Krebsstatistik 2020: GLOBOCAN-Schätzungen zu Inzidenz und Mortalität von 36 Krebsarten in 185 Ländern"
   citation_key: sung_global_2021
   title: 'Global Cancer Statistics 2020: GLOBOCAN Estimates of Incidence and Mortality
     Worldwide for 36 Cancers in 185 Countries'
@@ -5559,6 +5640,7 @@
     note: 'Publisher: American Cancer Society'
 - model: citation
   name: tiankanon_improvement_2024
+  name_de: "Verbesserung der Adenomdetektionsrate durch zwei computergestützte Polypenerkennungssysteme bei hoher Ausgangsdetektionsrate: randomisierte multizentrische Studie"
   citation_key: tiankanon_improvement_2024
   title: 'Improvement of adenoma detection rate by two computer-aided colonic polyp
     detection systems in high adenoma detectors: a randomized multicenter trial'
@@ -5648,6 +5730,7 @@
       polyp detection systems in high adenoma detectors
 - model: citation
   name: troya_direct_2023
+  name_de: "Direkter Vergleich mehrerer computergestützter Polypenerkennungssysteme"
   citation_key: troya_direct_2023
   title: Direct comparison of multiple computer-aided polyp detection systems
   abstract: 'BACKGROUND AND STUDY AIMS: Artificial intelligence based computer-aided
@@ -5716,6 +5799,7 @@
     pmid: '37532115'
 - model: citation
   name: uraoka_sanos_2011
+  name_de: "Sano-Klassifikation der Kapillarmuster bei Schmalbandbildgebung früher kolorektaler Läsionen"
   citation_key: uraoka_sanos_2011
   title: Sano's Capillary Pattern Classification for Narrow-Band Imaging of Early
     Colorectal Lesions
@@ -5770,6 +5854,7 @@
     note: '_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1443-1661.2011.01118.x'
 - model: citation
   name: van_toledo_serrated_2022
+  name_de: "Erkennung serratierter Polypen und Risiko für kolorektale Intervallkarzinome nach Koloskopie: bevölkerungsbasierte Studie"
   citation_key: van_toledo_serrated_2022
   title: 'Serrated polyp detection and risk of interval post-colonoscopy colorectal
     cancer: a population-based study'
@@ -5903,6 +5988,7 @@
       cancer
 - model: citation
   name: vavricka_monitoring_2016
+  name_de: "Überwachung der koloskopischen Rückzugszeit verbessert die Adenomdetektionsrate und die Leistung Endoskopierender erheblich"
   citation_key: vavricka_monitoring_2016
   title: Monitoring colonoscopy withdrawal time significantly improves the adenoma
     detection rate and the performance of endoscopists
@@ -5976,6 +6062,7 @@
     note: 'publisher: © Georg Thieme Verlag KG'
 - model: citation
   name: waldmann_association_2021
+  name_de: "Zusammenhang von Adenomdetektionsrate und Adenommerkmalen mit der Darmkrebsmortalität nach Vorsorgekoloskopie"
   citation_key: waldmann_association_2021
   title: Association of Adenoma Detection Rate and Adenoma Characteristics With Colorectal
     Cancer Mortality After Screening Colonoscopy
@@ -6032,6 +6119,7 @@
     note: 'Publisher: Elsevier'
 - model: citation
   name: waldmann_interval_2021
+  name_de: "Intervallkarzinome nach Koloskopie im österreichischen Vorsorgeprogramm: Einfluss ärztlicher und patientenbezogener Faktoren"
   citation_key: waldmann_interval_2021
   title: 'Interval cancer after colonoscopy in the Austrian National Screening Programme:
     influence of physician and patient factors'
@@ -6133,6 +6221,7 @@
     note: 'publisher: BMJ Publishing Group section: Endoscopy'
 - model: citation
   name: waldmann_trends_2016
+  name_de: "Qualitätsentwicklung der Vorsorgekoloskopie in Österreich"
   citation_key: waldmann_trends_2016
   title: Trends in quality of screening colonoscopy in Austria
   abstract: '\textlessp\textgreater \textbfBackground and study aim: Screening colonoscopy
@@ -6226,6 +6315,7 @@
     note: 'Publisher: © Georg Thieme Verlag KG'
 - model: citation
   name: wang_artificial_2025
+  name_de: "Künstliche Intelligenz zur Verringerung übersehener Adenome und Polypen bei der Koloskopie: systematische Übersicht und Metaanalyse"
   citation_key: wang_artificial_2025
   title: 'Artificial intelligence for reducing missed detection of adenomas and polyps
     in colonoscopy: A systematic review and meta-analysis'
@@ -6345,6 +6435,7 @@
       and polyps in colonoscopy
 - model: citation
   name: wang_development_2018
+  name_de: "Entwicklung und Validierung eines Deep-Learning-Algorithmus zur Polypenerkennung während der Koloskopie"
   citation_key: wang_development_2018
   title: Development and validation of a deep-learning algorithm for the detection
     of polyps during colonoscopy
@@ -6411,6 +6502,7 @@
     pmid: '31015647'
 - model: citation
   name: wang_effect_2020
+  name_de: "Einfluss eines Deep-Learning-basierten Erkennungssystems auf die Adenomerkennung während der Koloskopie (CADe-DB): doppelblinde randomisierte Studie"
   citation_key: wang_effect_2020
   title: 'Effect of a deep-learning computer-aided detection system on adenoma detection
     during colonoscopy (CADe-DB trial): a double-blind randomised study'
@@ -6447,6 +6539,7 @@
     note: 'publisher: Elsevier'
 - model: citation
   name: wang_effect_2020-1
+  name_de: "Einfluss eines Deep-Learning-basierten Erkennungssystems auf die Adenomerkennung während der Koloskopie (CADe-DB): doppelblinde randomisierte Studie"
   citation_key: wang_effect_2020-1
   title: 'Effect of a deep-learning computer-aided detection system on adenoma detection
     during colonoscopy (CADe-DB trial): a double-blind randomised study'
@@ -6485,6 +6578,7 @@
     note: 'Publisher: Elsevier'
 - model: citation
   name: wang_real-time_2019
+  name_de: "Automatische Echtzeiterkennung erhöht Polypen- und Adenomdetektionsraten bei der Koloskopie: prospektive randomisierte kontrollierte Studie"
   citation_key: wang_real-time_2019
   title: 'Real-time automatic detection system increases colonoscopic polyp and adenoma
     detection rates: a prospective randomised controlled study'
@@ -6570,6 +6664,7 @@
       and adenoma detection rates
 - model: citation
   name: wei_artificial_2024
+  name_de: "KI-gestützte Koloskopie im klinischen Alltag: systematische Übersicht und Metaanalyse"
   citation_key: wei_artificial_2024
   title: 'Artificial Intelligence-Assisted Colonoscopy in Real-World Clinical Practice:
     A Systematic Review and Meta-Analysis'
@@ -6648,6 +6743,7 @@
       Practice
 - model: citation
   name: wei_evaluation_2022
+  name_de: "Bewertung computergestützter Erkennung bei Koloskopien in der wohnortnahen Versorgung (AI-SEE): multizentrische randomisierte klinische Studie"
   citation_key: wei_evaluation_2022
   title: 'Evaluation of Computer-Aided Detection During Colonoscopy in the Community
     (AI-SEE): A Multicenter Randomized Clinical Trial'
@@ -6750,6 +6846,7 @@
       (AI-SEE)
 - model: citation
   name: wendon_easl_2017
+  name_de: "Klinische EASL-Leitlinie zur Behandlung des akuten (fulminanten) Leberversagens"
   citation_key: wendon_easl_2017
   title: EASL Clinical Practical Guidelines on the management of acute (fulminant)
     liver failure
@@ -6781,6 +6878,7 @@
     note: 'Publisher: Elsevier'
 - model: citation
   name: wiest_deep_2024
+  name_de: "Deep sight: Verbesserung der Erfassung periprozeduraler unerwünschter Ereignisse in der Endoskopie durch datenschutzwahrende Strukturierung von Textdokumentation mit großen Sprachmodellen"
   citation_key: wiest_deep_2024
   title: 'Deep sight: enhancing periprocedural adverse event recording in endoscopy
     by structuring text documentation with privacy-preserving large language models'
@@ -6886,6 +6984,7 @@
     shorttitle: Deep sight
 - model: citation
   name: xu_artificial_2021
+  name_de: "KI-gestützte Koloskopie: prospektive multizentrische randomisierte kontrollierte Studie zur Polypenerkennung"
   citation_key: xu_artificial_2021
   title: 'Artificial intelligence-assisted colonoscopy: A prospective, multicenter,
     randomized controlled trial of polyp detection'
@@ -6967,6 +7066,7 @@
     shorttitle: Artificial intelligence-assisted colonoscopy
 - model: citation
   name: xu_artificial_2023
+  name_de: "KI-gestützte Koloskopie zur Darmkrebsvorsorge: multizentrische randomisierte kontrollierte Studie"
   citation_key: xu_artificial_2023
   title: 'Artificial Intelligence–Assisted Colonoscopy for Colorectal Cancer Screening:
     A Multicenter Randomized Controlled Trial'
@@ -7081,6 +7181,7 @@
       Screening
 - model: citation
   name: yao_effect_2022
+  name_de: "Einfluss eines KI-basierten Qualitätsverbesserungssystems auf die Wirksamkeit computergestützter Erkennung in der Koloskopie: Parallelgruppenstudie mit vier Gruppen"
   citation_key: yao_effect_2022
   title: 'Effect of an artificial intelligence-based quality improvement system on
     efficacy of a computer-aided detection system in colonoscopy: a four-group parallel
@@ -7133,6 +7234,7 @@
       on efficacy of a computer-aided detection system in colonoscopy
 - model: citation
   name: zhao_magnitude_2019
+  name_de: "Ausmaß, Risikofaktoren und Einflussfaktoren der Adenomübersehensrate bei Tandemkoloskopien: systematische Übersicht und Metaanalyse"
   citation_key: zhao_magnitude_2019
   title: 'Magnitude, Risk Factors, and Factors Associated With Adenoma Miss Rate of
     Tandem Colonoscopy: A Systematic Review and Meta-analysis'
@@ -7247,6 +7349,7 @@
       Rate of Tandem Colonoscopy
 - model: citation
   name: zimmermann-fraedrich_no_2025
+  name_de: "Kein Effekt computergestützter Diagnose auf die Adenomerkennung bei Koloskopien in einer großen pragmatischen multizentrischen randomisierten Studie"
   citation_key: zimmermann-fraedrich_no_2025
   title: No Effect of Computer-Aided Diagnosis on Colonoscopic Adenoma Detection in
     a Large Pragmatic Multicenter Randomized Study

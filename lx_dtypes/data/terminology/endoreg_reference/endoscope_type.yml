@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: endoscope_type
+  name_de: "Endoskoptypen"
   payload:
     schema_version: '1.0'
     records:

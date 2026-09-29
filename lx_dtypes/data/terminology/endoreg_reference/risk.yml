@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: risk
+  name_de: "Risiken"
   payload:
     schema_version: '1.0'
     records:

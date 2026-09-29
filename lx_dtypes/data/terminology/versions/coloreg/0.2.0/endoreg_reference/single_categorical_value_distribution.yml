@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: single_categorical_value_distribution
+  name_de: "Verteilungen einzelner kategorialer Werte"
   payload:
     schema_version: '1.0'
     records:

@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: medication_schedule
+  name_de: "Medikationspläne"
   payload:
     schema_version: '1.0'
     records:

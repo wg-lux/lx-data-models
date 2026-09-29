@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: qualification
+  name_de: "Qualifikationen"
   payload:
     schema_version: '1.0'
     records:

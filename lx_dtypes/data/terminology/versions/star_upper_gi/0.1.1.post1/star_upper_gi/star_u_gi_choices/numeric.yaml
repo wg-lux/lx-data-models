@@ -1,9 +1,11 @@
 - model: classification_choice
   name: distance_cm
+  name_de: "Abstand in Zentimetern"
   classification_choice_descriptors:
     - length_cm_descriptor
 
 - model: classification_choice
   name: size_mm
+  name_de: "Größe in Millimetern"
   classification_choice_descriptors:
     - length_mm_descriptor

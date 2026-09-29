@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: emission_factor
+  name_de: "Emissionsfaktoren"
   payload:
     schema_version: '1.0'
     records:

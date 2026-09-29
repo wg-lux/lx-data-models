@@ -1,4 +1,5 @@
 name: lx_unit_types
+name_de: "LX Einheit Typen"
 description: Unit utility data.
 version: 0.1.0
 modules: []

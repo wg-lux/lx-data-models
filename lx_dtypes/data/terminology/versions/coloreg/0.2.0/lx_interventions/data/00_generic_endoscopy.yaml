@@ -1,5 +1,6 @@
 - model: intervention
   name: endoscopy_injection_liftup
+  name_de: "Endoskopische Unterspritzung zur Anhebung"
   description: Lift-up injection is a technique used to lift up a lesion in the
     colon. It is performed by injecting a solution under the lesion to create a
     cushion of fluid that lifts the lesion away from the colon wall. This allows
@@ -11,6 +12,7 @@
 
 - model: intervention
   name: endoscopy_foreign_body_removal_generic
+  name_de: "Endoskopische Fremdkörperentfernung"
   description:
     Foreign body removal is a technique used to remove objects that have
     been accidentally swallowed and are stuck in the colon.
@@ -20,6 +22,7 @@
 
 - model: intervention
   name: endoscopy_foreign_body_removal_grasper
+  name_de: "Endoskopische Fremdkörperentfernung mit Greifzange"
   description:
     Foreign body removal with grasper is a technique used to remove objects
     that have been accidentally swallowed and are stuck in the colon using a grasper tool.
@@ -29,6 +32,7 @@
 
 - model: intervention
   name: endoscopy_foreign_body_removal_net
+  name_de: "Endoskopische Fremdkörperentfernung mit Netz"
   description:
     Foreign body removal with net is a technique used to remove objects
     that have been accidentally swallowed and are stuck in the colon using a net tool.
@@ -38,9 +42,11 @@
 
 - model: intervention
   name: endoscopy_foreign_body_removal_snare
+  name_de: "Endoskopische Fremdkörperentfernung mit Schlinge"
 
 - model: intervention
   name: endoscopy_biopsy_grasper_generic
+  name_de: "Endoskopische Zangenbiopsie"
   description: Biopsy is a technique used to take a small sample of tissue from
     a lesion in the colon. It is performed by inserting a small instrument through
     the colonoscope and removing a small piece of tissue from the lesion. The tissue

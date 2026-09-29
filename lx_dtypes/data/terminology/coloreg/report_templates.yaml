@@ -26,6 +26,7 @@
       in millimetres.
 - model: report_template_section
   name: coloreg_colonoscopy_polyps
+  name_de: "ColoReg – Kolonpolypen"
   title_de: Polypen
   title_en: Polyps
   position: 0
@@ -131,6 +132,7 @@
     applicability_rule: Required for each recorded resection attempt.
 - model: report_template_section
   name: coloreg_polyp_resection_section
+  name_de: "ColoReg – Polypenresektion"
   title_de: Interventionen und Indexkomplikationen
   title_en: Interventions and index complications
   position: 1
@@ -226,6 +228,7 @@
     applicability_rule: Required for each recorded follow-up assessment.
 - model: report_template_section
   name: coloreg_polyp_follow_up_section
+  name_de: "ColoReg – Polypennachsorge"
   title_de: Nachsorge und verzögerte Komplikationen
   title_en: Follow-up and delayed complications
   position: 2

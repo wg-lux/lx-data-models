@@ -3,6 +3,7 @@
 # - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
 - model: classification
   name: "visualized"
+  name_de: "Dargestellt"
   classification_types:
     - inferrable
   classification_choices:
@@ -11,6 +12,7 @@
 
 - model: classification
   name: "examination_setting_generic_location"
+  name_de: "Versorgungsform"
   classification_types: []
   classification_choices:
     - examination_setting_generic_location_inpatient

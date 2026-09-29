@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: endoscopy_processor
+  name_de: "Endoskopieprozessoren"
   payload:
     schema_version: '1.0'
     records:

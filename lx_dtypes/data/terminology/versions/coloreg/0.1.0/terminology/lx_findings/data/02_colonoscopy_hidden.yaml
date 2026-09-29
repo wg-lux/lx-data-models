@@ -1,5 +1,6 @@
 - model: finding
   name: "cecum"
+  name_de: "Zökum"
   description: "Anatomical structure: Cecum"
   finding_types:
     - anatomy
@@ -9,6 +10,7 @@
 
 - model: finding
   name: "terminal_ileum"
+  name_de: "Terminales Ileum"
   description: "Anatomical structure: Terminal ileum"
   finding_types:
     - anatomy
@@ -18,6 +20,7 @@
 
 - model: finding
   name: "appendiceal_orifice"
+  name_de: "Appendixostium"
   description: "Anatomical structure: Appendiceal orifice"
   finding_types:
     - anatomy
@@ -27,6 +30,7 @@
 
 - model: finding
   name: "ileocecal_valve"
+  name_de: "Ileozökalklappe"
   description: "Anatomical structure: Ileocecal valve"
   finding_types:
     - anatomy
@@ -36,6 +40,7 @@
 
 - model: finding
   name: "ascending_colon"
+  name_de: "Colon ascendens"
   description: "Anatomical structure: Ascending colon"
   finding_types:
     - anatomy
@@ -45,6 +50,7 @@
 
 - model: finding
   name: "right_flexure"
+  name_de: "Rechte Kolonflexur"
   description: "Anatomical structure: Right flexure"
   finding_types:
     - anatomy
@@ -54,6 +60,7 @@
 
 - model: finding
   name: "transverse_colon"
+  name_de: "Colon transversum"
   description: "Anatomical structure: Transverse colon"
   finding_types:
     - anatomy
@@ -63,6 +70,7 @@
 
 - model: finding
   name: "left_flexure"
+  name_de: "Linke Kolonflexur"
   description: "Anatomical structure: Left flexure"
   finding_types:
     - anatomy
@@ -72,6 +80,7 @@
 
 - model: finding
   name: "descending_colon"
+  name_de: "Colon descendens"
   description: "Anatomical structure: Descending colon"
   finding_types:
     - anatomy
@@ -81,6 +90,7 @@
 
 - model: finding
   name: "sigmoid_colon"
+  name_de: "Colon sigmoideum"
   description: "Anatomical structure: Sigmoid colon"
   finding_types:
     - anatomy
@@ -90,6 +100,7 @@
 
 - model: finding
   name: "rectum"
+  name_de: "Rektum"
   description: "Anatomical structure: Rectum"
   finding_types:
     - anatomy
@@ -99,6 +110,7 @@
 
 - model: finding
   name: "rectum_anus"
+  name_de: "Rektum und Anus"
   description: "Anatomical structure: Rectum and anus"
   finding_types:
     - anatomy

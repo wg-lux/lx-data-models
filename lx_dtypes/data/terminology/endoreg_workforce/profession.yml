@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: profession
+  name_de: "Berufe"
   payload:
     schema_version: '1.0'
     records:

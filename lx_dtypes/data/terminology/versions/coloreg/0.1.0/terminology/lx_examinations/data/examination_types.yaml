@@ -1,3 +1,4 @@
 - model: examination_type
   name: endoscopic_procedure
+  name_de: "Endoskopischer Eingriff"
   description: An examination performed using an endoscope to visualize internal organs or structures.

@@ -1,14 +1,17 @@
 - model: finding
   name: "coro_des_implantation"
+  name_de: "Implantation eines medikamentenfreisetzenden Koronarstents"
   tags:
     - event
 
 - model: finding
   name: "coro_bms_implantation"
+  name_de: "Implantation eines unbeschichteten Koronarstents"
   tags:
     - event
 
 - model: finding
   name: "complication_coro_stent_thrombosis"
+  name_de: "Koronare Stentthrombose"
   tags:
     - event

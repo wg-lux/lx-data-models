@@ -1,4 +1,5 @@
 name: endoreg_green_endoscopy
+name_de: "EndoReg nachhaltige Endoskopie"
 description: Versioned optional Green Endoscopy resource and product definitions.
 version: 1.0.0
 modules: []

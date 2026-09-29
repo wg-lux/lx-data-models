@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: lab_value
+  name_de: "Laborwerte"
   payload:
     schema_version: '1.0'
     records:

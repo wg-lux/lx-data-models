@@ -1,3 +1,4 @@
 - model: indication_type
   name: "default_indication_type"
+  name_de: "Standard-Indikationstyp"
   description: "Default indication type"

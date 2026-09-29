@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: endoscope
+  name_de: "Endoskope"
   payload:
     schema_version: '1.0'
     records:

@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: center_resource
+  name_de: "Ressourcen der Zentren"
   payload:
     schema_version: '1.0'
     records:

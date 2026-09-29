@@ -31,7 +31,7 @@
 - model: classification
   name: "bowel_prep_boston"
   classification_types: ["bowel_prep"]
-  name_de: "Boston Bowel Preparation Scale"
+  name_de: "Boston-Skala zur Darmvorbereitung"
   name_en: "Boston Bowel Preparation Scale"
   classification_choices:
     [
@@ -44,7 +44,7 @@
 - model: classification
   name: "bowel_prep_boston_simplified"
   classification_types: ["bowel_prep"]
-  name_de: "Boston Bowel Preparation Scale"
+  name_de: "Boston-Skala zur Darmvorbereitung"
   name_en: "Boston Bowel Preparation Scale"
   classification_choices:
     [
@@ -58,7 +58,7 @@
 - model: classification
   name: "bowel_prep_aronchick"
   classification_types: ["bowel_prep"]
-  name_de: "Aronchick Bowel Preparation Scale"
+  name_de: "Aronchick-Skala zur Darmvorbereitung"
   name_en: "Aronchick Bowel Preparation Scale"
   classification_choices:
     [

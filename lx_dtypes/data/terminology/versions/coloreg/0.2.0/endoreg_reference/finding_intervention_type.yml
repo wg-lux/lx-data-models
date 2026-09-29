@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: finding_intervention_type
+  name_de: "Befundinterventionstypen"
   payload:
     schema_version: '1.0'
     records:

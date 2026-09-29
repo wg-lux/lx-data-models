@@ -1,17 +1,23 @@
 - model: finding_type
   name: "preprocedure"
+  name_de: "Vor der Untersuchung"
 
 - model: finding_type
   name: "periprocedure"
+  name_de: "Während der Untersuchung"
 
 - model: finding_type
   name: "postprocedure"
+  name_de: "Nach der Untersuchung"
 
 - model: finding_type
   name: mandatory
+  name_de: "Erforderlich"
 
 - model: finding_type
   name: optional
+  name_de: "Optional"
 
 - model: finding_type
   name: conditonal
+  name_de: "Bedingt erforderlich"

@@ -20,6 +20,7 @@
 
 - model: report_template_section
   name: coloreg_colonoscopy_polyps
+  name_de: "ColoReg – Kolonpolypen"
   title_de: Polypen
   title_en: Polyps
   position: 0

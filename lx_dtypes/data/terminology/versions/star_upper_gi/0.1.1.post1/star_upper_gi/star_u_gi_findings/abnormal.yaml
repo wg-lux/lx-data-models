@@ -1,6 +1,7 @@
 # Generic
 - model: finding
   name: star_upper_gi_polyp
+  name_de: "Polyp"
   classifications:
     - star_upper_gi_location_classification
     - star_upper_gi_location_esophagus_distance_z_line
@@ -12,6 +13,7 @@
 
 - model: finding
   name: star_upper_gi_ulcer
+  name_de: "Ulkus"
   classifications:
     - star_upper_gi_forrest
     - star_upper_gi_location_classification
@@ -20,6 +22,7 @@
 # Esophagus
 - model: finding
   name: star_upper_gi_esophagus_ectopic_mucosa
+  name_de: "Ektope Schleimhaut im Ösophagus"
   classifications:
     - distance_cm
     - size_oval_mm
@@ -27,6 +30,7 @@
 
 - model: finding
   name: star_upper_gi_esophagus_diverticulum
+  name_de: "Ösophagusdivertikel"
   classifications:
     - distance_cm
     - size_oval_mm
@@ -34,24 +38,28 @@
 
 - model: finding
   name: star_upper_gi_esophagus_barretts
+  name_de: "Barrett-Ösophagus"
   classifications:
     - star_upper_gi_barrett_praque_classification
     - additional_text_info
 
 - model: finding
   name: star_upper_gi_esophagus_varices
+  name_de: "Ösophagusvarizen"
   classifications:
     - star_upper_gi_esophagus_varices_baveno
     - additional_text_info
 
 - model: finding
   name: star_upper_gi_esophagitis
+  name_de: "Ösophagitis"
   classifications:
     - star_upper_gi_los_angeles_classification
     - additional_text_info
 
 - model: finding
   name: star_upper_gi_esophagitis_eosinophilic
+  name_de: "Eosinophile Ösophagitis"
   classifications:
     - star_upper_gi_erefs_edema
     - star_upper_gi_erefs_rings
@@ -62,6 +70,7 @@
 
 - model: finding
   name: star_upper_gi_esophagitis_caustic
+  name_de: "Verätzungsösophagitis"
   classifications:
     - star_upper_gi_zargar
     - additional_text_info
@@ -70,6 +79,7 @@
 
 - model: finding
   name: star_upper_gi_stomach_varices
+  name_de: "Magenvarizen"
   classifications:
     - star_upper_gi_stomach_varices_sarin
     - additional_text_info
@@ -77,6 +87,7 @@
 # Duodenum
 - model: finding
   name: star_upper_gi_duodenum_diverticulum
+  name_de: "Duodenaldivertikel"
   classifications:
     - size_oval_mm
     - star_upper_gi_location_duodenum

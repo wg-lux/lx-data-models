@@ -2,6 +2,7 @@
 # - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
 - model: finding
   name: "examination_setting"
+  name_de: "Untersuchungsrahmen"
   finding_types:
     - baseline
   description: "Settings related to the examination environment and conditions."
@@ -21,6 +22,7 @@
 
 - model: finding
   name: "post_resection_wound"
+  name_de: "Resektionswunde"
   description: "Postresection Wound"
   finding_types:
     - observation

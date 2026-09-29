@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: examination_type
+  name_de: "Untersuchungstypen"
   payload:
     schema_version: '1.0'
     records:

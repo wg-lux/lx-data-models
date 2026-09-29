@@ -1,4 +1,5 @@
 name: lx_hardware
+name_de: "LX hardware"
 description: |
   A sample knowledge base module containing our current working state.
 version: 0.1.0

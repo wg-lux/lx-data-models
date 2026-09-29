@@ -1,9 +1,11 @@
 - model: classification_choice
   name: star_upper_gi_barrett_praque_c_value
+  name_de: "Zirkumferenzielle Ausdehnung (C)"
   classification_choice_descriptors:
     - length_cm_descriptor
 
 - model: classification_choice
   name: star_upper_gi_barrett_praque_m_value
+  name_de: "Maximale Ausdehnung (M)"
   classification_choice_descriptors:
     - length_cm_descriptor

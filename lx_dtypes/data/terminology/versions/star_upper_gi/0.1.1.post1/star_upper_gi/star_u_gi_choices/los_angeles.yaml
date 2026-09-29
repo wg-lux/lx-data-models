@@ -1,12 +1,16 @@
 - model: classification_choice
   name: star_upper_gi_los_angeles_classification_a
+  name_de: "Los Angeles A"
   description: "Grade A esophagitis: One or more mucosal break ≤ 5 mm that does not extend between the tops of two mucosal folds."
 - model: classification_choice
   name: star_upper_gi_los_angeles_classification_b
+  name_de: "Los Angeles B"
   description: "Grade B esophagitis: One or more mucosal break > 5 mm that does not extend between the tops of two mucosal folds."
 - model: classification_choice
   name: star_upper_gi_los_angeles_classification_c
+  name_de: "Los Angeles C"
   description: "Grade C esophagitis: One or more mucosal break that is continuous between the tops of two or more mucosal folds but that involves < 75 % of the circumference."
 - model: classification_choice
   name: star_upper_gi_los_angeles_classification_d
+  name_de: "Los Angeles D"
   description: "Grade D esophagitis: One or more mucosal break that involves ≥ 75 % of the esophageal circumference."

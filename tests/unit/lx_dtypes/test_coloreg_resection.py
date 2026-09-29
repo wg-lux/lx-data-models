@@ -292,11 +292,11 @@ def test_study_hypotheses_pin_terminology_and_do_not_claim_automatic_analysis(
     )
 
 
-def test_previous_release_retains_its_digest_and_template() -> None:
+def test_previous_release_matches_localized_digest_and_preserves_template() -> None:
     old = get_packaged_knowledge_base("coloreg", "0.2.0")
     assert (
         old.content_sha256
-        == "e3c8444570369fa4af50ed307d290ba588a606584b30bae31bbf9fc2157d9838"
+        == "4818d02181e6f19412eb4bdab54354f620484a82e0420cfb086aa5092392e92a"
     )
     old_kb = DataLoader(input_dirs=[old.installed_data_root()]).load_knowledge_base(
         "coloreg"

@@ -1,29 +1,39 @@
 - model: classification_type
   name: "default_classification_type"
+  name_de: "Standard-Klassifikationstyp"
 
 - model: classification_type
   name: "inferrable"
+  name_de: "Ableitbar"
 
 - model: classification_type
   name: "histology"
+  name_de: "Histologie"
 
 - model: classification_type
   name: "size"
+  name_de: "Größe"
 
 - model: classification_type
   name: "planarity"
+  name_de: "Planarität"
 
 - model: classification_type
   name: "morphology"
+  name_de: "Morphologie"
 
 - model: classification_type
   name: "location"
+  name_de: "Lokalisation"
 
 - model: classification_type
   name: "bowel_prep"
+  name_de: "Darmvorbereitung"
 
 - model: classification_type
   name: "capillary_pattern"
+  name_de: "Kapillarmuster"
 
 - model: classification_type
   name: "colon_lesion_advanced_imaging"
+  name_de: "Erweiterte Bildgebung von Kolonläsionen"

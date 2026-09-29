@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: unit
+  name_de: "Einheiten"
   payload:
     schema_version: '1.0'
     records:

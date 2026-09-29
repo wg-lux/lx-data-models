@@ -1,23 +1,31 @@
 - model: finding_type
   name: "default_finding_type"
+  name_de: "Standard-Befundtyp"
 
 - model: finding_type
   name: "complication"
+  name_de: "Komplikation"
 
 - model: finding_type
   name: "baseline"
+  name_de: "Ausgangsbefund"
 
 - model: finding_type
   name: "observation"
+  name_de: "Beobachtung"
 
 - model: finding_type
   name: "iatrogenic"
+  name_de: "Iatrogen"
 
 - model: finding_type
   name: "persisting"
+  name_de: "Fortbestehend"
 
 - model: finding_type
   name: "anatomy"
+  name_de: "Anatomie"
 
 - model: finding_type
   name: "hidden"
+  name_de: "Ausgeblendet"

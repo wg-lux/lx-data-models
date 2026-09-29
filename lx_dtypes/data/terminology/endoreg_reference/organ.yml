@@ -1,5 +1,6 @@
 - model: reference_catalog
   name: organ
+  name_de: "Organe"
   payload:
     schema_version: '1.0'
     records:

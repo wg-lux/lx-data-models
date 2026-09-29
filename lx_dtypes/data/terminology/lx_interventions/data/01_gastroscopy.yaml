@@ -1,14 +1,19 @@
 - model: intervention
   name: egd_percutaneous_gastroenterostomy
+  name_de: "Perkutane Gastroenterostomie"
 
 - model: intervention
   name: egd_percutaneous_jejunostomy
+  name_de: "Perkutane Jejunostomie"
 
 - model: intervention
   name: egd_poem
+  name_de: "Perorale endoskopische Myotomie (POEM)"
 
 - model: intervention
   name: egd_stepwise_biopsy
+  name_de: "Stufenbiopsien"
 
 - model: intervention
   name: egd_esophagus_injection_botox
+  name_de: "Botulinumtoxin-Injektion in den Ösophagus"
