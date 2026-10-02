@@ -1,0 +1,96 @@
+- model: reference_catalog
+  name: endoscope
+  name_de: "Endoskope"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: default_colonoscope_bbk
+      record_type: endoscope
+      sn: '5'
+      center:
+        name: bbk_regensburg
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_colonoscope_rbk
+      record_type: endoscope
+      sn: '3'
+      center:
+        name: rbk_stuttgart
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_colonoscope_rkh
+      record_type: endoscope
+      sn: '9'
+      center:
+        name: rkh_ludwigsburg
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_colonoscope_uke
+      record_type: endoscope
+      sn: '7'
+      center:
+        name: uke_hamburg
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_colonoscope_ukw
+      record_type: endoscope
+      sn: '1'
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_gastroscope_bbk
+      record_type: endoscope
+      sn: '6'
+      center:
+        name: bbk_regensburg
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null
+    - name: default_gastroscope_rbk
+      record_type: endoscope
+      sn: '4'
+      center:
+        name: rbk_stuttgart
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null
+    - name: default_gastroscope_rkh
+      record_type: endoscope
+      sn: '10'
+      center:
+        name: rkh_ludwigsburg
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null
+    - name: default_gastroscope_uke
+      record_type: endoscope
+      sn: '8'
+      center:
+        name: uke_hamburg
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null
+    - name: default_gastroscope_ukw
+      record_type: endoscope
+      sn: '2'
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null

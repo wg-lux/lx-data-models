@@ -1,0 +1,24 @@
+- model: reference_catalog
+  name: medication_indication_type
+  name_de: "Medikationsindikationstypen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: deep_vein_thrombosis-treatment
+      record_type: medication_indication_type
+    - name: disease
+      record_type: medication_indication_type
+    - name: event
+      record_type: medication_indication_type
+    - name: pulmonary_embolism-treatment
+      record_type: medication_indication_type
+    - name: thrombembolism-prevention-recurrent_thrombembolism
+      record_type: medication_indication_type
+    - name: thromboembolism-prevention-after_hip_replacement
+      record_type: medication_indication_type
+    - name: thromboembolism-prevention-after_knee_replacement
+      record_type: medication_indication_type
+    - name: thromboembolism-prevention-non_valvular_af
+      record_type: medication_indication_type
+    - name: thromboembolism-prevention-recurrent_thrombembolism
+      record_type: medication_indication_type

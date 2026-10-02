@@ -1,0 +1,11 @@
+name: report_template_examples
+name_de: "Bericht template examples"
+version: 0.1.1
+modules: []
+depends_on:
+  - dgvs_reporting
+  - star_upper_gi
+
+data:
+  files:
+    - "./report_templates.yaml"

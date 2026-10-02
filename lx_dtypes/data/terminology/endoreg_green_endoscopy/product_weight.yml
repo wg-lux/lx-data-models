@@ -1,0 +1,127 @@
+- model: reference_catalog
+  name: product_weight
+  name_de: "Produktgewichte"
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: product_weight
+      name: weight_absorbant_pad
+      product:
+        name: absorbant_pad
+        version: null
+      measured: 0.092
+      verified: 0.057
+      manufacturer: null
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_biliary_stent_cotton_leung_sof_flex
+      product:
+        name: biliary_stent_cotton_leung_sof_flex
+        version: null
+      measured: 0.061
+      verified: 0.058
+      manufacturer: null
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_biopsy_grasper_hot_radial_jaw_4
+      product:
+        name: biopsy_grasper_hot_radial_jaw_4
+        version: null
+      measured: 0.067
+      verified: 0.076
+      manufacturer: 0.15
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_bite_protector
+      product:
+        name: bite_protector
+        version: null
+      measured: 0.014
+      verified: 0.013
+      manufacturer: null
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_esophageal_dilator
+      product:
+        name: esophageal_dilator
+        version: null
+      measured: null
+      verified: 0.134
+      manufacturer: null
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_extraction_balloon_escort_2
+      product:
+        name: extraction_balloon_escort_2
+        version: null
+      measured: 0.077
+      verified: 0.074
+      manufacturer: 0.1862
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_foliodress_gown_standard
+      product:
+        name: foliodress_gown_standard
+        version: null
+      measured: 0.094
+      verified: 0.036
+      manufacturer: null
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_nitinol_stent_aix_oel
+      product:
+        name: nitinol_stent_aix_oel
+        version: null
+      measured: null
+      verified: 0.413
+      manufacturer: null
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_peg_freka_15_ch
+      product:
+        name: peg_freka_15_ch
+        version: null
+      measured: 0.234
+      verified: 0.228
+      manufacturer: 0.037
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_pressure_syringe_60_ml
+      product:
+        name: pressure_syringe_60_ml
+        version: null
+      measured: 0.146
+      verified: 0.143
+      manufacturer: 0.25
+      unit:
+        name: kilogram
+        version: null
+    - record_type: product_weight
+      name: weight_visiglide_2
+      product:
+        name: visiglide_2
+        version: null
+      measured: 0.19
+      verified: 0.194
+      manufacturer: 0.27
+      unit:
+        name: kilogram
+        version: null

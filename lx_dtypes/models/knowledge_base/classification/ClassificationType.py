@@ -1,5 +1,3 @@
-from typing import List
-
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
 )
@@ -10,7 +8,7 @@ from .ClassificationTypeDataDict import ClassificationTypeDataDict
 
 class ClassificationType(KnowledgebaseBaseModel[ClassificationTypeDataDict]):
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Return the list of field names that identify classification types.
 

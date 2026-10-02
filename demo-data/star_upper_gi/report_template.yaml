@@ -1,0 +1,53 @@
+- model: report_template_section
+  name: star_upper_gi_esophagus
+  position: 0
+  types:
+    - findings
+  findings:
+    - star_upper_gi_mucosa_esophagus_abnormal
+    - star_upper_gi_location_esophagogastric_junction
+    - star_upper_gi_location_hiatus
+    - star_upper_gi_location_squamocolumnar_junction
+    - star_upper_gi_imaging_modality_esophagus
+    - star_upper_gi_esophagus_ectopic_mucosa
+    - star_upper_gi_esophagus_barretts
+    - star_upper_gi_esophagus_diverticulum
+    - star_upper_gi_esophagus_varices
+    - star_upper_gi_esophagitis
+    - star_upper_gi_esophagitis_eosinophilic
+    - star_upper_gi_esophagitis_caustic
+
+- model: report_template_section
+  name: star_upper_gi_stomach
+  position: 1
+  types:
+    - findings
+  findings:
+    - star_upper_gi_mucosa_stomach_abnormal
+    - star_upper_gi_chromoendoscopy_stomach
+    - star_upper_gi_stomach_varices
+    - star_upper_gi_polyp
+    - star_upper_gi_ulcer
+
+- model: report_template_section
+  name: star_upper_gi_duodenum
+  position: 2
+  types:
+    - findings
+  findings:
+    - star_upper_gi_mucosa_duodenum_abnormal
+    - star_upper_gi_vili_duodenum_atrophic
+    - star_upper_gi_papilla_major_visualized
+    - star_upper_gi_papilla_minor_visualized
+    - star_upper_gi_duodenum_diverticulum
+
+- model: report_template
+  name: star_upper_gi_main
+  examination: star_upper_gi_endoscopy
+  report_sections:
+    - star_upper_gi_esophagus
+    - star_upper_gi_stomach
+    - star_upper_gi_duodenum
+  validators:
+    examination_validators: []
+    findings_validators: []

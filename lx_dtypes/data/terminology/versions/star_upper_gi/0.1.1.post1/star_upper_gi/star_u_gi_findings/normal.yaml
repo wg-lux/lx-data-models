@@ -1,0 +1,68 @@
+# Esophagus
+- model: finding
+  name: star_upper_gi_mucosa_esophagus_abnormal
+  name_de: "Auffälligkeit der Ösophagusschleimhaut"
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_location_esophagogastric_junction
+  name_de: "Lage des gastroösophagealen Übergangs"
+  classifications:
+    - distance_cm
+
+- model: finding
+  name: star_upper_gi_location_hiatus
+  name_de: "Lage des Hiatus"
+  classifications:
+    - distance_cm
+
+- model: finding
+  name: star_upper_gi_location_squamocolumnar_junction
+  name_de: "Lage der Z-Linie"
+  classifications:
+    - distance_cm
+
+- model: finding
+  name: star_upper_gi_imaging_modality_esophagus
+  name_de: "Bildgebungsverfahren am Ösophagus"
+  classifications:
+    - upper_gi_esophagus_imaging_modality_classification
+
+# Stomach
+- model: finding
+  name: star_upper_gi_mucosa_stomach_abnormal
+  name_de: "Auffälligkeit der Magenschleimhaut"
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_chromoendoscopy_stomach
+  name_de: "Chromoendoskopie des Magens"
+  classifications:
+    - yes_no_unknown_classification
+
+# Duodenum
+- model: finding
+  name: star_upper_gi_mucosa_duodenum_abnormal
+  name_de: "Auffälligkeit der Duodenalschleimhaut"
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_vili_duodenum_atrophic
+  name_de: "Atrophie der Duodenalzotten"
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_papilla_major_visualized
+  name_de: "Papilla major eingesehen"
+  classifications:
+    - yes_no_unknown_classification
+
+- model: finding
+  name: star_upper_gi_papilla_minor_visualized
+  name_de: "Papilla minor eingesehen"
+  classifications:
+    - yes_no_unknown_classification

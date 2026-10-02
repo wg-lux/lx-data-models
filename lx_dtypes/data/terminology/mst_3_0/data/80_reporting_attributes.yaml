@@ -1,0 +1,108 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Typed reporting controls derived from the attribute columns in MST 3.0.
+# The mst30_ prefix documents these reusable lx-dtypes structures as a
+# traceable implementation layer; the underlying MST field content is unchanged.
+
+- {model: classification_type, name: mst30_attribute, name_de: MST-Attribut, name_en: MST attribute}
+- {model: unit, name: mst30_millimeter, abbreviation: mm, name_de: Millimeter, name_en: Millimeter}
+- {model: unit, name: mst30_centimeter, abbreviation: cm, name_de: Zentimeter, name_en: Centimeter}
+- {model: unit, name: mst30_milliliter, abbreviation: ml, name_de: Milliliter, name_en: Milliliter}
+- {model: unit, name: mst30_french, abbreviation: Fr, name_de: French, name_en: French}
+- {model: unit, name: mst30_count, abbreviation: count, name_de: Anzahl, name_en: Count}
+
+- model: classification_choice_descriptor
+  name: mst30_size_mm_value
+  name_de: Größe in Millimetern
+  name_en: Size in millimeters
+  classification_choice_descriptor_type: numeric
+  unit: mst30_millimeter
+  numeric_min: 0
+  numeric_max: 1000
+- model: classification_choice_descriptor
+  name: mst30_length_cm_value
+  name_de: Länge in Zentimetern
+  name_en: Length in centimeters
+  classification_choice_descriptor_type: numeric
+  unit: mst30_centimeter
+  numeric_min: 0
+  numeric_max: 1000
+- model: classification_choice_descriptor
+  name: mst30_count_value
+  name_de: Anzahl
+  name_en: Count
+  classification_choice_descriptor_type: numeric
+  unit: mst30_count
+  numeric_min: 0
+  numeric_max: 1000
+- model: classification_choice_descriptor
+  name: mst30_volume_ml_value
+  name_de: Volumen in Millilitern
+  name_en: Volume in milliliters
+  classification_choice_descriptor_type: numeric
+  unit: mst30_milliliter
+  numeric_min: 0
+  numeric_max: 10000
+- model: classification_choice_descriptor
+  name: mst30_free_text_value
+  name_de: Freitextangabe
+  name_en: Free-text value
+  classification_choice_descriptor_type: text
+  text_max_length: 1000
+
+- {model: classification_choice, name: mst30_value_size_mm, name_de: Größenangabe, name_en: Size value, classification_choice_descriptors: [mst30_size_mm_value]}
+- {model: classification_choice, name: mst30_value_length_cm, name_de: Längenangabe, name_en: Length value, classification_choice_descriptors: [mst30_length_cm_value]}
+- {model: classification_choice, name: mst30_value_count, name_de: Anzahl, name_en: Count, classification_choice_descriptors: [mst30_count_value]}
+- {model: classification_choice, name: mst30_value_volume_ml, name_de: Volumenangabe, name_en: Volume value, classification_choice_descriptors: [mst30_volume_ml_value]}
+- {model: classification_choice, name: mst30_value_free_text, name_de: Freitext, name_en: Free text, classification_choice_descriptors: [mst30_free_text_value]}
+- {model: classification_choice, name: mst30_value_yes, name_de: Ja, name_en: "Yes"}
+- {model: classification_choice, name: mst30_value_no, name_de: Nein, name_en: "No"}
+- {model: classification_choice, name: mst30_value_unknown, name_de: Unbekannt, name_en: Unknown}
+- {model: classification_choice, name: mst30_value_single, name_de: Einzeln, name_en: Single}
+- {model: classification_choice, name: mst30_value_multiple, name_de: Mehrfach, name_en: Multiple}
+- {model: classification_choice, name: mst30_value_localised, name_de: Lokalisiert, name_en: Localised}
+- {model: classification_choice, name: mst30_value_patchy, name_de: Fleckförmig, name_en: Patchy}
+- {model: classification_choice, name: mst30_value_generalised, name_de: Generalisiert, name_en: Generalised}
+- {model: classification_choice, name: mst30_value_benign, name_de: Benigne, name_en: Benign}
+- {model: classification_choice, name: mst30_value_malignant, name_de: Maligne, name_en: Malignant}
+- {model: classification_choice, name: mst30_value_fresh, name_de: Frisch, name_en: Fresh}
+- {model: classification_choice, name: mst30_value_clot, name_de: Koagel, name_en: Clot}
+- {model: classification_choice, name: mst30_value_hematin, name_de: Hämatin, name_en: Hematin}
+- {model: classification_choice, name: mst30_value_spurting, name_de: Spritzend, name_en: Spurting}
+- {model: classification_choice, name: mst30_value_oozing, name_de: Sickernd, name_en: Oozing}
+- {model: classification_choice, name: mst30_value_stigmata, name_de: Blutungsstigmata, name_en: Stigmata}
+- {model: classification_choice, name: mst30_value_success, name_de: Erfolg, name_en: Success}
+- {model: classification_choice, name: mst30_value_partial_success, name_de: Teilerfolg, name_en: Partial success}
+- {model: classification_choice, name: mst30_value_failure, name_de: Misserfolg, name_en: Failure}
+- {model: classification_choice, name: mst30_value_probable, name_de: Wahrscheinlich, name_en: Probable}
+- {model: classification_choice, name: mst30_value_possible, name_de: Möglich, name_en: Possible}
+- {model: classification_choice, name: mst30_value_unlikely, name_de: Unwahrscheinlich, name_en: Unlikely}
+- {model: classification_choice, name: mst30_value_complete, name_de: Vollständig, name_en: Complete}
+- {model: classification_choice, name: mst30_value_incomplete, name_de: Unvollständig, name_en: Incomplete}
+- {model: classification_choice, name: mst30_value_not_applicable, name_de: Nicht zutreffend, name_en: Not applicable}
+
+- {model: classification, name: mst30_attr_size_mm, name_de: Größe, name_en: Size, classification_types: [mst30_attribute], classification_choices: [mst30_value_size_mm]}
+- {model: classification, name: mst30_attr_length_cm, name_de: Länge, name_en: Length, classification_types: [mst30_attribute], classification_choices: [mst30_value_length_cm]}
+- {model: classification, name: mst30_attr_count, name_de: Anzahl, name_en: Count, classification_types: [mst30_attribute], classification_choices: [mst30_value_count]}
+- {model: classification, name: mst30_attr_volume_ml, name_de: Volumen, name_en: Volume, classification_types: [mst30_attribute], classification_choices: [mst30_value_volume_ml]}
+- {model: classification, name: mst30_attr_type, name_de: Typ, name_en: Type, classification_types: [mst30_attribute], classification_choices: [mst30_value_free_text]}
+- {model: classification, name: mst30_attr_yes_no_unknown, name_de: Status, name_en: Status, classification_types: [mst30_attribute], classification_choices: [mst30_value_yes, mst30_value_no, mst30_value_unknown]}
+- {model: classification, name: mst30_attr_number_category, name_de: Anzahlskategorie, name_en: Number category, classification_types: [mst30_attribute], classification_choices: [mst30_value_single, mst30_value_multiple]}
+- {model: classification, name: mst30_attr_distribution, name_de: Verteilung, name_en: Distribution, classification_types: [mst30_attribute], classification_choices: [mst30_value_localised, mst30_value_patchy, mst30_value_generalised]}
+- {model: classification, name: mst30_attr_appearance, name_de: Erscheinungsbild, name_en: Appearance, classification_types: [mst30_attribute], classification_choices: [mst30_value_benign, mst30_value_malignant]}
+- {model: classification, name: mst30_attr_blood_type, name_de: Bluttyp, name_en: Blood type, classification_types: [mst30_attribute], classification_choices: [mst30_value_fresh, mst30_value_clot, mst30_value_hematin]}
+- {model: classification, name: mst30_attr_bleeding, name_de: Blutung, name_en: Bleeding, classification_types: [mst30_attribute], classification_choices: [mst30_value_spurting, mst30_value_oozing, mst30_value_clot, mst30_value_stigmata, mst30_value_no]}
+- {model: classification, name: mst30_attr_result, name_de: Ergebnis, name_en: Result, classification_types: [mst30_attribute], classification_choices: [mst30_value_success, mst30_value_partial_success, mst30_value_failure]}
+- {model: classification, name: mst30_attr_relation, name_de: Zusammenhang, name_en: Relation, classification_types: [mst30_attribute], classification_choices: [mst30_value_probable, mst30_value_possible, mst30_value_unlikely]}
+- {model: classification, name: mst30_attr_completeness, name_de: Vollständigkeit, name_en: Completeness, classification_types: [mst30_attribute], classification_choices: [mst30_value_complete, mst30_value_incomplete, mst30_value_not_applicable]}
+
+# Required template anchors. They make completeness explicit without changing
+# or pretending that MST 3.0 itself mandates local clinical workflow rules.
+- {model: finding, name: mst30_egd_documentation_status, name_de: Vollständigkeit der ÖGD-Dokumentation, name_en: EGD documentation completeness, finding_types: [mst30_luminal_finding], classifications: [mst30_attr_completeness], description: "LX reporting anchor for MST 3.0 sections 2–7."}
+- {model: finding, name: mst30_colonoscopy_documentation_status, name_de: Vollständigkeit der Koloskopie-Dokumentation, name_en: Colonoscopy documentation completeness, finding_types: [mst30_luminal_finding], classifications: [mst30_attr_completeness], description: "LX reporting anchor for MST 3.0 sections 2–7."}
+- {model: finding, name: mst30_enteroscopy_documentation_status, name_de: Vollständigkeit der Enteroskopie-Dokumentation, name_en: Enteroscopy documentation completeness, finding_types: [mst30_luminal_finding], classifications: [mst30_attr_completeness], description: "LX reporting anchor for MST 3.0 sections 2–7."}
+- {model: finding, name: mst30_vce_documentation_status, name_de: Vollständigkeit der Kapselendoskopie-Dokumentation, name_en: VCE documentation completeness, finding_types: [mst30_luminal_finding], classifications: [mst30_attr_completeness], description: "LX reporting anchor for MST 3.0 sections 2–7."}
+- {model: finding, name: mst30_ercp_documentation_status, name_de: Vollständigkeit der ERCP-Dokumentation, name_en: ERCP documentation completeness, finding_types: [mst30_ercp_finding], classifications: [mst30_attr_completeness], description: "LX reporting anchor for MST 3.0 sections 2–7."}
+- {model: finding, name: mst30_eus_documentation_status, name_de: Vollständigkeit der EUS-Dokumentation, name_en: EUS documentation completeness, finding_types: [mst30_eus_finding], classifications: [mst30_attr_completeness], description: "LX reporting anchor for MST 3.0 sections 2–7."}
+- {model: finding, name: mst30_luminal_procedure_summary, name_de: Zusammenfassung der luminalen Maßnahmen, name_en: Luminal procedure summary, finding_types: [mst30_luminal_finding], classifications: [mst30_attr_type, mst30_attr_result], interventions: [mst30_proc_luminal_sampling, mst30_proc_luminal_balloon_dilation, mst30_proc_luminal_bougie_dilation, mst30_proc_luminal_band_ligation, mst30_proc_luminal_injection_therapy, mst30_proc_luminal_clipping, mst30_proc_luminal_cautery, mst30_proc_luminal_apc, mst30_proc_luminal_polypectomy, mst30_proc_luminal_hot_biopsy, mst30_proc_luminal_foreign_body_removal, mst30_proc_luminal_emr, mst30_proc_luminal_esd, mst30_proc_luminal_stent_placement, mst30_proc_luminal_peg_placement, mst30_proc_luminal_tube_placement, mst30_proc_luminal_transmural_drainage, mst30_proc_luminal_ablation_therapy], description: "MST 3.0 luminal procedure documentation."}
+- {model: finding, name: mst30_ercp_procedure_summary, name_de: Zusammenfassung der ERCP-Maßnahmen, name_en: ERCP procedure summary, finding_types: [mst30_ercp_finding], classifications: [mst30_attr_type, mst30_attr_result], interventions: [mst30_proc_ercp_cannulation, mst30_proc_ercp_opacification, mst30_proc_ercp_papillotomy, mst30_proc_ercp_balloon_dilatation, mst30_proc_ercp_bougie_dilatation, mst30_proc_ercp_stone_extraction, mst30_proc_ercp_stent_placement, mst30_proc_ercp_stent_removal, mst30_proc_ercp_hemostasis], description: "MST 3.0 ERCP procedure documentation."}
+- {model: finding, name: mst30_eus_procedure_summary, name_de: Zusammenfassung der EUS-Maßnahmen, name_en: EUS procedure summary, finding_types: [mst30_eus_finding], classifications: [mst30_attr_type, mst30_attr_result], interventions: [mst30_proc_eus_fna, mst30_proc_eus_thru_cut_biopsy, mst30_proc_eus_celiac_plexus_block, mst30_proc_eus_contrast_injection, mst30_proc_eus_duct_drainage], description: "MST 3.0 EUS procedure documentation."}

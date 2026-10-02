@@ -1,0 +1,267 @@
+owner: lx_dtypes maintainers and manuscript authors
+topic: Editorial reconciliation of LXDM draft with executable versioned artifacts
+command: uv run python scripts/revise_lxdm_manuscript.py 'LXDM_revised_draft_v3(2).docx' --output temp/generated_exports/LXDM_reconciled_draft.docx
+review_note: This is a separate editorial draft for author review, not a renewed clinical-source audit.
+  Modified paragraphs adopt their first text run formatting; untouched DOCX parts are preserved. Review
+  layout and remaining study claims before submission. Exact paragraph matching rejects changed input
+  rather than silently applying edits elsewhere.
+replacements:
+- find: 'Methods: Using upper gastrointestinal endoscopy as a reference application, we operationalized
+    the ESGE STAR recommendations into an entry-validated KnowledgeBase (Pydantic, Django; GitHub/PyPI),
+    and audited an independently authored terminology, MST 3.0, against its official source tables to
+    assess applicability to gastrointestinal endoscopy in general.'
+  replace: 'Methods: Using upper gastrointestinal endoscopy as a reference application, we operationalized
+    the ESGE STAR recommendations into an entry-validated KnowledgeBase (Pydantic, Django; GitHub/PyPI),
+    and validated the references and reproducible inventory of an independently authored terminology,
+    MST 3.0, with targeted checks against its official source tables to assess applicability to gastrointestinal
+    endoscopy in general.'
+  matches: 1
+  rationale: Distinguish verified graph validation from an unsupported claim of an exhaustive source audit.
+- find: 'Results: Datasets are created, validated, stored, and exchanged as structured files and SQL objects,
+    each carrying the KnowledgeBase used to interpret it. The STAR-derived KnowledgeBase for gastroscopy
+    reports comprises 22 findings, 21 classifications, and 71 classification choices; the audited MST
+    3.0 KnowledgeBase comprises 357 findings, 40 classifications, and 290 classification choices across
+    five procedure types, with full referential integrity confirmed. Screening 206 PubMed-indexed endoscopy
+    data-sharing records showed only 0.5% with a FHIR/openEHR-structured representation. A runnable demonstration
+    shows versioned KnowledgeBaseConfig modules applying different guideline-specific size categories
+    to the same measurement without altering how it was recorded.'
+  replace: 'Results: Datasets are created, validated, stored, and exchanged as structured files and SQL
+    objects, each carrying the KnowledgeBase used to interpret it. The STAR-derived KnowledgeBase for
+    gastroscopy reports comprises 22 findings, 21 classifications, and 79 classification choices in the
+    repaired publication artifact; the packaged MST 3.0 KnowledgeBase comprises 357 findings, 39 classifications,
+    and 285 classification choices across five procedure types, with full referential integrity confirmed.
+    Screening 206 PubMed-indexed endoscopy data-sharing records showed only 0.5% with a FHIR/openEHR-structured
+    representation. A runnable demonstration shows versioned KnowledgeBaseConfig modules applying an illustrative
+    binary size grouping and a grouping based on ESGE 2024 size categories to the same measurement without
+    altering how it was recorded.'
+  matches: 1
+  rationale: Match the artifacts and distinguish the illustrative comparator from a guideline release.
+- find: 'Professional societies have long attempted to standardize the clinical content of gastrointestinal
+    endoscopy reports, from the Minimal Standard Terminology’s common vocabulary for indications, findings,
+    diagnoses, and interventions onward9–12, most recently in the European Society of Gastrointestinal
+    Endoscopy’s STAndardization of Reports (STAR) initiative for upper gastrointestinal endoscopy4. These
+    recommendations establish clinical consensus on what should be documented, but a human-readable recommendation
+    is not an executable clinical information model: implementing it in a reporting system, study database,
+    or case report form additionally requires explicit data types, permissible values, terminology bindings,
+    and validation rules13. Where these machine-readable artifacts are not distributed alongside the recommendation,
+    institutions, research groups, and software developers must each independently interpret and implement
+    the clinical content — a risk our own MST 3.0 audit illustrates concretely: ten small terminology-fidelity
+    corrections were still needed against its published source tables despite two decades of prior use
+    (Section 3.4).'
+  replace: 'Professional societies have long attempted to standardize the clinical content of gastrointestinal
+    endoscopy reports, from the Minimal Standard Terminology’s common vocabulary for indications, findings,
+    diagnoses, and interventions onward9–12, most recently in the European Society of Gastrointestinal
+    Endoscopy’s STAndardization of Reports (STAR) initiative for upper gastrointestinal endoscopy4. These
+    recommendations establish clinical consensus on what should be documented, but a human-readable recommendation
+    is not an executable clinical information model: implementing it in a reporting system, study database,
+    or case report form additionally requires explicit data types, permissible values, terminology bindings,
+    and validation rules13. Where these machine-readable artifacts are not distributed alongside the recommendation,
+    institutions, research groups, and software developers must each independently interpret and implement
+    the clinical content; executable reference checks and explicit source reconciliation therefore remain
+    necessary (Section 3.4).'
+  matches: 1
+  rationale: The claimed ten corrections are not established by the PR or this checkout.
+- find: 'In this study, we present the Layered Extraction Data Model (LXDM), an open-source, entry-validated
+    data model designed to translate clinical reporting recommendations into executable data structures
+    for research-oriented workflows. LXDM combines a stable generic structural model with a separately
+    managed, versioned knowledge base; patient-related records reference its clinical concepts and are
+    validated during construction against data types, existing references, and permissible relationships,
+    and the knowledge context used during validation is retained together with the resulting, re-exportable
+    dataset. Using the ESGE STAR recommendations, we implement a domain-specific knowledge-base module
+    for upper gastrointestinal endoscopy4; to test whether this approach generalizes beyond a single terminology,
+    we additionally audit and present a second, independently authored and more general module implementing
+    the Minimal Standard Terminology (MST 3.0)12. '
+  replace: 'In this study, we present the Layered Extraction Data Model (LXDM), an open-source, entry-validated
+    data model designed to translate clinical reporting recommendations into executable data structures
+    for research-oriented workflows. LXDM combines a stable generic structural model with a separately
+    managed, versioned knowledge base; patient-related records reference its clinical concepts and are
+    validated during construction against data types, existing references, and permissible relationships,
+    and the knowledge context used during validation is retained together with the resulting, re-exportable
+    dataset. Using the ESGE STAR recommendations, we implement a domain-specific knowledge-base module
+    for upper gastrointestinal endoscopy4; to test whether this approach generalizes beyond a single terminology,
+    we additionally validate and present a second, independently authored and more general module implementing
+    the Minimal Standard Terminology (MST 3.0)12. '
+  matches: 1
+  rationale: Match the scope of the reproducible checks.
+- find: To test whether this approach generalizes to a terminology it was not designed around, we independently
+    audited an existing MST 3.0 KnowledgeBaseConfig module against its official source tables12, sheet
+    by sheet, diffing every source term against the packaged fixtures and checking full referential integrity
+    — every classification, finding-type, and intervention-type reference resolving to a defined object
+    — across all 957 module entries. Gaps identified were closed without changing any existing internal
+    identifier, preserving backward compatibility with prior report-template references (Section 3.4).
+  replace: 'To assess applicability beyond the STAR terminology, we loaded the independently authored
+    MST 3.0 module through the same data-model infrastructure, validated its complete core reference graph,
+    and recorded its executable concept inventory. We also reconciled the MST additions in PR #32 with
+    the packaged source and checked the draft’s attribution of adverse-event severity to the official
+    source’s section 7.3. These checks establish structural consistency and targeted source correspondence;
+    they do not establish an exhaustive independent clinical terminology audit. The reconciliation inventory
+    records the compared PR commit and exact source-prefix hashes.'
+  matches: 1
+  rationale: Replace the unsubstantiated sheet-by-sheet audit and 957-entry claim with the performed checks.
+- find: The KnowledgeBaseConfig module “star_upper_gi” implements the Examination “star_upper_gi_endoscopy”
+    (gastroscopy) with its associated Findings, Classifications, ClassificationChoices, and ClassificationChoiceDescriptors
+    — for example, the Paris classification for the finding “polyp” (Supplementary Figure S2, Supplementary
+    File SF2). The module contains 22 findings, 21 classifications, 71 classification choices, and 3 classification
+    choice descriptors (Supplementary Table S1); a separate, reusable “lx_units” module supplies 41 Unit
+    fixtures (e.g., centimeter, millimeter, second, minute). Descriptive features that fit a controlled
+    vocabulary are represented as ClassificationChoices (e.g., polyp shape “star_upper_gi_paris_Ip”);
+    features requiring a non-categorical input (e.g., “size_oval_mm”) remain numeric descriptors rather
+    than being forced into artificial categories — a distinction that becomes relevant again in Section
+    3.6.
+  replace: The KnowledgeBaseConfig module “star_upper_gi” implements the Examination “star_upper_gi_endoscopy”
+    (gastroscopy) with its associated Findings, Classifications, ClassificationChoices, and ClassificationChoiceDescriptors
+    — for example, the Paris classification for the finding “polyp” (Supplementary Figure S2, Supplementary
+    File SF2). The original demo contains 22 findings, 21 classifications, 71 classification choices,
+    and 3 classification choice descriptors (Supplementary Table S1). The repaired publication artifact
+    star_upper_gi@0.1.1.post1 supplies eight previously referenced but undefined mucosal choices (79 choices
+    in total), corrects two descriptor references, and includes the corrected scoped lx_units@0.1.0.post1
+    dependency. This unit module supplies 41 Unit fixtures (e.g., centimeter, millimeter, second, minute).
+    Descriptive features that fit a controlled vocabulary are represented as ClassificationChoices (e.g.,
+    polyp shape “star_upper_gi_paris_Ip”); features requiring a non-categorical input (e.g., the “size_oval_mm”
+    classification using “length_mm_descriptor”) retain numeric descriptor values rather than being forced
+    into artificial categories — a distinction that becomes relevant again in Section 3.6.
+  matches: 1
+  rationale: Preserve the historical inventory while clearly identifying and counting the repaired artifact.
+- find: 'The audit described in Section 2.4 found the module near-complete and highly faithful to its
+    source: all 31 procedure-related interventions, all diagnosis/reason terms, and all ten standard classifications
+    in the source’s appendix (line angle, esophageal varices, Prague, Paris, JGCA, Forrest, Goligher,
+    Kudo, Bismuth, esophagogastric landmarks) matched exactly. Ten small terminology-fidelity corrections
+    and one structural gap were found and closed, all as additive, identifier-preserving edits: eight
+    diagnosis/finding/indication labels were corrected to the source’s exact spelling (“Angioectasia”/“Angiodysplasia”
+    → “Angiectasia”, “Lymphangioectasia” → “Lymphangiectasia”), two biliary-tree classification choices
+    were relabeled from an unofficial paraphrase to the source’s exact §2.2 terms (“Left/Right main duct”,
+    central/peripheral), and the source’s §7.3 adverse-event severity grading table (Incident/Mild/Moderate/Severe/Fatal)
+    — previously absent — was added with its five choices and four supporting outcome/action fixtures.
+    The resulting knowledge base comprises 357 findings, 40 classifications, 290 classification choices,
+    142 indications, 44 interventions, and 12 examinations (Table 3), with full referential integrity
+    confirmed.'
+  replace: 'The packaged MST 3.0 artifact (mst_3_0@3.0.0) contains 357 findings, 39 classifications, 285
+    classification choices, 142 indications, 40 interventions, and 12 examinations (Table 3). Its core
+    references validate successfully. The two MST source additions in PR #32 are already present byte-for-byte
+    as prefixes of the existing files and do not supply additional concepts. A targeted check of the WEO
+    document dated 03.08.2016 shows that section 7.3 on page 41 describes actions and outcomes, not the
+    five-level adverse-event severity classification attributed to it in the earlier draft. No such severity
+    extension was added to make counts match that draft. Any separately sourced extension requires explicit
+    provenance and a new artifact identity.'
+  matches: 1
+  rationale: Use verified counts and correct the source attribution without inventing clinical entries.
+- find: '40'
+  replace: '39'
+  matches: 1
+  rationale: Align Table 3 with the executable MST inventory.
+- find: '290'
+  replace: '285'
+  matches: 1
+  rationale: Align Table 3 with the executable MST inventory.
+- find: '44'
+  replace: '40'
+  matches: 1
+  rationale: Align Table 3 with the executable MST inventory.
+- find: 'A related problem arises when a continuous measurement is deliberately binned into named categories
+    that carry different clinical consequences on either side of a boundary — and that boundary can change
+    between guideline versions. The ESGE’s 2024 colorectal polypectomy/EMR guideline defines four size-based
+    management categories, each with its own resection-technique recommendation: diminutive (≤5 mm) and
+    small (6–9 mm) polyps for cold snare polypectomy, nonpedunculated 10–19 mm polyps for hot snare polypectomy,
+    and large nonpedunculated colorectal polyps (LNPCPs, ≥20 mm) for conventional EMR (Ferlitsch et al.,
+    2024). As we demonstrated in a previous study, literature handles thresholds for size categories inconsistently
+    – especially the corresponding category for the values 5 and 10 mm23.'
+  replace: Continuous measurements can be interpreted through separately versioned categorical schemes
+    without replacing the original values. The ESGE 2024 colorectal polypectomy guideline describes size
+    groups of ≤5, 6–9, 10–19 and ≥20 mm (Ferlitsch et al., 2024). Its treatment recommendations also depend
+    on lesion characteristics and clinical context. Our example compares an illustrative binary split
+    with these size groups; it does not infer treatment or transfer colorectal treatment recommendations
+    to upper-GI findings.
+  matches: 1
+  rationale: Limit the executable demo to what it actually computes.
+- find: Because LXDM externalizes categorical definitions into independently versioned KnowledgeBaseConfig
+    modules rather than compiling a single boundary into the data model, both schemes can be applied side
+    by side to the same underlying, non-categorically recorded value — the finding’s size_oval_mm descriptor,
+    already used for the 6 mm and 8 mm polyps in the star_upper_gi demo dataset (Section 3.3) — without
+    altering the recorded measurement. We implemented both as runnable modules (polyp_size_category_v1_legacy
+    v1.0.0 and polyp_size_category_v2_esge2024 v2.0.0, the latter carrying the guideline’s citation and
+    recommendation numbers directly in its ClassificationChoice definitions; Supplementary File SF4) and
+    applied them to five illustrative measurements (Table 4). Three the legacy scheme collapses into a
+    single “>5 mm” bin (6, 15, 22 mm) are correctly separated into three distinct, differently managed
+    categories under the current guideline; both versions agree exactly at the shared ≤5 mm boundary.
+  replace: Both schemes are published under the stable logical identity polyp_size_category, with versions
+    1.0.0 and 2.0.0 selected by the existing version-aware resolver. Their numeric_rules.yml files contain
+    validated executable boundaries bound to the corresponding classifications and choices. The legacy
+    version is an illustrative comparator, not an historical ESGE release. Version 2 accepts whole-number
+    millimeter values and rejects fractions without rounding; a continuous interpretation would require
+    an explicitly versioned policy. The five measurements in Table 4 are deterministic synthetic observations.
+    A separate test applies the revised grouping to the existing STAR ledger’s 8 mm polyp and verifies
+    that the ledger remains unchanged; its 6 mm finding is a diverticulum, not a second polyp. Each derived
+    result retains the original observation identity, value, descriptor, unit and source KB identity,
+    together with the interpretation KB identity, selected choice and rule digest. The values 6, 15 and
+    22 mm occupy distinct revised groups while sharing the legacy >5 mm group.
+  matches: 1
+  rationale: Connect the manuscript to the working resolver, rules, actual ledger and provenance.
+- find: v2.0.0 – ESGE 2024 guideline
+  replace: v2.0.0 – ESGE 2024 size grouping
+  matches: 1
+  rationale: Match the generated table; treatment is not an output of this size-only demonstration.
+- find: Diminutive (≤5 mm) — cold snare polypectomy
+  replace: ≤5 mm
+  matches: 1
+  rationale: Match the generated table; treatment is not an output of this size-only demonstration.
+- find: Small (6–9 mm) — cold snare polypectomy
+  replace: 6–9 mm
+  matches: 2
+  rationale: Match the generated table; treatment is not an output of this size-only demonstration.
+- find: Large nonpedunculated (10–19 mm) — hot snare polypectomy
+  replace: 10–19 mm
+  matches: 1
+  rationale: Match the generated table; treatment is not an output of this size-only demonstration.
+- find: LNPCP (≥20 mm) — conventional EMR
+  replace: ≥20 mm
+  matches: 1
+  rationale: Match the generated table; treatment is not an output of this size-only demonstration.
+- find: A complete dataset, including the nested KnowledgeBase and Ledger objects, can be exported into
+    a single file (model_dump) and re-imported (from_yaml), so the KnowledgeBase used at creation time
+    travels with the exported data rather than being reconstructed or assumed later. Both knowledge bases
+    and the two classification-versioning modules from Section 3.6 are available as YAML fixtures in the
+    code repository; Supplementary File SF3 provides a Python usage example end-to-end.
+  replace: A complete dataset, including the nested KnowledgeBase and Ledger objects, can be exported
+    into a single file (model_dump) and re-imported (from_yaml), so the KnowledgeBase used at creation
+    time travels with the exported data rather than being reconstructed or assumed later. Both knowledge
+    bases and the two releases of polyp_size_category from Section 3.6 are available as canonical versioned
+    YAML bundles. The authoring guide documents registry provisioning, the reproducible comparison, and
+    the source reconciliation; Supplementary File SF3 provides a Python usage example end-to-end.
+  matches: 1
+  rationale: Use canonical module/version terminology.
+- find: 'Supplementary File SF4. Classification-versioning demo: polyp_size_category_v1_legacy and polyp_size_category_v2_esge2024
+    KnowledgeBaseConfig modules and the comparison script producing Table 4.'
+  replace: 'Supplementary File SF4. Classification-versioning demonstration: canonical polyp_size_category@1.0.0
+    and polyp_size_category@2.0.0 bundles, numeric_rules.yml definitions, deterministic measurements.yml,
+    and the resolver-based comparison script producing Table 4 and provenance-bearing results.yml.'
+  matches: 1
+  rationale: Replace the competing version-in-module-name convention.
+- find: Creating or modifying a KnowledgeBaseConfig module currently requires editing raw YAML text files;
+    indentation errors can render a file unreadable to the DataLoader, a risk we plan to mitigate with
+    a dedicated editing web application. Although the published package is thoroughly tested and developed
+    under strict typing and linting standards, unexpected issues may still arise when extending the framework
+    to new domains beyond the two audited here.
+  replace: Raw YAML authoring remains sensitive to indentation and semantic errors. The documented authoring
+    workflow combines an editing interface, YAML linting, exact version resolution and executable validation.
+    These checks do not establish clinical effectiveness or exhaustive source fidelity. Future evaluation
+    should assess data quality in deployed workflows and independent clinical review should accompany
+    new terminology releases.
+  matches: 1
+  rationale: Keep limitations and conclusions consistent with the performed validation rather than an
+    unverified exhaustive audit.
+- find: We presented an entry-validated canonical data model designed to ensure correct data capture,
+    logical consistency, and uniform persistence as a prerequisite for interoperability, and showed that
+    this approach generalizes, with only minor corrections, across two independently governed endoscopy
+    terminologies. By decoupling internal structure from exchange standards and externalizing domain semantics
+    into a governed KnowledgeBase, the framework provides a robust foundation for high-quality clinical
+    data reuse and a pathway toward reproducible, auditable, AI-ready clinical datasets across domains.
+  replace: We presented an entry-validated canonical data model designed to ensure correct data capture,
+    logical consistency, and uniform persistence as a prerequisite for interoperability, and demonstrated
+    structural applicability across two independently governed endoscopy terminologies, with an explicit
+    reconciliation of the executable artifacts and manuscript claims. By decoupling internal structure
+    from exchange standards and externalizing domain semantics into a governed KnowledgeBase, the framework
+    provides a robust foundation for high-quality clinical data reuse and a pathway toward reproducible,
+    auditable, AI-ready clinical datasets across domains.
+  matches: 1
+  rationale: Keep limitations and conclusions consistent with the performed validation rather than an
+    unverified exhaustive audit.

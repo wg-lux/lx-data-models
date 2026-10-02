@@ -1,0 +1,30 @@
+- model: reference_catalog
+  name: shift_type
+  name_de: "Schichttypen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: shift_type
+      name: miscellaneous
+      description: null
+      is_active: true
+    - record_type: shift_type
+      name: off_hours
+      description: null
+      is_active: true
+    - record_type: shift_type
+      name: on_call
+      description: null
+      is_active: true
+    - record_type: shift_type
+      name: regular
+      description: null
+      is_active: true
+    - record_type: shift_type
+      name: supervision
+      description: null
+      is_active: true
+    - record_type: shift_type
+      name: ward
+      description: null
+      is_active: true

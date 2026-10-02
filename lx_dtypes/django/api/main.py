@@ -1,45 +1,71 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from functools import lru_cache
 from importlib import import_module
-from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Dict,
-    List,
+    Literal,
     NoReturn,
-    Optional,
     Protocol,
-    Set,
+    TypedDict,
     TypeVar,
     cast,
+    runtime_checkable,
 )
 
 from django.conf import settings
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
-from lx_dtypes.models.interface.DataLoader import DataLoader
-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
-    KnowledgeBaseVersionNotFoundError,
-    clear_knowledge_base_resolver_caches,
-    load_knowledge_base,
-)
-from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
-
-from .findings_routes import (
+from lx_dtypes.django.api.examinations_routes import register_examinations_routes
+from lx_dtypes.django.api.findings_routes import (
     PatientFindingClassificationInput,
-    build_p_examination_payload_from_host_ledger as _build_payload_from_host_ledger,
     clear_findings_route_caches,
     register_findings_routes,
 )
-from .request_types import BaseRequest
-from .report_template_routes import register_report_template_routes
-from .lookup_tracker import register_runtime_lookup_tracker
+from lx_dtypes.django.api.findings_routes import (
+    build_p_examination_payload_from_host_ledger as _build_payload_from_host_ledger,
+)
+from lx_dtypes.django.api.indications_routes import register_indications_routes
+from lx_dtypes.django.api.knowledge_base_graph_routes import (
+    KnowledgeBaseGraphRouteCache,
+    register_knowledge_base_graph_routes,
+)
+from lx_dtypes.django.api.report_template_builder import (
+    ReportTemplateModuleLocation,
+    resolve_report_template_module_location,
+)
+from lx_dtypes.django.api.report_template_routes import register_report_template_routes
+from lx_dtypes.django.api.request_types import BaseRequest
+from lx_dtypes.django.api.terminology_routes import register_terminology_routes
+from lx_dtypes.models.contracts import KnowledgeBaseContract
+from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+    clear_knowledge_base_resolver_caches,
+)
+from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+from lx_dtypes.terminology.lookup_tracker import register_runtime_lookup_tracker
+from lx_dtypes.terminology.terminology_loader import (
+    get_terminology_service,
+)
+from lx_dtypes.terminology.terminology_loader import (
+    load_module_kb as resolve_module_kb,
+)
+from lx_dtypes.terminology.terminology_service import TerminologyError
 
 F = TypeVar("F", bound=Callable[..., Any])
+ReportLanguageCode = Literal["de", "en"]
+
+
+class ReportLanguageOption(TypedDict):
+    code: ReportLanguageCode
+    label: str
+
+
+class ReportLanguagesResponse(TypedDict):
+    default_language: ReportLanguageCode
+    languages: list[ReportLanguageOption]
 
 
 class _RouteDecorator(Protocol):
@@ -64,6 +90,8 @@ class _TypedApi(Protocol):
 
 
 if TYPE_CHECKING:
+    from ninja import NinjaAPI
+
     api = cast(_TypedApi, object())
 else:
     from ninja import NinjaAPI
@@ -71,8 +99,21 @@ else:
     api = cast(_TypedApi, NinjaAPI(urls_namespace="lx_dtypes_base_api"))
 
 
+@api.get("/reporting/languages")
+def reporting_languages(request: BaseRequest) -> ReportLanguagesResponse:
+    """Return the report languages supported by LXDM concept labels."""
+    del request
+    return {
+        "default_language": "de",
+        "languages": [
+            {"code": "de", "label": "Deutsch"},
+            {"code": "en", "label": "English"},
+        ],
+    }
+
+
 @lru_cache(maxsize=1)
-def _orm_models() -> Dict[str, Any]:
+def _host_models_module() -> Any:
     module_path = getattr(settings, "LX_DTYPES_HOST_MODELS_MODULE", None) or os.getenv(
         "LX_DTYPES_HOST_MODELS_MODULE"
     )
@@ -80,22 +121,89 @@ def _orm_models() -> Dict[str, Any]:
         raise RuntimeError(
             "LX_DTYPES_HOST_MODELS_MODULE must be configured to use lx_dtypes.django.api."
         )
+    return import_module(module_path)
 
-    host_models = import_module(module_path)
 
+def _host_integration_is_configured() -> bool:
+    return bool(
+        getattr(settings, "LX_DTYPES_HOST_MODELS_MODULE", None)
+        or os.getenv("LX_DTYPES_HOST_MODELS_MODULE")
+    )
+
+
+@lru_cache(maxsize=1)
+def _orm_models() -> dict[str, Any]:
+    host_models = _host_models_module()
     return {
-        "Examination": getattr(host_models, "Examination"),
-        "Finding": getattr(host_models, "Finding"),
-        "FindingClassification": getattr(host_models, "FindingClassification"),
-        "FindingClassificationChoice": getattr(
-            host_models, "FindingClassificationChoice"
-        ),
-        "PatientExamination": getattr(host_models, "PatientExamination"),
-        "PatientFinding": getattr(host_models, "PatientFinding"),
-        "PatientFindingClassification": getattr(
-            host_models, "PatientFindingClassification"
-        ),
+        "Examination": host_models.Examination,
+        "Finding": host_models.Finding,
+        "FindingClassification": host_models.FindingClassification,
+        "FindingClassificationChoice": host_models.FindingClassificationChoice,
+        "PatientExamination": host_models.PatientExamination,
+        "PatientFinding": host_models.PatientFinding,
+        "PatientFindingClassification": host_models.PatientFindingClassification,
     }
+
+
+def _persist_patient_examination_dtypes_record(
+    patient_examination: object,
+    payload: PExamination,
+) -> dict[str, Any]:
+    persist = _host_models_module().persist_patient_examination_dtypes_record
+    return cast(dict[str, Any], persist(patient_examination, payload))
+
+
+def _authenticate_request_user(request: BaseRequest) -> Any | None:
+    if not _host_integration_is_configured():
+        return None
+    authenticate = getattr(_host_models_module(), "authenticate_request_user", None)
+    if callable(authenticate):
+        return authenticate(request)
+    return _request_user_if_authenticated(request)
+
+
+def _patient_finding_access_allowed(
+    request: BaseRequest, patient_finding: object
+) -> bool:
+    authorize = getattr(_host_models_module(), "patient_finding_access_allowed", None)
+    if not callable(authorize):
+        return False
+    return bool(authorize(request, patient_finding))
+
+
+def _patient_examination_access_allowed(
+    request: BaseRequest, patient_examination: object
+) -> bool:
+    authorize = getattr(
+        _host_models_module(), "patient_examination_access_allowed", None
+    )
+    if not callable(authorize):
+        return False
+    return bool(authorize(request, patient_examination))
+
+
+def _patient_findings_queryset_for_request(request: BaseRequest) -> Any:
+    scope_queryset = getattr(
+        _host_models_module(), "patient_findings_queryset_for_request", None
+    )
+    if not callable(scope_queryset):
+        return _active_patient_findings_queryset().none()
+    return scope_queryset(request)
+
+
+def _terminology_write_access_allowed(actor: object) -> bool:
+    authorize = getattr(_host_models_module(), "terminology_write_access_allowed", None)
+    return bool(callable(authorize) and authorize(actor))
+
+
+def _report_template_access_allowed(
+    actor: object,
+    capability: Literal["report_template:read", "report_template:write"],
+) -> bool:
+    if not _host_integration_is_configured():
+        return False
+    authorize = getattr(_host_models_module(), "report_template_access_allowed", None)
+    return bool(callable(authorize) and authorize(actor, capability))
 
 
 class StructuredApiError(Exception):
@@ -115,62 +223,63 @@ def handle_structured_api_error(request: Any, exc: StructuredApiError) -> Any:
     )
 
 
-@lru_cache(maxsize=1)
-def _kb_loader() -> DataLoader:
-    package_data_dir = Path(__file__).resolve().parents[2] / "data"
-    legacy_cwd_data_dir = Path("./lx_dtypes/data/").resolve()
-    input_dirs = [
-        data_dir
-        for data_dir in (package_data_dir, legacy_cwd_data_dir)
-        if data_dir.exists()
-    ]
-    loader = DataLoader(input_dirs=input_dirs or [package_data_dir])
-    loader.load_module_configs()
-    return loader
+@api.exception_handler(TerminologyError)
+def handle_terminology_error(request: Any, exc: TerminologyError) -> Any:
+    """Preserve the service status instead of relabeling every failure as a 404."""
+    return api.create_response(
+        request,
+        {"code": "terminology-error", "message": str(exc)},
+        status=exc.status,
+    )
 
 
-def _load_module_kb(module_name: str, version: str | None = None) -> Any:
-    if version:
-        try:
-            kb = cast(Any, load_knowledge_base(module_name, version=version))
-        except KnowledgeBaseVersionNotFoundError as exc:
-            raise HttpError(
-                409,
-                "Requested knowledge-base version is not provisioned locally for "
-                f"module '{module_name}' and version '{version}'.",
-            ) from exc
-        register_runtime_lookup_tracker(kb)
-        return kb
-
-    loader = _kb_loader()
-    try:
-        kb = cast(Any, loader.load_knowledge_base(module_name))
-    except ValueError as exc:
-        raise HttpError(404, f"Unknown knowledge-base module '{module_name}'.") from exc
+def _load_module_kb(
+    module_name: str, version: str | None = None
+) -> KnowledgeBaseContract:
+    """Keep the existing API callback, delegating all resolution to the provider."""
+    kb = resolve_module_kb(module_name, version=version)
     register_runtime_lookup_tracker(kb)
-    return kb
+    return cast(KnowledgeBaseContract, kb)
+
+
+def _resolve_report_template_module_location(
+    module_name: str,
+    version: str,
+) -> ReportTemplateModuleLocation:
+    """Preserve the callback API while the builder owns central path resolution."""
+    try:
+        return resolve_report_template_module_location(module_name, version)
+    except ValueError as exc:
+        raise HttpError(400, str(exc)) from exc
+
+
+_graph_route_cache = KnowledgeBaseGraphRouteCache()
 
 
 def _clear_kb_caches() -> None:
-    cache_clear = getattr(_kb_loader, "cache_clear", None)
-    if callable(cache_clear):
-        cache_clear()
     clear_findings_route_caches()
     clear_knowledge_base_resolver_caches()
+    _graph_route_cache.clear()
 
 
 def _resolve_payload_kb_identity(
     route_module_name: str,
     payload: PExamination,
-) -> tuple[str, str | None]:
+) -> tuple[str, str]:
     payload_module_name = str(payload.knowledge_base_module or "").strip()
-    payload_version = str(payload.knowledge_base_version or "").strip() or None
+    payload_version = str(payload.knowledge_base_version or "").strip()
 
     if payload_module_name and payload_module_name != route_module_name:
         raise HttpError(
             409,
             "Payload knowledge-base module does not match route module: "
             f"'{payload_module_name}' != '{route_module_name}'.",
+        )
+
+    if not payload_version:
+        raise HttpError(
+            409,
+            "Payload must include an explicit knowledge-base version.",
         )
 
     return payload_module_name or route_module_name, payload_version
@@ -180,10 +289,15 @@ def _api_error(status: int, code: str, message: str) -> NoReturn:
     raise StructuredApiError(status, code, message)
 
 
+@runtime_checkable
+class _RelatedManagerLike(Protocol):
+    def all(self) -> Any: ...
+
+
 def _as_str_list_from_relation(relation: object) -> list[str]:
     if relation is None:
         return []
-    if hasattr(relation, "all"):
+    if isinstance(relation, _RelatedManagerLike):
         return [str(getattr(item, "pk", item)) for item in relation.all()]
     if isinstance(relation, list):
         return [str(item) for item in relation]
@@ -207,22 +321,19 @@ def _build_p_examination_payload_from_host_ledger(
     )
 
 
-def _findings_module_name() -> str:
-    return os.getenv("LX_DTYPES_FINDINGS_MODULE", "lx_knowledge_base")
-
-
-def _norm_name(value: Optional[str]) -> str:
+def _norm_name(value: str | None) -> str:
     return str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
 
 
-@lru_cache(maxsize=8)
-def _kb_core_concepts(module_name: str) -> Dict[str, Any]:
-    return cast(Dict[str, Any], _load_module_kb(module_name).export_core_concepts())
+def _kb_core_concepts(module_name: str, version: str | None = None) -> dict[str, Any]:
+    # Do not cache a module-only request: its active version can change.
+    return _load_module_kb(module_name, version=version).export_core_concepts()
 
 
-@lru_cache(maxsize=8)
-def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
-    core = _kb_core_concepts(module_name)
+def _kb_lookup(
+    module_name: str, version: str | None = None
+) -> dict[str, dict[str, dict[str, Any]]]:
+    core = _kb_core_concepts(module_name, version=version)
     examination_by_name = {
         _norm_name(item.get("name")): item for item in core.get("examination", [])
     }
@@ -244,14 +355,14 @@ def _kb_lookup(module_name: str) -> Dict[str, Dict[str, Dict[str, Any]]]:
     }
 
 
-def _request_user_if_authenticated(request: BaseRequest) -> Optional[Any]:
+def _request_user_if_authenticated(request: BaseRequest) -> Any | None:
     user = getattr(request, "user", None)
     if getattr(user, "is_authenticated", False):
         return user
     return None
 
 
-def _serialize_choice(choice: Any) -> Dict[str, Any]:
+def _serialize_choice(choice: Any) -> dict[str, Any]:
     return {
         "id": choice.id,
         "name": choice.name,
@@ -263,7 +374,7 @@ def _serialize_choice(choice: Any) -> Dict[str, Any]:
 
 def _serialize_classification(
     classification: Any, *, required: bool = False
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     choices = classification.choices.all()
     classification_types = [
         _norm_name(c_type.name) for c_type in classification.classification_types.all()
@@ -279,10 +390,10 @@ def _serialize_classification(
 
 
 def _split_classifications(
-    classifications: List[Dict[str, Any]],
-) -> Dict[str, List[Dict[str, Any]]]:
-    location: List[Dict[str, Any]] = []
-    morphology: List[Dict[str, Any]] = []
+    classifications: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    location: list[dict[str, Any]] = []
+    morphology: list[dict[str, Any]] = []
     for classification in classifications:
         c_types = {
             _norm_name(v) for v in classification.get("classification_types", [])
@@ -300,9 +411,9 @@ def _split_classifications(
 def _serialize_finding(
     finding: Any,
     *,
-    allowed_classification_names: Optional[Set[str]] = None,
-    required_classification_names: Optional[Set[str]] = None,
-) -> Dict[str, Any]:
+    allowed_classification_names: set[str] | None = None,
+    required_classification_names: set[str] | None = None,
+) -> dict[str, Any]:
     all_classifications = finding.finding_classifications.all().prefetch_related(
         "choices", "classification_types"
     )
@@ -335,7 +446,7 @@ def _serialize_finding(
 
 def _serialize_patient_finding_classification(
     item: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return {
         "id": item.id,
         "classification": item.classification_id,
@@ -348,7 +459,7 @@ def _serialize_patient_finding_classification(
     }
 
 
-def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
+def _serialize_patient_finding(item: Any) -> dict[str, Any]:
     classifications = item.classifications.filter(is_active=True).select_related(
         "classification", "classification_choice"
     )
@@ -368,7 +479,7 @@ def _serialize_patient_finding(item: Any) -> Dict[str, Any]:
 
 def _resolve_exam_kb_finding_names(
     examination: Any, *, module_name: str
-) -> Optional[Set[str]]:
+) -> set[str] | None:
     lookup = _kb_lookup(module_name)
     exam_entry = lookup["examination"].get(_norm_name(examination.name))
     if not exam_entry:
@@ -381,7 +492,7 @@ def _resolve_exam_kb_finding_names(
 
 def _resolve_kb_finding_classification_names(
     finding: Any, *, module_name: str
-) -> Optional[Set[str]]:
+) -> set[str] | None:
     lookup = _kb_lookup(module_name)
     finding_entry = lookup["finding"].get(_norm_name(finding.name))
     if not finding_entry:
@@ -394,7 +505,7 @@ def _resolve_kb_finding_classification_names(
 
 def _resolve_kb_classification_choice_names(
     classification: Any, *, module_name: str
-) -> Optional[Set[str]]:
+) -> set[str] | None:
     lookup = _kb_lookup(module_name)
     classification_entry = lookup["classification"].get(_norm_name(classification.name))
     if not classification_entry:
@@ -479,7 +590,7 @@ def _validate_classification_payload(
 
 def _replace_patient_finding_classifications(
     patient_finding: Any,
-    entries: List[PatientFindingClassificationInput],
+    entries: list[PatientFindingClassificationInput],
     *,
     module_name: str,
 ) -> None:
@@ -526,6 +637,9 @@ register_report_template_routes(
     api,
     load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
     clear_kb_caches=lambda: _clear_kb_caches(),
+    resolve_builder_module_location=lambda module_name, version: (
+        _resolve_report_template_module_location(module_name, version)
+    ),
     resolve_payload_kb_identity=lambda *args, **kwargs: _resolve_payload_kb_identity(
         *args, **kwargs
     ),
@@ -533,11 +647,57 @@ register_report_template_routes(
     build_p_examination_payload_from_host_ledger=lambda *args, **kwargs: (
         _build_p_examination_payload_from_host_ledger(*args, **kwargs)
     ),
+    persist_patient_examination_dtypes_record=lambda *args, **kwargs: (
+        _persist_patient_examination_dtypes_record(*args, **kwargs)
+    ),
+    authenticate_request_user=lambda request: _authenticate_request_user(request),
+    report_template_access_allowed=lambda actor, capability: (
+        _report_template_access_allowed(actor, capability)
+    ),
+)
+
+register_knowledge_base_graph_routes(
+    api,
+    graph_cache=_graph_route_cache,
+    load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
 )
 
 register_findings_routes(
     api,
-    load_module_kb=lambda *args, **kwargs: _load_module_kb(*args, **kwargs),
     orm_models=lambda: _orm_models(),
     api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
+    authenticate_request_user=_authenticate_request_user,
+    patient_examination_access_allowed=_patient_examination_access_allowed,
+    patient_finding_access_allowed=_patient_finding_access_allowed,
+    patient_findings_queryset_for_request=_patient_findings_queryset_for_request,
+    build_p_examination_payload_from_host_ledger=lambda *args, **kwargs: (
+        _build_p_examination_payload_from_host_ledger(*args, **kwargs)
+    ),
+    persist_patient_examination_dtypes_record=lambda *args, **kwargs: (
+        _persist_patient_examination_dtypes_record(*args, **kwargs)
+    ),
+)
+
+register_indications_routes(
+    api,
+    orm_models=lambda: _orm_models(),
+    api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
+)
+
+register_examinations_routes(
+    api,
+    orm_models=lambda: _orm_models(),
+    api_error=lambda *args, **kwargs: _api_error(*args, **kwargs),
+)
+
+register_terminology_routes(
+    cast(NinjaAPI, api),
+    service=get_terminology_service(),
+    clear_kb_caches=lambda: _clear_kb_caches(),
+    authenticate_request_user=(
+        _authenticate_request_user if _host_integration_is_configured() else None
+    ),
+    terminology_write_access_allowed=(
+        _terminology_write_access_allowed if _host_integration_is_configured() else None
+    ),
 )

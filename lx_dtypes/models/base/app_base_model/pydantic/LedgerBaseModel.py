@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, ClassVar, Dict, List, TypeVar
+from typing import Any, ClassVar, TypeVar
 
 from pydantic import Field
 
@@ -22,7 +22,7 @@ class LedgerBaseModel(
     DDictMixIn[DDictT],
     # Generic[DDictT],
 ):
-    external_ids: Dict[str, str] = Field(default_factory=dict)
+    external_ids: dict[str, str] = Field(default_factory=dict)
     serialized_model_cls: ClassVar[Any] = None
     serialized_ddict_cls: ClassVar[Any] = None
 
@@ -41,7 +41,7 @@ class LedgerBaseModel(
 
     @classmethod
     @abstractmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         """
         Return the names of DataDict fields whose values are nested DataDicts.
 

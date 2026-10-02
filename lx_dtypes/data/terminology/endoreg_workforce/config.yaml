@@ -1,0 +1,13 @@
+name: endoreg_workforce
+name_de: "EndoReg Personal"
+description: Versioned optional workforce reference definitions; no employees or assignments.
+version: 1.0.0
+modules: []
+depends_on: []
+data:
+  files:
+  - ./profession.yml
+  - ./qualification.yml
+  - ./qualification_type.yml
+  - ./shift.yml
+  - ./shift_type.yml

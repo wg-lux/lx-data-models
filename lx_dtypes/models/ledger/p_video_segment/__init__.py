@@ -30,12 +30,12 @@ l_p_video_segment_models = Union[PVideoSegment]
 l_p_video_segment_ddicts = Union[PVideoSegmentDataDict]
 
 __all__ = [
+    "LPVideoSegmentLookupType",
     "PVideoSegment",
     "PVideoSegmentDataDict",
-    "l_p_video_segment_lookup",
-    "LPVideoSegmentLookupType",
-    "l_p_video_segment_models",
     "l_p_video_segment_ddicts",
+    "l_p_video_segment_lookup",
+    "l_p_video_segment_models",
     # "LPVideoSegmentDjangoLookupType",
     # "l_p_video_segment_django_lookup",
     # "l_p_video_segment_django_models", # TODO

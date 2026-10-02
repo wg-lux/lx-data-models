@@ -1,0 +1,1 @@
+In this module, we define findings, finding_classifications and choices related to hardware used in endoscopy procedures.

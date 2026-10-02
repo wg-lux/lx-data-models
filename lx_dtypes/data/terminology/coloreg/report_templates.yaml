@@ -1,0 +1,868 @@
+- model: report_finding
+  name: coloreg_colonoscopy_polyp
+  name_de: ColoReg-Kolonpolyp
+  name_en: ColoReg colon polyp
+  description: Optional repeatable colon polyps with maximum diameter, Paris and NICE; linked resection
+    records hold study outcomes.
+  finding: colon_polyp
+  required: false
+  multiple_allowed: true
+  classifications:
+  - classification: colon_lesion_paris
+    required: true
+    concept_id: coloreg.polyp.paris
+    applicability_status: conditional
+    applicability_rule: Required for every documented colon polyp.
+  - classification: colon_lesion_nice
+    required: true
+    concept_id: coloreg.polyp.nice
+    applicability_status: conditional
+    applicability_rule: Required for every documented colon polyp.
+  - classification: lesion_size_mm
+    required: true
+    concept_id: coloreg.polyp.size
+    applicability_status: conditional
+    applicability_rule: Required for each documented index polyp; record the maximum pre-resection diameter
+      in millimetres.
+- model: report_template_section
+  name: coloreg_colonoscopy_polyps
+  name_de: "ColoReg – Kolonpolypen"
+  title_de: Polypen
+  title_en: Polyps
+  position: 0
+  section_kind: findings
+  types:
+  - findings
+  fields: []
+  findings:
+  - coloreg_colonoscopy_polyp
+- model: report_finding
+  name: coloreg_polyp_resection_report
+  name_de: Interventionen und Indexkomplikationen
+  name_en: Interventions and index complications
+  description: Repeatable, lesion-linked study observation.
+  finding: coloreg_polyp_resection
+  required: false
+  multiple_allowed: true
+  classifications:
+  - classification: coloreg_case_id
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_case_id
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_lesion_id
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_lesion_id
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_index_examination_id
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_index_examination_id
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_index_polyp_finding_id
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_index_polyp_finding_id
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: lesion_size_mm
+    required: true
+    concept_id: coloreg_polyp_resection.lesion_size_mm
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_resection_technique
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_resection_technique
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_completion_technique
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_completion_technique
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_snare_type
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_snare_type
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_electrosurgery_settings
+    required: false
+    concept_id: coloreg_polyp_resection.coloreg_electrosurgery_settings
+    applicability_status: conditional
+    applicability_rule: Required if a diathermic snare was used, alone or with a cold snare.
+  - classification: coloreg_primary_success
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_primary_success
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_primary_success_protocol
+    required: false
+    concept_id: coloreg_polyp_resection.coloreg_primary_success_protocol
+    applicability_status: conditional
+    applicability_rule: Required when primary success has been adjudicated yes or no.
+  - classification: coloreg_macroscopic_complete
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_macroscopic_complete
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_conversion_to_surgery
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_conversion_to_surgery
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_resection_mode
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_resection_mode
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_histological_margin_status
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_histological_margin_status
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_index_perforation
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_index_perforation
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+  - classification: coloreg_index_uncontrolled_bleeding
+    required: true
+    concept_id: coloreg_polyp_resection.coloreg_index_uncontrolled_bleeding
+    applicability_status: conditional
+    applicability_rule: Required for each recorded resection attempt.
+- model: report_template_section
+  name: coloreg_polyp_resection_section
+  name_de: "ColoReg – Polypenresektion"
+  title_de: Interventionen und Indexkomplikationen
+  title_en: Interventions and index complications
+  position: 1
+  section_kind: findings
+  types:
+  - findings
+  fields: []
+  findings:
+  - coloreg_polyp_resection_report
+- model: report_finding
+  name: coloreg_polyp_follow_up_report
+  name_de: Nachsorge und verzögerte Komplikationen
+  name_en: Follow-up and delayed complications
+  description: Repeatable, lesion-linked study observation.
+  finding: coloreg_polyp_follow_up
+  required: false
+  multiple_allowed: true
+  classifications:
+  - classification: coloreg_case_id
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_case_id
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_lesion_id
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_lesion_id
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_index_examination_id
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_index_examination_id
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_index_polyp_finding_id
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_index_polyp_finding_id
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_index_resection_finding_id
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_index_resection_finding_id
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_follow_up_sequence
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_follow_up_sequence
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_previous_follow_up_examination_id
+    required: false
+    concept_id: coloreg_polyp_follow_up.coloreg_previous_follow_up_examination_id
+    applicability_status: conditional
+    applicability_rule: Required for subsequent follow-up visits; omit for the first follow-up.
+  - classification: coloreg_days_since_index
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_days_since_index
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_follow_up_result
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_follow_up_result
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_interval_bleeding
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_interval_bleeding
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_interval_uncontrolled_bleeding
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_interval_uncontrolled_bleeding
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_interval_perforation
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_interval_perforation
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_repeat_required_bleeding
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_repeat_required_bleeding
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_repeat_required_perforation
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_repeat_required_perforation
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+  - classification: coloreg_nonpassable_stenosis
+    required: true
+    concept_id: coloreg_polyp_follow_up.coloreg_nonpassable_stenosis
+    applicability_status: conditional
+    applicability_rule: Required for each recorded follow-up assessment.
+- model: report_template_section
+  name: coloreg_polyp_follow_up_section
+  name_de: "ColoReg – Polypennachsorge"
+  title_de: Nachsorge und verzögerte Komplikationen
+  title_en: Follow-up and delayed complications
+  position: 2
+  section_kind: findings
+  types:
+  - findings
+  fields: []
+  findings:
+  - coloreg_polyp_follow_up_report
+- model: report_template
+  verbosity_options:
+  - short
+  - standard
+  - detailed
+  name: coloreg_colonoscopy
+  name_de: ColoReg – Koloskopie
+  name_en: ColoReg – Colonoscopy
+  description: 'Lesion-level ColoReg reporting: polyp morphology, resection, histology, complications
+    and linked follow-up.'
+  version: '2.0.0'
+  coverage_version: report_concept_coverage_v1
+  coverage_concepts:
+  - concept_id: coloreg.polyp.paris
+    label: Paris-Klassifikation
+    applicability_status: conditional
+    applicability_rule: Applies to every documented colon polyp.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: colon_polyp
+      classification_name: colon_lesion_paris
+    allowed_values:
+    - colon_lesion_paris_Is
+    - colon_lesion_paris_Ip
+    - colon_lesion_paris_IIa
+    - colon_lesion_paris_IIb
+    - colon_lesion_paris_IIc
+    - colon_lesion_paris_III
+    - colon_lesion_paris_IIa_IIc
+    - colon_lesion_paris_IIb_IIc
+    guideline_citations: []
+  - concept_id: coloreg.polyp.nice
+    label: NICE-Klassifikation
+    applicability_status: conditional
+    applicability_rule: Applies to every documented colon polyp.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: colon_polyp
+      classification_name: colon_lesion_nice
+    allowed_values:
+    - colon_lesion_NICE_type_1
+    - colon_lesion_NICE_type_2
+    - colon_lesion_NICE_type_3
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_case_id.0
+    label: Pseudonyme Fallkennung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_case_id
+      classification_choice: coloreg_case_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_lesion_id.0
+    label: Stabile Läsionskennung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_lesion_id
+      classification_choice: coloreg_lesion_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_index_examination_id.0
+    label: Referenz zur Indexuntersuchung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_index_examination_id
+      classification_choice: coloreg_index_examination_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_index_polyp_finding_id.0
+    label: Referenz zum Indexpolypen
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_index_polyp_finding_id
+      classification_choice: coloreg_index_polyp_finding_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.lesion_size_mm.0
+    label: Größter Durchmesser (mm)
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: lesion_size_mm
+      classification_choice: lesion_size_oval_mm
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: number_range
+    guideline_citations: []
+    numeric_min: 0
+    numeric_max: 200
+  - concept_id: coloreg_polyp_resection.coloreg_resection_technique
+    label: Primäre Abtragungstechnik
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_resection_technique
+    allowed_values:
+    - coloreg_technique_emr
+    - coloreg_technique_esd
+    - coloreg_technique_eftr
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_completion_technique
+    label: Abschließende Abtragungstechnik
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_completion_technique
+    allowed_values:
+    - coloreg_technique_emr
+    - coloreg_technique_esd
+    - coloreg_technique_eftr
+    - coloreg_resection_not_completed
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_snare_type
+    label: Verwendete Schlinge
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_snare_type
+    allowed_values:
+    - coloreg_snare_cold
+    - coloreg_snare_diathermic
+    - coloreg_snare_both
+    - coloreg_snare_not_used
+    - coloreg_snare_unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_electrosurgery_settings.0
+    label: Generatorhersteller und -modell
+    applicability_status: conditional
+    applicability_rule: Required if a diathermic snare was used, alone or with a cold snare.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_electrosurgery_settings
+      classification_choice: coloreg_electrosurgery_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_electrosurgery_settings.1
+    label: Strommodus
+    applicability_status: conditional
+    applicability_rule: Required if a diathermic snare was used, alone or with a cold snare.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_electrosurgery_settings
+      classification_choice: coloreg_electrosurgery_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '1'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_electrosurgery_settings.2
+    label: Verwendete Stromeinstellungen
+    applicability_status: conditional
+    applicability_rule: Required if a diathermic snare was used, alone or with a cold snare.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_electrosurgery_settings
+      classification_choice: coloreg_electrosurgery_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '2'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_primary_success
+    label: Primär erfolgreiche Abtragung laut Protokoll
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_primary_success
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_primary_success_protocol.0
+    label: Protokoll für primären Erfolg
+    applicability_status: conditional
+    applicability_rule: Required when primary success has been adjudicated yes or no.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_primary_success_protocol
+      classification_choice: coloreg_primary_success_protocol_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_macroscopic_complete
+    label: Makroskopisch vollständige Abtragung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_macroscopic_complete
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_conversion_to_surgery
+    label: Konversion zur Operation
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_conversion_to_surgery
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_resection_mode
+    label: Resektionsmodus
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_resection_mode
+    allowed_values:
+    - coloreg_mode_en_bloc
+    - coloreg_mode_piecemeal
+    - coloreg_mode_aborted
+    - coloreg_mode_unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_histological_margin_status
+    label: Histologischer Resektionsstatus
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_histological_margin_status
+    allowed_values:
+    - coloreg_margin_r0
+    - coloreg_margin_r1
+    - coloreg_margin_rx
+    - coloreg_margin_pending
+    - coloreg_margin_no_specimen
+    - coloreg_margin_unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_index_perforation
+    label: Perforation bei Indexresektion
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_index_perforation
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_resection.coloreg_index_uncontrolled_bleeding
+    label: Endoskopisch nicht kontrollierbare Blutung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_resection.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_resection
+      classification_name: coloreg_index_uncontrolled_bleeding
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_case_id.0
+    label: Pseudonyme Fallkennung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_case_id
+      classification_choice: coloreg_case_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_lesion_id.0
+    label: Stabile Läsionskennung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_lesion_id
+      classification_choice: coloreg_lesion_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_index_examination_id.0
+    label: Referenz zur Indexuntersuchung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_index_examination_id
+      classification_choice: coloreg_index_examination_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_index_polyp_finding_id.0
+    label: Referenz zum Indexpolypen
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_index_polyp_finding_id
+      classification_choice: coloreg_index_polyp_finding_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_index_resection_finding_id.0
+    label: Referenz zur Indexresektion
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_index_resection_finding_id
+      classification_choice: coloreg_index_resection_finding_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_follow_up_sequence
+    label: Nachsorgesequenz
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_follow_up_sequence
+    allowed_values:
+    - coloreg_follow_up_first
+    - coloreg_follow_up_subsequent
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_previous_follow_up_examination_id.0
+    label: Vorherige Nachsorgeuntersuchung
+    applicability_status: conditional
+    applicability_rule: Required for subsequent follow-up visits; omit for the first follow-up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_previous_follow_up_examination_id
+      classification_choice: coloreg_previous_follow_up_examination_id_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: non_empty_string
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_days_since_index.0
+    label: Tage seit Indexresektion
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_days_since_index
+      classification_choice: coloreg_days_since_index_documented
+    concept_value_path:
+    - patient_finding_classification_choice_descriptors
+    - '0'
+    - descriptor_value
+    value_constraint: number_range
+    guideline_citations: []
+    numeric_min: 0
+    numeric_max: 36525
+  - concept_id: coloreg_polyp_follow_up.coloreg_follow_up_result
+    label: Nachsorgebefund der Resektionsstelle
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_follow_up_result
+    allowed_values:
+    - coloreg_follow_up_unremarkable
+    - coloreg_follow_up_abnormal
+    - coloreg_follow_up_not_assessable
+    - coloreg_follow_up_not_performed
+    - coloreg_follow_up_unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_interval_bleeding
+    label: Intervallblutung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_interval_bleeding
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_interval_uncontrolled_bleeding
+    label: Endoskopisch nicht kontrollierbare Intervallblutung
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_interval_uncontrolled_bleeding
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_interval_perforation
+    label: Intervallperforation
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_interval_perforation
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_repeat_required_bleeding
+    label: Erneute Untersuchung wegen Intervallblutung erforderlich
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_repeat_required_bleeding
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_repeat_required_perforation
+    label: Erneute Untersuchung wegen Intervallperforation erforderlich
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_repeat_required_perforation
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  - concept_id: coloreg_polyp_follow_up.coloreg_nonpassable_stenosis
+    label: Nicht passierbare Stenose in der Nachsorge
+    applicability_status: conditional
+    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
+    validator_names: []
+    evidence_path:
+    - patient_findings
+    finding_selector:
+      finding_name: coloreg_polyp_follow_up
+      classification_name: coloreg_nonpassable_stenosis
+    allowed_values:
+    - 'yes'
+    - 'no'
+    - unknown
+    guideline_citations: []
+  examination: colonoscopy
+  report_sections:
+  - coloreg_colonoscopy_polyps
+  - coloreg_polyp_resection_section
+  - coloreg_polyp_follow_up_section
+  validators:
+    examination_validators: []
+    classification_validators: []
+    intervention_validators: []
+    unit_validators: []
+    findings_validators:
+    - coloreg_hot_snare_requires_settings
+    - coloreg_primary_success_requires_protocol
+    - coloreg_subsequent_follow_up_requires_previous
+    - coloreg_technique_emr_requires_intervention
+    - coloreg_technique_esd_requires_intervention
+    - coloreg_technique_eftr_requires_intervention
+    - coloreg_snare_cold_requires_intervention
+    - coloreg_snare_diathermic_requires_intervention
+    - coloreg_completion_emr_requires_intervention
+    - coloreg_completion_esd_requires_intervention
+    - coloreg_completion_eftr_requires_intervention
+    - coloreg_interval_uncontrolled_bleeding_requires_event
+    - coloreg_repeat_required_bleeding_requires_event
+    - coloreg_repeat_required_perforation_requires_event

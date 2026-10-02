@@ -1,0 +1,241 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Source: MST 3.0 section 5. Diagnosis IDs include the procedure context so
+# repeated source labels remain unambiguous.
+
+# Upper endoscopy (§5.1)
+- {model: finding, name: mst30_dx_upper_aberrant_pancreas, name_en: Aberrant pancreas, name_de: "Aberrantes Pankreas", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_achalasia, name_en: Achalasia, name_de: "Achalasie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_barretts_esophagus, name_en: Barretts esophagus, name_de: "Barrett-Ösophagus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_benign_stricture, name_en: Benign stricture, name_de: "Benigne Stenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_bleeding_unknown_origin, name_en: Bleeding of unknown origin, name_de: "Blutung unklarer Herkunft", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_coeliac_disease, name_en: Coeliac disease, name_de: "Zöliakie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_crohns_disease, name_en: Crohns disease, name_de: "Morbus Crohn", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_dieulafoy_lesion, name_en: Dieulafoy lesion, name_de: "Dieulafoy-Läsion", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_benign_tumor, name_en: Duodenal benign tumor, name_de: "Benigner Duodenaltumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_bulb_deformity, name_en: Duodenal bulb deformity, name_de: "Deformität des Bulbus duodeni", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_cancer, name_en: Duodenal cancer, name_de: "Duodenalkarzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_diverticulum, name_en: Duodenal diverticulum, name_de: "Duodenaldivertikel", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_fistula, name_en: Duodenal fistula, name_de: "Duodenalfistel", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_polyp, name_en: Duodenal polyp, name_de: "Duodenalpolyp", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_postoperative_appearance, name_en: Duodenal postoperative appearance, name_de: "Postoperativer Befund im Duodenum", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_submucosal_tumor, name_en: Duodenal submucosal tumor, name_de: "Submuköser Duodenaltumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_superficial_neoplasm, name_en: Duodenal superficial neoplasm, name_de: "Oberflächliche Neoplasie des Duodenums", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_ulcer, name_en: Duodenal ulcer, name_de: "Duodenalulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenal_ulcer_bleeding, name_en: Duodenal ulcer with bleeding, name_de: "Blutendes Duodenalulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenopathy_erosive, name_en: Duodenopathy - erosive, name_de: "Erosive Duodenopathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenopathy_hemorrhagic, name_en: Duodenopathy - hemorrhagic, name_de: "Hämorrhagische Duodenopathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_duodenopathy_hyperemic, name_en: Duodenopathy - hyperemic, name_de: "Hyperämische Duodenopathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_eosinophilic_esophagitis, name_en: Eosinophilic esophagitis, name_de: "Eosinophile Ösophagitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_benign_tumor, name_en: Esophageal benign tumor, name_de: "Benigner Ösophagustumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_caustic_injury, name_en: Esophageal caustic injury, name_de: "Ösophagusverätzung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_cancer, name_en: Esophageal cancer, name_de: "Ösophaguskarzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_candidiasis, name_en: Esophageal candidiasis, name_de: "Ösophaguscandidose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_diverticulum, name_en: Esophageal diverticulum, name_de: "Ösophagusdivertikel", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_fistula, name_en: Esophageal fistula, name_de: "Ösophagusfistel", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_foreign_body, name_en: Esophageal foreign body, name_de: "Fremdkörper im Ösophagus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_polyp, name_en: Esophageal polyp, name_de: "Ösophaguspolyp", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_postoperative_appearance, name_en: Esophageal postoperative apperance, name_de: "Postoperativer Befund im Ösophagus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_stricture, name_en: Esophageal stricture, name_de: "Ösophagusstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_superficial_neoplasm, name_en: Esophageal superficial neoplasm, name_de: "Oberflächliche Neoplasie des Ösophagus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_submucosal_tumor, name_en: Esophageal submucosal tumor, name_de: "Submuköser Ösophagustumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_esophageal_varices, name_en: Esophageal varices, name_de: "Ösophagusvarizen", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_extrinsic_compression, name_en: Extrinsic compression, name_de: "Kompression von außen", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_benign_tumor, name_en: Gastric benign tumor, name_de: "Benigner Magentumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_cancer, name_en: Gastric cancer, name_de: "Magenkarzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_diverticulum, name_en: Gastric diverticulum, name_de: "Magendivertikel", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_fistula, name_en: Gastric fistula, name_de: "Magenfistel", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_foreign_body, name_en: Gastric foreign body, name_de: "Fremdkörper im Magen", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_caustic_injury, name_en: Gastric caustic injury, name_de: "Magenverätzung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_lymphoma, name_en: Gastric lymphoma, name_de: "Magenlymphom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_polyps, name_en: Gastric polyp(s), name_de: "Magenpolypen", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_postoperative_appearance, name_en: Gastric postoperative appearance, name_de: "Postoperativer Befund im Magen", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_retention, name_en: Gastric retention, name_de: "Magenretention", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_submucosal_tumor, name_en: Gastric submucosal tumor, name_de: "Submuköser Magentumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_superficial_neoplasm, name_en: Gastric superficial neoplasm, name_de: "Oberflächliche Neoplasie des Magens", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_ulcer, name_en: Gastric ulcer, name_de: "Magenulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_ulcer_bleeding, name_en: Gastric ulcer with bleeding, name_de: "Blutendes Magenulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_ulcer_anastomotic, name_en: Gastric ulcer-anastomotic, name_de: "Anastomosenulkus des Magens", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastric_varices, name_en: Gastric varices, name_de: "Magenvarizen", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastropathy_erosive, name_en: Gastropathy-erosive, name_de: "Erosive Gastropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastropathy_hemorrhagic, name_en: Gastropathy-hemorrhagic, name_de: "Hämorrhagische Gastropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastropathy_hyperemic, name_en: Gastropathy-hyperemic, name_de: "Hyperämische Gastropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastropathy_hypertrophic, name_en: Gastropathy-hypertrophic, name_de: "Hypertrophe Gastropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastropathy_nsaid_related, name_en: Gastropathy-NSAID-related, name_de: "NSAR-assoziierte Gastropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastropathy_portal_hypertensive, name_en: Gastropathy-portal hypertensive, name_de: "Portalhypertensive Gastropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_gastropathy_varioloform, name_en: Gastropathy-varioloform, name_de: "Varioliforme Gastropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_hiatus_hernia, name_en: Hiatus hernia, name_de: "Hiatushernie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_mallory_weiss_tear, name_en: Mallory-Weiss tear, name_de: "Mallory-Weiss-Läsion", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_other_esophagitis, name_en: Other esophagitis, name_de: "Sonstige Ösophagitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_parasites, name_en: Parasites, name_de: "Parasiten", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_post_sclerotherapy_appearance, name_en: Post sclerotherapy appearance, name_de: "Befund nach Sklerotherapie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_pyloric_stenosis, name_en: Pyloric stenosis, name_de: "Pylorusstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_reflux_esophagitis, name_en: Reflux esophagitis, name_de: "Refluxösophagitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_schatzki_ring, name_en: Schatzki ring, name_de: "Schatzki-Ring", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_scar, name_en: Scar, name_de: "Narbe", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_upper_submucosal_tumor, name_en: Submucosal tumor, name_de: "Submuköser Tumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+
+# Colonoscopy (§5.2)
+- {model: finding, name: mst30_dx_colon_angiodysplasia, name_en: Angiodysplasia, name_de: "Angiodysplasie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_bleeding_unknown_origin, name_en: Bleeding of unknown origin, name_de: "Blutung unklarer Herkunft", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_colitis_ischemic, name_en: Colitis - ischemic, name_de: "Ischämische Kolitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_colitis_pseudomembranous, name_en: Colitis - pseudomembranous, name_de: "Pseudomembranöse Kolitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_colorectal_cancer, name_en: Colorectal cancer, name_de: "Kolorektales Karzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_colorectal_superficial_neoplasm, name_en: Colorectal superficial neoplasm, name_de: "Oberflächliche kolorektale Neoplasie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_condylomata, name_en: Condylomata, name_de: "Kondylome", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_crohns_active, name_en: Crohns disease - active, name_de: "Morbus Crohn – aktiv", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_crohns_fulminant, name_en: Crohns disease - fulminant, name_de: "Morbus Crohn – fulminant", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_crohns_quiescent, name_en: Crohns disease - quiescent, name_de: "Morbus Crohn – in Remission", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_diverticulitis, name_en: Diverticulitis, name_de: "Divertikulitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_diverticulosis, name_en: Diverticulosis, name_de: "Divertikulose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_fistula, name_en: Fistula, name_de: "Fistel", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_foreign_body, name_en: Foreign body, name_de: "Fremdkörper", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_hemorrhoids, name_en: Hemorrhoids, name_de: "Hämorrhoiden", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_ileitis, name_en: Ileitis, name_de: Ileitis, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_lipoma, name_en: Lipoma, name_de: "Lipom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_lymphoma, name_en: Lymphoma, name_de: "Lymphom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_melanosis, name_en: Melanosis, name_de: "Melanose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_parasites, name_en: Parasites, name_de: "Parasiten", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_pneumatosis_coli, name_en: Pneumatosis coli, name_de: Pneumatosis coli, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_polyp, name_en: Polyp, name_de: Polyp, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_polyposis_syndrome, name_en: Polyposis syndrome, name_de: "Polyposissyndrom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_postoperative_appearance, name_en: Postoperative appearance, name_de: "Postoperativer Befund", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_proctitis, name_en: Proctitis, name_de: "Proktitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_rectal_ulcer, name_en: Rectal ulcer, name_de: "Rektumulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_solitary_ulcer, name_en: Solitary ulcer, name_de: "Solitäres Ulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_stricture_inflammatory, name_en: Stricture - inflammatory, name_de: "Entzündliche Stenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_stricture_malignant, name_en: Stricture - malignant, name_de: "Maligne Stenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_stricture_postoperative, name_en: Stricture - postoperative, name_de: "Postoperative Stenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_submucosal_tumor, name_en: Submucosal tumor, name_de: "Submuköser Tumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_uc_active, name_en: Ulcerative colitis - active, name_de: "Colitis ulcerosa – aktiv", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_uc_fulminant, name_en: Ulcerative colitis - fulminant, name_de: "Colitis ulcerosa – fulminant", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_colon_uc_quiescent, name_en: Ulcerative colitis – quiescent, name_de: "Colitis ulcerosa – in Remission", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+
+# Enteroscopy (§5.3)
+- {model: finding, name: mst30_dx_enteroscopy_angioectasia, name_en: Angioectasia, name_de: "Angiektasie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_bleeding_unknown_origin, name_en: "Bleeding, unknown origin", name_de: "Blutung unklarer Herkunft", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_celiac_disease, name_en: Celiac disease, name_de: "Zöliakie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_crohns_disease, name_en: Crohns disease, name_de: "Morbus Crohn", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_diverticula, name_en: Diverticula, name_de: "Divertikel", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_enteropathy_erosive, name_en: Enteropathy - erosive, name_de: "Erosive Enteropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_enteropathy_hemorrhagic, name_en: Enteropathy - hemorrhagic, name_de: "Hämorrhagische Enteropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_enteropathy_hyperemic, name_en: Enteropathy - hyperemic, name_de: "Hyperämische Enteropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_enteropathy_nsaid_related, name_en: Enteropathy - NSAID-related, name_de: "NSAR-assoziierte Enteropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_erosions, name_en: Erosions, name_de: "Erosionen", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_fap, name_en: FAP, name_de: FAP, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_gist, name_en: GIST, name_de: GIST, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_graft_v_host, name_en: Graft v host disease, name_de: "Graft-versus-Host-Erkrankung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_juvenile_polyposis, name_en: Juvenile polyposis, name_de: "Juvenile Polyposis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_lipoma, name_en: Lipoma, name_de: "Lipom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_lymphangioectasia, name_en: Lymphangioectasia, name_de: "Lymphangiektasie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_lymphoma, name_en: Lymphoma, name_de: "Lymphom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_nsaid_enteropathy, name_en: NSAID-enteropathy, name_de: "NSAR-Enteropathie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_parasites, name_en: Parasites, name_de: "Parasiten", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_peutz_jaeger, name_en: Peutz-Jæger polyposis, name_de: "Peutz-Jeghers-Polyposis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_polyps, name_en: Polyp(s), name_de: "Polypen", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_radiation_enteritis, name_en: Radiation enteritis, name_de: "Strahlenenteritis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_small_bowel_benign_tumor, name_en: Small bowel benign tumor, name_de: "Benigner Dünndarmtumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_small_bowel_malignant_tumor, name_en: Small bowel malignant tumor, name_de: "Maligner Dünndarmtumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_small_bowel_superficial_neoplasm, name_en: Small bowel superficial neoplasm, name_de: "Oberflächliche Neoplasie des Dünndarms", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_submucosal_tumor, name_en: Submucosal tumor, name_de: "Submuköser Tumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_enteroscopy_ulcer, name_en: Ulcer, name_de: "Ulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+
+# ERCP (§5.4)
+- {model: finding, name: mst30_dx_ercp_abnormal_pancreatobiliary_junction, name_en: Abnormal pancreatobiliary junction, name_de: "Abnorme pankreatobiliäre Verbindung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_anastomotic_stricture, name_en: Anastomotic stricture, name_de: "Anastomosenstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_biliary_fistula_leak, name_en: Biliary fistula/leak, name_de: "Gallenwegsfistel/-leckage", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_biliary_injury, name_en: Biliary injury, name_de: "Gallenwegsverletzung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_biliary_occlusion, name_en: Biliary occlusion, name_de: "Gallenwegsverschluss", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_biliary_stent_occlusion, name_en: Biliary stent occlusion, name_de: "Verschluss eines Gallenwegsstents", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_biliary_stones, name_en: Biliary stone(s), name_de: "Gallenwegssteine", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_biliary_stricture, name_en: Biliary stricture, name_de: "Gallenwegsstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_carolis_disease, name_en: Carolis disease, name_de: "Caroli-Krankheit", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_choledochal_cyst, name_en: Choledochal cyst, name_de: "Choledochuszyste", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_choledochocele, name_en: Choledochocele, name_de: "Choledochozele", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_cystic_duct_stones, name_en: Cystic duct stones, name_de: "Steine im Ductus cysticus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_gallbladder_stones, name_en: Gallbladder stone(s), name_de: "Gallenblasensteine", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_gallbladder_tumor, name_en: Gallbladder tumor, name_de: "Gallenblasentumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_hemobilia, name_en: Hemobilia, name_de: "Hämobilie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_ipmt, name_en: IPMT, name_de: IPMT, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_kolangiocarcinoma, name_en: Kolangiocarcinoma, name_de: "Cholangiokarzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_liver_parenchymal_disease, name_en: Liver parenchymal disease, name_de: "Leberparenchymerkrankung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_mirizzi_syndrome, name_en: Mirizzi syndrome, name_de: "Mirizzi-Syndrom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreas_annulare, name_en: Pancreas annulare, name_de: Pancreas annulare, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreas_divisum, name_en: Pancreas divisum, name_de: Pancreas divisum, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreatic_cyst, name_en: Pancreatic cyst, name_de: "Pankreaszyste", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreatic_duct_fistula_leak, name_en: Pancreatic duct fistula/leak, name_de: "Pankreasgangfistel/-leckage", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreatic_duct_injury, name_en: Pancreatic duct injury, name_de: "Pankreasgangverletzung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreatic_duct_stricture, name_en: Pancreatic duct stricture, name_de: "Pankreasgangstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreatic_stent_occlusion, name_en: Pancreatic stent occlusion, name_de: "Verschluss eines Pankreasstents", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreatic_stone, name_en: Pancreatic stone, name_de: "Pankreasstein", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreatic_tumor, name_en: Pancreatic tumor, name_de: "Pankreastumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreatitis_acute, name_en: Pancreatitis - acute, name_de: "Akute Pankreatitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_pancreatitis_chronic, name_en: Pancreatitis - chronic, name_de: "Chronische Pankreatitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_papillary_stenosis, name_en: Papillary stenosis, name_de: "Papillenstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_papillary_tumor, name_en: Papillary tumor, name_de: "Papillentumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_primary_sclerosing_cholangitis, name_en: Primary sclerosing cholangitis, name_de: "Primär sklerosierende Cholangitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_sump_syndrome, name_en: Sump syndrome, name_de: "Sump-Syndrom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_ercp_suppurative_cholangitis, name_en: Suppurative cholangitis, name_de: "Eitrige Cholangitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+
+# EUS (§5.5)
+- {model: finding, name: mst30_dx_eus_aortic_aneurysm, name_en: Aortic aneurysm, name_de: "Aortenaneurysma", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_ascites, name_en: Ascites, name_de: "Aszites", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_bile_duct_dilation, name_en: Bile duct dilation, name_de: "Gallengangserweiterung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_bile_duct_stone, name_en: Bile duct stone, name_de: "Gallengangsstein", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_bile_duct_stricture, name_en: Bile duct stricture, name_de: "Gallengangsstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_bile_duct_tumor, name_en: Bile duct tumor, name_de: "Gallengangstumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_biliary_sludge, name_en: Biliary sludge, name_de: "Gallengangssludge", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_colorectal_cancer, name_en: Colorectal cancer, name_de: "Kolorektales Karzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_colorectal_polyp, name_en: Colorectal polyp, name_de: "Kolorektaler Polyp", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_colorectal_stricture, name_en: Colorectal stricture, name_de: "Kolorektale Stenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_colorectal_submucosal_mass, name_en: Colorectal submucosal mass, name_de: "Submuköse kolorektale Raumforderung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_colorectal_ulcer, name_en: Colorectal ulcer, name_de: "Kolorektales Ulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_crohns_disease, name_en: Crohns disease, name_de: "Morbus Crohn", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_duodenal_cancer, name_en: Duodenal cancer, name_de: "Duodenalkarzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_duodenal_polyp, name_en: Duodenal polyp, name_de: "Duodenalpolyp", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_duodenal_stricture, name_en: Duodenal stricture, name_de: "Duodenalstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_duodenal_submucosal_mass, name_en: Duodenal submucosal mass, name_de: "Submuköse Raumforderung des Duodenums", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_duodenal_ulcer, name_en: Duodenal ulcer, name_de: "Duodenalulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_endocrine_tumor, name_en: Endocrine tumor, name_de: "Endokriner Tumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_esophageal_cancer, name_en: Esophageal cancer, name_de: "Ösophaguskarzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_esophageal_mass, name_en: Esophageal mass, name_de: "Raumforderung des Ösophagus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_esophageal_polyp, name_en: Esophageal polyp, name_de: "Ösophaguspolyp", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_esophageal_stricture, name_en: Esophageal stricture, name_de: "Ösophagusstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_esophageal_submucosal_mass, name_en: Esophageal submucosal mass, name_de: "Submuköse Raumforderung des Ösophagus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_esophageal_ulcer, name_en: Esophageal ulcer, name_de: "Ösophagusulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_gallbladder_sludge, name_en: Gallbladder sludge, name_de: "Gallenblasensludge", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_gallbladder_stone, name_en: Gallbladder stone, name_de: "Gallenblasenstein", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_gastric_cancer, name_en: Gastric cancer, name_de: "Magenkarzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_gastric_polyp, name_en: Gastric polyp, name_de: "Magenpolyp", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_gastric_submucosal_mass, name_en: Gastric submucosal mass, name_de: "Submuköse Raumforderung des Magens", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_gastric_ulcer, name_en: Gastric ulcer, name_de: "Magenulkus", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_gist_tumor, name_en: GIST tumor, name_de: "GIST-Tumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_ipmt, name_en: IPMT, name_de: IPMT, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_linitis_plastica, name_en: linitis plastica, name_de: "Linitis plastica", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_lipoma, name_en: lipoma, name_de: "Lipom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_lymphoma, name_en: lymphoma, name_de: "Lymphom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_mediastinal_lymph_nodes, name_en: Mediastinal lymph node(s), name_de: "Mediastinale Lymphknoten", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_mediastinal_mass, name_en: Mediastinal mass, name_de: "Mediastinale Raumforderung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_menetriers_disease, name_en: Menetrier’s disease, name_de: "Morbus Ménétrier", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_mesenteric_artery_aneurysm, name_en: Mesenteric artery aneurysm, name_de: "Aneurysma der Mesenterialarterie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pancreas_divisum, name_en: Pancreas divisum, name_de: Pancreas divisum, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pancreatic_cancer, name_en: Pancreatic cancer, name_de: "Pankreaskarzinom", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pancreatic_duct_dilation, name_en: Pancreatic duct dilation, name_de: "Pankreasgangerweiterung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pancreatic_duct_stricture, name_en: Pancreatic duct stricture, name_de: "Pankreasgangstenose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pancreatic_mass, name_en: Pancreatic mass, name_de: "Pankreasraumforderung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pancreatic_pseudocyst, name_en: Pancreatic pseudocyst, name_de: "Pankreaspseudozyste", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pancreatic_stone, name_en: Pancreatic stone, name_de: "Pankreasstein", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pancreatitis_acute, name_en: Pancreatitis - acute, name_de: "Akute Pankreatitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pancreatitis_chronic, name_en: Pancreatitis - chronic, name_de: "Chronische Pankreatitis", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_papillary_mass, name_en: Papillary mass, name_de: "Raumforderung der Papille", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pericardial_effusion, name_en: Pericardial effusion, name_de: "Perikarderguss", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pleural_effusion, name_en: Pleural effusion, name_de: "Pleuraerguss", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_polyp, name_en: Polyp, name_de: Polyp, finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_portal_vein_thrombosis, name_en: portal vein thrombosis, name_de: "Pfortaderthrombose", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_postradiation_changes, name_en: postradiation changes, name_de: "Veränderungen nach Bestrahlung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_pseudoaneurysm, name_en: pseudoaneurysm, name_de: "Pseudoaneurysma", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_splenic_artery_aneurysm, name_en: Splenic artery aneurysm, name_de: "Aneurysma der Milzarterie", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_submucosal_tumor, name_en: Submucosal tumor, name_de: "Submuköser Tumor", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_tnm_stage, name_en: TNM-stage, name_de: "TNM-Stadium", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_ulcerative_colitis, name_en: Ulcerative colitis, name_de: "Colitis ulcerosa", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_varices, name_en: Varices, name_de: "Varizen", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}
+- {model: finding, name: mst30_dx_eus_wall_thickening, name_en: Wall thickening, name_de: "Wandverdickung", finding_types: [mst30_diagnosis], description: "MST 3.0 section 5 diagnosis term."}

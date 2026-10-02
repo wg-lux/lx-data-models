@@ -1,0 +1,175 @@
+# Sources for every record in this file:
+# - DGVS S2k quality guideline (AWMF 021-022), team time-out: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b20056d03/chapter_69f4b200d1e40/
+- model: classification_choice
+  name: "endoscopy_team_timeout_time_recorded"
+  name_de: "Zeitpunkt des Team-Time-outs dokumentiert"
+  name_en: "Team time-out time recorded"
+  classification_choice_descriptors:
+    - endoscopy_team_timeout_time_value
+
+- model: classification_choice
+  name: "endoscopy_sign_out_time_recorded"
+  name_de: "Zeitpunkt des Sign-outs dokumentiert"
+  name_en: "Sign-out time recorded"
+  classification_choice_descriptors:
+    - endoscopy_sign_out_time_value
+
+- model: classification_choice
+  name: "team_introduction_confirmed"
+  name_de: "Teamvorstellung bestätigt"
+  name_en: "Team introduction confirmed"
+
+- model: classification_choice
+  name: "team_introduction_not_applicable"
+  name_de: "Nicht zutreffend – keine teamfremden Personen"
+  name_en: "Not applicable — no unfamiliar team members"
+
+- model: classification_choice
+  name: "team_introduction_not_confirmed"
+  name_de: "Teamvorstellung nicht bestätigt"
+  name_en: "Team introduction not confirmed"
+
+- model: classification_choice
+  name: "patient_identity_confirmed_against_identifiers"
+  name_de: "Patientenidentität anhand der Identifikatoren bestätigt"
+  name_en: "Patient identity confirmed against identifiers"
+
+- model: classification_choice
+  name: "patient_identity_not_confirmed"
+  name_de: "Patientenidentität nicht bestätigt"
+  name_en: "Patient identity not confirmed"
+
+- model: classification_choice
+  name: "patient_preparation_confirmed"
+  name_de: "Patientenvorbereitung bestätigt"
+  name_en: "Patient preparation confirmed"
+
+- model: classification_choice
+  name: "patient_preparation_not_confirmed"
+  name_de: "Patientenvorbereitung nicht bestätigt"
+  name_en: "Patient preparation not confirmed"
+
+- model: classification_choice
+  name: "procedure_confirmed_no_special_features"
+  name_de: "Eingriff bestätigt – keine Besonderheiten"
+  name_en: "Procedure confirmed — no special features"
+
+- model: classification_choice
+  name: "procedure_confirmed_special_features_discussed"
+  name_de: "Eingriff bestätigt – Besonderheiten besprochen"
+  name_en: "Procedure confirmed — special features discussed"
+
+- model: classification_choice
+  name: "procedure_not_confirmed"
+  name_de: "Eingriff nicht bestätigt"
+  name_en: "Procedure not confirmed"
+
+- model: classification_choice
+  name: "risks_reviewed_none_identified"
+  name_de: "Risiken und besondere Medikation geprüft – keine identifiziert"
+  name_en: "Risks and special medication reviewed — none identified"
+
+- model: classification_choice
+  name: "risks_reviewed_present_and_communicated"
+  name_de: "Risiken oder besondere Medikation vorhanden und kommuniziert"
+  name_en: "Risks or special medication present and communicated"
+
+- model: classification_choice
+  name: "risks_not_reviewed"
+  name_de: "Risiken und besondere Medikation nicht geprüft"
+  name_en: "Risks and special medication not reviewed"
+
+- model: classification_choice
+  name: "required_documents_confirmed_complete"
+  name_de: "Erforderliche Dokumente vollständig"
+  name_en: "Required documents confirmed complete"
+
+- model: classification_choice
+  name: "required_documents_incomplete"
+  name_de: "Erforderliche Dokumente unvollständig"
+  name_en: "Required documents incomplete"
+
+- model: classification_choice
+  name: "required_equipment_confirmed_ready"
+  name_de: "Erforderliches Equipment vollständig und funktionsbereit"
+  name_en: "Required equipment confirmed ready"
+
+- model: classification_choice
+  name: "required_equipment_not_ready"
+  name_de: "Erforderliches Equipment nicht vollständig funktionsbereit"
+  name_en: "Required equipment not ready"
+
+- model: classification_choice
+  name: "required_personnel_confirmed_ready"
+  name_de: "Erforderliches Personal vollständig bereit"
+  name_en: "Required personnel confirmed ready"
+
+- model: classification_choice
+  name: "required_personnel_not_ready"
+  name_de: "Erforderliches Personal nicht vollständig bereit"
+  name_en: "Required personnel not ready"
+
+- model: classification_choice
+  name: "postprocedure_patient_condition_documented"
+  name_de: "Patientenzustand nach dem Eingriff dokumentiert"
+  name_en: "Post-procedure patient condition documented"
+
+- model: classification_choice
+  name: "postprocedure_patient_condition_not_documented"
+  name_de: "Patientenzustand nach dem Eingriff nicht dokumentiert"
+  name_en: "Post-procedure patient condition not documented"
+
+- model: classification_choice
+  name: "follow_up_confirmed_no_special_measures"
+  name_de: "Nachsorge bestätigt – keine besonderen Maßnahmen"
+  name_en: "Follow-up confirmed — no special measures"
+
+- model: classification_choice
+  name: "follow_up_special_measures_documented_and_handed_over"
+  name_de: "Besondere Nachsorgemaßnahmen dokumentiert und übergeben"
+  name_en: "Special follow-up measures documented and handed over"
+
+- model: classification_choice
+  name: "follow_up_not_confirmed"
+  name_de: "Nachsorgemaßnahmen nicht bestätigt"
+  name_en: "Follow-up measures not confirmed"
+
+- model: classification_choice
+  name: "specimen_handling_not_applicable"
+  name_de: "Nicht zutreffend – keine Proben oder Resektate"
+  name_en: "Not applicable — no specimens or resections"
+
+- model: classification_choice
+  name: "specimen_handling_all_secured"
+  name_de: "Alle Proben und Resektate korrekt versorgt"
+  name_en: "All specimens and resections secured"
+
+- model: classification_choice
+  name: "specimen_handling_unresolved"
+  name_de: "Versorgung von Proben oder Resektaten ungeklärt"
+  name_en: "Specimen or resection handling unresolved"
+
+- model: classification_choice
+  name: "procedure_problems_reviewed_none"
+  name_de: "Eingriffsprobleme geprüft – keine aufgetreten"
+  name_en: "Procedure problems reviewed — none occurred"
+
+- model: classification_choice
+  name: "procedure_problems_documented_and_communicated"
+  name_de: "Eingriffsprobleme dokumentiert und kommuniziert"
+  name_en: "Procedure problems documented and communicated"
+
+- model: classification_choice
+  name: "procedure_problems_not_reviewed"
+  name_de: "Eingriffsprobleme nicht geprüft"
+  name_en: "Procedure problems not reviewed"
+
+- model: classification_choice
+  name: "report_documentation_confirmed_complete"
+  name_de: "Befunddokumentation vollständig"
+  name_en: "Report documentation confirmed complete"
+
+- model: classification_choice
+  name: "report_documentation_incomplete"
+  name_de: "Befunddokumentation unvollständig"
+  name_en: "Report documentation incomplete"

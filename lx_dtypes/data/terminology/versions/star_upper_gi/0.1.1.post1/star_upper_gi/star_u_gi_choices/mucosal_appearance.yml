@@ -1,0 +1,40 @@
+# Structured mucosal appearances used by the STAR upper-GI terminology.
+- model: classification_choice
+  name: star_upper_gi_mucosal_appearance_normal
+  name_de: Normale Mukosa
+  name_en: Normal mucosa
+
+- model: classification_choice
+  name: star_upper_gi_mucosal_appearance_inflammation
+  name_de: Entzündung
+  name_en: Inflammation
+
+- model: classification_choice
+  name: star_upper_gi_mucosal_appearance_erosion
+  name_de: Erosion
+  name_en: Erosion
+
+- model: classification_choice
+  name: star_upper_gi_mucosal_appearance_ulcer
+  name_de: Ulkus
+  name_en: Ulcer
+
+- model: classification_choice
+  name: star_upper_gi_mucosal_appearance_bleeding
+  name_de: Blutung
+  name_en: Bleeding
+
+- model: classification_choice
+  name: star_upper_gi_mucosal_appearance_atrophy
+  name_de: Atrophie
+  name_en: Atrophy
+
+- model: classification_choice
+  name: star_upper_gi_mucosal_appearance_metaplasia
+  name_de: Metaplasie
+  name_en: Metaplasia
+
+- model: classification_choice
+  name: star_upper_gi_mucosal_appearance_dysplasia
+  name_de: Dysplasie
+  name_en: Dysplasia

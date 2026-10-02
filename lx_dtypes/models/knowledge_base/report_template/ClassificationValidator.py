@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import List, Literal, cast
+from typing import Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -14,12 +14,12 @@ from lx_dtypes.models.knowledge_base.report_template.ClassificationValidatorData
     ClassificationValidatorPrecedenceLiteral,
     ClassificationValidatorQueryDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.ValidatorRequirementReference import (
-    ValidatorRequirementReference,
-)
 from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
     FindingsValidatorConditionClause,
     _normalize_value,
+)
+from lx_dtypes.models.knowledge_base.report_template.ValidatorRequirementReference import (
+    ValidatorRequirementReference,
 )
 from lx_dtypes.models.knowledge_base.report_template.ValueTypes import ValidationParams
 
@@ -198,7 +198,7 @@ class ClassificationValidator(KnowledgebaseBaseModel[ClassificationValidatorData
         return self
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return []
 
     @property

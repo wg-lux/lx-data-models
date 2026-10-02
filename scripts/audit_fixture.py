@@ -15,7 +15,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
+from typing import Any, Iterable, Mapping, Sequence
 from textwrap import dedent
 
 import yaml
@@ -115,7 +115,9 @@ def load_yaml_file(path: Path) -> list[dict[str, Any]]:
     return []
 
 
-def iter_yaml_files_from_module_config(config_path: Path) -> tuple[dict[str, Any], list[Path]]:
+def iter_yaml_files_from_module_config(
+    config_path: Path,
+) -> tuple[dict[str, Any], list[Path]]:
     config = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
     if not isinstance(config, dict):
         raise ValueError(f"Config is not a mapping: {config_path}")
@@ -197,7 +199,9 @@ def discover_module_configs(data_root: Path) -> dict[str, Path]:
     return out
 
 
-def extract_references(records: Sequence[Record]) -> tuple[list[Reference], list[str], list[str]]:
+def extract_references(
+    records: Sequence[Record],
+) -> tuple[list[Reference], list[str], list[str]]:
     refs: list[Reference] = []
     mixed_inline_sections: list[str] = []
     alias_warnings: list[str] = []
@@ -428,7 +432,9 @@ def render_traceability_matrix(rows: Sequence[MatrixRow]) -> str:
     ]
     for row in rows:
         left = f"`{row.reference}` ({row.source})"
-        right = row.definition if row.definition == "(missing)" else f"`{row.definition}`"
+        right = (
+            row.definition if row.definition == "(missing)" else f"`{row.definition}`"
+        )
         lines.append(
             f"| {row.feature} | {left} | {right} | **{row.status}** | {row.risk} |"
         )
@@ -457,7 +463,9 @@ def main() -> int:
     local_by_model, _ = build_name_index(local_records)
 
     module_configs = discover_module_configs(data_root)
-    depends_on = [str(item) for item in (config.get("depends_on") or []) if isinstance(item, str)]
+    depends_on = [
+        str(item) for item in (config.get("depends_on") or []) if isinstance(item, str)
+    ]
 
     dep_records: list[Record] = []
     missing_dep_modules: list[str] = []
@@ -500,13 +508,13 @@ def main() -> int:
 
     duplicate_lines = [
         f"{name}: "
-        + ", ".join(
-            f"{rec.model_raw}@{rec.source_file.name}" for rec in recs
-        )
+        + ", ".join(f"{rec.model_raw}@{rec.source_file.name}" for rec in recs)
         for name, recs in duplicates
     ]
 
-    shadowing = find_shadowing_risks(local_by_model=local_by_model, dep_by_model=dep_by_model)
+    shadowing = find_shadowing_risks(
+        local_by_model=local_by_model, dep_by_model=dep_by_model
+    )
 
     print(f"# Audit Report: {module_name}")
     print(f"- config: `{config_path}`")
@@ -520,7 +528,9 @@ def main() -> int:
     print_section("Dangling References", dangling)
     print_section("Case/Style Mismatches", style_mismatches)
     print_section("Traceability Collisions", collisions)
-    print_section("KnowledgeBase Collisions (Duplicate Names in Module)", duplicate_lines)
+    print_section(
+        "KnowledgeBase Collisions (Duplicate Names in Module)", duplicate_lines
+    )
     print_section("Circular Examination Validator Chains", cycle_lines)
     print_section("Shadowing Risks (depends_on overlap)", shadowing)
     print_section("Mixed Inline vs Reference Findings", mixed_inline_sections)

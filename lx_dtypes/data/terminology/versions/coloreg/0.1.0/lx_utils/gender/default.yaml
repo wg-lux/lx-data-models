@@ -1,0 +1,6 @@
+- model: gender
+  fields:
+    name: male
+    name_de: "Männlich"
+    abbreviation: M
+    description: Male
