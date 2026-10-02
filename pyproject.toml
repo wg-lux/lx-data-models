@@ -74,7 +74,7 @@ dev = [
   "sphinx>=8.2.3,<9.0",
   "furo>=2025.9.25",
   "ruff>=0.14.8",
-  "twine>=7.0.0",
+  "twine>=6.2.0,<7",
   "opencv-python-headless>=4.12.0.88",
   "vulture>=2.16",
 
