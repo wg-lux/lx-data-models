@@ -62,8 +62,9 @@ class _RuntimeValidationKb:
         return "published"
 
     def evaluate_report_template_validators(
-        self, name: str, p_examination: PExamination
+        self, name: str, p_examination: PExamination, *, language: str = "de"
     ) -> dict[str, object]:
+        self.last_language = language
         del p_examination
         return {
             "template_name": name,
@@ -72,7 +73,7 @@ class _RuntimeValidationKb:
         }
 
     def evaluate_findings_validator(
-        self, name: str, p_examination: PExamination
+        self, name: str, p_examination: PExamination, *, language: str = "de"
     ) -> dict[str, object]:
         del p_examination
         return {"name": name, "ok": False, "issues": []}
@@ -184,17 +185,24 @@ def test_advanced_endoscopy_template_api_exposes_production_template(
     }
 
 
+@pytest.mark.parametrize(
+    "query, expected_language",
+    [("", "de"), ("&language=de", "de"), ("&language=en", "en")],
+)
 def test_report_template_runtime_validation_api(
     monkeypatch: pytest.MonkeyPatch,
+    query: str,
+    expected_language: str,
 ) -> None:
+    kb = _RuntimeValidationKb()
     monkeypatch.setattr(
         api_main,
         "resolve_module_kb",
-        lambda *args, **kwargs: _RuntimeValidationKb(),
+        lambda *args, **kwargs: kb,
     )
     client = Client()
     response = client.post(
-        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.0",
+        f"/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.0{query}",
         data=json.dumps(
             {
                 "patient": "test_patient",
@@ -239,6 +247,7 @@ def test_report_template_runtime_validation_api(
         secure=True,
     )
     assert response.status_code == 200
+    assert kb.last_language == expected_language
     payload = response.json()
     assert payload["template_name"] == "star_upper_gi_main"
     assert payload["ok"] is False
@@ -505,3 +514,21 @@ def test_core_concepts_api() -> None:
     assert payload["module_name"] == "report_template_examples"
     assert isinstance(payload["finding"], list)
     assert isinstance(payload["classification"], list)
+
+
+def test_runtime_validation_api_rejects_unsupported_language() -> None:
+    response = Client().post(
+        "/base_api/report-templates/report_template_examples/star_upper_gi_main/validate?version=0.1.0&language=fr",
+        data=json.dumps(
+            {
+                "patient": "test_patient",
+                "examination": "star_upper_gi_endoscopy",
+                "knowledge_base_module": "report_template_examples",
+                "knowledge_base_version": "0.1.0",
+            }
+        ),
+        content_type="application/json",
+        secure=True,
+    )
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"] == ["query", "language"]

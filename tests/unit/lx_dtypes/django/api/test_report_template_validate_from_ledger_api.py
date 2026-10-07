@@ -207,7 +207,7 @@ def test_validate_report_template_runtime_from_ledger_success(
             }
 
         def evaluate_report_template_validators(
-            self, name: str, p_examination: PExamination
+            self, name: str, p_examination: PExamination, *, language: str = "de"
         ) -> dict[str, Any]:
             assert name == "star_upper_gi_main"
             assert p_examination.examination == "star_upper_gi_endoscopy"

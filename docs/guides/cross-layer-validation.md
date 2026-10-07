@@ -49,6 +49,14 @@ Consumers branch on codes, display messages, and use paths to identify contract
 fields. `ok` means no error-level findings; warnings remain visible. It is not
 authorization to persist or a statement of clinical correctness.
 
+Both `validate_contract()` and `assess_examination()` accept a keyword-only
+`language="de"` or `language="en"`. They use the shared default from
+`lx_dtypes.language` (German); callers needing the previous English boundary
+messages must pass `language="en"`. Unsupported languages raise `ValueError`,
+including for valid payloads. `assess_examination()` forwards the selection to
+study validation, so contract, terminology, and study messages share one language.
+Codes, paths, severity, and validation decisions are unchanged.
+
 Boundary messages are centralized in `lx_dtypes/validation_messages.yml`.
 Contract issue codes retain Pydantic's error type with a `contract.` prefix.
 Unknown error types use a generic constraint message; submitted values and

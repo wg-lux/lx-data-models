@@ -40,6 +40,7 @@ from lx_dtypes.django.api.report_template_builder import (
 from lx_dtypes.django.api.report_template_routes import register_report_template_routes
 from lx_dtypes.django.api.request_types import BaseRequest
 from lx_dtypes.django.api.terminology_routes import register_terminology_routes
+from lx_dtypes.language import DEFAULT_LANGUAGE, LANGUAGE_LABELS, LanguageCode
 from lx_dtypes.models.contracts import KnowledgeBaseContract
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,
@@ -55,7 +56,7 @@ from lx_dtypes.terminology.terminology_loader import (
 from lx_dtypes.terminology.terminology_service import TerminologyError
 
 F = TypeVar("F", bound=Callable[..., Any])
-ReportLanguageCode = Literal["de", "en"]
+ReportLanguageCode = LanguageCode
 
 
 class ReportLanguageOption(TypedDict):
@@ -104,10 +105,9 @@ def reporting_languages(request: BaseRequest) -> ReportLanguagesResponse:
     """Return the report languages supported by LXDM concept labels."""
     del request
     return {
-        "default_language": "de",
+        "default_language": DEFAULT_LANGUAGE,
         "languages": [
-            {"code": "de", "label": "Deutsch"},
-            {"code": "en", "label": "English"},
+            {"code": code, "label": label} for code, label in LANGUAGE_LABELS.items()
         ],
     }
 

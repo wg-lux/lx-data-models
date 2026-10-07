@@ -574,6 +574,26 @@ For `condition` validators:
 - validation only fails for those triggered occurrences
 - non-triggering occurrences are ignored for the conditional requirement itself
 
+### Runtime message language
+
+Runtime and `KnowledgeBase.evaluate_*` methods accept `language="de"` (the
+new default) or `language="en"`. The template `/validate`, `/validate-from-ledger`,
+and single-validator `/validate` API routes accept the same `language` query
+parameter; omitting it returns German messages for lx-annotate. Clients that
+require the previous English wording must explicitly request `language=en`.
+Unsupported languages are rejected, including when validation succeeds.
+
+Only issue `message` text is translated. Codes, identifiers, details, hints,
+result field names, and validation decisions remain language independent.
+Nested dependency issues use the selected language too. The lx-dtypes
+maintainers own the canonical text catalogue in
+`lx_dtypes/validator_runtime_messages.yml`. The shared `lx_dtypes.language` module
+owns `LanguageCode`, `DEFAULT_LANGUAGE`, language labels, validation, and catalogue
+loading. Reporting options, draft contracts, API routes, and runtime methods use
+this policy; the existing `RuntimeValidationLanguage` and `ReportLanguageCode`
+imports remain aliases. Select a language per call; no process-global language
+is changed.
+
 ### What is returned
 
 Top-level template validation returns a `ReportTemplateRuntimeValidationResultDataDict` with:
@@ -712,3 +732,14 @@ Expected registry shape:
 - Graph-specific validation: `docs/guides/report-template-graph-validation.md`
 - Operator migration for persisted validator data: `docs/guides/report-template-findings-validator-migration.md`
 - Intentionally broken audit fixture: `docs/guides/fixtures/report-template-chaos/README.md`
+
+## ColoReg identifier capture
+
+The current ColoReg template omits the case, lesion, index examination, index
+polyp, index resection, and preceding follow-up identifier inputs and their
+coverage checks. Subsequent follow-up no longer requires a documented preceding
+examination ID through a template validator. The terminology definitions remain
+available for existing observations and host-managed linkage; historical
+packages are unchanged. Hosts that consumed these template inputs must obtain
+linkage from their own observation context. Clinical validation rules remain
+active.

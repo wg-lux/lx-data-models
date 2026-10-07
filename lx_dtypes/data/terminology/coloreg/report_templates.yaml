@@ -45,26 +45,6 @@
   required: false
   multiple_allowed: true
   classifications:
-  - classification: coloreg_case_id
-    required: true
-    concept_id: coloreg_polyp_resection.coloreg_case_id
-    applicability_status: conditional
-    applicability_rule: Required for each recorded resection attempt.
-  - classification: coloreg_lesion_id
-    required: true
-    concept_id: coloreg_polyp_resection.coloreg_lesion_id
-    applicability_status: conditional
-    applicability_rule: Required for each recorded resection attempt.
-  - classification: coloreg_index_examination_id
-    required: true
-    concept_id: coloreg_polyp_resection.coloreg_index_examination_id
-    applicability_status: conditional
-    applicability_rule: Required for each recorded resection attempt.
-  - classification: coloreg_index_polyp_finding_id
-    required: true
-    concept_id: coloreg_polyp_resection.coloreg_index_polyp_finding_id
-    applicability_status: conditional
-    applicability_rule: Required for each recorded resection attempt.
   - classification: lesion_size_mm
     required: true
     concept_id: coloreg_polyp_resection.lesion_size_mm
@@ -151,41 +131,11 @@
   required: false
   multiple_allowed: true
   classifications:
-  - classification: coloreg_case_id
-    required: true
-    concept_id: coloreg_polyp_follow_up.coloreg_case_id
-    applicability_status: conditional
-    applicability_rule: Required for each recorded follow-up assessment.
-  - classification: coloreg_lesion_id
-    required: true
-    concept_id: coloreg_polyp_follow_up.coloreg_lesion_id
-    applicability_status: conditional
-    applicability_rule: Required for each recorded follow-up assessment.
-  - classification: coloreg_index_examination_id
-    required: true
-    concept_id: coloreg_polyp_follow_up.coloreg_index_examination_id
-    applicability_status: conditional
-    applicability_rule: Required for each recorded follow-up assessment.
-  - classification: coloreg_index_polyp_finding_id
-    required: true
-    concept_id: coloreg_polyp_follow_up.coloreg_index_polyp_finding_id
-    applicability_status: conditional
-    applicability_rule: Required for each recorded follow-up assessment.
-  - classification: coloreg_index_resection_finding_id
-    required: true
-    concept_id: coloreg_polyp_follow_up.coloreg_index_resection_finding_id
-    applicability_status: conditional
-    applicability_rule: Required for each recorded follow-up assessment.
   - classification: coloreg_follow_up_sequence
     required: true
     concept_id: coloreg_polyp_follow_up.coloreg_follow_up_sequence
     applicability_status: conditional
     applicability_rule: Required for each recorded follow-up assessment.
-  - classification: coloreg_previous_follow_up_examination_id
-    required: false
-    concept_id: coloreg_polyp_follow_up.coloreg_previous_follow_up_examination_id
-    applicability_status: conditional
-    applicability_rule: Required for subsequent follow-up visits; omit for the first follow-up.
   - classification: coloreg_days_since_index
     required: true
     concept_id: coloreg_polyp_follow_up.coloreg_days_since_index
@@ -285,74 +235,6 @@
     - colon_lesion_NICE_type_1
     - colon_lesion_NICE_type_2
     - colon_lesion_NICE_type_3
-    guideline_citations: []
-  - concept_id: coloreg_polyp_resection.coloreg_case_id.0
-    label: Pseudonyme Fallkennung
-    applicability_status: conditional
-    applicability_rule: Required for each recorded coloreg_polyp_resection.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_resection
-      classification_name: coloreg_case_id
-      classification_choice: coloreg_case_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
-    guideline_citations: []
-  - concept_id: coloreg_polyp_resection.coloreg_lesion_id.0
-    label: Stabile Läsionskennung
-    applicability_status: conditional
-    applicability_rule: Required for each recorded coloreg_polyp_resection.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_resection
-      classification_name: coloreg_lesion_id
-      classification_choice: coloreg_lesion_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
-    guideline_citations: []
-  - concept_id: coloreg_polyp_resection.coloreg_index_examination_id.0
-    label: Referenz zur Indexuntersuchung
-    applicability_status: conditional
-    applicability_rule: Required for each recorded coloreg_polyp_resection.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_resection
-      classification_name: coloreg_index_examination_id
-      classification_choice: coloreg_index_examination_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
-    guideline_citations: []
-  - concept_id: coloreg_polyp_resection.coloreg_index_polyp_finding_id.0
-    label: Referenz zum Indexpolypen
-    applicability_status: conditional
-    applicability_rule: Required for each recorded coloreg_polyp_resection.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_resection
-      classification_name: coloreg_index_polyp_finding_id
-      classification_choice: coloreg_index_polyp_finding_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
     guideline_citations: []
   - concept_id: coloreg_polyp_resection.lesion_size_mm.0
     label: Größter Durchmesser (mm)
@@ -599,91 +481,6 @@
     - 'no'
     - unknown
     guideline_citations: []
-  - concept_id: coloreg_polyp_follow_up.coloreg_case_id.0
-    label: Pseudonyme Fallkennung
-    applicability_status: conditional
-    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_follow_up
-      classification_name: coloreg_case_id
-      classification_choice: coloreg_case_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
-    guideline_citations: []
-  - concept_id: coloreg_polyp_follow_up.coloreg_lesion_id.0
-    label: Stabile Läsionskennung
-    applicability_status: conditional
-    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_follow_up
-      classification_name: coloreg_lesion_id
-      classification_choice: coloreg_lesion_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
-    guideline_citations: []
-  - concept_id: coloreg_polyp_follow_up.coloreg_index_examination_id.0
-    label: Referenz zur Indexuntersuchung
-    applicability_status: conditional
-    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_follow_up
-      classification_name: coloreg_index_examination_id
-      classification_choice: coloreg_index_examination_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
-    guideline_citations: []
-  - concept_id: coloreg_polyp_follow_up.coloreg_index_polyp_finding_id.0
-    label: Referenz zum Indexpolypen
-    applicability_status: conditional
-    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_follow_up
-      classification_name: coloreg_index_polyp_finding_id
-      classification_choice: coloreg_index_polyp_finding_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
-    guideline_citations: []
-  - concept_id: coloreg_polyp_follow_up.coloreg_index_resection_finding_id.0
-    label: Referenz zur Indexresektion
-    applicability_status: conditional
-    applicability_rule: Required for each recorded coloreg_polyp_follow_up.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_follow_up
-      classification_name: coloreg_index_resection_finding_id
-      classification_choice: coloreg_index_resection_finding_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
-    guideline_citations: []
   - concept_id: coloreg_polyp_follow_up.coloreg_follow_up_sequence
     label: Nachsorgesequenz
     applicability_status: conditional
@@ -697,23 +494,6 @@
     allowed_values:
     - coloreg_follow_up_first
     - coloreg_follow_up_subsequent
-    guideline_citations: []
-  - concept_id: coloreg_polyp_follow_up.coloreg_previous_follow_up_examination_id.0
-    label: Vorherige Nachsorgeuntersuchung
-    applicability_status: conditional
-    applicability_rule: Required for subsequent follow-up visits; omit for the first follow-up.
-    validator_names: []
-    evidence_path:
-    - patient_findings
-    finding_selector:
-      finding_name: coloreg_polyp_follow_up
-      classification_name: coloreg_previous_follow_up_examination_id
-      classification_choice: coloreg_previous_follow_up_examination_id_documented
-    concept_value_path:
-    - patient_finding_classification_choice_descriptors
-    - '0'
-    - descriptor_value
-    value_constraint: non_empty_string
     guideline_citations: []
   - concept_id: coloreg_polyp_follow_up.coloreg_days_since_index.0
     label: Tage seit Indexresektion
@@ -854,7 +634,6 @@
     findings_validators:
     - coloreg_hot_snare_requires_settings
     - coloreg_primary_success_requires_protocol
-    - coloreg_subsequent_follow_up_requires_previous
     - coloreg_technique_emr_requires_intervention
     - coloreg_technique_esd_requires_intervention
     - coloreg_technique_eftr_requires_intervention

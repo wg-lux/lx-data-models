@@ -141,3 +141,57 @@ def test_schema_failure_is_non_blocking(kb: KnowledgeBase) -> None:
     assert not result.ok
     assert all(issue.source == "contract" for issue in result.issues)
     assert not result.study_evaluated
+
+
+@pytest.mark.parametrize("payload", [{}, {"count": -1}, {"count": 2}])
+def test_contract_language_changes_only_messages(payload: dict[str, object]) -> None:
+    german = validate_contract(ExampleContract, payload, language="de")
+    english = validate_contract(ExampleContract, payload, language="en")
+    assert validate_contract(ExampleContract, payload) == german
+    assert german.value == english.value
+    for de_issue, en_issue in zip(
+        german.report.issues, english.report.issues, strict=True
+    ):
+        assert de_issue.message != en_issue.message
+        assert de_issue.model_copy(update={"message": en_issue.message}) == en_issue
+    with pytest.raises(ValueError, match="language"):
+        validate_contract(ExampleContract, payload, language="fr")  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    "scenario", ["study", "contract", "identity", "template", "semantic"]
+)
+def test_assessment_language_is_consistent_across_boundaries(
+    kb: KnowledgeBase, scenario: str
+) -> None:
+    payload = examination(kb)
+    template = "star_upper_gi_main"
+    if scenario == "study":
+        payload.pop("knowledge_base_module")
+        payload.pop("knowledge_base_version")
+    elif scenario == "contract":
+        payload.pop("patient")
+    elif scenario == "identity":
+        payload["knowledge_base_version"] = "unknown"
+    elif scenario == "template":
+        template = "unknown"
+    else:
+        payload["examination"] = "unknown"
+    german = assess_examination(kb, payload, template_name=template, language="de")
+    english = assess_examination(kb, payload, template_name=template, language="en")
+    assert german.issues
+    if scenario == "study":
+        assert {issue.source for issue in german.issues} == {"terminology", "study"}
+        assert german.issues[0].message == (
+            "Die Untersuchung hat keine vollständige Wissensbasis-Identität."
+        )
+        assert english.issues[0].message == (
+            "The examination has no complete knowledge-base identity."
+        )
+    for de_issue, en_issue in zip(german.issues, english.issues, strict=True):
+        assert de_issue.message != en_issue.message
+        assert de_issue.model_copy(update={"message": en_issue.message}) == en_issue
+    assert german.model_copy(update={"issues": english.issues}) == english
+    assert assess_examination(kb, payload, template_name=template) == german
+    with pytest.raises(ValueError, match="language"):
+        assess_examination(kb, payload, language="fr")  # type: ignore[arg-type]

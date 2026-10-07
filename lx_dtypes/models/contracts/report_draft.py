@@ -5,6 +5,8 @@ from typing import Literal, cast
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
+from lx_dtypes.language import DEFAULT_LANGUAGE, LanguageCode
+
 from .json_types import JsonObject
 
 REPORT_DRAFT_SCHEMA_VERSION: Literal["1.0"] = "1.0"
@@ -83,7 +85,7 @@ class PatientExaminationReportDraft(BaseModel):
     template_section_drafts: dict[str, ReportDraftSectionState] = Field(
         default_factory=dict
     )
-    selected_report_language: Literal["de", "en"] = "de"
+    selected_report_language: LanguageCode = DEFAULT_LANGUAGE
     active_report_id: int | None = Field(default=None, gt=0)
     report_text_mode: Literal["generated", "manual"] = "generated"
     rendered_text: str = ""

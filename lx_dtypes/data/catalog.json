@@ -92,7 +92,7 @@
       "version": "0.3.0",
       "medical_field": "gastroenterology",
       "resource_root": "data/terminology/coloreg",
-      "content_sha256": "b4b805f7398d18653d50f35429f568c9f7d34310ab66657ffef0b23301139f16",
+      "content_sha256": "63735107f588f164159e8707586e318eecc65c0ef3ae3647d4c418891ccaf8b8",
       "default": true
     }
   ]

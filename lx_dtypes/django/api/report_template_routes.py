@@ -5,12 +5,16 @@ from typing import Any, Literal, Protocol, TypeVar, cast
 
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
+from lx_dtypes.language import DEFAULT_LANGUAGE
 from lx_dtypes.models.contracts import KnowledgeBaseContract
 from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 from lx_dtypes.models.knowledge_base.report_template.ReportConceptCoverageBuilder import (
     build_report_concept_coverage,
+)
+from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+    RuntimeValidationLanguage,
 )
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
@@ -377,6 +381,7 @@ def register_report_template_routes(
         template_name: str,
         version: str,
         payload: PExamination,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> dict[str, Any]:
         """
         Execute report-template validator logic against typed patient examination state.
@@ -398,7 +403,9 @@ def register_report_template_routes(
         try:
             template_export = kb.export_report_template(template_name)
             validation = kb.evaluate_report_template_validators(
-                template_name, p_examination=payload
+                template_name,
+                p_examination=payload,
+                language=language,
             )
             response = _attach_resolved_kb_identity(
                 validation,
@@ -478,6 +485,7 @@ def register_report_template_routes(
         template_name: str,
         patient_examination_id: int,
         version: str,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> dict[str, Any]:
         del request
         patient_examination_model = orm_models()["PatientExamination"]
@@ -513,7 +521,9 @@ def register_report_template_routes(
         try:
             template_export = kb.export_report_template(template_name)
             validation = kb.evaluate_report_template_validators(
-                template_name, p_examination=payload
+                template_name,
+                p_examination=payload,
+                language=language,
             )
             response = _attach_resolved_kb_identity(
                 validation,
@@ -572,6 +582,7 @@ def register_report_template_routes(
         validator_name: str,
         version: str,
         payload: PExamination,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> dict[str, Any]:
         del request
         resolved_module_name, resolved_version = resolve_payload_kb_identity(
@@ -593,7 +604,9 @@ def register_report_template_routes(
                 raise HttpError(404, f"Unknown findings validator '{validator_name}'.")
             try:
                 validation = kb.evaluate_findings_validator(
-                    validator_name, p_examination=payload
+                    validator_name,
+                    p_examination=payload,
+                    language=language,
                 )
                 return _attach_resolved_kb_identity(
                     validation,
@@ -612,6 +625,7 @@ def register_report_template_routes(
                 validation = kb.evaluate_classification_validator(
                     validator_name,
                     p_examination=payload,
+                    language=language,
                 )
                 return _attach_resolved_kb_identity(
                     validation,
@@ -628,7 +642,9 @@ def register_report_template_routes(
                 )
             try:
                 validation = kb.evaluate_intervention_validator(
-                    validator_name, p_examination=payload
+                    validator_name,
+                    p_examination=payload,
+                    language=language,
                 )
                 return _attach_resolved_kb_identity(
                     validation,
@@ -643,7 +659,9 @@ def register_report_template_routes(
                 raise HttpError(404, f"Unknown unit validator '{validator_name}'.")
             try:
                 validation = kb.evaluate_unit_validator(
-                    validator_name, p_examination=payload
+                    validator_name,
+                    p_examination=payload,
+                    language=language,
                 )
                 return _attach_resolved_kb_identity(
                     validation,
@@ -662,6 +680,7 @@ def register_report_template_routes(
                 validation = kb.evaluate_examination_validator(
                     validator_name,
                     p_examination=payload,
+                    language=language,
                 )
                 return _attach_resolved_kb_identity(
                     validation,

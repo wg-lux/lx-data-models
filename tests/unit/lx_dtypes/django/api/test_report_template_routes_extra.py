@@ -60,33 +60,38 @@ class _FakeKb:
         return {"name": name, "lifecycle_status": "draft"}
 
     def evaluate_findings_validator(
-        self, name: str, p_examination: PExamination
+        self, name: str, p_examination: PExamination, *, language: str = "de"
     ) -> dict[str, Any]:
         del p_examination
+        assert language in {"de", "en"}
         return {"name": name, "kind": "findings"}
 
     def evaluate_classification_validator(
-        self, name: str, p_examination: PExamination
+        self, name: str, p_examination: PExamination, *, language: str = "de"
     ) -> dict[str, Any]:
         del p_examination
+        assert language in {"de", "en"}
         return {"name": name, "kind": "classification"}
 
     def evaluate_intervention_validator(
-        self, name: str, p_examination: PExamination
+        self, name: str, p_examination: PExamination, *, language: str = "de"
     ) -> dict[str, Any]:
         del p_examination
+        assert language in {"de", "en"}
         return {"name": name, "kind": "intervention"}
 
     def evaluate_unit_validator(
-        self, name: str, p_examination: PExamination
+        self, name: str, p_examination: PExamination, *, language: str = "de"
     ) -> dict[str, Any]:
         del p_examination
+        assert language in {"de", "en"}
         return {"name": name, "kind": "unit"}
 
     def evaluate_examination_validator(
-        self, name: str, p_examination: PExamination
+        self, name: str, p_examination: PExamination, *, language: str = "de"
     ) -> dict[str, Any]:
         del p_examination
+        assert language in {"de", "en"}
         return {"name": name, "kind": "examination"}
 
 

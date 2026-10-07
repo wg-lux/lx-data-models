@@ -6,6 +6,14 @@ from enum import Enum
 from math import isfinite
 from typing import Literal, TypedDict
 
+from lx_dtypes.language import (
+    DEFAULT_LANGUAGE,
+    LanguageCode,
+    load_message_catalogue,
+)
+from lx_dtypes.language import (
+    validate_language as _validate_language,
+)
 from lx_dtypes.models.contracts.fhir_clinical import (
     FhirCodeableConcept,
     FhirObservationComponent,
@@ -44,6 +52,19 @@ from .ValueTypes import (
     ValidationScalar,
     ValidationValue,
 )
+
+# Preserve the existing public alias.
+RuntimeValidationLanguage = LanguageCode
+
+
+def _runtime_messages() -> dict[RuntimeValidationLanguage, dict[str, str]]:
+    return load_message_catalogue("validator_runtime_messages.yml")
+
+
+def _runtime_message(
+    key: str, language: RuntimeValidationLanguage, **values: str
+) -> str:
+    return _runtime_messages()[language][key].format(**values)
 
 
 class RuntimeValidationIssueDataDict(TypedDict):
@@ -608,9 +629,11 @@ def validate_reported_findings_against_terminology(
     classifications: Mapping[str, Classification],
     classification_choices: Mapping[str, ClassificationChoice],
     units: Mapping[str, Unit],
+    language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
 ) -> list[RuntimeValidationIssueDataDict]:
     """Validate normalized findings against the currently loaded YAML terminology."""
 
+    _validate_language(language)
     issues: list[RuntimeValidationIssueDataDict] = []
     for occurrence_index, occurrence in enumerate(
         _normalize_reported_findings(reported_findings)
@@ -620,7 +643,9 @@ def validate_reported_findings_against_terminology(
             issues.append(
                 _build_issue(
                     code="unknown_finding",
-                    message=f"Finding '{occurrence['finding']}' is not in the KB.",
+                    message=_runtime_message(
+                        "unknown_finding", language, finding=occurrence["finding"]
+                    ),
                     validator_name="terminology",
                     validator_kind="template",
                     details={"occurrence_index": occurrence_index},
@@ -635,8 +660,10 @@ def validate_reported_findings_against_terminology(
                 issues.append(
                     _build_issue(
                         code="unknown_classification",
-                        message=(
-                            f"Classification '{classification_name}' is not in the KB."
+                        message=_runtime_message(
+                            "unknown_classification",
+                            language,
+                            classification_name=classification_name,
                         ),
                         validator_name="terminology",
                         validator_kind="template",
@@ -651,9 +678,11 @@ def validate_reported_findings_against_terminology(
                 issues.append(
                     _build_issue(
                         code="classification_not_allowed_for_finding",
-                        message=(
-                            f"Classification '{classification_name}' is not allowed "
-                            f"for finding '{occurrence['finding']}'."
+                        message=_runtime_message(
+                            "classification_not_allowed_for_finding",
+                            language,
+                            classification_name=classification_name,
+                            finding=occurrence["finding"],
                         ),
                         validator_name="terminology",
                         validator_kind="template",
@@ -674,9 +703,11 @@ def validate_reported_findings_against_terminology(
                     issues.append(
                         _build_issue(
                             code="classification_choice_not_allowed",
-                            message=(
-                                f"Choice '{value_name}' is not allowed for "
-                                f"classification '{classification_name}'."
+                            message=_runtime_message(
+                                "classification_choice_not_allowed",
+                                language,
+                                value_name=value_name,
+                                classification_name=classification_name,
                             ),
                             validator_name="terminology",
                             validator_kind="template",
@@ -692,7 +723,9 @@ def validate_reported_findings_against_terminology(
                     issues.append(
                         _build_issue(
                             code="unknown_unit",
-                            message=f"Unit '{unit_name}' is not in the KB.",
+                            message=_runtime_message(
+                                "unknown_unit", language, unit_name=unit_name
+                            ),
                             validator_name="terminology",
                             validator_kind="template",
                             details={
@@ -711,9 +744,11 @@ def import_terminology_validated_fhir_observations(
     classifications: Mapping[str, Classification],
     classification_choices: Mapping[str, ClassificationChoice],
     units: Mapping[str, Unit],
+    language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
 ) -> FhirTerminologyValidatedFindingResultDataDict:
     """Import FHIR Observations and validate them against YAML KB terminology."""
 
+    _validate_language(language)
     reported_findings = import_fhir_observations_to_reported_findings(observations)
     issues = validate_reported_findings_against_terminology(
         reported_findings,
@@ -721,6 +756,7 @@ def import_terminology_validated_fhir_observations(
         classifications=classifications,
         classification_choices=classification_choices,
         units=units,
+        language=language,
     )
     return FhirTerminologyValidatedFindingResultDataDict(
         ok=not issues,
@@ -738,9 +774,11 @@ def export_terminology_validated_fhir_observations(
     classification_choices: Mapping[str, ClassificationChoice],
     units: Mapping[str, Unit],
     base_url: str = "https://wg-lux.de/fhir",
+    language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
 ) -> FhirTerminologyValidatedFindingResultDataDict:
     """Validate runtime findings against YAML KB terminology and export FHIR."""
 
+    _validate_language(language)
     observations = export_reported_findings_to_fhir_observations(
         reported_findings,
         base_url=base_url,
@@ -751,6 +789,7 @@ def export_terminology_validated_fhir_observations(
         classifications=classifications,
         classification_choices=classification_choices,
         units=units,
+        language=language,
     )
     return FhirTerminologyValidatedFindingResultDataDict(
         ok=not issues,
@@ -1216,7 +1255,9 @@ def evaluate_findings_validator_runtime(
     validator: FindingsValidator,
     *,
     reported_findings: Sequence[Mapping[str, object]] | None = None,
+    language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
 ) -> FindingsValidatorExecutionDataDict:
+    _validate_language(language)
     normalized_findings = _normalize_reported_findings(reported_findings)
     target_finding = validator.finding
     matched_occurrences = [
@@ -1235,9 +1276,11 @@ def evaluate_findings_validator_runtime(
             issues.append(
                 _build_issue(
                     code="finding_not_present",
-                    message=(
-                        f"Finding '{target_finding}' is required by validator "
-                        f"'{validator.name}' but is not present."
+                    message=_runtime_message(
+                        "finding_not_present",
+                        language,
+                        target_finding=target_finding,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="findings_validator",
@@ -1249,9 +1292,11 @@ def evaluate_findings_validator_runtime(
             issues.append(
                 _build_issue(
                     code="finding_present_but_should_be_missing",
-                    message=(
-                        f"Finding '{target_finding}' should be absent for validator "
-                        f"'{validator.name}'."
+                    message=_runtime_message(
+                        "finding_present_but_should_be_missing",
+                        language,
+                        target_finding=target_finding,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="findings_validator",
@@ -1265,9 +1310,10 @@ def evaluate_findings_validator_runtime(
             issues.append(
                 _build_issue(
                     code="invalid_conditional_validator_definition",
-                    message=(
-                        f"Validator '{validator.name}' uses 'condition' operator but "
-                        "has no condition block."
+                    message=_runtime_message(
+                        "invalid_conditional_validator_definition",
+                        language,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="findings_validator",
@@ -1283,10 +1329,11 @@ def evaluate_findings_validator_runtime(
                     issues.append(
                         _build_issue(
                             code="missing_data_requirement",
-                            message=(
-                                f"Validator '{validator.name}' cannot evaluate its "
-                                "condition because required source data is missing: "
-                                f"{', '.join(missing_condition_data)}."
+                            message=_runtime_message(
+                                "missing_data_requirement",
+                                language,
+                                name=validator.name,
+                                requirements=", ".join(missing_condition_data),
                             ),
                             validator_name=validator.name,
                             validator_kind="findings_validator",
@@ -1328,9 +1375,11 @@ def evaluate_findings_validator_runtime(
                             if missing
                             else "missing_required_reference"
                         ),
-                        message=(
-                            f"Validator '{validator.name}' requires "
-                            f"{', '.join(missing or missing_generic)} when condition is met."
+                        message=_runtime_message(
+                            "missing_required_classification",
+                            language,
+                            name=validator.name,
+                            requirements=", ".join(missing or missing_generic),
                         ),
                         validator_name=validator.name,
                         validator_kind="findings_validator",
@@ -1347,9 +1396,8 @@ def evaluate_findings_validator_runtime(
         issues.append(
             _build_issue(
                 code="unsupported_findings_validator_operator",
-                message=(
-                    f"Operator '{validator.operator}' is not supported by the runtime "
-                    "validator engine."
+                message=_runtime_message(
+                    "unsupported_operator", language, operator=validator.operator
                 ),
                 validator_name=validator.name,
                 validator_kind="findings_validator",
@@ -1376,7 +1424,9 @@ def evaluate_classification_validator_runtime(
     classification_choices: Mapping[str, ClassificationChoice],
     classification_choice_descriptors: Mapping[str, ClassificationChoiceDescriptor],
     reported_findings: Sequence[Mapping[str, object]] | None = None,
+    language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
 ) -> ClassificationValidatorExecutionDataDict:
+    _validate_language(language)
     normalized_findings = _normalize_reported_findings(reported_findings)
     target_finding = validator.finding
     target_classification = validator.classification
@@ -1402,9 +1452,11 @@ def evaluate_classification_validator_runtime(
                 issues.append(
                     _build_issue(
                         code="finding_not_present_for_classification_validator",
-                        message=(
-                            f"Finding '{target_finding}' is not present for classification "
-                            f"validator '{validator.name}'."
+                        message=_runtime_message(
+                            "finding_not_present_for_classification_validator",
+                            language,
+                            target_finding=target_finding,
+                            name=validator.name,
                         ),
                         validator_name=validator.name,
                         validator_kind="classification_validator",
@@ -1428,9 +1480,19 @@ def evaluate_classification_validator_runtime(
                             else "classification_not_present"
                         ),
                         message=(
-                            f"Classification '{target_classification}' is required by "
-                            f"validator '{validator.name}' but "
-                            f"{'has no evaluable descriptor value' if requires_descriptor else 'is not present'}."
+                            _runtime_message(
+                                "classification_value_not_present",
+                                language,
+                                target_classification=target_classification,
+                                name=validator.name,
+                            )
+                            if requires_descriptor
+                            else _runtime_message(
+                                "classification_not_present",
+                                language,
+                                target_classification=target_classification,
+                                name=validator.name,
+                            )
                         ),
                         validator_name=validator.name,
                         validator_kind="classification_validator",
@@ -1445,9 +1507,11 @@ def evaluate_classification_validator_runtime(
             issues.append(
                 _build_issue(
                     code="classification_present_but_should_be_missing",
-                    message=(
-                        f"Classification '{target_classification}' should be absent "
-                        f"for validator '{validator.name}'."
+                    message=_runtime_message(
+                        "classification_present_but_should_be_missing",
+                        language,
+                        target_classification=target_classification,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="classification_validator",
@@ -1460,9 +1524,10 @@ def evaluate_classification_validator_runtime(
             issues.append(
                 _build_issue(
                     code="invalid_conditional_classification_validator_definition",
-                    message=(
-                        f"Validator '{validator.name}' uses 'condition' operator but "
-                        "has no condition block."
+                    message=_runtime_message(
+                        "invalid_conditional_validator_definition",
+                        language,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="classification_validator",
@@ -1474,9 +1539,11 @@ def evaluate_classification_validator_runtime(
                 issues.append(
                     _build_issue(
                         code="finding_not_present_for_classification_validator",
-                        message=(
-                            f"Finding '{target_finding}' is not present for classification "
-                            f"validator '{validator.name}'."
+                        message=_runtime_message(
+                            "finding_not_present_for_classification_validator",
+                            language,
+                            target_finding=target_finding,
+                            name=validator.name,
                         ),
                         validator_name=validator.name,
                         validator_kind="classification_validator",
@@ -1493,10 +1560,11 @@ def evaluate_classification_validator_runtime(
                         issues.append(
                             _build_issue(
                                 code="missing_data_requirement",
-                                message=(
-                                    f"Validator '{validator.name}' cannot evaluate its "
-                                    "condition because required source data is missing: "
-                                    f"{', '.join(missing_condition_data)}."
+                                message=_runtime_message(
+                                    "missing_data_requirement",
+                                    language,
+                                    name=validator.name,
+                                    requirements=", ".join(missing_condition_data),
                                 ),
                                 validator_name=validator.name,
                                 validator_kind="classification_validator",
@@ -1531,15 +1599,18 @@ def evaluate_classification_validator_runtime(
                                 if not missing_requirements
                                 else "missing_required_reference"
                             ),
-                            message=(
-                                f"Validator '{validator.name}' requires classification "
-                                f"'{target_classification}'"
-                                + (
-                                    f" and {', '.join(missing_requirements)}"
-                                    if missing_requirements
-                                    else ""
+                            message=_runtime_message(
+                                "conditional_classification_requirement",
+                                language,
+                                name=validator.name,
+                                classification=target_classification,
+                                additional=_runtime_message(
+                                    "additional_requirements",
+                                    language,
+                                    requirements=", ".join(missing_requirements),
                                 )
-                                + " when condition is met."
+                                if missing_requirements
+                                else "",
                             ),
                             validator_name=validator.name,
                             validator_kind="classification_validator",
@@ -1555,9 +1626,8 @@ def evaluate_classification_validator_runtime(
         issues.append(
             _build_issue(
                 code="unsupported_classification_validator_operator",
-                message=(
-                    f"Operator '{validator.operator}' is not supported by the runtime "
-                    "validator engine."
+                message=_runtime_message(
+                    "unsupported_operator", language, operator=validator.operator
                 ),
                 validator_name=validator.name,
                 validator_kind="classification_validator",
@@ -1583,7 +1653,9 @@ def evaluate_intervention_validator_runtime(
     *,
     interventions: Mapping[str, Intervention],
     reported_findings: Sequence[Mapping[str, object]] | None = None,
+    language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
 ) -> InterventionValidatorExecutionDataDict:
+    _validate_language(language)
     normalized_findings = _normalize_reported_findings(reported_findings)
     matched_occurrences = [
         finding
@@ -1603,9 +1675,11 @@ def evaluate_intervention_validator_runtime(
             issues.append(
                 _build_issue(
                     code="intervention_not_present",
-                    message=(
-                        f"Intervention '{validator.intervention}' is required by "
-                        f"validator '{validator.name}' but is not present."
+                    message=_runtime_message(
+                        "intervention_not_present",
+                        language,
+                        intervention=validator.intervention,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="intervention_validator",
@@ -1620,9 +1694,11 @@ def evaluate_intervention_validator_runtime(
             issues.append(
                 _build_issue(
                     code="intervention_present_but_should_be_missing",
-                    message=(
-                        f"Intervention '{validator.intervention}' should be absent "
-                        f"for validator '{validator.name}'."
+                    message=_runtime_message(
+                        "intervention_present_but_should_be_missing",
+                        language,
+                        intervention=validator.intervention,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="intervention_validator",
@@ -1636,9 +1712,10 @@ def evaluate_intervention_validator_runtime(
             issues.append(
                 _build_issue(
                     code="invalid_conditional_intervention_validator_definition",
-                    message=(
-                        f"Validator '{validator.name}' uses 'condition' operator but "
-                        "has no condition block."
+                    message=_runtime_message(
+                        "invalid_conditional_validator_definition",
+                        language,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="intervention_validator",
@@ -1654,10 +1731,11 @@ def evaluate_intervention_validator_runtime(
                     issues.append(
                         _build_issue(
                             code="missing_data_requirement",
-                            message=(
-                                f"Validator '{validator.name}' cannot evaluate its "
-                                "condition because required source data is missing: "
-                                f"{', '.join(missing_condition_data)}."
+                            message=_runtime_message(
+                                "missing_data_requirement",
+                                language,
+                                name=validator.name,
+                                requirements=", ".join(missing_condition_data),
                             ),
                             validator_name=validator.name,
                             validator_kind="intervention_validator",
@@ -1688,9 +1766,11 @@ def evaluate_intervention_validator_runtime(
                 issues.append(
                     _build_issue(
                         code="missing_required_intervention",
-                        message=(
-                            f"Validator '{validator.name}' requires intervention "
-                            f"'{validator.intervention}' when condition is met."
+                        message=_runtime_message(
+                            "missing_required_intervention",
+                            language,
+                            name=validator.name,
+                            intervention=validator.intervention,
                         ),
                         validator_name=validator.name,
                         validator_kind="intervention_validator",
@@ -1705,9 +1785,8 @@ def evaluate_intervention_validator_runtime(
         issues.append(
             _build_issue(
                 code="unsupported_intervention_validator_operator",
-                message=(
-                    f"Operator '{validator.operator}' is not supported by the runtime "
-                    "validator engine."
+                message=_runtime_message(
+                    "unsupported_operator", language, operator=validator.operator
                 ),
                 validator_name=validator.name,
                 validator_kind="intervention_validator",
@@ -1733,7 +1812,9 @@ def evaluate_unit_validator_runtime(
     *,
     units: Mapping[str, Unit],
     reported_findings: Sequence[Mapping[str, object]] | None = None,
+    language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
 ) -> UnitValidatorExecutionDataDict:
+    _validate_language(language)
     normalized_findings = _normalize_reported_findings(reported_findings)
     matched_occurrences = [
         finding
@@ -1755,9 +1836,11 @@ def evaluate_unit_validator_runtime(
             issues.append(
                 _build_issue(
                     code="unit_not_present",
-                    message=(
-                        f"Unit '{validator.unit}' is required by validator "
-                        f"'{validator.name}' but is not present."
+                    message=_runtime_message(
+                        "unit_not_present",
+                        language,
+                        unit=validator.unit,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="unit_validator",
@@ -1771,9 +1854,11 @@ def evaluate_unit_validator_runtime(
             issues.append(
                 _build_issue(
                     code="unit_present_but_should_be_missing",
-                    message=(
-                        f"Unit '{validator.unit}' should be absent for validator "
-                        f"'{validator.name}'."
+                    message=_runtime_message(
+                        "unit_present_but_should_be_missing",
+                        language,
+                        unit=validator.unit,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="unit_validator",
@@ -1787,9 +1872,10 @@ def evaluate_unit_validator_runtime(
             issues.append(
                 _build_issue(
                     code="invalid_conditional_unit_validator_definition",
-                    message=(
-                        f"Validator '{validator.name}' uses 'condition' operator but "
-                        "has no condition block."
+                    message=_runtime_message(
+                        "invalid_conditional_validator_definition",
+                        language,
+                        name=validator.name,
                     ),
                     validator_name=validator.name,
                     validator_kind="unit_validator",
@@ -1805,10 +1891,11 @@ def evaluate_unit_validator_runtime(
                     issues.append(
                         _build_issue(
                             code="missing_data_requirement",
-                            message=(
-                                f"Validator '{validator.name}' cannot evaluate its "
-                                "condition because required source data is missing: "
-                                f"{', '.join(missing_condition_data)}."
+                            message=_runtime_message(
+                                "missing_data_requirement",
+                                language,
+                                name=validator.name,
+                                requirements=", ".join(missing_condition_data),
                             ),
                             validator_name=validator.name,
                             validator_kind="unit_validator",
@@ -1836,9 +1923,11 @@ def evaluate_unit_validator_runtime(
                 issues.append(
                     _build_issue(
                         code="missing_required_unit",
-                        message=(
-                            f"Validator '{validator.name}' requires unit "
-                            f"'{validator.unit}' when condition is met."
+                        message=_runtime_message(
+                            "missing_required_unit",
+                            language,
+                            name=validator.name,
+                            unit=validator.unit,
                         ),
                         validator_name=validator.name,
                         validator_kind="unit_validator",
@@ -1853,9 +1942,8 @@ def evaluate_unit_validator_runtime(
         issues.append(
             _build_issue(
                 code="unsupported_unit_validator_operator",
-                message=(
-                    f"Operator '{validator.operator}' is not supported by the runtime "
-                    "validator engine."
+                message=_runtime_message(
+                    "unsupported_operator", language, operator=validator.operator
                 ),
                 validator_name=validator.name,
                 validator_kind="unit_validator",
@@ -1892,7 +1980,9 @@ def evaluate_report_template_validators_runtime(
     interventions: Mapping[str, Intervention],
     units: Mapping[str, Unit],
     reported_findings: Sequence[Mapping[str, object]] | None = None,
+    language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
 ) -> ReportTemplateRuntimeValidationResultDataDict:
+    _validate_language(language)
     normalized_findings = _normalize_reported_findings(reported_findings)
 
     classification_cache: dict[str, ClassificationValidatorExecutionDataDict] = {}
@@ -1927,9 +2017,10 @@ def evaluate_report_template_validators_runtime(
                 issues=[
                     _build_issue(
                         code="unknown_classification_validator_reference",
-                        message=(
-                            f"Classification validator '{validator_name}' is referenced "
-                            "but is not defined."
+                        message=_runtime_message(
+                            "unknown_classification_validator_reference",
+                            language,
+                            validator_name=validator_name,
                         ),
                         validator_name=validator_name,
                         validator_kind="classification_validator",
@@ -1945,6 +2036,7 @@ def evaluate_report_template_validators_runtime(
             classification_choices=classification_choices,
             classification_choice_descriptors=classification_choice_descriptors,
             reported_findings=normalized_findings,
+            language=language,
         )
         classification_cache[validator_name] = result
         return result
@@ -1969,9 +2061,10 @@ def evaluate_report_template_validators_runtime(
                 issues=[
                     _build_issue(
                         code="unknown_findings_validator_reference",
-                        message=(
-                            f"Findings validator '{validator_name}' is referenced but "
-                            "is not defined."
+                        message=_runtime_message(
+                            "unknown_findings_validator_reference",
+                            language,
+                            validator_name=validator_name,
                         ),
                         validator_name=validator_name,
                         validator_kind="findings_validator",
@@ -1982,7 +2075,9 @@ def evaluate_report_template_validators_runtime(
             return result
 
         result = evaluate_findings_validator_runtime(
-            validator, reported_findings=normalized_findings
+            validator,
+            reported_findings=normalized_findings,
+            language=language,
         )
         findings_cache[validator_name] = result
         return result
@@ -2012,9 +2107,10 @@ def evaluate_report_template_validators_runtime(
                 issues=[
                     _build_issue(
                         code="unknown_intervention_validator_reference",
-                        message=(
-                            f"Intervention validator '{validator_name}' is referenced "
-                            "but is not defined."
+                        message=_runtime_message(
+                            "unknown_intervention_validator_reference",
+                            language,
+                            validator_name=validator_name,
                         ),
                         validator_name=validator_name,
                         validator_kind="intervention_validator",
@@ -2028,6 +2124,7 @@ def evaluate_report_template_validators_runtime(
             validator,
             interventions=interventions,
             reported_findings=normalized_findings,
+            language=language,
         )
         intervention_cache[validator_name] = result
         return result
@@ -2058,9 +2155,10 @@ def evaluate_report_template_validators_runtime(
                 issues=[
                     _build_issue(
                         code="unknown_unit_validator_reference",
-                        message=(
-                            f"Unit validator '{validator_name}' is referenced but "
-                            "is not defined."
+                        message=_runtime_message(
+                            "unknown_unit_validator_reference",
+                            language,
+                            validator_name=validator_name,
                         ),
                         validator_name=validator_name,
                         validator_kind="unit_validator",
@@ -2074,6 +2172,7 @@ def evaluate_report_template_validators_runtime(
             validator,
             units=units,
             reported_findings=normalized_findings,
+            language=language,
         )
         unit_cache[validator_name] = result
         return result
@@ -2096,9 +2195,10 @@ def evaluate_report_template_validators_runtime(
                 issues=[
                     _build_issue(
                         code="circular_examination_validator_dependency",
-                        message=(
-                            f"Circular examination-validator dependency detected: "
-                            f"{' -> '.join(cycle)}"
+                        message=_runtime_message(
+                            "circular_examination_validator_dependency",
+                            language,
+                            cycle=" -> ".join(cycle),
                         ),
                         validator_name=validator_name,
                         validator_kind="examination_validator",
@@ -2117,9 +2217,10 @@ def evaluate_report_template_validators_runtime(
                 issues=[
                     _build_issue(
                         code="unknown_examination_validator_reference",
-                        message=(
-                            f"Examination validator '{validator_name}' is referenced but "
-                            "is not defined."
+                        message=_runtime_message(
+                            "unknown_examination_validator_reference",
+                            language,
+                            validator_name=validator_name,
                         ),
                         validator_name=validator_name,
                         validator_kind="examination_validator",
@@ -2148,9 +2249,11 @@ def evaluate_report_template_validators_runtime(
             issues.append(
                 _build_issue(
                     code="failed_finding_validator_dependency",
-                    message=(
-                        f"Examination validator '{validator_name}' depends on failing "
-                        f"findings validator '{dep_name}'."
+                    message=_runtime_message(
+                        "failed_finding_validator_dependency",
+                        language,
+                        validator_name=validator_name,
+                        dep_name=dep_name,
                     ),
                     validator_name=validator_name,
                     validator_kind="examination_validator",
@@ -2172,9 +2275,11 @@ def evaluate_report_template_validators_runtime(
             issues.append(
                 _build_issue(
                     code="failed_examination_validator_dependency",
-                    message=(
-                        f"Examination validator '{validator_name}' depends on failing "
-                        f"examination validator '{dep_name}'."
+                    message=_runtime_message(
+                        "failed_examination_validator_dependency",
+                        language,
+                        validator_name=validator_name,
+                        dep_name=dep_name,
                     ),
                     validator_name=validator_name,
                     validator_kind="examination_validator",
@@ -2261,6 +2366,7 @@ __all__ = [
     "InterventionValidatorExecutionDataDict",
     "ReportTemplateRuntimeValidationResultDataDict",
     "RuntimeValidationIssueDataDict",
+    "RuntimeValidationLanguage",
     "UnitValidatorExecutionDataDict",
     "evaluate_classification_validator_runtime",
     "evaluate_findings_validator_runtime",

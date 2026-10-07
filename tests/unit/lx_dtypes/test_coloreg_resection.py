@@ -162,34 +162,21 @@ def test_primary_success_remains_protocol_defined(
     )["ok"]
 
 
-def test_later_follow_up_requires_preceding_visit_on_same_lesion(
+def test_template_does_not_request_or_validate_documented_ids(
     kb: KnowledgeBase,
 ) -> None:
-    validator = kb.findings_validator["coloreg_subsequent_follow_up_requires_previous"]
-    first = {
-        "finding": "coloreg_polyp_follow_up",
-        "classifications": {
-            "coloreg_follow_up_sequence": "coloreg_follow_up_first",
-        },
-    }
-    later = {
-        "finding": "coloreg_polyp_follow_up",
-        "classifications": {
-            "coloreg_follow_up_sequence": "coloreg_follow_up_subsequent",
-        },
-    }
-    assert evaluate_findings_validator_runtime(validator, reported_findings=[first])[
-        "ok"
-    ]
-    assert not evaluate_findings_validator_runtime(
-        validator, reported_findings=[first, later]
-    )["ok"]
-    later["classifications"]["coloreg_previous_follow_up_examination_id"] = (
-        "coloreg_previous_follow_up_examination_id_documented"
+    template = kb.export_report_template("coloreg_colonoscopy")
+    for section in template["report_sections"]:
+        for finding in section["findings"]:
+            assert all(
+                not requirement["classification"].endswith("_id")
+                for requirement in finding["classifications"]
+            )
+    assert all(
+        not concept["finding_selector"].get("classification_name", "").endswith("_id")
+        for concept in template["coverage_concepts"]
     )
-    assert evaluate_findings_validator_runtime(
-        validator, reported_findings=[first, later]
-    )["ok"]
+    assert "coloreg_subsequent_follow_up_requires_previous" not in kb.findings_validator
 
 
 def electricity_exam(kb: KnowledgeBase, settings: str) -> PExamination:

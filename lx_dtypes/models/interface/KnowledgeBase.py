@@ -11,6 +11,7 @@ from typing import (
 import yaml
 from pydantic import BaseModel, Field, PrivateAttr
 
+from lx_dtypes.language import DEFAULT_LANGUAGE
 from lx_dtypes.models.base.app_base_model.ddict.AppBaseModelUUIDTagsDataDict import (
     AppBaseModelUUIDTagsDataDict,
 )
@@ -165,6 +166,7 @@ from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
     FindingsValidatorExecutionDataDict,
     InterventionValidatorExecutionDataDict,
     ReportTemplateRuntimeValidationResultDataDict,
+    RuntimeValidationLanguage,
     UnitValidatorExecutionDataDict,
     evaluate_classification_validator_runtime,
     evaluate_findings_validator_runtime,
@@ -1275,6 +1277,8 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         p_examination: "PExamination | None" = None,
         ledger: "Ledger | None" = None,
         patient_examination_uuid: str | None = None,
+        *,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> ReportTemplateRuntimeValidationResultDataDict:
         """
         Execute report-template validators against typed ledger state.
@@ -1284,6 +1288,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             p_examination (PExamination | None): Typed ledger examination instance.
             ledger (Ledger | None): Typed ledger instance.
             patient_examination_uuid (str | None): UUID used with `ledger`.
+            language: Issue message language (`de` by default, or `en`).
 
         Returns:
             ReportTemplateRuntimeValidationResultDataDict: Runtime validator execution result.
@@ -1348,6 +1353,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             interventions=self.intervention,
             units=self.unit,
             reported_findings=normalized_reported_findings,
+            language=language,
         )
 
     def evaluate_findings_validator(
@@ -1357,6 +1363,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         p_examination: "PExamination | None" = None,
         ledger: "Ledger | None" = None,
         patient_examination_uuid: str | None = None,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> FindingsValidatorExecutionDataDict:
         if p_examination is not None:
             self.assert_examination_admissibility(p_examination)
@@ -1373,6 +1380,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         return evaluate_findings_validator_runtime(
             validator,
             reported_findings=normalized_reported_findings,
+            language=language,
         )
 
     def evaluate_classification_validator(
@@ -1382,6 +1390,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         p_examination: "PExamination | None" = None,
         ledger: "Ledger | None" = None,
         patient_examination_uuid: str | None = None,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> ClassificationValidatorExecutionDataDict:
         if p_examination is not None:
             self.assert_examination_admissibility(p_examination)
@@ -1401,6 +1410,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             classification_choices=self.classification_choice,
             classification_choice_descriptors=self.classification_choice_descriptor,
             reported_findings=normalized_reported_findings,
+            language=language,
         )
 
     def evaluate_intervention_validator(
@@ -1410,6 +1420,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         p_examination: "PExamination | None" = None,
         ledger: "Ledger | None" = None,
         patient_examination_uuid: str | None = None,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> InterventionValidatorExecutionDataDict:
         if p_examination is not None:
             self.assert_examination_admissibility(p_examination)
@@ -1427,6 +1438,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             validator,
             interventions=self.intervention,
             reported_findings=normalized_reported_findings,
+            language=language,
         )
 
     def evaluate_unit_validator(
@@ -1436,6 +1448,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         p_examination: "PExamination | None" = None,
         ledger: "Ledger | None" = None,
         patient_examination_uuid: str | None = None,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> UnitValidatorExecutionDataDict:
         if p_examination is not None:
             self.assert_examination_admissibility(p_examination)
@@ -1453,6 +1466,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             validator,
             units=self.unit,
             reported_findings=normalized_reported_findings,
+            language=language,
         )
 
     def evaluate_examination_validator(
@@ -1462,6 +1476,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         p_examination: "PExamination | None" = None,
         ledger: "Ledger | None" = None,
         patient_examination_uuid: str | None = None,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> ExaminationValidatorExecutionDataDict:
         if p_examination is not None:
             self.assert_examination_admissibility(p_examination)
@@ -1502,6 +1517,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             interventions=self.intervention,
             units=self.unit,
             reported_findings=normalized_reported_findings,
+            language=language,
         )
         return result["examination_validators"][0]
 
@@ -1510,6 +1526,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         reported_findings: Sequence[Mapping[str, object]],
         *,
         base_url: str = "https://wg-lux.de/fhir",
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> FhirTerminologyValidatedFindingResultDataDict:
         return export_terminology_validated_fhir_observations(
             reported_findings,
@@ -1518,11 +1535,14 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             classification_choices=self.classification_choice,
             units=self.unit,
             base_url=base_url,
+            language=language,
         )
 
     def import_terminology_validated_fhir_observations(
         self,
         observations: Sequence[Mapping[str, object]],
+        *,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> FhirTerminologyValidatedFindingResultDataDict:
         return import_terminology_validated_fhir_observations(
             observations,
@@ -1530,6 +1550,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             classifications=self.classification,
             classification_choices=self.classification_choice,
             units=self.unit,
+            language=language,
         )
 
     def get_report_template_classification_validators(

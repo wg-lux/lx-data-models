@@ -35,23 +35,6 @@
       - kind: classification
         name: coloreg_primary_success_protocol
 - model: findings_validator
-  name: coloreg_subsequent_follow_up_requires_previous
-  name_de: "ColoReg – Weitere Nachsorge erfordert vorherige Nachsorgeuntersuchung"
-  finding: coloreg_polyp_follow_up
-  operator: condition
-  query:
-    finding: coloreg_polyp_follow_up
-    operator: condition
-    condition:
-      any:
-      - classification: coloreg_follow_up_sequence
-        comparator: in
-        values:
-        - coloreg_follow_up_subsequent
-      then_requires:
-      - kind: classification
-        name: coloreg_previous_follow_up_examination_id
-- model: findings_validator
   name: coloreg_technique_emr_requires_intervention
   name_de: "ColoReg – EMR-Technik erfordert EMR-Intervention"
   finding: coloreg_polyp_resection
