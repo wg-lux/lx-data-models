@@ -13,6 +13,58 @@ from lx_dtypes.knowledge_bases import (
     get_packaged_knowledge_base,
 )
 from lx_dtypes.scripts.kb_registry import main
+from lx_dtypes.terminology.terminology_service import TerminologyService
+
+
+@pytest.fixture
+def hydrated_registry(tmp_path: Path) -> Path:
+    registry = tmp_path / "registry.json"
+    TerminologyService(registry_path=registry).provision()
+    return registry
+
+
+def test_bootstrap_preserves_hydrated_edits_and_active_identity(
+    hydrated_registry: Path,
+) -> None:
+    payload = json.loads(hydrated_registry.read_text())
+    payload["active"] = {"module_name": "coloreg", "version": "0.3.0"}
+    hydrated_registry.write_text(json.dumps(payload))
+    descriptor = get_packaged_knowledge_base("dgvs_reporting")
+    entry = payload["modules"][descriptor.module_name][descriptor.version]
+    root = Path(entry["sources"][0]["input_dirs"][0])
+    config = root / descriptor.module_name / "config.yaml"
+    edited = config.read_bytes() + b"\n# Local builder edit retained across startup\n"
+    config.write_bytes(edited)
+    original = hydrated_registry.read_bytes()
+
+    assert main(_bootstrap_args(hydrated_registry)) == 0
+    assert main(_bootstrap_args(hydrated_registry)) == 0
+    assert hydrated_registry.read_bytes() == original
+    assert config.read_bytes() == edited
+
+
+@pytest.mark.parametrize("damage", ["marker", "digest", "path", "identity"])
+def test_bootstrap_rejects_invalid_hydrated_copy(
+    hydrated_registry: Path, damage: str,
+) -> None:
+    payload = json.loads(hydrated_registry.read_text())
+    entry = payload["modules"]["dgvs_reporting"]["0.1.0"]
+    root = Path(entry["sources"][0]["input_dirs"][0])
+    tree = hydrated_registry.parent / "shipped" / entry["shipped_tree_sha256"]
+    if damage == "marker":
+        (tree / "origin.json").write_text("{}")
+    elif damage == "digest":
+        entry["hydrated_from_sha256"] = "0" * 64
+    elif damage == "path":
+        entry["sources"][0]["input_dirs"] = [str(root / "unrelated")]
+    else:
+        config = root / "dgvs_reporting" / "config.yaml"
+        config.write_text(config.read_text().replace("0.1.0", "9.9.9"))
+    hydrated_registry.write_text(json.dumps(payload))
+    original = hydrated_registry.read_bytes()
+
+    assert main(_bootstrap_args(hydrated_registry)) == 1
+    assert hydrated_registry.read_bytes() == original
 
 
 def test_bootstrap_preserves_retained_historical_identity(

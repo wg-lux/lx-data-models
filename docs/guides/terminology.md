@@ -90,6 +90,14 @@ The shipped tree's internal layout, including versioned subdirectories, is prese
 
 Hydration validates the catalog identities and content for entries it needs to seed, publishes a copied tree, and registers its filesystem locations. Repeated hydration preserves existing runtime filesystem entries, edited copies, and the active selection. An initially empty registry receives the shipped default active identity. A populated registry without an active selection is not automatically assigned one.
 
+`lx-dtypes-kb-registry bootstrap` also accepts these hydrated registrations.
+It checks the published tree's origin marker, original catalog, and registered
+source path, then validates the registered knowledge base. It preserves local
+edits and the active identity, even when a newer wheel ships different content.
+Missing or inconsistent hydration metadata and invalid module identities fail
+startup; deleting the registry or replacing editable copies is not a recovery
+step.
+
 The source-tree digest identifies the original shipped tree. It is not a guarantee that an editable runtime copy still has those original contents.
 
 ## Load active or explicitly versioned knowledge bases

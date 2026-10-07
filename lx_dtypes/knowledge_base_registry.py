@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -13,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
     PackagedKnowledgeBase,
+    PackagedKnowledgeBaseCatalog,
     get_packaged_knowledge_base,
     list_packaged_knowledge_bases,
 )
@@ -196,7 +198,42 @@ def _write_registry(registry: Path, payload: RegistryPayload) -> None:
     )
 
 
-def _ensure_packaged_entries(payload: RegistryPayload) -> bool:
+def _is_hydrated_entry(
+    registry: Path, entry: RegistryEntry, descriptor: PackagedKnowledgeBase,
+) -> bool:
+    """Recognize a published editable copy without replacing its contents."""
+    metadata = entry.model_extra or {}
+    digest = metadata.get("shipped_tree_sha256")
+    if not isinstance(digest, str) or re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+        return False
+    if entry.sources is None or len(entry.sources) != 1:
+        return False
+    source = entry.sources[0]
+    if not isinstance(source, FilesystemSource):
+        return False
+    tree = registry.parent / "shipped" / digest
+    marker = json.loads((tree / "origin.json").read_text(encoding="utf-8"))
+    if marker != {"source_sha256": digest, "schema_version": 1}:
+        return False
+    catalog = PackagedKnowledgeBaseCatalog.model_validate_json(
+        (tree / "data" / "catalog.json").read_bytes()
+    )
+    for original in catalog.knowledge_bases:
+        if (original.module_name, original.version) != (
+            descriptor.module_name, descriptor.version,
+        ):
+            continue
+        # Use the original catalog: upgrades and builder edits need not match
+        # today's wheel digest. Full identity/content validation follows below.
+        expected_root = (tree / original.resource_root).parent
+        return (
+            metadata.get("hydrated_from_sha256") == original.content_sha256
+            and source.input_dirs == [str(expected_root)]
+        )
+    return False
+
+
+def _ensure_packaged_entries(payload: RegistryPayload, registry: Path) -> bool:
     changed = False
     for descriptor in list_packaged_knowledge_bases():
         expected = _packaged_registry_entry(descriptor)
@@ -204,12 +241,14 @@ def _ensure_packaged_entries(payload: RegistryPayload) -> bool:
         existing = versions.get(descriptor.version)
         if existing == expected:
             continue
+        if existing is not None and _is_hydrated_entry(registry, existing, descriptor):
+            continue
         if existing is not None and not _is_replaceable_packaged_entry(existing):
             raise ValueError(
                 "immutable knowledge-base identity collision for "
                 f"{descriptor.module_name}@{descriptor.version}: the existing "
-                "entry is not a recognized packaged provider or installed-wheel "
-                "source",
+                "entry is not a recognized packaged provider, hydrated copy, "
+                "or installed-wheel source",
             )
         versions[descriptor.version] = expected
         changed = True
@@ -295,7 +334,8 @@ def bootstrap_packaged_knowledge_bases(
 
     Existing custom active identities are preserved. Missing active state uses
     ``default_module``. Recognized provider and installed-wheel entries may be
-    repaired, while collisions with deployment-owned sources fail closed.
+    repaired. Hydrated editable copies are preserved and validated, while
+    collisions with unrelated deployment-owned sources fail closed.
     """
 
     registry = registry.expanduser().resolve()
@@ -303,7 +343,7 @@ def bootstrap_packaged_knowledge_bases(
         read_registry(registry) if registry.exists() else RegistryPayload(modules={})
     )
     had_registered_modules = bool(payload.modules)
-    changed = _ensure_packaged_entries(payload)
+    changed = _ensure_packaged_entries(payload, registry)
 
     if payload.active is None:
         descriptor = get_packaged_knowledge_base(default_module)
