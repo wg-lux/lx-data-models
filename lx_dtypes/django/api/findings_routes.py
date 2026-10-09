@@ -164,12 +164,9 @@ def _resolve_catalog_kb_identity(
                     f"PatientExamination '{patient_examination_id}' not found.",
                 )
             assert patient_examination is not None
-            pinned_module = str(
-                getattr(patient_examination, "knowledge_base_module", "") or ""
-            ).strip()
-            pinned_version = str(
-                getattr(patient_examination, "knowledge_base_version", "") or ""
-            ).strip()
+            pinned_module, pinned_version = _resolve_exam_kb_identity(
+                patient_examination
+            )
             if (
                 pinned_module != requested_module_name
                 or pinned_version != requested_module_version

@@ -34,6 +34,7 @@ guides/knowledge-base-contract-migration
 guides/knowledge-base-graph-api
 guides/runtime-output-vs-canonical-ddict
 guides/report-concept-coverage
+guides/report-template-authoring
 guides/report-template-infrastructure
 guides/report-template-graph-validation
 guides/report-template-findings-validator-migration

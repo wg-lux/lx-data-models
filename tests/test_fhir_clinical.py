@@ -13,7 +13,7 @@ from lx_dtypes.models.contracts.fhir_clinical import (
     FhirObservationComponent,
     FhirPatient,
 )
-from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+from lx_dtypes.models.knowledge_base.fhir.findings import (
     export_reported_findings_to_fhir_observations,
     import_fhir_observations_to_reported_findings,
 )

@@ -261,7 +261,10 @@ def test_explicit_catalog_identity_rejects_unpinned_patient_examination() -> Non
         knowledge_base_version=None,
     )
 
-    with pytest.raises(_ApiError) as exc_info:
+    with pytest.raises(
+            findings_routes.PatientExaminationKnowledgeBaseIdentityError,
+            match="requires an explicit knowledge-base identity",
+        ):
         findings_routes._resolve_catalog_kb_identity(
             module_name="dgvs_reporting",
             module_version="1.0.0",
@@ -270,8 +273,6 @@ def test_explicit_catalog_identity_rejects_unpinned_patient_examination() -> Non
             api_error=_api_error,
         )
 
-    assert exc_info.value.status == 409
-    assert exc_info.value.code == "knowledge-base-identity-conflict"
 
 
 def test_explicit_catalog_identity_accepts_matching_patient_examination() -> None:

@@ -61,6 +61,11 @@ from lx_dtypes.models.knowledge_base.examination.ExaminationType import Examinat
 from lx_dtypes.models.knowledge_base.examination.ExaminationTypeDataDict import (
     ExaminationTypeDataDict,
 )
+from lx_dtypes.models.knowledge_base.fhir.findings import (
+    FhirTerminologyValidatedFindingResultDataDict,
+    export_terminology_validated_fhir_observations,
+    import_terminology_validated_fhir_observations,
+)
 from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.finding._FindingType import FindingType
 from lx_dtypes.models.knowledge_base.finding.FindingDataDict import FindingDataDict
@@ -107,30 +112,6 @@ from lx_dtypes.models.knowledge_base.reference_catalog import (
     ReferenceCatalog,
     ReferenceCatalogDataDict,
 )
-from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
-    ClassificationValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.ClassificationValidatorDataDict import (
-    ClassificationValidatorDataDict,
-)
-from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
-    ExaminationValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.ExaminationValidatorDataDict import (
-    ExaminationValidatorDataDict,
-)
-from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
-    FindingsValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.FindingsValidatorDataDict import (
-    FindingsValidatorDataDict,
-)
-from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
-    InterventionValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.InterventionValidatorDataDict import (
-    InterventionValidatorDataDict,
-)
 from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
     ReportFinding,
     ReportTemplateClassificationRequirement,
@@ -155,27 +136,6 @@ from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
     ReportTemplateLifecycleStatusLiteral,
     ReportTemplateReadinessSummary,
 )
-from lx_dtypes.models.knowledge_base.report_template.UnitValidator import UnitValidator
-from lx_dtypes.models.knowledge_base.report_template.UnitValidatorDataDict import (
-    UnitValidatorDataDict,
-)
-from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
-    ClassificationValidatorExecutionDataDict,
-    ExaminationValidatorExecutionDataDict,
-    FhirTerminologyValidatedFindingResultDataDict,
-    FindingsValidatorExecutionDataDict,
-    InterventionValidatorExecutionDataDict,
-    ReportTemplateRuntimeValidationResultDataDict,
-    RuntimeValidationLanguage,
-    UnitValidatorExecutionDataDict,
-    evaluate_classification_validator_runtime,
-    evaluate_findings_validator_runtime,
-    evaluate_intervention_validator_runtime,
-    evaluate_report_template_validators_runtime,
-    evaluate_unit_validator_runtime,
-    export_terminology_validated_fhir_observations,
-    import_terminology_validated_fhir_observations,
-)
 from lx_dtypes.models.knowledge_base.study_preset import (
     StudyPreset,
     StudyPresetDataDict,
@@ -184,6 +144,54 @@ from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 from lx_dtypes.models.knowledge_base.unit.UnitDataDict import UnitDataDict
 from lx_dtypes.models.knowledge_base.unit.UnitType import UnitType
 from lx_dtypes.models.knowledge_base.unit.UnitTypeDataDict import UnitTypeDataDict
+from lx_dtypes.models.knowledge_base.validators.ClassificationValidator import (
+    ClassificationValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.ClassificationValidatorDataDict import (
+    ClassificationValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.ExaminationValidator import (
+    ExaminationValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.ExaminationValidatorDataDict import (
+    ExaminationValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
+    FindingsValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.FindingsValidatorDataDict import (
+    FindingsValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.InterventionValidator import (
+    InterventionValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.InterventionValidatorDataDict import (
+    InterventionValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.RuntimeIssues import (
+    RuntimeValidationLanguage,
+)
+from lx_dtypes.models.knowledge_base.validators.UnitValidator import (
+    UnitValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.UnitValidatorDataDict import (
+    UnitValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.ValidatorRuntime import (
+    evaluate_classification_validator_runtime,
+    evaluate_findings_validator_runtime,
+    evaluate_intervention_validator_runtime,
+    evaluate_report_template_validators_runtime,
+    evaluate_unit_validator_runtime,
+)
+from lx_dtypes.models.knowledge_base.validators.ValidatorRuntimeDataDict import (
+    ClassificationValidatorExecutionDataDict,
+    ExaminationValidatorExecutionDataDict,
+    FindingsValidatorExecutionDataDict,
+    InterventionValidatorExecutionDataDict,
+    ReportTemplateRuntimeValidationResultDataDict,
+    UnitValidatorExecutionDataDict,
+)
 from lx_dtypes.utils.parser import (
     camel_to_snake,
     parse_shallow_object_with_meta,
@@ -706,7 +714,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         """
         Export core KB terminology as FHIR CodeSystem and ValueSet resources.
         """
-        from lx_dtypes.models.knowledge_base.fhir import (
+        from lx_dtypes.models.knowledge_base.fhir.terminology import (
             export_fhir_terminology,
             export_fhir_terminology_bundle,
         )
@@ -735,7 +743,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         """
         Import FHIR CodeSystem resources into KB storage-compatible concepts.
         """
-        from lx_dtypes.models.knowledge_base.fhir import import_fhir_terminology
+        from lx_dtypes.models.knowledge_base.fhir.terminology import (
+            import_fhir_terminology,
+        )
 
         return import_fhir_terminology(
             payload,
@@ -756,7 +766,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         strict: bool = True,
     ) -> Self:
         """Create a validated knowledge base from FHIR terminology resources."""
-        from lx_dtypes.models.knowledge_base.fhir_yaml import (
+        from lx_dtypes.models.knowledge_base.fhir.yaml import (
             knowledge_base_from_fhir,
         )
 

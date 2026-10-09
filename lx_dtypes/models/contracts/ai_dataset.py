@@ -30,7 +30,7 @@ class AIDataSetScoredActiveLearningCandidateContract(BaseModel):
     frame_score: float
 
 
-DatasetType = Literal["image", "video"]
+DatasetType = Literal["image", "video", "clinical"]
 AIModelType = Literal[
     "image_multilabel_classification",
     "phi_region_detector",
@@ -148,7 +148,7 @@ class AIDataSetContract(BaseModel):
     id: int
     name: str
     description: str
-    ai_model_type: AIModelType = "image_multilabel_classification"
+    ai_model_type: AIModelType | None = "image_multilabel_classification"
     dataset_type: DatasetType = "image"
     is_active: bool = True
     created_at: datetime
@@ -169,15 +169,16 @@ class AIDataSetContract(BaseModel):
 
     @model_validator(mode="after")
     def validate_model_type_matches_dataset_type(self) -> AIDataSetContract:
-        allowed_by_dataset_type: dict[str, set[AIModelType]] = {
+        allowed_by_dataset_type: dict[str, set[AIModelType | None]] = {
             "image": {"image_multilabel_classification", "phi_region_detector"},
             "video": {"video_segment_classification"},
+            "clinical": {None},
         }
         allowed = allowed_by_dataset_type[self.dataset_type]
         if self.ai_model_type not in allowed:
             raise ValueError(
                 f"ai_model_type={self.ai_model_type!r} is not compatible with "
-                f"dataset_type={self.dataset_type!r}; expected one of {sorted(allowed)!r}."
+                f"dataset_type={self.dataset_type!r}; expected one of {sorted(str(item) for item in allowed)!r}."
             )
         return self
 
@@ -188,7 +189,7 @@ class AIDataSetCreateContract(BaseModel):
     name: str
     description: str = ""
     dataset_type: DatasetType = "image"
-    ai_model_type: AIModelType
+    ai_model_type: AIModelType | None = None
     is_active: bool = True
 
     @model_validator(mode="before")
@@ -197,7 +198,7 @@ class AIDataSetCreateContract(BaseModel):
         if not isinstance(value, Mapping):
             return value
         candidate = dict(cast(Mapping[object, object], value))
-        dataset_type = candidate.get("dataset_type", "image")
+        dataset_type = candidate.get("dataset_type", cls.model_fields["dataset_type"].default)
         expected_by_dataset_type: dict[object, AIModelType] = {
             "image": "image_multilabel_classification",
             "video": "video_segment_classification",
@@ -233,9 +234,10 @@ class AIDataSetCreateContract(BaseModel):
 
     @model_validator(mode="after")
     def fill_and_validate_ai_model_type(self) -> AIDataSetCreateContract:
-        allowed_by_dataset_type: dict[str, set[AIModelType]] = {
+        allowed_by_dataset_type: dict[str, set[AIModelType | None]] = {
             "image": {"image_multilabel_classification", "phi_region_detector"},
             "video": {"video_segment_classification"},
+            "clinical": {None},
         }
         if self.ai_model_type not in allowed_by_dataset_type[self.dataset_type]:
             raise ValueError("ai_model_type is not compatible with dataset_type")

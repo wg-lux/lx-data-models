@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
+from lx_dtypes.models.knowledge_base.validators.InterventionValidator import (
     InterventionValidator,
 )
-from lx_dtypes.models.knowledge_base.report_template.UnitValidator import UnitValidator
+from lx_dtypes.models.knowledge_base.validators.UnitValidator import (
+    UnitValidator,
+)
 
 
 def test_unit_validator_accepts_condition_with_typed_requirement_reference() -> None:

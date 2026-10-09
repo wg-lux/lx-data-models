@@ -1,18 +1,8 @@
-from typing import Literal, TypedDict
+"""Compatibility imports; implementation lives in lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReferenceDataDict."""
 
-ValidatorRequirementKindLiteral = Literal[
-    "classification",
-    "classification_choice",
-    "finding",
-    "intervention",
-    "unit",
-]
+from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReferenceDataDict import (
+    ValidatorRequirementKindLiteral,
+    ValidatorRequirementReferenceDataDict,
+)
 
-
-class ValidatorRequirementReferenceDataDict(TypedDict, total=False):
-    kind: ValidatorRequirementKindLiteral
-    name: str
-    names: list[str]
-    required: bool
-    finding: str
-    classification: str
+__all__ = ["ValidatorRequirementKindLiteral", "ValidatorRequirementReferenceDataDict"]

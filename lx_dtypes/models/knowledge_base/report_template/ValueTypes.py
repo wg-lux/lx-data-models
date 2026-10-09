@@ -1,9 +1,21 @@
-type ValidationScalar = str | int | float | bool
-type ValidationScalarList = list[ValidationScalar]
-type ValidationValue = ValidationScalar | ValidationScalarList
-type ValidationParams = dict[str, ValidationValue]
-type ValidationIssueScalar = ValidationScalar | None
-type ValidationIssueValue = (
-    ValidationIssueScalar | list[str] | list[int] | list[float] | list[bool]
+"""Compatibility imports; implementation lives in lx_dtypes.models.knowledge_base.validators.ValueTypes."""
+
+from lx_dtypes.models.knowledge_base.validators.ValueTypes import (
+    ValidationIssueDetails,
+    ValidationIssueScalar,
+    ValidationIssueValue,
+    ValidationParams,
+    ValidationScalar,
+    ValidationScalarList,
+    ValidationValue,
 )
-type ValidationIssueDetails = dict[str, ValidationIssueValue]
+
+__all__ = [
+    "ValidationScalar",
+    "ValidationScalarList",
+    "ValidationValue",
+    "ValidationParams",
+    "ValidationIssueScalar",
+    "ValidationIssueValue",
+    "ValidationIssueDetails",
+]

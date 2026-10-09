@@ -12,6 +12,41 @@ from lx_dtypes.django.api import main as api_main
 from lx_dtypes.terminology import terminology_loader as central
 
 
+@pytest.mark.parametrize("access", ["allowed", "anonymous", "denied"])
+def test_portable_package_route_authorization(
+    access: str, monkeypatch: MonkeyPatch
+) -> None:
+    from tests.unit.lx_dtypes.django.api.test_report_template_builder_helpers import (
+        study_package_payload,
+    )
+
+    if access == "anonymous":
+        monkeypatch.setattr(
+            api_main, "_authenticate_request_user", lambda request: None
+        )
+    if access == "denied":
+        monkeypatch.setattr(
+            api_main, "_report_template_access_allowed", lambda actor, capability: False
+        )
+    response = Client().post(
+        "/base_api/report-templates/builder/package",
+        data=study_package_payload().model_dump_json(),
+        content_type="application/json",
+        secure=True,
+    )
+    assert (
+        response.status_code
+        == {"allowed": 200, "anonymous": 401, "denied": 403}[access]
+    )
+    if access == "allowed":
+        assert set(response.json()) == {
+            "package_name",
+            "config_yaml",
+            "report_templates_yaml",
+            "validators_yaml",
+        }
+
+
 @pytest.fixture(autouse=True)
 def builder_route_authorization(monkeypatch: MonkeyPatch) -> None:
     """Keep lifecycle tests focused on builder behavior after route auth."""

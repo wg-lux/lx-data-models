@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from types import ModuleType
 from typing import Any, cast
 
+import pytest
+
+from lx_dtypes.models.knowledge_base import report_template
 from lx_dtypes.models.knowledge_base.classification.Classification import (
     Classification,
 )
@@ -11,25 +15,46 @@ from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice 
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
     ClassificationChoiceDescriptor,
 )
+from lx_dtypes.models.knowledge_base.fhir import (
+    findings as fhir,
+)
 from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
-from lx_dtypes.models.knowledge_base.report_template import ValidatorRuntime as runtime
-from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
+from lx_dtypes.models.knowledge_base.report_template import (
+    ReportedFindings as reported,
+)
+from lx_dtypes.models.knowledge_base.report_template import (
+    ValidatorRuntime as legacy_runtime,
+)
+from lx_dtypes.models.knowledge_base.unit.Unit import Unit
+from lx_dtypes.models.knowledge_base.validators import (
+    FindingTerminologyValidation as terminology,
+)
+from lx_dtypes.models.knowledge_base.validators import (
+    ValidatorRuntime as runtime,
+)
+from lx_dtypes.models.knowledge_base.validators import (
+    ValidatorRuntimeDataDict as results,
+)
+from lx_dtypes.models.knowledge_base.validators.ClassificationValidator import (
     ClassificationValidator,
 )
-from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
     FindingsValidator,
     FindingsValidatorConditionClause,
 )
-from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
+from lx_dtypes.models.knowledge_base.validators.InterventionValidator import (
     InterventionValidator,
 )
-from lx_dtypes.models.knowledge_base.report_template.UnitValidator import UnitValidator
-from lx_dtypes.models.knowledge_base.report_template.ValidatorRequirementReference import (
+from lx_dtypes.models.knowledge_base.validators.UnitValidator import (
+    UnitValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReference import (
     ValidatorRequirementReference,
 )
-from lx_dtypes.models.knowledge_base.report_template.ValueTypes import ValidationScalar
-from lx_dtypes.models.knowledge_base.unit.Unit import Unit
+from lx_dtypes.models.knowledge_base.validators.ValueTypes import (
+    ValidationScalar,
+)
 
 
 def _normalize_clause_or_fail(
@@ -43,7 +68,7 @@ def _normalize_clause_or_fail(
 
 
 def test_runtime_normalizers_cover_mapping_and_sequence_shapes() -> None:
-    classifications, units = runtime._normalize_classifications(
+    classifications, units = reported._normalize_classifications(
         [
             {
                 "classification": "size_mm",
@@ -58,10 +83,10 @@ def test_runtime_normalizers_cover_mapping_and_sequence_shapes() -> None:
         ]
     )
 
-    interventions = runtime._normalize_interventions(
+    interventions = reported._normalize_interventions(
         [{"intervention": "resection"}, {"name": "biopsy"}, "argon"]
     )
-    findings = runtime._normalize_reported_findings(
+    findings = reported._normalize_reported_findings(
         [
             {
                 "name": "colon_polyp",
@@ -113,7 +138,7 @@ def test_fhir_observation_export_import_validates_against_yaml_terminology() -> 
     }
     units = {"mm": Unit(name="mm", abbreviation="mm")}
 
-    exported = runtime.export_terminology_validated_fhir_observations(
+    exported = fhir.export_terminology_validated_fhir_observations(
         reported_findings,
         findings=findings,
         classifications=classifications,
@@ -136,7 +161,7 @@ def test_fhir_observation_export_import_validates_against_yaml_terminology() -> 
         "code": "mm",
     }
 
-    imported = runtime.import_terminology_validated_fhir_observations(
+    imported = fhir.import_terminology_validated_fhir_observations(
         exported["observations"],
         findings=findings,
         classifications=classifications,
@@ -159,7 +184,7 @@ def test_fhir_observation_export_import_validates_against_yaml_terminology() -> 
 
 
 def test_fhir_observation_export_reports_yaml_terminology_mismatch() -> None:
-    result = runtime.export_terminology_validated_fhir_observations(
+    result = fhir.export_terminology_validated_fhir_observations(
         [
             {
                 "finding": "colon_polyp",
@@ -377,7 +402,7 @@ def test_normalize_condition_clause_returns_none_for_blank_classification() -> N
 
 
 def test_missing_requirement_references_cover_all_reference_kinds() -> None:
-    occurrence = runtime._RuntimeFindingOccurrence(
+    occurrence = reported._RuntimeFindingOccurrence(
         finding="colon_polyp",
         classifications={"size_mm": [12], "retrieval": ["snare"]},
         classification_units={"size_mm": ["mm"]},
@@ -414,7 +439,7 @@ def test_missing_requirement_references_cover_all_reference_kinds() -> None:
 
 
 def test_missing_requirement_references_accepts_any_classification_choice() -> None:
-    occurrence = runtime._RuntimeFindingOccurrence(
+    occurrence = reported._RuntimeFindingOccurrence(
         finding="colon_polyp",
         classifications={"retrieval": ["snare"]},
         classification_units={},
@@ -823,3 +848,40 @@ def test_classification_validator_runtime_covers_missing_condition_and_unsupport
     assert unsupported["issues"][0]["code"] == (
         "unsupported_classification_validator_operator"
     )
+
+
+@pytest.mark.parametrize(
+    "owner, names",
+    [
+        (
+            fhir,
+            [
+                "FhirTerminologyValidatedFindingResultDataDict",
+                "export_reported_findings_to_fhir_observations",
+                "export_terminology_validated_fhir_observations",
+                "import_fhir_observations_to_reported_findings",
+                "import_terminology_validated_fhir_observations",
+            ],
+        ),
+        (terminology, ["validate_reported_findings_against_terminology"]),
+        (
+            results,
+            [
+                "ClassificationValidatorExecutionDataDict",
+                "ExaminationValidatorDependencyStatusDataDict",
+                "ExaminationValidatorExecutionDataDict",
+                "FindingsValidatorExecutionDataDict",
+                "InterventionValidatorExecutionDataDict",
+                "ReportTemplateRuntimeValidationResultDataDict",
+                "RuntimeValidationIssueDataDict",
+                "UnitValidatorExecutionDataDict",
+            ],
+        ),
+    ],
+)
+def test_relocated_public_apis_preserve_import_identity(
+    owner: ModuleType, names: list[str]
+) -> None:
+    for name in names:
+        assert getattr(legacy_runtime, name) is getattr(owner, name)
+        assert getattr(report_template, name) is getattr(owner, name)

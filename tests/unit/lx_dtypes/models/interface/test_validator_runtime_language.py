@@ -5,23 +5,27 @@ from typing import Literal
 import pytest
 
 from lx_dtypes.language import LANGUAGE_LABELS, load_message_catalogue
-from lx_dtypes.models.knowledge_base.report_template import ValidatorRuntime as runtime
-from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
-    ClassificationValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
-    ExaminationValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
-    FindingsValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
-    InterventionValidator,
-)
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
     ReportTemplate,
 )
-from lx_dtypes.models.knowledge_base.report_template.UnitValidator import UnitValidator
+from lx_dtypes.models.knowledge_base.validators import (
+    ValidatorRuntime as runtime,
+)
+from lx_dtypes.models.knowledge_base.validators.ClassificationValidator import (
+    ClassificationValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.ExaminationValidator import (
+    ExaminationValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
+    FindingsValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.InterventionValidator import (
+    InterventionValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.UnitValidator import (
+    UnitValidator,
+)
 
 
 @pytest.mark.parametrize(

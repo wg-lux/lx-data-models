@@ -5,7 +5,7 @@ from lx_dtypes.models.interface.KnowledgeBase import SemanticAdmissibilityError
 from lx_dtypes.models.knowledge_base.report_template import (
     build_report_concept_coverage,
 )
-from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+from lx_dtypes.models.knowledge_base.validators.ValidatorRuntime import (
     evaluate_classification_validator_runtime,
     evaluate_findings_validator_runtime,
 )

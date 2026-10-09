@@ -10,30 +10,30 @@ from lx_dtypes.models.knowledge_base.classification_choice_descriptor.Classifica
     ClassificationChoiceDescriptor,
 )
 from lx_dtypes.models.knowledge_base.intervention.Intervention import Intervention
-from lx_dtypes.models.knowledge_base.report_template.ClassificationValidator import (
-    ClassificationValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.ExaminationValidator import (
-    ExaminationValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
-    FindingsValidator,
-)
-from lx_dtypes.models.knowledge_base.report_template.InterventionValidator import (
-    InterventionValidator,
-)
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
     ReportTemplate,
 )
-from lx_dtypes.models.knowledge_base.report_template.UnitValidator import (
+from lx_dtypes.models.knowledge_base.unit.Unit import Unit
+from lx_dtypes.models.knowledge_base.validators.ClassificationValidator import (
+    ClassificationValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.ExaminationValidator import (
+    ExaminationValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
+    FindingsValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.InterventionValidator import (
+    InterventionValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.UnitValidator import (
     UnitValidator,
 )
-from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+from lx_dtypes.models.knowledge_base.validators.ValidatorRuntime import (
     evaluate_classification_validator_runtime,
     evaluate_findings_validator_runtime,
     evaluate_report_template_validators_runtime,
 )
-from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 
 
 def test_evaluate_findings_validator_exists_and_missing() -> None:

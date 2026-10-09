@@ -15,7 +15,7 @@ from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.knowledge_base.report_template.ReportConceptCoverageBuilder import (
     build_report_concept_coverage,
 )
-from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+from lx_dtypes.models.knowledge_base.validators.ValidatorRuntime import (
     evaluate_findings_validator_runtime,
 )
 from lx_dtypes.models.ledger.p_examination import PExamination

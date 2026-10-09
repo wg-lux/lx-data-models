@@ -57,6 +57,7 @@ class CohortDefinitionFields(BaseModel):
 
 
 class CohortDefinition(CohortDefinitionFields):
+    study_id: PositiveId | None = None
     dataset_ids: list[PositiveId] = Field(default_factory=list, max_length=500)
 
     @model_validator(mode="after")
@@ -71,3 +72,9 @@ class CohortDatasetLink(BaseModel):
 
     cohort_id: PositiveId
     linked: bool
+
+
+class CohortPreviewDefinition(CohortDefinition):
+    """Optional owned saved cohort supplies explicitly imported examination scope."""
+
+    cohort_id: PositiveId | None = None

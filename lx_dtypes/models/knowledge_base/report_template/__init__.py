@@ -1,6 +1,7 @@
-from typing import TypeAlias, TypedDict, Union
+from importlib import import_module
+from typing import TYPE_CHECKING, TypeAlias, TypedDict, Union
 
-from .ClassificationValidator import (
+from lx_dtypes.models.knowledge_base.validators.ClassificationValidator import (
     CLASSIFICATION_VALIDATOR_OPERATORS,
     CLASSIFICATION_VALIDATOR_PRECEDENCE,
     ClassificationValidator,
@@ -10,15 +11,19 @@ from .ClassificationValidator import (
     ClassificationValidatorPrecedence,
     ClassificationValidatorQuery,
 )
-from .ClassificationValidatorDataDict import (
+from lx_dtypes.models.knowledge_base.validators.ClassificationValidatorDataDict import (
     ClassificationValidatorConditionDataDict,
     ClassificationValidatorDataDict,
     ClassificationValidatorHintDataDict,
     ClassificationValidatorQueryDataDict,
 )
-from .ExaminationValidator import ExaminationValidator
-from .ExaminationValidatorDataDict import ExaminationValidatorDataDict
-from .FindingsValidator import (
+from lx_dtypes.models.knowledge_base.validators.ExaminationValidator import (
+    ExaminationValidator,
+)
+from lx_dtypes.models.knowledge_base.validators.ExaminationValidatorDataDict import (
+    ExaminationValidatorDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
     DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
     FINDINGS_VALIDATOR_COMPARATORS,
     FINDINGS_VALIDATOR_OPERATORS,
@@ -30,13 +35,18 @@ from .FindingsValidator import (
     FindingsValidatorQuery,
     FindingsValidatorRequiredClassification,
 )
-from .FindingsValidator import FindingsValidator as FindingsValidatorModel
-from .FindingsValidatorDataDict import (
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
+    FindingsValidator as FindingsValidatorModel,
+)
+from lx_dtypes.models.knowledge_base.validators.FindingsValidatorDataDict import (
     FindingsValidatorConditionDataDict,
     FindingsValidatorDataDict,
     FindingsValidatorQueryDataDict,
 )
-from .InterventionValidator import (
+from lx_dtypes.models.knowledge_base.validators.FindingTerminologyValidation import (
+    validate_reported_findings_against_terminology,
+)
+from lx_dtypes.models.knowledge_base.validators.InterventionValidator import (
     INTERVENTION_VALIDATOR_OPERATORS,
     INTERVENTION_VALIDATOR_PRECEDENCE,
     InterventionValidator,
@@ -46,12 +56,47 @@ from .InterventionValidator import (
     InterventionValidatorPrecedence,
     InterventionValidatorQuery,
 )
-from .InterventionValidatorDataDict import (
+from lx_dtypes.models.knowledge_base.validators.InterventionValidatorDataDict import (
     InterventionValidatorConditionDataDict,
     InterventionValidatorDataDict,
     InterventionValidatorHintDataDict,
     InterventionValidatorQueryDataDict,
 )
+from lx_dtypes.models.knowledge_base.validators.UnitValidator import (
+    UNIT_VALIDATOR_OPERATORS,
+    UNIT_VALIDATOR_PRECEDENCE,
+    UnitValidator,
+    UnitValidatorCondition,
+    UnitValidatorConditionClause,
+    UnitValidatorOperator,
+    UnitValidatorPrecedence,
+    UnitValidatorQuery,
+)
+from lx_dtypes.models.knowledge_base.validators.UnitValidatorDataDict import (
+    UnitValidatorConditionDataDict,
+    UnitValidatorDataDict,
+    UnitValidatorHintDataDict,
+    UnitValidatorQueryDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReference import (
+    ValidatorRequirementKind,
+    ValidatorRequirementReference,
+)
+from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReferenceDataDict import (
+    ValidatorRequirementKindLiteral,
+    ValidatorRequirementReferenceDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.ValidatorRuntimeDataDict import (
+    ClassificationValidatorExecutionDataDict,
+    ExaminationValidatorDependencyStatusDataDict,
+    ExaminationValidatorExecutionDataDict,
+    FindingsValidatorExecutionDataDict,
+    InterventionValidatorExecutionDataDict,
+    ReportTemplateRuntimeValidationResultDataDict,
+    RuntimeValidationIssueDataDict,
+    UnitValidatorExecutionDataDict,
+)
+
 from .ReportConceptCoverage import (
     REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION,
     ReportConceptApplicability,
@@ -115,51 +160,22 @@ from .TemplateReadiness import (
     ReportTemplateReadinessSummary,
     ReportTemplateReadinessSummaryDataDict,
 )
-from .UnitValidator import (
-    UNIT_VALIDATOR_OPERATORS,
-    UNIT_VALIDATOR_PRECEDENCE,
-    UnitValidator,
-    UnitValidatorCondition,
-    UnitValidatorConditionClause,
-    UnitValidatorOperator,
-    UnitValidatorPrecedence,
-    UnitValidatorQuery,
-)
-from .UnitValidatorDataDict import (
-    UnitValidatorConditionDataDict,
-    UnitValidatorDataDict,
-    UnitValidatorHintDataDict,
-    UnitValidatorQueryDataDict,
-)
-from .ValidatorRequirementReference import (
-    ValidatorRequirementKind,
-    ValidatorRequirementReference,
-)
-from .ValidatorRequirementReferenceDataDict import (
-    ValidatorRequirementKindLiteral,
-    ValidatorRequirementReferenceDataDict,
-)
-from .ValidatorRuntime import (
-    ClassificationValidatorExecutionDataDict,
-    ExaminationValidatorDependencyStatusDataDict,
-    ExaminationValidatorExecutionDataDict,
-    FhirTerminologyValidatedFindingResultDataDict,
-    FindingsValidatorExecutionDataDict,
-    InterventionValidatorExecutionDataDict,
-    ReportTemplateRuntimeValidationResultDataDict,
-    RuntimeValidationIssueDataDict,
-    UnitValidatorExecutionDataDict,
-    evaluate_classification_validator_runtime,
-    evaluate_findings_validator_runtime,
-    evaluate_intervention_validator_runtime,
-    evaluate_report_template_validators_runtime,
-    evaluate_unit_validator_runtime,
-    export_reported_findings_to_fhir_observations,
-    export_terminology_validated_fhir_observations,
-    import_fhir_observations_to_reported_findings,
-    import_terminology_validated_fhir_observations,
-    validate_reported_findings_against_terminology,
-)
+
+if TYPE_CHECKING:
+    from lx_dtypes.models.knowledge_base.fhir.findings import (
+        FhirTerminologyValidatedFindingResultDataDict,
+        export_reported_findings_to_fhir_observations,
+        export_terminology_validated_fhir_observations,
+        import_fhir_observations_to_reported_findings,
+        import_terminology_validated_fhir_observations,
+    )
+    from lx_dtypes.models.knowledge_base.validators.ValidatorRuntime import (
+        evaluate_classification_validator_runtime,
+        evaluate_findings_validator_runtime,
+        evaluate_intervention_validator_runtime,
+        evaluate_report_template_validators_runtime,
+        evaluate_unit_validator_runtime,
+    )
 
 FindingsValidator = FindingsValidatorModel
 
@@ -357,3 +373,25 @@ __all__ = [
     "validate_report_template_structure",
     "validate_reported_findings_against_terminology",
 ]
+
+
+_RUNTIME_EXPORTS = {
+    "evaluate_classification_validator_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "evaluate_findings_validator_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "evaluate_intervention_validator_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "evaluate_report_template_validators_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "evaluate_unit_validator_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "FhirTerminologyValidatedFindingResultDataDict": "lx_dtypes.models.knowledge_base.fhir.findings",
+    "export_reported_findings_to_fhir_observations": "lx_dtypes.models.knowledge_base.fhir.findings",
+    "export_terminology_validated_fhir_observations": "lx_dtypes.models.knowledge_base.fhir.findings",
+    "import_fhir_observations_to_reported_findings": "lx_dtypes.models.knowledge_base.fhir.findings",
+    "import_terminology_validated_fhir_observations": "lx_dtypes.models.knowledge_base.fhir.findings",
+}
+
+
+def __getattr__(name: str) -> object:
+    if name not in _RUNTIME_EXPORTS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    value = getattr(import_module(_RUNTIME_EXPORTS[name]), name)
+    globals()[name] = value
+    return value

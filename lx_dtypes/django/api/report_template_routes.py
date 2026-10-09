@@ -13,16 +13,19 @@ from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateVal
 from lx_dtypes.models.knowledge_base.report_template.ReportConceptCoverageBuilder import (
     build_report_concept_coverage,
 )
-from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+from lx_dtypes.models.knowledge_base.validators.ValidatorRuntime import (
     RuntimeValidationLanguage,
 )
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 from .report_template_builder import (
+    BuildReportTemplatePackageRequest,
     PublishReportTemplateResponse,
     ReportTemplateModuleLocation,
+    ReportTemplatePackageResponse,
     SaveReportTemplateRequest,
     SaveReportTemplateResponse,
+    build_report_template_package,
     save_report_template_definition,
     set_saved_report_template_lifecycle,
 )
@@ -140,6 +143,16 @@ def register_report_template_routes(
         if not resolved:
             raise HttpError(400, "An explicit knowledge-base version is required.")
         return resolved
+
+    @api.post("/report-templates/builder/package")
+    def export_report_template_package(
+        request: BaseRequest, payload: BuildReportTemplatePackageRequest
+    ) -> ReportTemplatePackageResponse:
+        require_builder_access(request, "report_template:write")
+        try:
+            return build_report_template_package(payload)
+        except ValueError as exc:
+            raise HttpError(400, str(exc)) from exc
 
     @api.post("/report-templates/builder/templates")
     def save_report_template(

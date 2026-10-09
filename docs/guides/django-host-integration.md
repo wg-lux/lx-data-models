@@ -212,6 +212,15 @@ The effective examination object must expose:
 
 `examiners` may be a Django relation with `.all()` or a plain list-like object.
 
+Examination-bound catalog requests require both persisted knowledge-base fields.
+Missing or partial identities return `409 knowledge-base-identity-required`,
+including when the request supplies an explicit module and version. A complete
+persisted identity that differs from the requested identity returns
+`409 knowledge-base-identity-conflict`. Catalog reads never bind the examination
+to the request identity or the registry's active selection. The host must persist
+the intended identity through its validated examination/report workflow before
+requesting the examination-bound catalog.
+
 ### `PatientFinding`
 
 Required fields:

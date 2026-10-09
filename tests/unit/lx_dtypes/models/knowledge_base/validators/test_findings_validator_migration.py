@@ -7,10 +7,10 @@ from types import ModuleType
 
 import yaml
 
-from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
     FindingsValidator,
 )
-from lx_dtypes.models.knowledge_base.report_template.ValidatorRuntime import (
+from lx_dtypes.models.knowledge_base.validators.ValidatorRuntime import (
     evaluate_findings_validator_runtime,
 )
 from tests.paths import REPOSITORY_ROOT

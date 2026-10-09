@@ -185,12 +185,24 @@ def test_patient_identity_conflict_is_rejected(storage, catalog_models, api):
     )
 
 
-def test_missing_patient_identity_keeps_specific_error(storage, catalog_models, api):
+@pytest.mark.parametrize("explicit", [False, True])
+@pytest.mark.parametrize(
+    "path", ["/indications/tree/", "/examinations/{examination_id}/indications/"]
+)
+def test_missing_patient_identity_keeps_specific_error(
+    storage, catalog_models, api, explicit, path
+):
     models, _, patient = catalog_models
     patient.knowledge_base_version = ""
     handlers = register(api, models)
     with pytest.raises(ApiError) as exc:
-        handlers["/indications/tree/"](None, patient_examination_id=11)
+        handlers[path](
+            None,
+            **({"examination_id": 1} if "{examination_id}" in path else {}),
+            patient_examination_id=11,
+            module_name="dgvs_reporting" if explicit else None,
+            module_version="0.1.0" if explicit else None,
+        )
     assert (exc.value.status, exc.value.code) == (
         409,
         "knowledge-base-identity-required",

@@ -21,7 +21,9 @@ network resolution. Relative identifiers and exact `fullUrl` aliases are support
 ambiguous identifiers across servers require a host adapter. Resolving a bundle
 does not establish consent, access rights, terminology validity, or clinical safety.
 
-The finding/classification bridge in `ValidatorRuntime` is a component projection,
+The finding/classification bridge in
+`lx_dtypes.models.knowledge_base.fhir.findings` (also re-exported through the
+historical report-template modules) is a component projection,
 not a lossless round trip of complete clinical resources. It now rejects malformed
 components instead of substituting `True`. Unitless numeric exports use
 `valueQuantity`, a valid R4 choice; legacy `valueDecimal` remains accepted on input

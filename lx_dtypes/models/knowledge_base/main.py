@@ -1,5 +1,19 @@
 from typing import Literal, TypeAlias, Union
 
+from lx_dtypes.models.knowledge_base.fhir.terminology import (
+    DEFAULT_FHIR_BASE_URL,
+    DEFAULT_FHIR_PUBLISHER,
+    FHIR_EXPORT_DOMAINS,
+    export_fhir_terminology,
+    export_fhir_terminology_bundle,
+    import_fhir_terminology,
+)
+from lx_dtypes.models.knowledge_base.fhir.yaml import (
+    fhir_to_yaml,
+    knowledge_base_from_fhir,
+    write_fhir_yaml,
+)
+
 from .center.center_employee_list import (
     CenterEmployeeList,
     CenterEmployeeListDataDict,
@@ -49,19 +63,6 @@ from .examination import (
     kb_examination_django_models,
     kb_examination_lookup,
     kb_examination_models,
-)
-from .fhir import (
-    DEFAULT_FHIR_BASE_URL,
-    DEFAULT_FHIR_PUBLISHER,
-    FHIR_EXPORT_DOMAINS,
-    export_fhir_terminology,
-    export_fhir_terminology_bundle,
-    import_fhir_terminology,
-)
-from .fhir_yaml import (
-    fhir_to_yaml,
-    knowledge_base_from_fhir,
-    write_fhir_yaml,
 )
 from .finding import (
     KbFindingDjangoLookupType,

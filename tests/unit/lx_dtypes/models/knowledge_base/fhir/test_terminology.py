@@ -16,13 +16,13 @@ from lx_dtypes.models.knowledge_base.classification_choice.ClassificationChoice 
     ClassificationChoice,
 )
 from lx_dtypes.models.knowledge_base.examination.Examination import Examination
-from lx_dtypes.models.knowledge_base.fhir import (
+from lx_dtypes.models.knowledge_base.fhir.terminology import (
     DEFAULT_FHIR_BASE_URL,
     export_fhir_terminology,
     import_fhir_terminology,
     infer_fhir_code_system_domain,
 )
-from lx_dtypes.models.knowledge_base.fhir_yaml import (
+from lx_dtypes.models.knowledge_base.fhir.yaml import (
     fhir_to_yaml,
     knowledge_base_from_fhir,
     write_fhir_yaml,

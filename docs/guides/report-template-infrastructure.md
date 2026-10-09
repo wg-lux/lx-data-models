@@ -529,6 +529,29 @@ For classification payload values, the runtime accepts multiple shapes and extra
 
 This means identifier matching is string-oriented, but condition evaluation operates on actual extracted values.
 
+### Functionality package ownership
+
+The lx-dtypes maintainers own three sibling packages under
+`lx_dtypes/models/knowledge_base/`:
+
+- `fhir/`: `terminology.py` handles terminology import/export, `yaml.py` converts
+  FHIR terminology to KB YAML, and `findings.py` projects Observation components
+  into reported findings and performs terminology-validated exchange.
+- `report_template/`: template and section models, finding requirements, graph
+  structure, coverage, readiness, and shared reported-finding normalization.
+- `validators/`: classification, finding, intervention, unit, and examination
+  rules; requirement references; value and result contracts; terminology checks;
+  localized issue construction; and `ValidatorRuntime.py` execution.
+
+New code imports implementations from these packages. Historical validator module
+paths under `report_template/`, `FhirFindingInterop`, and `fhir_yaml` remain thin
+compatibility re-exports. The former `knowledge_base.fhir` module is now a package
+with the same terminology exports. Report-template package exports load runtime
+and FHIR functions on demand so imports work independently of initialization order.
+YAML contracts, validation decisions, messages, and FHIR projection behavior are
+unchanged. Clinical resource contracts remain under `models/contracts`; diagram
+rendering utilities and host integration retain their existing package boundaries.
+
 ### How numbers are handled
 
 Number handling is implemented by `_coerce_numeric`, `_value_equals`, and `_compare_ordered`.

@@ -1,8 +1,7 @@
-from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
-    KnowledgebaseBaseModelDataDict,
+"""Compatibility imports; implementation lives in lx_dtypes.models.knowledge_base.validators.ExaminationValidatorDataDict."""
+
+from lx_dtypes.models.knowledge_base.validators.ExaminationValidatorDataDict import (
+    ExaminationValidatorDataDict,
 )
 
-
-class ExaminationValidatorDataDict(KnowledgebaseBaseModelDataDict):
-    finding_validators: list[str]
-    examination_validators: list[str]
+__all__ = ["ExaminationValidatorDataDict"]

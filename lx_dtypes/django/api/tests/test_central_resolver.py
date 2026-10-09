@@ -194,6 +194,35 @@ CATALOG_ROUTES = [
 
 
 @pytest.mark.parametrize("path,id_name", CATALOG_ROUTES)
+@pytest.mark.parametrize("name,version", [("", ""), ("test_module", ""), ("", "v1")])
+@pytest.mark.parametrize("explicit", [False, True])
+def test_catalog_missing_exam_identity_is_required_not_conflict(
+    harness, path, id_name, name, version, explicit
+):
+    h = harness
+    h.patient_exam.knowledge_base_module = name
+    h.patient_exam.knowledge_base_version = version
+    with pytest.raises(ApiError) as caught:
+        route(h, "GET", path)(
+            h.request,
+            **{id_name: 1},
+            module_name="test_module" if explicit else None,
+            module_version="v1" if explicit else None,
+            patient_examination_id=9,
+        )
+    assert (caught.value.status, caught.value.code) == (
+        409,
+        "knowledge-base-identity-required",
+    )
+    h.resolver.active_kb_identity.assert_not_called()
+    h.resolver.load_module_kb.assert_not_called()
+    assert (
+        h.patient_exam.knowledge_base_module,
+        h.patient_exam.knowledge_base_version,
+    ) == (name, version)
+
+
+@pytest.mark.parametrize("path,id_name", CATALOG_ROUTES)
 def test_catalog_keeps_single_identity_if_active_changes_mid_response(
     harness, path, id_name
 ):

@@ -7,9 +7,16 @@ from typing import Any, Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
     ReportTemplateLifecycleStatusLiteral,
     ReportTemplateReadinessSummaryDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
+    FindingsValidatorQuery,
+)
+from lx_dtypes.models.knowledge_base.validators.ValueTypes import (
+    ValidationScalar,
 )
 from lx_dtypes.terminology.terminology_loader import resolve_module_path
 from lx_dtypes.terminology.terminology_service import TerminologyError
@@ -64,7 +71,8 @@ class ReportTemplateBuilderClassification(BaseModel):
 class ReportTemplateBuilderValidatorCondition(BaseModel):
     classification: str = ""
     comparator: Literal["eq", "ne", "gt", "gte", "lt", "lte", "in", "not_in"] = "eq"
-    value: Any = None
+    value: ValidationScalar | None = None
+    values: list[ValidationScalar] = Field(default_factory=list)
     then_requires: list[str] = Field(default_factory=list)
 
 
@@ -137,6 +145,19 @@ class SaveReportTemplateResponse(BaseModel):
     records_written: int
     lifecycle_status: ReportTemplateLifecycleStatusLiteral = "draft"
     readiness: ReportTemplateReadinessSummaryDataDict | None = None
+
+
+class BuildReportTemplatePackageRequest(SaveReportTemplateRequest):
+    package_name: str = Field(pattern=r"^[a-z][a-z0-9_]*$")
+    package_version: str = Field(min_length=1, max_length=100, pattern=r"^\S+$")
+    depends_on: list[str] = Field(min_length=1)
+
+
+class ReportTemplatePackageResponse(BaseModel):
+    package_name: str
+    config_yaml: str
+    report_templates_yaml: str
+    validators_yaml: str
 
 
 class PublishReportTemplateResponse(BaseModel):
@@ -327,8 +348,14 @@ def _build_findings_validator_record(
     }
 
     if validator.operator == "condition":
+        if (
+            not validator.condition.values
+            and isinstance(validator.condition.value, str)
+            and not validator.condition.value.strip()
+        ):
+            raise ValueError("Conditional rules require a non-empty comparison value.")
         then_requires = [
-            {"classification": classification.strip()}
+            {"kind": "classification", "name": classification.strip()}
             for classification in validator.condition.then_requires
             if classification.strip()
         ]
@@ -337,11 +364,22 @@ def _build_findings_validator_record(
                 {
                     "classification": validator.condition.classification.strip(),
                     "comparator": validator.condition.comparator,
-                    "value": validator.condition.value,
+                    **(
+                        {"values": validator.condition.values}
+                        if validator.condition.comparator in {"in", "not_in"}
+                        and validator.condition.values
+                        else {"value": validator.condition.value}
+                    ),
                 }
             ],
             "then_requires": then_requires,
         }
+        if not then_requires:
+            raise ValueError(
+                "Conditional rules require at least one required classification."
+            )
+
+    FindingsValidatorQuery.model_validate(record["query"])
 
     return record
 
@@ -401,7 +439,47 @@ def build_yaml_records(payload: SaveReportTemplateRequest) -> list[dict[str, Any
         }
     )
 
+    identities = [(record["model"], record["name"]) for record in records]
+    if len(identities) != len(set(identities)):
+        raise ValueError("Generated record names must be unique within each model.")
     return records
+
+
+def build_report_template_package(
+    payload: BuildReportTemplatePackageRequest,
+) -> ReportTemplatePackageResponse:
+    """Render a portable draft using the same record builder as installed saves."""
+    if not payload.sections:
+        raise ValueError("A package requires at least one report section.")
+    if payload.package_name == payload.module_name:
+        raise ValueError("Use a new package name to retain the source release.")
+    if payload.module_name not in payload.depends_on:
+        raise ValueError(
+            "Package dependencies must include the source terminology module."
+        )
+    config = {
+        "name": payload.package_name,
+        "version": payload.package_version,
+        "modules": [],
+        "depends_on": payload.depends_on,
+        "data": {"files": ["./report_templates.yml", "./validators.yml"]},
+    }
+    KnowledgeBaseConfig.model_validate(config)
+    records = build_yaml_records(payload)
+    return ReportTemplatePackageResponse(
+        package_name=payload.package_name,
+        config_yaml=yaml.safe_dump(config, sort_keys=False, allow_unicode=True),
+        report_templates_yaml=yaml.safe_dump(
+            [record for record in records if record["model"] != "findings_validator"],
+            sort_keys=False,
+            allow_unicode=True,
+        ),
+        validators_yaml=yaml.safe_dump(
+            [record for record in records if record["model"] == "findings_validator"],
+            sort_keys=False,
+            allow_unicode=True,
+        ),
+    )
 
 
 def save_report_template_definition(

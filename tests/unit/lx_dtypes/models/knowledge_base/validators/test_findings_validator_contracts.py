@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from lx_dtypes.models.knowledge_base.report_template.FindingsValidator import (
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
     FindingsValidator,
 )
 
