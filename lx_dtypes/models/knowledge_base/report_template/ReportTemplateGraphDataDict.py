@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Literal, TypedDict
+from typing import Literal, TypedDict
 
 
 class ReportTemplateGraphNodeDataDict(TypedDict):
@@ -15,7 +15,7 @@ class ReportTemplateGraphNodeDataDict(TypedDict):
         "history_field",
     ]
     name: str
-    tokens: List[str]
+    tokens: list[str]
 
 
 class ReportTemplateGraphEdgeDataDict(TypedDict):
@@ -37,9 +37,9 @@ class ReportTemplateGraphDataDict(TypedDict):
     template_name: str
     examination: str
     start_node_id: str
-    ordered_section_node_ids: List[str]
-    nodes: List[ReportTemplateGraphNodeDataDict]
-    edges: List[ReportTemplateGraphEdgeDataDict]
+    ordered_section_node_ids: list[str]
+    nodes: list[ReportTemplateGraphNodeDataDict]
+    edges: list[ReportTemplateGraphEdgeDataDict]
 
 
 class ReportTemplateStructureIssueDataDict(TypedDict):
@@ -53,4 +53,4 @@ class ReportTemplateStructureValidationResultDataDict(TypedDict):
     template_name: str
     ok: bool
     graph: ReportTemplateGraphDataDict
-    issues: List[ReportTemplateStructureIssueDataDict]
+    issues: list[ReportTemplateStructureIssueDataDict]

@@ -1,11 +1,21 @@
-from typing import TypeAlias
+"""Compatibility imports; implementation lives in lx_dtypes.models.knowledge_base.validators.ValueTypes."""
 
-ValidationScalar: TypeAlias = str | int | float | bool
-ValidationScalarList: TypeAlias = list[ValidationScalar]
-ValidationValue: TypeAlias = ValidationScalar | ValidationScalarList
-ValidationParams: TypeAlias = dict[str, ValidationValue]
-ValidationIssueScalar: TypeAlias = ValidationScalar | None
-ValidationIssueValue: TypeAlias = (
-    ValidationIssueScalar | list[str] | list[int] | list[float] | list[bool]
+from lx_dtypes.models.knowledge_base.validators.ValueTypes import (
+    ValidationIssueDetails,
+    ValidationIssueScalar,
+    ValidationIssueValue,
+    ValidationParams,
+    ValidationScalar,
+    ValidationScalarList,
+    ValidationValue,
 )
-ValidationIssueDetails: TypeAlias = dict[str, ValidationIssueValue]
+
+__all__ = [
+    "ValidationScalar",
+    "ValidationScalarList",
+    "ValidationValue",
+    "ValidationParams",
+    "ValidationIssueScalar",
+    "ValidationIssueValue",
+    "ValidationIssueDetails",
+]

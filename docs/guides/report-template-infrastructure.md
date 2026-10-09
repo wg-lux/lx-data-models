@@ -3,7 +3,7 @@
 This guide explains how report-template YAML is loaded, validated, exported, and evaluated at runtime in this repository.
 
 Start here for a beginner authoring guide:
-- `lx_dtypes/data/report_template_examples/README.md`
+- `lx_dtypes/data/terminology/report_template_examples/README.md`
 This is the main system overview for report templates in this repository.
 
 It explains how report-template YAML is:
@@ -16,11 +16,12 @@ It explains how report-template YAML is:
 
 Read the guides in this order:
 
-1. Beginner authoring guide: `lx_dtypes/data/report_template_examples/README.md`
+1. Beginner authoring guide: `lx_dtypes/data/terminology/report_template_examples/README.md`
 2. `docs/guides/django-host-integration.md`
 3. This infrastructure guide
 4. `docs/guides/report-template-graph-validation.md`
 5. `docs/guides/report-template-findings-validator-migration.md`
+6. `docs/guides/report-concept-coverage.md`
 
 Use that README specifically for:
 
@@ -69,6 +70,9 @@ These terms are easy to blur together. Keep them separate:
   Builds and checks a typed graph representation of template structure.
 - runtime validation
   Evaluates an actual reported examination payload against template validators.
+- concept coverage
+  A versioned, server-generated evidence contract for the applicable concepts,
+  values, validators, and payload paths of one report.
 
 ## Status Summary
 
@@ -130,15 +134,37 @@ In short:
 
 ## Important Files
 
-- Example module config: `lx_dtypes/data/report_template_examples/config.yaml`
-- Example template YAML: `lx_dtypes/data/report_template_examples/report_templates.yaml`
+- Example module config: `lx_dtypes/data/terminology/report_template_examples/config.yaml`
+- Example template YAML: `lx_dtypes/data/terminology/report_template_examples/report_templates.yaml`
 - New model package: `lx_dtypes/models/knowledge_base/report_template/`
 - Global KB model registry: `lx_dtypes/models/knowledge_base/main.py`
 - YAML parser: `lx_dtypes/utils/parser.py`
 - KB export methods: `lx_dtypes/models/interface/KnowledgeBase.py`
 - Tests:
-  - `lx_dtypes/models/interface/tests/test_report_template_example_module.py`
-  - `lx_dtypes/models/interface/tests/test_report_template_export.py`
+  - `tests/unit/lx_dtypes/models/interface/test_report_template_example_module.py`
+  - `tests/unit/lx_dtypes/models/interface/test_report_template_export.py`
+
+`report_template_examples` is package-owned example and test data. It is not a
+clinical fallback module and it is not a valid builder write target. Production
+resolution must use an explicitly provisioned registry identity.
+
+## Versioned API And Builder Contract
+
+Every report-template read, preview, validation, publication, and unpublication
+request requires an exact knowledge-base version. GET and lifecycle routes use
+the required `version` query parameter. Runtime validation additionally requires
+the same version in the typed `PExamination` payload. A mismatch returns `409`
+before template evaluation.
+
+Builder save requests require both `module_name` and `module_version`. The
+backend resolves that exact registry entry, verifies the loaded artifact
+identity, and rejects package-owned sources. Blank modules never normalize to
+`report_template_examples`.
+
+Versioned resolver calls require either `LX_DTYPES_KB_REGISTRY` or explicit
+`input_dirs`. They never fall back to installed package data roots. Unversioned
+library loading remains available for explicit local authoring and test code,
+but is not used by the versioned Django reporting contract.
 
 ## Mental Model
 
@@ -282,8 +308,8 @@ Current scope:
 - Structural validation via `validate_report_template_structure(...)`
 - Runtime validator execution for `exists`, `missing`, and `condition` operators via:
   - `KnowledgeBase.evaluate_report_template_validators(...)`
-  - `POST /base_api/report-templates/{module_name}/{template_name}/validate`
-- Version-aware KB loading for runtime validation when a payload carries `knowledge_base_version`
+  - `POST /base_api/report-templates/{module_name}/{template_name}/validate?version={module_version}`
+- Exact-version KB loading for runtime validation; the query and payload identities must match
 
 Operators are strict canonical-only now:
 
@@ -371,7 +397,7 @@ Do not treat the raw YAML format as a safe end-user authoring surface yet.
 Use either:
 
 - `KnowledgeBase.evaluate_report_template_validators(template_name, p_examination=...)`
-- `POST /base_api/report-templates/{module_name}/{template_name}/validate`
+- `POST /base_api/report-templates/{module_name}/{template_name}/validate?version={module_version}`
 
 Expected typed examination payload example:
 
@@ -503,6 +529,29 @@ For classification payload values, the runtime accepts multiple shapes and extra
 
 This means identifier matching is string-oriented, but condition evaluation operates on actual extracted values.
 
+### Functionality package ownership
+
+The lx-dtypes maintainers own three sibling packages under
+`lx_dtypes/models/knowledge_base/`:
+
+- `fhir/`: `terminology.py` handles terminology import/export, `yaml.py` converts
+  FHIR terminology to KB YAML, and `findings.py` projects Observation components
+  into reported findings and performs terminology-validated exchange.
+- `report_template/`: template and section models, finding requirements, graph
+  structure, coverage, readiness, and shared reported-finding normalization.
+- `validators/`: classification, finding, intervention, unit, and examination
+  rules; requirement references; value and result contracts; terminology checks;
+  localized issue construction; and `ValidatorRuntime.py` execution.
+
+New code imports implementations from these packages. Historical validator module
+paths under `report_template/`, `FhirFindingInterop`, and `fhir_yaml` remain thin
+compatibility re-exports. The former `knowledge_base.fhir` module is now a package
+with the same terminology exports. Report-template package exports load runtime
+and FHIR functions on demand so imports work independently of initialization order.
+YAML contracts, validation decisions, messages, and FHIR projection behavior are
+unchanged. Clinical resource contracts remain under `models/contracts`; diagram
+rendering utilities and host integration retain their existing package boundaries.
+
 ### How numbers are handled
 
 Number handling is implemented by `_coerce_numeric`, `_value_equals`, and `_compare_ordered`.
@@ -547,6 +596,26 @@ For `condition` validators:
 - `triggered_occurrences` counts how many finding occurrences matched the condition
 - validation only fails for those triggered occurrences
 - non-triggering occurrences are ignored for the conditional requirement itself
+
+### Runtime message language
+
+Runtime and `KnowledgeBase.evaluate_*` methods accept `language="de"` (the
+new default) or `language="en"`. The template `/validate`, `/validate-from-ledger`,
+and single-validator `/validate` API routes accept the same `language` query
+parameter; omitting it returns German messages for lx-annotate. Clients that
+require the previous English wording must explicitly request `language=en`.
+Unsupported languages are rejected, including when validation succeeds.
+
+Only issue `message` text is translated. Codes, identifiers, details, hints,
+result field names, and validation decisions remain language independent.
+Nested dependency issues use the selected language too. The lx-dtypes
+maintainers own the canonical text catalogue in
+`lx_dtypes/validator_runtime_messages.yml`. The shared `lx_dtypes.language` module
+owns `LanguageCode`, `DEFAULT_LANGUAGE`, language labels, validation, and catalogue
+loading. Reporting options, draft contracts, API routes, and runtime methods use
+this policy; the existing `RuntimeValidationLanguage` and `ReportLanguageCode`
+imports remain aliases. Select a language per call; no process-global language
+is changed.
 
 ### What is returned
 
@@ -682,7 +751,18 @@ Expected registry shape:
 
 ## Related Guides
 
-- Beginner authoring: `lx_dtypes/data/report_template_examples/README.md`
+- Beginner authoring: `lx_dtypes/data/terminology/report_template_examples/README.md`
 - Graph-specific validation: `docs/guides/report-template-graph-validation.md`
 - Operator migration for persisted validator data: `docs/guides/report-template-findings-validator-migration.md`
 - Intentionally broken audit fixture: `docs/guides/fixtures/report-template-chaos/README.md`
+
+## ColoReg identifier capture
+
+The current ColoReg template omits the case, lesion, index examination, index
+polyp, index resection, and preceding follow-up identifier inputs and their
+coverage checks. Subsequent follow-up no longer requires a documented preceding
+examination ID through a template validator. The terminology definitions remain
+available for existing observations and host-managed linkage; historical
+packages are unchanged. Hosts that consumed these template inputs must obtain
+linkage from their own observation context. Clinical validation rules remain
+active.

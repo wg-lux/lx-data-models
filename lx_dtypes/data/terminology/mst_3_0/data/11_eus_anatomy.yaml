@@ -1,0 +1,131 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Source: MST 3.0 section 2.4. The choice descriptions retain modifiers where
+# they apply; prefixed IDs distinguish identical labels in different organs.
+- {model: classification, name: mst30_eus_location_esophagus, name_en: EUS esophagus anatomy, name_de: "Endosonographische Anatomie des Ösophagus", classification_types: [mst30_location], classification_choices: [mst30_eus_esophageal_wall, mst30_eus_upper_esophagus, mst30_eus_mid_esophagus, mst30_eus_lower_esophagus, mst30_eus_cardia, mst30_eus_mediastinum, mst30_eus_periesophageal, mst30_eus_paraesophageal, mst30_eus_subcarina, mst30_eus_pleura, mst30_eus_lung, mst30_eus_trachea, mst30_eus_main_bronchus, mst30_eus_left_atrium, mst30_eus_pericardium, mst30_eus_aortopulmonary_window, mst30_eus_diaphragm, mst30_eus_crus, mst30_eus_spine, mst30_eus_carotid_artery, mst30_eus_subclavian_artery, mst30_eus_aortic_arch, mst30_eus_thoracic_aorta, mst30_eus_pulmonary_artery, mst30_eus_superior_vena_cava, mst30_eus_inferior_vena_cava, mst30_eus_azygos_vein, mst30_eus_lymph_node_station]}
+- {model: classification, name: mst30_eus_location_stomach, name_en: EUS stomach anatomy, name_de: "Endosonographische Anatomie des Magens", classification_types: [mst30_location], classification_choices: [mst30_eus_stomach, mst30_eus_stomach_cardia, mst30_eus_stomach_fundus, mst30_eus_stomach_body, mst30_eus_stomach_incisura, mst30_eus_stomach_antrum, mst30_eus_stomach_prepyloric, mst30_eus_stomach_pylorus, mst30_eus_whole_stomach, mst30_eus_stomach_anastomosis, mst30_eus_stomach_hiatal_hernia, mst30_eus_gastric_wall, mst30_eus_celiac_axis, mst30_eus_perigastric, mst30_eus_left_kidney, mst30_eus_spleen, mst30_eus_splenic_hilum, mst30_eus_left_adrenal, mst30_eus_portal_vein, mst30_eus_splenic_vein, mst30_eus_portal_confluence, mst30_eus_splenic_artery, mst30_eus_left_renal_artery, mst30_eus_left_renal_vein, mst30_eus_hepatic_artery, mst30_eus_superior_mes_artery, mst30_eus_superior_mes_vein, mst30_eus_left_gastric_artery], description: "Modifiers include curve/wall and distances from incisors, GE junction, pylorus, or GI wall."}
+- {model: classification, name: mst30_eus_location_duodenum, name_en: EUS duodenum anatomy, name_de: "Endosonographische Anatomie des Duodenums", classification_types: [mst30_location], classification_choices: [mst30_eus_duodenum, mst30_eus_duodenal_bulb, mst30_eus_duodenum_d2, mst30_eus_duodenum_d3, mst30_eus_duodenum_d4, mst30_eus_duodenum_upper_knee, mst30_eus_ampullary_region, mst30_eus_major_papilla, mst30_eus_minor_papilla, mst30_eus_duodenum_anastomosis, mst30_eus_duodenal_wall, mst30_eus_periduodenal, mst30_eus_right_kidney, mst30_eus_right_adrenal, mst30_eus_duodenum_inferior_vena_cava, mst30_eus_abdominal_aorta], description: "Modifiers: proximal/distal."}
+- {model: classification, name: mst30_eus_location_biliary_tract, name_en: EUS biliary tract anatomy, name_de: "Endosonographische Anatomie der Gallenwege", classification_types: [mst30_location], classification_choices: [mst30_eus_biliary_major_papilla, mst30_eus_whole_biliary_tree, mst30_eus_common_bile_duct, mst30_eus_cystic_duct, mst30_eus_cystic_duct_takeoff, mst30_eus_gallbladder, mst30_eus_bifurcation, mst30_eus_biliary_generalized, mst30_eus_peribiliary], description: "Common bile duct modifiers: whole/upper/mid/lower/terminal, distance from papilla, above/below."}
+- {model: classification, name: mst30_eus_location_pancreas, name_en: EUS pancreas anatomy, name_de: "Endosonographische Anatomie des Pankreas", classification_types: [mst30_location], classification_choices: [mst30_eus_pancreas_major_papilla, mst30_eus_pancreas_minor_papilla, mst30_eus_whole_pancreatic_duct, mst30_eus_pancreas_head, mst30_eus_pancreas_neck, mst30_eus_pancreas_body, mst30_eus_pancreas_tail, mst30_eus_pancreas_uncinate, mst30_eus_ventral_duct, mst30_eus_dorsal_duct, mst30_eus_duct_santorini, mst30_eus_duct_wirsungi, mst30_eus_side_branches, mst30_eus_pancreas_generalized, mst30_eus_peripancreatic], description: "Modifiers: distance from papilla, whole/upstream/downstream/central/peripheral."}
+- {model: classification, name: mst30_eus_location_colorectum, name_en: EUS colorectal anatomy, name_de: "Endosonographische Anatomie von Kolon und Rektum", classification_types: [mst30_location], classification_choices: [mst30_eus_colorectal_wall, mst30_eus_anal_canal, mst30_eus_lower_rectum, mst30_eus_mid_rectum, mst30_eus_upper_rectum, mst30_eus_rectosigmoid_junction, mst30_eus_sigmoid, mst30_eus_descending_colon, mst30_eus_transverse_colon, mst30_eus_ascending_colon, mst30_eus_cecum, mst30_eus_terminal_ileum, mst30_eus_perianal, mst30_eus_perirectal, mst30_eus_pericolonic, mst30_eus_prostate_gland, mst30_eus_seminal_vesicles, mst30_eus_urinary_bladder, mst30_eus_uterus, mst30_eus_vagina, mst30_eus_sacrum, mst30_eus_puborectalis_muscle, mst30_eus_internal_sphincter, mst30_eus_external_sphincter, mst30_eus_colorectal_anastomosis], description: "Modifiers: proximal/mid/distal; distance from anus/stoma."}
+
+- {model: classification_choice, name: mst30_eus_esophageal_wall, name_en: esophageal wall, name_de: "Ösophaguswand", description: "Modifiers: right/left."}
+- {model: classification_choice, name: mst30_eus_upper_esophagus, name_en: upper esophagus, name_de: "Oberer Ösophagus"}
+- {model: classification_choice, name: mst30_eus_mid_esophagus, name_en: mid esophagus, name_de: "Mittlerer Ösophagus", description: "Modifier: xx cm from incisors."}
+- {model: classification_choice, name: mst30_eus_lower_esophagus, name_en: lower esophagus, name_de: "Unterer Ösophagus"}
+- {model: classification_choice, name: mst30_eus_cardia, name_en: cardia, name_de: "Kardia"}
+- {model: classification_choice, name: mst30_eus_mediastinum, name_en: mediastinum, name_de: "Mediastinum"}
+- {model: classification_choice, name: mst30_eus_periesophageal, name_en: periesophageal, name_de: "Periösophageal"}
+- {model: classification_choice, name: mst30_eus_paraesophageal, name_en: paraesophageal, name_de: "Paraösophageal"}
+- {model: classification_choice, name: mst30_eus_subcarina, name_en: subcarina, name_de: "Subkarinal"}
+- {model: classification_choice, name: mst30_eus_pleura, name_en: pleura, name_de: "Pleura"}
+- {model: classification_choice, name: mst30_eus_lung, name_en: lung, name_de: "Lunge"}
+- {model: classification_choice, name: mst30_eus_trachea, name_en: trachea, name_de: "Trachea"}
+- {model: classification_choice, name: mst30_eus_main_bronchus, name_en: main bronchus, name_de: "Hauptbronchus"}
+- {model: classification_choice, name: mst30_eus_left_atrium, name_en: left atrium, name_de: "Linker Vorhof"}
+- {model: classification_choice, name: mst30_eus_pericardium, name_en: pericardium, name_de: "Perikard"}
+- {model: classification_choice, name: mst30_eus_aortopulmonary_window, name_en: aortopulmonary window, name_de: "Aortopulmonales Fenster"}
+- {model: classification_choice, name: mst30_eus_diaphragm, name_en: diaphragm, name_de: "Zwerchfell"}
+- {model: classification_choice, name: mst30_eus_crus, name_en: crus, name_de: "Zwerchfellschenkel"}
+- {model: classification_choice, name: mst30_eus_spine, name_en: spine, name_de: "Wirbelsäule"}
+- {model: classification_choice, name: mst30_eus_carotid_artery, name_en: carotid artery, name_de: "Arteria carotis"}
+- {model: classification_choice, name: mst30_eus_subclavian_artery, name_en: Subclavian artery, name_de: "Arteria subclavia"}
+- {model: classification_choice, name: mst30_eus_aortic_arch, name_en: aortic arch, name_de: "Aortenbogen"}
+- {model: classification_choice, name: mst30_eus_thoracic_aorta, name_en: thoracic aorta, name_de: "Thorakale Aorta"}
+- {model: classification_choice, name: mst30_eus_pulmonary_artery, name_en: pulmonary artery, name_de: "Pulmonalarterie"}
+- {model: classification_choice, name: mst30_eus_superior_vena_cava, name_en: superior vena cava, name_de: "Vena cava superior"}
+- {model: classification_choice, name: mst30_eus_inferior_vena_cava, name_en: inferior vena cava, name_de: "Vena cava inferior"}
+- {model: classification_choice, name: mst30_eus_azygos_vein, name_en: azygos vein, name_de: "Vena azygos"}
+- {model: classification_choice, name: mst30_eus_lymph_node_station, name_en: lymph node station xx, name_de: "Lymphknotenstation xx", description: "Modifier: station no."}
+- {model: classification_choice, name: mst30_eus_stomach, name_en: Stomach, name_de: "Magen"}
+- {model: classification_choice, name: mst30_eus_stomach_cardia, name_en: Cardia, name_de: "Kardia"}
+- {model: classification_choice, name: mst30_eus_stomach_fundus, name_en: Fundus, name_de: Fundus}
+- {model: classification_choice, name: mst30_eus_stomach_body, name_en: Body, name_de: "Korpus"}
+- {model: classification_choice, name: mst30_eus_stomach_incisura, name_en: Incisura, name_de: Incisura}
+- {model: classification_choice, name: mst30_eus_stomach_antrum, name_en: Antrum, name_de: Antrum}
+- {model: classification_choice, name: mst30_eus_stomach_prepyloric, name_en: Prepyloric region, name_de: "Präpylorische Region"}
+- {model: classification_choice, name: mst30_eus_stomach_pylorus, name_en: Pylorus, name_de: Pylorus}
+- {model: classification_choice, name: mst30_eus_whole_stomach, name_en: Whole stomach, name_de: "Gesamter Magen"}
+- {model: classification_choice, name: mst30_eus_stomach_anastomosis, name_en: Anastomosis, name_de: "Anastomose"}
+- {model: classification_choice, name: mst30_eus_stomach_hiatal_hernia, name_en: Hiatal hernia, name_de: "Hiatushernie"}
+- {model: classification_choice, name: mst30_eus_gastric_wall, name_en: Gastric wall, name_de: "Magenwand"}
+- {model: classification_choice, name: mst30_eus_celiac_axis, name_en: celiac axis, name_de: "Truncus coeliacus"}
+- {model: classification_choice, name: mst30_eus_perigastric, name_en: perigastric, name_de: "Perigastrisch"}
+- {model: classification_choice, name: mst30_eus_left_kidney, name_en: left kidney, name_de: "Linke Niere"}
+- {model: classification_choice, name: mst30_eus_spleen, name_en: spleen, name_de: "Milz"}
+- {model: classification_choice, name: mst30_eus_splenic_hilum, name_en: splenic hilum, name_de: "Milzhilus"}
+- {model: classification_choice, name: mst30_eus_left_adrenal, name_en: left adrenal, name_de: "Linke Nebenniere"}
+- {model: classification_choice, name: mst30_eus_portal_vein, name_en: portal vein, name_de: "Pfortader"}
+- {model: classification_choice, name: mst30_eus_splenic_vein, name_en: splenic vein, name_de: "Vena splenica"}
+- {model: classification_choice, name: mst30_eus_portal_confluence, name_en: portal confluence, name_de: "Pfortaderkonfluenz"}
+- {model: classification_choice, name: mst30_eus_splenic_artery, name_en: splenic artery, name_de: "Arteria splenica"}
+- {model: classification_choice, name: mst30_eus_left_renal_artery, name_en: left renal artery, name_de: "Linke Nierenarterie"}
+- {model: classification_choice, name: mst30_eus_left_renal_vein, name_en: left renal vein, name_de: "Linke Nierenvene"}
+- {model: classification_choice, name: mst30_eus_hepatic_artery, name_en: hepatic artery, name_de: "Leberarterie"}
+- {model: classification_choice, name: mst30_eus_superior_mes_artery, name_en: superior mes artery, name_de: "Arteria mesenterica superior"}
+- {model: classification_choice, name: mst30_eus_superior_mes_vein, name_en: superior mes vein, name_de: "Vena mesenterica superior"}
+- {model: classification_choice, name: mst30_eus_left_gastric_artery, name_en: left gastric artery, name_de: "Arteria gastrica sinistra"}
+- {model: classification_choice, name: mst30_eus_duodenum, name_en: Duodenum, name_de: Duodenum}
+- {model: classification_choice, name: mst30_eus_duodenal_bulb, name_en: Duodenal bulb, name_de: "Bulbus duodeni"}
+- {model: classification_choice, name: mst30_eus_duodenum_d2, name_en: D2 - 2nd part of duodenum, name_de: "D2 – Pars descendens duodeni"}
+- {model: classification_choice, name: mst30_eus_duodenum_d3, name_en: D3 - 3rd part of duodenum, name_de: "D3 – Pars horizontalis duodeni"}
+- {model: classification_choice, name: mst30_eus_duodenum_d4, name_en: D4 - 4th part of duodenum, name_de: "D4 – Pars ascendens duodeni"}
+- {model: classification_choice, name: mst30_eus_duodenum_upper_knee, name_en: Upper duodenal knee/superior duodenal angulus, name_de: "Obere Duodenalflexur"}
+- {model: classification_choice, name: mst30_eus_ampullary_region, name_en: Ampullary region, name_de: "Ampullenregion"}
+- {model: classification_choice, name: mst30_eus_major_papilla, name_en: Major papilla, name_de: "Papilla duodeni major"}
+- {model: classification_choice, name: mst30_eus_minor_papilla, name_en: Minor papilla, name_de: "Papilla duodeni minor"}
+- {model: classification_choice, name: mst30_eus_duodenum_anastomosis, name_en: Anastomosis, name_de: "Anastomose"}
+- {model: classification_choice, name: mst30_eus_duodenal_wall, name_en: duiodenal wall, name_de: "Duodenalwand"}
+- {model: classification_choice, name: mst30_eus_periduodenal, name_en: periduodenal, name_de: "Periduodenal"}
+- {model: classification_choice, name: mst30_eus_right_kidney, name_en: right kidney, name_de: "Rechte Niere"}
+- {model: classification_choice, name: mst30_eus_right_adrenal, name_en: right adrenal, name_de: "Rechte Nebenniere"}
+- {model: classification_choice, name: mst30_eus_duodenum_inferior_vena_cava, name_en: Inferior vena cava, name_de: "Vena cava inferior"}
+- {model: classification_choice, name: mst30_eus_abdominal_aorta, name_en: Aorta (abdominal), name_de: "Bauchaorta"}
+- {model: classification_choice, name: mst30_eus_biliary_major_papilla, name_en: Major papilla, name_de: "Papilla duodeni major"}
+- {model: classification_choice, name: mst30_eus_whole_biliary_tree, name_en: Whole biliary tree, name_de: "Gesamtes Gallenwegssystem"}
+- {model: classification_choice, name: mst30_eus_common_bile_duct, name_en: Common bile duct, name_de: "Ductus choledochus"}
+- {model: classification_choice, name: mst30_eus_cystic_duct, name_en: Cystic duct, name_de: "Ductus cysticus"}
+- {model: classification_choice, name: mst30_eus_cystic_duct_takeoff, name_en: Cystic duct takeoff, name_de: "Abgang des Ductus cysticus"}
+- {model: classification_choice, name: mst30_eus_gallbladder, name_en: Gallbladder, name_de: "Gallenblase"}
+- {model: classification_choice, name: mst30_eus_bifurcation, name_en: Bifurcation, name_de: "Bifurkation"}
+- {model: classification_choice, name: mst30_eus_biliary_generalized, name_en: generalized, name_de: "Generalisiert"}
+- {model: classification_choice, name: mst30_eus_peribiliary, name_en: peribiliary, name_de: "Peribiliär"}
+- {model: classification_choice, name: mst30_eus_pancreas_major_papilla, name_en: Major papilla, name_de: "Papilla duodeni major"}
+- {model: classification_choice, name: mst30_eus_pancreas_minor_papilla, name_en: Minor papilla, name_de: "Papilla duodeni minor"}
+- {model: classification_choice, name: mst30_eus_whole_pancreatic_duct, name_en: Whole pancreatic duct, name_de: "Gesamter Pankreasgang"}
+- {model: classification_choice, name: mst30_eus_pancreas_head, name_en: head, name_de: "Kopf"}
+- {model: classification_choice, name: mst30_eus_pancreas_neck, name_en: neck, name_de: "Hals"}
+- {model: classification_choice, name: mst30_eus_pancreas_body, name_en: body, name_de: "Korpus"}
+- {model: classification_choice, name: mst30_eus_pancreas_tail, name_en: tail, name_de: "Schwanz"}
+- {model: classification_choice, name: mst30_eus_pancreas_uncinate, name_en: Uncinate process, name_de: "Processus uncinatus"}
+- {model: classification_choice, name: mst30_eus_ventral_duct, name_en: ventral duct, name_de: "Ventraler Gang"}
+- {model: classification_choice, name: mst30_eus_dorsal_duct, name_en: dorsal duct, name_de: "Dorsaler Gang"}
+- {model: classification_choice, name: mst30_eus_duct_santorini, name_en: Duct of Santorini, name_de: "Ductus pancreaticus accessorius (Santorini)"}
+- {model: classification_choice, name: mst30_eus_duct_wirsungi, name_en: Duct of Wirsungi, name_de: "Ductus pancreaticus (Wirsung)"}
+- {model: classification_choice, name: mst30_eus_side_branches, name_en: Side branches, name_de: "Seitengänge"}
+- {model: classification_choice, name: mst30_eus_pancreas_generalized, name_en: generalized, name_de: "Generalisiert"}
+- {model: classification_choice, name: mst30_eus_peripancreatic, name_en: peripancreatic, name_de: "Peripankreatisch"}
+- {model: classification_choice, name: mst30_eus_colorectal_wall, name_en: colorectal wall, name_de: "Kolorektale Wand"}
+- {model: classification_choice, name: mst30_eus_anal_canal, name_en: anal canal, name_de: "Analkanal"}
+- {model: classification_choice, name: mst30_eus_lower_rectum, name_en: lower rectum, name_de: "Unteres Rektum"}
+- {model: classification_choice, name: mst30_eus_mid_rectum, name_en: mid rectum, name_de: "Mittleres Rektum"}
+- {model: classification_choice, name: mst30_eus_upper_rectum, name_en: upper rectum, name_de: "Oberes Rektum"}
+- {model: classification_choice, name: mst30_eus_rectosigmoid_junction, name_en: rectosigmoid junction, name_de: "Rektosigmoidaler Übergang"}
+- {model: classification_choice, name: mst30_eus_sigmoid, name_en: sigmoid, name_de: "Sigma"}
+- {model: classification_choice, name: mst30_eus_descending_colon, name_en: descending colon, name_de: "Colon descendens"}
+- {model: classification_choice, name: mst30_eus_transverse_colon, name_en: transverse colon, name_de: "Colon transversum"}
+- {model: classification_choice, name: mst30_eus_ascending_colon, name_en: ascending colon, name_de: "Colon ascendens"}
+- {model: classification_choice, name: mst30_eus_cecum, name_en: cecum, name_de: "Zökum"}
+- {model: classification_choice, name: mst30_eus_terminal_ileum, name_en: terminal ileum, name_de: "Terminales Ileum"}
+- {model: classification_choice, name: mst30_eus_perianal, name_en: perianal, name_de: "Perianal"}
+- {model: classification_choice, name: mst30_eus_perirectal, name_en: perirectal, name_de: "Perirektal"}
+- {model: classification_choice, name: mst30_eus_pericolonic, name_en: pericolonic, name_de: "Perikolisch"}
+- {model: classification_choice, name: mst30_eus_prostate_gland, name_en: prostate gland, name_de: "Prostata"}
+- {model: classification_choice, name: mst30_eus_seminal_vesicles, name_en: seminal vesicles, name_de: "Samenblasen"}
+- {model: classification_choice, name: mst30_eus_urinary_bladder, name_en: urinary bladder, name_de: "Harnblase"}
+- {model: classification_choice, name: mst30_eus_uterus, name_en: uterus, name_de: "Uterus"}
+- {model: classification_choice, name: mst30_eus_vagina, name_en: vagina, name_de: "Vagina"}
+- {model: classification_choice, name: mst30_eus_sacrum, name_en: sacrum, name_de: "Kreuzbein"}
+- {model: classification_choice, name: mst30_eus_puborectalis_muscle, name_en: puborectalis muscle, name_de: "Musculus puborectalis"}
+- {model: classification_choice, name: mst30_eus_internal_sphincter, name_en: internal sphincter, name_de: "Innerer Schließmuskel"}
+- {model: classification_choice, name: mst30_eus_external_sphincter, name_en: external sphincter, name_de: "Äußerer Schließmuskel"}
+- {model: classification_choice, name: mst30_eus_colorectal_anastomosis, name_en: anastomosis, name_de: "Anastomose"}

@@ -6,11 +6,15 @@ from types import ModuleType
 from pathlib import Path
 
 
-_MODULE_PATH = Path(__file__).resolve().parent / "lx_dtypes" / "utils" / "kb_yaml_lint.py"
+_MODULE_PATH = (
+    Path(__file__).resolve().parent / "lx_dtypes" / "utils" / "kb_yaml_lint.py"
+)
 
 
 def _load_runtime_module() -> ModuleType:
-    spec = importlib.util.spec_from_file_location("lx_kb_yaml_lint_runtime", _MODULE_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "lx_kb_yaml_lint_runtime", _MODULE_PATH
+    )
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Could not load KB lint module: {_MODULE_PATH}")
     module = importlib.util.module_from_spec(spec)

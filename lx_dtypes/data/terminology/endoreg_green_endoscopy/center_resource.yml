@@ -1,0 +1,234 @@
+- model: reference_catalog
+  name: center_resource
+  name_de: "Ressourcen der Zentren"
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: center_resource
+      name: electricity_ukw_extern_2020
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 48000.0
+      resource:
+        name: electricity
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_electricity_extern
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_electricity_extern
+        version: null
+      year: 2020
+      unit:
+        name: kilowatt-hours
+        version: null
+    - record_type: center_resource
+      name: electricity_ukw_extern_2021
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 45000.0
+      resource:
+        name: electricity
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_electricity_extern
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_electricity_extern
+        version: null
+      year: 2021
+      unit:
+        name: kilowatt-hours
+        version: null
+    - record_type: center_resource
+      name: electricity_ukw_extern_2022
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 46000.0
+      resource:
+        name: electricity
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_electricity_extern
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_electricity_extern
+        version: null
+      year: 2022
+      unit:
+        name: kilowatt-hours
+        version: null
+    - record_type: center_resource
+      name: electricity_ukw_selfmade_2020
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 22000.0
+      resource:
+        name: electricity
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_electricity_selfmade
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_electricity_selfmade
+        version: null
+      year: 2020
+      unit:
+        name: kilowatt-hours
+        version: null
+    - record_type: center_resource
+      name: electricity_ukw_selfmade_2021
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 22000.0
+      resource:
+        name: electricity
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_electricity_selfmade
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_electricity_selfmade
+        version: null
+      year: 2021
+      unit:
+        name: kilowatt-hours
+        version: null
+    - record_type: center_resource
+      name: electricity_ukw_selfmade_2022
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 22000.0
+      resource:
+        name: electricity
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_electricity_selfmade
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_electricity_selfmade
+        version: null
+      year: 2022
+      unit:
+        name: kilowatt-hours
+        version: null
+    - record_type: center_resource
+      name: gas_ukw_2020
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 19000.0
+      resource:
+        name: gas
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_gas
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_gas
+        version: null
+      year: 2020
+      unit:
+        name: liter
+        version: null
+    - record_type: center_resource
+      name: gas_ukw_2021
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 18000.0
+      resource:
+        name: gas
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_gas
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_gas
+        version: null
+      year: 2021
+      unit:
+        name: liter
+        version: null
+    - record_type: center_resource
+      name: gas_ukw_2022
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 18500.0
+      resource:
+        name: gas
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_gas
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_gas
+        version: null
+      year: 2022
+      unit:
+        name: liter
+        version: null
+    - record_type: center_resource
+      name: oil_ukw_2020
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 0.0
+      resource:
+        name: oil
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_oil
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_oil
+        version: null
+      year: 2020
+      unit:
+        name: cubic_meter
+        version: null
+    - record_type: center_resource
+      name: oil_ukw_2021
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 0.0
+      resource:
+        name: oil
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_oil
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_oil
+        version: null
+      year: 2021
+      unit:
+        name: cubic_meter
+        version: null
+    - record_type: center_resource
+      name: oil_ukw_2022
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      quantity: 0.0
+      resource:
+        name: oil
+        version: null
+      transport_emission_factor:
+        name: transport_resource_emission_ukw_oil
+        version: null
+      use_emission_factor:
+        name: use_resource_emission_ukw_oil
+        version: null
+      year: 2022
+      unit:
+        name: cubic_meter
+        version: null

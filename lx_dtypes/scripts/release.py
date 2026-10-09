@@ -4,19 +4,20 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import re
 import subprocess
 import sys
-from pathlib import Path
+import tarfile
+import zipfile
+from pathlib import Path, PurePosixPath
 
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(?:[A-Za-z0-9._+-]*)?$")
 PROJECT_VERSION_RE = re.compile(r'(?ms)^(\[project\].*?^\s*version\s*=\s*")([^"]+)(")')
 INIT_VERSION_RE = re.compile(r'(?m)^(__version__\s*=\s*")([^"]+)(")')
-YAML_VERSION_RE = re.compile(r"(?m)^(version:\s*)(\S+)(\s*)$")
-NIX_ATTR_VERSION_RE = re.compile(r'(?m)^(\s*version\s*=\s*")([^"]+)(";\s*)$')
-NIX_KB_MODULE_VERSION_RE = re.compile(
-    r'(?m)^(\s*kbModuleVersion\s*=\s*")([^"]+)(";\s*)$'
-)
+MIGRATION_FILE_RE = re.compile(r"^\d{4}_.+\.py$")
+MIGRATION_PACKAGE_PATH = PurePosixPath("lx_dtypes/django/migrations")
+KNOWLEDGE_BASE_DATA_PATH = PurePosixPath("lx_dtypes/data")
 
 
 def _project_root() -> Path:
@@ -29,18 +30,6 @@ def _pyproject_path() -> Path:
 
 def _init_path() -> Path:
     return _project_root() / "lx_dtypes" / "__init__.py"
-
-
-def _kb_config_paths() -> tuple[Path, ...]:
-    root = _project_root()
-    return (
-        root / "lx_dtypes" / "data" / "star_upper_gi" / "config.yaml",
-        root / "demo-data" / "star_upper_gi" / "config.yaml",
-    )
-
-
-def _kb_package_path() -> Path:
-    return _project_root() / "package.nix"
 
 
 def _validate_version(version: str) -> str:
@@ -82,39 +71,174 @@ def write_project_version(version: str) -> None:
         if init_count == 1:
             init_path.write_text(updated_init)
 
-    for kb_config_path in _kb_config_paths():
-        if not kb_config_path.exists():
-            continue
-        kb_config_text = kb_config_path.read_text()
-        updated_kb_config, kb_count = YAML_VERSION_RE.subn(
-            rf"\g<1>{version}\g<3>",
-            kb_config_text,
-            count=1,
-        )
-        if kb_count == 1:
-            kb_config_path.write_text(updated_kb_config)
-
-    kb_package_path = _kb_package_path()
-    if kb_package_path.exists():
-        kb_package_text = kb_package_path.read_text()
-        updated_kb_package, package_count = NIX_ATTR_VERSION_RE.subn(
-            rf"\g<1>{version}\g<3>",
-            kb_package_text,
-            count=1,
-        )
-        if package_count == 1:
-            updated_kb_package, _ = NIX_KB_MODULE_VERSION_RE.subn(
-                rf"\g<1>{version}\g<3>",
-                updated_kb_package,
-                count=1,
-            )
-            kb_package_path.write_text(updated_kb_package)
-
 
 def run_command(args: list[str], *, cwd: Path) -> None:
     completed = subprocess.run(args, cwd=cwd, check=False)
     if completed.returncode != 0:
         raise SystemExit(completed.returncode)
+
+
+def _migration_contract_from_entries(
+    entries: dict[PurePosixPath, bytes],
+    *,
+    root: PurePosixPath,
+    label: str,
+) -> tuple[tuple[tuple[str, str], ...], str]:
+    migration_files = tuple(
+        sorted(
+            (path.name, hashlib.sha256(contents).hexdigest())
+            for path, contents in entries.items()
+            if path.parent == root and MIGRATION_FILE_RE.fullmatch(path.name)
+        )
+    )
+    migration_names = frozenset(filename for filename, _digest in migration_files)
+    max_migration_path = root / "max_migration.txt"
+    try:
+        max_migration = entries[max_migration_path].decode("utf-8").strip()
+    except KeyError as exc:
+        raise SystemExit(f"{label} does not contain {max_migration_path}.") from exc
+    except UnicodeDecodeError as exc:
+        raise SystemExit(f"{label} contains a non-UTF-8 max_migration.txt.") from exc
+    if f"{max_migration}.py" not in migration_names:
+        raise SystemExit(
+            f"{label} names missing migration {max_migration!r} as its canonical maximum."
+        )
+    return migration_files, max_migration
+
+
+def _source_migration_contract(root: Path) -> tuple[tuple[tuple[str, str], ...], str]:
+    migration_root = root / MIGRATION_PACKAGE_PATH
+    entries = {
+        MIGRATION_PACKAGE_PATH / path.name: path.read_bytes()
+        for path in migration_root.iterdir()
+        if path.is_file()
+    }
+    return _migration_contract_from_entries(
+        entries,
+        root=MIGRATION_PACKAGE_PATH,
+        label="source migration package",
+    )
+
+
+def _artifact_migration_contract(
+    artifact: Path,
+    *,
+    version: str,
+) -> tuple[tuple[tuple[str, str], ...], str]:
+    if artifact.suffix == ".whl":
+        with zipfile.ZipFile(artifact) as archive:
+            entries = {
+                PurePosixPath(name): archive.read(name)
+                for name in archive.namelist()
+                if not name.endswith("/")
+            }
+        contract_root = MIGRATION_PACKAGE_PATH
+    elif artifact.name.endswith(".tar.gz"):
+        with tarfile.open(artifact, mode="r:gz") as archive:
+            entries = {
+                PurePosixPath(member.name): extracted.read()
+                for member in archive.getmembers()
+                if member.isfile()
+                and (extracted := archive.extractfile(member)) is not None
+            }
+        contract_root = PurePosixPath(f"lx_dtypes-{version}") / MIGRATION_PACKAGE_PATH
+    else:
+        raise SystemExit(f"Unsupported release artifact: {artifact.name}")
+    return _migration_contract_from_entries(
+        entries,
+        root=contract_root,
+        label=artifact.name,
+    )
+
+
+def verify_migration_artifacts(
+    root: Path,
+    *,
+    version: str,
+    artifacts: list[Path],
+) -> None:
+    source_contract = _source_migration_contract(root)
+    for artifact in artifacts:
+        artifact_contract = _artifact_migration_contract(artifact, version=version)
+        if artifact_contract != source_contract:
+            raise SystemExit(
+                f"{artifact.name} migration contract differs from the source tree: "
+                f"expected {source_contract}, found {artifact_contract}."
+            )
+
+
+def _source_knowledge_base_contract(root: Path) -> tuple[tuple[str, str], ...]:
+    data_root = root / KNOWLEDGE_BASE_DATA_PATH
+    return tuple(
+        sorted(
+            (
+                path.relative_to(root).as_posix(),
+                hashlib.sha256(path.read_bytes()).hexdigest(),
+            )
+            for path in data_root.rglob("*")
+            if path.is_file() and path.name != ".gitkeep"
+        )
+    )
+
+
+def _artifact_knowledge_base_contract(
+    artifact: Path,
+    *,
+    version: str,
+) -> tuple[tuple[str, str], ...]:
+    if artifact.suffix == ".whl":
+        with zipfile.ZipFile(artifact) as archive:
+            entries = {
+                PurePosixPath(name): archive.read(name)
+                for name in archive.namelist()
+                if not name.endswith("/")
+            }
+        artifact_root = PurePosixPath()
+    elif artifact.name.endswith(".tar.gz"):
+        with tarfile.open(artifact, mode="r:gz") as archive:
+            entries = {
+                PurePosixPath(member.name): extracted.read()
+                for member in archive.getmembers()
+                if member.isfile()
+                and (extracted := archive.extractfile(member)) is not None
+            }
+        artifact_root = PurePosixPath(f"lx_dtypes-{version}")
+    else:
+        raise SystemExit(f"Unsupported release artifact: {artifact.name}")
+
+    data_root = artifact_root / KNOWLEDGE_BASE_DATA_PATH
+    return tuple(
+        sorted(
+            (
+                (KNOWLEDGE_BASE_DATA_PATH / path.relative_to(data_root)).as_posix(),
+                hashlib.sha256(contents).hexdigest(),
+            )
+            for path, contents in entries.items()
+            if path.is_relative_to(data_root) and path.name != ".gitkeep"
+        )
+    )
+
+
+def verify_knowledge_base_artifacts(
+    root: Path,
+    *,
+    version: str,
+    artifacts: list[Path],
+) -> None:
+    """Require release artifacts to contain the exact source terminology data."""
+    source_contract = _source_knowledge_base_contract(root)
+    if not source_contract:
+        raise SystemExit("Source knowledge-base data contract is empty.")
+    for artifact in artifacts:
+        artifact_contract = _artifact_knowledge_base_contract(
+            artifact,
+            version=version,
+        )
+        if artifact_contract != source_contract:
+            raise SystemExit(
+                f"{artifact.name} knowledge-base data contract differs from the "
+                "source tree."
+            )
 
 
 def cmd_current(_: argparse.Namespace) -> int:
@@ -129,23 +253,42 @@ def cmd_prepare(args: argparse.Namespace) -> int:
     print(f"Updated version: {current} -> {version}")
     print("Next steps:")
     print(f"  1. Update CHANGELOG.md for {version}")
-    print("  2. Run: lx-dtypes-release build")
-    print(f"  3. Tag and push: git tag v{version} && git push origin v{version}")
-    print("  4. Publish via GitHub release or workflow_dispatch")
+    print("  2. Refresh the lock: uv lock")
+    print("  3. Run: lx-dtypes-release build")
+    print(f"  4. Tag and push: git tag v{version} && git push origin v{version}")
+    print("  5. Publish via GitHub release or workflow_dispatch")
     return 0
 
 
 def cmd_build(_: argparse.Namespace) -> int:
     root = _project_root()
+    version = read_project_version()
     run_command([sys.executable, "-m", "build"], cwd=root)
-    dist_paths = sorted((root / "dist").glob("*"))
-    if not dist_paths:
-        raise SystemExit("No build artifacts found under dist/.")
+    dist_paths = sorted((root / "dist").glob(f"lx_dtypes-{version}*"))
+    if len(dist_paths) != 2:
+        raise SystemExit(
+            f"Expected exactly one wheel and one sdist for {version}; "
+            f"found {len(dist_paths)} artifact(s)."
+        )
+    verify_migration_artifacts(root, version=version, artifacts=dist_paths)
+    verify_knowledge_base_artifacts(root, version=version, artifacts=dist_paths)
+    run_command(
+        [
+            sys.executable,
+            "-m",
+            "lx_dtypes.scripts.verify_packaged_report_templates",
+        ],
+        cwd=root,
+    )
     run_command(
         [sys.executable, "-m", "twine", "check", *[str(path) for path in dist_paths]],
         cwd=root,
     )
-    print("Built and validated dist artifacts.")
+    print(f"Built and validated lx-dtypes {version} artifacts only.")
+    print(
+        "Publish these artifacts through the protected GitHub workflow; "
+        "do not upload dist/* from a reused local directory."
+    )
     return 0
 
 

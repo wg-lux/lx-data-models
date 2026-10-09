@@ -1,0 +1,41 @@
+title: Shared study protocol metadata
+owner: lx-dtypes maintainers
+contract: lx_dtypes.models.contracts.study_metadata.StudyMetadata
+consumers:
+  - lx_dtypes.models.knowledge_base.study_preset.StudyPreset.study_metadata
+  - lx_dtypes.models.contracts.cohort_definition.CohortDefinitionFields.study_metadata
+  - lx_dtypes.models.contracts.study_setup.StudySetupDefinition.cohorts
+boundaries:
+  - The shared package validates structure and declared references; hosts resolve terminology and evaluate patient eligibility.
+  - A StudyPreset remains a knowledge-base record; a StudySetupDefinition remains a separate portable configuration document.
+  - Metadata never grants center access, imports patient data, activates packages, or chooses host filesystem paths.
+fields:
+  participating_centers:
+    identity: center_key
+    description: Stable center key and human-readable name; duplicate keys are rejected.
+  age_groups:
+    identity: name
+    description: Integer minimum_age and optional maximum_age, inclusive bounds between zero and 150.
+    validation: Reversed bounds, duplicate names, booleans, and numeric strings are rejected.
+  terminology_requirements:
+    identity: [module, version]
+    description: Exact package identities; multiple versions of the same module are permitted.
+  inclusion_criteria:
+    identity: name
+    description: Named criterion, optional description, and one or more concept references.
+    concept_fields: [module, version, kind, name]
+    concept_kinds: [examination, finding]
+    validation: Each concept must name a declared terminology requirement; duplicate references are rejected.
+lx_annotate_evaluation:
+  criteria: All criteria required; references inside one criterion are alternatives.
+  version_evidence: Exact examination-recorded module/version, never current active terminology inferred from a name.
+  finding_evidence: An active PatientFinding belonging to the same examination.
+  age: Completed years at examination start using the stored birth date; missing dates fail an age constraint.
+  age_groups: Alternative inclusive ranges; February 29 reaches its birthday on March 1 in a non-leap year.
+  centers: Restrict existing authorized patient-center scope to participating keys.
+  dependencies: Host save and preview require all declared packages and concepts to resolve locally.
+compatibility:
+  - Metadata is optional for existing cohorts and presets; empty metadata adds no eligibility restrictions.
+  - Portable documents are parsed by lx_dtypes.utils.study_setup_yaml.parse_study_setup_yaml.
+  - Consumers must install a version containing this contract; older parsers reject the new fields.
+  - Host importers must explicitly preserve and evaluate this metadata before claiming operational compatibility.

@@ -2,19 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TypeAlias
 
 from lx_dtypes.models.interface.DbInterface import DbInterface
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
-from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.interface.Ledger import Ledger
+from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 EXAMINATION_NAME = "star_upper_gi_endoscopy"
 
-ClassificationChoiceTuple: TypeAlias = tuple[str, str]
-DescriptorClassificationChoiceTuple: TypeAlias = tuple[str, str, str | None, str | None]
-FindingWithChoices: TypeAlias = tuple[str, list[ClassificationChoiceTuple]]
-FindingWithDescriptorChoices: TypeAlias = tuple[
+type ClassificationChoiceTuple = tuple[str, str]
+type DescriptorClassificationChoiceTuple = tuple[str, str, str | None, str | None]
+type FindingWithChoices = tuple[str, list[ClassificationChoiceTuple]]
+type FindingWithDescriptorChoices = tuple[
     str, list[DescriptorClassificationChoiceTuple]
 ]
 

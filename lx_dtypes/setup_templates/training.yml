@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=./deployment_setup.schema.json
+# Review the site identity and package selection before planning.
+schema_version: '1.0'
+site:
+  center_key: training-center
+  name: Training Center
+reference_packages:
+- module: endoreg_reference
+  version: 1.0.0
+- module: endoreg_workforce
+  version: 1.0.0
+study_packages: []
+adopt_existing: false

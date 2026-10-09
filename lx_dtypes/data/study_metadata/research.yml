@@ -1,0 +1,48 @@
+# Research definitions only; no patient records or deployment settings.
+# Validate with lx_dtypes.utils.study_setup_yaml.parse_study_setup_yaml.
+# Stable identifiers are independent of editable display names and database IDs.
+schema_version: '1.0'
+definition_id: colorectal_research
+definition_version: '1.0.0'
+
+datasets:
+  - definition_id: colorectal_images
+    name: Colorectal research images
+    description: Image annotation collection for the research protocol.
+    dataset_type: image
+    ai_model_type: image_multilabel_classification
+    is_active: true
+  - definition_id: colorectal_videos
+    name: Colorectal research videos
+    description: Video segment annotation collection for the research protocol.
+    dataset_type: video
+    ai_model_type: video_segment_classification
+    is_active: true
+
+cohorts:
+  - definition_id: multimodal_review
+    name: Multimodal review
+    hypothesis: Linked image and video annotations support joint examination review.
+    dataset_refs: [colorectal_images, colorectal_videos]
+    filters:
+      date_from: '2026-01-01'
+      date_to: '2026-12-31'
+      has_video: true
+      # False is a filter, not an omitted value.
+      has_report: false
+      # Presentation bound only; membership remains live.
+      limit: 100
+  - definition_id: image_review
+    name: Image review
+    hypothesis: Image annotations support an independent review population.
+    # Several cohorts may share the same dataset.
+    dataset_refs: [colorectal_images]
+    filters:
+      limit: 100
+  - definition_id: authorized_scope_review
+    name: Authorized examination review
+    hypothesis: Available reports support review across the authorized examination scope.
+    # Empty selection uses current authorized scope; it never grants wider access.
+    dataset_refs: []
+    filters:
+      has_report: true

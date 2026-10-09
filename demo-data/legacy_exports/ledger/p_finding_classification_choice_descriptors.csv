@@ -1,0 +1,15 @@
+created_at,uuid,tags,external_ids,descriptor_value,classification_choice_descriptor,patient_finding_classification_choice
+2026-09-04 06:36:57.132417+00:00,29624819-f9ed-4826-a522-13ce8369f731,,{},21.0,length_cm_descriptor,b59b6971-7cf5-4232-b3e8-81df586092bc
+2026-09-04 06:36:57.132530+00:00,a50d90be-71a6-4c1c-8691-f055f0a71b63,,{},21.0,length_cm_descriptor,412788b9-4565-45df-a9ea-9006428c097b
+2026-09-04 06:36:57.132631+00:00,9e11e859-e144-437d-b021-94b7a05f9157,,{},20.0,length_cm_descriptor,1fe727b5-6f0a-4964-9f5a-b1fac5f25a25
+2026-09-04 06:36:57.133591+00:00,b948daf8-08b8-48cb-925b-ce684ede25e7,,{},-2.0,length_cm_descriptor,2df1cdf7-7b47-4fa8-9727-929195703d99
+2026-09-04 06:36:57.133648+00:00,c7db7ef8-5a6a-49b5-8d69-2c713852600c,,{},8.0,length_mm_descriptor,6409470d-8fa3-4add-98b1-107552079a7e
+2026-09-04 06:36:57.133775+00:00,642979e5-ffef-4f27-8725-1a4fa2ce1349,,{},Other Information not yet reflected in structured manner can be added here.,additional_text_info,d1e39c67-e604-49ba-9f24-f32c49da0c8c
+2026-09-04 06:36:57.134103+00:00,94cadb9b-6001-4839-8410-74b3ddf3ba0e,,{},12.0,length_cm_descriptor,17442cdf-5e64-46f8-81c1-fa2523e059e1
+2026-09-04 06:36:57.134160+00:00,2fed867f-8738-4c25-abe3-61b7061bf303,,{},5.0,length_mm_descriptor,c0b45158-f3b8-41b1-9dc0-150158881304
+2026-09-04 06:36:57.134259+00:00,91135539-7b06-4608-800c-452a5ecac9ce,,{},3.0,length_cm_descriptor,f80aa4f3-adf1-47f9-80e1-532beb3bf138
+2026-09-04 06:36:57.134317+00:00,8736320c-263f-4553-9071-cdb5c42fa9b8,,{},4.0,length_cm_descriptor,70f77931-668d-4215-8b18-f9d31be37696
+2026-09-04 06:36:57.134458+00:00,be839d57-9a0f-4009-be97-326eac5be607,,{},"1 varices noted, no red wale markings.",additional_text_info,23a6ada1-a1c5-442a-940d-e5cebd41f94c
+2026-09-04 06:36:57.134558+00:00,f1c8470c-ce2c-4920-9469-51fa4f21fc89,,{},8.0,length_cm_descriptor,b84a74a6-c6e9-4c16-a13c-47ea06b6fa2d
+2026-09-04 06:36:57.134615+00:00,86a2e967-d5d3-458e-bdf0-d008ee0a146d,,{},6.0,length_mm_descriptor,d4ef5f44-10af-4bd1-96d8-55b48d94a43b
+2026-09-04 06:36:57.135297+00:00,a7db3b22-a9ac-40d2-8406-cab238c8f7c2,,{},4.0,length_mm_descriptor,55b1b0e3-2eff-4920-ba34-2c84b104d484

@@ -1,5 +1,5 @@
 import uuid as uuid_module
-from typing import ClassVar, Generic, List, Literal, Self, TypeVar
+from typing import ClassVar, Generic, Literal, Self, TypeVar
 
 from django.db import models
 
@@ -35,7 +35,7 @@ class LedgerBaseModelDjango(
         abstract = True
 
     @classmethod
-    def m2m_fields(cls) -> List[str]:
+    def m2m_fields(cls) -> list[str]:
         """
         Return many-to-many field names excluding nested data-dictionary fields.
 
@@ -49,7 +49,7 @@ class LedgerBaseModelDjango(
         return [field for field in m2m_fields if field not in nested_fields]
 
     @classmethod
-    def fk_fields(cls) -> List[str]:
+    def fk_fields(cls) -> list[str]:
         """
         List foreign-key field names excluding any fields declared as nested DataDict fields.
 
@@ -61,14 +61,14 @@ class LedgerBaseModelDjango(
         return [field for field in fk_fields if field not in nested_fields]
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         """
         List nested DataDict field names for the model.
 
         Returns:
             List[str]: Field names that should be treated as nested DataDicts (empty by default).
         """
-        default_nested_fields: List[str] = []
+        default_nested_fields: list[str] = []
         return default_nested_fields
 
     @classmethod
@@ -82,7 +82,7 @@ class LedgerBaseModelDjango(
         return "uuid"
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """
         Identify the model field names that should be treated as lists in the DataDict.
 
@@ -162,9 +162,8 @@ class LedgerBaseModelDjango(
                 data[field] = value
         # Align with pydantic model dump which includes created_at
         if "created_at" not in data and hasattr(self, "created_at"):
-            data["created_at"] = getattr(self, "created_at")
-        if "id" in data:
-            del data["id"]
+            data["created_at"] = self.created_at
+        data.pop("id", None)
         return self.ddict_class(**data)  # type: ignore
 
     @classmethod

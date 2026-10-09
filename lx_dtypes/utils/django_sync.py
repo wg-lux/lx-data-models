@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple
+from typing import TYPE_CHECKING, Any
 
 from django.db import models
 
@@ -15,9 +15,9 @@ if TYPE_CHECKING:
 
 
 def parse_list_type_field(
-    list_type_fields: List[str],
+    list_type_fields: list[str],
     m2m_field_names: set[str],
-    defaults_dict: Dict[str, Any],
+    defaults_dict: dict[str, Any],
     instance: models.Model,
 ) -> None:
     for field_name in list_type_fields:
@@ -35,7 +35,7 @@ def parse_list_type_field(
 
 
 def sync_from_ddict_m2m_field(
-    m2m_values: Dict[str, object], instance: models.Model, cls: type[models.Model]
+    m2m_values: dict[str, object], instance: models.Model, cls: type[models.Model]
 ) -> None:
     for field_name, related_names in m2m_values.items():
         if related_names is None or related_names == "":
@@ -62,7 +62,7 @@ def sync_from_ddict_m2m_field(
 
 
 def sort_kb_model_entries_by_load_order(
-    entries: List[Tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]],
+    entries: list[tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]],
 ) -> list[tuple["KB_MODEL_NAMES_LITERAL", "KB_MODELS"]]:
     from lx_dtypes.models.knowledge_base.main import (
         KB_MODEL_NAMES_ORDERED,
@@ -110,4 +110,4 @@ def sync_django_db_from_interface(db_interface: "DbInterface") -> None:
                     f"Error syncing {model_name} with name {model_instance.name}: {e}"
                 )
                 print(model_ddict)
-                raise e
+                raise

@@ -1,0 +1,18 @@
+- model: reference_catalog
+  name: risk_type
+  name_de: "Risikotypen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: bleeding
+      record_type: risk_type
+      description: Bleeding risk
+    - name: infection
+      record_type: risk_type
+      description: Infection risk
+    - name: perforation
+      record_type: risk_type
+      description: Perforation risk
+    - name: thrombosis
+      record_type: risk_type
+      description: Thrombosis risk

@@ -1,0 +1,76 @@
+- model: reference_catalog
+  name: material
+  name_de: "Materialien"
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: material
+      name: cardboard
+      emission_factor:
+        name: material_emission_cardboard
+        version: null
+    - record_type: material
+      name: foil
+      emission_factor:
+        name: material_emission_foil
+        version: null
+    - record_type: material
+      name: gold
+      emission_factor:
+        name: material_emission_gold
+        version: null
+    - record_type: material
+      name: metal
+      emission_factor:
+        name: material_emission_metal
+        version: null
+    - record_type: material
+      name: nickel
+      emission_factor:
+        name: material_emission_nickel
+        version: null
+    - record_type: material
+      name: paper
+      emission_factor:
+        name: material_emission_paper
+        version: null
+    - record_type: material
+      name: paper_coated
+      emission_factor:
+        name: material_emission_paper_coated
+        version: null
+    - record_type: material
+      name: plastic
+      emission_factor:
+        name: material_emission_plastic
+        version: null
+    - record_type: material
+      name: plastic_coated
+      emission_factor:
+        name: material_emission_plastic_coated
+        version: null
+    - record_type: material
+      name: silicone
+      emission_factor:
+        name: material_emission_silicone
+        version: null
+    - record_type: material
+      name: steel
+      emission_factor:
+        name: material_emission_steel
+        version: null
+    - record_type: material
+      name: tantal
+      emission_factor:
+        name: material_emission_tantal
+        version: null
+    - record_type: material
+      name: textile
+      emission_factor:
+        name: material_emission_textile
+        version: null
+    - record_type: material
+      name: titan
+      emission_factor:
+        name: material_emission_titan
+        version: null

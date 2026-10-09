@@ -1,0 +1,29 @@
+source_knowledge_base:
+  knowledge_base_module: star_upper_gi
+  knowledge_base_version: 0.1.1.post1
+descriptor: length_mm_descriptor
+unit: millimeter
+observations:
+- observation_id: table4-1
+  value: 4.0
+- observation_id: table4-2
+  value: 6.0
+- observation_id: table4-3
+  value: 8.0
+- observation_id: table4-4
+  value: 15.0
+- observation_id: table4-5
+  value: 22.0
+expected_choices:
+  1.0.0:
+  - size_le_5
+  - size_gt_5
+  - size_gt_5
+  - size_gt_5
+  - size_gt_5
+  2.0.0:
+  - size_le_5
+  - size_6_9
+  - size_6_9
+  - size_10_19
+  - size_ge_20

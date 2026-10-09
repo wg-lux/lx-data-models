@@ -4,7 +4,7 @@ This guide explains the graph-specific validation layer for report templates.
 
 Read this after:
 
-1. `lx_dtypes/data/report_template_examples/README.md`
+1. `lx_dtypes/data/terminology/report_template_examples/README.md`
 2. `docs/guides/report-template-infrastructure.md`
 
 This guide is not about runtime report validation. It is about validating and exporting the structure of already-loaded report templates as a graph.
@@ -87,5 +87,5 @@ Typical usage:
 ## Relationship To Other Guides
 
 - System overview: `docs/guides/report-template-infrastructure.md`
-- Authoring quickstart: `lx_dtypes/data/report_template_examples/README.md`
+- Authoring quickstart: `lx_dtypes/data/terminology/report_template_examples/README.md`
 - Operator migration: `docs/guides/report-template-findings-validator-migration.md`

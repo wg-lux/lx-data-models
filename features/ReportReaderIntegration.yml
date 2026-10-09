@@ -1,0 +1,58 @@
+schema_version: "1.0"
+id: report_reader_integration
+name: ReportReader shared-contract integration
+description: >-
+  Provide strict reusable report request, result, metadata, and anonymization
+  contracts for lx-anonymizer ReportReader without importing application
+  extraction, filesystem, provider, or persistence workflows into lx-data-models.
+owners:
+  - lx-dtypes maintainers
+production_critical: true
+source_documents:
+  - path: lx_dtypes/models/meta/ReportMeta.py
+    disposition: normative
+    note: Defines ReportReader flags, inputs, outputs, and metadata models.
+  - path: lx_dtypes/models/contracts/report_anonymization.py
+    disposition: normative
+    note: Defines the versioned cross-service report anonymization contract.
+invariants:
+  - Shared models validate report-domain data and contain no application filesystem writes, provider calls, retries, publication, or database logic.
+  - Unknown contract versions and invalid known boundary data fail validation instead of being silently retained.
+  - Public report-model imports remain stable for lx-anonymizer and host consumers.
+definition_of_done:
+  - id: report_reader_models
+    category: requirements
+    title: ReportReader inputs and outputs have strict shared representations
+    acceptance:
+      - Flags, processing inputs, metadata, crop inputs, and processing outputs use explicit models.
+      - Field constraints and validators encode valid report values and reject contradictory states.
+      - Serialization produces deterministic boundary payloads without checkout-specific paths.
+    required: true
+    verification:
+      kind: manual
+      instructions: Exercise valid and invalid ReportReader payloads against the public ReportMeta models.
+      timeout_seconds: 600
+  - id: versioned_anonymization_contract
+    category: interoperability
+    title: Report anonymization has one versioned cross-service contract
+    acceptance:
+      - The public contract identifies its version and ReportReader implementation boundary.
+      - Unsupported versions, malformed requests, and malformed results are rejected.
+      - Required contract types and helpers are exported through supported lx_dtypes modules.
+    required: true
+    verification:
+      kind: command
+      command: [uv, run, pytest, tests/unit/lx_dtypes/models/contracts/test_report_anonymization.py, -q]
+      timeout_seconds: 600
+  - id: packaged_specification
+    category: operations
+    title: The ReportReader feature specification ships with lx-dtypes
+    acceptance:
+      - The package installs this specification below share/lx-data-models/features.
+      - The installed specification contains no mutable assessment state or checkout provenance.
+      - Deployment resolution preserves the semantic identity lx-data-models plus report_reader_integration.
+    required: true
+    verification:
+      kind: manual
+      instructions: Build the lx-dtypes package and inspect its share/lx-data-models/features directory.
+      timeout_seconds: 600

@@ -33,13 +33,13 @@ l_p_finding_classification_choice_django_models = Union[
 ]
 
 __all__ = [
+    "LPFindingClassificationChoiceDjangoLookupType",
+    "LPFindingClassificationChoiceLookupType",
     "PFindingClassificationChoice",
     "PFindingClassificationChoiceDataDict",
-    "l_p_finding_classification_choice_django_models",
-    "l_p_finding_classification_choice_django_lookup",
-    "LPFindingClassificationChoiceDjangoLookupType",
-    "l_p_finding_classification_choice_lookup",
-    "LPFindingClassificationChoiceLookupType",
-    "l_p_finding_classification_choice_models",
     "l_p_finding_classification_choice_ddicts",
+    "l_p_finding_classification_choice_django_lookup",
+    "l_p_finding_classification_choice_django_models",
+    "l_p_finding_classification_choice_lookup",
+    "l_p_finding_classification_choice_models",
 ]

@@ -1,0 +1,153 @@
+{
+  "$defs": {
+    "DeploymentPackage": {
+      "additionalProperties": false,
+      "properties": {
+        "module": {
+          "maxLength": 255,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.+-]*$",
+          "title": "Version",
+          "type": "string"
+        },
+        "content_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional digest of the complete resolved source dependency closure.",
+          "title": "Content Sha256"
+        }
+      },
+      "required": [
+        "module",
+        "version"
+      ],
+      "title": "DeploymentPackage",
+      "type": "object"
+    },
+    "DeploymentSite": {
+      "additionalProperties": false,
+      "properties": {
+        "center_key": {
+          "description": "Immutable host center key; selects the local application default.",
+          "maxLength": 255,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_-]*$",
+          "title": "Center Key",
+          "type": "string"
+        },
+        "name": {
+          "description": "Center name. Existing rows with a different name are conflicts.",
+          "maxLength": 255,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "center_key",
+        "name"
+      ],
+      "title": "DeploymentSite",
+      "type": "object"
+    },
+    "DeploymentStudyPackage": {
+      "additionalProperties": false,
+      "properties": {
+        "module": {
+          "maxLength": 255,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.+-]*$",
+          "title": "Version",
+          "type": "string"
+        },
+        "content_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional digest of the complete resolved source dependency closure.",
+          "title": "Content Sha256"
+        },
+        "activate": {
+          "default": false,
+          "description": "Select this registered terminology after database commit. False leaves active selection unchanged; no study records are created.",
+          "title": "Activate",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "module",
+        "version"
+      ],
+      "title": "DeploymentStudyPackage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "site": {
+      "$ref": "#/$defs/DeploymentSite"
+    },
+    "reference_packages": {
+      "items": {
+        "$ref": "#/$defs/DeploymentPackage"
+      },
+      "maxItems": 100,
+      "title": "Reference Packages",
+      "type": "array"
+    },
+    "study_packages": {
+      "items": {
+        "$ref": "#/$defs/DeploymentStudyPackage"
+      },
+      "maxItems": 100,
+      "title": "Study Packages",
+      "type": "array"
+    },
+    "adopt_existing": {
+      "default": false,
+      "description": "Explicitly adopt equivalent existing reference rows, preserving their primary keys. Never overwrite conflicts.",
+      "title": "Adopt Existing",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "site"
+  ],
+  "title": "DeploymentSetup",
+  "type": "object"
+}

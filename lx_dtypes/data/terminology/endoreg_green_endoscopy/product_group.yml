@@ -1,0 +1,28 @@
+- model: reference_catalog
+  name: product_group
+  name_de: "Produktgruppen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: product_group
+      name: Absorbant-Pad
+    - record_type: product_group
+      name: Balloon
+    - record_type: product_group
+      name: Bougie
+    - record_type: product_group
+      name: Coat
+    - record_type: product_group
+      name: Instrument
+    - record_type: product_group
+      name: Metal-Stent
+    - record_type: product_group
+      name: PEG
+    - record_type: product_group
+      name: Plastic
+    - record_type: product_group
+      name: Plastic-Large
+    - record_type: product_group
+      name: Plastic-Stent
+    - record_type: product_group
+      name: Wire

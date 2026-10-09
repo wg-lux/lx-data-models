@@ -1,0 +1,94 @@
+- model: reference_catalog
+  name: product
+  name_de: "Produkte"
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: product
+      name: absorbant_pad
+      transport_route:
+        name: generic_overseas
+        version: null
+      product_group:
+        name: Absorbant-Pad
+        version: null
+    - record_type: product
+      name: biliary_stent_cotton_leung_sof_flex
+      transport_route:
+        name: generic_overseas
+        version: null
+      product_group:
+        name: Plastic-Stent
+        version: null
+    - record_type: product
+      name: biopsy_grasper_hot_radial_jaw_4
+      transport_route:
+        name: generic_overseas
+        version: null
+      product_group:
+        name: Instrument
+        version: null
+    - record_type: product
+      name: bite_protector
+      transport_route:
+        name: generic_europe
+        version: null
+      product_group:
+        name: Plastic
+        version: null
+    - record_type: product
+      name: esophageal_dilator
+      transport_route:
+        name: generic_europe
+        version: null
+      product_group:
+        name: Bougie
+        version: null
+    - record_type: product
+      name: extraction_balloon_escort_2
+      transport_route:
+        name: generic_overseas
+        version: null
+      product_group:
+        name: Balloon
+        version: null
+    - record_type: product
+      name: foliodress_gown_standard
+      transport_route:
+        name: generic_europe
+        version: null
+      product_group:
+        name: Coat
+        version: null
+    - record_type: product
+      name: nitinol_stent_aix_oel
+      transport_route:
+        name: generic_europe
+        version: null
+      product_group:
+        name: Metal-Stent
+        version: null
+    - record_type: product
+      name: peg_freka_15_ch
+      transport_route:
+        name: generic_europe
+        version: null
+      product_group:
+        name: PEG
+        version: null
+    - record_type: product
+      name: pressure_syringe_60_ml
+      transport_route:
+        name: generic_overseas
+        version: null
+      product_group:
+        name: Plastic-Large
+        version: null
+    - record_type: product
+      name: visiglide_2
+      transport_route:
+        name: generic_overseas
+        version: null
+      product_group:
+        name: Wire
+        version: null

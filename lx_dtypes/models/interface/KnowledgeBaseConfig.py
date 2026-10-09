@@ -1,22 +1,50 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Self
 
-from pydantic import Field
+from pydantic import Field, field_validator, model_validator
 
 from lx_dtypes.factories.models import default_data_model_factory
 from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelNamesUUIDTags import (
     AppBaseModelNamesUUIDTags,
 )
 from lx_dtypes.models.base.file.pydantic.FilesAndDirs import FilesAndDirsModel
+from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
 
 
 class KnowledgeBaseConfig(AppBaseModelNamesUUIDTags):
-    depends_on: List[str] = Field(default_factory=list)
-    modules: List[str] = Field(default_factory=list)
+    name: str = Field(min_length=1)
+    depends_on: list[str] = Field(default_factory=list)
+    modules: list[str] = Field(default_factory=list)
     data: FilesAndDirsModel = Field(default_factory=default_data_model_factory)
-    version: str
+    version: str = Field(min_length=1)
+    medical_field: str | None = None
+    author: str | None = None
 
-    def normalize_data_paths(self, config_file: Optional[Path]) -> None:
+    @field_validator("depends_on", "modules")
+    @classmethod
+    def validate_module_references(cls, values: list[str]) -> list[str]:
+        if any(not value for value in values):
+            raise ValueError("knowledge-base module references must not be empty")
+        if len(values) != len(set(values)):
+            raise ValueError("knowledge-base module references must be unique")
+        return values
+
+    @model_validator(mode="after")
+    def validate_dependency_graph_node(self) -> Self:
+        if self.name in self.depends_on or self.name in self.modules:
+            raise ValueError("a knowledge-base module must not reference itself")
+        return self
+
+    @property
+    def knowledge_base_identity(self) -> KnowledgeBaseIdentity:
+        """Return the same canonical identity used by ledger and API contracts."""
+
+        return KnowledgeBaseIdentity(
+            knowledge_base_module=self.name,
+            knowledge_base_version=self.version,
+        )
+
+    def normalize_data_paths(self, config_file: Path | None) -> None:
         """
         Normalize data paths to absolute paths relative to the knowledge base module.
 
