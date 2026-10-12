@@ -1,39 +1,50 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_interventions
 - model: intervention
   name: endosonography_solid_lesion_fna
   name_de: "Endosonographische Feinnadelaspiration einer soliden Läsion"
+  name_en: "Endoscopic ultrasound-guided fine-needle aspiration of a solid lesion"
 
 - model: intervention
   name: endosonography_lymph_node_fna
   name_de: "Endosonographische Feinnadelaspiration eines Lymphknotens"
+  name_en: "Endoscopic ultrasound-guided fine-needle aspiration of a lymph node"
 
 - model: intervention
   name: endosonography_cyst_fna
   name_de: "Endosonographische Feinnadelaspiration einer Zyste"
+  name_en: "Endoscopic ultrasound-guided fine-needle aspiration of a cyst"
 
 - model: intervention
   name: endosonography_pseudocyst_fna
   name_de: "Endosonographische Feinnadelaspiration einer Pseudozyste"
+  name_en: "Endoscopic ultrasound-guided fine-needle aspiration of a pseudocyst"
 
 - model: intervention
   name: endosonography_biliary_drainage
   name_de: "Endosonographische Gallenwegsdrainage"
+  name_en: "Endoscopic ultrasound-guided biliary drainage"
 
 - model: intervention
   name: endosonography_pancreatic_drainage
   name_de: "Endosonographische Pankreasdrainage"
+  name_en: "Endoscopic ultrasound-guided pancreatic drainage"
 
 - model: intervention
   name: endosonography_cyst_gastrostomy
   name_de: "Endosonographische Zystogastrostomie"
+  name_en: "Endoscopic ultrasound-guided cystogastrostomy"
 
 - model: intervention
   name: endosonography_pancreaticogastrostomy
   name_de: "Endosonographische Pankreatikogastrostomie"
+  name_en: "Endoscopic ultrasound-guided pancreaticogastrostomy"
 
 - model: intervention
   name: endosonography_cholangioduodenostomy
   name_de: "Endosonographische Cholangioduodenostomie"
+  name_en: "Endoscopic ultrasound-guided choledochoduodenostomy"
 
 - model: intervention
   name: endosonography_pancreaticoduodenostomy
   name_de: "Endosonographische Pankreatikoduodenostomie"
+  name_en: "Endoscopic ultrasound-guided pancreaticoduodenostomy"

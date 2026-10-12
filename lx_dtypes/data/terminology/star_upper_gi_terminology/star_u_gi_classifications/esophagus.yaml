@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.star_upper_gi_terminology
 - model: classification
   name: "star_upper_gi_location_esophagus_distance_z_line"
   name_de: "Abstand zur Z-Linie"
+  name_en: "Distance from the Z-line"
   description: |
     Classification of distance from Z-line in the esophagus during upper GI endoscopy.
     Distances proximal to the Z-line are negative, distances distal to the Z-line are positive.
@@ -10,6 +12,7 @@
 - model: classification
   name: "upper_gi_esophagus_imaging_modality_classification"
   name_de: "Bildgebungsverfahren am Ösophagus"
+  name_en: "Esophageal imaging modality"
   description: "Classification of imaging modalities used for esophagus during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_imaging_modality_white_light
@@ -20,6 +23,7 @@
 - model: classification
   name: star_upper_gi_barrett_praque_classification
   name_de: "Prag-Klassifikation"
+  name_en: "Prague classification"
   description: "Classification of Barrett's esophagus praque types observed during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_barrett_praque_c_value
@@ -28,6 +32,7 @@
 - model: classification
   name: star_upper_gi_esophagus_varices_baveno
   name_de: "Baveno-Klassifikation der Ösophagusvarizen"
+  name_en: "Baveno classification of esophageal varices"
   description: "Classification of esophageal varices according to Baveno criteria."
   classification_choices:
     - star_upper_gi_esophagus_varices_baveno_none
@@ -37,6 +42,7 @@
 - model: classification
   name: star_upper_gi_los_angeles_classification
   name_de: "Los-Angeles-Klassifikation"
+  name_en: "Los Angeles classification"
   description: "Los Angeles classification of esophagitis severity observed during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_los_angeles_classification_a
@@ -48,6 +54,7 @@
 - model: classification
   name: star_upper_gi_erefs_edema
   name_de: "EREFS: Ödem"
+  name_en: "EREFS: edema"
   description: "Classification of edema in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_edema_none
@@ -57,6 +64,7 @@
 - model: classification
   name: star_upper_gi_erefs_rings
   name_de: "EREFS: Ringe"
+  name_en: "EREFS: rings"
   description: "Classification of rings in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_rings_none
@@ -68,6 +76,7 @@
 - model: classification
   name: star_upper_gi_erefs_exudates
   name_de: "EREFS: Exsudate"
+  name_en: "EREFS: exudates"
   description: "Classification of exudates in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_exudates_none
@@ -77,6 +86,7 @@
 - model: classification
   name: star_upper_gi_erefs_furrows
   name_de: "EREFS: Längsfurchen"
+  name_en: "EREFS: furrows"
   description: "Classification of furrows in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_furrows_none
@@ -85,6 +95,7 @@
 - model: classification
   name: star_upper_gi_erefs_strictures
   name_de: "EREFS: Strikturen"
+  name_en: "EREFS: strictures"
   description: "Classification of strictures in eosinophilic esophagitis according to EREFS criteria."
   classification_choices:
     - star_upper_gi_erefs_strictures_none
@@ -94,6 +105,7 @@
 - model: classification
   name: star_upper_gi_zargar
   name_de: "Zargar-Klassifikation"
+  name_en: "Zargar classification"
   description: "Zargar classification of caustic esophagitis severity observed during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_zargar_grade_0
@@ -108,6 +120,7 @@
 - model: classification
   name: star_upper_gi_stomach_varices_sarin
   name_de: "Sarin-Klassifikation der Magenvarizen"
+  name_en: "Sarin classification of gastric varices"
   description: "Classification of stomach varices according to Sarin criteria."
   classification_choices:
     - star_upper_gi_stomach_varices_sarin_none

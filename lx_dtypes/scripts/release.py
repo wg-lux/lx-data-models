@@ -246,6 +246,33 @@ def cmd_current(_: argparse.Namespace) -> int:
     return 0
 
 
+def verify_storage_artifacts(*, version: str, artifacts: list[Path]) -> None:
+    """Reject scratch output and runtime storage, including archive symlinks."""
+    excluded = (
+        PurePosixPath("temp"),
+        PurePosixPath("storage"),
+        PurePosixPath("docs/_build"),
+    )
+    for artifact in artifacts:
+        if artifact.suffix == ".whl":
+            with zipfile.ZipFile(artifact) as archive:
+                names = archive.namelist()
+            root = PurePosixPath()
+        elif artifact.name.endswith(".tar.gz"):
+            with tarfile.open(artifact, mode="r:gz") as archive:
+                names = archive.getnames()
+            root = PurePosixPath(f"lx_dtypes-{version}")
+        else:
+            raise SystemExit(f"Unsupported release artifact: {artifact.name}")
+        for name in names:
+            if any(
+                PurePosixPath(name).is_relative_to(root / path) for path in excluded
+            ):
+                raise SystemExit(
+                    f"{artifact.name} contains generated/runtime storage: {name}"
+                )
+
+
 def cmd_prepare(args: argparse.Namespace) -> int:
     version = _validate_version(args.version)
     current = read_project_version()
@@ -270,6 +297,7 @@ def cmd_build(_: argparse.Namespace) -> int:
             f"Expected exactly one wheel and one sdist for {version}; "
             f"found {len(dist_paths)} artifact(s)."
         )
+    verify_storage_artifacts(version=version, artifacts=dist_paths)
     verify_migration_artifacts(root, version=version, artifacts=dist_paths)
     verify_knowledge_base_artifacts(root, version=version, artifacts=dist_paths)
     run_command(

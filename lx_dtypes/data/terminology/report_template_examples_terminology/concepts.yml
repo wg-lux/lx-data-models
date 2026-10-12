@@ -1,32 +1,39 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.report_template_examples_terminology
 - model: classification_choice
   name: large
   name_de: "Groß"
+  name_en: "Large"
 
 - model: classification_choice
   name: present
   name_de: "Vorhanden"
+  name_en: "Present"
 
 - model: classification
   name: size_mm
   name_de: "Größe in Millimetern"
+  name_en: "Size in millimeters"
   classification_choices:
     - size_mm
 
 - model: classification
   name: size_cat
   name_de: "Größenkategorie"
+  name_en: "Size category"
   classification_choices:
     - large
 
 - model: classification
   name: lst
   name_de: "Lateral ausgedehnter Tumor (LST)"
+  name_en: "Laterally spreading tumor (LST)"
   classification_choices:
     - present
 
 - model: finding
   name: esophagus_polyp
   name_de: "Ösophaguspolyp"
+  name_en: "Esophageal polyp"
   description: Esophageal polyp used by the legacy report-template example.
   classifications:
     - size_mm

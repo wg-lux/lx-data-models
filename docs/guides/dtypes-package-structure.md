@@ -77,6 +77,14 @@ There are three different locations; they need not be siblings:
 | Registry file | Maps exact identities to package source directories | `/var/lib/study-host/terminology/registry.json` |
 | Upload directory | Managed copies produced by ZIP imports, derived from the registry parent | `/var/lib/study-host/terminology/terminology-packages` |
 
+For direct Python loading, `KnowledgeBaseConfig.from_yaml_file(path)` resolves
+`data.file`, `data.dir`, `data.files`, and `data.dirs` relative to the manifest
+and records its source on both the config and its data selection. Paths escaping
+the package, including symlink escapes, fail during file loading. Earlier callers
+that explicitly invoke `normalize_data_paths()` can continue doing so; repeating
+normalization against the same manifest is safe. In-memory `model_validate()`
+keeps relative paths until an explicit normalization step.
+
 Absolute paths belong in deployment configuration and registry entries. Inside
 the package manifest, use relative paths so the same release works at every
 centre. Local registration is suitable for application-owned storage and mounted
@@ -188,7 +196,7 @@ This guide owns package structure and the shared deployment document contract.
 
 Example source files: [manifest](../examples/dtypes_packages/training_preset/config.yaml),
 [preset](../examples/dtypes_packages/training_preset/data/preset.yml),
-[examinations](../examples/dtypes_packages/training_preset/data/examinations.yml),
+[examinations](../examples/dtypes_packages/training_preset/training_terminology/examinations.yml),
 and [optional employees](../examples/dtypes_packages/training_preset/optional/employees.yml).
 
 ## 1. The directory contract
@@ -198,7 +206,9 @@ an_authoring_root/
 └── training_preset/                 # module directory
     ├── config.yaml                 # required exact discovery filename
     ├── data/
-    │   ├── preset.yml               # centers, genders, labels
+    │   └── preset.yml               # centers, genders, labels
+    ├── training_terminology/        # terminology dependency bundled for portability
+    │   ├── config.yaml
     │   └── examinations.yml         # ordinary clinical KB record format
     └── optional/
         └── employees.yml           # excluded unless config selects it
@@ -258,7 +268,9 @@ select source files for parser evaluation; merged KBs include dependencies.
 | `modules` | Names of composed modules that the loader must resolve. |
 | `depends_on` | Names of prerequisite modules, loaded before dependents. |
 
-Keep `modules` and `depends_on` empty for this standalone example. References
+Keep `modules` empty; `depends_on` selects the bundled `training_terminology`
+module. This keeps examination definitions separate from the study preset while
+allowing the complete example to be copied or zipped as one folder. References
 are module **names**, not file paths or invented `name@version` strings. For a
 multi-module artifact, include the referenced modules and their manifests in
 the resolved source tree. Avoid competing configurations for the same module.
@@ -295,7 +307,7 @@ ledger metadata are not a replacement for the explicit host identity rules.
 
 ## 4. Examinations use the existing knowledge-base schema
 
-```{literalinclude} ../examples/dtypes_packages/training_preset/data/examinations.yml
+```{literalinclude} ../examples/dtypes_packages/training_preset/training_terminology/examinations.yml
 :language: yaml
 ```
 
@@ -346,7 +358,7 @@ From an lx-data-models checkout with its development environment activated,
 lint the clinical data file:
 
 ```sh
-python scripts/lint_kb_yaml.py docs/examples/dtypes_packages/training_preset/data/examinations.yml
+python scripts/lint_kb_yaml.py docs/examples/dtypes_packages/training_preset/training_terminology/examinations.yml
 ```
 
 The current standalone linter's model allowlist does not yet include

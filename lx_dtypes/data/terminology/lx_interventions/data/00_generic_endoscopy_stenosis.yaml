@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_interventions
 - model: intervention
   name: endoscopy_dilation_balloon
   name_de: "Endoskopische Ballondilatation"
+  name_en: "Endoscopic balloon dilation"
   description: Balloon dilation is a technique used to widen a narrowed area
     in the colon.
   intervention_types:
@@ -10,6 +12,7 @@
 - model: intervention
   name: endoscopy_dilation_bougie
   name_de: "Endoskopische Bougierung"
+  name_en: "Endoscopic bougie dilation"
   description: Bougie dilation is a technique used to widen a narrowed area
     in the colon.
   intervention_types:

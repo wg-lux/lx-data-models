@@ -22,7 +22,7 @@
       "version": "3.0.0",
       "medical_field": "gastroenterology",
       "resource_root": "data/report_templates/mst_3_0",
-      "content_sha256": "ea354e28292cf916116f180f78abf63b2efa19bb3c4dee0619a1039206b311a0",
+      "content_sha256": "edf6439f9654f773cbef4ac2c83c252c22033467d25534472dde4d71ac8b8607",
       "default": true
     },
     {
@@ -46,7 +46,7 @@
       "version": "2.0.0",
       "medical_field": "gastroenterology",
       "resource_root": "data/terminology/polyp_size_category",
-      "content_sha256": "615f71898544223d3a2e3864ab6110e473692bf753fa58f6c69da8c700c385d9",
+      "content_sha256": "2010ffed3374f9c0d8fa09b11d6c43930659fb54c3f320f59032be01238473eb",
       "default": true
     },
     {
@@ -108,7 +108,7 @@
       "version": "3.0.0",
       "medical_field": "gastroenterology",
       "resource_root": "data/terminology/mst_3_0_terminology",
-      "content_sha256": "d0bc0b073b875303ff7fb6fa0865bd0bd8c4bde522635cbccb857289c8712b70",
+      "content_sha256": "c773d2a2b673172fadf9b65da864a0964161d598973a7e139a2535d23659a780",
       "default": true
     },
     {
@@ -116,7 +116,7 @@
       "version": "0.1.1",
       "medical_field": null,
       "resource_root": "data/terminology/report_template_examples_terminology",
-      "content_sha256": "f851a4d091c4351868154c92a6b2ffaf2c350d279b376d7123df8c4a772a5e44",
+      "content_sha256": "8a5d7764613122abde931693bd78e6108946420a12113a162fb847dcdddf9d47",
       "default": true
     },
     {
@@ -124,7 +124,7 @@
       "version": "0.1.2",
       "medical_field": "gastroenterology",
       "resource_root": "data/terminology/star_upper_gi_terminology",
-      "content_sha256": "fb51a2b6a4214f509f504017e4fc949abd08f77824ede3d56c711ece561ddbfb",
+      "content_sha256": "0bb484c9c8a7d5b5ae505ed5767e2c489a5e22ccb8dc7b936a04ca4b5d996b68",
       "default": true
     }
   ]

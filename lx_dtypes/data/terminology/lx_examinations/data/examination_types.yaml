@@ -1,4 +1,6 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_examinations
 - model: examination_type
   name: endoscopic_procedure
   name_de: "Endoskopischer Eingriff"
+  name_en: "Endoscopic procedure"
   description: An examination performed using an endoscope to visualize internal organs or structures.

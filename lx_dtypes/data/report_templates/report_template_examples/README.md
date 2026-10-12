@@ -2,6 +2,13 @@
 
 Owner: lx_dtypes maintainers. This package contains executable examples and
 synthetic test data for report-template structure, validators, and coverage.
+All current examples resolve against their terminology dependencies. The minimal
+`base_report_template` and `ukw_gastroscopy` examples reuse the STAR upper-GI
+examination and esophageal mucosal-status finding through `base_required_section`.
+Their names do not establish a clinically approved or institution-approved protocol.
+The package owns reporting references only; its extra illustrative concepts are
+owned by `report_template_examples_terminology`. Provenance is recorded in
+`data/definitions.yml` under `source_provenance`.
 
 For authoring instructions and the ColoReg findings-validation trace, read
 [Making report templates and tracing findings issues](../../../../docs/guides/report-template-authoring.md).

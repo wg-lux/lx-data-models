@@ -26,7 +26,10 @@ def test_multiple_packaged_report_templates_are_published_and_usable() -> None:
         "report_template_examples",
     ],
 )
-def test_reporting_catalog_has_german_labels(module_name: str) -> None:
+@pytest.mark.parametrize("language", ["de", "en"])
+def test_reporting_catalog_has_bilingual_labels(
+    module_name: str, language: str
+) -> None:
     """Check resolved YAML references, including choices and input descriptors."""
     kb = verifier_module.DataLoader().load_knowledge_base(module_name)
 
@@ -36,37 +39,43 @@ def test_reporting_catalog_has_german_labels(module_name: str) -> None:
 
     finding_names: set[str] = set()
     for template_name in kb.report_template:
-        if template_name == "base_report_template":
-            # This legacy authoring example deliberately has incomplete coverage.
-            with pytest.raises(KeyError, match="not production-ready"):
-                kb.export_report_template(template_name)
-            continue
         exported = kb.export_report_template(template_name)
-        assert_label(template_name, exported["name_de"])
+        assert not [
+            issue
+            for issue in exported["readiness"]["issues"]
+            if issue["severity"] != "info" or issue["blocks_publish"]
+        ], template_name
+        assert_label(template_name, exported[f"name_{language}"])
         assert exported["verbosity_options"] == ["short", "standard", "detailed"]
         examination = kb.examination[exported["examination"]]
-        assert_label(examination.name, examination.name_de)
+        assert_label(examination.name, getattr(examination, f"name_{language}"))
         for section in exported["report_sections"]:
-            assert_label(section["name"], section["title_de"])
+            assert_label(section["name"], section[f"title_{language}"])
             finding_names.update(finding["finding"] for finding in section["findings"])
             for finding in section["findings"]:
                 for classification in finding.get("classifications", []):
                     for choice in classification["input"]["choices"]:
                         for descriptor in choice["descriptors"]:
-                            assert_label(descriptor["name"], descriptor["name_de"])
+                            assert_label(
+                                descriptor["name"], descriptor[f"name_{language}"]
+                            )
 
     for finding_name in finding_names:
         finding = kb.finding[finding_name]
-        assert_label(finding.name, finding.name_de)
+        assert_label(finding.name, getattr(finding, f"name_{language}"))
         for classification_name in finding.classifications:
             classification = kb.classification[classification_name]
-            assert_label(classification.name, classification.name_de)
+            assert_label(
+                classification.name, getattr(classification, f"name_{language}")
+            )
             for choice_name in classification.classification_choices:
                 choice = kb.classification_choice[choice_name]
-                assert_label(choice.name, choice.name_de)
+                assert_label(choice.name, getattr(choice, f"name_{language}"))
                 for descriptor_name in choice.classification_choice_descriptors:
                     descriptor = kb.classification_choice_descriptor[descriptor_name]
-                    assert_label(descriptor.name, descriptor.name_de)
+                    assert_label(
+                        descriptor.name, getattr(descriptor, f"name_{language}")
+                    )
 
 
 def test_star_upper_gi_patient_fields_have_german_labels() -> None:

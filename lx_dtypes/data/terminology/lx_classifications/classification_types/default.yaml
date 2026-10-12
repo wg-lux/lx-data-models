@@ -1,39 +1,50 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_classifications
 - model: classification_type
   name: "default_classification_type"
   name_de: "Standard-Klassifikationstyp"
+  name_en: "Default classification type"
 
 - model: classification_type
   name: "inferrable"
   name_de: "Ableitbar"
+  name_en: "Inferable"
 
 - model: classification_type
   name: "histology"
   name_de: "Histologie"
+  name_en: "Histology"
 
 - model: classification_type
   name: "size"
   name_de: "Größe"
+  name_en: "Size"
 
 - model: classification_type
   name: "planarity"
   name_de: "Planarität"
+  name_en: "Planarity"
 
 - model: classification_type
   name: "morphology"
   name_de: "Morphologie"
+  name_en: "Morphology"
 
 - model: classification_type
   name: "location"
   name_de: "Lokalisation"
+  name_en: "Location"
 
 - model: classification_type
   name: "bowel_prep"
   name_de: "Darmvorbereitung"
+  name_en: "Bowel preparation"
 
 - model: classification_type
   name: "capillary_pattern"
   name_de: "Kapillarmuster"
+  name_en: "Capillary pattern"
 
 - model: classification_type
   name: "colon_lesion_advanced_imaging"
   name_de: "Erweiterte Bildgebung von Kolonläsionen"
+  name_en: "Advanced imaging of colonic lesions"

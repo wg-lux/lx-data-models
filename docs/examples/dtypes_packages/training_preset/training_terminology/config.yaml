@@ -1,0 +1,6 @@
+name: training_terminology
+version: "1.0.0"
+description: Synthetic examination terminology for the training preset.
+data:
+  files:
+    - examinations.yml

@@ -1,3 +1,4 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_classification_choices
 # Paris
 # Sources for guideline-derived additions in this file:
 # - DGVS S2k quality guideline v2.1 (AWMF 021-022), Paris morphology: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
@@ -5,6 +6,7 @@
 
   name: "colon_lesion_paris_Is"
   name_de: "Paris Is"
+  name_en: "Paris Is"
   # name_en: "Colon Lesion Shape Classification (Paris Is)"
   description: "Shape classification for colon lesions (Paris Is)"
 
@@ -12,6 +14,7 @@
 
   name: "colon_lesion_paris_Ip"
   name_de: "Paris Ip"
+  name_en: "Paris Ip"
   # name_en: "Colon Lesion Shape Classification (Paris Ip)"
   description: "Shape classification for colon lesions (Paris Ip)"
 
@@ -19,6 +22,7 @@
 
   name: "colon_lesion_paris_IIa"
   name_de: "Paris IIa"
+  name_en: "Paris IIa"
   # name_en: "Colon Lesion Shape Classification (Paris IIa)"
   description: "Shape classification for colon lesions (Paris IIa)"
 
@@ -26,6 +30,7 @@
 
   name: "colon_lesion_paris_IIb"
   name_de: "Paris IIb"
+  name_en: "Paris IIb"
   # name_en: "Colon Lesion Shape Classification (Paris IIb)"
   description: "Shape classification for colon lesions (Paris IIb)"
 
@@ -33,6 +38,7 @@
 
   name: "colon_lesion_paris_IIc"
   name_de: "Paris IIc"
+  name_en: "Paris IIc"
   # name_en: "Colon Lesion Shape Classification (Paris IIc)"
   description: "Shape classification for colon lesions (Paris IIc)"
 
@@ -40,6 +46,7 @@
 
   name: "colon_lesion_paris_III"
   name_de: "Paris III"
+  name_en: "Paris III"
   # name_en: "Colon Lesion Shape Classification (Paris III)"
   description: "Shape classification for colon lesions (Paris III)"
 
@@ -48,6 +55,7 @@
 
   name: "colon_lesion_paris_IIa_IIc"
   name_de: "Paris IIa+IIc"
+  name_en: "Paris IIa+IIc"
   # name_en: "Colon Lesion Shape Classification (Paris IIa+IIc)"
   description: "Shape classification for colon lesions (Paris IIa+IIc)"
 
@@ -56,6 +64,7 @@
 
   name: "colon_lesion_paris_IIb_IIc"
   name_de: "Paris IIb+IIc"
+  name_en: "Paris IIb+IIc"
   # name_en: "Colon Lesion Shape Classification (Paris IIb+IIc)"
   description: "Shape classification for colon lesions (Paris IIb+IIc)"
 
@@ -64,18 +73,22 @@
 
   name: "colon_lesion_lst_granular_homogeneous"
   name_de: "Granulärer LST, homogen"
+  name_en: "Granular LST, homogeneous"
 
 - model: classification_choice
 
   name: "colon_lesion_lst_granular_nodular_mixed"
   name_de: "Granulärer LST, nodulär gemischt"
+  name_en: "Granular LST, nodular mixed"
 
 - model: classification_choice
 
   name: "colon_lesion_lst_non_granular_flat_elevated"
   name_de: "Nicht granulärer LST, flach erhaben"
+  name_en: "Nongranular LST, flat elevated"
 
 - model: classification_choice
 
   name: "colon_lesion_lst_non_granular_pseudodepressed"
   name_de: "Nicht granulärer LST, pseudodeprimiert"
+  name_en: "Nongranular LST, pseudodepressed"

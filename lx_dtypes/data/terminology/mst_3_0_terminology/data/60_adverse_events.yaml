@@ -1,122 +1,110 @@
 # Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
 # Source: MST 3.0 section 7. Late events require post-hoc data entry.
-- {
-    model: finding,
-    name: mst_event_intraprocedure_perforation,
-    name_en: Perforation of lumen,
-    name_de: "Perforation des Hohlorgans",
-    finding_types: [mst_adverse_event],
-    classifications: [mst_attr_type],
-    description: "§7.1. Location; communicating to Retroperitoneum/Peritoneum/Mediastinum; type: By endoscope/Sphincterotomy-related/Polypectomy-related/Dilation-related.",
-  }
-- {
-    model: finding,
-    name: mst_event_intraprocedure_bleeding,
-    name_en: Bleeding,
-    name_de: "Blutung",
-    finding_types: [mst_adverse_event],
-    description: "§7.1. Location: main sites.",
-  }
-- {
-    model: finding,
-    name: mst_event_intraprocedure_cardiopulmonary,
-    name_en: Cardiopulmonary,
-    name_de: "Kardiopulmonal",
-    finding_types: [mst_adverse_event],
-    description: "§7.1. Type: apnoea/hypopnea/bronchospasm/laryngospasm/hypotension/hypertension/arrest/dysrythmia/aspiration; Action: ventilation assist/Emergency code/actions in §7.3.",
-  }
-- {
-    model: finding,
-    name: mst_event_intraprocedure_equipment_malfunction,
-    name_en: Equipment malfunction,
-    name_de: "Gerätefehlfunktion",
-    finding_types: [mst_adverse_event],
-    description: "§7.1. Type: specify.",
-  }
-- {
-    model: finding,
-    name: mst_event_intraprocedure_equipment_impaction,
-    name_en: Equipment impaction,
-    name_de: "Einklemmung eines Instruments",
-    finding_types: [mst_adverse_event],
-    description: "§7.1. Type: specify.",
-  }
-- {
-    model: finding,
-    name: mst_event_intraprocedure_allergic_reaction,
-    name_en: Allergic reaction,
-    name_de: "Allergische Reaktion",
-    finding_types: [mst_adverse_event],
-    description: "§7.1. Agent/type: specify; Action: ventilation assist/Emergency code/actions in §7.3.",
-  }
-- {
-    model: finding,
-    name: mst_event_intraprocedure_other,
-    name_en: Other events,
-    name_de: "Sonstige Ereignisse",
-    finding_types: [mst_adverse_event],
-    description: "§7.1. Type: specify.",
-  }
-- {
-    model: finding,
-    name: mst_event_postprocedure_cardiopulmonary,
-    name_en: cardiopulmonary event,
-    name_de: "Kardiopulmonales Ereignis",
-    finding_types: [mst_adverse_event],
-    classifications: [mst_attr_type, mst_attr_relation],
-    description: "§7.2. Type/date of onset: specify; relation: probable/possible/unlikely.",
-  }
-- {
-    model: finding,
-    name: mst_event_postprocedure_abdominal_pain,
-    name_en: Abdominal pain,
-    name_de: "Bauchschmerzen",
-    finding_types: [mst_adverse_event],
-    classifications: [mst_attr_relation],
-    description: "§7.2. Date of onset; relation: probable/possible/unlikely.",
-  }
-- {
-    model: finding,
-    name: mst_event_postprocedure_infection,
-    name_en: Infection,
-    name_de: "Infektion",
-    finding_types: [mst_adverse_event],
-    classifications: [mst_attr_type, mst_attr_relation],
-    description: "§7.2. Type/date of onset: specify; relation: probable/possible/unlikely.",
-  }
-- {
-    model: finding,
-    name: mst_event_postprocedure_thromboembolic,
-    name_en: Thromboembolic event,
-    name_de: "Thromboembolisches Ereignis",
-    finding_types: [mst_adverse_event],
-    classifications: [mst_attr_type, mst_attr_relation],
-    description: "§7.2. Type/date of onset: specify; relation: probable/possible/unlikely.",
-  }
-- {
-    model: finding,
-    name: mst_event_postprocedure_late_perforation,
-    name_en: Late perforation,
-    name_de: "Spätperforation",
-    finding_types: [mst_adverse_event],
-    description: "§7.2. Type/date of onset: specify.",
-  }
-- {
-    model: finding,
-    name: mst_event_postprocedure_late_bleeding,
-    name_en: Late bleeding,
-    name_de: "Spätblutung",
-    finding_types: [mst_adverse_event],
-    description: "§7.2. Type/date of onset: specify.",
-  }
-- {
-    model: finding,
-    name: mst_event_postprocedure_pancreatitis,
-    name_en: Pancreatitis,
-    name_de: "Pankreatitis",
-    finding_types: [mst_adverse_event],
-    description: "§7.2. Date of onset: specify.",
-  }
+- model: finding
+  name: mst_event_intraprocedure_perforation
+  name_en: Perforation of lumen
+  name_de: Perforation des Hohlorgans
+  finding_types: [mst_adverse_event]
+  classifications: [mst_event_severity, mst_event_outcome, mst_event_intraprocedure_perforation_location, mst_event_intraprocedure_perforation_communicating_to,
+    mst_event_intraprocedure_perforation_type]
+  description: '§7.1. Location; communicating to Retroperitoneum/Peritoneum/Mediastinum; type: By endoscope/Sphincterotomy-related/Polypectomy-related/Dilation-related.'
+- model: finding
+  name: mst_event_intraprocedure_bleeding
+  name_en: Bleeding
+  name_de: Blutung
+  finding_types: [mst_adverse_event]
+  description: '§7.1. Location: main sites.'
+  classifications: [mst_event_severity, mst_event_outcome, mst_event_intraprocedure_bleeding_location]
+- model: finding
+  name: mst_event_intraprocedure_cardiopulmonary
+  name_en: Cardiopulmonary
+  name_de: Kardiopulmonal
+  finding_types: [mst_adverse_event]
+  description: '§7.1. Type: apnoea/hypopnea/bronchospasm/laryngospasm/hypotension/hypertension/arrest/dysrythmia/aspiration;
+    Action: ventilation assist/Emergency code/actions in §7.3.'
+  classifications: [mst_event_severity, mst_event_outcome, mst_event_intraprocedure_cardiopulmonary_type, mst_event_intraprocedure_cardiopulmonary_action]
+- model: finding
+  name: mst_event_intraprocedure_equipment_malfunction
+  name_en: Equipment malfunction
+  name_de: Gerätefehlfunktion
+  finding_types: [mst_adverse_event]
+  description: '§7.1. Type: specify.'
+  classifications: [mst_event_severity, mst_event_outcome, mst_luminal_previous_surgery_type]
+- model: finding
+  name: mst_event_intraprocedure_equipment_impaction
+  name_en: Equipment impaction
+  name_de: Einklemmung eines Instruments
+  finding_types: [mst_adverse_event]
+  description: '§7.1. Type: specify.'
+  classifications: [mst_event_severity, mst_event_outcome, mst_luminal_previous_surgery_type]
+- model: finding
+  name: mst_event_intraprocedure_allergic_reaction
+  name_en: Allergic reaction
+  name_de: Allergische Reaktion
+  finding_types: [mst_adverse_event]
+  description: '§7.1. Agent/type: specify; Action: ventilation assist/Emergency code/actions in §7.3.'
+  classifications: [mst_event_severity, mst_event_outcome, mst_event_intraprocedure_allergic_reaction_agent, mst_luminal_previous_surgery_type,
+    mst_event_intraprocedure_cardiopulmonary_action]
+- model: finding
+  name: mst_event_intraprocedure_other
+  name_en: Other events
+  name_de: Sonstige Ereignisse
+  finding_types: [mst_adverse_event]
+  description: '§7.1. Type: specify.'
+  classifications: [mst_event_severity, mst_event_outcome, mst_luminal_previous_surgery_type]
+- model: finding
+  name: mst_event_postprocedure_cardiopulmonary
+  name_en: cardiopulmonary event
+  name_de: Kardiopulmonales Ereignis
+  finding_types: [mst_adverse_event]
+  classifications: [mst_event_severity, mst_event_outcome, mst_luminal_previous_surgery_type, mst_event_postprocedure_cardiopulmonary_date_of_onset,
+    mst_event_postprocedure_cardiopulmonary_relation]
+  description: '§7.2. Type/date of onset: specify; relation: probable/possible/unlikely.'
+- model: finding
+  name: mst_event_postprocedure_abdominal_pain
+  name_en: Abdominal pain
+  name_de: Bauchschmerzen
+  finding_types: [mst_adverse_event]
+  classifications: [mst_event_severity, mst_event_outcome, mst_event_postprocedure_cardiopulmonary_date_of_onset,
+    mst_event_postprocedure_cardiopulmonary_relation]
+  description: '§7.2. Date of onset; relation: probable/possible/unlikely.'
+- model: finding
+  name: mst_event_postprocedure_infection
+  name_en: Infection
+  name_de: Infektion
+  finding_types: [mst_adverse_event]
+  classifications: [mst_event_severity, mst_event_outcome, mst_luminal_previous_surgery_type, mst_event_postprocedure_cardiopulmonary_date_of_onset,
+    mst_event_postprocedure_cardiopulmonary_relation]
+  description: '§7.2. Type/date of onset: specify; relation: probable/possible/unlikely.'
+- model: finding
+  name: mst_event_postprocedure_thromboembolic
+  name_en: Thromboembolic event
+  name_de: Thromboembolisches Ereignis
+  finding_types: [mst_adverse_event]
+  classifications: [mst_event_severity, mst_event_outcome, mst_luminal_previous_surgery_type, mst_event_postprocedure_cardiopulmonary_date_of_onset,
+    mst_event_postprocedure_cardiopulmonary_relation]
+  description: '§7.2. Type/date of onset: specify; relation: probable/possible/unlikely.'
+- model: finding
+  name: mst_event_postprocedure_late_perforation
+  name_en: Late perforation
+  name_de: Spätperforation
+  finding_types: [mst_adverse_event]
+  description: '§7.2. Type/date of onset: specify.'
+  classifications: [mst_event_severity, mst_event_outcome, mst_luminal_previous_surgery_type, mst_event_postprocedure_cardiopulmonary_date_of_onset]
+- model: finding
+  name: mst_event_postprocedure_late_bleeding
+  name_en: Late bleeding
+  name_de: Spätblutung
+  finding_types: [mst_adverse_event]
+  description: '§7.2. Type/date of onset: specify.'
+  classifications: [mst_event_severity, mst_event_outcome, mst_luminal_previous_surgery_type, mst_event_postprocedure_cardiopulmonary_date_of_onset]
+- model: finding
+  name: mst_event_postprocedure_pancreatitis
+  name_en: Pancreatitis
+  name_de: Pankreatitis
+  finding_types: [mst_adverse_event]
+  description: '§7.2. Date of onset: specify.'
+  classifications: [mst_event_severity, mst_event_outcome, mst_event_postprocedure_cardiopulmonary_date_of_onset]
 - {
     model: intervention,
     name: mst_event_action_endoscopic_intervention,

@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.polyp_size_category
 - model: unit
   name: millimeter
   name_de: "Millimeter"
+  name_en: "Millimeter"
   abbreviation: mm
 - model: classification
   name: polyp_size_category

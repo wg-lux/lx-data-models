@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_examinations
 - model: examination
   name: ercp
   name_de: Endoskopisch retrograde Cholangiopankreatikografie (ERCP)
+  name_en: "Endoscopic retrograde cholangiopancreatography (ERCP)"
   description: "Endoscopic retrograde cholangiopancreatography."
   examination_types: [endoscopic_procedure]
   findings:
@@ -14,6 +16,7 @@
 - model: examination
   name: endoscopic_ultrasound
   name_de: Endosonografie (EUS)
+  name_en: "Endoscopic ultrasound (EUS)"
   description: "Diagnostic or interventional endoscopic ultrasound examination."
   examination_types: [endoscopic_procedure]
   findings:

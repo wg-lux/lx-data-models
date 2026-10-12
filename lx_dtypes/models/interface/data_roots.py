@@ -34,6 +34,12 @@ def module_search_root(config_path: Path) -> Path:
     enclosing directory as the discovery scope.
     """
     root = config_path.parent.parent
-    if root.name in {"terminology", "report_templates"} and root.parent.name == "data":
-        return root.parent
+    for ancestor in config_path.parents:
+        if ancestor.name == "versions":
+            break
+        if (
+            ancestor.name in {"terminology", "report_templates"}
+            and ancestor.parent.name == "data"
+        ):
+            return ancestor.parent
     return root

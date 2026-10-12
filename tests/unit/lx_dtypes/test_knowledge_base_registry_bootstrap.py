@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import stat
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
@@ -12,14 +13,43 @@ from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
     get_packaged_knowledge_base,
 )
+from lx_dtypes.models.interface.KnowledgeBase import ReportTemplateConceptWarning
 from lx_dtypes.scripts.kb_registry import main
 from lx_dtypes.terminology.terminology_service import TerminologyService
+
+
+def _assert_retained_release_warnings(load: Callable[[], None]) -> None:
+    """Check the frozen release's debt, including warnings from hydrated copies."""
+    with pytest.warns(ReportTemplateConceptWarning) as recorded:
+        load()
+    locations: set[tuple[Path, int, int]] = set()
+    for warning in recorded:
+        message = warning.message
+        assert isinstance(message, ReportTemplateConceptWarning)
+        assert "/versions/star_upper_gi/0.1.1.post1/star_upper_gi/" in str(
+            message.source_file
+        )
+        locations.add((message.source_file, message.line, message.column))
+    assert len(recorded) == len(locations) == 132
+
+
+@pytest.fixture(autouse=True)
+def check_retained_release_warnings(monkeypatch: pytest.MonkeyPatch) -> None:
+    validate = registry_module._validate_identity
+
+    def checked(registry: Path, module: str, version: str) -> None:
+        if (module, version) == ("star_upper_gi", "0.1.1.post1"):
+            _assert_retained_release_warnings(lambda: validate(registry, module, version))
+        else:
+            validate(registry, module, version)
+
+    monkeypatch.setattr(registry_module, "_validate_identity", checked)
 
 
 @pytest.fixture
 def hydrated_registry(tmp_path: Path) -> Path:
     registry = tmp_path / "registry.json"
-    TerminologyService(registry_path=registry).provision()
+    _assert_retained_release_warnings(TerminologyService(registry_path=registry).provision)
     return registry
 
 

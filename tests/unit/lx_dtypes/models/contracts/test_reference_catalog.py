@@ -140,3 +140,22 @@ def test_composite_identity_uses_all_declared_natural_keys() -> None:
     assert first.key == first.model_copy(update={"quantity": 13.0}).key
     assert first.key != first.model_copy(update={"year": 2026}).key
     assert first.key != first.model_copy(update={"waste": first.center}).key
+
+
+def test_concrete_catalog_discriminator_is_validated_through_base_interface() -> None:
+    from lx_dtypes.models.contracts.reference_catalog import (
+        CatalogRecordBase,
+        GenderReference,
+        ReferenceKind,
+    )
+
+    record: CatalogRecordBase = GenderReference.model_validate(
+        {"name": "unknown", "abbreviation": None, "description": None}
+    )
+    assert record.kind is ReferenceKind.GENDER
+
+    invalid: CatalogRecordBase = record.model_copy(update={"record_type": 1})
+    with pytest.raises(TypeError, match="discriminator must be a string"):
+        _ = invalid.kind
+    with pytest.raises(AttributeError):
+        _ = CatalogRecordBase().kind

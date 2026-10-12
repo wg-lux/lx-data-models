@@ -253,3 +253,61 @@ def test_frame_box_envelope_rejects_conflicting_item_frame_id() -> None:
                 ],
             }
         )
+
+
+@pytest.mark.parametrize("empty", [None, ""])
+def test_frame_box_legacy_omissions_inherit_without_mutation(empty: object) -> None:
+    from copy import deepcopy
+
+    payload = {
+        "frame_id": 8,
+        "annotator": "reviewer",
+        "information_source": "reviewed",
+        "annotations": [
+            {
+                "frame_id": empty,
+                "annotator": empty,
+                "information_source_name": empty,
+                "label_id": 2,
+                "x": 0,
+                "y": 0,
+                "width": 10,
+                "height": 10,
+                "image_width": 100,
+                "image_height": 100,
+            }
+        ],
+    }
+    original = deepcopy(payload)
+    result = FrameBoxAnnotationBulkEnvelopePayload.model_validate(payload)
+
+    assert result.annotations[0].frame_id == 8
+    assert result.annotations[0].annotator == "reviewer"
+    assert result.annotations[0].information_source_name == "reviewed"
+    assert payload == original
+    assert (
+        FrameBoxAnnotationBulkEnvelopePayload.model_validate_json(
+            result.model_dump_json()
+        )
+        == result
+    )
+
+
+def test_frame_box_null_wrapper_values_roundtrip_as_null() -> None:
+    result = FrameBoxAnnotationBulkEnvelopePayload.model_validate(
+        {
+            "annotator": None,
+            "information_source_name": None,
+            "information_source": None,
+            "annotations": [],
+        }
+    )
+
+    assert result.annotator is None
+    assert result.resolved_information_source_name is None
+    assert (
+        FrameBoxAnnotationBulkEnvelopePayload.model_validate_json(
+            result.model_dump_json()
+        )
+        == result
+    )

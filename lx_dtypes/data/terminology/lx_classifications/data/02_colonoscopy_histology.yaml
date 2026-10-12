@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_classifications
 - model: classification
   name: "colonoscopy_polyp_histology"
   name_de: "Polypenhistologie"
+  name_en: "Polyp histology"
   classification_types:
     - histology
   classification_choices: [

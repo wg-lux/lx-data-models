@@ -45,7 +45,10 @@ def test_current_definitions_load_and_have_no_unclassified_yaml() -> None:
             module_files.update(resolved.data.get_files_with_suffix(".yaml"))
             module_files.update(resolved.data.get_files_with_suffix(".yml"))
         assert not lint_kb_yaml_files(
-            module_files, strict_aliases=True, strict_mixed_styles=True
+            module_files,
+            strict_aliases=True,
+            strict_mixed_styles=True,
+            check_authoring=True,
         )
         selected.update(module_files)
     inventory = yaml.safe_load((root / "definitions.yml").read_text())
@@ -124,3 +127,72 @@ def test_report_manifest_lint_resolves_terminology_dependencies(module: str) -> 
     files, issues = discover_yaml_files(paths=[], config_paths=[manifest])
     assert not issues
     assert not lint_kb_yaml_files(files, strict_aliases=True, strict_mixed_styles=True)
+
+
+def test_current_modules_have_explicit_sources() -> None:
+    root = package_data_root()
+    inventory = yaml.safe_load((root / "definitions.yml").read_text())
+    provenance = inventory["source_provenance"]
+    current_modules = {
+        yaml.safe_load(path.read_text())["name"]
+        for path in root.rglob("config.yaml")
+        if "versions" not in path.relative_to(root).parts
+    }
+    assert set(provenance["module_sources"]) == current_modules
+    for source_ids in provenance["module_sources"].values():
+        assert source_ids
+        assert set(source_ids) <= provenance["sources"].keys()
+    for source in provenance["sources"].values():
+        assert source["authority"] and source["scope"]
+        if "canonical_document" in source:
+            assert Path(source["canonical_document"]).is_file()
+        if "url" in source:
+            assert source["url"].startswith("https://")
+
+
+def test_legacy_unit_wrapper_composes_with_canonical_units(tmp_path: Path) -> None:
+    (tmp_path / "config.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "name": "unit_composition",
+                "version": "1.0.0",
+                "depends_on": ["lx_units", "lx_utils_units"],
+                "data": {"files": [], "dirs": []},
+            }
+        )
+    )
+    loader = DataLoader(
+        input_dirs=[
+            package_data_root() / "terminology" / "lx_units",
+            package_data_root() / "terminology" / "lx_utils",
+            tmp_path,
+        ]
+    )
+    canonical = loader.load_knowledge_base("lx_units")
+    combined = loader.load_knowledge_base("unit_composition")
+    assert combined.unit.keys() == canonical.unit.keys()
+    for name, unit in canonical.unit.items():
+        assert combined.unit[name].model_dump(
+            exclude={"created_at", "uuid"}
+        ) == unit.model_dump(exclude={"created_at", "uuid"})
+    assert all(unit.kb_module_name == "lx_units" for unit in combined.unit.values())
+
+
+@pytest.mark.parametrize(
+    ("manifest", "expected"),
+    [
+        ("data/terminology/lx_utils/unit/config.yaml", "data"),
+        ("data/report_templates/coloreg/config.yaml", "data"),
+        (
+            "data/terminology/versions/coloreg/0.1.0/coloreg/config.yaml",
+            "data/terminology/versions/coloreg/0.1.0",
+        ),
+        ("custom/modules/unit/config.yaml", "custom/modules"),
+    ],
+)
+def test_module_search_scope_preserves_release_isolation(
+    manifest: str, expected: str
+) -> None:
+    from lx_dtypes.models.interface.data_roots import module_search_root
+
+    assert module_search_root(Path(manifest)) == Path(expected)

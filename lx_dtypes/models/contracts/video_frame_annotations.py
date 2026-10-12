@@ -178,13 +178,19 @@ class FrameBoxAnnotationBulkEnvelopePayload(BaseModel):
                 normalized_annotations.append(cast(JsonValue, item))
                 continue
             item_mapping = {str(key): value for key, value in item.items()}
-            if outer_frame_id is not None and "frame_id" not in item_mapping:
+            if outer_frame_id is not None and item_mapping.get("frame_id") in (
+                None,
+                "",
+            ):
                 item_mapping["frame_id"] = cast(JsonValue, outer_frame_id)
-            if "information_source_name" not in item_mapping:
+            if item_mapping.get("information_source_name") in (None, ""):
                 item_mapping["information_source_name"] = cast(
                     JsonValue, wrapper_source
                 )
-            if wrapper_annotator is not None and "annotator" not in item_mapping:
+            if wrapper_annotator is not None and item_mapping.get("annotator") in (
+                None,
+                "",
+            ):
                 item_mapping["annotator"] = cast(JsonValue, wrapper_annotator)
             normalized_annotations.append(cast(JsonValue, item_mapping))
 
@@ -206,6 +212,8 @@ class FrameBoxAnnotationBulkEnvelopePayload(BaseModel):
     def _blank_to_none(cls, value: str | float | bool | None) -> str | None:
         if isinstance(value, str):
             return value.strip() or None
+        if value is None:
+            return None
         return str(value)
 
     @property

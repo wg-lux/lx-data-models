@@ -1,31 +1,40 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_findings
 - model: finding_type
   name: "default_finding_type"
   name_de: "Standard-Befundtyp"
+  name_en: "Default finding type"
 
 - model: finding_type
   name: "complication"
   name_de: "Komplikation"
+  name_en: "Complication"
 
 - model: finding_type
   name: "baseline"
   name_de: "Ausgangsbefund"
+  name_en: "Baseline finding"
 
 - model: finding_type
   name: "observation"
   name_de: "Beobachtung"
+  name_en: "Observation"
 
 - model: finding_type
   name: "iatrogenic"
   name_de: "Iatrogen"
+  name_en: "Iatrogenic"
 
 - model: finding_type
   name: "persisting"
   name_de: "Fortbestehend"
+  name_en: "Persistent"
 
 - model: finding_type
   name: "anatomy"
   name_de: "Anatomie"
+  name_en: "Anatomy"
 
 - model: finding_type
   name: "hidden"
   name_de: "Ausgeblendet"
+  name_en: "Hidden"

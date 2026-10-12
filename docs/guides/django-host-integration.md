@@ -11,6 +11,10 @@ Use this guide when:
 
 This is a contract document, not an internal implementation walkthrough.
 
+`FindingDjango` preserves the canonical finding's `text_extraction` rules during
+DataDict synchronization. Apply migration `0007_findingdjango_text_extraction`
+before importing findings; existing rows receive an empty rule list.
+
 ## Required Settings
 
 The host project must configure:

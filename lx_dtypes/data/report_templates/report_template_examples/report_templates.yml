@@ -1,3 +1,4 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.report_template_examples
 - model: findings_validator
   name: polyp_has_lst_if_large
   name_de: "LST-Klassifikation bei großem Polypen erforderlich"
@@ -71,6 +72,7 @@
   verbosity_options: [short, standard, detailed]
   name: star_upper_gi_main
   name_de: STAR-ÖGD – Basisbericht
+  name_en: "STAR upper GI – basic report"
   examination: star_upper_gi_endoscopy
   report_sections:
     - examination_baseline
@@ -383,17 +385,21 @@
 - model: report_template
   verbosity_options: [short, standard, detailed]
   name: ukw_gastroscopy
+  description: Minimal local authoring example using the shared upper-GI mucosal-status terminology.
   name_de: UKW – Gastroskopiebericht
+  name_en: "UKW gastroscopy report"
   examination: star_upper_gi_endoscopy
-  report_sections: []
+  report_sections:
+    - base_required_section
   validators:
     examination_validators: []
     findings_validators: []
 
 - model: report_finding
   name: base_required_finding
-  name_de: "Verpflichtender Basisbefund"
-  finding: base_required_finding
+  name_de: "Schleimhautstatus des Ösophagus"
+  name_en: "Esophageal mucosal status"
+  finding: star_upper_gi_mucosa_esophagus_status
   required: true
   multiple_allowed: false
   classifications: []
@@ -412,8 +418,10 @@
 - model: report_template
   verbosity_options: [short, standard, detailed]
   name: base_report_template
+  description: Minimal upper-GI authoring example; references shared terminology without defining a new finding.
   name_de: "Basis-Befundvorlage"
-  examination: generic_endoscopy
+  name_en: "Basic report template"
+  examination: star_upper_gi_endoscopy
   report_sections:
     - base_required_section
   validators:

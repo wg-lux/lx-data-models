@@ -1,12 +1,15 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.star_upper_gi_terminology
 - model: classification
   name: "distance_cm"
   name_de: "Abstand in Zentimetern"
+  name_en: "Distance in centimeters"
   classification_choices:
     - distance_cm
 
 - model: classification
   name: "size_oval_mm"
   name_de: "Größe in Millimetern"
+  name_en: "Size in millimeters"
   description: "Classification of size in millimeters."
   classification_choices:
     - size_mm
@@ -14,12 +17,14 @@
 - model: "classification"
   name: "additional_text_info"
   name_de: "Zusätzliche Angaben"
+  name_en: "Additional information"
   classification_choices:
     - additional_text_info
 
 - model: classification
   name: "star_upper_gi_location_classification"
   name_de: "Lokalisation"
+  name_en: "Location"
   description: "Classification of locations visualized during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_location_esophagus_proximal
@@ -41,6 +46,7 @@
 - model: classification
   name: "star_upper_gi_location_duodenum"
   name_de: "Lokalisation im Duodenum"
+  name_en: "Duodenal location"
   description: "Classification of duodenal locations visualized during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_location_duodenum_bulbus
@@ -51,6 +57,7 @@
 - model: classification
   name: star_upper_gi_mucosal_appearance_classification
   name_de: "Schleimhautbeschaffenheit"
+  name_en: "Mucosal appearance"
   description: "Classification of mucosal appearance observed during upper GI endoscopy."
   classification_choices:
     - star_upper_gi_mucosal_appearance_normal
@@ -66,6 +73,7 @@
 - model: classification
   name: yes_no_unknown_classification
   name_de: "Ja / Nein / Unbekannt"
+  name_en: "Yes / No / Unknown"
   description: "A simple yes/no/unknown classification."
   classification_choices:
     - "yes"
@@ -75,6 +83,7 @@
 - model: classification
   name: "star_upper_gi_lesion_paris"
   name_de: "Paris-Klassifikation"
+  name_en: "Paris classification"
   classification_choices:
     [
       "star_upper_gi_paris_Is",
@@ -92,6 +101,7 @@
 - model: classification
   name: star_upper_gi_forrest
   name_de: "Forrest-Klassifikation"
+  name_en: "Forrest classification"
   classification_choices:
     - star_upper_gi_forrest_Ia
     - star_upper_gi_forrest_Ib
@@ -103,6 +113,7 @@
 - model: classification
   name: star_upper_gi_count
   name_de: "Anzahl"
+  name_en: "Count"
   description: "Non-negative count used for varices, biopsies, vials, and images."
   classification_choices:
     - star_upper_gi_count_value
@@ -110,6 +121,7 @@
 - model: classification
   name: star_upper_gi_duration_minutes
   name_de: "Dauer in Minuten"
+  name_en: "Duration in minutes"
   description: "Duration in minutes."
   classification_choices:
     - star_upper_gi_minutes_value

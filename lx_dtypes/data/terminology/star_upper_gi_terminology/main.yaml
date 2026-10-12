@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.star_upper_gi_terminology
 - model: examination
   name: "star_upper_gi_endoscopy"
   name_de: "Ösophagogastroduodenoskopie"
+  name_en: "Esophagogastroduodenoscopy"
   findings:
     # Preprocedure information
     - star_upper_gi_exam_date

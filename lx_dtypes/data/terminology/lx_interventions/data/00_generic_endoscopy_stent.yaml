@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_interventions
 - model: intervention
   name: endoscopy_stent_generic
   name_de: "Endoskopische Stenteinlage"
+  name_en: "Endoscopic stent placement"
   description: Stent placement is a technique used to keep a narrowed area
     in the colon open.
   intervention_types:

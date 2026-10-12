@@ -160,7 +160,7 @@ class TestKnowledgeBaseConfig:
         )
 
         kb_config = KnowledgeBaseConfig.from_yaml_file(config_path)
-        kb_config.normalize_data_paths(config_path)
+        assert kb_config.data.source_file == config_path.resolve()
 
         assert kb_config.data.file == (module_dir / "schema.yaml").resolve()
         assert kb_config.data.dirs == [(module_dir / "data").resolve()]
@@ -168,4 +168,37 @@ class TestKnowledgeBaseConfig:
             (module_dir / "relative" / "manifest.yaml").resolve()
         ]
 
-    # def test_reimport_sample_kb(self, )
+        before = kb_config.data.model_dump()
+        kb_config.normalize_data_paths(None)
+        assert kb_config.data.model_dump() == before
+
+    @pytest.mark.parametrize("field", ["file", "dir", "files", "dirs"])
+    @pytest.mark.parametrize("escape", ["parent", "absolute", "symlink"])
+    def test_file_loading_rejects_escaping_data_paths(
+        self, tmp_path: Path, field: str, escape: str
+    ) -> None:
+        module = tmp_path / "module"
+        module.mkdir()
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        (module / "link").symlink_to(outside, target_is_directory=True)
+        value = {"parent": "../outside", "absolute": str(outside), "symlink": "link"}[
+            escape
+        ]
+        entry = f"[{value}]" if field in {"files", "dirs"} else value
+        config_path = module / "config.yaml"
+        config_path.write_text(
+            f"name: example\nversion: 1.0.0\ndata:\n  {field}: {entry}\n"
+        )
+
+        with pytest.raises(ValueError, match="Unsafe .* path"):
+            KnowledgeBaseConfig.from_yaml_file(config_path)
+
+    def test_in_memory_config_keeps_relative_paths(self) -> None:
+        config = KnowledgeBaseConfig.model_validate(
+            {"name": "example", "version": "1.0.0", "data": {"file": "data.yml"}}
+        )
+
+        assert config.source_file is None
+        assert config.data.source_file is None
+        assert config.data.file == Path("data.yml")

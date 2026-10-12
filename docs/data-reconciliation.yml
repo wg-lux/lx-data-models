@@ -63,3 +63,35 @@ ledger_source_check:
   polyp_size_mm: 8
   diverticulum_size_mm: 6
   finding: The draft incorrectly describes both measurements as polyps; Table 4 uses explicit synthetic observations.
+
+mst_excel_reconciliation:
+  source: mst30_tables(1).xls
+  specification: scripts/mst/import.yml
+  importer: scripts/import_mst_excel.py
+  provenance: lx_dtypes/data/terminology/mst_3_0_terminology/excel_source.yml
+  identity_policy: Owner-requested in-place correction of MST 3.0.0; catalog digests change.
+  counts: {finding: 389, classification: 293, classification_choice: 546, indication: 142, intervention: 40, examination: 12}
+  historical_counts: The mst_counts above describe the pre-Excel PR reconciliation only.
+  severity_source: "Adv event severity!B3:F17; not PDF section 7.3."
+
+manuscript_artifact_review:
+  owner: lx-dtypes maintainers and manuscript authors
+  review_date: '2026-10-12'
+  preserved_input: temp/generated_exports/LXDM_reconciled_draft.docx
+  corrected_output: temp/generated_exports/LXDM_current_artifact.docx
+  correction_spec: temp/generated_exports/LXDM_current_artifact.spec.yml
+  provenance: temp/generated_exports/LXDM_current_artifact.changes.yml
+  canonical_editorial_spec: docs/manuscript-reconciliation.yml
+  scope: Current executable MST counts and Excel severity provenance; no new clinical-source or literature audit.
+  source_limit: The original LXDM_revised_draft_v3(2).docx was unavailable; the verified earlier output was used for the seven follow-up replacements.
+  checks:
+  - MST loader and core export succeeded; 17 MST tests passed.
+  - Workbook digest and Incident/Mild/Moderate/Severe/Fatal header verified against the local source.
+  - DOCX ZIP integrity, all non-document parts, exact Table 3 counts and input/output digests verified.
+  - LibreOffice PDF conversion succeeded; methods and Table 3 pages inspected.
+  author_review_required:
+  - Methods says 196 unique records while the abstract, results and Table 2 use 206; verify the screening ledger and recalculate percentages if needed. An inline review note now exposes this conflict.
+  - The PubMed search date lacks a year; supply it from the actual search record.
+  - Table 3 has narrow columns that split Count and Classifications in the rendered draft; final journal layout needs adjustment.
+  - Existing tracked edits and highlighted methods text remain for author review; this is not a submission-ready document.
+  reproducibility: Existing published MST identity was corrected in place by earlier work; content digests distinguish the current workbook import from the historical PR inventory.

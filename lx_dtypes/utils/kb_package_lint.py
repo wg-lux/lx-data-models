@@ -54,7 +54,6 @@ def lint_kb_package(
                 issues.extend(
                     lint_name_version(selected.name, model_name="package", file=path)
                 )
-                selected.normalize_data_paths(path)
                 loader.module_configs[selected.name] = selected
                 loader.module_config_candidates.setdefault(selected.name, []).append(
                     selected

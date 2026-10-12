@@ -1,24 +1,30 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_classification_choices
 - model: classification_choice
   name: "histology_polyp_hyperplastic"
   name_de: "Hyperplastischer Polyp"
+  name_en: "Hyperplastic polyp"
   description: "Histology: Hyperplastic polyp"
 
 - model: classification_choice
   name: "histology_polyp_adenoma_tubular"
   name_de: "Tubuläres Adenom"
+  name_en: "Tubular adenoma"
   description: "Histology: Tubular adenoma"
 
 - model: classification_choice
   name: "histology_polyp_adenoma_tubulovillous"
   name_de: "Tubulovillöses Adenom"
+  name_en: "Tubulovillous adenoma"
   description: "Histology: Tubulovillous adenoma"
 
 - model: classification_choice
   name: "histology_polyp_adenoma_villous"
   name_de: "Villöses Adenom"
+  name_en: "Villous adenoma"
   description: "Histology: Villous adenoma"
 
 - model: classification_choice
   name: "histology_polyp_sessile_serrated_lesion"
   name_de: "Sessile serratierte Läsion"
+  name_en: "Sessile serrated lesion"
   description: "Histology: Sessile serrated lesion"

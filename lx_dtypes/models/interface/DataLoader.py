@@ -108,8 +108,6 @@ class DataLoader(AppBaseModel):
         self.module_config_candidates = {}
         for config_file in config_files:
             kb_config = KnowledgeBaseConfig.from_yaml_file(config_file)
-            kb_config.data.source_file = config_file
-            kb_config.normalize_data_paths(config_file)
             self.module_config_candidates.setdefault(kb_config.name, []).append(
                 kb_config
             )

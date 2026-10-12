@@ -1,4 +1,5 @@
 import pytest
+from pydantic import ValidationError
 
 from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.finding._FindingDjango import FindingDjango
@@ -9,6 +10,44 @@ from tests.paths import GENERATED_TEST_OUTPUT_ROOT
 
 TEST_EXPORT = GENERATED_TEST_OUTPUT_ROOT / "finding_fixture.yaml"
 TEST_EXPORT_DDICT_SCHEMA = GENERATED_TEST_OUTPUT_ROOT / "finding_ddict_schema.yaml"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("presence", ["present", "absent", "uncertain"])
+def test_text_extraction_round_trips_through_django(presence: str) -> None:
+    finding = Finding.model_validate(
+        {
+            "name": "synthetic_finding",
+            "text_extraction": [
+                {"presence": presence, "pattern": [{"LOWER": "example"}]}
+            ],
+        }
+    )
+
+    stored = FindingDjango.sync_from_ddict(finding.ddict)
+
+    assert (
+        Finding.model_validate(stored.ddict).text_extraction == finding.text_extraction
+    )
+    finding.text_extraction = []
+    updated = FindingDjango.sync_from_ddict(finding.ddict)
+    assert updated.pk == stored.pk
+    assert updated.text_extraction == []
+
+
+@pytest.mark.parametrize(
+    "rule",
+    [{"presence": "invalid", "pattern": [{}]}, {"presence": "present", "pattern": []}],
+)
+def test_text_extraction_rejects_invalid_rules(rule: dict[str, object]) -> None:
+    with pytest.raises(ValidationError):
+        Finding.model_validate({"name": "synthetic_finding", "text_extraction": [rule]})
+
+
+def test_text_extraction_defaults_are_independent() -> None:
+    first, second = FindingDjango(), FindingDjango()
+    first.text_extraction.append({"presence": "present"})
+    assert second.text_extraction == []
 
 
 @pytest.mark.django_db

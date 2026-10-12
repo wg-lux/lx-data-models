@@ -50,10 +50,11 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.4.4"
+version = "0.4.5"
 
 [project.optional-dependencies]
 dev = [
+  "xlrd==2.0.2",
   "build>=1.3.0",
   "flake8>=7.3.0",
   "linkify-it-py>=2.0.3",
@@ -184,6 +185,12 @@ target-version = ["py312"]
 
 [tool.hatch.build]
 exclude = [
+  "temp",
+  "temp/**",
+  "storage",
+  "storage/**",
+  "docs/_build",
+  "docs/_build/**",
   ".devenv",
   ".devenv/**",
   ".direnv",
@@ -195,6 +202,8 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
+# Keep release metadata compatible with the declared Twine 6.x toolchain.
+core-metadata-version = "2.4"
 packages = ["lx_dtypes"]
 
 [tool.hatch.build.targets.wheel.force-include]
@@ -206,7 +215,10 @@ build-backend = "hatchling.build"
 requires = ["hatchling"]
 
 [tool.hatch.build.targets.sdist]
+core-metadata-version = "2.4"
 exclude = [
+  "docs/_build",
+  "docs/_build/**",
   ".devenv",
   ".devenv/**",
   ".direnv",
@@ -221,6 +233,8 @@ exclude = [
   "result/**",
   "storage",
   "storage/**",
+  "temp",
+  "temp/**",
 ]
 
 [tool.hatch.build.targets.sdist.force-include]

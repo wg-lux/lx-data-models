@@ -25,7 +25,7 @@ guides/cross-layer-validation
 guides/django-host-integration
 guides/fhir-clinical-testing
 guides/fhir-lxdm-mapping-diagrams
-guides/konzept-verknuepfungen
+guides/concept-relationships
 guides/knowledge-base-authoring
 guides/terminology
 guides/dtypes-package-structure

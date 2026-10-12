@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_findings
 - model: finding
   name: "cecum"
   name_de: "Zökum"
+  name_en: "Cecum"
   description: "Anatomical structure: Cecum"
   finding_types:
     - anatomy
@@ -11,6 +13,7 @@
 - model: finding
   name: "terminal_ileum"
   name_de: "Terminales Ileum"
+  name_en: "Terminal ileum"
   description: "Anatomical structure: Terminal ileum"
   finding_types:
     - anatomy
@@ -21,6 +24,7 @@
 - model: finding
   name: "appendiceal_orifice"
   name_de: "Appendixostium"
+  name_en: "Appendiceal orifice"
   description: "Anatomical structure: Appendiceal orifice"
   finding_types:
     - anatomy
@@ -31,6 +35,7 @@
 - model: finding
   name: "ileocecal_valve"
   name_de: "Ileozökalklappe"
+  name_en: "Ileocecal valve"
   description: "Anatomical structure: Ileocecal valve"
   finding_types:
     - anatomy
@@ -41,6 +46,7 @@
 - model: finding
   name: "ascending_colon"
   name_de: "Colon ascendens"
+  name_en: "Ascending colon"
   description: "Anatomical structure: Ascending colon"
   finding_types:
     - anatomy
@@ -51,6 +57,7 @@
 - model: finding
   name: "right_flexure"
   name_de: "Rechte Kolonflexur"
+  name_en: "Right colonic flexure"
   description: "Anatomical structure: Right flexure"
   finding_types:
     - anatomy
@@ -61,6 +68,7 @@
 - model: finding
   name: "transverse_colon"
   name_de: "Colon transversum"
+  name_en: "Transverse colon"
   description: "Anatomical structure: Transverse colon"
   finding_types:
     - anatomy
@@ -71,6 +79,7 @@
 - model: finding
   name: "left_flexure"
   name_de: "Linke Kolonflexur"
+  name_en: "Left colonic flexure"
   description: "Anatomical structure: Left flexure"
   finding_types:
     - anatomy
@@ -81,6 +90,7 @@
 - model: finding
   name: "descending_colon"
   name_de: "Colon descendens"
+  name_en: "Descending colon"
   description: "Anatomical structure: Descending colon"
   finding_types:
     - anatomy
@@ -91,6 +101,7 @@
 - model: finding
   name: "sigmoid_colon"
   name_de: "Colon sigmoideum"
+  name_en: "Sigmoid colon"
   description: "Anatomical structure: Sigmoid colon"
   finding_types:
     - anatomy
@@ -101,6 +112,7 @@
 - model: finding
   name: "rectum"
   name_de: "Rektum"
+  name_en: "Rectum"
   description: "Anatomical structure: Rectum"
   finding_types:
     - anatomy
@@ -111,6 +123,7 @@
 - model: finding
   name: "rectum_anus"
   name_de: "Rektum und Anus"
+  name_en: "Rectum and anus"
   description: "Anatomical structure: Rectum and anus"
   finding_types:
     - anatomy

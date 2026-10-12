@@ -33,6 +33,7 @@ from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,
 )
+from lx_dtypes.terminology import terminology as legacy_routes
 from lx_dtypes.terminology import terminology_loader as central
 from lx_dtypes.terminology import terminology_service as service_module
 from lx_dtypes.terminology.lookup_tracker import consume_runtime_lookup_trackers
@@ -75,8 +76,9 @@ class TerminologyApi:
     tracked: list[KnowledgeBase] = field(default_factory=list)
 
 
-@pytest.fixture
+@pytest.fixture(params=[terminology_routes, legacy_routes], ids=["canonical", "legacy"])
 def terminology_api(
+    request: pytest.FixtureRequest,
     terminology_service: TerminologyService,
     settings: SettingsWrapper,
     monkeypatch: pytest.MonkeyPatch,
@@ -92,7 +94,7 @@ def terminology_api(
         docs_url=None,
         openapi_url=None,
     )
-    terminology_routes.register_terminology_routes(
+    request.param.register_terminology_routes(
         api,
         service=terminology_service,
         clear_kb_caches=lambda: harness.cache_clears.append(None),

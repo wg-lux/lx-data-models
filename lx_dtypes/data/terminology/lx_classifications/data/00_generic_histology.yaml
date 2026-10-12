@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_classifications
 - model: classification
   name: "histology_dysplasia_default"
   name_de: "Dysplasiegrad"
+  name_en: "Grade of dysplasia"
   classification_types:
     - histology
   classification_choices:
@@ -11,6 +13,7 @@
 - model: classification
   name: "histology_dignity_default"
   name_de: "Dignität"
+  name_en: "Benign or malignant status"
   classification_types:
     - histology
   classification_choices:
@@ -20,6 +23,7 @@
 - model: classification
   name: "histology_in_sano_default"
   name_de: "Resektion im Gesunden"
+  name_en: "Resection with clear margins"
   classification_types:
     - histology
   classification_choices:

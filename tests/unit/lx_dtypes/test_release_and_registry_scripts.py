@@ -17,6 +17,7 @@ from lx_dtypes.scripts.release import (
     read_project_version,
     verify_knowledge_base_artifacts,
     verify_migration_artifacts,
+    verify_storage_artifacts,
     write_project_version,
 )
 
@@ -121,6 +122,12 @@ def test_cmd_build_checks_only_current_version_artifacts(
         lambda args, *, cwd: commands.append(args),
     )
     verified_artifacts: list[Path] = []
+    verified_storage: list[Path] = []
+    monkeypatch.setattr(
+        release_module,
+        "verify_storage_artifacts",
+        lambda *, version, artifacts: verified_storage.extend(artifacts),
+    )
     monkeypatch.setattr(
         release_module,
         "verify_migration_artifacts",
@@ -137,6 +144,7 @@ def test_cmd_build_checks_only_current_version_artifacts(
 
     assert cmd_build(Namespace()) == 0
     assert verified_artifacts == [current_wheel, current_sdist]
+    assert verified_storage == [current_wheel, current_sdist]
     assert verified_knowledge_base_artifacts == [current_wheel, current_sdist]
     assert commands[1][-1] == "lx_dtypes.scripts.verify_packaged_report_templates"
     assert commands[2][-2:] == [str(current_wheel), str(current_sdist)]
@@ -199,9 +207,9 @@ def _write_release_artifacts(
                 packaged_migration_contents
             )
         if include_knowledge_base:
-            files["lx_dtypes/data/report_templates/report_template_examples/config.yaml"] = (
-                packaged_knowledge_base_contents
-            )
+            files[
+                "lx_dtypes/data/report_templates/report_template_examples/config.yaml"
+            ] = packaged_knowledge_base_contents
         for relative_path, contents in files.items():
             info = tarfile.TarInfo(f"lx_dtypes-{version}/{relative_path}")
             info.size = len(contents)
@@ -217,6 +225,31 @@ def test_verify_migration_artifacts_matches_source_tree(tmp_path: Path) -> None:
         version="0.2.16",
         artifacts=artifacts,
     )
+
+
+@pytest.mark.parametrize("kind", ["whl", "tar.gz"])
+@pytest.mark.parametrize(
+    "entry", ["temp/run.yml", "storage/registry.json", "docs/_build/index.html"]
+)
+def test_release_rejects_runtime_storage(tmp_path: Path, kind: str, entry: str) -> None:
+    artifact = tmp_path / f"lx_dtypes-0.2.16.{kind}"
+    if kind == "whl":
+        with zipfile.ZipFile(artifact, "w") as archive:
+            archive.writestr(entry, "scratch")
+    else:
+        with tarfile.open(artifact, "w:gz") as archive:
+            # Reject symlinks as well as regular file contents.
+            info = tarfile.TarInfo(f"lx_dtypes-0.2.16/{entry}")
+            info.type = tarfile.SYMTYPE
+            info.linkname = "../source"
+            archive.addfile(info)
+    with pytest.raises(SystemExit, match="contains generated/runtime storage"):
+        verify_storage_artifacts(version="0.2.16", artifacts=[artifact])
+
+
+def test_release_storage_check_preserves_packaged_data(tmp_path: Path) -> None:
+    artifacts = _write_release_artifacts(tmp_path, version="0.2.16")
+    verify_storage_artifacts(version="0.2.16", artifacts=artifacts)
 
 
 def test_verify_migration_artifacts_rejects_packaging_omission(

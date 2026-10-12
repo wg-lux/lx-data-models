@@ -3,10 +3,10 @@ name: training_preset
 version: "1.0.0"
 description: Synthetic documentation example, not a clinical study definition.
 modules: []
-depends_on: []
+depends_on:
+  - training_terminology
 data:
   files:
     - data/preset.yml
-    - data/examinations.yml
     # Optional: enable only when center-specific employee hints are wanted.
     # - optional/employees.yml

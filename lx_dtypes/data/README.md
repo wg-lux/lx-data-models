@@ -3,6 +3,11 @@
 Maintained by the lx-dtypes maintainers. The structural contract is documented in
 [Structure of a valid lx-dtypes package](../../docs/guides/dtypes-package-structure.md).
 The machine-readable inventory is [definitions.yml](definitions.yml).
+Its `source_provenance` section identifies the authority and applicability of each
+current module's sources. File-level citations narrow guideline attribution to the
+records they describe; local and synthetic definitions are explicitly distinguished
+from guideline adaptations. English display labels translate the authored German
+labels without changing clinical identifiers or rules.
 
 - **`study_metadata/`** contains portable study documents. `research.yml` uses
   `StudySetupDefinition`: datasets, cohorts and study eligibility metadata belong
@@ -24,6 +29,13 @@ Annotation mappings and numeric rules are separate sidecars, not ordinary KB lis
 Study metadata must not be added to a terminology manifest's selected data files.
 No participating centres, age limits or eligibility rules should be inferred from
 clinical concept names; these require an authored study protocol.
+
+`lx_utils_units` is a compatibility composition of `lx_units` and `lx_unit_types`.
+The 41 formerly duplicated unit definitions are now owned only by `lx_units`;
+references keep their existing names, but unit provenance is `lx_units` and the
+wrapper also exposes that package's newer units. Retained release bundles keep
+their original definitions. Current working-tree catalog digests reflect these
+authoring changes; deployed immutable packages must not be overwritten in place.
 
 Legacy CSV exports have moved to `demo-data/legacy_exports/`; they are not packaged
 reference definitions. Unfinished authoring examples live under `demo-data/drafts/`.

@@ -17,12 +17,23 @@ from lx_dtypes.terminology import terminology_loader as central
 from lx_dtypes.terminology.terminology_service import TerminologyError
 
 
-@pytest.mark.parametrize("value", [None, "", "relative", Path("relative")])
+@pytest.mark.parametrize("value", ["", "relative", Path("relative")])
 def test_invalid_roots_are_rejected(monkeypatch, value):
     monkeypatch.setattr(settings, "TERMINOLOGY_ROOT", value)
     central.get_terminology_service.cache_clear()
     with pytest.raises(ImproperlyConfigured):
         central.get_terminology_service()
+
+
+def test_unset_root_uses_default_without_creating_storage(monkeypatch, tmp_path):
+    root = tmp_path / "user-data"
+    monkeypatch.setattr(settings, "TERMINOLOGY_ROOT", None)
+    monkeypatch.setattr(central, "user_data_path", lambda *args, **kwargs: root)
+    central.get_terminology_service.cache_clear()
+    service = central.get_terminology_service()
+    assert service.registry_path == root / "terminology" / "registry.json"
+    assert not root.exists()
+    central.get_terminology_service.cache_clear()
 
 
 def test_source_fallback_ignores_cwd(storage, tmp_path, monkeypatch):

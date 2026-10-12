@@ -98,741 +98,1655 @@
 # Upper endoscopy sections
 - model: report_template_section
   name: mst_egd_overview
-  name_de: "ÖGD – Übersicht"
+  name_de: ÖGD – Übersicht
   title_de: Untersuchungsübersicht
   title_en: Examination overview
   position: 0
   types: [baseline]
   findings:
-    - {
-        finding: mst_egd_documentation_status,
-        required: true,
-        multiple_allowed: false,
-        concept_id: mst30.egd.documentation_status,
-        classifications:
-          [
-            {
-              classification: mst_attr_completeness,
-              required: true,
-              concept_id: mst30.egd.documentation_status.value,
-            },
-          ],
-      }
-    - {
-        finding: mst_luminal_normal,
-        required: false,
-        multiple_allowed: false,
-        classifications: [],
-      }
-    - {
-        finding: mst_luminal_stenosis,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_appearance, required: false },
-            { classification: mst_attr_length_cm, required: false },
-          ],
-      }
-    - {
-        finding: mst_luminal_diverticulum,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_number_category, required: false },
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_type, required: false },
-          ],
-      }
-    - {
-        finding: mst_luminal_hiatal_hernia,
-        required: false,
-        multiple_allowed: false,
-        classifications: [],
-      }
-    - {
-        finding: mst_luminal_z_line,
-        required: false,
-        multiple_allowed: false,
-        classifications: [],
-      }
+  - finding: mst_egd_documentation_status
+    required: true
+    multiple_allowed: false
+    concept_id: mst30.egd.documentation_status
+    classifications:
+    - {classification: mst_attr_completeness, required: true, concept_id: mst30.egd.documentation_status.value}
+  - finding: mst_luminal_normal
+    required: false
+    multiple_allowed: false
+    classifications: []
+  - finding: mst_luminal_stenosis
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_luminal_stenosis_appearance, required: false}
+    - {classification: mst_luminal_stenosis_length, required: false}
+    - {classification: mst_luminal_stenosis_traversable, required: false}
+  - finding: mst_luminal_diverticulum
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_luminal_compression_size, required: false}
+    - {classification: mst_luminal_diverticulum_neck, required: false}
+    - {classification: mst_luminal_diverticulum_content, required: false}
+  - finding: mst_luminal_hiatal_hernia
+    required: false
+    multiple_allowed: false
+    classifications:
+    - {classification: mst_luminal_hiatal_hernia_anatomical_location, required: false}
+    - {classification: mst_luminal_hiatal_hernia_upper_border, required: false}
+    - {classification: mst_luminal_hiatal_hernia_lower_border, required: false}
+  - finding: mst_luminal_z_line
+    required: false
+    multiple_allowed: false
+    classifications:
+    - {classification: mst_luminal_z_line_anatomical_location, required: false}
+    - {classification: mst_luminal_z_line_position, required: false}
 - model: report_template_section
   name: mst_egd_mucosa_and_lesions
-  name_de: "ÖGD – Schleimhaut und Läsionen"
+  name_de: ÖGD – Schleimhaut und Läsionen
   title_de: Mukosa und Läsionen
   title_en: Mucosa and lesions
   position: 10
   findings:
-    - {
-        finding: mst_mucosa_erythematous,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_distribution, required: false }],
-      }
-    - {
-        finding: mst_mucosa_edematous,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_distribution, required: false }],
-      }
-    - {
-        finding: mst_mucosa_hemorrhagic,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_distribution, required: false }],
-      }
-    - {
-        finding: mst_mucosa_atrophic,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_distribution, required: false }],
-      }
-    - {
-        finding: mst_mucosa_barretts_esophagus,
-        required: false,
-        multiple_allowed: false,
-        classifications: [{ classification: mst_prague_cm, required: false }],
-      }
-    - {
-        finding: mst_mucosa_esophagitis,
-        required: false,
-        multiple_allowed: false,
-        classifications:
-          [
-            { classification: mst_los_angeles, required: false },
-            { classification: mst_attr_bleeding, required: false },
-          ],
-      }
-    - {
-        finding: mst_flat_angioectasia,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_number_category, required: false },
-            { classification: mst_attr_bleeding, required: false },
-          ],
-      }
-    - {
-        finding: mst_flat_dieulafoy_lesion,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_number_category, required: false },
-            { classification: mst_attr_bleeding, required: false },
-          ],
-      }
-    - {
-        finding: mst_protruding_polyp,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_appearance, required: false },
-            { classification: mst_paris, required: false },
-          ],
-      }
-    - {
-        finding: mst_protruding_tumor_mass,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_appearance, required: false },
-            { classification: mst_paris, required: false },
-          ],
-      }
-    - {
-        finding: mst_protruding_varices,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_esophageal_varices_size, required: false },
-            { classification: mst_attr_bleeding, required: false },
-          ],
-      }
-    - {
-        finding: mst_excavated_erosion,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_bleeding, required: false }],
-      }
-    - {
-        finding: mst_excavated_ulcer,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_forrest, required: false },
-          ],
-      }
+  - finding: mst_mucosa_erythematous
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_edematous
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_hemorrhagic
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_atrophic
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_a506ce14, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_barretts_esophagus
+    required: false
+    multiple_allowed: false
+    classifications:
+    - {classification: mst_mucosa_barretts_esophagus_anatomical_location, required: false}
+    - {classification: mst_prague_cm, required: false}
+  - finding: mst_mucosa_esophagitis
+    required: false
+    multiple_allowed: false
+    classifications:
+    - {classification: mst_mucosa_esophagitis_anatomical_location, required: false}
+    - {classification: mst_los_angeles, required: false}
+    - {classification: mst_mucosa_esophagitis_bleeding, required: false}
+  - finding: mst_flat_angioectasia
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_a506ce14, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_angioectasia_bleeding, required: false}
+  - finding: mst_flat_dieulafoy_lesion
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_a506ce14, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_dieulafoy_lesion_bleeding, required: false}
+  - finding: mst_protruding_polyp
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_protruding_polyp_shape, required: false}
+    - {classification: mst_kudo, required: false}
+    - {classification: mst_protruding_polyp_appearance, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_protruding_tumor_mass
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_flat_superficial_lesion_free_margins, required: false}
+    - {classification: mst_excel_paris_type_0_4, required: false}
+    - {classification: mst_jgca_superficial_neoplastic_lesions, required: false}
+    - {classification: mst_kudo, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_protruding_varices
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_protruding_varices_number, required: false}
+    - {classification: mst_esophageal_varices_size, required: false}
+    - {classification: mst_protruding_varices_size, required: false}
+    - {classification: mst_protruding_varices_bleeding, required: false}
+    - {classification: mst_protruding_varices_red_signs, required: false}
+  - finding: mst_excavated_erosion
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_excavated_ulcer
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_protruding_varices_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_excavated_ulcer_depth, required: false}
+    - {classification: mst_excavated_ulcer_shape, required: false}
+    - {classification: mst_forrest, required: false}
 - model: report_template_section
   name: mst_egd_diagnoses
-  name_de: "ÖGD – Diagnosen"
+  name_de: ÖGD – Diagnosen
   title_de: Endoskopische Diagnosen
   title_en: Endoscopic diagnoses
   position: 20
   findings:
-    [
-      mst_dx_upper_achalasia,
-      mst_dx_upper_barretts_esophagus,
-      mst_dx_upper_benign_stricture,
-      mst_dx_upper_coeliac_disease,
-      mst_dx_upper_duodenal_ulcer,
-      mst_dx_upper_esophageal_cancer,
-      mst_dx_upper_esophageal_varices,
-      mst_dx_upper_gastric_cancer,
-      mst_dx_upper_gastric_ulcer,
-      mst_dx_upper_gastric_varices,
-      mst_dx_upper_reflux_esophagitis,
-    ]
+  - {finding: mst_dx_upper_achalasia, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_barretts_esophagus, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_benign_stricture, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_coeliac_disease, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_duodenal_ulcer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_esophageal_cancer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_esophageal_varices, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_gastric_cancer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_gastric_ulcer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_gastric_varices, required: false, multiple_allowed: true}
+  - {finding: mst_dx_upper_reflux_esophagitis, required: false, multiple_allowed: true}
 - model: report_template_section
   name: mst_egd_procedures_events
-  name_de: "ÖGD – Eingriffe und Ereignisse"
+  name_de: ÖGD – Eingriffe und Ereignisse
   title_de: Maßnahmen und unerwünschte Ereignisse
   title_en: Procedures and adverse events
   position: 30
   findings:
-    - {
-        finding: mst_luminal_procedure_summary,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_type, required: false },
-            { classification: mst_attr_result, required: false },
-          ],
-      }
-    - { finding: mst_event_intraprocedure_perforation }
-    - { finding: mst_event_intraprocedure_bleeding }
-    - { finding: mst_event_intraprocedure_cardiopulmonary }
-    - { finding: mst_event_postprocedure_abdominal_pain }
-    - { finding: mst_event_postprocedure_infection }
-    - { finding: mst_event_postprocedure_late_perforation }
-    - { finding: mst_event_postprocedure_late_bleeding }
-
-# Colonoscopy sections
+  - finding: mst_luminal_procedure_summary
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_attr_type, required: false}
+    - {classification: mst_attr_result, required: false}
+  - finding: mst_event_intraprocedure_perforation
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+    - {classification: mst_event_intraprocedure_perforation_communicating_to, required: false}
+    - {classification: mst_event_intraprocedure_perforation_type, required: false}
+  - finding: mst_event_intraprocedure_bleeding
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_excel_egd_location_c4d43cbf, required: false}
+  - finding: mst_event_intraprocedure_cardiopulmonary
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_intraprocedure_cardiopulmonary_type, required: false}
+    - {classification: mst_event_intraprocedure_cardiopulmonary_action, required: false}
+  - finding: mst_event_postprocedure_abdominal_pain
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_relation, required: false}
+  - finding: mst_event_postprocedure_infection
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_relation, required: false}
+  - finding: mst_event_postprocedure_late_perforation
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+  - finding: mst_event_postprocedure_late_bleeding
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+  - finding: mst_proc_luminal_sampling_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_sampling_details_lesion, required: false}
+    - {classification: mst_proc_luminal_sampling_details_type, required: false}
+    - {classification: mst_proc_luminal_sampling_details_final_reading, required: false}
+  - finding: mst_proc_luminal_balloon_dilation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_caliber, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_time, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_end_caliber, required: false}
+  - finding: mst_proc_luminal_bougie_dilation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_bougie_dilation_details_start_caliber, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_end_caliber, required: false}
+  - finding: mst_proc_luminal_band_ligation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_stent_number, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_injection_therapy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_injection_therapy_details_material, required: false}
+    - {classification: mst_proc_luminal_injection_therapy_details_volume, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_clipping_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_ercp_stent_number, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_cautery_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_apc_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_apc_details_gas_used, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_polypectomy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_polypectomy_details_method, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_injection, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_fluid, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_volume, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_hot_biopsy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_foreign_body_removal_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_emr_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_fluid, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_volume, required: false}
+    - {classification: mst_proc_luminal_emr_details_result, required: false}
+    - {classification: mst_proc_luminal_emr_details_specimen_size, required: false}
+  - finding: mst_proc_luminal_esd_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_fluid, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_volume, required: false}
+    - {classification: mst_proc_luminal_emr_details_result, required: false}
+    - {classification: mst_proc_luminal_emr_details_specimen_size, required: false}
+  - finding: mst_proc_luminal_stent_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_size, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_pre_dilation, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_peg_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_size, required: false}
+    - {classification: mst_proc_luminal_peg_placement_details_result, required: false}
+  - finding: mst_proc_luminal_tube_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_size, required: false}
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_transmural_drainage_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_transmural_drainage_details_method, required: false}
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_lesion, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_eus_guidance, required: false}
+    - {classification: mst_proc_luminal_injection_therapy_details_material, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_stents_placed, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_ablation_therapy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_ablation_therapy_details_settings, required: false}
 - model: report_template_section
   name: mst_colonoscopy_overview
-  name_de: "Koloskopie – Übersicht"
+  name_de: Koloskopie – Übersicht
   title_de: Untersuchungsübersicht
   title_en: Examination overview
   position: 0
   findings:
-    - {
-        finding: mst_colonoscopy_documentation_status,
-        required: true,
-        multiple_allowed: false,
-        concept_id: mst30.colonoscopy.documentation_status,
-        classifications:
-          [
-            {
-              classification: mst_attr_completeness,
-              required: true,
-              concept_id: mst30.colonoscopy.documentation_status.value,
-            },
-          ],
-      }
-    - { finding: mst_luminal_normal }
-    - {
-        finding: mst_luminal_stenosis,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_appearance, required: false },
-            { classification: mst_attr_length_cm, required: false },
-          ],
-      }
-    - {
-        finding: mst_luminal_diverticulum,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_number_category, required: false },
-            { classification: mst_attr_size_mm, required: false },
-          ],
-      }
-    - {
-        finding: mst_content_blood,
-        required: false,
-        multiple_allowed: false,
-        classifications:
-          [{ classification: mst_attr_blood_type, required: false }],
-      }
+  - finding: mst_colonoscopy_documentation_status
+    required: true
+    multiple_allowed: false
+    concept_id: mst30.colonoscopy.documentation_status
+    classifications:
+    - {classification: mst_attr_completeness, required: true, concept_id: mst30.colonoscopy.documentation_status.value}
+  - {finding: mst_luminal_normal}
+  - finding: mst_luminal_stenosis
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_luminal_stenosis_appearance, required: false}
+    - {classification: mst_luminal_stenosis_length, required: false}
+    - {classification: mst_luminal_stenosis_traversable, required: false}
+  - finding: mst_luminal_diverticulum
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_luminal_compression_size, required: false}
+    - {classification: mst_luminal_diverticulum_neck, required: false}
+    - {classification: mst_luminal_diverticulum_content, required: false}
+  - finding: mst_content_blood
+    required: false
+    multiple_allowed: false
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_content_blood_type, required: false}
 - model: report_template_section
   name: mst_colonoscopy_mucosa_and_lesions
-  name_de: "Koloskopie – Schleimhaut und Läsionen"
+  name_de: Koloskopie – Schleimhaut und Läsionen
   title_de: Mukosa und Läsionen
   title_en: Mucosa and lesions
   position: 10
   findings:
-    - {
-        finding: mst_mucosa_erythematous,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_distribution, required: false }],
-      }
-    - {
-        finding: mst_mucosa_edematous,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_distribution, required: false }],
-      }
-    - {
-        finding: mst_mucosa_granular,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_distribution, required: false }],
-      }
-    - {
-        finding: mst_mucosa_friable,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_distribution, required: false }],
-      }
-    - {
-        finding: mst_flat_angioectasia,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_bleeding, required: false }],
-      }
-    - {
-        finding: mst_protruding_polyp,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_kudo, required: false },
-            { classification: mst_paris, required: false },
-          ],
-      }
-    - {
-        finding: mst_protruding_tumor_mass,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_appearance, required: false },
-          ],
-      }
-    - {
-        finding: mst_protruding_hemorrhoids,
-        required: false,
-        multiple_allowed: true,
-        classifications: [{ classification: mst_goligher, required: false }],
-      }
-    - {
-        finding: mst_excavated_erosion,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_bleeding, required: false }],
-      }
-    - {
-        finding: mst_excavated_ulcer,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_size_mm, required: false }],
-      }
+  - finding: mst_mucosa_erythematous
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_edematous
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_granular
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_friable
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_flat_angioectasia
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_angioectasia_bleeding, required: false}
+  - finding: mst_protruding_polyp
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_protruding_polyp_shape, required: false}
+    - {classification: mst_kudo, required: false}
+    - {classification: mst_protruding_polyp_appearance, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_protruding_tumor_mass
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_flat_superficial_lesion_free_margins, required: false}
+    - {classification: mst_excel_paris_type_0_4, required: false}
+    - {classification: mst_jgca_superficial_neoplastic_lesions, required: false}
+    - {classification: mst_kudo, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_protruding_hemorrhoids
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_protruding_hemorrhoids_anatomical_location, required: false}
+    - {classification: mst_protruding_varices_number, required: false}
+    - {classification: mst_goligher, required: false}
+  - finding: mst_excavated_erosion
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_excavated_ulcer
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_protruding_varices_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_excavated_ulcer_depth, required: false}
+    - {classification: mst_excavated_ulcer_shape, required: false}
+    - {classification: mst_forrest, required: false}
 - model: report_template_section
   name: mst_colonoscopy_diagnoses
-  name_de: "Koloskopie – Diagnosen"
+  name_de: Koloskopie – Diagnosen
   title_de: Endoskopische Diagnosen
   title_en: Endoscopic diagnoses
   position: 20
   findings:
-    [
-      mst_dx_colon_angiodysplasia,
-      mst_dx_colon_colitis_ischemic,
-      mst_dx_colon_colitis_pseudomembranous,
-      mst_dx_colon_colorectal_cancer,
-      mst_dx_colon_colorectal_superficial_neoplasm,
-      mst_dx_colon_crohns_active,
-      mst_dx_colon_diverticulitis,
-      mst_dx_colon_diverticulosis,
-      mst_dx_colon_polyp,
-      mst_dx_colon_polyposis_syndrome,
-      mst_dx_colon_uc_active,
-    ]
+  - {finding: mst_dx_colon_angiodysplasia, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_colitis_ischemic, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_colitis_pseudomembranous, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_colorectal_cancer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_colorectal_superficial_neoplasm, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_crohns_active, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_diverticulitis, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_diverticulosis, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_polyp, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_polyposis_syndrome, required: false, multiple_allowed: true}
+  - {finding: mst_dx_colon_uc_active, required: false, multiple_allowed: true}
 - model: report_template_section
   name: mst_colonoscopy_procedures_events
-  name_de: "Koloskopie – Eingriffe und Ereignisse"
+  name_de: Koloskopie – Eingriffe und Ereignisse
   title_de: Maßnahmen und unerwünschte Ereignisse
   title_en: Procedures and adverse events
   position: 30
   findings:
-    [
-      mst_luminal_procedure_summary,
-      mst_event_intraprocedure_perforation,
-      mst_event_intraprocedure_bleeding,
-      mst_event_intraprocedure_cardiopulmonary,
-      mst_event_postprocedure_abdominal_pain,
-      mst_event_postprocedure_infection,
-      mst_event_postprocedure_late_perforation,
-      mst_event_postprocedure_late_bleeding,
-    ]
-
-# Enteroscopy and VCE sections
+  - {finding: mst_luminal_procedure_summary, required: false, multiple_allowed: true}
+  - finding: mst_event_intraprocedure_perforation
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+    - {classification: mst_event_intraprocedure_perforation_communicating_to, required: false}
+    - {classification: mst_event_intraprocedure_perforation_type, required: false}
+  - finding: mst_event_intraprocedure_bleeding
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_excel_colonoscopy_location_c61afd77, required: false}
+  - finding: mst_event_intraprocedure_cardiopulmonary
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_intraprocedure_cardiopulmonary_type, required: false}
+    - {classification: mst_event_intraprocedure_cardiopulmonary_action, required: false}
+  - finding: mst_event_postprocedure_abdominal_pain
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_relation, required: false}
+  - finding: mst_event_postprocedure_infection
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_relation, required: false}
+  - finding: mst_event_postprocedure_late_perforation
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+  - finding: mst_event_postprocedure_late_bleeding
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+  - finding: mst_proc_luminal_sampling_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_sampling_details_lesion, required: false}
+    - {classification: mst_proc_luminal_sampling_details_type, required: false}
+    - {classification: mst_proc_luminal_sampling_details_final_reading, required: false}
+  - finding: mst_proc_luminal_balloon_dilation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_caliber, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_time, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_end_caliber, required: false}
+  - finding: mst_proc_luminal_bougie_dilation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_bougie_dilation_details_start_caliber, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_end_caliber, required: false}
+  - finding: mst_proc_luminal_band_ligation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_stent_number, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_injection_therapy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_injection_therapy_details_material, required: false}
+    - {classification: mst_proc_luminal_injection_therapy_details_volume, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_clipping_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_ercp_stent_number, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_cautery_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_apc_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_apc_details_gas_used, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_polypectomy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_polypectomy_details_method, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_injection, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_fluid, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_volume, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_hot_biopsy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_foreign_body_removal_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_emr_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_fluid, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_volume, required: false}
+    - {classification: mst_proc_luminal_emr_details_result, required: false}
+    - {classification: mst_proc_luminal_emr_details_specimen_size, required: false}
+  - finding: mst_proc_luminal_esd_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_fluid, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_volume, required: false}
+    - {classification: mst_proc_luminal_emr_details_result, required: false}
+    - {classification: mst_proc_luminal_emr_details_specimen_size, required: false}
+  - finding: mst_proc_luminal_stent_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_size, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_pre_dilation, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_peg_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_size, required: false}
+    - {classification: mst_proc_luminal_peg_placement_details_result, required: false}
+  - finding: mst_proc_luminal_tube_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_size, required: false}
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_transmural_drainage_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_transmural_drainage_details_method, required: false}
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_lesion, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_eus_guidance, required: false}
+    - {classification: mst_proc_luminal_injection_therapy_details_material, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_stents_placed, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_ablation_therapy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_ablation_therapy_details_settings, required: false}
 - model: report_template_section
   name: mst_enteroscopy_overview
-  name_de: "Enteroskopie – Übersicht"
+  name_de: Enteroskopie – Übersicht
   title_de: Untersuchungsübersicht
   title_en: Examination overview
   position: 0
   findings:
-    [
-      mst_rf_enteroscopy_documentation_status,
-      mst_luminal_normal,
-      mst_luminal_stenosis,
-      mst_luminal_diverticulum,
-      mst_content_blood,
-    ]
+  - finding: mst_enteroscopy_documentation_status
+    required: true
+    multiple_allowed: false
+    concept_id: mst30.enteroscopy.documentation_status
+    classifications:
+    - {classification: mst_attr_completeness, required: true, concept_id: mst30.enteroscopy.documentation_status.value}
+  - {finding: mst_luminal_normal, required: false, multiple_allowed: true}
+  - finding: mst_luminal_stenosis
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_stenosis_anatomical_location, required: false}
+    - {classification: mst_luminal_stenosis_appearance, required: false}
+    - {classification: mst_luminal_stenosis_length, required: false}
+    - {classification: mst_luminal_stenosis_traversable, required: false}
+  - finding: mst_luminal_diverticulum
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_diverticulum_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_luminal_compression_size, required: false}
+    - {classification: mst_luminal_diverticulum_neck, required: false}
+    - {classification: mst_luminal_diverticulum_content, required: false}
+  - finding: mst_content_blood
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_content_blood_anatomical_location, required: false}
+    - {classification: mst_content_blood_type, required: false}
 - model: report_template_section
   name: mst_enteroscopy_findings
-  name_de: "Enteroskopie – Befunde"
+  name_de: Enteroskopie – Befunde
   title_de: Dünndarmbefunde
   title_en: Small-bowel findings
   position: 10
   findings:
-    [
-      mst_mucosa_erythematous,
-      mst_mucosa_edematous,
-      mst_mucosa_granular,
-      mst_mucosa_friable,
-      mst_mucosa_hemorrhagic,
-      mst_mucosa_atrophic,
-      mst_mucosa_scalloping,
-      mst_flat_angioectasia,
-      mst_protruding_polyp,
-      mst_protruding_tumor_mass,
-      mst_excavated_erosion,
-      mst_excavated_ulcer,
-    ]
+  - finding: mst_mucosa_erythematous
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_erythematous_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_edematous
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_edematous_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_granular
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_granular_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_friable
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_friable_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_hemorrhagic
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_hemorrhagic_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_atrophic
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_atrophic_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_scalloping
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_scalloping_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_flat_angioectasia
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_flat_angioectasia_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_angioectasia_bleeding, required: false}
+  - finding: mst_protruding_polyp
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_protruding_polyp_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_protruding_polyp_shape, required: false}
+    - {classification: mst_kudo, required: false}
+    - {classification: mst_protruding_polyp_appearance, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_protruding_tumor_mass
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_protruding_tumor_mass_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_flat_superficial_lesion_free_margins, required: false}
+    - {classification: mst_excel_paris_type_0_4, required: false}
+    - {classification: mst_jgca_superficial_neoplastic_lesions, required: false}
+    - {classification: mst_kudo, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_excavated_erosion
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excavated_erosion_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_excavated_ulcer
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excavated_ulcer_anatomical_location, required: false}
+    - {classification: mst_protruding_varices_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_excavated_ulcer_depth, required: false}
+    - {classification: mst_excavated_ulcer_shape, required: false}
+    - {classification: mst_forrest, required: false}
 - model: report_template_section
   name: mst_enteroscopy_diagnoses
-  name_de: "Enteroskopie – Diagnosen"
+  name_de: Enteroskopie – Diagnosen
   title_de: Endoskopische Diagnosen
   title_en: Endoscopic diagnoses
   position: 20
   findings:
-    [
-      mst_dx_enteroscopy_angioectasia,
-      mst_dx_enteroscopy_bleeding_unknown_origin,
-      mst_dx_enteroscopy_celiac_disease,
-      mst_dx_enteroscopy_crohns_disease,
-      mst_dx_enteroscopy_gist,
-      mst_dx_enteroscopy_lymphoma,
-      mst_dx_enteroscopy_nsaid_enteropathy,
-      mst_dx_enteroscopy_polyps,
-      mst_dx_enteroscopy_small_bowel_benign_tumor,
-      mst_dx_enteroscopy_small_bowel_malignant_tumor,
-      mst_dx_enteroscopy_ulcer,
-    ]
+  - {finding: mst_dx_enteroscopy_angioectasia, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_bleeding_unknown_origin, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_celiac_disease, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_crohns_disease, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_gist, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_lymphoma, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_nsaid_enteropathy, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_polyps, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_small_bowel_benign_tumor, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_small_bowel_malignant_tumor, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_ulcer, required: false, multiple_allowed: true}
 - model: report_template_section
   name: mst_enteroscopy_procedures_events
-  name_de: "Enteroskopie – Eingriffe und Ereignisse"
+  name_de: Enteroskopie – Eingriffe und Ereignisse
   title_de: Maßnahmen und unerwünschte Ereignisse
   title_en: Procedures and adverse events
   position: 30
   findings:
-    [
-      mst_luminal_procedure_summary,
-      mst_event_intraprocedure_perforation,
-      mst_event_intraprocedure_bleeding,
-      mst_event_postprocedure_abdominal_pain,
-      mst_event_postprocedure_infection,
-    ]
+  - {finding: mst_luminal_procedure_summary, required: false, multiple_allowed: true}
+  - finding: mst_event_intraprocedure_perforation
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_excel_enteroscopy_location_7e1deee1, required: false}
+    - {classification: mst_event_intraprocedure_perforation_communicating_to, required: false}
+    - {classification: mst_event_intraprocedure_perforation_type, required: false}
+  - finding: mst_event_intraprocedure_bleeding
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_excel_enteroscopy_location_7e1deee1, required: false}
+  - finding: mst_event_postprocedure_abdominal_pain
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_relation, required: false}
+  - finding: mst_event_postprocedure_infection
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_relation, required: false}
+  - finding: mst_proc_luminal_sampling_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_sampling_details_lesion, required: false}
+    - {classification: mst_proc_luminal_sampling_details_type, required: false}
+    - {classification: mst_proc_luminal_sampling_details_final_reading, required: false}
+  - finding: mst_proc_luminal_balloon_dilation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_caliber, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_time, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_end_caliber, required: false}
+  - finding: mst_proc_luminal_bougie_dilation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_bougie_dilation_details_start_caliber, required: false}
+    - {classification: mst_proc_luminal_balloon_dilation_details_end_caliber, required: false}
+  - finding: mst_proc_luminal_band_ligation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_stent_number, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_injection_therapy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_injection_therapy_details_material, required: false}
+    - {classification: mst_proc_luminal_injection_therapy_details_volume, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_clipping_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_ercp_stent_number, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_cautery_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_apc_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_apc_details_gas_used, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_polypectomy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_polypectomy_details_method, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_injection, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_fluid, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_volume, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_hot_biopsy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_foreign_body_removal_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_emr_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_fluid, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_volume, required: false}
+    - {classification: mst_proc_luminal_emr_details_result, required: false}
+    - {classification: mst_proc_luminal_emr_details_specimen_size, required: false}
+  - finding: mst_proc_luminal_esd_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_fluid, required: false}
+    - {classification: mst_proc_luminal_polypectomy_details_pre_inj_volume, required: false}
+    - {classification: mst_proc_luminal_emr_details_result, required: false}
+    - {classification: mst_proc_luminal_emr_details_specimen_size, required: false}
+  - finding: mst_proc_luminal_stent_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_size, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_pre_dilation, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_peg_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_size, required: false}
+    - {classification: mst_proc_luminal_peg_placement_details_result, required: false}
+  - finding: mst_proc_luminal_tube_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_stent_placement_details_size, required: false}
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_transmural_drainage_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_transmural_drainage_details_method, required: false}
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_lesion, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_eus_guidance, required: false}
+    - {classification: mst_proc_luminal_injection_therapy_details_material, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_stents_placed, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_luminal_ablation_therapy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_ablation_therapy_details_settings, required: false}
 - model: report_template_section
   name: mst_vce_overview
-  name_de: "Videokapselendoskopie – Übersicht"
+  name_de: Videokapselendoskopie – Übersicht
   title_de: Untersuchungsübersicht
   title_en: Examination overview
   position: 0
   findings:
-    [
-      mst_rf_vce_documentation_status,
-      mst_luminal_normal,
-      mst_luminal_stenosis,
-      mst_luminal_diverticulum,
-      mst_content_blood,
-    ]
+  - finding: mst_vce_documentation_status
+    required: true
+    multiple_allowed: false
+    concept_id: mst30.vce.documentation_status
+    classifications:
+    - {classification: mst_attr_completeness, required: true, concept_id: mst30.vce.documentation_status.value}
+  - {finding: mst_luminal_normal, required: false, multiple_allowed: true}
+  - finding: mst_luminal_stenosis
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_stenosis_anatomical_location, required: false}
+    - {classification: mst_luminal_stenosis_appearance, required: false}
+    - {classification: mst_luminal_stenosis_length, required: false}
+    - {classification: mst_luminal_stenosis_traversable, required: false}
+  - finding: mst_luminal_diverticulum
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_diverticulum_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_luminal_compression_size, required: false}
+    - {classification: mst_luminal_diverticulum_neck, required: false}
+    - {classification: mst_luminal_diverticulum_content, required: false}
+  - finding: mst_content_blood
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_content_blood_anatomical_location, required: false}
+    - {classification: mst_content_blood_type, required: false}
 - model: report_template_section
   name: mst_vce_findings
-  name_de: "Videokapselendoskopie – Befunde"
+  name_de: Videokapselendoskopie – Befunde
   title_de: Kapselendoskopische Befunde
   title_en: Capsule endoscopy findings
   position: 10
   findings:
-    [
-      mst_mucosa_erythematous,
-      mst_mucosa_edematous,
-      mst_mucosa_granular,
-      mst_mucosa_friable,
-      mst_mucosa_hemorrhagic,
-      mst_mucosa_atrophic,
-      mst_mucosa_scalloping,
-      mst_flat_angioectasia,
-      mst_protruding_polyp,
-      mst_protruding_tumor_mass,
-      mst_excavated_erosion,
-      mst_excavated_ulcer,
-    ]
+  - finding: mst_mucosa_erythematous
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_erythematous_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_edematous
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_edematous_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_granular
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_granular_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_friable
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_friable_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_hemorrhagic
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_hemorrhagic_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_atrophic
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_atrophic_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_mucosa_scalloping
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_mucosa_scalloping_anatomical_location, required: false}
+    - {classification: mst_mucosa_erythematous_distribution, required: false}
+  - finding: mst_flat_angioectasia
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_flat_angioectasia_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_angioectasia_bleeding, required: false}
+  - finding: mst_protruding_polyp
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_protruding_polyp_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_protruding_polyp_shape, required: false}
+    - {classification: mst_kudo, required: false}
+    - {classification: mst_protruding_polyp_appearance, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_protruding_tumor_mass
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_protruding_tumor_mass_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_flat_superficial_lesion_free_margins, required: false}
+    - {classification: mst_excel_paris_type_0_4, required: false}
+    - {classification: mst_jgca_superficial_neoplastic_lesions, required: false}
+    - {classification: mst_kudo, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_excavated_erosion
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excavated_erosion_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_flat_superficial_lesion_bleeding, required: false}
+  - finding: mst_excavated_ulcer
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_excavated_ulcer_anatomical_location, required: false}
+    - {classification: mst_protruding_varices_number, required: false}
+    - {classification: mst_flat_ectopic_gastric_mucosa_size, required: false}
+    - {classification: mst_excavated_ulcer_depth, required: false}
+    - {classification: mst_excavated_ulcer_shape, required: false}
+    - {classification: mst_forrest, required: false}
 - model: report_template_section
   name: mst_vce_diagnoses
-  name_de: "Videokapselendoskopie – Diagnosen"
+  name_de: Videokapselendoskopie – Diagnosen
   title_de: Endoskopische Diagnosen
   title_en: Endoscopic diagnoses
   position: 20
   findings:
-    [
-      mst_dx_enteroscopy_angioectasia,
-      mst_dx_enteroscopy_bleeding_unknown_origin,
-      mst_dx_enteroscopy_celiac_disease,
-      mst_dx_enteroscopy_crohns_disease,
-      mst_dx_enteroscopy_nsaid_enteropathy,
-      mst_dx_enteroscopy_polyps,
-      mst_dx_enteroscopy_small_bowel_benign_tumor,
-      mst_dx_enteroscopy_small_bowel_malignant_tumor,
-      mst_dx_enteroscopy_ulcer,
-    ]
-
-# ERCP sections
+  - {finding: mst_dx_enteroscopy_angioectasia, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_bleeding_unknown_origin, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_celiac_disease, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_crohns_disease, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_nsaid_enteropathy, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_polyps, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_small_bowel_benign_tumor, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_small_bowel_malignant_tumor, required: false, multiple_allowed: true}
+  - {finding: mst_dx_enteroscopy_ulcer, required: false, multiple_allowed: true}
 - model: report_template_section
   name: mst_ercp_overview
-  name_de: "ERCP – Übersicht"
+  name_de: ERCP – Übersicht
   title_de: Untersuchungsübersicht
   title_en: Examination overview
   position: 0
   findings:
-    [
-      mst_rf_ercp_documentation_status,
-      mst_ercp_papillary_features,
-      mst_ercp_pancreas_divisum,
-      mst_ercp_pancreas_annulare,
-      mst_ercp_common_channel,
-    ]
+  - finding: mst_ercp_documentation_status
+    required: true
+    multiple_allowed: false
+    concept_id: mst30.ercp.documentation_status
+    classifications:
+    - {classification: mst_attr_completeness, required: true, concept_id: mst30.ercp.documentation_status.value}
+  - finding: mst_ercp_papillary_features
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_papillary_features_anatomical_location, required: false}
+    - {classification: mst_ercp_papillary_features_location, required: false}
+    - {classification: mst_ercp_papillary_features_appearance, required: false}
+    - {classification: mst_ercp_papillary_features_output, required: false}
+  - finding: mst_ercp_pancreas_divisum
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_pancreas_divisum_anatomical_location, required: false}
+    - {classification: mst_ercp_pancreas_divisum_type, required: false}
+  - finding: mst_ercp_pancreas_annulare
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_pancreas_annulare_anatomical_location, required: false}
+  - finding: mst_ercp_common_channel
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_common_channel_length, required: false}
 - model: report_template_section
   name: mst_ercp_ductal_findings
-  name_de: "ERCP – Gangbefunde"
+  name_de: ERCP – Gangbefunde
   title_de: Gangbefunde
   title_en: Ductal findings
   position: 10
   findings:
-    - { finding: mst_ercp_irregularity }
-    - { finding: mst_ercp_dilation }
-    - {
-        finding: mst_ercp_stenosis,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_type, required: false },
-          ],
-      }
-    - {
-        finding: mst_ercp_stone,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_number_category, required: false },
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_yes_no_unknown, required: false },
-          ],
-      }
-    - {
-        finding: mst_ercp_tumor,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_type, required: false },
-            { classification: mst_bismuth, required: false },
-          ],
-      }
-    - { finding: mst_ercp_cavity }
-    - { finding: mst_ercp_fistula }
-    - { finding: mst_ercp_leak }
-    - { finding: mst_ercp_stent }
-    - { finding: mst_ercp_filling_defects }
+  - finding: mst_ercp_irregularity
+    classifications:
+    - {classification: mst_ercp_irregularity_anatomical_location, required: false}
+    - {classification: mst_protruding_enlarged_folds_distribution, required: false}
+  - finding: mst_ercp_dilation
+    classifications:
+    - {classification: mst_ercp_dilation_anatomical_location, required: false}
+    - {classification: mst_ercp_dilation_type, required: false}
+  - finding: mst_ercp_stenosis
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_stenosis_anatomical_location, required: false}
+    - {classification: mst_ercp_stenosis_length, required: false}
+    - {classification: mst_ercp_stenosis_degree, required: false}
+    - {classification: mst_ercp_stenosis_type, required: false}
+  - finding: mst_ercp_stone
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_stone_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_ercp_stone_size, required: false}
+    - {classification: mst_ercp_stone_obstructing, required: false}
+  - finding: mst_ercp_tumor
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_ercp_tumor_anatomical_location, required: false}
+    - {classification: mst_ercp_tumor_type, required: false}
+    - {classification: mst_ercp_tumor_obstructing, required: false}
+    - {classification: mst_bismuth, required: false}
+  - finding: mst_ercp_cavity
+    classifications:
+    - {classification: mst_ercp_cavity_anatomical_location, required: false}
+    - {classification: mst_luminal_diverticulum_number, required: false}
+    - {classification: mst_ercp_cavity_size, required: false}
+  - finding: mst_ercp_fistula
+    classifications:
+    - {classification: mst_ercp_fistula_anatomical_location, required: false}
+    - {classification: mst_ercp_fistula_communicating_structure, required: false}
+  - finding: mst_ercp_leak
+    classifications:
+    - {classification: mst_ercp_leak_anatomical_location, required: false}
+    - {classification: mst_ercp_leak_degree, required: false}
+  - finding: mst_ercp_stent
+    classifications:
+    - {classification: mst_ercp_stent_anatomical_location, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_ercp_stent_number, required: false}
+    - {classification: mst_ercp_stent_migrated, required: false}
+  - finding: mst_ercp_filling_defects
+    classifications:
+    - {classification: mst_ercp_filling_defects_anatomical_location, required: false}
+    - {classification: mst_ercp_filling_defects_type, required: false}
 - model: report_template_section
   name: mst_ercp_diagnoses
-  name_de: "ERCP – Diagnosen"
+  name_de: ERCP – Diagnosen
   title_de: Endoskopische Diagnosen
   title_en: Endoscopic diagnoses
   position: 20
   findings:
-    [
-      mst_dx_ercp_abnormal_pancreatobiliary_junction,
-      mst_dx_ercp_biliary_fistula_leak,
-      mst_dx_ercp_biliary_stones,
-      mst_dx_ercp_biliary_stricture,
-      mst_dx_ercp_choledochal_cyst,
-      mst_dx_ercp_choledochocele,
-      mst_dx_ercp_pancreatic_duct_stricture,
-      mst_dx_ercp_pancreatic_stone,
-      mst_dx_ercp_pancreatic_tumor,
-      mst_dx_ercp_primary_sclerosing_cholangitis,
-    ]
+  - {finding: mst_dx_ercp_abnormal_pancreatobiliary_junction, required: false, multiple_allowed: true}
+  - {finding: mst_dx_ercp_biliary_fistula_leak, required: false, multiple_allowed: true}
+  - {finding: mst_dx_ercp_biliary_stones, required: false, multiple_allowed: true}
+  - {finding: mst_dx_ercp_biliary_stricture, required: false, multiple_allowed: true}
+  - {finding: mst_dx_ercp_choledochal_cyst, required: false, multiple_allowed: true}
+  - {finding: mst_dx_ercp_choledochocele, required: false, multiple_allowed: true}
+  - {finding: mst_dx_ercp_pancreatic_duct_stricture, required: false, multiple_allowed: true}
+  - {finding: mst_dx_ercp_pancreatic_stone, required: false, multiple_allowed: true}
+  - {finding: mst_dx_ercp_pancreatic_tumor, required: false, multiple_allowed: true}
+  - {finding: mst_dx_ercp_primary_sclerosing_cholangitis, required: false, multiple_allowed: true}
 - model: report_template_section
   name: mst_ercp_procedures_events
-  name_de: "ERCP – Eingriffe und Ereignisse"
+  name_de: ERCP – Eingriffe und Ereignisse
   title_de: Maßnahmen und unerwünschte Ereignisse
   title_en: Procedures and adverse events
   position: 30
   findings:
-    [
-      mst_ercp_procedure_summary,
-      mst_event_intraprocedure_perforation,
-      mst_event_intraprocedure_bleeding,
-      mst_event_intraprocedure_cardiopulmonary,
-      mst_event_postprocedure_infection,
-      mst_event_postprocedure_late_perforation,
-      mst_event_postprocedure_late_bleeding,
-      mst_event_postprocedure_pancreatitis,
-    ]
-
-# EUS sections
+  - {finding: mst_ercp_procedure_summary, required: false, multiple_allowed: true}
+  - finding: mst_event_intraprocedure_perforation
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_excel_ercp_location_071d1190, required: false}
+    - {classification: mst_event_intraprocedure_perforation_communicating_to, required: false}
+    - {classification: mst_event_intraprocedure_perforation_type, required: false}
+  - finding: mst_event_intraprocedure_bleeding
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_excel_ercp_location_071d1190, required: false}
+  - finding: mst_event_intraprocedure_cardiopulmonary
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_intraprocedure_cardiopulmonary_type, required: false}
+    - {classification: mst_event_intraprocedure_cardiopulmonary_action, required: false}
+  - finding: mst_event_postprocedure_infection
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_relation, required: false}
+  - finding: mst_event_postprocedure_late_perforation
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+  - finding: mst_event_postprocedure_late_bleeding
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+  - finding: mst_event_postprocedure_pancreatitis
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+  - finding: mst_proc_ercp_cannulation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_ercp_cannulation_details_biliary, required: false}
+    - {classification: mst_proc_ercp_cannulation_details_pancreatic, required: false}
+    - {classification: mst_proc_ercp_cannulation_details_minor_papilla, required: false}
+  - finding: mst_proc_ercp_opacification_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_ercp_opacification_details_biliary, required: false}
+    - {classification: mst_proc_ercp_opacification_details_pancreatic, required: false}
+  - finding: mst_proc_ercp_papillotomy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_ercp_papillotomy_details_type, required: false}
+    - {classification: mst_proc_ercp_papillotomy_details_tool, required: false}
+    - {classification: mst_proc_ercp_papillotomy_details_duct, required: false}
+  - finding: mst_proc_ercp_balloon_dilatation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_ercp_balloon_dilatation_details_balloon_caliber, required: false}
+    - {classification: mst_proc_ercp_balloon_dilatation_details_end_caliber, required: false}
+  - finding: mst_proc_ercp_bougie_dilatation_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_ercp_bougie_dilatation_details_bougie_caliber, required: false}
+    - {classification: mst_proc_ercp_bougie_dilatation_details_result_caliber, required: false}
+  - finding: mst_proc_ercp_stone_extraction_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_ercp_stone_extraction_details_method, required: false}
+    - {classification: mst_proc_ercp_stone_extraction_details_fragmentation, required: false}
+    - {classification: mst_proc_ercp_stone_extraction_details_result, required: false}
+  - finding: mst_proc_ercp_stent_placement_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_ercp_stent_number, required: false}
+    - {classification: mst_proc_ercp_stent_placement_details_size_caliber, required: false}
+  - finding: mst_proc_ercp_stent_removal_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_ercp_stent_removal_details_category, required: false}
+    - {classification: mst_proc_luminal_foreign_body_removal_details_tool, required: false}
+    - {classification: mst_proc_luminal_peg_placement_details_result, required: false}
+  - finding: mst_proc_ercp_hemostasis_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_ercp_hemostasis_details_method, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
 - model: report_template_section
   name: mst_eus_overview
-  name_de: "Endosonographie – Übersicht"
+  name_de: Endosonographie – Übersicht
   title_de: Untersuchungsübersicht
   title_en: Examination overview
   position: 0
   findings:
-    [
-      mst_rf_eus_documentation_status,
-      mst_eus_wall_thickening,
-      mst_eus_stricture,
-      mst_eus_ascites,
-    ]
+  - finding: mst_eus_documentation_status
+    required: true
+    multiple_allowed: false
+    concept_id: mst30.eus.documentation_status
+    classifications:
+    - {classification: mst_attr_completeness, required: true, concept_id: mst30.eus.documentation_status.value}
+  - finding: mst_eus_wall_thickening
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_eus_wall_thickening_anatomical_location, required: false}
+    - {classification: mst_eus_intramural_lesion_layer_origin, required: false}
+    - {classification: mst_eus_intramural_lesion_size_mm, required: false}
+    - {classification: mst_eus_intramural_lesion_echofeatures, required: false}
+  - finding: mst_eus_stricture
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_eus_stricture_anatomical_location, required: false}
+    - {classification: mst_eus_mass_t_stage, required: false}
+    - {classification: mst_eus_mass_n_stage, required: false}
+    - {classification: mst_eus_varices_degree, required: false}
+  - finding: mst_eus_ascites
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_eus_ascites_anatomical_location, required: false}
+    - {classification: mst_eus_varices_degree, required: false}
 - model: report_template_section
   name: mst_eus_lesions
-  name_de: "Endosonographie – Läsionen"
+  name_de: Endosonographie – Läsionen
   title_de: Läsionen und Organbefunde
   title_en: Lesions and organ findings
   position: 10
   findings:
-    - {
-        finding: mst_eus_intramural_lesion,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_type, required: false },
-          ],
-      }
-    - {
-        finding: mst_eus_polyp,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_size_mm, required: false }],
-      }
-    - {
-        finding: mst_eus_mass,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_type, required: false },
-          ],
-      }
-    - {
-        finding: mst_eus_lymph_nodes,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_count, required: false },
-            { classification: mst_attr_type, required: false },
-          ],
-      }
-    - {
-        finding: mst_eus_extramural_mass,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [{ classification: mst_attr_size_mm, required: false }],
-      }
-    - {
-        finding: mst_eus_cyst,
-        required: false,
-        multiple_allowed: true,
-        classifications:
-          [
-            { classification: mst_attr_size_mm, required: false },
-            { classification: mst_attr_type, required: false },
-          ],
-      }
-    - { finding: mst_eus_parenchymal_changes }
-    - { finding: mst_eus_pancreatic_duct_changes }
-    - { finding: mst_eus_bile_duct_changes }
-    - { finding: mst_eus_cholelithiasis }
+  - finding: mst_eus_intramural_lesion
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_eus_intramural_lesion_anatomical_location, required: false}
+    - {classification: mst_eus_intramural_lesion_layer_origin, required: false}
+    - {classification: mst_eus_intramural_lesion_outer_limit, required: false}
+    - {classification: mst_eus_intramural_lesion_size_mm, required: false}
+    - {classification: mst_eus_intramural_lesion_shape_character, required: false}
+    - {classification: mst_eus_intramural_lesion_margins, required: false}
+    - {classification: mst_eus_intramural_lesion_echofeatures, required: false}
+    - {classification: mst_eus_intramural_lesion_invasion_ext, required: false}
+    - {classification: mst_eus_intramural_lesion_invasion_into, required: false}
+  - finding: mst_eus_polyp
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_eus_polyp_anatomical_location, required: false}
+    - {classification: mst_eus_intramural_lesion_layer_origin, required: false}
+    - {classification: mst_eus_intramural_lesion_size_mm, required: false}
+    - {classification: mst_eus_polyp_shape_character, required: false}
+    - {classification: mst_eus_intramural_lesion_margins, required: false}
+    - {classification: mst_eus_intramural_lesion_echofeatures, required: false}
+  - finding: mst_eus_mass
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_eus_mass_anatomical_location, required: false}
+    - {classification: mst_eus_mass_origin, required: false}
+    - {classification: mst_eus_intramural_lesion_layer_origin, required: false}
+    - {classification: mst_eus_intramural_lesion_outer_limit, required: false}
+    - {classification: mst_eus_intramural_lesion_size_mm, required: false}
+    - {classification: mst_eus_mass_shape_character, required: false}
+    - {classification: mst_eus_intramural_lesion_margins, required: false}
+    - {classification: mst_eus_mass_echofeatures, required: false}
+    - {classification: mst_eus_intramural_lesion_invasion_ext, required: false}
+    - {classification: mst_eus_intramural_lesion_invasion_into, required: false}
+    - {classification: mst_eus_mass_t_stage, required: false}
+    - {classification: mst_eus_mass_n_stage, required: false}
+  - finding: mst_eus_lymph_nodes
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_eus_lymph_nodes_anatomical_location, required: false}
+    - {classification: mst_eus_intramural_lesion_size_mm, required: false}
+    - {classification: mst_eus_lymph_nodes_shape_character, required: false}
+    - {classification: mst_eus_intramural_lesion_margins, required: false}
+    - {classification: mst_eus_lymph_nodes_echofeatures, required: false}
+    - {classification: mst_protruding_varices_number, required: false}
+  - finding: mst_eus_extramural_mass
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_eus_extramural_mass_anatomical_location, required: false}
+    - {classification: mst_eus_mass_origin, required: false}
+    - {classification: mst_eus_intramural_lesion_size_mm, required: false}
+    - {classification: mst_eus_extramural_mass_shape_character, required: false}
+    - {classification: mst_eus_intramural_lesion_margins, required: false}
+    - {classification: mst_eus_extramural_mass_echofeatures, required: false}
+    - {classification: mst_eus_intramural_lesion_invasion_ext, required: false}
+    - {classification: mst_eus_intramural_lesion_invasion_into, required: false}
+    - {classification: mst_eus_mass_t_stage, required: false}
+    - {classification: mst_eus_mass_n_stage, required: false}
+  - finding: mst_eus_cyst
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_eus_cyst_anatomical_location, required: false}
+    - {classification: mst_eus_intramural_lesion_size_mm, required: false}
+    - {classification: mst_eus_cyst_shape_character, required: false}
+    - {classification: mst_eus_intramural_lesion_margins, required: false}
+    - {classification: mst_eus_cyst_cyst_features, required: false}
+  - finding: mst_eus_parenchymal_changes
+    classifications:
+    - {classification: mst_eus_parenchymal_changes_anatomical_location, required: false}
+    - {classification: mst_eus_parenchymal_changes_shape_character, required: false}
+    - {classification: mst_eus_parenchymal_changes_echofeatures, required: false}
+    - {classification: mst_eus_varices_degree, required: false}
+  - finding: mst_eus_pancreatic_duct_changes
+    classifications:
+    - {classification: mst_eus_pancreatic_duct_changes_anatomical_location, required: false}
+    - {classification: mst_eus_calcification_shape_character, required: false}
+    - {classification: mst_eus_varices_degree, required: false}
+    - {classification: mst_eus_pancreatic_duct_changes_duct_changes, required: false}
+  - finding: mst_eus_bile_duct_changes
+    classifications:
+    - {classification: mst_eus_bile_duct_changes_anatomical_location, required: false}
+    - {classification: mst_eus_pancreatic_duct_changes_duct_changes, required: false}
+  - finding: mst_eus_cholelithiasis
+    classifications:
+    - {classification: mst_eus_cholelithiasis_anatomical_location, required: false}
+    - {classification: mst_eus_intramural_lesion_size_mm, required: false}
+    - {classification: mst_eus_cholelithiasis_echofeatures, required: false}
+    - {classification: mst_protruding_varices_number, required: false}
 - model: report_template_section
   name: mst_eus_diagnoses
-  name_de: "Endosonographie – Diagnosen"
+  name_de: Endosonographie – Diagnosen
   title_de: Endoskopische Diagnosen
   title_en: Endoscopic diagnoses
   position: 20
   findings:
-    [
-      mst_dx_eus_bile_duct_stone,
-      mst_dx_eus_bile_duct_stricture,
-      mst_dx_eus_bile_duct_tumor,
-      mst_dx_eus_colorectal_cancer,
-      mst_dx_eus_duodenal_cancer,
-      mst_dx_eus_esophageal_cancer,
-      mst_dx_eus_gastric_cancer,
-      mst_dx_eus_gist_tumor,
-      mst_dx_eus_mediastinal_lymph_nodes,
-      mst_dx_eus_pancreatic_cancer,
-      mst_dx_eus_pancreatic_mass,
-      mst_dx_eus_pancreatic_pseudocyst,
-      mst_dx_eus_pancreatitis_chronic,
-    ]
+  - {finding: mst_dx_eus_bile_duct_stone, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_bile_duct_stricture, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_bile_duct_tumor, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_colorectal_cancer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_duodenal_cancer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_esophageal_cancer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_gastric_cancer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_gist_tumor, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_mediastinal_lymph_nodes, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_pancreatic_cancer, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_pancreatic_mass, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_pancreatic_pseudocyst, required: false, multiple_allowed: true}
+  - {finding: mst_dx_eus_pancreatitis_chronic, required: false, multiple_allowed: true}
 - model: report_template_section
   name: mst_eus_procedures_events
-  name_de: "Endosonographie – Eingriffe und Ereignisse"
+  name_de: Endosonographie – Eingriffe und Ereignisse
   title_de: Maßnahmen und unerwünschte Ereignisse
   title_en: Procedures and adverse events
   position: 30
   findings:
-    [
-      mst_eus_procedure_summary,
-      mst_event_intraprocedure_perforation,
-      mst_event_intraprocedure_bleeding,
-      mst_event_intraprocedure_cardiopulmonary,
-      mst_event_postprocedure_abdominal_pain,
-      mst_event_postprocedure_infection,
-    ]
-
-# Runtime validators
+  - {finding: mst_eus_procedure_summary, required: false, multiple_allowed: true}
+  - finding: mst_event_intraprocedure_perforation
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_intraprocedure_perforation_location, required: false}
+    - {classification: mst_event_intraprocedure_perforation_communicating_to, required: false}
+    - {classification: mst_event_intraprocedure_perforation_type, required: false}
+  - finding: mst_event_intraprocedure_bleeding
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_intraprocedure_bleeding_location, required: false}
+  - finding: mst_event_intraprocedure_cardiopulmonary
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_intraprocedure_cardiopulmonary_type, required: false}
+    - {classification: mst_event_intraprocedure_cardiopulmonary_action, required: false}
+  - finding: mst_event_postprocedure_abdominal_pain
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_relation, required: false}
+  - finding: mst_event_postprocedure_infection
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_event_severity, required: false}
+    - {classification: mst_event_outcome, required: false}
+    - {classification: mst_luminal_previous_surgery_type, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_date_of_onset, required: false}
+    - {classification: mst_event_postprocedure_cardiopulmonary_relation, required: false}
+  - finding: mst_proc_eus_fna_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_eus_fna_details_needle, required: false}
+    - {classification: mst_proc_eus_fna_details_passes, required: false}
+    - {classification: mst_proc_eus_fna_details_volume, required: false}
+    - {classification: mst_proc_eus_fna_details_appearance, required: false}
+    - {classification: mst_proc_eus_fna_details_analysis, required: false}
+  - finding: mst_proc_eus_thru_cut_biopsy_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_eus_fna_details_needle, required: false}
+    - {classification: mst_proc_eus_fna_details_passes, required: false}
+  - finding: mst_proc_eus_celiac_plexus_block_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_eus_celiac_plexus_block_details_injection_material, required: false}
+    - {classification: mst_proc_eus_celiac_plexus_block_details_volume, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_eus_contrast_injection_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_tube_placement_details_location, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
+  - finding: mst_proc_eus_duct_drainage_details
+    required: false
+    multiple_allowed: true
+    classifications:
+    - {classification: mst_proc_luminal_transmural_drainage_details_method, required: false}
+    - {classification: mst_proc_luminal_transmural_drainage_details_stents_placed, required: false}
+    - {classification: mst_proc_luminal_band_ligation_details_result, required: false}
 - {
     model: findings_validator,
     name: mst_egd_documentation_status_documented,

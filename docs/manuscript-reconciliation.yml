@@ -4,7 +4,8 @@ command: uv run python scripts/revise_lxdm_manuscript.py 'LXDM_revised_draft_v3(
 review_note: This is a separate editorial draft for author review, not a renewed clinical-source audit.
   Modified paragraphs adopt their first text run formatting; untouched DOCX parts are preserved. Review
   layout and remaining study claims before submission. Exact paragraph matching rejects changed input
-  rather than silently applying edits elsewhere.
+  rather than silently applying edits elsewhere. Current MST counts use the workbook-imported artifact;
+  the screening denominator and search year remain author-review items.
 replacements:
 - find: 'Methods: Using upper gastrointestinal endoscopy as a reference application, we operationalized
     the ESGE STAR recommendations into an entry-validated KnowledgeBase (Pydantic, Django; GitHub/PyPI),
@@ -28,14 +29,15 @@ replacements:
   replace: 'Results: Datasets are created, validated, stored, and exchanged as structured files and SQL
     objects, each carrying the KnowledgeBase used to interpret it. The STAR-derived KnowledgeBase for
     gastroscopy reports comprises 22 findings, 21 classifications, and 79 classification choices in the
-    repaired publication artifact; the packaged MST 3.0 KnowledgeBase comprises 357 findings, 39 classifications,
-    and 285 classification choices across five procedure types, with full referential integrity confirmed.
+    repaired publication artifact; the packaged MST 3.0 KnowledgeBase comprises 389 findings, 293 classifications,
+    and 546 classification choices across five procedure types, with full referential integrity confirmed.
     Screening 206 PubMed-indexed endoscopy data-sharing records showed only 0.5% with a FHIR/openEHR-structured
     representation. A runnable demonstration shows versioned KnowledgeBaseConfig modules applying an illustrative
     binary size grouping and a grouping based on ESGE 2024 size categories to the same measurement without
     altering how it was recorded.'
   matches: 1
-  rationale: Match the artifacts and distinguish the illustrative comparator from a guideline release.
+  rationale: Reconcile the current executable MST inventory and workbook provenance; preserve historical
+    source distinctions.
 - find: 'Professional societies have long attempted to standardize the clinical content of gastrointestinal
     endoscopy reports, from the Minimal Standard Terminology’s common vocabulary for indications, findings,
     diagnoses, and interventions onward9–12, most recently in the European Society of Gastrointestinal
@@ -90,14 +92,16 @@ replacements:
     — across all 957 module entries. Gaps identified were closed without changing any existing internal
     identifier, preserving backward compatibility with prior report-template references (Section 3.4).
   replace: 'To assess applicability beyond the STAR terminology, we loaded the independently authored
-    MST 3.0 module through the same data-model infrastructure, validated its complete core reference graph,
-    and recorded its executable concept inventory. We also reconciled the MST additions in PR #32 with
-    the packaged source and checked the draft’s attribution of adverse-event severity to the official
-    source’s section 7.3. These checks establish structural consistency and targeted source correspondence;
-    they do not establish an exhaustive independent clinical terminology audit. The reconciliation inventory
-    records the compared PR commit and exact source-prefix hashes.'
+    MST 3.0 module through the same data-model infrastructure, validated its core reference graph, and
+    recorded its executable concept inventory. After the earlier PR #32 reconciliation, the current artifact
+    incorporated the supplied mst30_tables(1).xls workbook using an explicit import specification and
+    cell-level provenance. The workbook SHA-256 is f4cf8e2fb50b74d9910295974b96f34c5bcb2813a8eb55796fb9e4ced5b98564.
+    Its adverse-event severity table is on the "Adv event severity" sheet, not in PDF section 7.3. These
+    checks establish structural consistency and traceable source mapping; they do not establish an exhaustive
+    independent clinical terminology audit.'
   matches: 1
-  rationale: Replace the unsubstantiated sheet-by-sheet audit and 957-entry claim with the performed checks.
+  rationale: Reconcile the current executable MST inventory and workbook provenance; preserve historical
+    source distinctions.
 - find: The KnowledgeBaseConfig module “star_upper_gi” implements the Examination “star_upper_gi_endoscopy”
     (gastroscopy) with its associated Findings, Classifications, ClassificationChoices, and ClassificationChoiceDescriptors
     — for example, the Paris classification for the finding “polyp” (Supplementary Figure S2, Supplementary
@@ -135,24 +139,28 @@ replacements:
     The resulting knowledge base comprises 357 findings, 40 classifications, 290 classification choices,
     142 indications, 44 interventions, and 12 examinations (Table 3), with full referential integrity
     confirmed.'
-  replace: 'The packaged MST 3.0 artifact (mst_3_0@3.0.0) contains 357 findings, 39 classifications, 285
-    classification choices, 142 indications, 40 interventions, and 12 examinations (Table 3). Its core
-    references validate successfully. The two MST source additions in PR #32 are already present byte-for-byte
-    as prefixes of the existing files and do not supply additional concepts. A targeted check of the WEO
-    document dated 03.08.2016 shows that section 7.3 on page 41 describes actions and outcomes, not the
-    five-level adverse-event severity classification attributed to it in the earlier draft. No such severity
-    extension was added to make counts match that draft. Any separately sourced extension requires explicit
-    provenance and a new artifact identity.'
+  replace: 'The current packaged MST 3.0 artifact (mst_3_0@3.0.0) contains 389 findings, 293 classifications,
+    546 classification choices, 142 indications, 40 interventions, and 12 examinations (Table 3). Its
+    core references validate successfully. These counts supersede the earlier PR #32 inventory following
+    the import of mst30_tables(1).xls. The five-level adverse-event severity classification is sourced
+    from the workbook sheet "Adv event severity", cells B3:F17, rather than PDF section 7.3. The import
+    specification and cell-level provenance are recorded in scripts/mst/import.yml and lx_dtypes/data/terminology/mst_3_0_terminology/excel_source.yml.
+    This was an explicitly recorded in-place correction: the module/version label is unchanged but package
+    content digests change. Retain the exact artifact digest when reproducing these counts. Source ambiguities,
+    including exactly three hospitalization nights, were not resolved by inventing thresholds.'
   matches: 1
-  rationale: Use verified counts and correct the source attribution without inventing clinical entries.
+  rationale: Reconcile the current executable MST inventory and workbook provenance; preserve historical
+    source distinctions.
 - find: '40'
-  replace: '39'
+  replace: '293'
   matches: 1
-  rationale: Align Table 3 with the executable MST inventory.
+  rationale: Reconcile the current executable MST inventory and workbook provenance; preserve historical
+    source distinctions.
 - find: '290'
-  replace: '285'
+  replace: '546'
   matches: 1
-  rationale: Align Table 3 with the executable MST inventory.
+  rationale: Reconcile the current executable MST inventory and workbook provenance; preserve historical
+    source distinctions.
 - find: '44'
   replace: '40'
   matches: 1
@@ -265,3 +273,27 @@ replacements:
   matches: 1
   rationale: Keep limitations and conclusions consistent with the performed validation rather than an
     unverified exhaustive audit.
+- find: '357'
+  replace: '389'
+  matches: 1
+  rationale: Align the Table 3 findings count with the current workbook-imported artifact.
+- find: 'We searched PubMed on the 6th of August with the search string by combining terms for gastrointestinal
+    endoscopy with terms for data and reporting. The complete mapped terms with Boolean operators is provided
+    in Appendix 1. We looked for English-language full-text publications reporting or sharing gastrointestinal
+    endoscopy datasets, screened [206] records, excluded commentary and corrigendum records and coded
+    each of the resulting 196 unique records for the data format(s) and reusable model artifacts documented
+    in the source publication or its linked repository: PDF/text description, in-article table, image,
+    video, plain CSV export, SQL/EMR/OMOP-linked resource, and JSON/XML/YAML/FHIR- or openEHR-structured
+    representation. Results are reported in Section 3.1.'
+  replace: 'We searched PubMed on the 6th of August with the search string by combining terms for gastrointestinal
+    endoscopy with terms for data and reporting. The complete mapped terms with Boolean operators is provided
+    in Appendix 1. We looked for English-language full-text publications reporting or sharing gastrointestinal
+    endoscopy datasets, screened [206] records, excluded commentary and corrigendum records and coded
+    each of the resulting 196 unique records for the data format(s) and reusable model artifacts documented
+    in the source publication or its linked repository: PDF/text description, in-article table, image,
+    video, plain CSV export, SQL/EMR/OMOP-linked resource, and JSON/XML/YAML/FHIR- or openEHR-structured
+    representation. Results are reported in Section 3.1. [Author review required: reconcile the 196 unique
+    records here with the denominator of 206 in the abstract, Section 3.1 and Table 2; confirm the search
+    year.]'
+  matches: 1
+  rationale: Expose an unresolved study-denominator discrepancy without inventing screening evidence.

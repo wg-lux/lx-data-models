@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_interventions
 - model: intervention
   name: endoscopy_cold_snare_polypectomy_colorectal
   name_de: "Kolorektale Kaltschlingenpolypektomie"
+  name_en: "Colorectal cold snare polypectomy"
   description:
     Cold snare polypectomy is a purely mechanical snare-based colorectal
     resection technique without electrocautery. It is primarily used for diminutive
@@ -14,6 +16,7 @@
 - model: intervention
   name: endoscopy_hot_snare_polypectomy_colorectal
   name_de: "Kolorektale Heißschlingenpolypektomie"
+  name_en: "Colorectal hot snare polypectomy"
   description:
     Hot snare polypectomy is a snare-based colorectal resection technique
     that combines tissue transection with electrocautery. It is commonly used
@@ -27,6 +30,7 @@
 - model: intervention
   name: endoscopy_cold_emr_colorectal
   name_de: "Kolorektale kalte EMR"
+  name_en: "Colorectal cold EMR"
   description:
     Cold endoscopic mucosal resection is a lift-assisted colorectal resection
     technique that combines submucosal injection with mechanical snare transection
@@ -39,6 +43,7 @@
 - model: intervention
   name: endoscopy_hot_emr_colorectal
   name_de: "Kolorektale EMR mit Stromanwendung"
+  name_en: "Colorectal hot EMR"
   description:
     Hot endoscopic mucosal resection is a lift-assisted colorectal resection
     technique that combines submucosal injection with electrocautery-assisted snare
@@ -51,6 +56,7 @@
 - model: intervention
   name: endoscopy_esd_colorectal
   name_de: "Kolorektale ESD"
+  name_en: "Colorectal ESD"
   description:
     Colorectal endoscopic submucosal dissection is an advanced electrosurgical
     dissection technique that enables en bloc resection of selected lesions, including
@@ -64,6 +70,7 @@
 - model: intervention
   name: endoscopy_eftr_colorectal
   name_de: "Kolorektale EFTR"
+  name_en: "Colorectal EFTR"
   description:
     Colorectal endoscopic full-thickness resection is a clip-assisted full-wall
     resection technique used for selected difficult lesions, including scarred lesions
@@ -78,6 +85,7 @@
 - model: intervention
   name: endoscopy_margin_ablation_soft_coagulation_colorectal
   name_de: "Kolorektale Resektionsrandablation mittels Softkoagulation"
+  name_en: "Colorectal resection-margin ablation with soft coagulation"
   description:
     Margin ablation with snare-tip soft coagulation is an adjunctive thermal
     technique applied to the visible margin after colorectal EMR to reduce residual
@@ -89,6 +97,7 @@
 - model: intervention
   name: endoscopy_hot_avulsion_colorectal
   name_de: "Kolorektale Avulsion mit Stromanwendung"
+  name_en: "Colorectal hot avulsion"
   description:
     Hot avulsion is a rescue resection technique that uses electrocautery-enabled
     forceps to remove small residual or fibrotic colorectal tissue fragments that

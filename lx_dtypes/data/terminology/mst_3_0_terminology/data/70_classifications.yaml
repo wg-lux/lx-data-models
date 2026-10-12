@@ -78,20 +78,19 @@
     classification_choices: [mst_prague_c, mst_prague_m],
     description: "§8.1.3. Sharma P et al. Gastroenterology 2006;131:1392-9.",
   }
-- {
-    model: classification_choice,
-    name: mst_prague_c,
-    name_en: C,
-    name_de: C,
-    description: "Difference in insertion distances between GEJ and proximal margin of circumferential Barretts epithelium.",
-  }
-- {
-    model: classification_choice,
-    name: mst_prague_m,
-    name_en: M,
-    name_de: M,
-    description: "Difference in insertion distances between GEJ and proximal margin of the longest tongue-like Barretts segment; excludes islands.",
-  }
+- model: classification_choice
+  name: mst_prague_c
+  name_en: C
+  name_de: C
+  description: Difference in insertion distances between GEJ and proximal margin of circumferential Barretts epithelium.
+  classification_choice_descriptors: [mst_length_cm_value]
+- model: classification_choice
+  name: mst_prague_m
+  name_en: M
+  name_de: M
+  description: Difference in insertion distances between GEJ and proximal margin of the longest tongue-like Barretts
+    segment; excludes islands.
+  classification_choice_descriptors: [mst_length_cm_value]
 - {
     model: classification,
     name: mst_paris,

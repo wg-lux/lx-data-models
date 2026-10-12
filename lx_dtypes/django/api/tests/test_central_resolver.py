@@ -387,6 +387,7 @@ def test_create_uses_exam_pinned_kb_not_active(harness):
     payload = h.findings.PatientFindingCreateRequest(patient_examination=9, finding=3)
     result = route(h, "POST", "/patient-findings/")(h.request, payload)
     assert result["id"] == 4
+    assert result["instance_id"] == str(h.patient_finding.instance_id)
     h.resolver.load_module_kb.assert_called_once_with("test_module", version="history")
     h.resolver.active_kb_identity.assert_not_called()
 

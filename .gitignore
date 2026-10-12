@@ -226,3 +226,7 @@ __marimo__/
 test_interface_export.yaml
 
 standardized_dataset/**
+
+# Disposable authoring/test output and checkout-local runtime state.
+/temp/
+/storage/

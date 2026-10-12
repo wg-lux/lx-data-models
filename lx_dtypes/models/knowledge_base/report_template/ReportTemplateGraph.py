@@ -20,6 +20,15 @@ if TYPE_CHECKING:
 
 
 _PATIENT_DATA_FIELD_KEYS = {
+    # Shipped STAR and DGVS context fields are resolved by the host through
+    # each field's declared patient / patient_examination source.
+    "name",
+    "date_of_birth",
+    "examination_date",
+    "examiner",
+    "assisting_personnel",
+    "device_identification",
+    "relevant_images",
     "patient_birth_date",
     "patient_gender",
     "patient_age",

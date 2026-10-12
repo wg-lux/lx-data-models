@@ -21,6 +21,11 @@ from lx_dtypes.utils.deployment_setup import parse_deployment_setup, resolve_dep
 from tests.paths import PACKAGE_ROOT
 
 
+pytestmark = pytest.mark.filterwarnings(
+    "error::lx_dtypes.models.interface.KnowledgeBase.ReportTemplateConceptWarning"
+)
+
+
 @pytest.fixture
 def package(tmp_path: Path) -> Path:
     source = PACKAGE_ROOT.parent / "docs/examples/dtypes_packages/training_preset"
@@ -91,7 +96,7 @@ def test_dependency_can_live_in_another_explicit_source_root(
     )
     manifest = package / "config.yaml"
     payload = yaml.safe_load(manifest.read_text())
-    payload["depends_on"] = ["shared_terms"]
+    payload["depends_on"].append("shared_terms")
     manifest.write_text(yaml.safe_dump(payload))
     service = TerminologyService(tmp_path / "registry.json")
     service.register_local("training_preset", "1.0.0", input_dirs=[package, dependency])
@@ -224,7 +229,7 @@ def test_multicentre_document_has_portable_content_identity(
     assert str(tmp_path) not in second_lock.model_dump_json()
     assert first.active_identity() is None and second.active_identity() is None
     # Reusing a version with changed bytes cannot preserve the reviewed digest.
-    data = other / "data/examinations.yml"
+    data = other / "training_terminology/examinations.yml"
     data.write_text(data.read_text() + "\n# Altered release content\n")
     assert resolve_deployment(setup, second).lock.packages != first_lock.packages
 

@@ -1,17 +1,21 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_findings
 - model: finding
   name: "coro_des_implantation"
   name_de: "Implantation eines medikamentenfreisetzenden Koronarstents"
+  name_en: "Drug-eluting coronary stent implantation"
   tags:
     - event
 
 - model: finding
   name: "coro_bms_implantation"
   name_de: "Implantation eines unbeschichteten Koronarstents"
+  name_en: "Bare-metal coronary stent implantation"
   tags:
     - event
 
 - model: finding
   name: "complication_coro_stent_thrombosis"
   name_de: "Koronare Stentthrombose"
+  name_en: "Coronary stent thrombosis"
   tags:
     - event

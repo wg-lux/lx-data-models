@@ -14,6 +14,7 @@ from pathlib import Path
 from types import ModuleType
 from types import SimpleNamespace as NS
 from unittest.mock import Mock
+from uuid import UUID
 
 import pytest
 from pydantic import BaseModel, ConfigDict
@@ -57,6 +58,14 @@ class Query:
 
     def first(self):
         return self.items[0] if self.items else None
+
+    def select_for_update(self):
+        return self
+
+    def get(self, **kwargs):
+        matches = self.filter(**kwargs).items
+        assert len(matches) == 1
+        return matches[0]
 
     def exists(self):
         return bool(self.items)
@@ -264,6 +273,7 @@ def harness(monkeypatch):
     )
     patient_exam = NS(
         id=9,
+        pk=9,
         examination_id=exam.id,
         examination=exam,
         examination_safe=exam,
@@ -272,6 +282,7 @@ def harness(monkeypatch):
     )
     patient_finding = NS(
         id=4,
+        instance_id=UUID(int=4),
         patient_examination=patient_exam,
         patient_examination_id=9,
         finding=found[2],

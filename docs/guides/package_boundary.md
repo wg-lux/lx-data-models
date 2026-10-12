@@ -28,6 +28,10 @@ applications such as `endoreg-db`.
 - Tests should use `tmp_path` and assert on generated files there.
 - Golden fixtures, if intentionally committed, should live under explicit test
   data directories rather than package roots.
+- Storage ownership, loading and cleanup follow the
+  [terminology storage lifecycle](terminology.md#storage-ownership-and-lifetime).
+  Shared legacy test exports use process-scoped temporary storage and are cleaned
+  at normal interpreter shutdown; new tests should prefer `tmp_path`.
 
 ## Test Layout
 

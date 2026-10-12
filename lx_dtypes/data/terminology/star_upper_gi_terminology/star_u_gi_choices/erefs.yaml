@@ -1,77 +1,91 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.star_upper_gi_terminology
 # star_upper_gi_erefs_edema_none
 - model: classification_choice
   name: star_upper_gi_erefs_edema_none
   name_de: "Ödem: nicht vorhanden"
+  name_en: "Edema: absent"
   description: "No edema observed"
 
 # star_upper_gi_erefs_edema_present
 - model: classification_choice
   name: star_upper_gi_erefs_edema_present
   name_de: "Ödem: vorhanden"
+  name_en: "Edema: present"
   description: "Edema present"
 
 # star_upper_gi_erefs_rings_none
 - model: classification_choice
   name: star_upper_gi_erefs_rings_none
   name_de: "Ringe: nicht vorhanden"
+  name_en: "Rings: absent"
   description: "No rings observed"
 
 # star_upper_gi_erefs_rings_mild
 - model: classification_choice
   name: star_upper_gi_erefs_rings_mild
   name_de: "Ringe: gering ausgeprägt"
+  name_en: "Rings: mild"
   description: "Mild rings observed (subtle circumferential ridges)"
 
 # star_upper_gi_erefs_rings_moderate
 - model: classification_choice
   name: star_upper_gi_erefs_rings_moderate
   name_de: "Ringe: mäßig ausgeprägt"
+  name_en: "Rings: moderate"
   description: "Moderate rings observed (distinct rings that do not impair passage of a standard adult endoscope [outer diameter 8–9.5 mm]"
 
 # star_upper_gi_erefs_rings_severe
 - model: classification_choice
   name: star_upper_gi_erefs_rings_severe
   name_de: "Ringe: stark ausgeprägt"
+  name_en: "Rings: severe"
   description: "Severe rings observed"
 
 # star_upper_gi_erefs_strictures_none
 - model: classification_choice
   name: star_upper_gi_erefs_strictures_none
   name_de: "Strikturen: nicht vorhanden"
+  name_en: "Strictures: absent"
   description: "No strictures observed"
 
 # star_upper_gi_erefs_strictures_present
 - model: classification_choice
   name: star_upper_gi_erefs_strictures_present
   name_de: "Strikturen: vorhanden"
+  name_en: "Strictures: present"
   description: "Strictures present"
 
 # star_upper_gi_erefs_furrows_none
 - model: classification_choice
   name: star_upper_gi_erefs_furrows_none
   name_de: "Längsfurchen: nicht vorhanden"
+  name_en: "Furrows: absent"
   description: "No furrows observed"
 
 # star_upper_gi_erefs_furrows_present
 - model: classification_choice
   name: star_upper_gi_erefs_furrows_present
   name_de: "Längsfurchen: vorhanden"
+  name_en: "Furrows: present"
   description: "Furrows present"
 
 # star_upper_gi_erefs_exudates_none
 - model: classification_choice
   name: star_upper_gi_erefs_exudates_none
   name_de: "Exsudate: nicht vorhanden"
+  name_en: "Exudates: absent"
   description: "No exudates observed"
 
 # star_upper_gi_erefs_exudates_mild
 - model: classification_choice
   name: star_upper_gi_erefs_exudates_mild
   name_de: "Exsudate: gering ausgeprägt"
+  name_en: "Exudates: mild"
   description: "Mild exudates observed (few white spots or plaques)"
 
 # star_upper_gi_erefs_exudates_severe
 - model: classification_choice
   name: star_upper_gi_erefs_exudates_severe
   name_de: "Exsudate: stark ausgeprägt"
+  name_en: "Exudates: severe"
   description: "Severe exudates observed (confluent plaques covering large areas of the esophageal mucosa)"

@@ -552,19 +552,89 @@ descriptions inherited from the demo. It is a reproducibility artifact, not an
 updated clinical reporting interface. These warnings do not affect core-reference
 validation or the numeric comparison; the operational STAR default remains 0.1.2.
 
-The two MST files in PR #32 are already present in this checkout. The complete
-`mst_3_0@3.0.0` has 357 findings, 39 classifications, 285 choices, 142 indications,
-40 interventions and 12 examinations. The draft's larger counts must not be
-reproduced by inventing additional concepts. In the
-[WEO source](https://www.worldendo.org/assets-craft/pdf/resources/mst-3-0.pdf),
-§7.3 on page 41 lists actions and outcomes; it does not contain the five-level
-severity table attributed to it in the draft. A separately sourced severity
-scheme would need its own provenance and explicit extension identity.
+The two MST files in PR #32 were already present before the Excel reconciliation.
+That historical artifact had 357 findings, 39 classifications, 285 choices,
+142 indications, 40 interventions and 12 examinations. Those counts describe
+that artifact, not complete structured coverage of MST. The PDF check of §7.3
+concerned actions and outcomes only. The supplied Excel workbook separately
+contains an explicit five-level `Adv event severity` sheet; the importer below
+uses that sheet as its severity source.
 
 The [editorial replacement specification](../manuscript-reconciliation.yml)
 and `scripts/revise_lxdm_manuscript.py` produce a separate revised DOCX with an
 audit of replacements. They never overwrite the original. Follow the command
 in that YAML file; review the resulting document before submitting it.
+
+### Reproduce the MST 3.0 Excel import
+
+This section is the canonical importer guide, maintained by the lx-dtypes
+maintainers. `scripts/import_mst_excel.py` reconciles the repository's
+`mst30_tables(1).xls` with the existing MST package. Per the package owner's
+request, the identity remains **`mst_3_0@3.0.0`** and its terminology dependency
+remains **`mst_3_0_terminology@3.0.0`**; existing concept names are retained.
+The package bytes and catalog digests change. Hosts that have already imported
+this identity must explicitly reconcile/reprovision it under their own integrity
+policy; the importer does not alter registries, databases, or deployed packages.
+
+```bash
+uv sync --extra dev --locked
+uv run --extra dev python scripts/import_mst_excel.py
+uv run --extra dev python scripts/import_mst_excel.py --check
+uv run --extra dev pytest tests/unit/lx_dtypes/models/interface/test_mst_3_0.py -q
+uv run --extra dev ok --config lx_dtypes/data/report_templates/mst_3_0/config.yaml
+```
+
+The reviewed mapping specification is `scripts/mst/import.yml`. Its workbook
+SHA-256 and expected cell labels must match before import. A different workbook
+fails rather than using approximate label matching. Existing identifiers and
+translations come from the existing YAML records; `bindings` explicitly relate
+Excel cells to those identifiers, including spelling variants. Repeated values
+and equivalent attributes share definitions. Only changed baseline records are
+rewritten; unrelated files and comments are retained. Generated additions use
+`data/82_excel_attributes.yml`.
+
+The importer validates the complete staged dependency closure and exports every
+report before writing. It refreshes only the two MST catalog digests. `--check`
+performs the same validation and fails if generated files or those digests are
+stale, without writing. `excel_source.yml`, beside the terminology manifest,
+records the workbook cells, attribute provenance and interpretation decisions;
+it is evidence outside the manifest's selected `data/` records.
+
+The corrected package includes finding-specific categorical values, EUS
+lesion-specific attributes, allowed anatomical sites and location modifiers,
+indication qualifiers, descriptor-backed Prague C/M measurements, and all five
+workbook severity levels. Procedure attributes use 32 companion findings linked
+to the existing interventions, because the intervention contract does not own
+classifications. Reports expose these optional detail findings as well as their
+existing summary fields. Original generic classifications remain available for
+identifier compatibility; workbook-derived fields use the corrected value sets.
+
+There are 389 findings, 293 classifications and 546 choices after reconciliation.
+The 82 ordinary and 121 EUS anatomical sites, 142 indications, 228 diagnoses and
+40 intervention identities are retained. Tests check workbook semantics and
+report inputs in addition to these inventory counts.
+
+Source limitations and interpretation decisions are explicit:
+
+- EUS lesion-specific matrices override the general attribute lists. For
+  example, `linear` occurs only in the lesion-specific shape list.
+- Papillary output `None` and `Mucin` occur in different sheets; both are retained.
+  Papillary value restrictions conditional on major/minor papilla and Paris/Japan conditional relationships remain source
+  constraints, not automatic cross-field validators. Finding-to-organ matrices
+  restrict the generated location choices; report inputs additionally intersect
+  those sites with the procedure-to-organ matrix.
+- Terms absent from an organ matrix receive no invented organ applicability.
+  T/N staging uses text inputs because Excel provides no staging enumeration.
+- The severity table omits exactly three hospitalization nights. The importer
+  preserves its literal outcome descriptions and never infers a severity score.
+- Shared anatomy modifier columns are interpreted as blocks, with separate
+  biliary duct scopes and a dedicated EUS lymph-node station number. Numeric
+  EUS cyst dimensions use millimeters consistently with the sheet's size header.
+- Existing German labels are preserved. Newly imported English source labels
+  are also used in the German display field pending reviewed translations.
+
+This is terminology and reporting support; it does not establish clinical
+approval or downstream host persistence of every new field.
 
 ## Related Guides
 

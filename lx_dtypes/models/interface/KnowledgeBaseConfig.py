@@ -44,6 +44,14 @@ class KnowledgeBaseConfig(AppBaseModelNamesUUIDTags):
             knowledge_base_version=self.version,
         )
 
+    @classmethod
+    def from_yaml_file(cls, path: Path) -> Self:
+        """Load a file-backed config with attributable, contained data paths."""
+        config = super().from_yaml_file(path)
+        config.data.source_file = config.source_file
+        config.normalize_data_paths(None)
+        return config
+
     def normalize_data_paths(self, config_file: Path | None) -> None:
         """
         Normalize data paths to absolute paths relative to the knowledge base module.

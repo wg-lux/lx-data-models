@@ -1,6 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_findings
 - model: finding
   name: "gastroscopy_polyp"
   name_de: "Polyp bei Gastroskopie"
+  name_en: "Polyp at gastroscopy"
   description: "Polyp"
   finding_types:
     - observation
@@ -9,6 +11,7 @@
 - model: finding
   name: "gastroscopy_ulcer"
   name_de: "Ulkus bei Gastroskopie"
+  name_en: "Ulcer at gastroscopy"
   description: "Ulcer"
   finding_types:
     - observation
@@ -16,6 +19,7 @@
 - model: finding
   name: "gastroscopy_erythema"
   name_de: "Erythem bei Gastroskopie"
+  name_en: "Erythema at gastroscopy"
   description: "Erythema"
   finding_types:
     - observation
@@ -23,6 +27,7 @@
 - model: finding
   name: "gastroscopy_subepithelial_tumor"
   name_de: "Subepithelialer Tumor bei Gastroskopie"
+  name_en: "Subepithelial tumor at gastroscopy"
   description: "Subepithelial Tumor"
   finding_types:
     - observation
@@ -30,6 +35,7 @@
 - model: finding
   name: "gastroscopy_stenosis"
   name_de: "Stenose bei Gastroskopie"
+  name_en: "Stenosis at gastroscopy"
   description: "Stenosis"
   finding_types:
     - observation
@@ -37,6 +43,7 @@
 - model: finding
   name: "gastroscopy_varices_esophageal"
   name_de: "Ösophagusvarizen"
+  name_en: "Esophageal varices"
   description: "Esophageal Varices"
   finding_types:
     - observation
@@ -45,6 +52,7 @@
 - model: finding
   name: "gastroscopy_varices_gastric"
   name_de: "Magenvarizen"
+  name_en: "Gastric varices"
   description: "Gastric Varices"
   finding_types:
     - observation
@@ -52,6 +60,7 @@
 - model: finding
   name: "gastroscopy_varices_duodenal"
   name_de: "Duodenalvarizen"
+  name_en: "Duodenal varices"
   description: "Duodenal Varices"
   finding_types:
     - observation
@@ -59,6 +68,7 @@
 - model: finding
   name: "gastroscopy_scar"
   name_de: "Narbe bei Gastroskopie"
+  name_en: "Scar at gastroscopy"
   description: "Scar"
   finding_types:
     - observation
@@ -66,6 +76,7 @@
 - model: finding
   name: "gastroscopy_bleeding"
   name_de: "Blutung bei Gastroskopie"
+  name_en: "Bleeding at gastroscopy"
   description: "Bleeding"
   finding_types:
     - observation
@@ -73,6 +84,7 @@
 - model: finding
   name: "gastroscopy_ectopic_gastric_mucosa"
   name_de: "Ektope Magenschleimhaut"
+  name_en: "Ectopic gastric mucosa"
   description: "Ectopic Gastric Mucosa"
   finding_types:
     - observation
@@ -80,6 +92,7 @@
 - model: finding
   name: "gastroscopy_diverticulum_esophagus"
   name_de: "Ösophagusdivertikel"
+  name_en: "Esophageal diverticulum"
   description: "Divertikel (Ösophagus)"
   finding_types:
     - observation
@@ -87,6 +100,7 @@
 - model: finding
   name: "gastroscopy_diverticulum_duodenum"
   name_de: "Duodenaldivertikel"
+  name_en: "Duodenal diverticulum"
   description: "Divertikel (Duodenum)"
   finding_types:
     - observation
@@ -94,6 +108,7 @@
 - model: finding
   name: "gastroscopy_ectopic_pancreatic_tissue"
   name_de: "Ektopes Pankreasgewebe"
+  name_en: "Ectopic pancreatic tissue"
   description: "Ectopic Pancreatic Tissue"
   finding_types:
     - observation
@@ -101,6 +116,7 @@
 - model: finding
   name: "gastroscopy_obstruction_generic"
   name_de: "Obstruktion bei Gastroskopie"
+  name_en: "Obstruction at gastroscopy"
   description: "Generic Obstruction"
   finding_types:
     - observation

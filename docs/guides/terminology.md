@@ -65,6 +65,39 @@ print(get_terminology_service().registry_path)
 
 ## Understand the source and runtime data
 
+### Storage ownership and lifetime
+
+Use the existing resolver and `TerminologyService` as the storage boundary. Do
+not introduce another registry, copy package YAML into the checkout, or scan the
+repository root to discover definitions. A broad scan can discover generated
+test copies with the same module/version as the real package.
+
+| Storage | Owner and loading mechanism | Lifetime and cleanup |
+| --- | --- | --- |
+| `lx_dtypes/data/` | Shipped definitions selected through the packaged catalogue; read-only to runtime callers. | Versioned release input; never scratch space. |
+| `<terminology-root>/registry.json`, `shipped/`, `terminology-packages/` | Persistent `TerminologyService` storage, selected explicitly or through the configured root. | Back up registry and referenced source trees together. Keep historical versions needed by stored records; never remove as cache. |
+| External registered package directories | `register_local(..., input_dirs=[...])` records absolute source paths without copying them. | Caller owns durability; retain them while the registry references them. |
+| Remote download cache | `LX_DTYPES_REMOTE_CACHE_ROOT`, otherwise the user cache directory; explicit remote registry sources only. | Rebuildable from a pinned commit while the source is available. Evict only with readers stopped and a recovery plan for offline use. Never use it for edited definitions. |
+| Pytest `tmp_path` and process-scoped test exports | Test-owned isolated registries and generated files. | Automatically cleaned according to pytest retention or at normal interpreter shutdown. |
+| Repository `temp/` | Deliberately retained exports and compact audit evidence. Never an implicit loading source. | Ignored by Git and excluded from releases. Delete reproducible output after verification; preserve requested deliverables until handed off. |
+
+Provision once into durable runtime storage, then load through the same service
+using an exact module/version. Reading a registry must not create directories,
+hydrate packages, or silently fall back to another source. Missing storage is an
+error. Editing and ZIP import use their existing validated runtime workflows;
+loading packaged data remains independent of the working directory.
+
+Repository cleanup only covers disposable authoring output. It must not follow
+registry references and delete their targets. There is intentionally no
+age-based garbage collector for registered knowledge bases: timestamps cannot
+prove that a historical examination no longer needs a version.
+
+`temp/`, checkout-local `storage/`, and `docs/_build/` are excluded from both
+release formats. `lx-dtypes-release build` also checks the resulting archives,
+including symlink entries, and rejects these directories before release
+validation. Git ignore rules do not untrack existing entries; remove accidental
+scratch additions from the index before committing.
+
 Hydration reads the data directory belonging to the imported `lx_dtypes` package. When the package is imported from a `./lx-data-models` checkout, the source is `./lx-data-models/lx_dtypes/data`. An installed package uses its own data directory. The source is not selected from the process's current working directory.
 
 The runtime directory has this layout:

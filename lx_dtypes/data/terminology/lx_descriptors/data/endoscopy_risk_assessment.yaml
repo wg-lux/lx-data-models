@@ -1,9 +1,11 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_descriptors
 # Sources for every record in this file:
 # - DGVS S2k quality guideline (AWMF 021-022), risk assessment: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b20056d03/chapter_69f4b200c4ff0/
 # - DGVS S3 sedation guideline (AWMF 021-014): https://www.dgvs.de/leitlinien/endoskopie-notfall/sedierung-in-der-gastrointestinalen-endoskopie/?digital=1
 - model: classification_choice_descriptor
   name: "endoscopy_risk_assessment_time_value"
   name_de: "Zeitpunkt der Risikobewertung"
+  name_en: "Risk assessment time"
   description: "Uhrzeitgenauer Zeitpunkt des standardisierten Risikoassessments vor dem endoskopischen Eingriff."
   classification_choice_descriptor_type: "text"
   text_max_length: 32
@@ -11,6 +13,7 @@
 - model: classification_choice_descriptor
   name: "risk_assessment_protocol_version_value"
   name_de: "Version des Risikobewertungsprotokolls"
+  name_en: "Risk assessment protocol version"
   description: "Bezeichnung und Version der für das standardisierte Risikoassessment verwendeten Checkliste oder Verfahrensanweisung."
   classification_choice_descriptor_type: "text"
   text_max_length: 128
@@ -18,12 +21,14 @@
 - model: classification_choice_descriptor
   name: "preprocedure_physical_assessment_time_value"
   name_de: "Zeitpunkt der körperlichen Voruntersuchung"
+  name_en: "Preprocedure physical assessment time"
   description: "Uhrzeitgenauer Zeitpunkt der körperlichen Untersuchung vor der Sedierung."
   classification_choice_descriptor_type: "text"
   text_max_length: 32
 - model: classification_choice_descriptor
   name: "preprocedure_heart_rate_value"
   name_de: "Herzfrequenz vor der Untersuchung"
+  name_en: "Preprocedure heart rate"
   description: "Herzfrequenz bei der präprozeduralen körperlichen Untersuchung."
   unit: "beats_per_minute"
   classification_choice_descriptor_type: "numeric"
@@ -31,6 +36,7 @@
 - model: classification_choice_descriptor
   name: "preprocedure_systolic_blood_pressure_value"
   name_de: "Systolischer Blutdruck vor der Untersuchung"
+  name_en: "Preprocedure systolic blood pressure"
   description: "Systolischer Blutdruck bei der präprozeduralen körperlichen Untersuchung."
   unit: "millimeter_mercury"
   classification_choice_descriptor_type: "numeric"
@@ -38,6 +44,7 @@
 - model: classification_choice_descriptor
   name: "preprocedure_diastolic_blood_pressure_value"
   name_de: "Diastolischer Blutdruck vor der Untersuchung"
+  name_en: "Preprocedure diastolic blood pressure"
   description: "Diastolischer Blutdruck bei der präprozeduralen körperlichen Untersuchung."
   unit: "millimeter_mercury"
   classification_choice_descriptor_type: "numeric"
@@ -45,6 +52,7 @@
 - model: classification_choice_descriptor
   name: "preprocedure_oxygen_saturation_value"
   name_de: "Sauerstoffsättigung vor der Untersuchung"
+  name_en: "Preprocedure oxygen saturation"
   description: "Pulsoxymetrische Sauerstoffsättigung bei der präprozeduralen körperlichen Untersuchung."
   unit: "percent"
   classification_choice_descriptor_type: "numeric"
@@ -53,12 +61,14 @@
 - model: classification_choice_descriptor
   name: "last_oral_intake_time_value"
   name_de: "Zeitpunkt der letzten oralen Aufnahme"
+  name_en: "Time of last oral intake"
   description: "Dokumentierter Zeitpunkt der letzten Nahrungs- oder Flüssigkeitsaufnahme."
   classification_choice_descriptor_type: "text"
   text_max_length: 32
 - model: classification_choice_descriptor
   name: "last_oral_intake_type_value"
   name_de: "Art der letzten oralen Aufnahme"
+  name_en: "Type of last oral intake"
   description: "Dokumentierte Art der letzten Nahrungs- oder Flüssigkeitsaufnahme."
   classification_choice_descriptor_type: "text"
   text_max_length: 128
