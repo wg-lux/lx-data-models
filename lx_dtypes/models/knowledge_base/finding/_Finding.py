@@ -1,10 +1,10 @@
 from pydantic import Field
-from lx_dtypes.models.contracts.finding_extraction import FindingTextRule
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
 )
+from lx_dtypes.models.contracts.finding_extraction import FindingTextRule
 from lx_dtypes.models.knowledge_base.finding.FindingDataDict import FindingDataDict
 from lx_dtypes.names import FINDING_MODEL_LIST_TYPE_FIELDS
 

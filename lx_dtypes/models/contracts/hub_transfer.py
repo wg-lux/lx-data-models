@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from .video_provenance import VideoProvenanceBundle
-
 from collections.abc import Mapping
 from typing import Literal, NotRequired, TypedDict, cast
 
@@ -15,6 +13,7 @@ from pydantic import (
 )
 
 from .json_types import JsonObject, JsonValue
+from .video_provenance import VideoProvenanceBundle
 
 type HubTransferJsonScalar = str | int | float | bool | None
 type HubTransferJsonValue = (
@@ -366,12 +365,22 @@ class HubTransferVideoTransferPayload(_HubTransferPayload):
     def _validate_resource_linkage(self) -> HubTransferVideoTransferPayload:
         if self.resource_rows.video_file.raw_video_hash != self.resource_hash:
             raise ValueError("video_file.raw_video_hash must match resource_hash")
-        if self.provenance is not None and self.provenance.video_frame_provenance is not None:
+        if (
+            self.provenance is not None
+            and self.provenance.video_frame_provenance is not None
+        ):
             frames = self.provenance.video_frame_provenance.transformations
             if frames[0].source.content_hash != self.resource_hash:
-                raise ValueError("Frame provenance must start at the transferred recording")
-            if frames[-1].output.content_hash != self.resource_rows.video_file.processed_video_hash:
-                raise ValueError("Frame provenance must end at the transferred processed media")
+                raise ValueError(
+                    "Frame provenance must start at the transferred recording"
+                )
+            if (
+                frames[-1].output.content_hash
+                != self.resource_rows.video_file.processed_video_hash
+            ):
+                raise ValueError(
+                    "Frame provenance must end at the transferred processed media"
+                )
         for segment in self.resource_rows.video_segments:
             if segment.source_node_key != self.source_node_key:
                 raise ValueError("video segment source_node_key must match transfer")

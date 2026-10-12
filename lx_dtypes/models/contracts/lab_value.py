@@ -1,34 +1,32 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from typing import Self
+
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class LabValueNormalRangeBandPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+    model_config = ConfigDict(
+        extra="forbid", frozen=True, strict=True, allow_inf_nan=False
+    )
 
     min: float | None = None
     max: float | None = None
 
+    @model_validator(mode="after")
+    def validate_bounds(self) -> Self:
+        if self.min is not None and self.max is not None and self.min > self.max:
+            raise ValueError("normal range min must not exceed max")
+        return self
 
-class LabValueNormalRangeData(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
-    min: float | None = None
-    max: float | None = None
+class LabValueNormalRangeData(LabValueNormalRangeBandPayload):
     male: LabValueNormalRangeBandPayload | None = None
     female: LabValueNormalRangeBandPayload | None = None
     other: LabValueNormalRangeBandPayload | None = None
 
 
-class LabValueNormalRangePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
-    min: float | None = None
-    max: float | None = None
-    male: LabValueNormalRangeBandPayload | None = None
-    female: LabValueNormalRangeBandPayload | None = None
-    other: LabValueNormalRangeBandPayload | None = None
-
+class LabValueNormalRangePayload(LabValueNormalRangeData):
     def to_data(self) -> LabValueNormalRangeData:
         return LabValueNormalRangeData.model_validate(self.model_dump())
 

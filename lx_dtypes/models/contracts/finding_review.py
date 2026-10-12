@@ -2,7 +2,9 @@
 
 from typing import Literal
 from uuid import UUID
+
 from pydantic import BaseModel, ConfigDict, Field
+
 from .knowledge_base import KnowledgeBaseIdentity
 
 

@@ -39,7 +39,9 @@ def check_retained_release_warnings(monkeypatch: pytest.MonkeyPatch) -> None:
 
     def checked(registry: Path, module: str, version: str) -> None:
         if (module, version) == ("star_upper_gi", "0.1.1.post1"):
-            _assert_retained_release_warnings(lambda: validate(registry, module, version))
+            _assert_retained_release_warnings(
+                lambda: validate(registry, module, version)
+            )
         else:
             validate(registry, module, version)
 
@@ -49,7 +51,9 @@ def check_retained_release_warnings(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.fixture
 def hydrated_registry(tmp_path: Path) -> Path:
     registry = tmp_path / "registry.json"
-    _assert_retained_release_warnings(TerminologyService(registry_path=registry).provision)
+    _assert_retained_release_warnings(
+        TerminologyService(registry_path=registry).provision
+    )
     return registry
 
 
@@ -75,7 +79,8 @@ def test_bootstrap_preserves_hydrated_edits_and_active_identity(
 
 @pytest.mark.parametrize("damage", ["marker", "digest", "path", "identity"])
 def test_bootstrap_rejects_invalid_hydrated_copy(
-    hydrated_registry: Path, damage: str,
+    hydrated_registry: Path,
+    damage: str,
 ) -> None:
     payload = json.loads(hydrated_registry.read_text())
     entry = payload["modules"]["dgvs_reporting"]["0.1.0"]

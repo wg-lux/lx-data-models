@@ -1,4 +1,5 @@
 """Portable mask definitions; coordinates describe the image region to retain."""
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from .video_processing import VideoMaskConfig

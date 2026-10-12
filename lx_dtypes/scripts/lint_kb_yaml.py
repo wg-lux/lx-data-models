@@ -8,13 +8,13 @@ from pathlib import Path
 
 from lx_dtypes.models.interface.data_roots import package_data_root
 from lx_dtypes.utils.kb_package_lint import lint_kb_package
-from lx_dtypes.utils.parser import parse_shallow_object_with_meta
 from lx_dtypes.utils.kb_yaml_lint import (
     KbYamlLintIssue,
     discover_yaml_files,
     lint_kb_yaml_files,
     summarize_issues,
 )
+from lx_dtypes.utils.parser import parse_shallow_object_with_meta
 
 
 def parse_args() -> argparse.Namespace:

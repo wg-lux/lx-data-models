@@ -7,10 +7,10 @@ from pathlib import Path
 
 import yaml
 
+from lx_dtypes.models.interface.data_roots import module_search_root
 from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.KnowledgeBase import ReportTemplateConceptWarning
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
-from lx_dtypes.models.interface.data_roots import module_search_root
 from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
     ReportTemplateReadinessSummary,
 )

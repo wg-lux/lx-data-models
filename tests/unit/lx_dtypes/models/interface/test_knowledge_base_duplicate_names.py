@@ -76,9 +76,11 @@ def test_loader_rejects_child_concept_redefinition(
         "- model: report_finding\n  name: reference\n  finding: shared\n",
         f"{edge}: [child]\n",
     )
-    with pytest.warns(UserWarning, match=f"'{model}' definition 'shared'"):
-        with pytest.raises(ValueError, match=f"Conflicting '{model}'") as exc:
-            DataLoader(input_dirs=[tmp_path]).load_knowledge_base("reporting")
+    with (
+        pytest.warns(UserWarning, match=f"'{model}' definition 'shared'"),
+        pytest.raises(ValueError, match=f"Conflicting '{model}'") as exc,
+    ):
+        DataLoader(input_dirs=[tmp_path]).load_knowledge_base("reporting")
     assert str(tmp_path / "child" / "records.yml") in str(exc.value)
     assert str(tmp_path / "reporting" / "records.yml") in str(exc.value)
 
@@ -106,6 +108,7 @@ def test_reporting_warns_for_custom_concepts_across_selected_files(
 
 def test_reporting_references_dependency_without_warning(tmp_path: Path) -> None:
     import warnings
+
     from lx_dtypes.models.interface.DataLoader import DataLoader
 
     _write_module(tmp_path, "child", "- model: finding\n  name: canonical\n")
@@ -247,6 +250,7 @@ def test_bundled_terminology_under_reporting_directory_does_not_warn(
     tmp_path: Path,
 ) -> None:
     import warnings
+
     from lx_dtypes.models.interface.DataLoader import DataLoader
 
     root = tmp_path / "report_templates"

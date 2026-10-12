@@ -199,7 +199,9 @@ def _write_registry(registry: Path, payload: RegistryPayload) -> None:
 
 
 def _is_hydrated_entry(
-    registry: Path, entry: RegistryEntry, descriptor: PackagedKnowledgeBase,
+    registry: Path,
+    entry: RegistryEntry,
+    descriptor: PackagedKnowledgeBase,
 ) -> bool:
     """Recognize a published editable copy without replacing its contents."""
     metadata = entry.model_extra or {}
@@ -220,7 +222,8 @@ def _is_hydrated_entry(
     )
     for original in catalog.knowledge_bases:
         if (original.module_name, original.version) != (
-            descriptor.module_name, descriptor.version,
+            descriptor.module_name,
+            descriptor.version,
         ):
             continue
         # Use the original catalog: upgrades and builder edits need not match
@@ -228,7 +231,8 @@ def _is_hydrated_entry(
         expected_root = (tree / original.resource_root).parent
         expected_roots = {str(expected_root)}
         if expected_root in {
-            tree / "data" / "terminology", tree / "data" / "report_templates",
+            tree / "data" / "terminology",
+            tree / "data" / "report_templates",
         }:
             expected_roots.add(str(tree / "data"))
         return (

@@ -1,5 +1,4 @@
 import warnings
-from lx_dtypes.models.contracts.finding_extraction import FindingTextExtractor
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import (
@@ -21,6 +20,7 @@ from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelUUIDTags import (
     AppBaseModelUUIDTags,
 )
 from lx_dtypes.models.contracts import kb_to_core_concepts_payload
+from lx_dtypes.models.contracts.finding_extraction import FindingTextExtractor
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.interface.LookupTracker import KnowledgeBaseLookupTracker
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler

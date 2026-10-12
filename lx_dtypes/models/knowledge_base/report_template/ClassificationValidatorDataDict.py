@@ -12,12 +12,12 @@ from lx_dtypes.models.knowledge_base.validators.ClassificationValidatorDataDict 
 )
 
 __all__ = [
-    "ClassificationValidatorOperatorLiteral",
-    "ClassificationValidatorPrecedenceLiteral",
-    "ClassificationValidatorHintDataTypeLiteral",
     "ClassificationValidatorConditionClauseDataDict",
     "ClassificationValidatorConditionDataDict",
-    "ClassificationValidatorQueryDataDict",
-    "ClassificationValidatorHintDataDict",
     "ClassificationValidatorDataDict",
+    "ClassificationValidatorHintDataDict",
+    "ClassificationValidatorHintDataTypeLiteral",
+    "ClassificationValidatorOperatorLiteral",
+    "ClassificationValidatorPrecedenceLiteral",
+    "ClassificationValidatorQueryDataDict",
 ]

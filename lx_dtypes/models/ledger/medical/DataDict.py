@@ -71,6 +71,8 @@ class SerializedPatientLabSampleDataDict(LedgerBaseModelDataDict):
 
 
 class PatientMedicationDataDict(LedgerBaseModelDataDict):
+    start_at: NotRequired[datetime | None]
+    end_at: NotRequired[datetime | None]
     patient: str
     medication_indication: str | None
     medication: str

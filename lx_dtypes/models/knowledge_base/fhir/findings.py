@@ -5,16 +5,16 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from math import isfinite
 from typing import Literal, NotRequired, TypedDict
-from lx_dtypes.models.contracts.finding_extraction import (
-    FindingMention,
-    FindingTextExtractor,
-)
 
 from lx_dtypes.language import DEFAULT_LANGUAGE
 from lx_dtypes.language import validate_language as _validate_language
 from lx_dtypes.models.contracts.fhir_clinical import (
     FhirCodeableConcept,
     FhirObservationComponent,
+)
+from lx_dtypes.models.contracts.finding_extraction import (
+    FindingMention,
+    FindingTextExtractor,
 )
 from lx_dtypes.models.knowledge_base.report_template.ReportedFindings import (
     _normalize_identifier,

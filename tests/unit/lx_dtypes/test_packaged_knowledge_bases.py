@@ -28,4 +28,6 @@ def test_installed_wheel_data_root_is_runtime_only_and_loadable() -> None:
     data_root = descriptor.installed_data_root()
 
     assert isinstance(data_root, Path)
-    assert (data_root / "report_templates" / descriptor.module_name / "config.yaml").is_file()
+    assert (
+        data_root / "report_templates" / descriptor.module_name / "config.yaml"
+    ).is_file()

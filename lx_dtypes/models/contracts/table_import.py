@@ -9,9 +9,10 @@ from uuid import UUID
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
 
+from lx_dtypes.models.meta.ReportMeta import ReportPatientInfo
+
 from .dtypes_record_persistence import DtypesRecordPersistencePayload
 from .knowledge_base import KnowledgeBaseIdentity
-from lx_dtypes.models.meta.ReportMeta import ReportPatientInfo
 
 
 class TableColumn(BaseModel):

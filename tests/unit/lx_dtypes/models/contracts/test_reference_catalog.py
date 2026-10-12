@@ -37,6 +37,30 @@ def test_packaged_catalog_roundtrip_in_standard_loader():
         == snapshot
     )
     assert len(kb.export_record_lists()["reference_catalogs"]) == 50
+    from lx_dtypes.models.contracts.reference_catalog import (
+        LabValueReference,
+        MedicationReference,
+    )
+
+    medications = [
+        record for record in payload.records if isinstance(record, MedicationReference)
+    ]
+    labs = [
+        record for record in payload.records if isinstance(record, LabValueReference)
+    ]
+    assert medications and labs
+    assert any(record.name == "apixaban" for record in medications)
+    assert any(record.name == "hemoglobin" for record in labs)
+    for record in [*medications, *labs]:
+        assert type(record).model_validate_json(record.model_dump_json()) == record
+    lab_data = labs[0].model_dump()
+    for mutation in (
+        {"numeric_precision": -1},
+        {"bound_adjustment_factor": -0.1},
+        {"default_normal_range": {"min": 10.0, "max": 1.0}},
+    ):
+        with pytest.raises(ValidationError):
+            LabValueReference.model_validate({**lab_data, **mutation})
 
 
 @pytest.mark.parametrize(

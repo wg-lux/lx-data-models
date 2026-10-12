@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -21,7 +22,7 @@ class VideoFrameTimeline(BaseModel):
     @model_validator(mode="after")
     def validate_timestamps(self) -> Self:
         ticks = self.presentation_timestamps
-        if ticks[0] < 0 or any(b <= a for a, b in zip(ticks, ticks[1:])):
+        if ticks[0] < 0 or any(b <= a for a, b in itertools.pairwise(ticks)):
             raise ValueError(
                 "Presentation timestamps must be nonnegative and strictly increasing"
             )
@@ -52,7 +53,7 @@ class VideoFrameProvenancePayload(BaseModel):
             raise ValueError("Every output frame requires exactly one source index")
         if any(index >= len(self.source.presentation_timestamps) for index in indices):
             raise ValueError("Source frame index exceeds decoded source timeline")
-        if any(b < a for a, b in zip(indices, indices[1:])):
+        if any(b < a for a, b in itertools.pairwise(indices)):
             raise ValueError("Source frame order must not reverse")
         if self.source.content_hash == self.output.content_hash and (
             self.source != self.output or indices != list(range(len(indices)))
@@ -82,8 +83,10 @@ class ElectricalTimestampSeries(BaseModel):
     @model_validator(mode="after")
     def validate_order(self) -> Self:
         ticks = self.presentation_timestamps
-        if any(b <= a for a, b in zip(ticks, ticks[1:])):
-            raise ValueError("Electrical timestamps must increase within one clock epoch")
+        if any(b <= a for a, b in itertools.pairwise(ticks)):
+            raise ValueError(
+                "Electrical timestamps must increase within one clock epoch"
+            )
         return self
 
 

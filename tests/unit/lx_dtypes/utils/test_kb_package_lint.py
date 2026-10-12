@@ -291,6 +291,7 @@ def test_authored_language_coverage_cannot_be_filled_by_model_defaults(
     tmp_path: Path, english: object
 ) -> None:
     import yaml
+
     from lx_dtypes.utils.kb_yaml_lint import lint_kb_yaml_files
 
     file = tmp_path / "records.yml"

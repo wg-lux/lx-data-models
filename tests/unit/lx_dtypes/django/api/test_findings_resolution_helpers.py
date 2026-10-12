@@ -262,9 +262,9 @@ def test_explicit_catalog_identity_rejects_unpinned_patient_examination() -> Non
     )
 
     with pytest.raises(
-            findings_routes.PatientExaminationKnowledgeBaseIdentityError,
-            match="requires an explicit knowledge-base identity",
-        ):
+        findings_routes.PatientExaminationKnowledgeBaseIdentityError,
+        match="requires an explicit knowledge-base identity",
+    ):
         findings_routes._resolve_catalog_kb_identity(
             module_name="dgvs_reporting",
             module_version="1.0.0",
@@ -272,7 +272,6 @@ def test_explicit_catalog_identity_rejects_unpinned_patient_examination() -> Non
             orm_models=_orm_models_for_patient_examination(patient_examination),
             api_error=_api_error,
         )
-
 
 
 def test_explicit_catalog_identity_accepts_matching_patient_examination() -> None:

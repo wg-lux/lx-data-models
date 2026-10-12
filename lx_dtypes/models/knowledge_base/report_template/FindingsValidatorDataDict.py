@@ -10,10 +10,10 @@ from lx_dtypes.models.knowledge_base.validators.FindingsValidatorDataDict import
 )
 
 __all__ = [
-    "FindingsValidatorOperatorLiteral",
     "FindingsValidatorComparatorLiteral",
     "FindingsValidatorConditionClauseDataDict",
     "FindingsValidatorConditionDataDict",
-    "FindingsValidatorQueryDataDict",
     "FindingsValidatorDataDict",
+    "FindingsValidatorOperatorLiteral",
+    "FindingsValidatorQueryDataDict",
 ]

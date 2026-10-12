@@ -263,8 +263,9 @@ def test_reports_expose_all_imported_attributes(
 def test_import_is_reproducible_and_keeps_existing_identifiers(
     mst_3_0: KnowledgeBase,
 ) -> None:
-    from scripts.import_mst_excel import GENERATED, ImportSpec, render
     import yaml
+
+    from scripts.import_mst_excel import GENERATED, ImportSpec, render
 
     outputs = render(
         ROOT, ROOT / "mst30_tables(1).xls", ROOT / "scripts/mst/import.yml"
@@ -302,8 +303,9 @@ def test_import_is_reproducible_and_keeps_existing_identifiers(
 
 
 def test_import_rejects_unreviewed_workbook(tmp_path: Path) -> None:
-    from scripts.import_mst_excel import ImportSpec, read_workbook
     import yaml
+
+    from scripts.import_mst_excel import ImportSpec, read_workbook
 
     spec = ImportSpec.model_validate(
         yaml.safe_load((ROOT / "scripts/mst/import.yml").read_text())
@@ -366,6 +368,7 @@ def test_delivered_locations_match_every_workbook_matrix_row(
 ) -> None:
     import xlrd
     import yaml
+
     from scripts.import_mst_excel import ImportSpec
 
     source = xlrd.open_workbook(str(ROOT / "mst30_tables(1).xls")).sheet_by_name(sheet)

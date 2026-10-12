@@ -17,6 +17,7 @@ from pydantic import (
 
 from lx_dtypes.models.contracts.json_types import JsonObject, JsonValue
 from lx_dtypes.models.contracts.lab_value import LabValueNormalRangeData
+from lx_dtypes.models.contracts.medication import MedicationPeriodFields
 
 
 class _MedicalWriteModel(BaseModel):
@@ -147,7 +148,7 @@ class PatientLabSampleCreate(_MedicalWriteModel):
         return _parse_aware_datetime(value)
 
 
-class PatientMedicationCreate(_MedicalWriteModel):
+class PatientMedicationCreate(MedicationPeriodFields, _MedicalWriteModel):
     medication: str = Field(min_length=1)
     medication_indication: str | None = Field(default=None, min_length=1)
     intake_times: list[str] = Field(default_factory=list)
@@ -162,6 +163,14 @@ class PatientMedicationCreate(_MedicalWriteModel):
 
 
 class PatientMedicationUpdate(_MedicalWriteModel):
+    start_at: AwareDatetime | None = None
+    end_at: AwareDatetime | None = None
+
+    @field_validator("start_at", "end_at", mode="before")
+    @classmethod
+    def parse_period_datetime(cls, value: object) -> object:
+        return _parse_aware_datetime(value)
+
     medication: str | None = Field(default=None, min_length=1)
     medication_indication: str | None = Field(default=None, min_length=1)
     intake_times: list[str] | None = None
@@ -224,6 +233,7 @@ class PatientMedicationScheduleAggregateCreate(_MedicalWriteModel):
 
 class PatientMedicalLedgerCreate(_MedicalWriteModel):
     patient: str = Field(min_length=1)
+    case_id: int | None = Field(default=None, gt=0)
     diseases: list[PatientDiseaseCreate] = Field(
         default_factory=lambda: list[PatientDiseaseCreate]()
     )

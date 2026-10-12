@@ -4,11 +4,13 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from lx_dtypes.models.interface.video_masks import load_video_mask, load_video_masks
 from lx_dtypes.models.contracts.video_masks import VideoMaskProfile
+from lx_dtypes.models.interface.video_masks import load_video_mask, load_video_masks
 
 
-def test_packaged_default_is_available_without_runtime_directory(tmp_path: Path) -> None:
+def test_packaged_default_is_available_without_runtime_directory(
+    tmp_path: Path,
+) -> None:
     profile = load_video_mask("olympus_cv_1500", tmp_path / "missing")
     assert profile.mask.x == 550
     assert profile.mask.width == 1350

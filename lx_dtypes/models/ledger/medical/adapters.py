@@ -241,6 +241,8 @@ def patient_medication_from_endoreg(record: object) -> PatientMedication:
     return PatientMedication.model_validate(
         {
             **_ledger_identity(record),
+            "start_at": getattr(record, "start_at", None),
+            "end_at": getattr(record, "end_at", None),
             "patient": _required_identity_reference(
                 getattr(record, "patient", None), "patient"
             ),

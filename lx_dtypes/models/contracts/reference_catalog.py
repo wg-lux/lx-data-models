@@ -140,7 +140,7 @@ class CatalogRecordBase(BaseModel):
 
     @property
     def kind(self) -> ReferenceKind:
-        value: object = getattr(self, "record_type")
+        value: object = self.record_type
         if not isinstance(value, str):
             raise TypeError("Catalog discriminator must be a string")
         return ReferenceKind(value)
@@ -580,7 +580,7 @@ class LabValueReference(CatalogRecordBase):
     name: str = Field(max_length=255, min_length=1)
     abbreviation: str | None = Field(max_length=10)
     default_unit: CatalogIdentity | None
-    numeric_precision: int
+    numeric_precision: int = Field(ge=0)
     default_single_categorical_value_distribution: CatalogIdentity | None
     default_numerical_value_distribution: CatalogIdentity | None
     default_multiple_categorical_value_distribution: CatalogIdentity | None
@@ -589,7 +589,7 @@ class LabValueReference(CatalogRecordBase):
     normal_range_age_dependent: bool
     normal_range_gender_dependent: bool
     normal_range_special_case: bool
-    bound_adjustment_factor: float
+    bound_adjustment_factor: float = Field(ge=0)
 
 
 class LabelReference(CatalogRecordBase):

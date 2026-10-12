@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 
-from lx_dtypes.models.contracts.json_types import JsonValue
 from lx_dtypes.models.base.app_base_model.django.KnowledgebaseBaseModelDjango import (
     KnowledgebaseBaseModelDjango,
 )
+from lx_dtypes.models.contracts.json_types import JsonValue
 from lx_dtypes.names import FINDING_MODEL_LIST_TYPE_FIELDS, FieldNames
 
 from .FindingDataDict import (

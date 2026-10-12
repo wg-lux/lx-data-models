@@ -1,9 +1,11 @@
 """Load immutable packaged masks and explicitly supplied host-owned masks."""
+
 from pathlib import Path
 
 import yaml
 
 from lx_dtypes.models.contracts.video_masks import VideoMaskProfile
+
 from .data_roots import package_data_root
 
 

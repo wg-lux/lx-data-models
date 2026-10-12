@@ -20,7 +20,6 @@ from lx_dtypes.terminology.terminology_service import (
 from lx_dtypes.utils.deployment_setup import parse_deployment_setup, resolve_deployment
 from tests.paths import PACKAGE_ROOT
 
-
 pytestmark = pytest.mark.filterwarnings(
     "error::lx_dtypes.models.interface.KnowledgeBase.ReportTemplateConceptWarning"
 )

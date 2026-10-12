@@ -11,11 +11,11 @@ from lx_dtypes.models.knowledge_base.validators.ValueTypes import (
 )
 
 __all__ = [
+    "ValidationIssueDetails",
+    "ValidationIssueScalar",
+    "ValidationIssueValue",
+    "ValidationParams",
     "ValidationScalar",
     "ValidationScalarList",
     "ValidationValue",
-    "ValidationParams",
-    "ValidationIssueScalar",
-    "ValidationIssueValue",
-    "ValidationIssueDetails",
 ]

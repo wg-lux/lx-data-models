@@ -10,6 +10,7 @@ from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
 )
 from lx_dtypes.models.contracts.json_types import JsonObject, JsonValue
 from lx_dtypes.models.contracts.lab_value import LabValueNormalRangeData
+from lx_dtypes.models.contracts.medication import MedicationPeriodFields
 
 from .DataDict import (
     PatientDiseaseDataDict,
@@ -124,7 +125,9 @@ class SerializedPatientLabSample(
 
 
 class PatientMedication(
-    _MedicalLedgerModel, LedgerBaseModel[PatientMedicationDataDict]
+    _MedicalLedgerModel,
+    MedicationPeriodFields,
+    LedgerBaseModel[PatientMedicationDataDict],
 ):
     patient: str
     medication_indication: str | None = None

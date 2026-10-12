@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Annotated, Literal, Self
+
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .ai_dataset import AIDataSetCreateContract

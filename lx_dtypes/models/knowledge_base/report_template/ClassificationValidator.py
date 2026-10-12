@@ -12,12 +12,12 @@ from lx_dtypes.models.knowledge_base.validators.ClassificationValidator import (
 )
 
 __all__ = [
-    "ClassificationValidatorOperator",
-    "ClassificationValidatorPrecedence",
     "CLASSIFICATION_VALIDATOR_OPERATORS",
     "CLASSIFICATION_VALIDATOR_PRECEDENCE",
-    "ClassificationValidatorConditionClause",
-    "ClassificationValidatorCondition",
-    "ClassificationValidatorQuery",
     "ClassificationValidator",
+    "ClassificationValidatorCondition",
+    "ClassificationValidatorConditionClause",
+    "ClassificationValidatorOperator",
+    "ClassificationValidatorPrecedence",
+    "ClassificationValidatorQuery",
 ]

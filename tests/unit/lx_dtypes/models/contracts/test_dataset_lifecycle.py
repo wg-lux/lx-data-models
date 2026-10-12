@@ -1,11 +1,12 @@
 import pytest
 from pydantic import ValidationError
+
+from lx_dtypes.models.contracts.ai_dataset import AIDataSetCreateContract
 from lx_dtypes.models.contracts.dataset_lifecycle import (
     DatasetCreate,
     DatasetDelete,
     DatasetSplit,
 )
-from lx_dtypes.models.contracts.ai_dataset import AIDataSetCreateContract
 
 
 def test_clinical_dataset_has_no_training_model() -> None:

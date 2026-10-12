@@ -85,3 +85,64 @@ def test_aggregate_rejects_invalid_schedule_indices() -> None:
                 "medication_schedules": [{"medication_indices": [1]}],
             }
         )
+
+
+@pytest.mark.parametrize(
+    "period",
+    [
+        {"end_at": "2026-01-02T10:00:00Z"},
+        {"start_at": "2026-01-02T10:00:00Z", "end_at": "2026-01-01T10:00:00Z"},
+        {"start_at": "2026-01-01T10:00:00"},
+        {"start_at": 123},
+    ],
+)
+def test_medication_rejects_invalid_periods(period: dict[str, object]) -> None:
+    with pytest.raises(ValidationError):
+        PatientMedicationCreate.model_validate({"medication": "example", **period})
+
+
+def test_medication_period_roundtrip_and_open_end() -> None:
+    from lx_dtypes.models.ledger.medical import PatientMedication
+
+    payload = PatientMedicationCreate.model_validate(
+        {
+            "medication": "example",
+            "start_at": "2026-01-01T10:00:00+02:00",
+            "end_at": "2026-01-01T09:00:00Z",
+        }
+    )
+    record = PatientMedication.model_validate({"patient": "1", **payload.model_dump()})
+    assert record.start_at == payload.start_at
+    assert (
+        PatientMedication.model_validate_json(record.model_dump_json()).end_at
+        == payload.end_at
+    )
+    assert record.ddict["start_at"] == payload.start_at
+    assert PatientMedicationCreate(medication="example").start_at is None
+
+
+@pytest.mark.parametrize(
+    "bounds",
+    [
+        {"min": 5.0, "max": 1.0},
+        {"min": float("nan")},
+        {"max": float("inf")},
+        {"female": {"min": 5.0, "max": 1.0}},
+    ],
+)
+def test_measurement_rejects_invalid_normal_range(bounds: dict[str, object]) -> None:
+    with pytest.raises(ValidationError):
+        PatientLabValueCreate.model_validate(
+            {
+                "lab_value": "example",
+                "value": 0.0,
+                "timestamp": "2026-01-01T10:00:00Z",
+                "normal_range": bounds,
+            }
+        )
+
+
+@pytest.mark.parametrize("case_id", [0, -1, True, "1"])
+def test_aggregate_rejects_invalid_case_ids(case_id: object) -> None:
+    with pytest.raises(ValidationError):
+        PatientMedicalLedgerCreate.model_validate({"patient": "1", "case_id": case_id})
