@@ -3,10 +3,16 @@ from typing import Any
 import pytest
 
 from lx_dtypes.models.knowledge_base.report_template.ReportConceptCoverageBuilder import (
+    _concept_status_and_evidence,
+    _indexed_mappings,
+    _path_value,
+    _selected_finding_values,
+    _values_validation_status,
     build_report_concept_coverage,
 )
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateCoverage import (
     ReportTemplateCoverageConcept,
+    ReportTemplateCoverageFindingSelector,
 )
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
@@ -465,3 +471,327 @@ def test_typed_open_identifier_list_constraint(
     )
 
     assert coverage.concepts[0].validation_status == expected_status
+
+
+@pytest.mark.parametrize(
+    ("payload", "path", "expected"),
+    [
+        ({"value": None}, ("value",), (True, None)),
+        ({}, ("value",), (False, None)),
+        ({"0": "mapped"}, ("0",), (True, "mapped")),
+        ({"rows": [{"value": False}]}, ("rows", "0", "value"), (True, False)),
+        (["first", "last"], ("-1",), (True, "last")),
+        (("first",), ("0",), (True, "first")),
+        (bytearray(b"a"), ("0",), (True, 97)),
+        ([], ("0",), (False, None)),
+        ([1], ("bad",), (False, None)),
+        ([1], ("-2",), (False, None)),
+        ("text", ("0",), (False, None)),
+        (b"text", ("0",), (False, None)),
+        (None, ("value",), (False, None)),
+        ({"root": 1}, (), (True, {"root": 1})),
+    ],
+)
+def test_path_value_preserves_lookup_semantics(
+    payload: object, path: tuple[str, ...], expected: tuple[bool, object]
+) -> None:
+    result = _path_value(payload, path)
+
+    assert result == expected
+
+
+@pytest.mark.parametrize("use_selector", [False, True])
+@pytest.mark.parametrize(
+    ("values", "validator_ok", "validator_missing", "expected"),
+    [
+        (["polyp"], True, False, "present"),
+        (["mass"], True, False, "invalid"),
+        (["polyp"], True, True, "unknown"),
+        ([], False, True, "unknown"),
+        ([], False, False, "missing"),
+    ],
+)
+def test_builder_status_and_evidence_precedence(
+    use_selector: bool,
+    values: list[str],
+    validator_ok: bool,
+    validator_missing: bool,
+    expected: str,
+) -> None:
+    template = _template()
+    concept = template["coverage_concepts"][0]
+    template["coverage_concepts"] = [concept]
+    concept["evidence_path"] = ["patient_findings", "0"]
+    concept["concept_value_path"] = ["patient_findings", "0", "patient_examination"]
+    if use_selector:
+        concept["finding_selector"] = {"finding_name": "polyp"}
+        concept["concept_value_path"] = ["patient_examination"]
+    payload = PExamination.model_validate(
+        {
+            "patient": "p",
+            "examination": "exam",
+            "patient_findings": [
+                {"finding": "polyp", "patient_examination": value} for value in values
+            ],
+        }
+    )
+    validation = {
+        "findings_validators": []
+        if validator_missing
+        else [{"name": "present_validator", "ok": validator_ok}]
+    }
+
+    coverage = build_report_concept_coverage(
+        kb=_KnowledgeBase(),
+        requested_template_name="template",
+        template_export=template,
+        p_examination=payload,
+        validation=validation,
+    )
+
+    item = coverage.concepts[0]
+    assert item.validation_status == expected
+    assert item.evidence_path == ("patient_findings", "0")
+    assert item.evidence_paths == (
+        ()
+        if use_selector and not values and not validator_missing
+        else (("patient_findings", "0"),)
+    )
+
+
+@pytest.mark.parametrize(
+    ("values", "expected"),
+    [
+        ([], "missing"),
+        ([(False, "polyp")], "unknown"),
+        ([(True, None)], "unknown"),
+        ([(True, "polyp")], "present"),
+        ([(True, "mass")], "invalid"),
+        ([(True, True)], "invalid"),
+        ([(True, [])], "invalid"),
+        ([(True, ["polyp", "polyp"])], "present"),
+        ([(True, ["polyp", "mass"])], "invalid"),
+        ([(True, "mass"), (False, None)], "unknown"),
+        ([(True, "mass"), (True, {"value": "polyp"})], "unknown"),
+        ([(True, "polyp"), (True, "mass")], "invalid"),
+    ],
+)
+def test_values_validation_status(
+    values: list[tuple[bool, object]], expected: str
+) -> None:
+    concept = ReportTemplateCoverageConcept.model_validate(
+        _template()["coverage_concepts"][0]
+    )
+
+    status = _values_validation_status(values, concept)
+
+    assert status == expected
+
+
+@pytest.mark.parametrize("use_selector", [False, True])
+@pytest.mark.parametrize(
+    ("value_path", "expected_direct", "expected_selected"),
+    [
+        (["finding"], "invalid", "present"),
+        (["absent"], "invalid", "unknown"),
+    ],
+)
+def test_failed_validator_precedence_depends_on_selector(
+    use_selector: bool,
+    value_path: list[str],
+    expected_direct: str,
+    expected_selected: str,
+) -> None:
+    data = _template()["coverage_concepts"][0]
+    if use_selector:
+        data["finding_selector"] = {"finding_name": "polyp"}
+        data["concept_value_path"] = value_path
+    else:
+        data["concept_value_path"] = ["patient_findings", "0", *value_path]
+    concept = ReportTemplateCoverageConcept.model_validate(data)
+    payload = {"patient_findings": [{"finding": "polyp"}]}
+    validators = {"present_validator": {"ok": False}}
+
+    result = _concept_status_and_evidence(payload, concept, validators)
+
+    assert result == (
+        expected_selected if use_selector else expected_direct,
+        (("patient_findings", "0"),) if use_selector else (("patient_findings",),),
+    )
+
+
+@pytest.mark.parametrize(
+    "malformed", [None, 1, "text", b"bytes", bytearray(b"x"), {}, [None], ()]
+)
+@pytest.mark.parametrize("level", ["findings", "classifications", "choices"])
+def test_selector_malformed_containers_preserve_missing_evidence(
+    malformed: object, level: str
+) -> None:
+    classifications = "patient_finding_classifications"
+    choices = "patient_finding_classification_choices"
+    finding: dict[str, object] = {"finding": "lesion"}
+    payload: dict[str, object] = {"patient_findings": [finding]}
+    if level == "findings":
+        payload["patient_findings"] = malformed
+    elif level == "classifications":
+        finding[classifications] = malformed
+    else:
+        finding[classifications] = [{choices: malformed}]
+    selector = ReportTemplateCoverageFindingSelector(
+        finding_name="lesion", classification_name="severity"
+    )
+
+    result = _selected_finding_values(payload, selector, None)
+
+    assert result == (
+        []
+        if level == "findings"
+        else [(("patient_findings", "0", classifications), False, None)]
+    )
+
+
+@pytest.mark.parametrize("choice_filter", [None, "confirmed", "absent"])
+@pytest.mark.parametrize("value_path", [None, [], ["detail", "value"], ["absent"]])
+def test_selector_preserves_indices_filters_and_relative_values(
+    choice_filter: str | None, value_path: list[str] | None
+) -> None:
+    classifications = "patient_finding_classifications"
+    choices = "patient_finding_classification_choices"
+    finding = {
+        "finding": "lesion",
+        classifications: [
+            None,
+            {
+                choices: (
+                    None,
+                    {"classification": "other"},
+                    {
+                        "classification": "severity",
+                        "classification_choice": "confirmed",
+                        "detail": {"value": 0},
+                    },
+                )
+            },
+            {
+                choices: [
+                    {"classification": "severity", "classification_choice": "uncertain"}
+                ]
+            },
+        ],
+    }
+    payload = {"patient_findings": (None, {"finding": "other"}, finding, finding)}
+    selector = ReportTemplateCoverageFindingSelector(
+        finding_name="lesion",
+        classification_name="severity",
+        classification_choice=choice_filter,
+    )
+    expected: list[tuple[tuple[str, ...], bool, object]] = []
+    for index in ("2", "3"):
+        path = ("patient_findings", index, classifications)
+        if choice_filter == "absent":
+            expected.append((path, False, None))
+            continue
+        exists, value = (
+            (False, None)
+            if value_path == ["absent"]
+            else (True, 0)
+            if value_path
+            else (True, "confirmed")
+        )
+        expected.append((path + ("1", choices, "2"), exists, value))
+        if choice_filter is None:
+            expected.append(
+                (
+                    path + ("2", choices, "0"),
+                    not bool(value_path),
+                    None if value_path else "uncertain",
+                )
+            )
+
+    result = _selected_finding_values(payload, selector, value_path)
+
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "choice",
+    [
+        {"classification": "severity"},
+        {
+            "classification": "severity",
+            "classification_choice": None,
+        },
+    ],
+)
+def test_selector_distinguishes_missing_choice_from_null(
+    choice: dict[str, object],
+) -> None:
+    payload = {
+        "patient_findings": [
+            {
+                "finding": "lesion",
+                "patient_finding_classifications": [
+                    {"patient_finding_classification_choices": [choice]}
+                ],
+            }
+        ]
+    }
+    selector = ReportTemplateCoverageFindingSelector(
+        finding_name="lesion", classification_name="severity"
+    )
+
+    result = _selected_finding_values(payload, selector, None)
+
+    assert result == [
+        (
+            (
+                "patient_findings",
+                "0",
+                "patient_finding_classifications",
+                "0",
+                "patient_finding_classification_choices",
+                "0",
+            ),
+            "classification_choice" in choice,
+            None,
+        )
+    ]
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (None, []),
+        ("text", []),
+        (b"bytes", []),
+        ({"finding": "lesion"}, []),
+        ([], []),
+        (
+            [None, {}, "skip", {"finding": "lesion"}],
+            [(1, {}), (3, {"finding": "lesion"})],
+        ),
+        ((False, {"finding": "lesion"}), [(1, {"finding": "lesion"})]),
+    ],
+)
+def test_indexed_mappings_preserves_original_positions(
+    value: object, expected: list[tuple[int, dict[str, str]]]
+) -> None:
+    result = list(_indexed_mappings(value))
+
+    assert result == expected
+
+
+@pytest.mark.parametrize("path", [None, [], ["finding"], ["absent"]])
+def test_selector_without_classification_resolves_relative_path(
+    path: list[str] | None,
+) -> None:
+    finding = {"finding": "lesion"}
+    payload = {"patient_findings": [None, finding]}
+    selector = ReportTemplateCoverageFindingSelector(finding_name="lesion")
+    expected = (
+        (False, None) if path == ["absent"] else (True, "lesion" if path else finding)
+    )
+
+    result = _selected_finding_values(payload, selector, path)
+
+    assert result == [(("patient_findings", "1"), *expected)]

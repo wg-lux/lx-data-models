@@ -1,4 +1,5 @@
 from pydantic import Field
+from lx_dtypes.models.contracts.finding_extraction import FindingTextRule
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
@@ -9,6 +10,7 @@ from lx_dtypes.names import FINDING_MODEL_LIST_TYPE_FIELDS
 
 
 class Finding(KnowledgebaseBaseModel[FindingDataDict]):
+    text_extraction: list[FindingTextRule] = Field(default_factory=list)
     finding_types: str | list[str] = Field(default_factory=list_of_str_factory)
     classifications: str | list[str] = Field(default_factory=list_of_str_factory)
     interventions: str | list[str] = Field(default_factory=list_of_str_factory)

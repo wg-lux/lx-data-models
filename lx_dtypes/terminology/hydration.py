@@ -27,7 +27,7 @@ from lx_dtypes.knowledge_bases import (
     PackagedKnowledgeBaseCatalog,
     knowledge_base_content_sha256,
 )
-from lx_dtypes.models.interface.data_roots import package_data_root
+from lx_dtypes.models.interface.data_roots import module_search_root, package_data_root
 from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,
@@ -112,10 +112,10 @@ def _needs_copy(
     # Other filesystem sources, including older hydrated trees, stay authoritative.
     expected = (source / _module_relative_path(descriptor)).parent
     expected_roots = {expected}
-    if expected == source / "terminology":
+    if expected in {source / "terminology", source / "report_templates"}:
         # Before the layout split, current packages were direct children of
         # data/. Preserve migration of registries pointing at that exact root.
-        expected_roots.add(source)
+        expected_roots.update({source, source / "terminology"})
     return (
         len(inputs) == 1
         and Path(inputs[0]).is_absolute()
@@ -213,9 +213,9 @@ def hydrate_registry(
                 for descriptor in pending:
                     if created:
                         _verify_source(copied_root, descriptor)
-                    input_root = (
-                        copied_root / _module_relative_path(descriptor)
-                    ).parent
+                    input_root = module_search_root(
+                        copied_root / _module_relative_path(descriptor) / "config.yaml"
+                    )
                     # Fresh loaders avoid retaining temporary paths or cached graphs.
                     loader = DataLoader(input_dirs=[input_root])
                     loader.load_module_configs()

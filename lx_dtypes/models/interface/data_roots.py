@@ -25,3 +25,15 @@ def resolve_default_data_root() -> Path | None:
         if root.exists():
             return root
     return None
+
+
+def module_search_root(config_path: Path) -> Path:
+    """Include sibling definition categories for current packaged manifests.
+
+    Historical bundles and independently authored module trees retain their
+    enclosing directory as the discovery scope.
+    """
+    root = config_path.parent.parent
+    if root.name in {"terminology", "report_templates"} and root.parent.name == "data":
+        return root.parent
+    return root

@@ -76,7 +76,7 @@ Compare your question list with the existing template. Mark each question as
 matches your protocol. Keep an editable copy under a new study package identity
 when creating a different study; retain the original release for existing data.
 
-The [example package](../../lx_dtypes/data/terminology/report_template_examples/report_templates.yaml)
+The [example package](../../lx_dtypes/data/report_templates/report_template_examples/report_templates.yml)
 shows the file format. The [package guide](dtypes-package-structure.md) provides
 a small training package for learning how files are loaded.
 
@@ -262,7 +262,7 @@ messages or checking the YAML connections.
 
 
 In the current source, `coloreg@0.3.0` defines `coloreg_colonoscopy` template
-version `2.0.0`. Its `report_templates.yaml` **names all 13 resection and
+version `2.0.0`. Its `report_templates.yml` **names all 13 resection and
 follow-up validators**, at the end under `validators.findings_validators`.
 It references record names, not `resection_validators.yml` as a file.
 The empty `coverage_concepts[].validator_names` lists are coverage metadata;
@@ -270,8 +270,9 @@ they do not disable template validators.
 
 The process is:
 
-1. `lx_dtypes/data/terminology/coloreg/config.yaml` selects both
-   `report_templates.yaml` and `data/resection_validators.yml` in `data.files`.
+1. `lx_dtypes/data/report_templates/coloreg/config.yaml` selects
+   `report_templates.yml` and depends on `coloreg_terminology`, which selects
+   `data/resection_terminology.yml` and `data/resection_validators.yml`.
    The loader parses their records into one KB and loads declared dependencies.
 2. `KnowledgeBase.evaluate_report_template_validators()` selects the named
    rules. It also calls `get_report_template_classification_validators()`:

@@ -81,7 +81,7 @@ def test_guideline_extension_files_declare_sources() -> None:
         repository_root
         / "lx_dtypes/data/terminology/lx_examinations/data/colonoscopy.yaml",
         repository_root
-        / "lx_dtypes/data/terminology/dgvs_reporting/data/00_colonoscopy_reporting.yaml",
+        / "lx_dtypes/data/report_templates/dgvs_reporting/report_templates.yml",
     ):
         content = integration_file.read_text(encoding="utf-8")
         assert "DGVS S2k quality guideline" in content, integration_file
@@ -309,7 +309,7 @@ def test_linter_rejects_descriptor_with_unresolved_unit(tmp_path: Path) -> None:
     data_file.write_text(
         (
             "- model: classification_choice_descriptor\n"
-            "  name: mst30_count_value\n"
+            "  name: mst_count_value\n"
             "  classification_choice_descriptor_type: numeric\n"
             "  unit: unknown\n"
         ),
@@ -321,7 +321,7 @@ def test_linter_rejects_descriptor_with_unresolved_unit(tmp_path: Path) -> None:
     issue = next(issue for issue in issues if issue.code == "missing_unit_reference")
     assert issue.severity == "error"
     assert issue.line == 1
-    assert "mst30_count_value" in issue.message
+    assert "mst_count_value" in issue.message
     assert "unknown" in issue.message
 
 
@@ -332,7 +332,7 @@ def test_linter_rejects_numeric_descriptor_with_implicit_unknown_unit(
     data_file.write_text(
         (
             "- model: classification_choice_descriptor\n"
-            "  name: mst30_count_value\n"
+            "  name: mst_count_value\n"
             "  classification_choice_descriptor_type: numeric\n"
         ),
         encoding="utf-8",
@@ -344,7 +344,7 @@ def test_linter_rejects_numeric_descriptor_with_implicit_unknown_unit(
         issue for issue in issues if issue.code == "numeric_descriptor_missing_unit"
     )
     assert issue.severity == "error"
-    assert "mst30_count_value" in issue.message
+    assert "mst_count_value" in issue.message
     assert "unknown" in issue.message
 
 
@@ -355,7 +355,7 @@ def test_linter_accepts_descriptor_with_resolved_unit(tmp_path: Path) -> None:
             "- model: unit\n"
             "  name: count\n"
             "- model: classification_choice_descriptor\n"
-            "  name: mst30_count_value\n"
+            "  name: mst_count_value\n"
             "  classification_choice_descriptor_type: numeric\n"
             "  unit: count\n"
         ),

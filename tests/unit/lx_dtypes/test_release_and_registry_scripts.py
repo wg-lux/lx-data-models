@@ -163,7 +163,7 @@ def _write_release_artifacts(
     (migration_root / "max_migration.txt").write_text("0001_initial\n")
     packaged_migration_contents = artifact_migration_contents or migration_contents
     knowledge_base_root = (
-        root / "lx_dtypes" / "data" / "terminology" / "report_template_examples"
+        root / "lx_dtypes" / "data" / "report_templates" / "report_template_examples"
     )
     knowledge_base_root.mkdir(parents=True)
     knowledge_base_contents = b"name: report_template_examples\nversion: 0.1.0\n"
@@ -185,7 +185,7 @@ def _write_release_artifacts(
         )
         if include_knowledge_base:
             archive.writestr(
-                "lx_dtypes/data/terminology/report_template_examples/config.yaml",
+                "lx_dtypes/data/report_templates/report_template_examples/config.yaml",
                 packaged_knowledge_base_contents,
             )
 
@@ -199,7 +199,7 @@ def _write_release_artifacts(
                 packaged_migration_contents
             )
         if include_knowledge_base:
-            files["lx_dtypes/data/terminology/report_template_examples/config.yaml"] = (
+            files["lx_dtypes/data/report_templates/report_template_examples/config.yaml"] = (
                 packaged_knowledge_base_contents
             )
         for relative_path, contents in files.items():

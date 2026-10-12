@@ -226,9 +226,15 @@ def _is_hydrated_entry(
         # Use the original catalog: upgrades and builder edits need not match
         # today's wheel digest. Full identity/content validation follows below.
         expected_root = (tree / original.resource_root).parent
+        expected_roots = {str(expected_root)}
+        if expected_root in {
+            tree / "data" / "terminology", tree / "data" / "report_templates",
+        }:
+            expected_roots.add(str(tree / "data"))
         return (
             metadata.get("hydrated_from_sha256") == original.content_sha256
-            and source.input_dirs == [str(expected_root)]
+            and len(source.input_dirs) == 1
+            and source.input_dirs[0] in expected_roots
         )
     return False
 

@@ -217,6 +217,31 @@ them through `data.files` or `data.dirs`. Directory selection is recursive;
 keep unrelated YAML documents outside selected directories. Relative paths are
 resolved from the manifest's directory and must remain inside the module.
 
+### Shipped terminology and report templates
+
+The shipped data separates current concept packages under `data/terminology/`
+from reporting packages under `data/report_templates/`. Reporting packages
+reference concept names through terminology dependencies; they must not define
+findings, classifications, choices, examinations or other clinical concepts.
+`report_finding` is a reporting reference, not a `finding` definition.
+The runtime loader rejects repeated `(model, name)` definitions across loaded
+modules, including identical copies and transitive dependencies. Errors identify
+both modules and their source YAML files; reference the existing definition
+instead of overriding it. This replaces the former last-import-wins behavior.
+Packages containing or transitively importing reporting records or study presets,
+and packages under `report_templates/`, emit `ReportTemplateConceptWarning`
+(a `UserWarning` subclass in `lx_dtypes.models.interface.KnowledgeBase`) for locally
+defined clinical concepts, including every finding definition. Concepts
+in their terminology dependencies do not trigger this warning. Conflict errors
+preserve both YAML line locations and identify the terminology definition to keep
+when only one of the conflicting modules is a reporting package. For conflicts
+between two terminology packages, ownership requires author review. Move custom
+concepts into a versioned terminology package and select it through `depends_on`;
+use `lx_dtypes/data/definitions.yml` to locate the canonical guideline sources.
+The inventory and historical-release exclusions are documented in
+`lx_dtypes/data/README.md`. Use that inventory to
+select source files for parser evaluation; merged KBs include dependencies.
+
 ## 2. The manifest
 
 ```{literalinclude} ../examples/dtypes_packages/training_preset/config.yaml
@@ -566,3 +591,20 @@ For the ColoReg resection study, see the [endpoint and linkage specification](co
 Its [study document](../../lx_dtypes/data/study_metadata/coloreg_resection.yml) uses
 `StudySetupDefinition`; lesion-size filtering and longitudinal analysis remain
 explicit host operations.
+
+## Video mask data
+
+`VideoMaskConfig` remains the coordinate contract for the image rectangle to
+retain. `VideoMaskProfile` (`models.contracts.video_masks`) associates it with a
+portable unique `name`, display `label`, and `device_name`. Packaged defaults
+live in `lx_dtypes/data/video_masks/*.yml`; load them through
+`models.interface.video_masks.load_video_mask` or `load_video_masks`.
+Names, positive sizes and containment in the reference image are validated.
+
+The loader takes an optional explicit runtime root for host-created profiles;
+it never writes to package data or repairs missing definitions. Duplicate names
+and unknown selections fail. Host persistence, permissions and processing jobs
+remain outside lx-dtypes. Endoreg-db stores immutable runtime YAML in its shared
+terminology storage and persists a complete profile snapshot with each selected
+correction job. Definitions describe coordinates, not clinical validation of a
+mask; labels on migrated placeholder coordinates retain their unverified status.

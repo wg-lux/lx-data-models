@@ -1,57 +1,85 @@
 # KB YAML Linting
 
-Use the lint command to help authors produce parseable, consistent concept YAML files with explicit line references.
+Owner: lx-dtypes maintainers. This guide owns the `ok` authoring and CI checks.
+Read the [package structure guide](dtypes-package-structure.md) before authoring YAML.
 
-Recommended reading order:
-
-1. `docs/guides/knowledge-base-authoring.md`
-2. `docs/guides/kb-yaml-linting.md`
-
-## Command
+## Default quality gate
 
 ```bash
-python scripts/lint_kb_yaml.py --config lx_dtypes/data/terminology/report_template_examples/config.yaml
+uv run ok
 ```
 
-You can also lint files/directories directly:
+Without arguments, `ok` checks every current package under the installed
+`data/terminology/` and `data/report_templates/` directories. It excludes retained
+releases under `versions/`. Each package is checked with its own dependency closure;
+independent packages are not merged into an artificial combined knowledge base.
+The summary counts unique selected YAML files, not manifests or repeated dependencies.
+
+Strict aliases, strict mixed finding styles, and failure on warnings are enabled
+by default. Exit status `0` means no enabled check reported an error or warning;
+status `1` means the quality gate failed. Diagnostics include source locations and
+stable issue codes. Shared findings are printed once even when several packages
+expose them. All selected packages are checked so one failure does not hide the rest.
+
+## Check a specific package
 
 ```bash
-python scripts/lint_kb_yaml.py lx_dtypes/data/terminology/report_template_examples/data
+uv run ok --config lx_dtypes/data/report_templates/coloreg/config.yaml
 ```
 
-## What It Checks
+Repeat `--config` to check several independent packages. A positional `config.yaml`
+works too. Passing a directory containing manifests checks those packages; explicitly
+selected historical releases are checked without exemptions. Explicit selections
+replace the default package list.
 
-- invalid YAML syntax (`file:line:column`)
-- duplicate YAML mapping keys, including nested mappings
-- invalid root/item structure
-- duplicate `(model, name)` definitions (with both source locations)
-- deprecated model aliases (for example `finding_validator` instead of `findings_validator`)
-- mixed finding reference styles in `report_template_section.findings`
-- unresolved descriptor-unit references across the discovered module graph
-- numeric descriptors that would implicitly use the `unknown` unit sentinel
-- module references that use an aggregator directory instead of its declared name
+## What it checks
 
-The aggregator-name warning is emitted when a consumer references an aggregator
-by its folder name even though module loading uses the different `name` declared
-in `config.yaml`. Use `--fail-on-warnings` when packaging or import workflows
-must resolve every configured module reference.
+- YAML syntax, duplicate mapping keys (including manifests), and record structure.
+- Duplicate `(model, name)` definitions within each dependency closure.
+- Deprecated aliases and mixed finding-reference styles.
+- Version markers embedded in record or package `name` values (`version_in_name`).
+  Examples include `_v2`, `_version_2`, `@1.0.0`, `_1.2.3`, and `_1_0_0`.
+  Store release versions in dedicated version fields. Size ranges, clinical stage
+  identifiers and guideline years are not treated as release versions. Correcting
+  a published identifier requires a coordinated migration, not an in-place rename.
+- Authored German and English display names on clinical concepts and templates
+  (`missing_language_coverage`). Sections may supply `title_de`/`title_en` or
+  `name_de`/`name_en`. Missing, blank, non-string or placeholder values do not count;
+  model-generated identifier fallbacks cannot conceal missing translations.
+  Internal reporting references, validators and bibliographic identifiers do not
+  require duplicate labels. Embedded host reference catalogues retain their own
+  schema. This checks field coverage, not translation accuracy; descriptions have
+  a single shared field and are not required in two languages.
+- Missing descriptions for template findings, broken classification input chains,
+  descriptor units, and descriptor-backed coverage paths.
+- Runtime Pydantic model validation, dependency resolution, and definition conflicts.
+- Concepts defined locally in reporting/study packages, including inherited reporting
+  packages; use terminology dependencies instead (`report_template_concept_definition`).
+- Compilation and readiness of every loaded report template, including missing
+  examinations, sections, findings and validators, empty sections/templates, and
+  unsupported section fields. Issues that block publication are errors.
 
-## Strict Modes
+Draft status alone is not an error. Template readiness checks use the existing
+reporting validator; `ok` does not publish templates or alter package data. A clean
+result does not establish clinical correctness, host projection compatibility, or
+validate separate study documents and host-owned sidecars.
+
+## File-only checks and deliberate relaxation
 
 ```bash
-python scripts/lint_kb_yaml.py \
-  --config lx_dtypes/data/terminology/report_template_examples/config.yaml \
-  --strict-aliases \
-  --strict-mixed-styles \
-  --fail-on-warnings
+uv run ok path/to/records.yml
 ```
 
-## CI Recommendation
+Files or directories without manifests receive YAML lint and model-schema checks.
+The output explicitly labels this limited scope: use `--config` to validate dependency
+resolution and template readiness.
 
-- Run this command in CI before loading KB modules.
-- Keep `pytest` for contract/runtime behavior tests.
-- Use linting for authoring feedback and governance checks.
+For exploratory work, `--no-fail-on-warnings` keeps warnings visible but allows exit
+status `0` when there are no errors. `--no-strict-aliases` and
+`--no-strict-mixed-styles` downgrade those specific errors to warnings. Existing
+positive flags remain supported. Use the strict defaults for CI and publication.
 
-## Related Guides
+The repository wrapper `python scripts/lint_kb_yaml.py` runs the same checks.
+Keep pytest for runtime behavior and host integration tests.
 
-- Authoring and publication workflow: `docs/guides/knowledge-base-authoring.md`
+See [knowledge-base authoring](knowledge-base-authoring.md) for publication workflows.

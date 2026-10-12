@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from math import isfinite
-from typing import Literal, TypedDict
+from typing import Literal, NotRequired, TypedDict
+from lx_dtypes.models.contracts.finding_extraction import (
+    FindingMention,
+    FindingTextExtractor,
+)
 
 from lx_dtypes.language import DEFAULT_LANGUAGE
 from lx_dtypes.language import validate_language as _validate_language
@@ -40,6 +44,7 @@ class FhirTerminologyValidatedFindingResultDataDict(TypedDict):
     reported_findings: list[dict[str, object]]
     observations: list[dict[str, object]]
     issues: list[RuntimeValidationIssueDataDict]
+    extraction_mentions: NotRequired[list[dict[str, object]]]
 
 
 def _slug(value: object) -> str:
@@ -262,11 +267,77 @@ def import_terminology_validated_fhir_observations(
     classification_choices: Mapping[str, ClassificationChoice],
     units: Mapping[str, Unit],
     language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
+    text_extractor: FindingTextExtractor | None = None,
 ) -> FhirTerminologyValidatedFindingResultDataDict:
     """Import FHIR Observations and validate them against YAML KB terminology."""
 
     _validate_language(language)
-    reported_findings = import_fhir_observations_to_reported_findings(observations)
+    # Known LX codes outrank localized display labels. An explicit callback
+    # handles textual concepts using the same configured rules as report imports.
+    normalized: list[Mapping[str, object]] = []
+    extracted: list[dict[str, object]] = []
+    extraction_mentions: list[dict[str, object]] = []
+    rules = {name: finding.text_extraction for name, finding in findings.items()}
+    for observation_index, observation in enumerate(observations):
+        if observation.get("resourceType") != "Observation":
+            raise ValueError("Expected an Observation resource")
+        concept = FhirCodeableConcept.model_validate(observation.get("code"))
+        names = {
+            name
+            for name in findings
+            for coding in concept.coding
+            if coding.system.endswith("/CodeSystem/lx-finding-cs")
+            and coding.code in {name, _slug(name)}
+        }
+        if len(names) > 1:
+            raise ValueError("Observation code resolves to ambiguous finding names")
+        if names:
+            name = next(iter(names))
+            if observation.get("valueBoolean") is False:
+                continue
+            canonical_code = {
+                "coding": [
+                    {"system": concept.coding[0].system, "code": name, "display": name}
+                ]
+            }
+            normalized.append({**observation, "code": canonical_code})
+        elif concept.text and text_extractor is not None:
+            if not any(rules.values()):
+                raise ValueError("Text extraction requires configured finding rules")
+            if "valueBoolean" in observation:
+                raise ValueError(
+                    "Text extraction cannot reinterpret an explicit Boolean observation"
+                )
+            if observation.get("component"):
+                raise ValueError(
+                    "Text-extracted findings cannot attribute Observation components"
+                )
+            mentions = [
+                FindingMention.model_validate(mention.model_dump())
+                for mention in text_extractor(concept.text, rules)
+            ]
+            if any(mention.finding not in findings for mention in mentions):
+                raise ValueError("Text extractor returned an unknown finding")
+            if any(mention.end > len(concept.text) for mention in mentions):
+                raise ValueError("Text extractor returned an out-of-bounds span")
+            extraction_mentions.extend(
+                {"observation_index": observation_index, **mention.model_dump()}
+                for mention in mentions
+            )
+            positive = {
+                mention.finding for mention in mentions if mention.presence == "present"
+            }
+            nonpositive = {
+                mention.finding for mention in mentions if mention.presence != "present"
+            }
+            extracted.extend(
+                {"finding": name, "classifications": [], "interventions": []}
+                for name in sorted(positive - nonpositive)
+            )
+        else:
+            normalized.append(observation)
+    reported_findings = import_fhir_observations_to_reported_findings(normalized)
+    reported_findings.extend(extracted)
     issues = validate_reported_findings_against_terminology(
         reported_findings,
         findings=findings,
@@ -280,6 +351,7 @@ def import_terminology_validated_fhir_observations(
         reported_findings=reported_findings,
         observations=[dict(observation) for observation in observations],
         issues=issues,
+        extraction_mentions=extraction_mentions,
     )
 
 

@@ -6,8 +6,10 @@ criteria:
 - Resolve each dependency closure without competing releases, then validate with DataLoader and strict
   KB YAML lint.
 - Study documents use StudySetupDefinition or StudyMetadata and are never selected as KB record lists.
-- Catalogued package YAML paths and bytes retain their published content_sha256.
+- Historical package YAML paths and bytes retain their published content_sha256.
 - Structural validity does not establish clinical approval or downstream host projection support.
+- Current report_templates packages contain reporting records and validators only; concept definitions
+  belong in terminology dependencies.
 study_metadata:
 - path: study_metadata/research.yml
   contract: lx_dtypes.models.contracts.study_setup.StudySetupDefinition
@@ -25,20 +27,6 @@ terminology:
   - strict_kb_lint
 - manifest: terminology/citations/config.yaml
   module: citations
-  version: 0.1.0
-  role: current
-  required_checks:
-  - exact_identity_loading
-  - strict_kb_lint
-- manifest: terminology/coloreg/config.yaml
-  module: coloreg
-  version: 0.3.0
-  role: current
-  required_checks:
-  - exact_identity_loading
-  - strict_kb_lint
-- manifest: terminology/dgvs_reporting/config.yaml
-  module: dgvs_reporting
   version: 0.1.0
   role: current
   required_checks:
@@ -174,13 +162,6 @@ terminology:
   required_checks:
   - exact_identity_loading
   - strict_kb_lint
-- manifest: terminology/mst_3_0/config.yaml
-  module: mst_3_0
-  version: 3.0.0
-  role: current
-  required_checks:
-  - exact_identity_loading
-  - strict_kb_lint
 - manifest: terminology/polyp_size_category/config.yaml
   module: polyp_size_category
   version: 2.0.0
@@ -188,23 +169,9 @@ terminology:
   required_checks:
   - exact_identity_loading
   - strict_kb_lint
-- manifest: terminology/report_template_examples/config.yaml
-  module: report_template_examples
-  version: 0.1.1
-  role: current
-  required_checks:
-  - exact_identity_loading
-  - strict_kb_lint
 - manifest: terminology/sample_knowledge_base/config.yaml
   module: lx_knowledge_base
   version: 0.1.0
-  role: current
-  required_checks:
-  - exact_identity_loading
-  - strict_kb_lint
-- manifest: terminology/star_upper_gi/config.yaml
-  module: star_upper_gi
-  version: 0.1.2
   role: current
   required_checks:
   - exact_identity_loading
@@ -475,8 +442,36 @@ terminology:
   required_checks:
   - exact_identity_loading
   - strict_kb_lint
+- manifest: terminology/coloreg_terminology/config.yaml
+  module: coloreg_terminology
+  version: 0.3.0
+  role: current
+  required_checks: &id001
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/mst_3_0_terminology/config.yaml
+  module: mst_3_0_terminology
+  version: 3.0.0
+  role: current
+  required_checks: &id002
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/report_template_examples_terminology/config.yaml
+  module: report_template_examples_terminology
+  version: 0.1.1
+  role: current
+  required_checks: &id003
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/star_upper_gi_terminology/config.yaml
+  module: star_upper_gi_terminology
+  version: 0.1.2
+  role: current
+  required_checks: &id004
+  - exact_identity_loading
+  - strict_kb_lint
 sidecars:
-- path: terminology/coloreg/annotation_mappings.yml
+- path: terminology/coloreg_terminology/annotation_mappings.yml
   contract: coloreg_annotation_mapping_v1
   notes: Mapping declares coloreg@0.1.0 intentionally; directory location does not change its declared
     target.
@@ -521,5 +516,35 @@ migration:
   terminology: data/<package> -> data/terminology/<package>
   study_metadata: data/study_setup/research.yml -> data/study_metadata/research.yml
   dgvs_manifest: data/terminology/config.yaml -> data/terminology/DGVS_Terminology/config.yaml
-  compatibility: Module names, versions and catalogued content digests are preserved; filesystem callers
-    must update paths. Existing hydrated registry copies are unchanged.
+  compatibility: Reporting module names and versions are preserved; current paths, concept provenance
+    and content digests change. Historical release bytes and existing hydrated registry copies are unchanged.
+  report_templates: Current reporting packages move to data/report_templates/<package>; concept definitions
+    move to data/terminology/<package>_terminology.
+report_templates:
+- manifest: report_templates/coloreg/config.yaml
+  module: coloreg
+  version: 0.3.0
+  role: current
+  required_checks: *id001
+- manifest: report_templates/dgvs_reporting/config.yaml
+  module: dgvs_reporting
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: report_templates/mst_3_0/config.yaml
+  module: mst_3_0
+  version: 3.0.0
+  role: current
+  required_checks: *id002
+- manifest: report_templates/report_template_examples/config.yaml
+  module: report_template_examples
+  version: 0.1.1
+  role: current
+  required_checks: *id003
+- manifest: report_templates/star_upper_gi/config.yaml
+  module: star_upper_gi
+  version: 0.1.2
+  role: current
+  required_checks: *id004

@@ -15,7 +15,7 @@ def mst_3_0() -> KnowledgeBase:
     return load_knowledge_base(
         "mst_3_0",
         version="3.0.0",
-        input_dirs=[ROOT / "lx_dtypes/data/terminology/mst_3_0"],
+        input_dirs=[ROOT / "lx_dtypes/data"],
     )
 
 
@@ -32,6 +32,6 @@ def test_mst_3_0_has_complete_data(mst_3_0: KnowledgeBase) -> None:
 
 
 def test_mst_anatomy_location_exists(mst_3_0: KnowledgeBase) -> None:
-    assert "mst30_location_esophagus" in mst_3_0.classification
-    assert "mst30_location_colon" in mst_3_0.classification
-    assert "mst30_eus_other" in mst_3_0.finding
+    assert "mst_location_esophagus" in mst_3_0.classification
+    assert "mst_location_colon" in mst_3_0.classification
+    assert "mst_eus_other" in mst_3_0.finding

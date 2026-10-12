@@ -39,9 +39,21 @@ class DataLoader(AppBaseModel):
         from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
         configs = self.resolved_module_configs(module_name)
-        kb = KnowledgeBase.create_from_config(configs[0])
+        modules = {
+            config.name: KnowledgeBase.create_from_config(config, warn_concepts=False)
+            for config in configs
+        }
+        reporting_names = {
+            name for name, module in modules.items() if module.is_reporting_package
+        }
+        # Resolved config.modules includes the transitive dependency closure.
+        for config in configs:
+            modules[config.name].warn_local_concept_definitions(
+                reporting_context=bool(reporting_names.intersection(config.modules))
+            )
+        kb = modules[configs[0].name]
         for config in configs[1:]:
-            kb.import_knowledge_base(KnowledgeBase.create_from_config(config))
+            kb.import_knowledge_base(modules[config.name])
         return kb
 
     def resolved_module_configs(
@@ -217,8 +229,9 @@ class DataLoader(AppBaseModel):
                     (context_dir / module_name / "config.yaml").resolve(),
                 ]
             canonical_paths = [
-                (input_dir / "terminology" / module_name / "config.yaml").resolve()
+                (input_dir / category / module_name / "config.yaml").resolve()
                 for input_dir in self.input_dirs
+                for category in ("terminology", "report_templates")
             ]
             # Some grouped packages declare their semantic module name in the
             # terminology/config.yaml manifest (for example DGVS_Terminology).
@@ -253,8 +266,9 @@ class DataLoader(AppBaseModel):
                 # Historical bundles may contain their own scoped terminology.
                 # An unversioned authoring scan still has one canonical location.
                 terminology_matches = [
-                    (input_dir / "terminology" / module_name / "config.yaml").resolve()
+                    (input_dir / category / module_name / "config.yaml").resolve()
                     for input_dir in self.input_dirs
+                    for category in ("terminology", "report_templates")
                 ]
                 terminology_matches.extend(
                     (input_dir / "terminology" / "config.yaml").resolve()

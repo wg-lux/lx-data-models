@@ -158,7 +158,7 @@ def test_missing_new_identity_is_added_without_overwriting_other_edits(storage):
 def test_bad_source_digest_is_not_published(tmp_path):
     source = tmp_path / "source"
     shutil.copytree(package_data_root(), source)
-    (source / "terminology/mst_3_0/data/bad.yaml").write_text("[]")
+    (source / "terminology/mst_3_0_terminology/data/bad.yaml").write_text("[]")
     service = TerminologyService(tmp_path / "destination/registry.json")
     with pytest.raises(TerminologyError, match="digest mismatch"):
         hydrate_registry(service, source_root=source)
@@ -234,7 +234,7 @@ def test_two_processes_provision_one_consistent_registry(tmp_path):
 def test_copy_of_read_only_source_gets_owner_write_permission(tmp_path):
     source = tmp_path / "source"
     shutil.copytree(package_data_root(), source)
-    original = source / "terminology/star_upper_gi/config.yaml"
+    original = source / "report_templates/star_upper_gi/config.yaml"
     original.chmod(0o444)
     service = TerminologyService(tmp_path / "destination/registry.json")
     hydrate_registry(service, source_root=source)

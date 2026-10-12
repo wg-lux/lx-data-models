@@ -1,3 +1,5 @@
+import warnings
+from lx_dtypes.models.contracts.finding_extraction import FindingTextExtractor
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import (
@@ -193,6 +195,7 @@ from lx_dtypes.models.knowledge_base.validators.ValidatorRuntimeDataDict import 
     UnitValidatorExecutionDataDict,
 )
 from lx_dtypes.utils.parser import (
+    CLINICAL_CONCEPT_MODELS,
     camel_to_snake,
     parse_shallow_object_with_meta,
     snake_to_camel,
@@ -213,6 +216,16 @@ if TYPE_CHECKING:
     from lx_dtypes.models.ledger.p_indication_classification.Pydantic import (
         PIndicationClassification,
     )
+
+
+class ReportTemplateConceptWarning(UserWarning):
+    """A reporting/study package defines concepts instead of referencing terminology."""
+
+    def __init__(self, message: str, *, source_file: Path, line: int, column: int):
+        super().__init__(message)
+        self.source_file = source_file
+        self.line = line
+        self.column = column
 
 
 class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
@@ -342,6 +355,61 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     _lookup_tracker: KnowledgeBaseLookupTracker = PrivateAttr(
         default_factory=KnowledgeBaseLookupTracker
     )
+
+    _definition_locations: dict[tuple[str, str], tuple[Path, int, int]] = PrivateAttr(
+        default_factory=dict
+    )
+    _reporting_modules: set[str] = PrivateAttr(default_factory=set)
+
+    @property
+    def is_reporting_package(self) -> bool:
+        """Whether this module owns or inherits reporting/study definitions."""
+        return self.config.name in self._reporting_modules
+
+    def warn_local_concept_definitions(
+        self, *, reporting_context: bool = False
+    ) -> None:
+        """Warn only for this module's concepts, before importing dependencies."""
+        if not (reporting_context or self.is_reporting_package):
+            return
+        self._reporting_modules.add(self.config.name)
+        for (model_name, name), location in self._definition_locations.items():
+            if model_name not in CLINICAL_CONCEPT_MODELS:
+                continue
+            record: KB_MODELS = getattr(self, model_name)[name]
+            if record.kb_module_name != self.config.name:
+                continue
+            file, line, column = location
+            warnings.warn(
+                ReportTemplateConceptWarning(
+                    f"{file}:{line}:{column}: '{model_name}' definition '{name}' "
+                    f"in reporting/study module '{self.config.name}'. Move this custom "
+                    "definition into a terminology package and reference it through "
+                    "depends_on. If it already exists in guideline terminology, remove "
+                    "this copy and reference that definition. See "
+                    "docs/guides/dtypes-package-structure.md and "
+                    "lx_dtypes/data/definitions.yml for terminology package manifests.",
+                    source_file=file,
+                    line=line,
+                    column=column,
+                ),
+                stacklevel=2,
+            )
+
+    def definition_source(
+        self, model_name: str, name: str
+    ) -> tuple[Path, int, int] | None:
+        """Return the original YAML location, including imported definitions."""
+        return self._definition_locations.get((model_name, name))
+
+    def _definition_location(
+        self, model_name: str, name: str, record: KB_MODELS
+    ) -> str:
+        location = self._definition_locations.get((model_name, name))
+        if location is None:
+            return str(record.source_file or "<source unavailable>")
+        file, line, column = location
+        return f"{file}:{line}:{column}"
 
     def _lookup_required(
         self,
@@ -1553,6 +1621,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         observations: Sequence[Mapping[str, object]],
         *,
         language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
+        text_extractor: FindingTextExtractor | None = None,
     ) -> FhirTerminologyValidatedFindingResultDataDict:
         return import_terminology_validated_fhir_observations(
             observations,
@@ -1561,6 +1630,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             classification_choices=self.classification_choice,
             units=self.unit,
             language=language,
+            text_extractor=text_extractor,
         )
 
     def get_report_template_classification_validators(
@@ -1657,7 +1727,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         return self.ddict_class(**self.model_dump())
 
     @classmethod
-    def create_from_config(cls, config: "KnowledgeBaseConfig") -> "KnowledgeBase":
+    def create_from_config(
+        cls, config: "KnowledgeBaseConfig", *, warn_concepts: bool = True
+    ) -> "KnowledgeBase":
         """
         Create a KnowledgeBase instance from a KnowledgeBaseConfig and populate its module entries from YAML files referenced by the config.
 
@@ -1686,7 +1758,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             registry_path = registry_path_for_module(
                 config.source_file.parent
             ).resolve()
-        seen_records: dict[tuple[str, str], tuple[Path, int, int]] = {}
+        seen_records = kb._definition_locations
         data = config.data
         submodule_files = sorted(
             set(data.get_files_with_suffix(".yaml"))
@@ -1726,6 +1798,19 @@ class KnowledgeBase(AppBaseModelUUIDTags):
 
                 # set the updated dict back to the kb
                 setattr(kb, model_name, model_dict)
+        if (
+            kb.report_template
+            or kb.report_template_section
+            or kb.report_finding
+            or kb.study_preset
+            or (
+                config.source_file is not None
+                and config.source_file.parent.parent.name == "report_templates"
+            )
+        ):
+            kb._reporting_modules.add(name)
+        if warn_concepts:
+            kb.warn_local_concept_definitions()
         return kb
 
     @classmethod
@@ -1748,14 +1833,52 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         """
         Merge records from another KnowledgeBase into this instance.
 
-        Merges each model collection from `other` into `self` by adding entries from `other` and replacing any existing entries with the same key. The `tags` list is merged as the union of both instances' tags. Fields listed in YAML_IMPORT_SKIP_FIELDS are ignored. Values from `other` will be validated or converted into the target model type when necessary.
+        Duplicate model names are rejected before mutation, including identical
+        redefinitions. The tags list is merged as a union. Fields listed in
+        YAML_IMPORT_SKIP_FIELDS are ignored.
 
         Parameters:
             other (KnowledgeBase): KnowledgeBase whose records will be merged into this one.
 
         Raises:
+            ValueError: If both knowledge bases define the same model and name.
             AssertionError: If a model field name is not recognised or if the expected model collections are not dicts.
         """
+        for model_name in KB_MODEL_NAMES_ORDERED:
+            field_name = camel_to_snake(model_name)
+            current: dict[str, KB_MODELS] = getattr(self, field_name)
+            incoming: dict[str, KB_MODELS] = getattr(other, field_name)
+            for key in sorted(current.keys() & incoming.keys()):
+                previous, replacement = current[key], incoming[key]
+                previous_source = self._definition_location(field_name, key, previous)
+                incoming_source = other._definition_location(
+                    field_name, key, replacement
+                )
+                guidance = "Keep one definition in the owning terminology package."
+                previous_reporting = previous.kb_module_name in self._reporting_modules
+                incoming_reporting = (
+                    replacement.kb_module_name in other._reporting_modules
+                )
+                if (
+                    field_name in CLINICAL_CONCEPT_MODELS
+                    and previous_reporting != incoming_reporting
+                ):
+                    owner, source = (
+                        (replacement, incoming_source)
+                        if previous_reporting
+                        else (previous, previous_source)
+                    )
+                    guidance = (
+                        f"Remove the reporting copy and reference '{key}' from "
+                        f"module '{owner.kb_module_name}' at {source}."
+                    )
+                raise ValueError(
+                    f"Conflicting '{field_name}' definition '{key}': "
+                    f"module '{previous.kb_module_name}' ({previous_source}) and "
+                    f"module '{replacement.kb_module_name}' ({incoming_source}). "
+                    f"{guidance} Redefinitions are not allowed. See "
+                    "docs/guides/dtypes-package-structure.md."
+                )
         for field_name in KnowledgeBase.model_fields:
             field_model_name = snake_to_camel(field_name)
             if field_name in YAML_IMPORT_SKIP_FIELDS:
@@ -1800,8 +1923,6 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 )
 
             for key, value in other_models.items():
-                if key in current_models:
-                    pass  # or raise warning?
                 current_models[key] = (
                     value
                     if isinstance(value, TargetModel)
@@ -1809,6 +1930,8 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                 )
 
             setattr(self, field_name, current_models)
+        self._definition_locations.update(other._definition_locations)
+        self._reporting_modules.update(other._reporting_modules)
 
     def export_knowledge_base(
         self, export_dir: Path, filename: str = "knowledge_base"

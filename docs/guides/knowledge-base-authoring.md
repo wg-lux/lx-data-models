@@ -56,7 +56,7 @@ module directory, for example:
         "sources": [{
           "kind": "filesystem",
           "input_dirs": [
-            "https://github.com/wg-lux/lx-data-models/tree/main/lx_dtypes/data/terminology/star_upper_gi"
+            "https://github.com/wg-lux/lx-data-models/tree/main/lx_dtypes/data/report_templates/star_upper_gi"
           ]
         }]
       }
@@ -234,7 +234,7 @@ tree used by `lx-data-models`.
 The current Nix example package in `package.nix` packages:
 
 ```text
-lx_dtypes/data/terminology/star_upper_gi/
+lx_dtypes/data/report_templates/star_upper_gi/
 ```
 
 That means the module folder name is currently part of the packaging contract.
@@ -245,7 +245,7 @@ Important naming rule:
 
 In the current package definition:
 
-- `kbSource = ./lx_dtypes/data/terminology/star_upper_gi;`
+- `kbSource = ./lx_dtypes/data/report_templates/star_upper_gi;`
 - `kbModuleName = builtins.baseNameOf (toString kbSource);`
 - the Nix package name is derived from that folder name
 
@@ -256,20 +256,20 @@ If you change the published module name, update the packaged source folder to ma
 Run the KB linter against the module config or data directory:
 
 ```bash
-python scripts/lint_kb_yaml.py --config lx_dtypes/data/terminology/star_upper_gi/config.yaml
+python scripts/lint_kb_yaml.py --config lx_dtypes/data/report_templates/star_upper_gi/config.yaml
 ```
 
 or:
 
 ```bash
-python scripts/lint_kb_yaml.py lx_dtypes/data/terminology/star_upper_gi
+python scripts/lint_kb_yaml.py lx_dtypes/data/report_templates/star_upper_gi
 ```
 
 Use strict mode when you want authoring governance checks as part of CI:
 
 ```bash
 python scripts/lint_kb_yaml.py \
-  --config lx_dtypes/data/terminology/star_upper_gi/config.yaml \
+  --config lx_dtypes/data/report_templates/star_upper_gi/config.yaml \
   --strict-aliases \
   --strict-mixed-styles \
   --fail-on-warnings

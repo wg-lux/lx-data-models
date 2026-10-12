@@ -32,7 +32,7 @@ def test_bootstrap_preserves_hydrated_edits_and_active_identity(
     descriptor = get_packaged_knowledge_base("dgvs_reporting")
     entry = payload["modules"][descriptor.module_name][descriptor.version]
     root = Path(entry["sources"][0]["input_dirs"][0])
-    config = root / descriptor.module_name / "config.yaml"
+    config = root / "report_templates" / descriptor.module_name / "config.yaml"
     edited = config.read_bytes() + b"\n# Local builder edit retained across startup\n"
     config.write_bytes(edited)
     original = hydrated_registry.read_bytes()
@@ -58,7 +58,7 @@ def test_bootstrap_rejects_invalid_hydrated_copy(
     elif damage == "path":
         entry["sources"][0]["input_dirs"] = [str(root / "unrelated")]
     else:
-        config = root / "dgvs_reporting" / "config.yaml"
+        config = root / "report_templates" / "dgvs_reporting" / "config.yaml"
         config.write_text(config.read_text().replace("0.1.0", "9.9.9"))
     hydrated_registry.write_text(json.dumps(payload))
     original = hydrated_registry.read_bytes()

@@ -71,13 +71,8 @@ def test_lint_kb_yaml_main_reports_success(
     monkeypatch.setattr(lint_kb_yaml, "parse_args", lambda: fake_args)
     monkeypatch.setattr(
         lint_kb_yaml,
-        "discover_yaml_files",
-        lambda *, paths, config_paths: ([Path("a.yaml")], []),
-    )
-    monkeypatch.setattr(
-        lint_kb_yaml,
-        "lint_kb_yaml_files",
-        lambda yaml_files, strict_aliases, strict_mixed_styles: [],
+        "lint_kb_package",
+        lambda config, strict_aliases, strict_mixed_styles: ([Path("a.yaml")], []),
     )
     monkeypatch.setattr(
         lint_kb_yaml,
@@ -105,13 +100,8 @@ def test_lint_kb_yaml_main_fails_when_warnings_requested(
     monkeypatch.setattr(lint_kb_yaml, "parse_args", lambda: fake_args)
     monkeypatch.setattr(
         lint_kb_yaml,
-        "discover_yaml_files",
-        lambda *, paths, config_paths: ([Path("a.yaml")], []),
-    )
-    monkeypatch.setattr(
-        lint_kb_yaml,
-        "lint_kb_yaml_files",
-        lambda yaml_files, strict_aliases, strict_mixed_styles: [],
+        "lint_kb_package",
+        lambda config, strict_aliases, strict_mixed_styles: ([Path("a.yaml")], []),
     )
     monkeypatch.setattr(
         lint_kb_yaml,

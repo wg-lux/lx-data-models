@@ -5,8 +5,8 @@
       "module_name": "dgvs_reporting",
       "version": "0.1.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/terminology/dgvs_reporting",
-      "content_sha256": "4aa23fc93dbab98be0ee68fabe2639862ea4b85d28e015d2e911eeef7b5c1ef8",
+      "resource_root": "data/report_templates/dgvs_reporting",
+      "content_sha256": "3641cde9c205b1c57140613abc01fd6e4c83a176870aca0963b8554e6e8e07b5",
       "default": true
     },
     {
@@ -21,16 +21,16 @@
       "module_name": "mst_3_0",
       "version": "3.0.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/terminology/mst_3_0",
-      "content_sha256": "b2c40f78f23d59383857193839da76bf26a6dae9f680e91ff877a0787ab476b6",
+      "resource_root": "data/report_templates/mst_3_0",
+      "content_sha256": "ea354e28292cf916116f180f78abf63b2efa19bb3c4dee0619a1039206b311a0",
       "default": true
     },
     {
       "module_name": "star_upper_gi",
       "version": "0.1.2",
       "medical_field": "gastroenterology",
-      "resource_root": "data/terminology/star_upper_gi",
-      "content_sha256": "32d8c4d14bcd63de1ac49b0d5eab95f6711228ce7e387971f0de169c6c9ebe36",
+      "resource_root": "data/report_templates/star_upper_gi",
+      "content_sha256": "cb5273a00abf017db38ef5d5cf0baa7746082f977994c9ee21698f6112ceebf4",
       "default": true
     },
     {
@@ -91,8 +91,40 @@
       "module_name": "coloreg",
       "version": "0.3.0",
       "medical_field": "gastroenterology",
-      "resource_root": "data/terminology/coloreg",
-      "content_sha256": "63735107f588f164159e8707586e318eecc65c0ef3ae3647d4c418891ccaf8b8",
+      "resource_root": "data/report_templates/coloreg",
+      "content_sha256": "1f8dcf81bb71452c3a0756655e65dd27b197d4604793332f645054445453f80b",
+      "default": true
+    },
+    {
+      "module_name": "coloreg_terminology",
+      "version": "0.3.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/terminology/coloreg_terminology",
+      "content_sha256": "a9cc11ed344d955bf48c23cf4e7e7e995b049e7529f445f512cd15217a178af8",
+      "default": true
+    },
+    {
+      "module_name": "mst_3_0_terminology",
+      "version": "3.0.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/terminology/mst_3_0_terminology",
+      "content_sha256": "d0bc0b073b875303ff7fb6fa0865bd0bd8c4bde522635cbccb857289c8712b70",
+      "default": true
+    },
+    {
+      "module_name": "report_template_examples_terminology",
+      "version": "0.1.1",
+      "medical_field": null,
+      "resource_root": "data/terminology/report_template_examples_terminology",
+      "content_sha256": "f851a4d091c4351868154c92a6b2ffaf2c350d279b376d7123df8c4a772a5e44",
+      "default": true
+    },
+    {
+      "module_name": "star_upper_gi_terminology",
+      "version": "0.1.2",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/terminology/star_upper_gi_terminology",
+      "content_sha256": "fb51a2b6a4214f509f504017e4fc949abd08f77824ede3d56c711ece561ddbfb",
       "default": true
     }
   ]

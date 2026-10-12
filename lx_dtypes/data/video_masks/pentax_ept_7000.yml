@@ -1,0 +1,19 @@
+name: pentax_ept_7000
+label: Pentax EPT-7000 (unverified coordinates)
+device_name: pentax_ept_7000
+# PLACEHOLDER COORDINATES - Verify with real Pentax EPT-7000 video footage
+# Measurement instructions:
+# 1. Open reference video in video player with frame info
+# 2. Identify leftmost visible endoscope pixel (X coordinate)
+# 3. Identify topmost visible endoscope pixel (Y coordinate)
+# 4. Measure endoscope image width (typically 1300-1350px for HD)
+# 5. Measure endoscope image height (typically 1000-1080px for HD)
+# 6. Update this file with measured values
+# 7. Test masking with sample video to verify black bars are correct
+mask:
+  x: 600
+  y: 50
+  width: 1300
+  height: 1000
+  image_width: 1920
+  image_height: 1080

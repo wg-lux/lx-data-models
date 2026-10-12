@@ -3,12 +3,16 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+import re
 from typing import Any, Literal
 
 import yaml
 from pydantic import ValidationError
 
+from lx_dtypes.language import LANGUAGE_LABELS
 from lx_dtypes.models.contracts.reference_catalog import ReferenceCatalogPayload
+from lx_dtypes.models.interface.data_roots import module_search_root
+from lx_dtypes.utils.parser import CLINICAL_CONCEPT_MODELS, _reject_duplicate_keys
 
 LintSeverity = Literal["error", "warning"]
 
@@ -128,6 +132,9 @@ def _discover_yaml_files_from_module_config(
 
     raw_text = config_path.read_text(encoding="utf-8")
     try:
+        node = yaml.compose(raw_text)
+        if node is not None:
+            _reject_duplicate_keys(node, set())
         loaded = yaml.safe_load(raw_text)
     except yaml.YAMLError as exc:
         problem_mark = getattr(exc, "problem_mark", None)
@@ -157,7 +164,7 @@ def _discover_yaml_files_from_module_config(
         ]
 
     if module_index is None:
-        search_root = config_path.parent.parent.resolve()
+        search_root = module_search_root(config_path).resolve()
         module_index = {}
         for nested in sorted(search_root.rglob("config.yaml")):
             nested_resolved = nested.resolve()
@@ -299,9 +306,9 @@ def _discover_yaml_files_from_module_config(
             selected = min(visited_matches)
             return selected, []
 
-        current_group = config_path.parent.parent.resolve()
+        current_group = module_search_root(config_path).resolve()
         same_group = [
-            c for c in candidates if c.parent.parent.resolve() == current_group
+            c for c in candidates if module_search_root(c).resolve() == current_group
         ]
         if len(same_group) == 1:
             return same_group[0], []
@@ -358,6 +365,7 @@ def discover_yaml_files(
     *,
     paths: Sequence[Path],
     config_paths: Sequence[Path],
+    resolved_configs: set[Path] | None = None,
 ) -> tuple[list[Path], list[KbYamlLintIssue]]:
     issues: list[KbYamlLintIssue] = []
     files: list[Path] = []
@@ -379,7 +387,7 @@ def discover_yaml_files(
                 module_index.setdefault(module_name.strip(), []).append(nested_resolved)
 
     search_roots = sorted(
-        {path.resolve().parent.parent for path in config_paths},
+        {module_search_root(path.resolve()) for path in config_paths},
         key=lambda path: (len(path.parts), str(path)),
     )
     indexed_roots: list[Path] = []
@@ -415,7 +423,7 @@ def discover_yaml_files(
         if path.is_file():
             if path.name == "config.yaml":
                 discovered, config_issues = _discover_yaml_files_from_module_config(
-                    path
+                    path, visited_configs=visited_configs
                 )
                 files.extend(discovered)
                 issues.extend(config_issues)
@@ -446,6 +454,8 @@ def discover_yaml_files(
             seen.add(file_path)
             deduped.append(file_path)
 
+    if resolved_configs is not None:
+        resolved_configs.update(visited_configs)
     return deduped, issues
 
 
@@ -965,11 +975,82 @@ def _lint_unresolved_model_references(
     return issues
 
 
+_VERSION_IN_NAME = re.compile(
+    r"(?:^|[_-])v(?:ersion)?[_-]?\d+(?=$|[_.-])"
+    r"|@\d+(?:[._-]\d+)*"
+    r"|(?:^|[_-])\d+\.\d+\.\d+(?=$|[_-])"
+    r"|(?:^|[_-])\d+_\d+_\d+(?=$|[_-])",
+    re.IGNORECASE,
+)
+_DISPLAY_NAME_MODELS = (CLINICAL_CONCEPT_MODELS - {"reference_catalog"}) | {
+    "report_template",
+    "report_template_section",
+}
+
+
+def lint_name_version(
+    name: str, *, model_name: str, file: Path, line: int = 1, column: int = 1
+) -> list[KbYamlLintIssue]:
+    issues: list[KbYamlLintIssue] = []
+    if _VERSION_IN_NAME.search(name):
+        issues.append(
+            _issue(
+                code="version_in_name",
+                severity="error",
+                file=file,
+                line=line,
+                column=column,
+                message=f"'{model_name}' name '{name}' embeds a version. Keep names stable; "
+                "use the package version (and report_template.version for templates). "
+                "Update references together when correcting an unpublished identifier; "
+                "do not rename published concepts in place.",
+            )
+        )
+    return issues
+
+
+def _lint_authoring_conventions(
+    item: _YamlItem, model_name: str, name: str
+) -> list[KbYamlLintIssue]:
+    issues = lint_name_version(
+        name, model_name=model_name, file=item.file, line=item.line, column=item.column
+    )
+    if model_name not in _DISPLAY_NAME_MODELS:
+        return issues
+    missing: list[str] = []
+    for language in LANGUAGE_LABELS:
+        fields = [f"name_{language}"]
+        if model_name == "report_template_section":
+            fields.insert(0, f"title_{language}")
+        if not any(
+            isinstance(value := item.payload.get(field), str)
+            and value.strip()
+            and (value.strip() != "unknown" or name == "unknown")
+            for field in fields
+        ):
+            missing.append(" or ".join(fields))
+    if missing:
+        issues.append(
+            _issue(
+                code="missing_language_coverage",
+                severity="warning",
+                file=item.file,
+                line=item.line,
+                column=item.column,
+                message=f"'{model_name}' '{name}' lacks authored display text: {', '.join(missing)}. "
+                "Provide nonempty translations; identifier fallbacks and 'unknown' "
+                "placeholders do not establish language coverage.",
+            )
+        )
+    return issues
+
+
 def lint_kb_yaml_files(
     yaml_files: Iterable[Path],
     *,
     strict_aliases: bool = False,
     strict_mixed_styles: bool = False,
+    check_authoring: bool = False,
 ) -> list[KbYamlLintIssue]:
     issues: list[KbYamlLintIssue] = []
     definitions: dict[tuple[str, str], _DefinitionLocation] = {}
@@ -1049,6 +1130,11 @@ def lint_kb_yaml_files(
                     )
                 )
                 continue
+
+            if check_authoring:
+                issues.extend(
+                    _lint_authoring_conventions(item, model_name, name.strip())
+                )
 
             if model_name == "reference_catalog":
                 try:

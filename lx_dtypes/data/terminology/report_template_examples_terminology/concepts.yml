@@ -1,0 +1,35 @@
+- model: classification_choice
+  name: large
+  name_de: "Groß"
+
+- model: classification_choice
+  name: present
+  name_de: "Vorhanden"
+
+- model: classification
+  name: size_mm
+  name_de: "Größe in Millimetern"
+  classification_choices:
+    - size_mm
+
+- model: classification
+  name: size_cat
+  name_de: "Größenkategorie"
+  classification_choices:
+    - large
+
+- model: classification
+  name: lst
+  name_de: "Lateral ausgedehnter Tumor (LST)"
+  classification_choices:
+    - present
+
+- model: finding
+  name: esophagus_polyp
+  name_de: "Ösophaguspolyp"
+  description: Esophageal polyp used by the legacy report-template example.
+  classifications:
+    - size_mm
+    - size_cat
+    - lst
+

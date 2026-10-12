@@ -13,6 +13,8 @@ from typing import Literal, Self
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from lx_dtypes.models.interface.data_roots import module_search_root
+
 BUILTIN_KNOWLEDGE_BASE_PROVIDER = "lx_dtypes.builtin"
 RESOURCE_ANCHOR = "lx_dtypes"
 CATALOG_RESOURCE = "data/catalog.json"
@@ -96,7 +98,7 @@ class PackagedKnowledgeBase(BaseModel):
                 "The packaged knowledge base is not installed as a filesystem "
                 "resource; consume resource_directory() instead."
             )
-        return module_resource.parent
+        return module_search_root(module_resource / "config.yaml")
 
 
 class PackagedKnowledgeBaseCatalog(BaseModel):

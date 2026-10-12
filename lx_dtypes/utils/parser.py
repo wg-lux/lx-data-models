@@ -17,6 +17,27 @@ MODEL_NAME_ALIASES: dict[str, str] = {
 }
 
 
+CLINICAL_CONCEPT_MODELS = frozenset(
+    {
+        "reference_catalog",
+        "unit",
+        "unit_type",
+        "classification",
+        "classification_type",
+        "classification_choice",
+        "classification_choice_descriptor",
+        "intervention",
+        "intervention_type",
+        "finding",
+        "finding_type",
+        "indication",
+        "indication_type",
+        "examination",
+        "examination_type",
+    }
+)
+
+
 @dataclass(frozen=True)
 class ParsedYamlObject:
     parsed_object: KB_MODELS
