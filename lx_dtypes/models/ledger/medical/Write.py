@@ -25,6 +25,7 @@ class _MedicalWriteModel(BaseModel):
         extra="forbid",
         strict=True,
         str_strip_whitespace=True,
+        allow_inf_nan=False,
     )
 
 

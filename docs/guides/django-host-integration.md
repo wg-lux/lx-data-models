@@ -11,6 +11,26 @@ Use this guide when:
 
 This is a contract document, not an internal implementation walkthrough.
 
+## Medical records and examination alternatives
+
+The canonical reference catalog includes `MedicationReference` and
+`LabValueReference`; use the standard reference catalog loader rather than
+host-specific replacement shapes. Medication ledger records and create/update
+contracts carry optional timezone-aware `start_at` and `end_at`. End-only and
+reversed periods are invalid; PATCH hosts must validate the merged period.
+Lab normal ranges reject nonfinite or reversed bounds.
+
+`lx_dtypes.models.contracts.examination_revision` defines complete clinical
+snapshot, optional evidence selection, revision write/read and case selection
+contracts. Clinical content reuses `DtypesRecordPersistencePayload`,
+`PatientMedicationCreate` and `PatientLabValueCreate`. Report-only, video-only,
+combined and media-free snapshots are valid shapes. Annotation coordinates pin
+integer presentation timestamps and a rational stream time base to the processed
+artifact hash. These contracts do not finalize records or authorize media use:
+the host owns persistence, transactions, scope checks, version conflicts,
+finalization and case lifecycle. EndoReg's canonical host guide is
+`docs/case_graph_persistence.md` in the endoreg-db repository.
+
 `FindingDjango` preserves the canonical finding's `text_extraction` rules during
 DataDict synchronization. Apply migration `0007_findingdjango_text_extraction`
 before importing findings; existing rows receive an empty rule list.

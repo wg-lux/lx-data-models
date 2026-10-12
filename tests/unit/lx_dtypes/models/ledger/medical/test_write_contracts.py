@@ -117,7 +117,7 @@ def test_medication_period_roundtrip_and_open_end() -> None:
         PatientMedication.model_validate_json(record.model_dump_json()).end_at
         == payload.end_at
     )
-    assert record.ddict["start_at"] == payload.start_at
+    assert record.ddict.get("start_at") == payload.start_at
     assert PatientMedicationCreate(medication="example").start_at is None
 
 

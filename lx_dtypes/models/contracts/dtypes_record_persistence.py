@@ -26,6 +26,7 @@ class _DtypesRecordLedgerPayload(BaseModel):
         extra="forbid",
         str_strip_whitespace=True,
         validate_default=True,
+        allow_inf_nan=False,
     )
 
     created_at: AwareDatetime = Field(default_factory=lambda: datetime.now(UTC))
