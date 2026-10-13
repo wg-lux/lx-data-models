@@ -1,0 +1,41 @@
+version: 1
+tier: domain
+path: lx_dtypes/data
+parent: ../structure.yml
+summary: Packaged terminology, reporting resources, portable study metadata, and release inventory. Existing
+  definitions.yml and catalog.json remain authoritative for data ownership and published identities.
+responsibilities:
+- Separate clinical concepts from reporting references and study metadata
+- Retain historical release bytes and catalog integrity
+boundaries:
+- Context metadata is not a KB record or package config.yaml
+- Patient data, runtime registries, and generated exports do not belong here
+entrypoints:
+- name: Resource guide
+  file: README.md
+  purpose: Resource ownership and path contracts
+- name: Definitions
+  file: definitions.yml
+  purpose: Canonical package and provenance inventory
+- name: Catalog
+  file: catalog.json
+  purpose: Published release identities and digests
+dependencies:
+  internal:
+  - ../models
+  external:
+  - YAML
+  - JSON
+submodules: []
+contracts:
+- name: Package structure
+  doc: ../../docs/guides/dtypes-package-structure.md
+tests:
+  directory: ../../tests/unit/lx_dtypes
+  command: uv run pytest tests/unit/lx_dtypes/test_packaged_knowledge_bases.py tests/unit/lx_dtypes/test_packaged_report_templates.py
+    -q
+files:
+- terminology
+- report_templates
+- study_metadata
+- video_masks

@@ -154,3 +154,28 @@ class ExaminationRevisionRead(RevisionContract):
     snapshot: ExaminationRevisionSnapshot
     finalized_at: AwareDatetime | None
     updated_at: AwareDatetime
+
+
+class SelectedExaminationExport(RevisionContract):
+    patient_examination_id: PositiveId
+    revision_id: PositiveId
+    revision_version: PositiveId
+    finalized_at: AwareDatetime
+    snapshot: ExaminationRevisionSnapshot
+
+
+class SelectedCaseExport(RevisionContract):
+    schema_version: Literal["1.0"] = "1.0"
+    generated_at: AwareDatetime
+    case_id: UUID
+    patient_pseudonym: str = Field(min_length=1)
+    center_key: str | None
+    is_closed: bool
+    examinations: list[SelectedExaminationExport] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def unique_examinations(self) -> Self:
+        ids = [item.patient_examination_id for item in self.examinations]
+        if len(ids) != len(set(ids)):
+            raise ValueError("An examination can appear only once per case export")
+        return self

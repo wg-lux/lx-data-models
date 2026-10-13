@@ -14,6 +14,12 @@ repos:
         pass_filenames: false
   - repo: local
     hooks:
+      - id: structure-lint
+        name: hierarchical context manifest lint
+        entry: python scripts/lint_structure.py
+        always_run: true
+        language: system
+        pass_filenames: false
       - id: kb-yaml-lint
         name: knowledge base yaml lint
         entry: python lx_dtypes/scripts/lint_kb_yaml.py

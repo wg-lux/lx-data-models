@@ -25,7 +25,14 @@ from lx_dtypes.models.contracts.examination_revision import (
 def test_optional_evidence_roundtrip(evidence: dict[str, object]) -> None:
     snapshot = ExaminationRevisionSnapshot.model_validate(
         {
-            "content": {"examination": {"patient": "1", "examination": "example"}},
+            "content": {
+                "examination": {
+                    "patient": "1",
+                    "examination": "example",
+                    "uuid": "12345678-1234-1234-1234-123456789013",
+                    "created_at": "2026-10-13T08:00:00Z",
+                }
+            },
             "evidence": evidence,
         }
     )
@@ -84,3 +91,51 @@ def test_annotations_preserve_integer_timing_and_reject_mixed_generations() -> N
     assert restored.annotations[0].value is False
     with pytest.raises(ValidationError, match="generation"):
         ExaminationEvidence.model_validate({**payload, "processed_sha256": "b" * 64})
+
+
+def test_selected_export_validates_serialized_identity_and_finalization() -> None:
+    import json
+
+    from lx_dtypes.models.contracts.examination_revision import SelectedCaseExport
+
+    record = {
+        "patient_examination_id": 1,
+        "revision_id": 2,
+        "revision_version": 1,
+        "finalized_at": "2026-10-13T09:00:00Z",
+        "snapshot": {
+            "content": {
+                "examination": {
+                    "patient": "1",
+                    "examination": "example",
+                    "uuid": "12345678-1234-1234-1234-123456789013",
+                    "created_at": "2026-10-13T08:00:00Z",
+                }
+            },
+            "evidence": {},
+        },
+    }
+    payload = {
+        "schema_version": "1.0",
+        "generated_at": "2026-10-13T09:00:00Z",
+        "case_id": "12345678-1234-1234-1234-123456789012",
+        "patient_pseudonym": "synthetic",
+        "center_key": None,
+        "is_closed": False,
+        "examinations": [record],
+    }
+    export = SelectedCaseExport.model_validate_json(json.dumps(payload))
+    assert SelectedCaseExport.model_validate_json(export.model_dump_json()) == export
+    for key, value in (
+        ("revision_id", True),
+        ("revision_id", "2"),
+        ("finalized_at", None),
+    ):
+        with pytest.raises(ValidationError):
+            SelectedCaseExport.model_validate_json(
+                json.dumps({**payload, "examinations": [{**record, key: value}]})
+            )
+    with pytest.raises(ValidationError, match="only once"):
+        SelectedCaseExport.model_validate_json(
+            json.dumps({**payload, "examinations": [record, record]})
+        )

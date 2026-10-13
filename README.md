@@ -109,6 +109,7 @@ make -C docs html
 git clone https://github.com/wg-lux/lx-data-models.git
 cd lx-data-models
 uv sync --extra dev
+uv run python scripts/lint_structure.py
 uv run pyright
 uv run pytest -q
 uv run make -C docs html
@@ -121,6 +122,9 @@ or a test-local temporary directory.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor and release
 workflow, [CHANGELOG.md](CHANGELOG.md) for release notes, and
 [SECURITY.md](SECURITY.md) for responsible vulnerability reporting.
+
+For scoped repository navigation, start at [structure.yml](structure.yml) and
+follow the [agent context guide](docs/agent_context.md).
 
 ## License and citation
 

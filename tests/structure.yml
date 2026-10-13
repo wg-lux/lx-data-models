@@ -1,0 +1,36 @@
+version: 1
+tier: domain
+path: tests
+parent: ../structure.yml
+summary: Deterministic unit, integration, and package-boundary verification. Unit suites mirror lx_dtypes
+  and fixtures remain test-only.
+responsibilities:
+- Verify typed contracts, loaders, adapters, and packaged resources
+- Verify repository tooling and executable documentation
+boundaries:
+- Use temporary directories for generated artifacts
+- Do not expose fixtures as public package dependencies or include patient data
+entrypoints:
+- name: Fixtures
+  file: conftest.py
+  purpose: Shared fixture registration
+- name: Django test settings
+  file: django_settings.py
+  purpose: Isolated host test configuration
+- name: Context tests
+  file: test_structure.py
+  purpose: Schema and manifest graph drift checks
+dependencies:
+  internal:
+  - ../lx_dtypes
+  - ../scripts
+  external:
+  - pytest
+  - pytest-django
+submodules: []
+contracts:
+- name: Test layout
+  doc: ../docs/guides/package_boundary.md
+tests:
+  directory: .
+  command: uv run pytest tests/test_structure.py -q

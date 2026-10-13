@@ -16,6 +16,7 @@ api/index
 :maxdepth: 2
 :caption: Guides
 
+agent_context
 guides/pydantic-cheatsheet
 guides/dates-and-times
 guides/typing_conventions

@@ -108,3 +108,46 @@ def test_http_and_yaml_share_filter_validation(has_report: bool | None) -> None:
         CohortDefinition.model_validate(
             {"name": "Study", "hypothesis": "Review", "dataset_ids": [1, 1]}
         )
+
+
+def test_import_receipt_binds_complete_distinct_persisted_identities() -> None:
+    from lx_dtypes.models.contracts.study_setup import StudySetupImportReceipt
+
+    definition = parse_study_setup_yaml(template())
+    payload = {
+        "definition": definition.model_dump(mode="json"),
+        "datasets": {
+            item.definition_id: index
+            for index, item in enumerate(definition.datasets, 1)
+        },
+        "cohorts": {
+            item.definition_id: index
+            for index, item in enumerate(definition.cohorts, 1)
+        },
+    }
+    receipt = StudySetupImportReceipt.model_validate(payload)
+    assert (
+        StudySetupImportReceipt.model_validate_json(receipt.model_dump_json())
+        == receipt
+    )
+    for invalid in (
+        {},
+        {"colorectal_images": 1, "colorectal_videos": 1},
+        {"colorectal_images": True, "colorectal_videos": 2},
+    ):
+        with pytest.raises(ValidationError):
+            StudySetupImportReceipt.model_validate({**payload, "datasets": invalid})
+
+
+def test_definition_digest_ignores_yaml_formatting_but_binds_content() -> None:
+    definition = parse_study_setup_yaml(template())
+    assert (
+        parse_study_setup_yaml(template() + "\n# comment\n").content_sha256
+        == definition.content_sha256
+    )
+    assert (
+        parse_study_setup_yaml(
+            template().replace("Colorectal research images", "Changed title")
+        ).content_sha256
+        != definition.content_sha256
+    )

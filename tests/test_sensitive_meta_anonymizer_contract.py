@@ -11,6 +11,7 @@ from lx_dtypes.models import (
     SensitiveMetaState,
     SensitiveMetaStateDataDict,
 )
+from lx_dtypes.models.meta.ReportMeta import ReportMeta
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta
 
 
@@ -68,6 +69,31 @@ def test_safe_update_is_fill_only_and_normalizes_blanks() -> None:
     assert meta.first_name == "Alice"
     assert meta.last_name == "Smith"
     assert meta.casenumber == "E123"
+
+
+def test_safe_update_preserves_typed_state_and_json_roundtrip() -> None:
+    meta = SensitiveMeta(
+        uuid="00000000-0000-0000-0000-000000000001",
+        sensitive_meta_state=SensitiveMetaState(
+            sensitive_meta="00000000-0000-0000-0000-000000000001", name_verified=True
+        ),
+    )
+
+    meta.safe_update(casenumber="E123")
+
+    assert isinstance(meta.sensitive_meta_state, SensitiveMetaState)
+    assert meta.sensitive_meta_state.name_verified is True
+    assert SensitiveMeta.model_validate_json(meta.model_dump_json()) == meta
+
+
+@pytest.mark.parametrize(
+    "payload", [{}, {"cropped_regions": {}}, {"cropped_regions": None}]
+)
+def test_report_meta_preserves_empty_crop_mapping(payload: dict[str, object]) -> None:
+    meta = ReportMeta.model_validate(payload)
+
+    assert meta.cropped_regions == {}
+    assert ReportMeta.model_validate_json(meta.model_dump_json()) == meta
 
 
 def test_safe_update_prevents_partial_mutation_on_validation_error() -> None:

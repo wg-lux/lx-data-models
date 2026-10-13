@@ -1,0 +1,35 @@
+version: 1
+tier: domain
+path: docs
+parent: ../structure.yml
+summary: Canonical developer guides, API reference sources, and executable documentation examples. Maintained
+  by lx_dtypes maintainers under the shared documentation governance policy.
+responsibilities:
+- Document public contracts and authoring workflows in English
+- Maintain Sphinx sources and deterministic examples
+boundaries:
+- Generated Sphinx output stays in ignored _build
+- Cross-repository readiness tracking belongs to endoreg-db
+entrypoints:
+- name: Documentation index
+  file: index.md
+  purpose: Top-down documentation entry point
+- name: Sphinx config
+  file: conf.py
+  purpose: Documentation build configuration
+- name: Agent context
+  file: agent_context.md
+  purpose: Canonical context manifest protocol
+dependencies:
+  internal:
+  - ../lx_dtypes
+  external:
+  - Sphinx
+  - MyST
+submodules: []
+contracts:
+- name: Package authoring
+  doc: guides/dtypes-package-structure.md
+tests:
+  directory: ../tests
+  command: uv run make -C docs html

@@ -33,11 +33,29 @@ package, host preset projection, and dataset/cohort setup are separate contracts
   explicitly required.
 - Generated Sphinx output belongs in `docs/_build/` and must not be committed.
 
+## Source of Truth & Context Protocol
+
+- Start at [structure.yml](structure.yml) and traverse its `submodules` top-down
+  to the domain needed for the task before searching source files. Scope searches
+  to that domain rather than broadly grepping the repository, and respect its
+  responsibilities, boundaries, public entrypoints, and referenced contracts.
+- Context manifests map architecture; existing package configs, resource
+  inventories, public exports, and canonical domain guides retain their authority.
+- Whenever adding, removing, or renaming files or changing boundaries, update
+  the corresponding `structure.yml` files in the same changeset. Preserve custom
+  metadata and maintain both child links and parent references. Keep trivial
+  folders at their existing architectural tier.
+- Before concluding any prompt or submitting a pull request, run
+  `uv run python scripts/lint_structure.py` and report any failures or blockers.
+- Follow [Hierarchical agent context](docs/agent_context.md) for the schema,
+  relative-path conventions, validation, and scoping delegated work.
+
 ## Verification
 
 Run the narrowest applicable checks from the repository root:
 
 ```bash
+uv run python scripts/lint_structure.py
 uv run pyright
 uv run pytest <test-path-or-node-id> -q
 uv run make -C docs html

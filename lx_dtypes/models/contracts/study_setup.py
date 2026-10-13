@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+from hashlib import sha256
 from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -35,9 +37,18 @@ class StudySetupDefinition(BaseModel):
 
     schema_version: Literal["1.0"]
     definition_id: DefinitionId
-    definition_version: Annotated[str, Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")]
+    definition_version: Annotated[
+        str, Field(max_length=64, pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
+    ]
     datasets: list[StudyDatasetDefinition] = Field(default_factory=list, max_length=500)
     cohorts: list[StudyCohortDefinition] = Field(default_factory=list, max_length=500)
+
+    @property
+    def content_sha256(self) -> str:
+        canonical = json.dumps(
+            self.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
+        )
+        return sha256(canonical.encode("utf-8")).hexdigest()
 
     @model_validator(mode="after")
     def validate_references(self) -> Self:
@@ -56,3 +67,41 @@ class StudySetupDefinition(BaseModel):
                     "cohort dataset_refs must reference datasets in this document"
                 )
         return self
+
+
+class StudySetupImportRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    yaml: str = Field(max_length=1_048_576)
+    mode: Literal["validate", "dry_run", "import"] = "validate"
+
+
+class StudySetupImportReceipt(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    definition: StudySetupDefinition
+    datasets: dict[str, Annotated[int, Field(gt=0)]]
+    cohorts: dict[str, Annotated[int, Field(gt=0)]]
+
+    @model_validator(mode="after")
+    def complete_mapping(self) -> Self:
+        if set(self.datasets) != {
+            row.definition_id for row in self.definition.datasets
+        }:
+            raise ValueError("dataset identity mapping is incomplete")
+        if set(self.cohorts) != {row.definition_id for row in self.definition.cohorts}:
+            raise ValueError("cohort identity mapping is incomplete")
+        if len(set(self.datasets.values())) != len(self.datasets) or len(
+            set(self.cohorts.values())
+        ) != len(self.cohorts):
+            raise ValueError("distinct definitions require distinct persisted rows")
+        return self
+
+
+class StudySetupImportResult(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    status: Literal["planned", "created", "unchanged"]
+    definition_id: DefinitionId
+    definition_version: str
+    content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    datasets: dict[str, int | None]
+    cohorts: dict[str, int | None]
+    links: dict[str, list[str]]

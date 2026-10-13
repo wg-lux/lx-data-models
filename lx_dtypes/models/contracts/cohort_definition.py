@@ -75,6 +75,6 @@ class CohortDatasetLink(BaseModel):
 
 
 class CohortPreviewDefinition(CohortDefinition):
-    """Optional owned saved cohort supplies explicitly imported examination scope."""
+    """An owned saved cohort supplies current filters, dataset links and imported scope."""
 
     cohort_id: PositiveId | None = None

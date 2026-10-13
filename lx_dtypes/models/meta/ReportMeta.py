@@ -24,6 +24,7 @@ class ReportMeta(SensitiveMeta):
     """Strong model for string-keyed report metadata produced by ReportReader."""
 
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+    _LIST_DEFAULT_FIELDS = SensitiveMeta._LIST_DEFAULT_FIELDS | {"cropped_regions"}
     pdf_hash: str | None = None
     anonymized_pdf_path: str | Path | None = None
     redaction_summary: ReportRedactionSummary | None = None

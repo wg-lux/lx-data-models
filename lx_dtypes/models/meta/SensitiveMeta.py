@@ -341,8 +341,8 @@ class SensitiveMeta(MetaBaseModel[SensitiveMetaDataDict]):
         except ValidationError:
             return
 
-        for field, value in merged.model_dump().items():
-            object.__setattr__(self, field, value)
+        for field in SensitiveMeta.model_fields:
+            object.__setattr__(self, field, getattr(merged, field))
         self.__pydantic_fields_set__.update(fill_updates.keys())
 
     @property

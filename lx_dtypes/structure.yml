@@ -1,0 +1,71 @@
+version: 1
+tier: package
+path: lx_dtypes
+parent: ../structure.yml
+summary: Distributable typed library and public lazy exports. Small utility, serialization, factory, statistics,
+  and CLI modules remain at this tier.
+responsibilities:
+- Expose stable typed contracts and validation APIs
+- Provide shared FHIR conversion, serialization, statistics, and package CLIs
+boundaries:
+- Do not import tests or repository scripts into the public package
+- Do not take ownership of host deployment workflows
+entrypoints:
+- name: Public exports
+  file: __init__.py
+  purpose: Stable lazy public API
+- name: Advisory validation
+  file: validation.py
+  purpose: Typed validation entry points
+- name: FHIR mapping
+  file: utils/fhir_lxdm_mapping.py
+  purpose: FHIR and LXDM conversions
+- name: Registry CLI
+  file: scripts/kb_registry.py
+  purpose: Explicit registry provisioning
+dependencies:
+  internal: []
+  external:
+  - Pydantic v2
+  - PyYAML
+  - FHIR
+  - NumPy
+  - pandas
+  - Pandera
+submodules:
+- name: models
+  path: models
+  manifest: models/structure.yml
+  summary: Typed domain, knowledge-base, ledger, interface, and external exchange contracts. Backend-specific
+    representations share explicit contract boundaries.
+- name: terminology
+  path: terminology
+  manifest: terminology/structure.yml
+  summary: Versioned terminology resolution, registry lifecycle, and host-configured loading. Explicit
+    service instances isolate registries and caller-owned storage.
+- name: django
+  path: django
+  manifest: django/structure.yml
+  summary: Django persistence adapters and reusable Ninja APIs for host integration. Test settings and
+    deployment orchestration remain outside the production integration surface.
+- name: data
+  path: data
+  manifest: data/structure.yml
+  summary: Packaged terminology, reporting resources, portable study metadata, and release inventory.
+    Existing definitions.yml and catalog.json remain authoritative for data ownership and published identities.
+contracts:
+- name: Package boundary
+  doc: ../docs/guides/package_boundary.md
+- name: Cross-layer validation
+  doc: ../docs/guides/cross-layer-validation.md
+tests:
+  directory: ../tests/unit/lx_dtypes
+  command: uv run pytest tests/test_fhir_lxdm_mapping.py -q
+files:
+- utils
+- serialization
+- factories
+- stats
+- names
+- scripts
+- setup_templates
