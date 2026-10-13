@@ -140,7 +140,7 @@ class CatalogRecordBase(BaseModel):
 
     @property
     def kind(self) -> ReferenceKind:
-        value: object = self.record_type
+        value: object = object.__getattribute__(self, "record_type")
         if not isinstance(value, str):
             raise TypeError("Catalog discriminator must be a string")
         return ReferenceKind(value)
