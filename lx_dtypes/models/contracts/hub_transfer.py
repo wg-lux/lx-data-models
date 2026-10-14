@@ -13,7 +13,7 @@ from pydantic import (
 )
 
 from .json_types import JsonObject, JsonValue
-from .video_provenance import VideoProvenanceBundle
+from .video_provenance import VideoProvenanceBundle, VideoProvenanceRecovery
 
 type HubTransferJsonScalar = str | int | float | bool | None
 type HubTransferJsonValue = (
@@ -138,6 +138,7 @@ class HubTransferProcessingSnapshotData(TypedDict):
 
 class HubTransferProvenanceData(TypedDict, total=False):
     video_frame_provenance: JsonObject
+    video_provenance_recovery: JsonObject
     entrypoint: str
     source_node_key: str
     source_center_key: str
@@ -333,6 +334,7 @@ class HubTransferProcessingSnapshotPayload(_StrictPayload):
 
 class HubTransferProvenancePayload(_StrictPayload):
     video_frame_provenance: VideoProvenanceBundle | None = None
+    video_provenance_recovery: VideoProvenanceRecovery | None = None
     entrypoint: str | None = None
     source_node_key: str | None = None
     source_center_key: str | None = None
@@ -381,6 +383,22 @@ class HubTransferVideoTransferPayload(_HubTransferPayload):
                 raise ValueError(
                     "Frame provenance must end at the transferred processed media"
                 )
+        recovery = (
+            self.provenance.video_provenance_recovery if self.provenance else None
+        )
+        if recovery is not None:
+            if (
+                self.provenance is not None
+                and self.provenance.video_frame_provenance is not None
+            ):
+                raise ValueError(
+                    "Transfer must select verified ancestry or unresolved recovery"
+                )
+            if recovery.recording_hash != self.resource_hash or (
+                recovery.processed_timeline.content_hash
+                != self.resource_rows.video_file.processed_video_hash
+            ):
+                raise ValueError("Unresolved provenance belongs to different media")
         for segment in self.resource_rows.video_segments:
             if segment.source_node_key != self.source_node_key:
                 raise ValueError("video segment source_node_key must match transfer")

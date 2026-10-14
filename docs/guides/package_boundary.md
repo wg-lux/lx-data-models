@@ -54,3 +54,15 @@ replace the raw identity or determine the resource's transfer key.
 This is an intentional breaking field rename from `video_hash`. Payloads must use
 `raw_video_hash`; there is no legacy alias. Upgrade producers and consumers
 together. The Django RenameField migration preserves existing identity values.
+
+## Unresolved video frame provenance
+
+`VideoProvenanceRecovery` is a separate strict exchange contract from
+`VideoProvenanceBundle`. It binds an explicit `unresolved` mapping status to a
+recording hash and processed timeline, retains optional original presentation
+timestamps and timezone-qualified recording start/end, and permanently sets
+`electrical_matching_eligible` to false. It contains no inferred frame indices.
+A transfer selects either verified ancestry or an unresolved receipt and must
+bind both endpoint hashes. Publishers and receivers must upgrade together;
+older strict schemas reject the new field. Persistence, user acknowledgment,
+audit and media verification belong to endoreg-db, not this package.

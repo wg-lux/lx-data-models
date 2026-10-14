@@ -53,3 +53,46 @@ def test_hub_transfer_segment_rejects_legacy_identity_name() -> None:
 
     with pytest.raises(ValueError, match="raw_video_hash"):
         HubTransferVideoSegmentPayload.model_validate(payload)
+
+
+def test_unresolved_provenance_preserves_pts_without_claiming_frame_identity() -> None:
+    from lx_dtypes.models.contracts.hub_transfer import HubTransferProvenancePayload
+    from lx_dtypes.models.contracts.video_provenance import (
+        VideoFrameTimeline,
+        VideoProvenanceRecovery,
+    )
+
+    timeline = VideoFrameTimeline(
+        content_hash="b" * 64,
+        time_base_num=1,
+        time_base_den=90000,
+        presentation_timestamps=[9000, 12000, 17000],
+    )
+    recovery = VideoProvenanceRecovery(
+        recording_hash="a" * 64,
+        processed_timeline=timeline,
+        recording_started_at="2026-10-13T10:00:00+02:00",
+        recording_ended_at="2026-10-13T10:01:00+02:00",
+    )
+    exchanged = HubTransferProvenancePayload.model_validate_json(
+        HubTransferProvenancePayload(
+            video_provenance_recovery=recovery
+        ).model_dump_json()
+    )
+    assert exchanged.video_provenance_recovery == recovery
+    assert recovery.original_timeline is None
+    assert recovery.electrical_matching_eligible is False
+    with pytest.raises(ValueError):
+        VideoProvenanceRecovery.model_validate(
+            {
+                **recovery.model_dump(),
+                "electrical_matching_eligible": True,
+            }
+        )
+    with pytest.raises(ValueError):
+        VideoProvenanceRecovery.model_validate(
+            {
+                **recovery.model_dump(),
+                "source_frame_indices": [0, 1, 2],
+            }
+        )
