@@ -1,76 +1,112 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_classification_choices
 # JNET
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022), optical lesion characterization: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: classification_choice
 
   name: "colon_lesion_jnet_1"
+  name_de: "JNET Typ 1"
+  name_en: "JNET type 1"
 
 - model: classification_choice
 
   name: "colon_lesion_jnet_2a"
+  name_de: "JNET Typ 2A"
+  name_en: "JNET type 2A"
 
 - model: classification_choice
 
   name: "colon_lesion_jnet_2b"
+  name_de: "JNET Typ 2B"
+  name_en: "JNET type 2B"
 
 - model: classification_choice
 
   name: "colon_lesion_jnet_3"
+  name_de: "JNET Typ 3"
+  name_en: "JNET type 3"
 
 # NICE
 - model: classification_choice
 
   name: "colon_lesion_NICE_type_1"
-  # name_de: "Kolonläsion - NICE Typ 1"
+  name_de: "NICE Typ 1"
+  name_en: "NICE type 1"
   # name_en: "Colon lesion - NICE type 1"
 
 - model: classification_choice
 
   name: "colon_lesion_NICE_type_2"
-  # name_de: "Kolonläsion - NICE Typ 2"
+  name_de: "NICE Typ 2"
+  name_en: "NICE type 2"
   # name_en: "Colon lesion - NICE type 2"
 
 - model: classification_choice
 
   name: "colon_lesion_NICE_type_3"
-  # name_de: "Kolonläsion - NICE Typ 3"
+  name_de: "NICE Typ 3"
+  name_en: "NICE type 3"
   # name_en: "Colon lesion - NICE type 3"
 
 # Kudo
 - model: classification_choice
 
   name: "colon_lesion_kudo_1"
+  name_de: "Kudo I"
+  name_en: "Kudo I"
 
 - model: classification_choice
 
   name: "colon_lesion_kudo_2"
+  name_de: "Kudo II"
+  name_en: "Kudo II"
 
 - model: classification_choice
 
   name: "colon_lesion_kudo_3s"
+  name_de: "Kudo IIIs"
+  name_en: "Kudo IIIs"
 - model: classification_choice
 
   name: "colon_lesion_kudo_3l"
+  name_de: "Kudo IIIL"
+  name_en: "Kudo IIIL"
 - model: classification_choice
 
   name: "colon_lesion_kudo_4"
+  name_de: "Kudo IV"
+  name_en: "Kudo IV"
 - model: classification_choice
 
   name: "colon_lesion_kudo_5i"
+  name_de: "Kudo Vi"
+  name_en: "Kudo Vi"
 - model: classification_choice
 
   name: "colon_lesion_kudo_5n"
+  name_de: "Kudo Vn"
+  name_en: "Kudo Vn"
 
 # Sano
 - model: classification_choice
 
   name: "colon_lesion_sano_1"
+  name_de: "Sano I"
+  name_en: "Sano I"
 
 - model: classification_choice
 
   name: "colon_lesion_sano_2"
+  name_de: "Sano II"
+  name_en: "Sano II"
 
 - model: classification_choice
 
   name: "colon_lesion_sano_3a"
+  name_de: "Sano IIIa"
+  name_en: "Sano IIIa"
 - model: classification_choice
 
   name: "colon_lesion_sano_3b"
+  name_de: "Sano IIIb"
+  name_en: "Sano IIIb"

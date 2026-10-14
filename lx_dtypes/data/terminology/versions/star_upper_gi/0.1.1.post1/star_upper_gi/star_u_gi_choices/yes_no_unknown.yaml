@@ -1,0 +1,9 @@
+- model: classification_choice
+  name: "yes"
+  name_de: "Ja"
+- model: classification_choice
+  name: "no"
+  name_de: "Nein"
+- model: classification_choice
+  name: "unknown"
+  name_de: "Unbekannt"

@@ -1,5 +1,8 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_interventions
 - model: intervention
   name: endoscopy_cold_snare_resection_generic
+  name_de: "Endoskopische Kaltschlingenresektion"
+  name_en: "Endoscopic cold snare resection"
   description: Cold snare polypectomy is a technique used to remove small polyps
     from the colon. It is performed using a snare wire loop that is passed through
     the colonoscope and used to remove the polyp by cutting it off at the base.
@@ -13,6 +16,8 @@
 
 - model: intervention
   name: endoscopy_diathermic_snare_resection_generic
+  name_de: "Endoskopische diathermische Schlingenresektion"
+  name_en: "Endoscopic diathermic snare resection"
   description: Hot snare polypectomy is a technique used to remove small polyps
     from the colon. It is performed using a snare wire loop that is passed through
     the colonoscope and used to remove the polyp by cutting it off at the base.
@@ -26,6 +31,8 @@
 
 - model: intervention
   name: endoscopy_biopsy_foreceps_resection_generic
+  name_de: "Endoskopische Resektion mit Biopsiezange"
+  name_en: "Endoscopic resection with biopsy forceps"
   description: Biopsy is a technique used to take a small sample of tissue from
     a lesion in the colon. It is performed by inserting a small instrument through
     the colonoscope and removing a small piece of tissue from the lesion. The tissue
@@ -39,6 +46,8 @@
 
 - model: intervention
   name: endoscopy_emr_generic
+  name_de: "Endoskopische Mukosaresektion (EMR)"
+  name_en: "Endoscopic mucosal resection (EMR)"
   description: Endoscopic mucosal resection (EMR) is a technique used to remove
     large polyps or early-stage cancers from the colon. It is performed by injecting
     a solution under the lesion to create a cushion of fluid that lifts the lesion
@@ -54,6 +63,8 @@
 
 - model: intervention
   name: endoscopy_esd_generic
+  name_de: "Endoskopische Submukosadissektion (ESD)"
+  name_en: "Endoscopic submucosal dissection (ESD)"
   description:
     Endoscopic submucosal dissection (ESD) is a technique used to remove
     large polyps or early-stage cancers from the colon. It is performed by injecting
@@ -70,6 +81,8 @@
 
 - model: intervention
   name: endoscopy_eftr_generic
+  name_de: "Endoskopische Vollwandresektion (EFTR)"
+  name_en: "Endoscopic full-thickness resection (EFTR)"
   description: Endoscopic full-thickness resection (EFTR) is a technique used to
     remove lesions in the colon.
   intervention_types:

@@ -4,12 +4,12 @@
 }:
 
 let
-  kbSource = ./demo-data/star_upper_gi;
+  kbSource = ./lx_dtypes/data/report_templates/star_upper_gi;
   kbModuleName = builtins.baseNameOf (toString kbSource);
   pname = "lx-dtypes-kb-${lib.replaceStrings [ "_" ] [ "-" ] kbModuleName}";
-  version = "0.1.1";
+  version = "0.1.2";
 
-  kbModuleVersion = "0.1.1";
+  kbModuleVersion = "0.1.2";
 in
 stdenvNoCC.mkDerivation {
   inherit pname version;
@@ -27,6 +27,10 @@ stdenvNoCC.mkDerivation {
 
     mkdir -p "$kbRoot/${kbModuleName}" "$registryRoot"
     cp -r ${kbSource}/. "$kbRoot/${kbModuleName}/"
+
+    for dependency in star_upper_gi_terminology lx_units lx_classification_choices lx_descriptors; do
+      cp -r ${./lx_dtypes/data/terminology}/"$dependency" "$kbRoot/"
+    done
 
     cat > "$registryPath" <<EOF
     {

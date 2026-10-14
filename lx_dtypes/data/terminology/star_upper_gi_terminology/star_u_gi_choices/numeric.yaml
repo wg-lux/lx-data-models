@@ -1,0 +1,42 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.star_upper_gi_terminology
+- model: classification_choice
+  name: distance_cm
+  name_de: "Abstand in Zentimetern"
+  name_en: "Distance in centimeters"
+  classification_choice_descriptors:
+    - length_cm_descriptor
+
+- model: classification_choice
+  name: size_mm
+  name_de: "Größe in Millimetern"
+  name_en: "Size in millimeters"
+  classification_choice_descriptors:
+    - length_mm_descriptor
+
+- model: classification_choice
+  name: star_upper_gi_count_value
+  name_de: "Anzahl"
+  name_en: "Count"
+  classification_choice_descriptors:
+    - star_upper_gi_count_descriptor
+
+- model: classification_choice
+  name: star_upper_gi_minutes_value
+  name_de: "Dauer in Minuten"
+  name_en: "Duration in minutes"
+  classification_choice_descriptors:
+    - star_upper_gi_minutes_descriptor
+
+- model: classification_choice
+  name: star_upper_gi_cleanliness_total_0_9_value
+  name_de: "Gesamtwert der Sauberkeit (0–9)"
+  name_en: "Total cleanliness score (0–9)"
+  classification_choice_descriptors:
+    - star_upper_gi_cleanliness_total_0_9_descriptor
+
+- model: classification_choice
+  name: star_upper_gi_cleanliness_total_0_10_value
+  name_de: "Gesamtwert der Sauberkeit (0–10)"
+  name_en: "Total cleanliness score (0–10)"
+  classification_choice_descriptors:
+    - star_upper_gi_cleanliness_total_0_10_descriptor

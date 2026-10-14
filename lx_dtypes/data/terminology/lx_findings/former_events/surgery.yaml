@@ -1,11 +1,16 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_findings
 - model: finding
   name: "hip_replacement_surgery"
+  name_de: "Hüftgelenkersatz"
+  name_en: "Hip replacement surgery"
   description: "Hip replacement surgery"
   tags:
     - event
 
 - model: finding
   name: "knee_replacement_surgery"
+  name_de: "Kniegelenkersatz"
+  name_en: "Knee replacement surgery"
   description: "Knee replacement surgery"
   tags:
     - event

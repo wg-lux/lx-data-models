@@ -1,0 +1,76 @@
+version: 1
+tier: root
+path: .
+parent: null
+summary: Reusable typed clinical data contracts, versioned knowledge bases, and interoperability adapters.
+  Repository tooling and documentation support this library boundary.
+responsibilities:
+- Own shared contracts and stable public imports
+- Maintain deterministic package resources and verification tooling
+boundaries:
+- Application persistence orchestration and deployed runtime storage belong to consuming hosts
+entrypoints:
+- name: README
+  file: README.md
+  purpose: Project entry point
+- name: Agent guide
+  file: AGENTS.md
+  purpose: Contribution and context protocol
+- name: Structure linter
+  file: scripts/lint_structure.py
+  purpose: Validate the context graph
+dependencies:
+  internal: []
+  external:
+  - Python 3.12
+  - uv
+  - Git
+  - pytest
+  - Pyright
+  - pre-commit
+submodules:
+- name: lx_dtypes
+  path: lx_dtypes
+  manifest: lx_dtypes/structure.yml
+  summary: Distributable typed library and public lazy exports. Small utility, serialization, factory,
+    statistics, and CLI modules remain at this tier.
+- name: docs
+  path: docs
+  manifest: docs/structure.yml
+  summary: Canonical developer guides, API reference sources, and executable documentation examples. Maintained
+    by lx_dtypes maintainers under the shared documentation governance policy.
+- name: tests
+  path: tests
+  manifest: tests/structure.yml
+  summary: Deterministic unit, integration, and package-boundary verification. Unit suites mirror lx_dtypes
+    and fixtures remain test-only.
+- name: scripts
+  path: scripts
+  manifest: scripts/structure.yml
+  summary: Repository-only authoring, audit, import, and context validation commands. Installed application
+    CLIs live separately in lx_dtypes/scripts.
+- name: demo-data
+  path: demo-data
+  manifest: demo-data/structure.yml
+  summary: Synthetic authoring examples, classification versioning demonstrations, and legacy exports.
+    These resources are separate from the packaged release catalog.
+contracts:
+- name: Package boundaries
+  doc: docs/guides/package_boundary.md
+- name: Agent context
+  doc: docs/agent_context.md
+tests:
+  directory: tests
+  command: uv run pytest tests/test_structure.py -q
+files:
+- pyproject.toml
+- .pre-commit-config.yaml
+- .github/workflows/ci.yml
+- features
+- data
+- templates
+- typings
+- .agents
+- devenv.nix
+- flake.nix
+- CONTRIBUTING.md

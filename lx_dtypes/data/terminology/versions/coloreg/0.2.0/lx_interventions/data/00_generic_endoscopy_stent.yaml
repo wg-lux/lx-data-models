@@ -1,0 +1,9 @@
+- model: intervention
+  name: endoscopy_stent_generic
+  name_de: "Endoskopische Stenteinlage"
+  description: Stent placement is a technique used to keep a narrowed area
+    in the colon open.
+  intervention_types:
+    - therapeutic
+    - invasive
+    - foreign_body

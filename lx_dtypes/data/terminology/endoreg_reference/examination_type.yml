@@ -1,0 +1,12 @@
+- model: reference_catalog
+  name: examination_type
+  name_de: "Untersuchungstypen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: endoscopy
+      record_type: examination_type
+    - name: sonography
+      record_type: examination_type
+    - name: xray
+      record_type: examination_type

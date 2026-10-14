@@ -1,0 +1,12 @@
+- model: reference_catalog
+  name: contraindication
+  name_de: "Kontraindikationen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: anticoagulation-therapeutic
+      record_type: contraindication
+      description: Therapeutic anticoagulation
+    - name: thrombocytopenia-severe
+      record_type: contraindication
+      description: Thrombocyte count < 50.000/µl

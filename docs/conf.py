@@ -74,6 +74,7 @@ exclude_patterns: list[str] = [
     ".DS_Store",
     "**/tests/**",
     "**/test_*",
+    "guides/fixtures/**",
 ]
 
 html_theme = "furo"

@@ -1,9 +1,13 @@
 - model: indication
   name: colonoscopy_generic
+  name_de: Koloskopie
+  name_en: Colonoscopy
   description: Generic indication for colonoscopy examination.
 
 - model: indication
   name: colonoscopy_screening
+  name_de: Koloskopie (Screening)
+  name_en: Colonoscopy (Screening)
   description: Indication for colonoscopy examination for screening purposes.
   interventions:
     - endoscopy_cold_snare_resection_generic
@@ -13,6 +17,8 @@
 
 - model: indication
   name: colonoscopy_lesion_removal_small
+  name_de: Koloskopie (Läsionsentfernung, klein (< 10 mm), elektiv)
+  name_en: Colonoscopy (Lesion removal, small (< 10 mm), elective)
   description: Indication for colonoscopy examination for removal of small lesions (e.g., polyps).
   interventions:
     - endoscopy_cold_snare_resection_generic
@@ -26,6 +32,8 @@
 
 - model: indication
   name: colonoscopy_lesion_removal_large
+  name_de: Koloskopie (Läsionsentfernung, groß (≥ 10 mm), elektiv)
+  name_en: Colonoscopy (Lesion removal, large (≥ 10 mm), elective)
   description: Indication for colonoscopy examination for removal of large lesions (e.g., polyps).
   interventions:
     - "endoscopy_injection_vasoactive"
@@ -44,6 +52,8 @@
 
 - model: indication
   name: colonoscopy_lesion_removal_emr
+  name_de: Koloskopie (Läsionsentfernung, EMR, elektiv)
+  name_en: Colonoscopy (Lesion removal, EMR, elective)
   description: Indication for colonoscopy examination for endoscopic mucosal resection (EMR) of lesions.
   interventions:
     - "endoscopy_emr_generic"
@@ -58,6 +68,8 @@
 
 - model: indication
   name: colonoscopy_diagnostic_acute_symptomatic
+  name_de: Koloskopie (Diagnostik, akut-symptomatisch)
+  name_en: Colonoscopy (Diagnostic, Acute Symptomatic)
   description: Indication for colonoscopy examination for diagnostic purposes in acute symptomatic patients.
   interventions:
     - endoscopy_cold_snare_resection_generic
@@ -69,6 +81,8 @@
 
 - model: indication
   name: colonoscopy_diagnostic_chronic_symptomatic
+  name_de: Koloskopie (Diagnostik, chronisch-symptomatisch)
+  name_en: Colonoscopy (diagnostic, chronic symptomatic)
   description: Indication for colonoscopy examination for diagnostic purposes in chronic symptomatic patients.
   interventions:
     - endoscopy_cold_snare_resection_generic
@@ -80,6 +94,8 @@
 
 - model: indication
   name: colonoscopy_surveillance_post_polypectomy
+  name_de: Kontrollkoloskopie nach Polypektomie
+  name_en: Surveillance colonoscopy after polypectomy
   description: Indication for colonoscopy examination for surveillance following polypectomy.
   interventions:
     - "endoscopy_cold_snare_resection_generic"
@@ -89,6 +105,8 @@
 
 - model: indication
   name: colonoscopy_surveillance_ibd
+  name_de: Überwachungskoloskopie bei chronisch-entzündlicher Darmerkrankung
+  name_en: Surveillance colonoscopy for inflammatory bowel disease
   description: Indication for colonoscopy examination for surveillance in patients with inflammatory bowel disease (IBD).
   interventions:
     - "endoscopy_cold_snare_resection_generic"
@@ -98,6 +116,8 @@
 
 - model: indication
   name: colonoscopy_surveillance_cancer_history
+  name_de: Nachsorgekoloskopie bei kolorektalem Karzinom in der Anamnese
+  name_en: Surveillance colonoscopy for a history of colorectal cancer
   description: Indication for colonoscopy examination for surveillance in patients with a history of colorectal cancer
   interventions:
     - "endoscopy_cold_snare_resection_generic"
@@ -107,6 +127,8 @@
 
 - model: indication
   name: colonoscopy_follow_up_post_emr
+  name_de: Kontrollkoloskopie nach EMR
+  name_en: Follow-up colonoscopy after EMR
   description: Follow-up colonoscopy after previous endoscopic mucosal resection (EMR) to assess for residual or recurrent lesion.
   interventions:
     - "endoscopy_biopsy_grasper_generic"
@@ -122,6 +144,8 @@
 
 - model: indication
   name: colonoscopy_follow_up_post_esd
+  name_de: Kontrollkoloskopie nach ESD
+  name_en: Follow-up colonoscopy after ESD
   description: Follow-up colonoscopy after previous endoscopic submucosal dissection (ESD) to assess healing or recurrent lesion.
   interventions:
     - "endoscopy_biopsy_grasper_generic"
@@ -138,6 +162,8 @@
 
 - model: indication
   name: colonoscopy_follow_up_post_eftr
+  name_de: Kontrollkoloskopie nach EFTR
+  name_en: Follow-up colonoscopy after EFTR
   description: Follow-up colonoscopy after previous endoscopic full-thickness resection (EFTR) to assess clip site or recurrent lesion.
   interventions:
     - "endoscopy_biopsy_grasper_generic"
@@ -153,6 +179,8 @@
 
 - model: indication
   name: colonoscopy_follow_up_residual_or_recurrent_lesion
+  name_de: Kontrollkoloskopie bei Verdacht auf Residual- oder Rezidivläsion
+  name_en: Follow-up colonoscopy for suspected residual or recurrent lesion
   description: Follow-up colonoscopy for suspected residual or recurrent colorectal lesion after prior endoscopic therapy.
   interventions:
     - "endoscopy_biopsy_grasper_generic"

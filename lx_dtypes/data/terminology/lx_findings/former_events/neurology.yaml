@@ -1,9 +1,14 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_findings
 - model: finding
   name: "stroke"
+  name_de: "Schlaganfall"
+  name_en: "Stroke"
   tags:
     - event
 
 - model: finding
   name: "transient_ischemic_attack"
+  name_de: "Transitorische ischämische Attacke"
+  name_en: "Transient ischemic attack"
   tags:
     - event

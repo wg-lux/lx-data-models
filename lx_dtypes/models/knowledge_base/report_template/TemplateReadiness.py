@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import List, Literal, TypedDict
+from typing import Literal, TypedDict
 
 from pydantic import BaseModel, Field
-
 
 ReportTemplateIssueSeverityLiteral = Literal["info", "warning", "blocking"]
 ReportTemplateLifecycleStatusLiteral = Literal["draft", "published"]
@@ -43,7 +42,7 @@ class ReportTemplateReadinessSummaryDataDict(TypedDict):
     blocking_issues: int
     warning_issues: int
     info_issues: int
-    issues: List[ReportTemplateReadinessIssueDataDict]
+    issues: list[ReportTemplateReadinessIssueDataDict]
 
 
 class ReportTemplateReadinessIssue(BaseModel):

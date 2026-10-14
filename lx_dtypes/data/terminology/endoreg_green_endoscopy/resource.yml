@@ -1,0 +1,12 @@
+- model: reference_catalog
+  name: resource
+  name_de: "Ressourcen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: resource
+      name: electricity
+    - record_type: resource
+      name: gas
+    - record_type: resource
+      name: oil

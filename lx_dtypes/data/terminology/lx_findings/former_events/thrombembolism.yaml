@@ -1,17 +1,24 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_findings
 - model: finding
   name: "deep_vein_thrombosis"
+  name_de: "Tiefe Venenthrombose"
+  name_en: "Deep vein thrombosis"
   description: "Deep Vein Thrombosis"
   tags:
     - event
 
 - model: finding
   name: "pulmonary_embolism"
+  name_de: "Lungenembolie"
+  name_en: "Pulmonary embolism"
   description: "Pulmonary Embolism"
   tags:
     - event
 
 - model: finding
   name: "recurrent_thrombembolism"
+  name_de: "Rezidivierende Thromboembolie"
+  name_en: "Recurrent thromboembolism"
   description: "Recurrent Thrombembolism"
   tags:
     - event

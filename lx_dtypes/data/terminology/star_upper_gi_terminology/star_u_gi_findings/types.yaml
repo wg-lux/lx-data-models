@@ -1,0 +1,30 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.star_upper_gi_terminology
+- model: finding_type
+  name: "preprocedure"
+  name_de: "Vor der Untersuchung"
+  name_en: "Preprocedure"
+
+- model: finding_type
+  name: "periprocedure"
+  name_de: "Während der Untersuchung"
+  name_en: "Periprocedure"
+
+- model: finding_type
+  name: "postprocedure"
+  name_de: "Nach der Untersuchung"
+  name_en: "Postprocedure"
+
+- model: finding_type
+  name: mandatory
+  name_de: "Erforderlich"
+  name_en: "Required"
+
+- model: finding_type
+  name: optional
+  name_de: "Optional"
+  name_en: "Optional"
+
+- model: finding_type
+  name: conditonal
+  name_de: "Bedingt erforderlich"
+  name_en: "Conditionally required"

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
+  <title id="title">lx-dtypes data model overview</title>
+  <desc id="desc">Seven bounded contexts connected from knowledge-base definitions through patient records, reports, media, AI, privacy, and external interfaces.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#536171"/></marker>
+    <style>
+      .title{font-family:Arial,Helvetica,sans-serif;font-size:28px;font-weight:700;fill:#172033}.subtitle{font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:400;fill:#536171}
+      .h{font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:600;fill:#172033}.t{font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:400;fill:#334155}.edge{font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:400;fill:#536171;paint-order:stroke;stroke:#fff;stroke-width:6px;stroke-linejoin:round}
+      .box{stroke-width:2;rx:16}.line{fill:none;stroke:#536171;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="760" fill="#ffffff"/>
+  <text x="50" y="48" class="title">lx-dtypes: The Model in One View</text>
+  <text x="50" y="76" class="subtitle">Definitions constrain patient facts; facts and evidence become validated reports and reusable data products.</text>
+
+  <rect class="box" x="55" y="160" width="250" height="145" fill="#eaf8ed" stroke="#2d7a46"/>
+  <text x="80" y="198" class="h">Knowledge Base</text>
+  <text x="80" y="230" class="t">Clinical vocabulary</text><text x="80" y="254" class="t">Allowed relationships</text><text x="80" y="278" class="t">Report templates and rules</text>
+
+  <rect class="box" x="395" y="160" width="250" height="145" fill="#e8f1ff" stroke="#2f6fba"/>
+  <text x="420" y="198" class="h">Patient Ledger</text>
+  <text x="420" y="230" class="t">Patient and case</text><text x="420" y="254" class="t">Examination observations</text><text x="420" y="278" class="t">Medical history</text>
+
+  <rect class="box" x="735" y="160" width="250" height="145" fill="#fff0c9" stroke="#a16207"/>
+  <text x="760" y="198" class="h">Reports</text>
+  <text x="760" y="230" class="t">Sections and findings</text><text x="760" y="254" class="t">Validation and coverage</text><text x="760" y="278" class="t">Draft and rendered result</text>
+
+  <rect class="box" x="1075" y="160" width="250" height="145" fill="#f4e8ff" stroke="#7c3ea0"/>
+  <text x="1100" y="198" class="h">AI and Datasets</text>
+  <text x="1100" y="230" class="t">Annotations and labels</text><text x="1100" y="254" class="t">Predictions and models</text><text x="1100" y="278" class="t">Training/export artifacts</text>
+
+  <rect class="box" x="395" y="430" width="250" height="145" fill="#e5f8fb" stroke="#147d8d"/>
+  <text x="420" y="468" class="h">Media and Documents</text>
+  <text x="420" y="500" class="t">Video, frames, segments</text><text x="420" y="524" class="t">PDF and reports</text><text x="420" y="548" class="t">Processing and storage state</text>
+
+  <rect class="box" x="735" y="430" width="250" height="145" fill="#ffe8eb" stroke="#b4233d"/>
+  <text x="760" y="468" class="h">Privacy and Governance</text>
+  <text x="760" y="500" class="t">Sensitive metadata</text><text x="760" y="524" class="t">Anonymization and identity</text><text x="760" y="548" class="t">Authorization and audit</text>
+
+  <rect class="box" x="55" y="430" width="250" height="145" fill="#f1f5f9" stroke="#536171"/>
+  <text x="80" y="468" class="h">Interfaces</text>
+  <text x="80" y="500" class="t">YAML loader and registry</text><text x="80" y="524" class="t">FHIR and persistence adapters</text><text x="80" y="548" class="t">Django host integration</text>
+
+  <path class="line" d="M305 232 H390"/><text x="321" y="218" class="edge">constrains</text>
+  <path class="line" d="M645 232 H730"/><text x="667" y="218" class="edge">feeds</text>
+  <path class="line" d="M985 232 H1070"/><text x="1004" y="218" class="edge">exports</text>
+  <path class="line" d="M520 425 V310"/><text x="532" y="372" class="edge">evidence</text>
+  <path class="line" d="M645 500 H730"/><text x="665" y="486" class="edge">protected by</text>
+  <path class="line" d="M860 425 V310"/><text x="872" y="372" class="edge">governs</text>
+  <path class="line" d="M305 500 H390"/><text x="318" y="486" class="edge">loads/exposes</text>
+  <path class="line" d="M180 425 V310"/><text x="192" y="372" class="edge">translates</text>
+  <path class="line" d="M645 540 C760 620,1110 625,1328 545 C1370 528,1370 350,1260 310"/><text x="1010" y="621" class="edge">supplies samples</text>
+
+  <rect x="55" y="650" width="1270" height="60" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="80" y="677" class="h">Shared Structure</text>
+  <text x="260" y="677" class="t">Strict Pydantic models</text><text x="450" y="677" class="t">DataDict representations</text><text x="670" y="677" class="t">UUID/name references</text><text x="865" y="677" class="t">Versioned KB identity</text><text x="1070" y="677" class="t">Optional Django adapters</text>
+  <text x="80" y="699" class="edge">Unknown fields are rejected at canonical boundaries; application transactions remain outside this package.</text>
+</svg>

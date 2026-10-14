@@ -1,7 +1,10 @@
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022), colonoscopy quality indicators: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: finding
   name: "bowel_preparation_lc"
   name_de: "Darmvorbereitung (Linkes Kolon)"
   name_en: "Bowel Preparation (Left Colon)"
+  description: "Segmentaler BBPS-Wert für das linke Kolon."
   finding_types:
     - baseline
   classifications:
@@ -12,6 +15,7 @@
   name: "bowel_preparation_tc"
   name_de: "Darmvorbereitung (Kolon Transversum)"
   name_en: "Bowel Preparation (Transverse Colon)"
+  description: "Segmentaler BBPS-Wert für das Colon transversum."
   finding_types:
     - baseline
   classifications:
@@ -22,6 +26,7 @@
   name: "bowel_preparation_rc"
   name_de: "Darmvorbereitung (Rechtes Kolon)"
   name_en: "Bowel Preparation (Right Colon)"
+  description: "Segmentaler BBPS-Wert für das rechte Kolon."
   finding_types:
     - baseline
   classifications:
@@ -39,19 +44,96 @@
 
 - model: finding
   name: "colonoscopy_withdrawal_time_minutes"
-  name_de: "Rückzugszeit während der Koloskopie"
+  name_de: "Mukosainspektionszeit beim Rückzug"
   name_en: "Colonoscopy withdrawal time"
+  description: "Dauer des sorgfältigen Schleimhaut-Rückzugs in Minuten; Zeiten für Biopsien und Polypektomien werden nicht mitgerechnet."
   finding_types:
     - baseline
   classifications:
     - time_minutes_generic
+    - withdrawal_time_quality_exception
 
 - model: finding
   name: "colonoscopy_deepest_viewed_location"
   name_de: "Tiefste betrachtete Stelle während einer Koloskopie"
   name_en: "Deepest viewed location during colonoscopy"
+  description: "Maximal erreichte und eingesehene Lokalisation; bei inkompletter Untersuchung ist ein Grund anzugeben."
   finding_types:
     - baseline
   classifications:
     - colonoscopy_location_default
     - colonoscopy_not_complete_reason #TODO Requirement should make sure, that a patientfindingclassification with reason is available if location is not cecum / appendix / terminal ileum
+
+- model: finding
+  name: "colonoscopy_cecal_landmarks_photodocumented"
+  name_de: "Fotodokumentation der Zökum-Landmarken"
+  name_en: "Cecal landmark photo documentation"
+  description: "Fotodokumentation von Appendixostium und Ileozökalklappe einschließlich zugehöriger Bildreferenzen."
+  finding_types:
+    - baseline
+  classifications:
+    - appendiceal_orifice_photodocumented
+    - ileocecal_valve_photodocumented
+    - appendiceal_orifice_image_reference
+    - ileocecal_valve_image_reference
+
+- model: finding
+  name: "colonoscopy_technical_quality"
+  name_de: "Technische Untersuchungsqualität"
+  name_en: "Technical examination quality"
+  description: "Dokumentation des verwendeten hochauflösenden Videoendoskops und der CO₂-Insufflation."
+  finding_types:
+    - baseline
+  classifications:
+    - hd_videoendoscope_used
+    - co2_insufflation_used
+
+- model: finding
+  name: "colonoscopy_complication_status"
+  name_de: "Komplikationsstatus der Koloskopie"
+  name_en: "Colonoscopy complication status"
+  description: "Explizite Angabe, ob keine oder mindestens eine Komplikation aufgetreten ist."
+  finding_types:
+    - complication
+  classifications:
+    - colonoscopy_complication_occurred
+
+- model: finding
+  name: "bowel_preparation_bbps_total"
+  name_de: "BBPS-Gesamtwert"
+  name_en: "BBPS total score"
+  description: "Gesamtwert der drei segmentalen BBPS-Werte von 0 bis 9."
+  finding_types:
+    - baseline
+  classifications:
+    - bowel_prep_boston_total
+
+- model: finding
+  name: "colonoscopy_pathology_summary"
+  name_de: "Zusammenfassung pathologischer Befunde"
+  name_en: "Pathology summary"
+  description: "Explizite Angabe, ob die Untersuchung ohne pathologischen Befund war oder pathologische Befunde dokumentiert wurden."
+  finding_types:
+    - baseline
+  classifications:
+    - colonoscopy_pathology_status
+
+- model: finding
+  name: "colonoscopy_follow_up_plan"
+  name_de: "Empfehlung zur Weiterbehandlung und Verlaufskontrolle"
+  name_en: "Follow-up plan"
+  description: "Abschließende Empfehlung zur endoskopischen Verlaufskontrolle oder weiteren klinischen Behandlung."
+  finding_types:
+    - baseline
+  classifications:
+    - colonoscopy_follow_up_recommendation
+
+- model: finding
+  name: "colonoscopy_early_repeat_plan"
+  name_de: "Frühe Wiederholungsplanung bei inadäquater Darmvorbereitung"
+  name_en: "Early repeat plan after inadequate bowel preparation"
+  description: "Bei BBPS-Gesamtwert 0 bis 5: Wiederholung innerhalb eines Jahres oder begründete klinische Ausnahme."
+  finding_types:
+    - baseline
+  classifications:
+    - colonoscopy_early_repeat_plan

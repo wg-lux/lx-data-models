@@ -1,0 +1,47 @@
+version: 1
+tier: domain
+path: lx_dtypes/models
+parent: ../structure.yml
+summary: Typed domain, knowledge-base, ledger, interface, and external exchange contracts. Backend-specific
+  representations share explicit contract boundaries.
+responsibilities:
+- Define strict Pydantic contracts and typed dictionary representations
+- Maintain knowledge-base/report-template graphs and ledger identities
+boundaries:
+- Keep application service orchestration outside shared models
+- Preserve raw video identity across processing and transfer
+entrypoints:
+- name: Contracts
+  file: contracts/__init__.py
+  purpose: Shared interchange exports
+- name: Knowledge-base interface
+  file: interface/__init__.py
+  purpose: Version-aware loading API
+- name: Report templates
+  file: knowledge_base/report_template/__init__.py
+  purpose: Graph and validation contracts
+- name: Ledger
+  file: ledger/__init__.py
+  purpose: Observation model exports
+dependencies:
+  internal: []
+  external:
+  - Pydantic v2
+  - Django
+  - FHIR
+submodules: []
+contracts:
+- name: Model concepts
+  doc: ../../docs/guides/data-model-concept-map.md
+- name: Report-template infrastructure
+  doc: ../../docs/guides/report-template-infrastructure.md
+tests:
+  directory: ../../tests/unit/lx_dtypes/models
+  command: uv run pytest tests/unit/lx_dtypes/models/contracts -q
+files:
+- base
+- contracts
+- interface
+- knowledge_base
+- ledger
+- meta

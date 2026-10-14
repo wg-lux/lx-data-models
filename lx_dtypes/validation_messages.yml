@@ -1,0 +1,53 @@
+# Canonical advisory boundary messages. Codes are the machine-readable API.
+de:
+  contract.invalid: Der Wert erfüllt die Vertragsbedingung nicht.
+  contract.missing: Ein erforderliches Feld fehlt.
+  contract.extra_forbidden: Dieses Feld wird vom Vertrag nicht unterstützt.
+  contract.int_type: Eine ganze Zahl ist erforderlich.
+  contract.int_parsing: Der Wert kann nicht als ganze Zahl gelesen werden.
+  contract.float_type: Eine Zahl ist erforderlich.
+  contract.float_parsing: Der Wert kann nicht als Zahl gelesen werden.
+  contract.finite_number: Eine endliche Zahl ist erforderlich.
+  contract.string_type: Text ist erforderlich.
+  contract.string_too_short: Der Text ist kürzer als die zulässige Mindestlänge.
+  contract.string_too_long: Der Text überschreitet die zulässige Höchstlänge.
+  contract.string_pattern_mismatch: Der Text entspricht nicht dem erforderlichen Format.
+  contract.bool_type: Ein Wahrheitswert ist erforderlich.
+  contract.list_type: Eine Liste ist erforderlich.
+  contract.dict_type: Ein Objekt ist erforderlich.
+  contract.literal_error: Der Wert gehört nicht zu den zulässigen Optionen.
+  contract.enum: Der Wert gehört nicht zu den zulässigen Optionen.
+  contract.greater_than: Der Wert muss die festgelegte Untergrenze überschreiten.
+  contract.greater_than_equal: Der Wert liegt unter der festgelegten Mindestgrenze.
+  contract.less_than: Der Wert muss unter der festgelegten Obergrenze liegen.
+  contract.less_than_equal: Der Wert überschreitet die festgelegte Höchstgrenze.
+  terminology.identity_missing: Die Untersuchung hat keine vollständige Wissensbasis-Identität.
+  terminology.identity_mismatch: Untersuchung und Wissensbasis verwenden unterschiedliche Terminologieversionen.
+  terminology.template_unknown: Die angeforderte Berichtsvorlage ist in dieser Wissensbasis nicht definiert.
+  terminology.inadmissible: Die Untersuchung enthält eine unzulässige Terminologiereferenz oder Beziehung.
+en:
+  contract.invalid: The value does not satisfy the contract constraint.
+  contract.missing: A required field is missing.
+  contract.extra_forbidden: This field is not supported by the contract.
+  contract.int_type: An integer is required.
+  contract.int_parsing: The value cannot be parsed as an integer.
+  contract.float_type: A number is required.
+  contract.float_parsing: The value cannot be parsed as a number.
+  contract.finite_number: A finite number is required.
+  contract.string_type: Text is required.
+  contract.string_too_short: The text is shorter than the permitted minimum.
+  contract.string_too_long: The text exceeds the permitted maximum length.
+  contract.string_pattern_mismatch: The text does not match the required format.
+  contract.bool_type: A boolean is required.
+  contract.list_type: A list is required.
+  contract.dict_type: An object is required.
+  contract.literal_error: The value is not one of the permitted options.
+  contract.enum: The value is not one of the permitted options.
+  contract.greater_than: The value must exceed the configured lower bound.
+  contract.greater_than_equal: The value is below the configured minimum.
+  contract.less_than: The value must be below the configured upper bound.
+  contract.less_than_equal: The value exceeds the configured maximum.
+  terminology.identity_missing: The examination has no complete knowledge-base identity.
+  terminology.identity_mismatch: The examination and knowledge base use different terminology versions.
+  terminology.template_unknown: The requested report template is not defined in this knowledge base.
+  terminology.inadmissible: The examination contains a terminology reference or relationship that is not permitted.

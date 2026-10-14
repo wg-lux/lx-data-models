@@ -2,7 +2,7 @@
 
   name: "picogram"
   abbreviation: "pg"
-  name_de: "Picogramm"
+  name_de: "Pikogramm"
   name_en: "Picogram"
 
 - model: unit
@@ -17,7 +17,7 @@
 
   name: "miligram"
   abbreviation: "mg"
-  name_de: "miligramm"
+  name_de: "Milligramm"
   name_en: "miligram"
   description: "miligrams"
 

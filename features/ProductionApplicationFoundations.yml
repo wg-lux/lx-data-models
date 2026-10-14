@@ -1,0 +1,672 @@
+schema_version: "1.0"
+id: production_application_foundations
+name: Production Application Foundations
+description: >-
+  Define the reusable lx-dtypes contracts and delivery guarantees that let host
+  applications provide predictable, resilient, secure, observable, accessible,
+  and maintainable production workflows. Application-specific UI, networking,
+  persistence, telemetry backends, and release infrastructure remain owned by
+  their host applications.
+owners:
+  - lx-dtypes maintainers
+production_critical: true
+source_documents:
+  - path: README.md
+    disposition: reference
+    note: Defines lx-dtypes as reusable typed contracts for host integrations.
+  - path: docs/guides/package_boundary.md
+    disposition: normative
+    note: Defines the package boundary between reusable models and host application behavior.
+  - path: /home/admin/dev/lx-annotate/frontend/README.md
+    disposition: reference
+    note: >-
+      Host reliability improvement assessed by codex-reliability-20260909-root
+      on 2026-09-09 in frontend/src/api/axiosInstance.ts: expected Axios cancellations from superseded video requests
+      or component teardown preserve their original rejection without global
+      failure toasts or login side effects. Network failures, timeouts, and 401
+      authentication handling retain their existing behavior. No automatic retry,
+      public contract change, or shared-package readiness approval is introduced.
+      Coordinated through tracker messages with codex-professional-foundations-20260909
+      (thread 01a08575-ed53-7010-b12e-1a88b68e68c2) and
+      codex-lxd-reliability-20260909-01; the latter confirmed non-overlapping scope.
+      Verification on 2026-09-09 from /home/admin/dev/lx-annotate/frontend:
+      node_modules/.bin/vitest run src/api/__tests__/axiosInstance.errors.test.ts
+      src/api/__tests__/axiosInstance.binary.test.ts
+      src/stores/__tests__/VideoStoreOptimization.spec.ts passed 18 tests in 3 files;
+      node_modules/.bin/vitest run src/api/__tests__ passed 169 tests in 24 files.
+      node_modules/.bin/eslint src/api/axiosInstance.ts
+      src/api/__tests__/axiosInstance.errors.test.ts --max-warnings 0,
+      node_modules/.bin/vue-tsc --noEmit -p tsconfig.component-tests.json, and
+      node_modules/.bin/vue-tsc --build --force each exited 0.
+      These are local host checks; browser end-to-end and deployment acceptance
+      were not run. Tested frontend base revision b5ebf16da55a203cf3014291a1dd687b6de79171
+      plus the uncommitted cancellation fix and regression tests. Installed
+      endoreg-db distribution is 1.2.1, non-editable; its metadata records no VCS
+      revision. Session expiry, preserved inputs, retry UX, and accessibility
+      acceptance remain outside this change. LX-Annotate tracker validation
+      passes for its own 44 definitions; this external feature cannot pass that
+      tracker schema because existing normative disposition, invariants, and
+      verification.commands fields are unsupported and features/policy.yml is absent.
+      Assessor: codex-reliability-20260909-root.
+      Follow-up on 2026-09-09 at the same frontend base revision plus uncommitted
+      changes: frontend/src/utils/http_kc.ts now preserves rejection after a 401
+      login redirect instead of resolving the failed request with undefined.
+      frontend/src/main.ts explicitly handles bootstrap failure through the
+      existing safe runtime logger and a generic user-facing error toast, while
+      retaining reporting identity binding. AuthCheck.vue exposes a role=alert
+      error state on bootstrap rejection and does not render protected or login
+      content in that failure state. No role policy or automatic retry changed.
+      Added tests/keycloak/http_kc.spec.ts, AuthCheck.spec.ts, and main.spec.ts.
+      node_modules/.bin/vitest run tests/keycloak src/api/__tests__ exited 0:
+      184 tests in 29 files, including real entry-point bootstrap rejection,
+      401/403/500 rejection identity, network failure, successful responses,
+      loading, anonymous login state, and safe failure with stale user state.
+      node_modules/.bin/eslint src/utils/http_kc.ts src/main.ts
+      src/components/Authentification/AuthCheck.vue tests/keycloak/http_kc.spec.ts
+      tests/keycloak/AuthCheck.spec.ts tests/keycloak/main.spec.ts --max-warnings 0
+      exited 0. Both vue-tsc commands above exited 0; component-test typing was
+      repeated after adding the entry-point regression test. YAML parsing,
+      git diff --check, and the local 44-definition tracker validation passed.
+      This provides local regression evidence, not browser OIDC/session-expiry
+      acceptance or complete keyboard/screen-reader validation. Shared package
+      readiness assessments remain unchanged by this host follow-up.
+  - path: /home/admin/dev/lx-annotate/AGENTS.md
+    disposition: reference
+    note: |-
+      Clinical zero-trust integration review, 2026-09-09.
+      Assessor: codex-reliability-20260909-root.
+      Readiness decision: BLOCKED. This is a repository review and local
+      verification record, not clinical approval or a deployed-release claim.
+      Shared lx-dtypes readiness criteria retain their package ownership.
+
+      Reviewed source identities (base revisions plus uncommitted changes):
+      lx-annotate /home/admin/dev/lx-annotate b5ebf16da55a203cf3014291a1dd687b6de79171;
+      endoreg-db /home/admin/endoreg-db e547189103a3ff5c084878fc9cfc23023f1d1fef;
+      lx-ai-core /home/admin/lx-ai-core ba602c78ed1273b40f11680de4d760e078c2e998;
+      lx-dtypes /home/admin/lx-data-models 95c3f58a973b5ede15393a137ce0b5966def08dd.
+      Independent agents reviewed anonymization, training, and clinical reporting;
+      backend tests are coordinated with codex-professional-foundations-20260909
+      in thread 01a08575-ed53-7010-b12e-1a88b68e68c2 to avoid concurrent mutation
+      or conflicting verification. No patient media or production keys were used.
+
+      Findings and implemented controls:
+      C01 HIGH, clinical identity integrity, fixed in checkout:
+      frontend/src/api/reportDraftApi.ts:216 and
+      frontend/src/views/reporting/ReportEditorPage.vue:700 previously trusted
+      response identity/revision enough to hydrate or acknowledge another
+      examination's state. Responses now bind to the requested examination,
+      report, status and expected revision before local state mutation.
+      Invalid acknowledgments preserve unsaved drafts and do not report success.
+
+      C02 HIGH, export identity and navigation, fixed in checkout:
+      frontend/src/api/reportExportApi.ts now validates final report identity,
+      safe integer IDs, included frame counts and trusted artifact URL origins.
+      ReportExportPage.vue uses context/request generations to reject late results.
+      Unbound timeline patient data no longer autofills export identity; explicit
+      user entry remains required until an examination-bound source is available.
+      reportListPayload.ts and editor history parsing reject fractional/unsafe IDs.
+
+      C03 MEDIUM, authentication startup integrity, fixed in checkout:
+      frontend/src/stores/auth_kc.ts:140 now deduplicates bootstrap per store,
+      retains failure state, clears stale capabilities, and fences logout results.
+      frontend/src/router/index.ts awaits bootstrap and cancels failed navigation.
+      Backend snake_case annotation-override capability is parsed as a boolean;
+      malformed/conflicting aliases reject instead of granting a privilege.
+      This frontend behavior supplements, and does not replace, server authorization.
+
+      C04 HIGH, training numeric correctness, fixed in lx-ai-core checkout:
+      src/lx_ai_core/training.py and active_learning.py reject nonfinite/out-of-range
+      labels/probabilities, invalid embeddings/frequencies, mismatched candidate
+      arrays, and holdout fractions consuming the entire training partition.
+      Valid soft labels remain supported. The separate Endoreg TrainingConfig
+      now rejects invalid split ratios; direct trainer-function integration and
+      central backend verification are owned by the coordinating backend agent.
+
+      C05 HIGH, anonymization eligibility, partial fix with remaining blocker:
+      endoreg_db/services/aidataset_training_manifests.py:385 now requires processed
+      media, clinical validation, export readiness and usable integrity even for
+      extracted frames. However _inspect_frame_format:237 and _build_sample:553
+      can still inspect or advertise raw cached frame paths. Video approval alone
+      does not establish that cached bytes are anonymized. Owner: endoreg-db
+      storage/training maintainers. Acceptance requires a scoped processed-media
+      export/materialization contract, ciphertext/tamper/wrong-key/cleanup tests,
+      and proof that standalone manifest consumers cannot read raw frame caches.
+
+      C06 HIGH, incomplete active-learning acceptance, BLOCKED:
+      Selection contracts and training executors exist, but a reproducible
+      reviewed-PHI correction -> versioned dataset -> retraining -> independent
+      evaluation -> approved model promotion roundtrip has not been demonstrated.
+      The backend coordinator is wiring the classification candidate caller;
+      this is not evidence of a complete reviewed feedback loop. Video-grouped
+      holdouts in trainer_gastronet_multilabel.py:179 do not prove patient-disjoint
+      evaluation. Owners: clinical model lead and endoreg-db/AI maintainers.
+      Required evidence: candidate eligibility and model/label identity, reviewer
+      provenance, patient-disjoint splits, selection budget/trigger, evaluation
+      thresholds, and explicit human retraining/promotion authority.
+
+      C07 HIGH, installed integration provenance, BLOCKED:
+      The application venv has lx-annotate 1.2.3 editable, endoreg-db 1.2.1,
+      lx-dtypes 0.2.37, lx-anonymizer 0.9.4.1 and lx-ai-core 0.0.1. The four
+      dependencies are non-editable and have no VCS revision in installation
+      metadata. Sibling checkout fixes therefore do not establish installed-runtime
+      behavior. The external anonymizer agent also found and fixed a real dataclass
+      result versus dictionary expectation in PHI training; its central backend
+      verification and report-result provenance persistence remain separate work.
+      Acceptance requires reviewed installed artifacts and hashes, migration/startup
+      verification, actual anonymizer/trainer contract roundtrips and browser tests.
+
+      C08 MEDIUM, dependency tooling exposure, partial fix:
+      npm audit initially reported two high and two moderate affected-package
+      findings. A js-yaml 4.3.2 override removes the high findings for
+      https://github.com/advisories/GHSA-2883-xcg3-v3hh .
+      Vitest 3.2.7 and @vitest/mocker remain affected by
+      https://github.com/advisories/GHSA-82fw-gwwq-j7x9 ; npm proposes a major
+      upgrade. This is a tooling advisory, not proof of an exploitable production
+      browser path. Keep test servers unexposed and verify a supported patched
+      tooling upgrade before treating dependency review as complete.
+
+      Local verification evidence:
+      Frontend node_modules/.bin/vitest run --maxWorkers=4 passed 904 tests in
+      125 files. Earlier full runs hit 5-second lazy page compilation timeouts in
+      routing tests; navigation tests now isolate page compilation, whose actual
+      lazy imports and rendering have their existing separate coverage. No timeout
+      threshold or production assertion was weakened.
+      After final auth/report-list changes, 140 focused tests in 14 files passed:
+      node_modules/.bin/vitest run tests/keycloak src/router/__tests__
+      src/api/__tests__/reportDraftApi.test.ts src/api/__tests__/reportExportApi.test.ts
+      src/views/reporting/__tests__/ReportEditorPage.test.ts
+      src/views/reporting/__tests__/ReportExportPage.test.ts
+      src/views/reporting/__tests__/reportListPayload.test.ts
+      src/views/reporting/__tests__/ReportingWorklistPage.test.ts --maxWorkers=4.
+      Subsequent removal of unbound patient autofill passed all 7 export-page tests.
+      Changed boundary tests are explicitly included in tsconfig.component-tests.json.
+      lx-ai-core tests/test_contracts.py tests/test_active_learning.py tests/test_cli.py:
+      44 passed; targeted production Pyright 0 errors/warnings; four-file Ruff passed.
+      Endoreg manifest/central-hub access lane: 23 passed, 1 skipped, 10 subtests
+      passed, 2 warnings. Explicit settings: SKIP_EXPENSIVE_TESTS=false,
+      USE_STUB_MODEL_META=true, TEST_DB_ENGINE=django.db.backends.sqlite3.
+      Skip: existing RUN_VIDEO_TESTS=false. These are not real-model/GPU acceptance.
+      Endoreg TrainingConfig tests and remaining overlapping backend changes are
+      handed to the central coordinator; their results must not be inferred here.
+
+      Packaging provenance for the parser patch:
+      frontend/package-lock.json SHA256 d00f9794d34930c89f80b5f8596bbe9c93f3112ecaad1f8f5fe2afb0a47c592a.
+      frontend/flake.lock SHA256 701a879651a02086081fba9ec0303d8c357547c777d2acae2d02e2a024f8d353,
+      locked nixpkgs 104240a772428cc2e20d8fd86c9ddbb886bbaff2.
+      nix run --inputs-from ./frontend nixpkgs#prefetch-npm-deps -- frontend/package-lock.json
+      produced sha256-QMxyOi59rAin1FANye79YQdIFB+3WRTzwvqOkuBmwJ8=,
+      now recorded in frontend/default.nix; nix-instantiate --parse passed.
+      No target host was selected, no release wheel was produced, and no host
+      was evaluated or deployed under this task. Existing unrelated dirty files
+      in sibling repositories were preserved. Read deployment-strategy.md,
+      wheel-deployment.md and LuxNix deployment-guide.md before packaging work.
+
+      Release acceptance still requires a named host and reviewed artifact set,
+      mTLS/key identity and encrypted-media checks on that host, clinical review
+      workflows with actual supported models, intended countries/languages and
+      terminology validation, accessibility, realistic failure/load testing,
+      backup/restore and rollback evidence, and an identified clinical approver.
+      The local tracker still reports professional_application_readiness 0/10 and
+      deployment_source_hygiene 0/6; no criterion is promoted by this review.
+invariants:
+  - External data is validated strictly at typed boundaries; malformed, ambiguous, or unsupported payloads do not silently become valid state.
+  - Failure information is structured, actionable, and safe to expose; it does not contain secrets, patient data, checkout paths, or internal implementation details.
+  - Contracts are deterministic: equivalent validated inputs produce equivalent serialized boundary payloads, and side-effect ownership remains explicit.
+  - Accessibility, UI feedback, network retry behavior, persistence, telemetry transport, and CI/CD execution belong to consuming applications, which may rely on these contracts without importing application logic into lx-dtypes.
+definition_of_done:
+  - id: resilient_error_contracts
+    category: requirements
+    title: Typed boundaries communicate recoverable and terminal failures
+    acceptance:
+      - Public validators reject invalid inputs with field-specific, actionable errors rather than uncaught implementation exceptions.
+      - Typed result and error contracts distinguish validation, conflict, unavailable-dependency, and unsupported-version failures where the package owns those boundaries.
+      - Failure payloads preserve correlation or request identifiers when supplied by a host without generating or persisting host operational state.
+    required: true
+    verification:
+      kind: manual
+      instructions: Review public boundary models and focused failure-path tests for actionable typed failures and absence of host retry or persistence logic.
+      timeout_seconds: 600
+  - id: security_and_privacy_boundaries
+    category: security
+    title: Shared contracts enforce secure and privacy-preserving data boundaries
+    acceptance:
+      - Models use explicit types and constraints for externally supplied identifiers, versions, paths, URLs, and content metadata.
+      - Serialization and validation errors do not expose credentials, patient data, absolute local paths, or raw untrusted payloads by default.
+      - Access-control decisions, encryption-key management, and credential handling are not implied by model defaults and remain explicit host responsibilities.
+    required: true
+    verification:
+      kind: manual
+      instructions: Review public models, serializers, and invalid-input tests for strict validation and confidential-data-safe error behavior.
+      timeout_seconds: 600
+  - id: observability_contracts
+    category: operations
+    title: Contracts retain safe context for host observability
+    acceptance:
+      - Relevant result, error, and provenance models include stable identifiers, schema or contract versions, and machine-readable failure classification.
+      - Models can be serialized deterministically for host logging, tracing, and metrics without requiring a telemetry vendor dependency.
+      - No model implicitly emits telemetry, writes logs, or transmits data outside the host-controlled boundary.
+    required: true
+    verification:
+      kind: manual
+      instructions: Review serialized public result and error contracts for stable diagnostic fields and confirm package code has no telemetry transport side effect.
+      timeout_seconds: 600
+  - id: accessibility_and_feedback_contracts
+    category: functionality
+    title: Host interfaces receive structured feedback suitable for inclusive UX
+    acceptance:
+      - Validation failures identify affected fields and constraints in a presentation-independent structure.
+      - Public enums and status values are stable, documented, and machine-readable so hosts can localize and present them accessibly.
+      - The package does not prescribe visual design, focus management, keyboard behavior, or screen-reader implementation.
+    required: true
+    verification:
+      kind: manual
+      instructions: Review validation error shapes and public status enums for stable presentation-independent information.
+      timeout_seconds: 600
+  - id: deterministic_state_contracts
+    category: functionality
+    title: Shared data contracts prevent ambiguous state transitions
+    acceptance:
+      - Models express version, identity, lifecycle, and concurrency-relevant fields explicitly where the domain requires them.
+      - Contradictory lifecycle combinations and unsupported versions fail validation.
+      - Serialization is deterministic and does not mutate caller-owned input or hidden global state.
+      - Validation and serialization introduce no implicit network, filesystem, or telemetry I/O, leaving host applications free to apply caching, optimistic updates, and responsive loading behavior.
+    required: true
+    verification:
+      kind: command
+      command: [uv, run, pytest, tests, -q]
+      timeout_seconds: 1200
+  - id: boundary_regression_coverage
+    category: testing
+    title: Production boundary behavior has automated regression coverage
+    acceptance:
+      - Focused tests cover valid payloads, invalid payloads, version mismatch, serialization, and representative failure paths for every public boundary changed under this feature.
+      - Tests are deterministic and contain no patient data, secrets, network dependency, or checkout-specific path assertions.
+      - Static type checking covers modified public contracts.
+    required: true
+    verification:
+      kind: command
+      commands:
+        - command: [uv, run, pyright]
+        - command: [uv, run, pytest, tests, -q]
+      timeout_seconds: 1800
+  - id: compatible_delivery_contract
+    category: operations
+    title: Package delivery preserves predictable integration behavior
+    acceptance:
+      - Public imports and serialized contract shapes are versioned and remain backward compatible unless a documented breaking change is released.
+      - Packaged resources are immutable, installation-path-independent, and validate before use where applicable.
+      - The package release pipeline gates publication on its required static analysis, automated tests, and documentation checks.
+      - Host-side caching, retries, optimistic updates, deployment rollout, and rollback are documented as host concerns rather than hidden package behavior.
+    required: true
+    verification:
+      kind: manual
+      instructions: Review package exports, versioning guidance, resource loading behavior, and host-integration documentation.
+      timeout_seconds: 600
+    assessment:
+      status: in_progress
+      assessed_by: codex-lxd-reliability-20260909-01
+      assessed_at: "2026-09-09T10:38:53Z"
+      note: >-
+        Publication now requires reusable CI and documentation jobs on the same
+        checkout before building distribution artifacts. CI explicitly installs
+        and runs Pyright and executes the full pytest suite with coverage and
+        JUnit output; the configured 70 percent coverage threshold is enforced.
+        Documentation requires HTML and link checks. Both release and manual
+        publication follow the dependency chain through these gates. Codecov
+        uploads remain limited to push and pull-request runs so release gates
+        do not need the caller's Codecov secret. Existing public imports remain;
+        KnowledgeBaseGraphResolver is additive. Compatibility changes include
+        stricter invalid-input rejection, preliminary FHIR export status, numeric
+        Quantity output, stable long-sheet names, and canonical graph ordering.
+        They are documented in the guides and hostile-input assessment below.
+        Checks ran against base revision 95c3f58a973b5ede15393a137ce0b5966def08dd
+        plus the uncommitted source, test, documentation, and workflow changes.
+        A local wheel was built and verified in a fresh environment outside the
+        checkout, using uv.lock runtime constraints, before the subsequent HTTP
+        resolver-cache changes. That artifact does not contain those latest changes.
+        Its unchanged 0.2.37 metadata
+        does not designate a new release. Select an appropriate release version
+        and align the endoreg-db lock before distribution. No hosted Actions run,
+        published release, or deployed host verification is claimed. Checkout
+        tests used the existing environment with --no-sync and Nix tools/native
+        library paths; no consumer installation or lockfile was modified.
+      evidence:
+        - kind: review
+          reference: .github/workflows/publish.yml
+          note: >-
+            build-artifacts requires quality and documentation; TestPyPI requires
+            build-artifacts and PyPI requires TestPyPI. Neither gate has a bypass
+            condition or continue-on-error. Local YAML dependency assertions pass.
+        - kind: command
+          reference: actionlint .github/workflows/ci.yml .github/workflows/docs.yml .github/workflows/publish.yml
+          note: "actionlint 1.7.9: exit 0."
+        - kind: command
+          reference: uv run --no-sync pyright
+          note: "Pyright 1.1.412: exit 0; 0 errors, 0 warnings, 0 informations."
+        - kind: command
+          reference: uv run --no-sync pytest tests -q --cov=lx_dtypes --junitxml=/tmp/lxd-clinical-junit.xml
+          note: >-
+            Exit 0; 926 passed, 2 skipped, 23 warnings in 200.46 seconds.
+            Total coverage 85.10 percent; required 70 percent threshold passed.
+            JUnit and coverage XML were generated locally, not published.
+        - kind: command
+          reference: uv run --no-project --with build --with hatchling --python .venv/bin/python python -m build --wheel --no-isolation --outdir /tmp/lxd-clinical-dist
+          note: >-
+            Exit 0; built lx_dtypes-0.2.37-py3-none-any.whl. SHA256
+            13026d7db775cbef1406575e2400eb4e30ccc2ea9627df0e659c184474b4c40a.
+            Build backend tools were supplied in an isolated temporary environment;
+            the initial existing-environment attempt lacked hatchling.
+        - kind: command
+          reference: installed-wheel lx-dtypes-verify-packaged-templates
+          note: >-
+            Exit 0 from a fresh temporary wheel installation outside the checkout.
+            Runtime versions were constrained by uv export --frozen --no-dev
+            --no-emit-project --no-hashes. Verified upper_gi_quality_2025,
+            colonoscopy_training_basic, and coloreg_colonoscopy. Resolver, FHIR,
+            SAP and Excel imports plus strict value smoke checks also passed;
+            imported module paths were confirmed inside the fresh environment.
+        - kind: command
+          reference: uv run --no-sync make -C docs html
+          note: "Exit 0; build succeeded without warnings."
+        - kind: command
+          reference: uv run --no-sync make -C docs linkcheck
+          note: "Exit 0; build succeeded. External links were checked locally."
+        - kind: review
+          reference: https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idneeds
+          note: GitHub documents success dependencies and propagation of failed or skipped prerequisites.
+        - kind: review
+          reference: codex://threads/01a08575-ed53-7010-b12e-1a88b68e68c2
+          note: >-
+            Coordinated through the shared endoreg-db tracker with owner
+            codex-professional-foundations-20260909. Confirmed no file conflict;
+            kept checkout checks separate from downstream artifact readiness.
+  - id: maintainable_contract_documentation
+    category: documentation
+    title: Boundary ownership and operating expectations are documented
+    acceptance:
+      - Documentation identifies the package as the source of truth for reusable data contracts and identifies host-owned operational responsibilities.
+      - Public contract changes include explicit compatibility, migration, and validation guidance.
+      - This feature specification remains the canonical production-foundations readiness definition for lx-dtypes.
+    required: true
+    verification:
+      kind: manual
+      instructions: Review README, package-boundary guidance, public API documentation, and this feature specification for consistent ownership and compatibility statements.
+      timeout_seconds: 600
+  - id: hostile_clinical_input_correctness
+    category: security
+    title: Untrusted clinical inputs cannot silently change report meaning
+    required: true
+    acceptance:
+      - Malformed, ambiguous, nonfinite, or unsupported clinical values fail explicitly instead of becoming successful findings.
+      - Duplicate identifiers, inconsistent graph relationships, stale hashes, and cross-patient references fail closed.
+      - Exported spreadsheet text is literal and failed or competing exports preserve existing workbooks.
+      - Every supported external profile has reviewed adversarial fixtures and explicit resource limits.
+    verification:
+      kind: command
+      command: [uv, run, pytest, tests/test_fhir_clinical.py, tests/unit/lx_dtypes/models/contracts/test_sap_ish_import.py, tests/unit/lx_dtypes/test_excel_export.py, tests/unit/lx_dtypes/django/api/test_knowledge_base_graph_api.py, tests/unit/lx_dtypes/models/knowledge_base/test_fhir_export.py, -q]
+      timeout_seconds: 600
+    assessment:
+      status: in_progress
+      assessed_by: codex-lxd-reliability-20260909-01
+      assessed_at: "2026-09-09T10:38:53Z"
+      note: >-
+        Provisional hostile-input assessment assumes attackers can supply import
+        content, graph payloads, and report text through endoreg-db, but cannot
+        execute arbitrary Python inside the trusted host process. Authentication,
+        center isolation, upload quotas, and process limits remain host-owned and
+        have not been verified in a deployed clinical environment. The fixes below
+        address demonstrated integrity and availability failures; they do not
+        constitute a completed independent security review or clinical approval.
+        Profile-specific limits, complete parser coverage, and host acceptance
+        remain outstanding. The user has not supplied profile or scale targets.
+      evidence:
+        - kind: review
+          reference: lx_dtypes/models/knowledge_base/report_template/ValidatorRuntime.py:442
+          note: >-
+            CLIN-001, high integrity impact: malformed FHIR component values could
+            become True. The bridge now validates typed components, preserves false
+            and literal strings, and rejects malformed choices. Unitless numbers
+            export as Quantity. Export status defaults to preliminary; explicit
+            status=final is required for final fragments. These are intentional
+            compatibility changes; the host still supplies patient/resource context.
+        - kind: review
+          reference: lx_dtypes/models/contracts/fhir_clinical.py:202
+          note: >-
+            CLIN-002, medium availability and high integrity impact: bundle link
+            traversal previously rebuilt the full index for each reference and
+            missed duplicate patient-only entries. Each operation now builds one
+            index, rejects duplicate targets and cross-patient links, and avoids
+            including reference contents in link-error messages. Strict numeric
+            values, FHIR resource ID syntax, and unsupported modifiers are checked.
+        - kind: review
+          reference: lx_dtypes/models/contracts/knowledge_base_graph.py:584
+          note: >-
+            CLIN-003, high integrity impact: envelopes previously accepted edges
+            inconsistent with concepts and content inconsistent with snapshot IDs.
+            Validation now checks both, as well as published template membership.
+            Hashes provide consistency, not authenticity; trusted source approval
+            remains necessary and must not be inferred from a valid hash.
+        - kind: review
+          reference: lx_dtypes/stats/excel.py:11
+          note: >-
+            CLIN-004, high integrity impact: spreadsheet text could become formulas
+            and failed overwrites could destroy prior exports. XLSX output now uses
+            literal string cells, preserves large integer identifiers as decimal
+            text, rejects oversized text and colliding sheet names, and publishes
+            completed files atomically with no-clobber behavior when requested.
+            Long sheet names now use a stable eight-hex suffix after a 22-character
+            prefix; this fixes actual classification-choice/descriptor sheet
+            collisions in the existing full dataset export. Consumers referencing
+            old truncated worksheet names must use the new deterministic names.
+            Aware timestamps become UTC naive values because Excel lacks timezone
+            storage. Source dataframes are not modified. CSV output is unchanged.
+        - kind: review
+          reference: lx_dtypes/models/knowledge_base/fhir.py:837
+          note: >-
+            CLIN-005, high integrity impact: different names could normalize to the
+            same FHIR code. Export now rejects collisions instead of conflating
+            concepts. Import rejects malformed or duplicate concepts and traverses
+            in-memory hierarchies iteratively with repeated-object detection.
+            Heuristic terminology domain inference still requires clinical review.
+        - kind: review
+          reference: lx_dtypes/models/contracts/sap_ish_import.py:18
+          note: >-
+            CLIN-006, medium integrity impact: nested SAP envelope dumps shared
+            mutable data and admitted nonfinite values. Dumps now copy recursively
+            and validation rejects nonfinite values. This remains a generic typed
+            transport envelope, not validation of SAP field meanings or clinical codes.
+  - id: graph_resolution_scale
+    category: operations
+    title: Graph resolution has measured scaling and explicit host cache ownership
+    required: true
+    acceptance:
+      - Repeated reporting queries reuse a validated isolated index without scanning unrelated graph records.
+      - Reference traversal avoids rebuilding the complete index for every edge.
+      - Benchmarks cover agreed graph sizes, provenance volume, concurrency, cold initialization, and tail latency within approved budgets.
+      - endoreg-db integrates snapshot-specific resolver lifetime, bounded memory use, invalidation, and authorization.
+    verification:
+      kind: command
+      command: [uv, run, python, scripts/benchmark_graph_resolution.py]
+      timeout_seconds: 600
+    assessment:
+      status: in_progress
+      assessed_by: codex-lxd-reliability-20260909-01
+      assessed_at: "2026-09-09T11:05:32Z"
+      note: >-
+        KnowledgeBaseGraphResolver isolates and indexes one validated snapshot.
+        Hosts may retain it and call reporting_context(examination_name). Input
+        and returned-context mutations cannot alter later results. Index construction
+        costs O(V+E) indexing work plus validation/sorting/serialization; repeated
+        queries process selected records/edges and retained provenance catalogs.
+        The one-shot helper constructs an index per call. HTTP route registrations
+        now retain up to eight source-specific snapshots and indexes with LRU eviction.
+        Both endpoints share projections while every request still invokes the loader.
+        Source replacement rebuilds; load failures evict without stale fallback.
+        Standard template and terminology mutation hooks clear retained projections.
+        Concurrent cold loads compile once; invalidation waits for compilation and
+        evicts its result. Already-started readers may finish on a coherent old snapshot.
+        In-place external edits require loader and graph invalidation in every worker.
+        Entry count is bounded, not bytes; cold loading/compilation serializes per cache.
+        This checkout integration is not installed or verified in endoreg-db yet;
+        its central installed-package test lane remains reserved by the coordinator.
+        No production latency, memory, concurrency, or graph-size budget was supplied.
+        Synthetic local measurements are evidence only, not an SLA or deployment proof.
+      evidence:
+        - kind: command
+          reference: /tmp/lxd-http-full.log
+          note: >-
+            uv run --no-sync pytest tests -q: exit 0; 934 passed, 2 skipped,
+            23 warnings in 111.91 seconds on the updated checkout. Focused graph,
+            editor import and template lane: 46 passed in 8.25 seconds. Pyright
+            1.1.412: zero errors and warnings. Ruff on changed Python files,
+            docs HTML, docs linkcheck and git diff --check passed. No Endoreg
+            consumer lane or wheel rebuild was run for these HTTP changes.
+        - kind: test
+          reference: tests/unit/lx_dtypes/django/api/test_knowledge_base_graph_api.py
+          note: Covers hash/edge corruption, canonical ordering, exporter input isolation, and retained resolver mutation isolation.
+        - kind: test
+          reference: tests/test_fhir_clinical.py
+          note: Verifies one index construction per resolved_reports operation and fresh resolution after input changes.
+        - kind: test
+          reference: tests/unit/lx_dtypes/django/api/test_reporting_shell_graph_aaa.py
+          note: >-
+            HTTP route regressions cover shared snapshot/context reuse, loader execution
+            on every request, source replacement, failed-load eviction, invalid identity,
+            response isolation, LRU eviction, explicit and main mutation-hook invalidation,
+            concurrent cold requests and invalidation during compilation.
+        - kind: command
+          reference: /tmp/lxd-http-timings.log
+          note: >-
+            Five-repeat local route-handler medians for SyntheticKnowledgeBase from
+            scripts/benchmark_graph_resolution.py, using a retained source object and
+            small_exam (ten findings). Each cold iteration clears the route cache;
+            the next warm response is asserted equal. At 100/1000/5000 findings,
+            cold milliseconds were 23.847/229.700/1009.752 and warm milliseconds
+            1.743/1.552/1.449. Excludes network, real registry/loader costs and fixture
+            generation; measured alongside local verification, not a production SLA.
+        - kind: command
+          reference: uv run --no-sync python scripts/benchmark_graph_resolution.py --repeats 5
+          note: >-
+            Local Python 3.12.13 median milliseconds at 100/1000/5000 synthetic
+            findings respectively: FHIR resolved reports 0.514/6.488/20.511;
+            full snapshot 7.156/77.382/389.479; one-shot full reporting context
+            10.091/146.630/612.185; retained ten-finding context
+            0.815/0.741/0.537. Full contexts contain all generated findings;
+            small contexts contain ten findings and no provenance catalog.
+            These are single-process local medians, not concurrent p95/p99 or
+            memory-budget acceptance. Fixture generation is outside the timed work.
+        - kind: review
+          reference: fhir-resolver-comparison-95c3f58a973b5ede15393a137ce0b5966def08dd
+          note: >-
+            Compared the baseline fhir_clinical module from this Git revision
+            with the working implementation on identical benchmark clinical_bundle
+            inputs, three repetitions each. Resolved JSON output was equal.
+            At 100 observations, baseline/current medians were 10.934/0.335 ms;
+            at 1000 they were 1023.465/3.264 ms (313.6x for that local sample).
+            The operation-count regression test protects single-index resolution;
+            the speedup is not a universal performance guarantee.
+  - id: advertised_interoperability_acceptance
+    category: functionality
+    title: Supported FHIR, Excel, and SAP profiles have explicit parsing and round-trip evidence
+    required: true
+    acceptance:
+      - Supported FHIR releases, implementation guides, resources, value choices, terminology mappings, and rejected cases are versioned and documented.
+      - Excel input formats and output semantics are explicitly scoped and verified with locale, Unicode, date, numeric precision, missing-value, and formula fixtures.
+      - SAP interface versions and clinical field schemas are validated against representative synthetic export fixtures through endoreg-db.
+      - Lossy projections and unsupported cases are explicit and cannot be mistaken for complete clinical round trips.
+    verification:
+      kind: manual
+      instructions: Review profile-specific clinical fixtures, parser contracts, round-trip comparisons, and endoreg-db consumer tests against an approved support matrix.
+      timeout_seconds: 1800
+    assessment:
+      status: blocked
+      assessed_by: codex-lxd-reliability-20260909-01
+      assessed_at: "2026-09-09T10:38:53Z"
+      note: >-
+        No worldwide support matrix or approved source-system fixtures were supplied.
+        FHIR models cover a patient-linked R4 subset, not full R4/R4B/R5 or national
+        profiles. Legacy valueDecimal input is retained for compatibility, while
+        newly exported values use R4 Quantity. Unsupported modifiers/value choices
+        fail explicitly; partial-date, absent-result, history, terminology/UCUM,
+        and exact decimal-precision semantics require further profile work. The
+        reporting bridge intentionally projects components and does not preserve
+        all resource content. Terminology domain inference is heuristic. This
+        package has XLSX/CSV export and no Excel input parser; general Excel parsing
+        cannot be claimed. XLSX numeric precision limitations remain for floating
+        values. SAP clinical normalization and persistence belong to endoreg-db;
+        this package's generic SAP envelope does not validate source-system schemas.
+        Consumer tests establish bounded compatibility only, not worldwide coverage.
+      evidence:
+        - kind: command
+          reference: endoreg-db pytest tests/api/test_knowledge_base_graph_api.py tests/services/test_sap_ish_import.py tests/services/test_fhir_r4_export.py -q
+          note: >-
+            18 passed, 2 warnings in 93.12 seconds; exit 0. Executed in endoreg-db's
+            existing environment with PYTHONPATH selecting this lx-data-models
+            checkout and isolated SQLite runtime paths. No installed package or
+            lockfile was changed; this is not published-artifact evidence.
+        - kind: command
+          reference: endoreg-db pytest tests/api/test_knowledge_base_graph_api.py tests/services/test_sap_ish_import.py tests/services/test_sap_ish_clinical.py tests/services/test_fhir_r4_export.py tests/management/commands/test_import_sap_ish_txt.py tests/management/commands/test_import_sap_ish_zip.py -q
+          note: >-
+            Final expanded consumer lane: exit 0; 27 passed, 2 warnings in
+            50.51 seconds. Backend base revision e547189103a3ff5c084878fc9cfc23023f1d1fef
+            with its existing working changes. The imported lx_dtypes source was
+            verified as this checkout; installed distribution metadata remains
+            0.2.37 and was not replaced. Test-only Nix library paths and isolated
+            SQLite runtime directories were used. This exercises existing SAP
+            clinical persistence and ZIP/TXT command fixtures, not all SAP products.
+        - kind: review
+          reference: docs/guides/fhir-clinical-testing.md
+          note: Documents supported subset, rejected modifiers, lossy projection, preliminary export default, and numeric compatibility changes.
+        - kind: review
+          reference: https://hl7.org/fhir/R4/observation.html
+          note: R4 Observation value choices and modifier semantics are normative references, not evidence of full conformance.
+  - id: future_prediction_integration
+    category: requirements
+    title: Future AI graph predictions cannot silently become canonical clinical facts
+    required: true
+    acceptance:
+      - Prediction proposals carry source snapshot identity, model/version provenance, explicit proposed relationships, and uncertainty separately from authored facts.
+      - Stale, unsupported, nonfinite, or contradictory predictions fail validation before any host-controlled acceptance.
+      - Host acceptance, clinician review, auditability, evaluation criteria, and rollback responsibilities are explicit.
+    verification:
+      kind: manual
+      instructions: Review a concrete versioned prediction proposal contract and adversarial integration tests against endoreg-db acceptance semantics.
+      timeout_seconds: 1800
+    assessment:
+      status: blocked
+      assessed_by: codex-lxd-reliability-20260909-01
+      assessed_at: "2026-09-09T10:38:53Z"
+      note: >-
+        Stable snapshot identities, declared relationships, and isolated graph
+        resolution provide foundations, but no concrete graph-prediction proposal
+        protocol, recommender interface, calibration targets, or clinical acceptance
+        workflow has been specified. Generic PropertyGraph is not a validated
+        clinical prediction boundary. No speculative recommendation engine or
+        automatic adoption of predicted edges was introduced. A separate versioned
+        proposal contract and endoreg-db validation/acceptance tests are required.
+  - id: clinical_release_acceptance
+    category: requirements
+    title: Clinical production readiness requires reviewed end-to-end evidence
+    required: true
+    acceptance:
+      - Clinical owners approve representative correctness cases, failure behavior, terminology mappings, and intended-use limitations for each supported deployment profile.
+      - The deployed endoreg-db host verifies authentication, center isolation, auditability, data protection, import resource limits, recovery, and load behavior.
+      - Versioned built artifacts pass required checks and are verified in the actual consuming deployment.
+      - Applicable regional deployment requirements and independent clinical/security reviews are documented by accountable owners.
+    verification:
+      kind: manual
+      instructions: Require clinical-owner acceptance and traceable deployed-artifact, host security, load, and recovery evidence; local tests alone cannot satisfy this gate.
+      timeout_seconds: 1800
+    assessment:
+      status: blocked
+      assessed_by: codex-lxd-reliability-20260909-01
+      assessed_at: "2026-09-09T10:38:53Z"
+      note: >-
+        Worldwide hostile-environment clinical readiness is not established. There
+        is no supplied clinical-owner acceptance corpus, supported deployment/profile
+        matrix, approved latency/resource budget, independent review, or deployed
+        artifact evidence. README still identifies the package as alpha research
+        software. The coordinator confirmed that no new clinical profiles or scale
+        targets are available in the backend task. Package hardening and local
+        consumer tests do not substitute for these missing release criteria.
+        No production release, clinical certification, or deployment was performed.

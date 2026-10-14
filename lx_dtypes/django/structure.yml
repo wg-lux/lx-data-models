@@ -1,0 +1,36 @@
+version: 1
+tier: domain
+path: lx_dtypes/django
+parent: ../structure.yml
+summary: Django persistence adapters and reusable Ninja APIs for host integration. Test settings and deployment
+  orchestration remain outside the production integration surface.
+responsibilities:
+- Expose ORM adapters, migrations, and graph/reporting APIs
+- Integrate shared contracts with configured host services
+boundaries:
+- Cross-service payloads use Pydantic contracts rather than ORM models
+- Host applications own authentication policy, deployment, and study provisioning
+entrypoints:
+- name: App config
+  file: apps.py
+  purpose: Django application registration
+- name: ORM exports
+  file: models.py
+  purpose: Persistence adapter exports
+- name: API router
+  file: api/main.py
+  purpose: Host-mounted API entry point
+dependencies:
+  internal:
+  - ../models
+  - ../terminology
+  external:
+  - Django
+  - django-ninja
+submodules: []
+contracts:
+- name: Host integration
+  doc: ../../docs/guides/django-host-integration.md
+tests:
+  directory: ../../tests/unit/lx_dtypes/django
+  command: uv run pytest tests/unit/lx_dtypes/django/api/test_knowledge_base_graph_api.py -q

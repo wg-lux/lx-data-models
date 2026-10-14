@@ -1,0 +1,97 @@
+owner: lx_dtypes maintainers
+topic: PR 32 terminology reconciliation and publication inventory
+pr_url: https://github.com/wg-lux/lx-data-models/pull/32
+pr_head: 37c8ff4bc2b87a5cccd6051ce7444d3b6fc2562c
+baseline_commit: 93b0b62
+mst_pr_additions_already_present:
+- file: lx_dtypes/data/terminology/mst_3_0_terminology/data/10_anatomy.yaml
+  prefix_lines: 11
+  sha256: 275f1c62a883b1cf0e7f926694709016c1c1a5b675638888c7bf0bdb6143d861
+- file: lx_dtypes/data/terminology/mst_3_0_terminology/data/20_findings.yaml
+  prefix_lines: 7
+  sha256: 85269aa7aa9437f69a472b609b949af97dd83c6b38183a8a69dc59baedfced37
+mst_module: mst_3_0
+mst_version: 3.0.0
+mst_counts:
+  finding: 357
+  classification: 39
+  classification_choice: 285
+mst_draft_counts:
+  finding: 357
+  classification: 40
+  classification_choice: 290
+interpretation: PR 32 adds no missing MST concepts at this head. Counts describe this
+  executable artifact, not an independent re-audit of the published MST source. Do
+  not invent entries to match manuscript totals.
+star_original:
+  module: star_upper_gi
+  version: 0.1.1
+  root: demo-data/star_upper_gi
+  finding: 22
+  classification: 21
+  classification_choice: 71
+  classification_choice_descriptor: 3
+star_repaired:
+  module: star_upper_gi
+  version: 0.1.1.post1
+  finding: 22
+  classification: 21
+  classification_choice: 79
+  classification_choice_descriptor: 3
+  unit: 41
+star_repairs:
+- Add eight already-referenced mucosal appearance choices from packaged STAR 0.1.2.
+- Replace two location-choice descriptor references distance_cm with length_cm_descriptor.
+- Correct scoped unit milimeter to millimeter; identify scoped lx_units as 0.1.0.post1.
+- Preserve raw demo inputs unchanged; publish repairs under a distinct version.
+versioning:
+  module: polyp_size_category
+  versions:
+  - 1.0.0
+  - 2.0.0
+  legacy_scope: Illustrative binary comparator, not a historical ESGE release.
+  revised_scope: Whole-number size grouping; no treatment recommendation is computed.
+  fractional_policy: Version 1 accepts continuous positive values. Version 2 rejects
+    fractions without rounding.
+mst_source_check:
+  url: https://www.worldendo.org/assets-craft/pdf/resources/mst-3-0.pdf
+  section: '7.3, page 41 of 45, document dated 03.08.2016'
+  finding: Actions and outcomes are listed; the five-level severity table claimed in the draft is not present in this section.
+  scope: Targeted source check, not a complete independent terminology-fidelity audit.
+ledger_source_check:
+  file: lx_dtypes/models/interface/examples/demo_star_upper_gi.py
+  polyp_size_mm: 8
+  diverticulum_size_mm: 6
+  finding: The draft incorrectly describes both measurements as polyps; Table 4 uses explicit synthetic observations.
+
+mst_excel_reconciliation:
+  source: mst30_tables(1).xls
+  specification: scripts/mst/import.yml
+  importer: scripts/import_mst_excel.py
+  provenance: lx_dtypes/data/terminology/mst_3_0_terminology/excel_source.yml
+  identity_policy: Owner-requested in-place correction of MST 3.0.0; catalog digests change.
+  counts: {finding: 389, classification: 293, classification_choice: 546, indication: 142, intervention: 40, examination: 12}
+  historical_counts: The mst_counts above describe the pre-Excel PR reconciliation only.
+  severity_source: "Adv event severity!B3:F17; not PDF section 7.3."
+
+manuscript_artifact_review:
+  owner: lx-dtypes maintainers and manuscript authors
+  review_date: '2026-10-12'
+  preserved_input: temp/generated_exports/LXDM_reconciled_draft.docx
+  corrected_output: temp/generated_exports/LXDM_current_artifact.docx
+  correction_spec: temp/generated_exports/LXDM_current_artifact.spec.yml
+  provenance: temp/generated_exports/LXDM_current_artifact.changes.yml
+  canonical_editorial_spec: docs/manuscript-reconciliation.yml
+  scope: Current executable MST counts and Excel severity provenance; no new clinical-source or literature audit.
+  source_limit: The original LXDM_revised_draft_v3(2).docx was unavailable; the verified earlier output was used for the seven follow-up replacements.
+  checks:
+  - MST loader and core export succeeded; 17 MST tests passed.
+  - Workbook digest and Incident/Mild/Moderate/Severe/Fatal header verified against the local source.
+  - DOCX ZIP integrity, all non-document parts, exact Table 3 counts and input/output digests verified.
+  - LibreOffice PDF conversion succeeded; methods and Table 3 pages inspected.
+  author_review_required:
+  - Methods says 196 unique records while the abstract, results and Table 2 use 206; verify the screening ledger and recalculate percentages if needed. An inline review note now exposes this conflict.
+  - The PubMed search date lacks a year; supply it from the actual search record.
+  - Table 3 has narrow columns that split Count and Classifications in the rendered draft; final journal layout needs adjustment.
+  - Existing tracked edits and highlighted methods text remain for author review; this is not a submission-ready document.
+  reproducibility: Existing published MST identity was corrected in place by earlier work; content digests distinguish the current workbook import from the historical PR inventory.

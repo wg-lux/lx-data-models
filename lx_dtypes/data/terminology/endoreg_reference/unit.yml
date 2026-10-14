@@ -1,0 +1,172 @@
+- model: reference_catalog
+  name: unit
+  name_de: "Einheiten"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: centimeter
+      record_type: unit
+      description: centimeters
+      abbreviation: cm
+    - name: cubic_meter
+      record_type: unit
+      description: cubic meters
+      abbreviation: m³
+    - name: days
+      record_type: unit
+      description: null
+      abbreviation: d
+    - name: dose
+      record_type: unit
+      description: null
+      abbreviation: ''
+    - name: femtoliter
+      record_type: unit
+      description: femtoliters
+      abbreviation: fl
+    - name: gram
+      record_type: unit
+      description: grams
+      abbreviation: g
+    - name: gram per deciliter
+      record_type: unit
+      description: null
+      abbreviation: null
+    - name: gram per liter
+      record_type: unit
+      description: null
+      abbreviation: g/L
+    - name: hours
+      record_type: unit
+      description: null
+      abbreviation: h
+    - name: kilogram
+      record_type: unit
+      description: kilograms
+      abbreviation: kg
+    - name: kilometer
+      record_type: unit
+      description: kilometers
+      abbreviation: km
+    - name: kilowatt-hours
+      record_type: unit
+      description: kilowatt-hours
+      abbreviation: kWh
+    - name: liter
+      record_type: unit
+      description: liters
+      abbreviation: l
+    - name: liters-per-minute
+      record_type: unit
+      description: liters per minute
+      abbreviation: l/min
+    - name: meter
+      record_type: unit
+      description: meters
+      abbreviation: m
+    - name: microgram
+      record_type: unit
+      description: micrograms
+      abbreviation: µg
+    - name: microgram per deciliter
+      record_type: unit
+      description: Micrograms per deciliter, a unit of measurement for concentration.
+      abbreviation: µg/dL
+    - name: microgram per mililiter
+      record_type: unit
+      description: null
+      abbreviation: µg/ml
+    - name: microinternational units per mililiter
+      record_type: unit
+      description: null
+      abbreviation: µU/ml
+    - name: micromole per liter
+      record_type: unit
+      description: null
+      abbreviation: µmol/L
+    - name: miliequivalent per liter
+      record_type: unit
+      description: miliequivalents per liter, used for electrolytes concentration.
+      abbreviation: mEq/L
+    - name: miligram
+      record_type: unit
+      description: miligrams
+      abbreviation: mg
+    - name: miligram per deciliter
+      record_type: unit
+      description: miligrams per deciliter, commonly used for various blood measurements.
+      abbreviation: mg/dL
+    - name: miligram per liter
+      record_type: unit
+      description: miligrams per liter, a unit of measurement for concentration in
+        blood.
+      abbreviation: mg/L
+    - name: mililiter
+      record_type: unit
+      description: mililiters
+      abbreviation: ml
+    - name: mililiter per minute per 1.73m^2
+      record_type: unit
+      description: null
+      abbreviation: ml/min/1.73m²
+    - name: milimeter
+      record_type: unit
+      description: milimeters
+      abbreviation: mm
+    - name: milimole per liter
+      record_type: unit
+      description: milimoles per liter, a unit of measurement for concentration in
+        blood.
+      abbreviation: mmol/L
+    - name: minutes
+      record_type: unit
+      description: null
+      abbreviation: min
+    - name: months
+      record_type: unit
+      description: null
+      abbreviation: mo
+    - name: nanogram per deciliter
+      record_type: unit
+      description: null
+      abbreviation: null
+    - name: nanogram per mililiter
+      record_type: unit
+      description: null
+      abbreviation: ng/ml
+    - name: percent
+      record_type: unit
+      description: null
+      abbreviation: '%'
+    - name: picogram
+      record_type: unit
+      description: null
+      abbreviation: pg
+    - name: picogram per mililiter
+      record_type: unit
+      description: null
+      abbreviation: pg/ml
+    - name: ratio
+      record_type: unit
+      description: null
+      abbreviation: ''
+    - name: seconds
+      record_type: unit
+      description: null
+      abbreviation: s
+    - name: units per liter
+      record_type: unit
+      description: null
+      abbreviation: U/l
+    - name: weeks
+      record_type: unit
+      description: null
+      abbreviation: w
+    - name: x 10^9 per liter
+      record_type: unit
+      description: Number of cells per liter, often used for blood cell counts.
+      abbreviation: x 10^9/L
+    - name: years
+      record_type: unit
+      description: null
+      abbreviation: y

@@ -1,5 +1,3 @@
-from typing import Dict, Union
-
 from lx_dtypes.models.base.app_base_model.ddict import KnowledgebaseBaseModelDataDict
 from lx_dtypes.names import (
     ClassificationChoiceDescriptorTypes,
@@ -13,7 +11,7 @@ class ClassificationChoiceDescriptorDataDict(KnowledgebaseBaseModelDataDict):
     numeric_min: float
     numeric_max: float
     numeric_distribution: NumericDistributionChoices
-    numeric_distribution_params: Dict[str, Union[str, float, int]]
+    numeric_distribution_params: dict[str, str | float | int]
     text_max_length: int
     default_value_str: str
     default_value_num: float
@@ -22,4 +20,4 @@ class ClassificationChoiceDescriptorDataDict(KnowledgebaseBaseModelDataDict):
     selection_multiple: bool
     selection_multiple_n_min: int
     selection_multiple_n_max: int
-    selection_default_options: Dict[str, float]
+    selection_default_options: dict[str, float]

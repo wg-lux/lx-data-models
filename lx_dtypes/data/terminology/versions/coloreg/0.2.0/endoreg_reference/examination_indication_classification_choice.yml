@@ -1,0 +1,115 @@
+- model: reference_catalog
+  name: examination_indication_classification_choice
+  name_de: "Auswahlwerte für Untersuchungsindikationsklassifikationen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: colonoscopy_bleeding
+      record_type: examination_indication_classification_choice
+      subcategories:
+        acuteness:
+          choices:
+          - N0
+          - N1
+          - N2
+          - N3
+          - N4
+          - N5
+          default: N4
+          required: false
+          probability:
+          - 0.005
+          - 0.005
+          - 0.01
+          - 0.13
+          - 0.35
+          - 0.5
+          description: 'Acuteness of the examination (N0: immediate, N1: < 1h, N2:
+            < 6h, N3: < 12h, N4: < 24h, N5: >= 24h)'
+      numerical_descriptors: {}
+    - name: colonoscopy_diagnostic
+      record_type: examination_indication_classification_choice
+      subcategories:
+        reason:
+          choices:
+          - abdominal_pain
+          - diarrhea
+          - constipation
+          - weight_loss
+          - anemia
+          - positive_ifobt
+          - suspected_inflammatory_bowel_disease
+          default: abdominal_pain
+          required: true
+          probability:
+          - 0.2
+          - 0.2
+          - 0.2
+          - 0.05
+          - 0.1
+          - 0.1
+          - 0.05
+          description: null
+      numerical_descriptors: {}
+    - name: colonoscopy_screening
+      record_type: examination_indication_classification_choice
+      subcategories:
+        reason:
+          choices:
+          - age
+          - family_history_colorectal_cancer
+          - family_history_polyposis_syndrome
+          default: age
+          required: true
+          probability:
+          - 0.8
+          - 0.1
+          - 0.1
+          description: Reason for screening
+      numerical_descriptors: {}
+    - name: colonoscopy_surveillance
+      record_type: examination_indication_classification_choice
+      subcategories:
+        reason:
+          choices:
+          - unknown
+          - polypectomy_surveillance
+          - known_polyposis_syndrome
+          - known_inflammatory_bowel_disease
+          - suspected_inflammatory_bowel_disease
+          - positive_ifobt
+          default: unknown
+          required: true
+          probability:
+          - 0.5
+          - 0.1
+          - 0.1
+          - 0.1
+          - 0.2
+          description: Reason for surveillance
+      numerical_descriptors:
+        months_since_last_colonoscopy:
+          unit: month
+          required: true
+          min: 3.0
+          max: 120.0
+          mean: 24.0
+          std: 12.0
+          default: null
+          distribution: normal
+          description: Months since last colonoscopy
+    - name: colonoscopy_therapeutic
+      record_type: examination_indication_classification_choice
+      subcategories:
+        reason:
+          choices:
+          - lesion_removal
+          - hemostasis
+          - dilatation
+          - stent_placement
+          - foreign_body_removal
+          default: null
+          required: null
+          probability: null
+          description: null
+      numerical_descriptors: {}

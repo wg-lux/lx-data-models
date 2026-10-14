@@ -1,14 +1,62 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_classification_choices
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022): https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: classification_choice
   name: "colonoscopy_incomplete_insufficient_preparation"
+  name_de: "Unzureichende Darmvorbereitung"
+  name_en: "Inadequate bowel preparation"
 
 - model: classification_choice
   name: "colonoscopy_incomplete_complication"
+  name_de: "Komplikation"
+  name_en: "Complication"
 
 - model: classification_choice
   name: "colonoscopy_incomplete_pain"
+  name_de: "Schmerzen"
+  name_en: "Pain"
 
 - model: classification_choice
   name: "colonoscopy_incomplete_stenosis"
+  name_de: "Stenose"
+  name_en: "Stenosis"
 
 - model: classification_choice
   name: "colonoscopy_incomplete_other"
+  name_de: "Anderer Grund"
+  name_en: "Other reason"
+
+- model: classification_choice
+  name: "complication_phase_intraprocedural"
+  name_de: "Intraprozedural"
+  name_en: "Intraprocedural"
+
+- model: classification_choice
+  name: "complication_phase_postprocedural"
+  name_de: "Postprozedural"
+  name_en: "Postprocedural"
+
+- model: classification_choice
+  name: "complication_severity_mild"
+  name_de: "Leicht"
+  name_en: "Mild"
+
+- model: classification_choice
+  name: "complication_severity_moderate"
+  name_de: "Mittelgradig"
+  name_en: "Moderate"
+
+- model: classification_choice
+  name: "complication_severity_severe"
+  name_de: "Schwer"
+  name_en: "Severe"
+
+- model: classification_choice
+  name: "complication_management_documented"
+  name_de: "Maßnahmen dokumentiert"
+  name_en: "Management documented"
+
+- model: classification_choice
+  name: "complication_outcome_documented"
+  name_de: "Ausgang dokumentiert"
+  name_en: "Outcome documented"

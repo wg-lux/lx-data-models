@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -6,6 +7,7 @@ from django.db import models
 from lx_dtypes.models.base.app_base_model.django.KnowledgebaseBaseModelDjango import (
     KnowledgebaseBaseModelDjango,
 )
+from lx_dtypes.models.contracts.json_types import JsonValue
 from lx_dtypes.names import FINDING_MODEL_LIST_TYPE_FIELDS, FieldNames
 
 from .FindingDataDict import (
@@ -23,6 +25,10 @@ if TYPE_CHECKING:
 
 
 class FindingDjango(KnowledgebaseBaseModelDjango[FindingDataDict]):
+    text_extraction: models.JSONField[
+        list[dict[str, JsonValue]], list[dict[str, JsonValue]]
+    ] = models.JSONField(default=list, blank=True)
+
     if TYPE_CHECKING:
         interventions: models.ManyToManyField[InterventionDjango, InterventionDjango]
         caused_by_interventions: models.ManyToManyField[

@@ -1,2 +1,5 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_interventions
 - model: intervention
   name: ercp_sphincterotomy
+  name_de: "Endoskopische Sphinkterotomie bei ERCP"
+  name_en: "Endoscopic sphincterotomy during ERCP"

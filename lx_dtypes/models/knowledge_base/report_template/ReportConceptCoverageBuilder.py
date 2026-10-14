@@ -1,0 +1,392 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+from collections.abc import Iterator, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Protocol, cast
+
+from .ReportConceptCoverage import (
+    REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION,
+    ReportConceptApplicability,
+    ReportConceptCoverage,
+    ReportConceptCoverageIdentity,
+    ReportConceptCoverageItem,
+    ReportConceptCoverageProvenance,
+    ReportConceptValidationStatus,
+)
+from .ReportTemplateCoverage import (
+    ReportTemplateCoverageConcept,
+    ReportTemplateCoverageFindingSelector,
+)
+
+if TYPE_CHECKING:
+    from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
+
+
+class _KnowledgeBaseConfig(Protocol):
+    def model_dump(self, *, mode: str) -> Mapping[str, Any]: ...
+
+
+class _CoverageKnowledgeBase(Protocol):
+    @property
+    def config(self) -> _KnowledgeBaseConfig: ...
+
+    def model_dump(self, *, mode: str) -> Mapping[str, Any]: ...
+
+
+RESOLVER_NAME = "lx_dtypes.report_concept_coverage"
+RESOLVER_VERSION = "1.0.0"
+_VOLATILE_KEYS = frozenset({"created_at", "updated_at", "uuid", "tags"})
+
+
+def _without_volatile_metadata(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            str(key): _without_volatile_metadata(item)
+            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+            if key not in _VOLATILE_KEYS
+        }
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [_without_volatile_metadata(item) for item in value]
+    return value
+
+
+def _digest(value: Any) -> str:
+    encoded = json.dumps(
+        _without_volatile_metadata(value),
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _require_text(value: Any, *, field: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(
+            f"Report concept coverage requires an explicit non-empty {field}; "
+            "lexical names are not accepted as clinical identifiers."
+        )
+    return value
+
+
+def _mapping(value: Any, *, field: str) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        raise ValueError(  # noqa: TRY004 - malformed contract value
+            f"Report concept coverage expected {field} to be an object."
+        )
+    return cast(Mapping[str, Any], value)
+
+
+def _path_value(payload: Any, path: Sequence[str]) -> tuple[bool, Any]:
+    current = payload
+    for segment in path:
+        if isinstance(current, Mapping):
+            if segment not in current:
+                return False, None
+            current = current[segment]
+            continue
+        if isinstance(current, Sequence) and not isinstance(current, (str, bytes)):
+            try:
+                current = current[int(segment)]
+            except (IndexError, TypeError, ValueError):
+                return False, None
+            continue
+        return False, None
+    return True, current
+
+
+def _strict_equal(left: Any, right: Any) -> bool:
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, list) and isinstance(right, list):
+        return len(left) == len(right) and all(
+            _strict_equal(left_item, right_item)
+            for left_item, right_item in zip(left, right, strict=True)
+        )
+    result = left == right
+    return result if isinstance(result, bool) else False
+
+
+def _value_matches_allowed(value: Any, allowed_values: Sequence[Any]) -> bool | None:
+    if value is None:
+        return None
+    if isinstance(value, list):
+        if not value:
+            return False
+        return all(
+            any(_strict_equal(item, allowed) for allowed in allowed_values)
+            for item in value
+        )
+    if isinstance(value, (Mapping, tuple, set)):
+        return None
+    return any(_strict_equal(value, allowed) for allowed in allowed_values)
+
+
+def _value_matches_constraint(
+    value: Any,
+    concept: ReportTemplateCoverageConcept,
+) -> bool | None:
+    if concept.value_constraint == "non_empty_string":
+        return isinstance(value, str) and bool(value.strip())
+    if concept.value_constraint == "non_empty_string_list":
+        return (
+            isinstance(value, list)
+            and bool(value)
+            and all(isinstance(item, str) and bool(item.strip()) for item in value)
+        )
+    if concept.value_constraint == "number_range":
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return False
+        if not math.isfinite(value):
+            return False
+        return bool(
+            concept.numeric_min is not None
+            and concept.numeric_max is not None
+            and concept.numeric_min <= value <= concept.numeric_max
+        )
+    return _value_matches_allowed(value, concept.allowed_values or ())
+
+
+def _indexed_mappings(value: object) -> Iterator[tuple[int, Mapping[object, object]]]:
+    """Skip malformed entries without changing their neighbours' evidence indices."""
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        for index, item in enumerate(value):
+            if isinstance(item, Mapping):
+                yield index, item
+
+
+def _matching_classification_choices(
+    finding: Mapping[object, object],
+    selector: ReportTemplateCoverageFindingSelector,
+) -> Iterator[tuple[tuple[str, ...], Mapping[object, object]]]:
+    for classification_index, classification in _indexed_mappings(
+        finding.get("patient_finding_classifications")
+    ):
+        for choice_index, choice in _indexed_mappings(
+            classification.get("patient_finding_classification_choices")
+        ):
+            if choice.get("classification") != selector.classification_name:
+                continue
+            if (
+                selector.classification_choice is not None
+                and choice.get("classification_choice")
+                != selector.classification_choice
+            ):
+                continue
+            yield (
+                (
+                    "patient_finding_classifications",
+                    str(classification_index),
+                    "patient_finding_classification_choices",
+                    str(choice_index),
+                ),
+                choice,
+            )
+
+
+def _selected_finding_values(
+    payload: Mapping[str, object],
+    selector: ReportTemplateCoverageFindingSelector,
+    value_path: Sequence[str] | None,
+) -> list[tuple[tuple[str, ...], bool, object]]:
+    """Resolve all selector matches in stable payload order.
+
+    ``value_path`` is relative to a selected finding. When a classification is
+    selected, the value is the selected classification choice unless an
+    explicit relative path is supplied.
+    """
+    selected: list[tuple[tuple[str, ...], bool, object]] = []
+    for finding_index, finding in _indexed_mappings(payload.get("patient_findings")):
+        if finding.get("finding") != selector.finding_name:
+            continue
+        finding_path = ("patient_findings", str(finding_index))
+        if not selector.classification_name:
+            exists, value = _path_value(finding, value_path or ())
+            selected.append((finding_path, exists, value))
+            continue
+        selected_choices = [
+            (
+                finding_path + path,
+                *_path_value(choice, value_path or ("classification_choice",)),
+            )
+            for path, choice in _matching_classification_choices(finding, selector)
+        ]
+        selected.extend(
+            selected_choices
+            or [(finding_path + ("patient_finding_classifications",), False, None)]
+        )
+    return selected
+
+
+def _validator_results(validation: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
+    results: dict[str, Mapping[str, Any]] = {}
+    for key in (
+        "classification_validators",
+        "intervention_validators",
+        "findings_validators",
+        "examination_validators",
+        "unit_validators",
+    ):
+        raw_results = validation.get(key, ())
+        if not isinstance(raw_results, Sequence) or isinstance(
+            raw_results, (str, bytes)
+        ):
+            raise ValueError(  # noqa: TRY004 - malformed contract value
+                f"Validator response does not expose {key} as a list."
+            )
+        for raw_result in raw_results:
+            result = _mapping(raw_result, field=f"{key} entries")
+            name = _require_text(result.get("name"), field=f"{key} validator name")
+            if name in results:
+                raise ValueError(
+                    f"Validator response contains duplicate validator '{name}'."
+                )
+            results[name] = result
+    return results
+
+
+def _coerce_coverage_concepts(
+    template_export: Mapping[str, Any],
+) -> tuple[ReportTemplateCoverageConcept, ...]:
+    raw_version = _require_text(
+        template_export.get("coverage_version"), field="coverage_version"
+    )
+    if raw_version != REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION:
+        raise ValueError(
+            "Report template coverage_version does not match the runtime coverage contract."
+        )
+    raw_concepts = template_export.get("coverage_concepts")
+    if not isinstance(raw_concepts, Sequence) or isinstance(raw_concepts, (str, bytes)):
+        raise ValueError(  # noqa: TRY004 - malformed contract value
+            "Report template export lacks explicit coverage_concepts; stable concept IDs "
+            "and applicability rules must be authored in the template."
+        )
+    if not raw_concepts:
+        raise ValueError("Report template coverage_concepts must not be empty.")
+    return tuple(
+        ReportTemplateCoverageConcept.model_validate(raw_concept)
+        for raw_concept in raw_concepts
+    )
+
+
+def _values_validation_status(
+    values: Sequence[tuple[bool, object]],
+    concept: ReportTemplateCoverageConcept,
+) -> ReportConceptValidationStatus:
+    """Unknown evidence takes precedence over invalid values across all matches."""
+    if not values:
+        return "missing"
+    if any(not exists or value is None for exists, value in values):
+        return "unknown"
+    matches = [_value_matches_constraint(value, concept) for _, value in values]
+    if any(match is None for match in matches):
+        return "unknown"
+    return "invalid" if any(match is False for match in matches) else "present"
+
+
+def _concept_status_and_evidence(
+    payload: Mapping[str, object],
+    concept: ReportTemplateCoverageConcept,
+    validators: Mapping[str, Mapping[str, object]],
+) -> tuple[ReportConceptValidationStatus, tuple[tuple[str, ...], ...]]:
+    evidence_paths = (tuple(concept.evidence_path),)
+    if concept.applicability_status == "not_applicable":
+        return "undetermined", evidence_paths
+    validator_states = [validators.get(name) for name in concept.validator_names]
+    if any(result is None for result in validator_states):
+        return "unknown", evidence_paths
+    if concept.finding_selector is not None:
+        selected = _selected_finding_values(
+            payload, concept.finding_selector, concept.concept_value_path
+        )
+        return (
+            _values_validation_status(
+                [(exists, value) for _, exists, value in selected], concept
+            ),
+            tuple(path for path, _, _ in selected),
+        )
+    if not _path_value(payload, concept.evidence_path)[0]:
+        return "missing", evidence_paths
+    if any(
+        result.get("ok") is False for result in validator_states if result is not None
+    ):
+        return "invalid", evidence_paths
+    return (
+        _values_validation_status(
+            [_path_value(payload, concept.concept_value_path or ())], concept
+        ),
+        evidence_paths,
+    )
+
+
+def build_report_concept_coverage(
+    *,
+    kb: _CoverageKnowledgeBase,
+    requested_template_name: str,
+    template_export: Mapping[str, Any],
+    p_examination: PExamination,
+    validation: Mapping[str, Any],
+) -> ReportConceptCoverage:
+    """Build deterministic coverage from one loaded KB and validated PExamination."""
+    config = _mapping(kb.config.model_dump(mode="json"), field="KB config")
+    module_name = _require_text(config.get("name"), field="module name")
+    module_version = _require_text(config.get("version"), field="module version")
+    template_name = _require_text(template_export.get("name"), field="template name")
+    if template_name != _require_text(
+        requested_template_name, field="requested template name"
+    ):
+        raise ValueError(
+            "Report template export identity does not match the requested template."
+        )
+    template_version = _require_text(
+        template_export.get("version"), field="template version"
+    )
+    concepts = _coerce_coverage_concepts(template_export)
+    payload = cast(Mapping[str, Any], p_examination.model_dump(mode="json"))
+    validators = _validator_results(validation)
+    coverage_items: list[ReportConceptCoverageItem] = []
+
+    for concept in concepts:
+        validation_status, evidence_paths = _concept_status_and_evidence(
+            payload, concept, validators
+        )
+
+        coverage_items.append(
+            ReportConceptCoverageItem(
+                concept_id=concept.concept_id,
+                label=concept.label,
+                applicability=ReportConceptApplicability(
+                    status=concept.applicability_status,
+                    rule=concept.applicability_rule,
+                    reason=concept.applicability_reason,
+                ),
+                validation_status=validation_status,
+                evidence_path=evidence_paths[0]
+                if evidence_paths
+                else tuple(concept.evidence_path),
+                evidence_paths=evidence_paths,
+                guideline_citations=tuple(concept.guideline_citations),
+            )
+        )
+
+    return ReportConceptCoverage(
+        identity=ReportConceptCoverageIdentity(
+            module_name=module_name,
+            module_version=module_version,
+            module_digest=_digest(kb.model_dump(mode="json")),
+            template_name=template_name,
+            template_version=template_version,
+            template_digest=_digest(template_export),
+        ),
+        provenance=ReportConceptCoverageProvenance(
+            resolver=RESOLVER_NAME,
+            resolver_version=RESOLVER_VERSION,
+            evidence_digest=_digest({"payload": payload, "validation": validation}),
+        ),
+        concepts=tuple(coverage_items),
+    )
+
+
+__all__ = ["build_report_concept_coverage"]

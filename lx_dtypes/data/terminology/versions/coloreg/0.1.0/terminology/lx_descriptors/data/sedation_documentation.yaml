@@ -1,0 +1,76 @@
+# Sources for every record in this file:
+# - DGVS S3 sedation guideline (AWMF 021-014), monitoring and documentation: https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
+- model: classification_choice_descriptor
+  name: "medication_administration_time_value"
+  name_de: "Zeitpunkt der Medikamentengabe"
+  description: "Zeitpunkt der Medikamentengabe als lokale Uhrzeit oder ISO-8601-Zeitangabe; erforderlich für die zeitabhängige Sedierungsdokumentation nach AWMF 021-014, Empfehlung 5.10."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "sedation_monitoring_time_value"
+  name_de: "Zeitpunkt der Sedierungsüberwachung"
+  description: "Zeitpunkt der Vitalparametermessung als lokale Uhrzeit oder ISO-8601-Zeitangabe."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32
+
+- model: classification_choice_descriptor
+  name: "sedation_heart_rate_value"
+  name_de: "Herzfrequenz unter Sedierung"
+  description: "Zum dokumentierten Zeitpunkt gemessene Herzfrequenz."
+  unit: "beats_per_minute"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 300
+
+- model: classification_choice_descriptor
+  name: "sedation_systolic_blood_pressure_value"
+  name_de: "Systolischer Blutdruck unter Sedierung"
+  description: "Zum dokumentierten Zeitpunkt gemessener systolischer Blutdruck."
+  unit: "millimeter_mercury"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 350
+
+- model: classification_choice_descriptor
+  name: "sedation_diastolic_blood_pressure_value"
+  name_de: "Diastolischer Blutdruck unter Sedierung"
+  description: "Zum dokumentierten Zeitpunkt gemessener diastolischer Blutdruck."
+  unit: "millimeter_mercury"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 250
+
+- model: classification_choice_descriptor
+  name: "sedation_oxygen_saturation_value"
+  name_de: "Sauerstoffsättigung unter Sedierung"
+  description: "Zum dokumentierten Zeitpunkt pulsoxymetrisch gemessene Sauerstoffsättigung."
+  unit: "percent"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 100
+
+- model: classification_choice_descriptor
+  name: "supplemental_oxygen_flow_rate_value"
+  name_de: "Flussrate der zusätzlichen Sauerstoffgabe"
+  description: "Dokumentierte Sauerstoffflussrate."
+  unit: "liters_per_minute"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 30
+
+- model: classification_choice_descriptor
+  name: "intravenous_fluid_volume_value"
+  name_de: "Volumen der intravenösen Flüssigkeit"
+  description: "Verabreichtes Volumen der intravenösen Flüssigkeit."
+  unit: "milliliter"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 10000
+
+- model: classification_choice_descriptor
+  name: "intravenous_fluid_administration_time_value"
+  name_de: "Zeitpunkt der intravenösen Flüssigkeitsgabe"
+  description: "Zeitpunkt der intravenösen Flüssigkeitsgabe als lokale Uhrzeit oder ISO-8601-Zeitangabe."
+  classification_choice_descriptor_type: "text"
+  text_max_length: 32

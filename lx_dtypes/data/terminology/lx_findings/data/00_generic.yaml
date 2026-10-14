@@ -1,5 +1,10 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_findings
+# Sources for guideline-derived additions in this file:
+# - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
 - model: finding
   name: "examination_setting"
+  name_de: "Untersuchungsrahmen"
+  name_en: "Examination setting"
   finding_types:
     - baseline
   description: "Settings related to the examination environment and conditions."
@@ -8,7 +13,9 @@
 
 - model: finding
   name: "sedation_endoscopy"
-  description: "Sedation during an examination"
+  name_de: "Sedierung bei der Endoskopie"
+  name_en: "Sedation during endoscopy"
+  description: "Zusammenfassende Dokumentation, ob eine Sedierung durchgeführt wurde und welches Sedierungsverfahren verwendet wurde."
   finding_types:
     - baseline
   classifications:
@@ -17,6 +24,8 @@
 
 - model: finding
   name: "post_resection_wound"
+  name_de: "Resektionswunde"
+  name_en: "Post-resection wound"
   description: "Postresection Wound"
   finding_types:
     - observation

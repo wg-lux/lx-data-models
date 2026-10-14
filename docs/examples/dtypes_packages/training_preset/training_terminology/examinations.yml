@@ -1,0 +1,11 @@
+# A structurally valid example, not a validated clinical examination catalog.
+- model: examination_type
+  name: training_examination_type
+
+- model: examination
+  name: training_examination
+  description: Examination used only to demonstrate package references.
+  examination_types:
+    - training_examination_type
+  findings: []
+  indications: []

@@ -1,0 +1,13 @@
+name: generic
+label: Generic mask
+device_name: generic
+# This is a conservative fallback mask that preserves the endoscope image
+# while masking typical metadata areas (left strip ~550px wide)
+# Use device-specific masks when available for better accuracy
+mask:
+  x: 550
+  y: 0
+  width: 1350
+  height: 1080
+  image_width: 1920
+  image_height: 1080

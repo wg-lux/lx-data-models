@@ -1,0 +1,10 @@
+name: olympus_cv_1500
+label: Olympus CV-1500
+device_name: olympus_cv_1500
+mask:
+  x: 550
+  y: 0
+  width: 1350
+  height: 1080
+  image_width: 1920
+  image_height: 1080

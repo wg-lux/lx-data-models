@@ -1,0 +1,16 @@
+- model: reference_catalog
+  name: ai_model
+  name_de: "KI-Modelle"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: image_multilabel_classification_colonoscopy_default
+      record_type: ai_model
+      description: Image multilabel classification model
+      model_type:
+        name: multilabel_classification
+        version: null
+      model_subtype: multilabel
+      video_segmentation_labelset:
+        name: colonoscopy_video_segmentation_raw
+        version: null

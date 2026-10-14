@@ -1,0 +1,34 @@
+- model: reference_catalog
+  name: gender
+  name_de: "Geschlechter"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: andy
+      record_type: gender
+      abbreviation: andy
+      description: null
+    - name: female
+      record_type: gender
+      abbreviation: f
+      description: null
+    - name: male
+      record_type: gender
+      abbreviation: m
+      description: null
+    - name: mostly_female
+      record_type: gender
+      abbreviation: mf
+      description: null
+    - name: mostly_male
+      record_type: gender
+      abbreviation: null
+      description: null
+    - name: other
+      record_type: gender
+      abbreviation: x
+      description: null
+    - name: unknown
+      record_type: gender
+      abbreviation: '?'
+      description: null

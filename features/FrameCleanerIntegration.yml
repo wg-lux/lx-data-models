@@ -1,0 +1,55 @@
+schema_version: "1.0"
+id: frame_cleaner_integration
+name: FrameCleaner shared-contract integration
+description: >-
+  Provide strict reusable video-analysis and metadata contracts for the
+  lx-anonymizer FrameCleaner boundary without importing application workflow or
+  persistence responsibilities into lx-data-models.
+owners:
+  - lx-dtypes maintainers
+production_critical: true
+source_documents:
+  - path: lx_dtypes/models/meta/VideoMeta.py
+    disposition: normative
+    note: Defines the shared FrameCleaner metadata and analysis-result models.
+invariants:
+  - Shared models validate domain data and contain no application filesystem writes, retries, publication, or database logic.
+  - Unknown or invalid boundary data fails validation instead of being silently retained.
+  - Public model imports remain stable for lx-anonymizer and endoreg-db consumers.
+definition_of_done:
+  - id: frame_analysis_contracts
+    category: requirements
+    title: Sampled-frame analysis has one strict shared representation
+    acceptance:
+      - Accumulated metadata, per-frame observations, analysis results, and detected video properties use explicit models.
+      - Literal and constrained fields encode valid FrameCleaner sources and media values.
+      - Invalid frame-analysis payloads are rejected at construction or parsing time.
+    required: true
+    verification:
+      kind: manual
+      instructions: Exercise valid and invalid FrameCleaner metadata payloads against the public VideoMeta models.
+      timeout_seconds: 600
+  - id: stable_consumer_imports
+    category: interoperability
+    title: FrameCleaner consumers use stable public package imports
+    acceptance:
+      - Required FrameCleaner contract models are exported through supported lx_dtypes modules.
+      - Contract evolution is additive unless a coordinated breaking release is explicitly declared.
+      - Consumer fixtures validate without checkout-specific or installation-specific paths.
+    required: true
+    verification:
+      kind: command
+      command: [uv, run, pyright]
+      timeout_seconds: 600
+  - id: packaged_specification
+    category: operations
+    title: The FrameCleaner feature specification ships with lx-dtypes
+    acceptance:
+      - The package installs this specification below share/lx-data-models/features.
+      - The installed specification contains no mutable assessment state or checkout provenance.
+      - Deployment resolution preserves the semantic identity lx-data-models plus frame_cleaner_integration.
+    required: true
+    verification:
+      kind: manual
+      instructions: Build the lx-dtypes package and inspect its share/lx-data-models/features directory.
+      timeout_seconds: 600

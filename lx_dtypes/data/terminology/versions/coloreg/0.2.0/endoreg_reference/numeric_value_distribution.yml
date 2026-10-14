@@ -1,0 +1,26 @@
+- model: reference_catalog
+  name: numeric_value_distribution
+  name_de: "Numerische Wertverteilungen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: uniform_default
+      record_type: numeric_value_distribution
+      distribution_type: uniform
+      min_descriptor: min_x_1
+      max_descriptor: max_x_1
+      min_value: null
+      max_value: null
+      mean: null
+      std_dev: null
+      skewness: null
+    - name: uniform_high_x1.5
+      record_type: numeric_value_distribution
+      distribution_type: uniform
+      min_descriptor: min_x_1
+      max_descriptor: max_x_1.5
+      min_value: null
+      max_value: null
+      mean: null
+      std_dev: null
+      skewness: null

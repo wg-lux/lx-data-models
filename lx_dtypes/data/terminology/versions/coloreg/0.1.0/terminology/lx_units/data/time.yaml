@@ -1,0 +1,48 @@
+- model: unit
+
+  name: "seconds"
+  abbreviation: "s"
+  name_de: "Sekunden"
+  name_en: "Sekunden"
+
+- model: unit
+
+  name: "minutes"
+  abbreviation: "min"
+  name_de: "Minuten"
+  name_en: "Minutes"
+
+- model: unit
+
+  name: "hours"
+  abbreviation: "h"
+  name_de: "Stunden"
+  name_en: "Hours"
+
+- model: unit
+
+  name: "days"
+  abbreviation: "d"
+  name_de: "Tage"
+  name_en: "Days"
+
+- model: unit
+
+  name: "weeks"
+  abbreviation: "w"
+  name_de: "Wochen"
+  name_en: "Weeks"
+
+- model: unit
+
+  name: "months"
+  abbreviation: "mo"
+  name_de: "Monate"
+  name_en: "Months"
+
+- model: unit
+
+  name: "years"
+  abbreviation: "y"
+  name_de: "Jahre"
+  name_en: "Years"

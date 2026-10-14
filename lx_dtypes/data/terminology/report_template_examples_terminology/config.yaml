@@ -1,0 +1,10 @@
+name: report_template_examples_terminology
+name_de: Bericht template examples
+version: 0.1.1
+modules: []
+depends_on:
+- star_upper_gi_terminology
+data:
+  files:
+  - ./concepts.yml
+  dirs: []

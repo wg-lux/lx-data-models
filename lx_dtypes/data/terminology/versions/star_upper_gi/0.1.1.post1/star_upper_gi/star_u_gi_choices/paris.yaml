@@ -1,0 +1,31 @@
+- model: classification_choice
+  name: "star_upper_gi_paris_Is"
+  name_de: "Paris Is"
+
+- model: classification_choice
+  name: "star_upper_gi_paris_Ip"
+  name_de: "Paris Ip"
+
+- model: classification_choice
+  name: "star_upper_gi_paris_IIa"
+  name_de: "Paris IIa"
+
+- model: classification_choice
+  name: "star_upper_gi_paris_IIb"
+  name_de: "Paris IIb"
+
+- model: classification_choice
+  name: "star_upper_gi_paris_IIc"
+  name_de: "Paris IIc"
+
+- model: classification_choice
+  name: "star_upper_gi_paris_III"
+  name_de: "Paris III"
+
+- model: classification_choice
+  name: "star_upper_gi_paris_IIa_IIc"
+  name_de: "Paris IIa + IIc"
+  
+- model: classification_choice
+  name: "star_upper_gi_paris_IIb_IIc"
+  name_de: "Paris IIb + IIc"

@@ -1,0 +1,10 @@
+name: lx_utils_units
+name_de: "LX Hilfsdaten Einheiten"
+description: Unit utility data.
+version: 0.1.0
+modules: []
+depends_on:
+  - lx_unit_types
+data:
+  dirs:
+    - ./data

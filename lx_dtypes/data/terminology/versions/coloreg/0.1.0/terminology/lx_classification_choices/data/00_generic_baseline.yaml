@@ -1,0 +1,25 @@
+# Sources for guideline-derived additions in this file:
+# - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
+- model: classification_choice
+  name: "examination_setting_generic_location_inpatient"
+  name_de: "Stationär"
+
+- model: classification_choice
+  name: "examination_setting_generic_location_outpatient"
+  name_de: "Ambulant"
+
+- model: classification_choice
+  name: "sedation_propofol"
+  name_de: "Propofol"
+
+- model: classification_choice
+  name: "sedation_midazolam"
+  name_de: "Midazolam"
+
+- model: classification_choice
+  name: "sedation_propofol_midazolam"
+  name_de: "Propofol und Midazolam"
+
+- model: classification_choice
+  name: "sedation_other"
+  name_de: "Anderes Sedierungsverfahren"
