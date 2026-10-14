@@ -146,28 +146,18 @@ class VideoProvenanceBundle(BaseModel):
         return self
 
 
-class VideoProvenanceRecovery(BaseModel):
-    """Explicitly acknowledged missing ancestry; never a frame correspondence proof."""
+class RecordingTimeRange(BaseModel):
+    """Validate optional recording clocks before any host media work begins.
+
+    Original timezone-qualified strings remain the exchange representation.
+    """
 
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-    schema_version: Literal["1"] = "1"
-    mapping_status: Literal["unresolved"] = "unresolved"
-    method: Literal["operator_acknowledged_unresolved_v1"] = (
-        "operator_acknowledged_unresolved_v1"
-    )
-    electrical_matching_eligible: Literal[False] = False
-    recording_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    original_timeline: VideoFrameTimeline | None = None
-    processed_timeline: VideoFrameTimeline
     recording_started_at: str | None = None
     recording_ended_at: str | None = None
 
     @model_validator(mode="after")
-    def validate_recording(self) -> Self:
-        if self.original_timeline is not None and (
-            self.original_timeline.content_hash != self.recording_hash
-        ):
-            raise ValueError("Original timestamps belong to another recording")
+    def validate_recording_times(self) -> Self:
         times: list[datetime] = []
         for value in (self.recording_started_at, self.recording_ended_at):
             if value is not None:
@@ -177,4 +167,26 @@ class VideoProvenanceRecovery(BaseModel):
                 times.append(parsed)
         if len(times) == 2 and times[1] <= times[0]:
             raise ValueError("Recording end must follow recording start")
+        return self
+
+
+class VideoProvenanceRecovery(RecordingTimeRange):
+    """Explicitly acknowledged missing ancestry; never a frame correspondence proof."""
+
+    schema_version: Literal["1"] = "1"
+    mapping_status: Literal["unresolved"] = "unresolved"
+    method: Literal["operator_acknowledged_unresolved_v1"] = (
+        "operator_acknowledged_unresolved_v1"
+    )
+    electrical_matching_eligible: Literal[False] = False
+    recording_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    original_timeline: VideoFrameTimeline | None = None
+    processed_timeline: VideoFrameTimeline
+
+    @model_validator(mode="after")
+    def validate_recording(self) -> Self:
+        if self.original_timeline is not None and (
+            self.original_timeline.content_hash != self.recording_hash
+        ):
+            raise ValueError("Original timestamps belong to another recording")
         return self

@@ -3,6 +3,66 @@ from __future__ import annotations
 import pytest
 
 from lx_dtypes.models.contracts.hub_transfer import HubTransferVideoSegmentPayload
+from lx_dtypes.models.contracts.video_provenance import (
+    RecordingTimeRange,
+    VideoFrameTimeline,
+    VideoProvenanceRecovery,
+)
+
+
+@pytest.mark.parametrize(
+    "started,ended",
+    [
+        (None, None),
+        ("2026-10-13T10:00:00+02:00", None),
+        (None, "2026-10-13T08:01:00Z"),
+        ("2026-10-13T10:00:00+02:00", "2026-10-13T08:01:00Z"),
+    ],
+)
+def test_recording_time_range_preserves_optional_exchange_strings(
+    started: str | None, ended: str | None
+) -> None:
+    value = RecordingTimeRange(recording_started_at=started, recording_ended_at=ended)
+    assert value.model_dump(mode="json") == {
+        "recording_started_at": started,
+        "recording_ended_at": ended,
+    }
+    assert RecordingTimeRange.model_validate_json(value.model_dump_json()) == value
+
+
+@pytest.mark.parametrize(
+    "started,ended",
+    [
+        ("invalid", None),
+        (None, ""),
+        ("2026-10-13", None),
+        (None, "2026-10-13T10:00:00"),
+        ("2026-02-30T10:00:00Z", None),
+        ("2026-10-13T10:00:00+02:00", "2026-10-13T08:00:00Z"),
+        ("2026-10-13T10:00:00+02:00", "2026-10-13T07:59:00Z"),
+    ],
+)
+@pytest.mark.parametrize("recovery", [False, True])
+def test_recording_times_reject_invalid_input_at_shared_and_receipt_boundaries(
+    started: str | None, ended: str | None, recovery: bool
+) -> None:
+    payload: dict[str, object] = {
+        "recording_started_at": started,
+        "recording_ended_at": ended,
+    }
+    if recovery:
+        payload.update(
+            recording_hash="a" * 64,
+            processed_timeline=VideoFrameTimeline(
+                content_hash="b" * 64,
+                time_base_num=1,
+                time_base_den=90000,
+                presentation_timestamps=[0, 3000],
+            ),
+        )
+    boundary = VideoProvenanceRecovery if recovery else RecordingTimeRange
+    with pytest.raises(ValueError):
+        boundary.model_validate(payload)
 
 
 def _segment_payload() -> dict[str, object]:
@@ -57,10 +117,6 @@ def test_hub_transfer_segment_rejects_legacy_identity_name() -> None:
 
 def test_unresolved_provenance_preserves_pts_without_claiming_frame_identity() -> None:
     from lx_dtypes.models.contracts.hub_transfer import HubTransferProvenancePayload
-    from lx_dtypes.models.contracts.video_provenance import (
-        VideoFrameTimeline,
-        VideoProvenanceRecovery,
-    )
 
     timeline = VideoFrameTimeline(
         content_hash="b" * 64,
