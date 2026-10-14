@@ -247,7 +247,7 @@ def test_cli_and_missing_root(tree: Path) -> None:
         [sys.executable, str(script), "--root", str(tree)],
         capture_output=True,
         text=True,
-        check=True,
+        check=False,  # A missing root must produce the nonzero status below.
     )
     assert result.returncode == 1
     assert "missing or invalid root" in result.stdout

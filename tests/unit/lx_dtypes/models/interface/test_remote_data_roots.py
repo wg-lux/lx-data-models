@@ -94,7 +94,8 @@ def test_safe_archive_members_rejects_ambiguous_paths(
     with zipfile.ZipFile(archive_buffer, "w") as archive:
         archive.writestr(filename, "first")
         if message == "duplicate file paths":
-            archive.writestr(filename, "second")
+            with pytest.warns(UserWarning, match="Duplicate name:"):
+                archive.writestr(filename, "second")
 
     with (
         zipfile.ZipFile(BytesIO(archive_buffer.getvalue())) as archive,
