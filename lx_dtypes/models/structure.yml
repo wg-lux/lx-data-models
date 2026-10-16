@@ -6,6 +6,7 @@ summary: Typed domain, knowledge-base, ledger, interface, and external exchange 
   representations share explicit contract boundaries.
 responsibilities:
 - Define strict Pydantic contracts and typed dictionary representations
+- Own versioned report extraction evidence and staging receipts; lifecycle transitions belong to the host native core.
 - Maintain knowledge-base/report-template graphs and ledger identities
 boundaries:
 - Keep application service orchestration outside shared models

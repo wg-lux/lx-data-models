@@ -400,6 +400,8 @@ if TYPE_CHECKING:
         ReportAnonymizationWarning,
         ReportAnonymizationWarningCode,
         ReportArtifactValidation,
+        ReportExtractionEvidence,
+        ReportExtractionReceipt,
     )
     from .report_context import ReportContext
     from .report_draft import (
@@ -920,6 +922,8 @@ _EXPORT_MODULES: dict[str, str] = {
     "ReportAnonymizationWarning": "report_anonymization",
     "ReportAnonymizationWarningCode": "report_anonymization",
     "ReportArtifactValidation": "report_anonymization",
+    "ReportExtractionEvidence": "report_anonymization",
+    "ReportExtractionReceipt": "report_anonymization",
     "ReportContext": "report_context",
     "REPORT_DRAFT_SCHEMA_VERSION": "report_draft",
     "PatientExaminationReportDraft": "report_draft",
@@ -1350,6 +1354,8 @@ __all__ = [
     "ReportAnonymizationWarning",
     "ReportAnonymizationWarningCode",
     "ReportArtifactValidation",
+    "ReportExtractionEvidence",
+    "ReportExtractionReceipt",
     "ReportContext",
     "ReportDraftTemplateIdentity",
     "ReportExportFrameDetailData",

@@ -18,6 +18,7 @@ from lx_dtypes.models.contracts.report_anonymization import (
     ReportAnonymizationRequest,
     ReportAnonymizationResult,
     ReportArtifactValidation,
+    ReportExtractionEvidence,
 )
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta
 
@@ -101,6 +102,12 @@ def test_report_result_round_trips_as_json(tmp_path: Path) -> None:
             page_count=1,
             repaired=False,
         ),
+        extraction_evidence=ReportExtractionEvidence(
+            outcome="fallback",
+            backend="spacy_regex",
+            finding_count=0,
+            provider_attempted=False,
+        ),
         provenance=ReportAnonymizationProvenance(
             anonymizer_version="0.9.3.4",
             detector_sources=("spacy",),
@@ -132,3 +139,69 @@ def test_report_failure_is_machine_safe_and_strict() -> None:
         ReportAnonymizationFailure.model_validate(
             {**failure.model_dump(), "retryable": "false"}
         )
+
+
+@pytest.mark.parametrize(
+    "updates",
+    [
+        {"outcome": "findings", "finding_count": 0},
+        {"outcome": "empty", "finding_count": 1},
+        {"provider_attempted": False},
+        {"backend": "spacy_regex"},
+        {"provider_failure": ReportAnonymizationErrorCode.PROVIDER_UNAVAILABLE},
+        {"finding_count": -1},
+    ],
+)
+def test_extraction_rejects_contradictory_evidence(updates: dict[str, object]) -> None:
+    with pytest.raises(ValidationError):
+        ReportExtractionEvidence.model_validate(
+            {
+                "outcome": "empty",
+                "backend": "configured_llm",
+                "finding_count": 0,
+                "provider_attempted": True,
+                **updates,
+            }
+        )
+
+
+@pytest.mark.parametrize("count", [0, 2])
+@pytest.mark.parametrize("attempted", [False, True])
+def test_validated_fallback_retains_bounded_provider_failure(
+    count: int, attempted: bool
+) -> None:
+    evidence = ReportExtractionEvidence(
+        outcome="fallback",
+        backend="spacy_regex",
+        finding_count=count,
+        provider_attempted=attempted,
+        provider_failure=ReportAnonymizationErrorCode.PROVIDER_UNAVAILABLE
+        if attempted
+        else None,
+    )
+    assert (
+        ReportExtractionEvidence.model_validate_json(evidence.model_dump_json())
+        == evidence
+    )
+
+
+@pytest.mark.parametrize("count", [0, 2])
+def test_actual_provider_distinguishes_valid_empty_from_findings(count: int) -> None:
+    evidence = ReportExtractionEvidence(
+        outcome="findings" if count else "empty",
+        backend="configured_llm",
+        finding_count=count,
+        provider_attempted=True,
+    )
+    assert evidence.provider_failure is None
+
+
+def test_valid_empty_provider_can_continue_configured_local_extraction() -> None:
+    evidence = ReportExtractionEvidence(
+        outcome="fallback",
+        backend="spacy_regex",
+        finding_count=1,
+        provider_attempted=True,
+        provider_failure=None,
+    )
+    assert evidence.provider_failure is None
