@@ -6,6 +6,8 @@ https://www.kbv.de/documents/infothek/rechtsquellen/weitere-vertraege/praxen/med
 https://www.kbv.de/documents/infothek/rechtsquellen/weitere-vertraege/praxen/medikationsplan/medikationsplan-anlage-2.pdf
 https://www.kbv.de/documents/infothek/rechtsquellen/weitere-vertraege/praxen/medikationsplan/medikationsplan-anlage-3.pdf
 
-We do not own the rights to the pdf files listed above.
+https://update.kbv.de/ita-update/Verordnungen/Arzneimittel/BMP/
+
+We do not own the rights to the pdf files and sample files / structured documentation listed above.
 
 (Accessed 20.10.2026, 11:51 AM)
