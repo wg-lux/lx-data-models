@@ -1,19 +1,25 @@
-from typing import TypedDict, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, TypedDict, Union
 
 from .DataDict import PFindingClassificationChoiceDescriptorDataDict
-from .Django import PFindingClassificationChoiceDescriptorDjango
 from .Pydantic import PFindingClassificationChoiceDescriptor
+
+if TYPE_CHECKING:
+    from .Django import PFindingClassificationChoiceDescriptorDjango
+
+    l_p_finding_classification_choice_descriptor_django_lookup: (
+        LPFindingClassificationChoiceDescriptorDjangoLookupType
+    )
+    type l_p_finding_classification_choice_descriptor_django_models = (
+        PFindingClassificationChoiceDescriptorDjango
+    )
 
 
 class LPFindingClassificationChoiceDescriptorDjangoLookupType(TypedDict):
     PFindingClassificationChoiceDescriptor: type[
         PFindingClassificationChoiceDescriptorDjango
     ]
-
-
-l_p_finding_classification_choice_descriptor_django_lookup = LPFindingClassificationChoiceDescriptorDjangoLookupType(
-    PFindingClassificationChoiceDescriptor=PFindingClassificationChoiceDescriptorDjango,
-)
 
 
 class LPFindingClassificationChoiceDescriptorLookupType(TypedDict):
@@ -34,9 +40,6 @@ l_p_finding_classification_choice_descriptor_models = Union[
 l_p_finding_classification_choice_descriptor_ddicts = Union[
     PFindingClassificationChoiceDescriptorDataDict,
 ]
-l_p_finding_classification_choice_descriptor_django_models = Union[
-    PFindingClassificationChoiceDescriptorDjango,
-]
 
 __all__ = [
     "LPFindingClassificationChoiceDescriptorDjangoLookupType",
@@ -49,3 +52,23 @@ __all__ = [
     "l_p_finding_classification_choice_descriptor_lookup",
     "l_p_finding_classification_choice_descriptor_models",
 ]
+
+
+def __getattr__(name: str) -> object:
+    if name not in {
+        "PFindingClassificationChoiceDescriptorDjango",
+        "l_p_finding_classification_choice_descriptor_django_lookup",
+        "l_p_finding_classification_choice_descriptor_django_models",
+    }:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    from .Django import PFindingClassificationChoiceDescriptorDjango
+
+    exports: dict[str, object] = {
+        "PFindingClassificationChoiceDescriptorDjango": PFindingClassificationChoiceDescriptorDjango,
+        "l_p_finding_classification_choice_descriptor_django_lookup": LPFindingClassificationChoiceDescriptorDjangoLookupType(
+            PFindingClassificationChoiceDescriptor=PFindingClassificationChoiceDescriptorDjango
+        ),
+        "l_p_finding_classification_choice_descriptor_django_models": PFindingClassificationChoiceDescriptorDjango,
+    }
+    globals().update(exports)
+    return exports[name]

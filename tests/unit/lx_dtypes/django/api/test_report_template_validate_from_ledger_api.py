@@ -257,3 +257,189 @@ def test_validate_report_template_runtime_from_ledger_success(
     assert (
         payload["concept_coverage"]["identity"]["template_name"] == "star_upper_gi_main"
     )
+
+
+def _descriptor_host_fixture():
+    from types import SimpleNamespace
+    from uuid import uuid4
+
+    from lx_dtypes.models.contracts.dtypes_record_persistence import (
+        DtypesRecordPersistencePayload,
+    )
+
+    finding_uuid = str(uuid4())
+    host = SimpleNamespace(
+        id=101,
+        patient_id=202,
+        examination=SimpleNamespace(name="colonoscopy"),
+        knowledge_base_module="test",
+        knowledge_base_version="1.0",
+        dtypes_record={},
+    )
+    choice = SimpleNamespace(
+        id=1,
+        classification=SimpleNamespace(name="histology"),
+        classification_choice=SimpleNamespace(name="result"),
+        numerical_descriptors={},
+    )
+    finding = SimpleNamespace(
+        id=303,
+        instance_id=finding_uuid,
+        finding=SimpleNamespace(name="colon_polyp"),
+        classifications=_FakeRelation([choice]),
+        interventions=_FakeRelation([]),
+    )
+    record = DtypesRecordPersistencePayload.model_validate(
+        {
+            "patient": "202",
+            "examination": "colonoscopy",
+            "knowledge_base_module": "test",
+            "knowledge_base_version": "1.0",
+            "patient_findings": [
+                {
+                    "uuid": finding_uuid,
+                    "finding": "colon_polyp",
+                    "patient_examination": "colonoscopy",
+                    "patient_finding_classifications": [
+                        {
+                            "patient_finding": finding_uuid,
+                            "patient_finding_classification_choices": [
+                                {
+                                    "classification": "histology",
+                                    "classification_choice": "result",
+                                    "patient_finding_classifications": "group",
+                                    "patient_finding_classification_choice_descriptors": [
+                                        {
+                                            "classification_choice_descriptor": name,
+                                            "descriptor_value": value,
+                                            "patient_finding_classification_choice": "choice",
+                                        }
+                                        for name, value in {
+                                            "text": "local wording",
+                                            "number": 3.5,
+                                            "integer": 2,
+                                            "boolean": False,
+                                            "selection": ["one", "two"],
+                                        }.items()
+                                    ],
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
+        }
+    )
+    return host, finding, choice, record
+
+
+def _rebuild_descriptor_fixture(host, finding, record=None):
+    from lx_dtypes.django.api.findings_routes import (
+        build_p_examination_payload_from_host_ledger,
+    )
+
+    return build_p_examination_payload_from_host_ledger(
+        host,
+        route_module_name="test",
+        orm_models=dict,
+        active_patient_findings_queryset=lambda: _FakeFindingsQueryset([finding]),
+        descriptor_source=record,
+    )
+
+
+def test_canonical_descriptors_survive_persisted_ledger_rebuild():
+    host, finding, _, record = _descriptor_host_fixture()
+    first = _rebuild_descriptor_fixture(host, finding, record)
+    host.dtypes_record = first.model_dump(mode="json")
+    rebuilt = _rebuild_descriptor_fixture(host, finding)
+    choices = (
+        rebuilt.patient_findings[0]
+        .patient_finding_classifications[0]
+        .patient_finding_classification_choices
+    )
+    assert {
+        item.classification_choice_descriptor: item.descriptor_value
+        for item in choices[0].patient_finding_classification_choice_descriptors
+    } == {
+        "text": "local wording",
+        "number": 3.5,
+        "integer": 2,
+        "boolean": False,
+        "selection": ["one", "two"],
+    }
+
+
+def test_canonical_descriptors_do_not_cross_findings_or_choices():
+    from uuid import uuid4
+
+    host, finding, choice, record = _descriptor_host_fixture()
+    host.dtypes_record = record.model_dump(mode="json")
+    for finding_uuid, choice_name in [
+        (str(uuid4()), "result"),
+        (finding.instance_id, "changed"),
+    ]:
+        finding.instance_id = finding_uuid
+        choice.classification_choice.name = choice_name
+        rebuilt = _rebuild_descriptor_fixture(host, finding)
+        assert (
+            not rebuilt.patient_findings[0]
+            .patient_finding_classifications[0]
+            .patient_finding_classification_choices[0]
+            .patient_finding_classification_choice_descriptors
+        )
+    finding.classifications = _FakeRelation([])
+    assert (
+        not _rebuild_descriptor_fixture(host, finding)
+        .patient_findings[0]
+        .patient_finding_classifications
+    )
+
+
+def test_canonical_descriptors_reject_wrong_identity_duplicates_and_conflicts():
+    import pytest
+
+    host, finding, _, record = _descriptor_host_fixture()
+    host.dtypes_record = record.model_dump(mode="json")
+    record.patient = "other"
+    with pytest.raises(ValueError, match="identity"):
+        _rebuild_descriptor_fixture(host, finding, record)
+    record.patient = "202"
+    descriptors = (
+        record.patient_findings[0]
+        .patient_finding_classifications[0]
+        .patient_finding_classification_choices[0]
+        .patient_finding_classification_choice_descriptors
+    )
+    descriptors.append(descriptors[0])
+    with pytest.raises(ValueError, match="Duplicate"):
+        _rebuild_descriptor_fixture(host, finding, record)
+    descriptors.pop()
+    descriptors[0].descriptor_value = "contradiction"
+    with pytest.raises(ValueError, match="Conflicting"):
+        _rebuild_descriptor_fixture(host, finding, record)
+
+
+def test_descriptor_sources_merge_additions_but_reject_scalar_type_conflicts():
+    import pytest
+
+    host, finding, choice, record = _descriptor_host_fixture()
+    stored = record.model_copy(deep=True)
+    stored.patient_findings[0].patient_finding_classifications[
+        0
+    ].patient_finding_classification_choices[
+        0
+    ].patient_finding_classification_choice_descriptors.pop()
+    host.dtypes_record = stored.model_dump(mode="json")
+    rebuilt = _rebuild_descriptor_fixture(host, finding, record)
+    assert (
+        len(
+            rebuilt.patient_findings[0]
+            .patient_finding_classifications[0]
+            .patient_finding_classification_choices[0]
+            .patient_finding_classification_choice_descriptors
+        )
+        == 5
+    )
+    choice.numerical_descriptors = {"boolean": 0}
+    with pytest.raises(ValueError, match="Conflicting host"):
+        _rebuild_descriptor_fixture(host, finding, record)

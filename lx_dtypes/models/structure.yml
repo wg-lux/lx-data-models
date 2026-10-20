@@ -6,11 +6,25 @@ summary: Typed domain, knowledge-base, ledger, interface, and external exchange 
   representations share explicit contract boundaries.
 responsibilities:
 - Define strict Pydantic contracts and typed dictionary representations
+- Own versioned report extraction evidence and staging receipts; lifecycle transitions belong to the host native core.
 - Maintain knowledge-base/report-template graphs and ledger identities
+- Own hub transfer version 5 with persistent patient and examination UUIDs instead of demographic hashes
 boundaries:
 - Keep application service orchestration outside shared models
 - Preserve raw video identity across processing and transfer
 entrypoints:
+- name: Study exchange
+  file: contracts/study_exchange.py
+  purpose: Canonical portable study definitions, collections, evaluations and package closure for hub and Excel
+- name: Study analysis definitions
+  file: contracts/study_analysis.py
+  purpose: Shared declarative predicates, analysis provenance, and descriptive result contracts
+- name: Complete package snapshot
+  file: contracts/package_snapshot.py
+  purpose: Preserve every registered knowledge-base concept in a typed package snapshot
+- name: Study collection
+  file: contracts/study_collection.py
+  purpose: Bind canonical ledger observations to versioned assessment and study provenance
 - name: Contracts
   file: contracts/__init__.py
   purpose: Shared interchange exports

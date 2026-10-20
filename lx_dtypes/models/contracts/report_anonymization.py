@@ -15,9 +15,9 @@ from pydantic import (
 
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta
 
-ReportAnonymizationContractVersion = Literal["report_anonymization"]
+ReportAnonymizationContractVersion = Literal["report_anonymization_v2"]
 REPORT_ANONYMIZATION_CONTRACT_VERSION: ReportAnonymizationContractVersion = (
-    "report_anonymization"
+    "report_anonymization_v2"
 )
 
 
@@ -151,6 +151,60 @@ class ReportAnonymizationWarning(BaseModel):
     phase: ReportAnonymizationPhase
 
 
+class ReportExtractionEvidence(BaseModel):
+    """Content-free extraction evidence, never an import lifecycle state."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    outcome: Literal["findings", "empty", "fallback"]
+    backend: Literal["configured_llm", "spacy_regex"]
+    # Count extracted metadata entries before generated defaults, not clinical findings.
+    finding_count: int = Field(ge=0)
+    provider_attempted: bool
+    provider_failure: ReportAnonymizationErrorCode | None = None
+
+    @model_validator(mode="after")
+    def validate_evidence(self) -> ReportExtractionEvidence:
+        if self.outcome == "findings" and self.finding_count == 0:
+            raise ValueError("findings requires a positive finding_count")
+        if self.outcome == "empty" and self.finding_count != 0:
+            raise ValueError("empty requires zero finding_count")
+        if self.outcome == "fallback":
+            if self.backend != "spacy_regex":
+                raise ValueError("fallback requires the spacy_regex backend")
+        elif (
+            self.backend != "configured_llm"
+            or not self.provider_attempted
+            or self.provider_failure is not None
+        ):
+            raise ValueError(
+                "provider extraction requires a successful actual invocation"
+            )
+        if self.provider_failure is not None and (
+            not self.provider_attempted
+            or self.provider_failure
+            not in {
+                ReportAnonymizationErrorCode.PROVIDER_UNAVAILABLE,
+                ReportAnonymizationErrorCode.VALIDATION_FAILED,
+            }
+        ):
+            raise ValueError(
+                "provider_failure requires an attempted provider and bounded error"
+            )
+        return self
+
+
+class ReportExtractionReceipt(BaseModel):
+    """Validated staging evidence bound to an owner; not publication or success."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    attempt_id: str = Field(pattern=r"^[0-9a-f]{32}$")
+    source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    staged_artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    extraction_evidence: ReportExtractionEvidence
+
+
 class ReportAnonymizationResult(BaseModel):
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -173,7 +227,17 @@ class ReportAnonymizationResult(BaseModel):
     artifact_size_bytes: int = Field(gt=0)
     artifact_validation: ReportArtifactValidation
     provenance: ReportAnonymizationProvenance
+    extraction_evidence: ReportExtractionEvidence
     warnings: tuple[ReportAnonymizationWarning, ...] = ()
+
+    @model_validator(mode="after")
+    def validate_extraction_provenance(self) -> ReportAnonymizationResult:
+        evidence = self.extraction_evidence
+        if self.provenance.used_llm != (evidence.backend == "configured_llm"):
+            raise ValueError("used_llm must describe the actual extraction backend")
+        if evidence.outcome == "fallback" and not self.provenance.deterministic:
+            raise ValueError("fallback requires deterministic extraction provenance")
+        return self
 
 
 class ReportAnonymizationFailure(BaseModel):
@@ -203,4 +267,6 @@ __all__ = [
     "ReportAnonymizationWarning",
     "ReportAnonymizationWarningCode",
     "ReportArtifactValidation",
+    "ReportExtractionEvidence",
+    "ReportExtractionReceipt",
 ]

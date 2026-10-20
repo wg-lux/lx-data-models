@@ -204,6 +204,8 @@ def _editor_bundle_zip() -> bytes:
                 [
                     "- model: unit",
                     "  name: imported_unit",
+                    "  name_de: Importierte Einheit",
+                    "  name_en: Imported unit",
                     "  abbreviation: iu",
                 ]
             )
@@ -749,6 +751,26 @@ def test_missing_dependency_cause_is_preserved(
     cause = error.value.__cause__
     assert cause is not None
     assert "missing_dependency" in str(cause)
+    assert not terminology_service.registry_path.exists()
+    _assert_import_storage_empty(terminology_service)
+
+
+def test_import_rejects_authoring_warnings_before_registration(
+    terminology_service: TerminologyService,
+) -> None:
+    output = BytesIO()
+    with (
+        zipfile.ZipFile(BytesIO(_editor_bundle_zip())) as source,
+        zipfile.ZipFile(output, "w") as target,
+    ):
+        for name in source.namelist():
+            content = source.read(name).replace(b"  name_en: Imported unit\n", b"")
+            target.writestr(name, content)
+    output.seek(0)
+    with pytest.raises(TerminologyError) as error:
+        terminology_service.import_zip(output)
+    assert error.value.status == 400
+    assert "missing_language_coverage" in str(error.value.__cause__)
     assert not terminology_service.registry_path.exists()
     _assert_import_storage_empty(terminology_service)
 

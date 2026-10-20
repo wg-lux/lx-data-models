@@ -2,7 +2,9 @@ import pytest
 from pydantic import ValidationError
 
 from lx_dtypes.models.contracts.study_metadata import StudyMetadata
+from lx_dtypes.models.interface.data_roots import package_data_root
 from lx_dtypes.models.knowledge_base.study_preset import StudyPreset
+from lx_dtypes.utils.study_setup_yaml import parse_study_setup_yaml
 
 
 def metadata_payload():
@@ -70,3 +72,33 @@ def test_duplicate_metadata_identities_rejected(field):
     payload[field].append(payload[field][0])
     with pytest.raises(ValidationError, match="unique"):
         StudyMetadata.model_validate(payload)
+
+
+def test_analysis_metadata_preserves_rules_and_requires_exact_dependency():
+    setup = parse_study_setup_yaml(
+        (package_data_root() / "study_metadata/coloreg_resection.yml").read_text()
+    )
+    metadata = setup.cohorts[1].study_metadata
+    assert metadata.analysis_definitions[0].status == "ready"
+    preset = StudyPreset(name="analysis", study_metadata=metadata)
+    assert StudyPreset.model_validate(preset.ddict).study_metadata == metadata
+    payload = metadata.model_dump(mode="python")
+    payload["terminology_requirements"] = []
+    with pytest.raises(ValidationError, match="analysis definitions require"):
+        StudyMetadata.model_validate(payload)
+
+
+def test_analysis_names_are_unique_and_unresolved_protocols_remain_drafts():
+    setup = parse_study_setup_yaml(
+        (package_data_root() / "study_metadata/coloreg_resection.yml").read_text()
+    )
+    for index in (0, 2, 3):
+        analysis = setup.cohorts[index].study_metadata.analysis_definitions[0]
+        payload = analysis.model_dump(mode="python")
+        payload["status"] = "ready"
+        with pytest.raises(ValidationError, match="unresolved"):
+            type(analysis).model_validate(payload)
+    metadata = setup.cohorts[1].study_metadata.model_dump(mode="python")
+    metadata["analysis_definitions"] *= 2
+    with pytest.raises(ValidationError, match="unique"):
+        StudyMetadata.model_validate(metadata)

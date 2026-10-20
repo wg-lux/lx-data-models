@@ -151,3 +151,28 @@ def test_definition_digest_ignores_yaml_formatting_but_binds_content() -> None:
         ).content_sha256
         != definition.content_sha256
     )
+
+
+def test_legacy_setup_digest_is_unchanged_without_analysis_definitions() -> None:
+    definition = StudySetupDefinition.model_validate(
+        {
+            "schema_version": "1.0",
+            "definition_id": "legacy",
+            "definition_version": "1.0.0",
+            "cohorts": [
+                {"definition_id": "cohort", "name": "Cohort", "hypothesis": "Legacy"}
+            ],
+        }
+    )
+    # Canonical digest before the optional analysis_definitions field existed.
+    assert definition.content_sha256 == (
+        "3ba96eba906f554baf9594f6989a49ce8b723a2906729fc55d1774c2efd754e9"
+    )
+    with_analysis = parse_study_setup_yaml(
+        files("lx_dtypes")
+        .joinpath("data/study_metadata/coloreg_resection.yml")
+        .read_text()
+    )
+    original = with_analysis.content_sha256
+    with_analysis.cohorts[1].study_metadata.analysis_definitions[0].name = "changed"
+    assert with_analysis.content_sha256 != original

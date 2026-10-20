@@ -1,8 +1,16 @@
+from collections.abc import Callable
+from pathlib import Path
+
 import pytest
+import yaml
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.DbInterface import DbInterface
-from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
+from lx_dtypes.models.interface.KnowledgeBase import (
+    CLINICAL_CONCEPT_MODELS,
+    KnowledgeBase,
+    ReportTemplateConceptWarning,
+)
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.interface.Ledger import Ledger
 
@@ -95,3 +103,50 @@ def db_interface_fixture(
         ledger=ledger_fixture,
     )
     return interface
+
+
+def assert_retained_release_warnings[Result](load: Callable[[], Result]) -> Result:
+    """Verify the immutable STAR release's known authoring debt."""
+    with pytest.warns(ReportTemplateConceptWarning) as recorded:
+        result = load()
+    locations: set[tuple[Path, int, int]] = set()
+    for warning in recorded:
+        message = warning.message
+        assert isinstance(message, ReportTemplateConceptWarning)
+        assert "/versions/star_upper_gi/0.1.1.post1/star_upper_gi/" in str(
+            message.source_file
+        )
+        locations.add((message.source_file, message.line, message.column))
+    assert len(recorded) == len(locations) == 132
+    return result
+
+
+def separate_report_terminology(module_dir: Path, data_path: Path) -> None:
+    """Move synthetic fixture concepts into an explicit terminology dependency."""
+    records = yaml.safe_load(data_path.read_text(encoding="utf-8"))
+    terminology = module_dir.parent / f"{module_dir.name}_terminology"
+    terminology.mkdir()
+    concepts = [
+        record for record in records if record["model"] in CLINICAL_CONCEPT_MODELS
+    ]
+    reports = [
+        record for record in records if record["model"] not in CLINICAL_CONCEPT_MODELS
+    ]
+    (terminology / "concepts.yml").write_text(
+        yaml.safe_dump(concepts), encoding="utf-8"
+    )
+    (terminology / "config.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "name": terminology.name,
+                "version": "1.0.0",
+                "data": {"files": ["concepts.yml"]},
+            }
+        ),
+        encoding="utf-8",
+    )
+    config_path = module_dir / "config.yaml"
+    config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    config["depends_on"].append(terminology.name)
+    config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
+    data_path.write_text(yaml.safe_dump(reports, sort_keys=False), encoding="utf-8")

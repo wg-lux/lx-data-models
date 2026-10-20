@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Literal
 from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModel import AppBaseModel
+from lx_dtypes.models.interface.data_roots import module_search_root
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.utils.dataloader import (
     _default_dataloader_dirs_factory,
@@ -54,6 +55,9 @@ class DataLoader(AppBaseModel):
         kb = modules[configs[0].name]
         for config in configs[1:]:
             kb.import_knowledge_base(modules[config.name])
+        kb._resolved_module_configs = {
+            config.name: config.model_copy(deep=True) for config in configs
+        }
         return kb
 
     def resolved_module_configs(
@@ -130,7 +134,7 @@ class DataLoader(AppBaseModel):
         if not self.module_configs:
             self.load_module_configs()
 
-        stored_config = self._resolve_module_config(
+        stored_config = self.resolve_module_config(
             module_name,
             context_config=context_config,
             relation=relation,
@@ -164,13 +168,14 @@ class DataLoader(AppBaseModel):
         legacy_config = self.module_configs.get(module_name)
         return [legacy_config] if legacy_config is not None else []
 
-    def _resolve_module_config(
+    def resolve_module_config(
         self,
         module_name: str,
         *,
         context_config: "KnowledgeBaseConfig | None" = None,
         relation: Literal["root", "module", "dependency"] = "root",
     ) -> "KnowledgeBaseConfig":
+        """Select one declared module using the runtime's source-scope rules."""
         candidates = self._configs_for_name(module_name)
         if not candidates:
             if relation == "dependency":
@@ -195,6 +200,19 @@ class DataLoader(AppBaseModel):
             ]
             if len(matched) == 1:
                 return matched[0]
+
+        # Semantic module names need not match directory names. Prefer the
+        # caller's release tree over unrelated retained copies of that module.
+        if context_config is not None and context_config.source_file is not None:
+            scope = module_search_root(context_config.source_file)
+            scoped = [
+                candidate
+                for candidate in candidates
+                if candidate.source_file is not None
+                and module_search_root(candidate.source_file) == scope
+            ]
+            if scoped:
+                candidates = scoped
 
         if len(candidates) == 1:
             return candidates[0]
@@ -301,7 +319,7 @@ class DataLoader(AppBaseModel):
                     f"visiting '{name}'."
                 )
 
-            module_config = self._resolve_module_config(
+            module_config = self.resolve_module_config(
                 name,
                 context_config=parent_config,
                 relation=self._reference_relation(name, parent_config),

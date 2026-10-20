@@ -152,3 +152,63 @@ def test_unresolved_provenance_preserves_pts_without_claiming_frame_identity() -
                 "source_frame_indices": [0, 1, 2],
             }
         )
+
+
+@pytest.mark.parametrize("as_string", [False, True])
+def test_transfer_identity_preserves_uuid_roundtrip(as_string: bool) -> None:
+    from uuid import UUID
+
+    from lx_dtypes.models.contracts.hub_transfer import HubTransferSensitiveMetaPayload
+
+    patient = UUID("821d81f1-fb20-4e38-b777-01c67fe03001")
+    examination = UUID("821d81f1-fb20-4e38-b777-01c67fe03002")
+    identity = HubTransferSensitiveMetaPayload.model_validate(
+        {
+            "patient_uuid": str(patient) if as_string else patient,
+            "examination_uuid": str(examination) if as_string else examination,
+        }
+    )
+    assert identity.patient_uuid == patient
+    assert identity.examination_uuid == examination
+    assert identity.model_dump(mode="json") == {
+        "patient_uuid": str(patient),
+        "examination_uuid": str(examination),
+    }
+    assert (
+        HubTransferSensitiveMetaPayload.model_validate_json(identity.model_dump_json())
+        == identity
+    )
+
+
+@pytest.mark.parametrize("invalid", [1, True, "1", "not-a-uuid", None])
+@pytest.mark.parametrize("field", ["patient_uuid", "examination_uuid"])
+def test_transfer_identity_rejects_invalid_uuid(field: str, invalid: object) -> None:
+    from lx_dtypes.models.contracts.hub_transfer import HubTransferSensitiveMetaPayload
+
+    payload: dict[str, object] = {
+        "patient_uuid": "821d81f1-fb20-4e38-b777-01c67fe03001",
+        "examination_uuid": "821d81f1-fb20-4e38-b777-01c67fe03002",
+    }
+    payload[field] = invalid
+    with pytest.raises(ValueError):
+        HubTransferSensitiveMetaPayload.model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"patient_hash": "a" * 64, "examination_hash": "b" * 64},
+        {"patient_id": "1", "examination_id": 2},
+        {"patient_id": True, "examination_id": 2},
+        {"patient_id": 0, "examination_id": 2},
+        {"patient_id": 1, "examination_id": -1},
+        {"patient_id": 1, "examination_id": 2, "patient_hash": "a" * 64},
+    ],
+)
+def test_transfer_identity_rejects_legacy_hashes_and_invalid_ids(
+    payload: dict[str, object],
+) -> None:
+    from lx_dtypes.models.contracts.hub_transfer import HubTransferSensitiveMetaPayload
+
+    with pytest.raises(ValueError):
+        HubTransferSensitiveMetaPayload.model_validate(payload)

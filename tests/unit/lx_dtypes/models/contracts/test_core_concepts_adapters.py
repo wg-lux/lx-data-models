@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from functools import partial
 from math import isfinite
 from typing import Any, cast
 
@@ -50,6 +51,7 @@ from lx_dtypes.names import (
     ClassificationChoiceDescriptorTypes,
     NumericDistributionChoices,
 )
+from tests.fixtures.lx_dtypes.models.interface import assert_retained_release_warnings
 from tests.paths import PACKAGE_ROOT
 
 _LIST_FIELDS: dict[CoreConceptName, list[str]] = {
@@ -491,12 +493,19 @@ def test_kb_snapshot_normalizes_unbounded_descriptor_sentinels() -> None:
 
 
 def test_packaged_snapshot_contains_only_finite_descriptor_numbers() -> None:
-    for descriptor in list_packaged_knowledge_bases():
-        loader = DataLoader(input_dirs=[descriptor.installed_data_root()])
-        snapshot = kb_to_core_concepts_payload(
-            loader.load_knowledge_base(descriptor.module_name)
+    for package in list_packaged_knowledge_bases():
+        loader = DataLoader(input_dirs=[package.installed_data_root()])
+
+        load = partial(loader.load_knowledge_base, package.module_name)
+
+        kb = (
+            assert_retained_release_warnings(load)
+            if (package.module_name, package.version)
+            == ("star_upper_gi", "0.1.1.post1")
+            else load()
         )
-        assert snapshot.knowledge_base_version == descriptor.version
+        snapshot = kb_to_core_concepts_payload(kb)
+        assert snapshot.knowledge_base_version == package.version
         for descriptor in snapshot.classification_choice_descriptor:
             scalar_values = (
                 descriptor.numeric_min,

@@ -82,3 +82,7 @@ The [study document](study_metadata/coloreg_resection.yml) stores the four
 comparison hypotheses separately from terminology. The canonical
 [endpoint and linkage specification](../../docs/guides/coloreg-resection-study.yml)
 explains protocol-defined primary success, denominators and host responsibilities.
+The study document's `analysis_definitions` contains executable descriptive
+rules for R0 and explicit draft definitions for protocol-dependent comparisons.
+Dataset evaluation is an explicit host action; it reports missingness and does
+not perform a statistical significance test.

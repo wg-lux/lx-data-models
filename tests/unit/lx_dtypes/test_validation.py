@@ -195,3 +195,132 @@ def test_assessment_language_is_consistent_across_boundaries(
     assert assess_examination(kb, payload, template_name=template) == german
     with pytest.raises(ValueError, match="language"):
         assess_examination(kb, payload, language="fr")  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("kind", ["finding", "indication"])
+@pytest.mark.parametrize(
+    ("descriptor_type", "valid", "invalid"),
+    [
+        ("numeric", 2, True),
+        ("numeric", 2.5, "2.5"),
+        ("numeric", 2, float("inf")),
+        ("numeric", 2, float("nan")),
+        ("numeric", 2, 11),
+        ("boolean", True, 1),
+        ("text", "ok", "too long"),
+        ("text", "ok", 1),
+        ("selection", ["a"], ["unknown"]),
+        ("selection", ["a"], ["a", "a"]),
+        ("selection", ["a"], []),
+        ("selection", ["a"], ["a", "b"]),
+        ("selection", ["a"], "a"),
+    ],
+)
+def test_assessment_uses_kb_descriptor_value_constraints(
+    kb: KnowledgeBase, kind: str, descriptor_type: str, valid: object, invalid: object
+) -> None:
+    from lx_dtypes.models.knowledge_base.classification_choice_descriptor import (
+        ClassificationChoiceDescriptor,
+    )
+
+    kb = kb.model_copy(deep=True)
+    descriptor = ClassificationChoiceDescriptor.model_validate(
+        {
+            "name": "synthetic_descriptor",
+            "classification_choice_descriptor_type": descriptor_type,
+            "numeric_min": 0,
+            "numeric_max": 10,
+            "text_max_length": 3,
+            "selection_options": ["a", "b"],
+        }
+    )
+    kb.classification_choice_descriptor[descriptor.name] = descriptor
+    classification = next(iter(kb.classification.values())).model_copy(
+        update={
+            "name": "synthetic_classification",
+            "classification_choices": ["synthetic_choice"],
+        }
+    )
+    choice = next(iter(kb.classification_choice.values())).model_copy(
+        update={
+            "name": "synthetic_choice",
+            "classification_choice_descriptors": [descriptor.name],
+        }
+    )
+    kb.classification[classification.name] = classification
+    kb.classification_choice[choice.name] = choice
+    from lx_dtypes.models.knowledge_base.indication.Indication import Indication
+
+    concept_name = "synthetic_concept"
+    if kind == "finding":
+        kb.finding[concept_name] = next(iter(kb.finding.values())).model_copy(
+            update={"name": concept_name, "classifications": [classification.name]}
+        )
+    else:
+        kb.indication[concept_name] = Indication(
+            name=concept_name, classifications=[classification.name]
+        )
+    exam = kb.examination["star_upper_gi_endoscopy"]
+    if kind == "finding":
+        exam.findings = [concept_name]
+    else:
+        exam.indications = [concept_name]
+
+    def payload(value: object) -> dict[str, object]:
+        descriptor_data = {
+            "classification_choice_descriptor": descriptor.name,
+            "descriptor_value": value,
+        }
+        classification_data: dict[str, object] = {
+            "classification": classification.name,
+            "classification_choice": choice.name,
+        }
+        if kind == "finding":
+            descriptor_data["patient_finding_classification_choice"] = (
+                "synthetic-choice"
+            )
+            classification_data.update(
+                {
+                    "patient_finding_classifications": "synthetic-group",
+                    "patient_finding_classification_choice_descriptors": [
+                        descriptor_data
+                    ],
+                }
+            )
+            observations = [
+                {
+                    "finding": concept_name,
+                    "patient_examination": "synthetic-exam",
+                    "patient_finding_classifications": [
+                        {
+                            "patient_finding": "synthetic-finding",
+                            "patient_finding_classification_choices": [
+                                classification_data
+                            ],
+                        }
+                    ],
+                }
+            ]
+        else:
+            descriptor_data["patient_indication_classification"] = (
+                "synthetic-classification"
+            )
+            classification_data.update(
+                {
+                    "patient_indication": "synthetic-indication",
+                    "patient_indication_classification_descriptors": [descriptor_data],
+                }
+            )
+            observations = [
+                {
+                    "indication": concept_name,
+                    "patient_examination": "synthetic-exam",
+                    "patient_indication_classifications": [classification_data],
+                }
+            ]
+        return {**examination(kb), f"patient_{kind}s": observations}
+
+    assert assess_examination(kb, payload(valid)).ok
+    report = assess_examination(kb, payload(invalid))
+    assert not report.ok
+    assert any(issue.source == "terminology" for issue in report.issues)

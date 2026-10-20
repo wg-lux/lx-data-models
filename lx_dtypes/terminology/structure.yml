@@ -7,6 +7,7 @@ summary: Versioned terminology resolution, registry lifecycle, and host-configur
 responsibilities:
 - Resolve exact knowledge-base identities and dependency closures
 - Validate registration, uploads, and source provenance
+- Reuse the shared package archive boundary and authoring gate for uploaded packages
 boundaries:
 - Registration does not select a package or project host database rows
 - Do not silently fall back from an explicit registry service

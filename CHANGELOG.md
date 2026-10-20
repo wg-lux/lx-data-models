@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.4.dev1] - Unreleased
+
+### Changed
+- Report anonymization v2 requires typed extraction evidence and owner-bound
+  staging receipts. Provider failure is distinct from valid empty extraction;
+  deterministic fallback preserves its actual backend and bounded failure code.
+- Producers and hosts must upgrade together; v1 payloads fail closed. This local
+  prerelease candidate is not a published release.
+
 ## [0.2.37] - 2026-09-08
 
 ### Added

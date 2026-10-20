@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import re
 from collections.abc import Mapping
 from datetime import date
 from typing import Annotated, Literal, Protocol, Self, cast
@@ -9,6 +11,10 @@ from uuid import UUID
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
 
+from lx_dtypes.models.descriptor_value import DescriptorValue
+from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
+    ClassificationChoiceDescriptor,
+)
 from lx_dtypes.models.meta.ReportMeta import ReportPatientInfo
 
 from .dtypes_record_persistence import DtypesRecordPersistencePayload
@@ -53,11 +59,89 @@ def _column_shorthand(value: object) -> object:
 ColumnMapping = Annotated[TableColumn, BeforeValidator(_column_shorthand)]
 
 
+class TableDescriptor(BaseModel):
+    """Explicit source representation; the referenced KB owns admissible values."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    column: ColumnMapping
+    value_type: Literal["text", "integer", "number", "boolean", "selection"]
+
+    def parse_value(
+        self, value: str, descriptor: ClassificationChoiceDescriptor
+    ) -> DescriptorValue:
+        expected = {
+            "text": "text",
+            "integer": "numeric",
+            "number": "numeric",
+            "boolean": "boolean",
+            "selection": "selection",
+        }[self.value_type]
+        if descriptor.classification_choice_descriptor_type.value != expected:
+            raise ValueError("Mapping representation disagrees with KB descriptor type")
+        parsed: DescriptorValue
+        if self.value_type == "text":
+            parsed = value
+        elif self.value_type == "boolean":
+            if value not in {"true", "false"}:
+                raise ValueError("Boolean descriptor requires true or false")
+            parsed = value == "true"
+        elif self.value_type == "selection":
+            try:
+                selected: object = json.loads(value)
+            except RecursionError as error:
+                raise ValueError(
+                    "Selection nesting exceeds supported JSON depth"
+                ) from error
+            if not isinstance(selected, list) or not all(
+                isinstance(item, str) for item in selected
+            ):
+                raise ValueError("Selection requires a JSON array of strings")
+            parsed = cast(list[str], selected)
+        else:
+            if (
+                self.value_type == "integer"
+                and re.fullmatch(r"[+-]?[0-9]+", value) is None
+            ):
+                raise ValueError(
+                    "Integer descriptor requires an integral decimal value"
+                )
+            if (
+                self.value_type == "number"
+                and re.fullmatch(
+                    r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?", value
+                )
+                is None
+            ):
+                raise ValueError("Number descriptor requires decimal numeric spelling")
+            parsed = int(value) if self.value_type == "integer" else float(value)
+        return descriptor.validate_value(parsed)
+
+
+class TableClassification(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    choice: ColumnMapping
+    descriptors: dict[str, TableDescriptor] = Field(
+        default_factory=dict, max_length=100
+    )
+
+
 class TableFinding(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
 
     finding: ColumnMapping
-    classifications: dict[str, ColumnMapping] = Field(default_factory=dict)
+    classifications: dict[str, TableClassification | ColumnMapping] = Field(
+        default_factory=dict
+    )
+
+    def classification_groups(self) -> dict[str, TableClassification]:
+        return {
+            name: item
+            if isinstance(item, TableClassification)
+            else TableClassification(choice=item)
+            for name, item in self.classifications.items()
+        }
 
 
 class TableSource(BaseModel):

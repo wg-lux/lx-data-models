@@ -7,6 +7,8 @@ from typing import Literal, Self, TypedDict
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .deployment_setup import PackageName, PackageVersion
+from .json_types import JsonObject
+from .study_analysis import StudyAnalysisDefinition
 
 
 class StudyMetadataModel(BaseModel):
@@ -64,6 +66,9 @@ class StudyMetadata(StudyMetadataModel):
     inclusion_criteria: list[StudyInclusionCriterion] = Field(
         default_factory=list, max_length=100
     )
+    analysis_definitions: list[StudyAnalysisDefinition] = Field(
+        default_factory=list, max_length=100
+    )
 
     @model_validator(mode="after")
     def unique_names_and_declared_dependencies(self) -> Self:
@@ -72,11 +77,17 @@ class StudyMetadata(StudyMetadataModel):
             [g.name for g in self.age_groups],
             [c.name for c in self.inclusion_criteria],
             [(r.module, r.version) for r in self.terminology_requirements],
+            [definition.name for definition in self.analysis_definitions],
         )
         for keys in collections:
             if len(keys) != len(set(keys)):
                 raise ValueError("study metadata identities must be unique")
         required = {(r.module, r.version) for r in self.terminology_requirements}
+        for definition in self.analysis_definitions:
+            if (definition.module, definition.version) not in required:
+                raise ValueError(
+                    "analysis definitions require a declared exact terminology dependency"
+                )
         for criterion in self.inclusion_criteria:
             for concept in criterion.concepts:
                 if (concept.module, concept.version) not in required:
@@ -118,3 +129,4 @@ class StudyMetadataDataDict(TypedDict):
     age_groups: list[StudyAgeGroupDataDict]
     terminology_requirements: list[StudyTerminologyRequirementDataDict]
     inclusion_criteria: list[StudyInclusionCriterionDataDict]
+    analysis_definitions: list[JsonObject]

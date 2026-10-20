@@ -1,8 +1,35 @@
 # lx-dtypes Documentation
 
-Welcome to the developer and maintainer documentation for `lx-dtypes`. These pages
-cover data modeling conventions, implementation details, and automation workflows
-used throughout the project.
+`lx-dtypes` provides models, terminology, and validation for clinical research.
+These pages explain the concepts, show examples, and describe integration.
+
+## Reader roadmap
+
+No prior knowledge of the project is needed. Follow these steps or go straight
+to the topic you need.
+
+| Step | Read or try | What you will learn |
+| --- | --- | --- |
+| 1. Understand the model | [Data-model concept map](guides/data-model-concept-map.md) | How terminology, patient records, and reports fit together. Start at Level 0. |
+| 2. Run a small example | [Project README](https://github.com/wg-lux/lx-data-models/blob/main/README.md) | Follow the quick start to load a shipped knowledge base and inspect validation findings. |
+| 3. Try package authoring | [Your first study package](guides/dtypes-package-structure.md#start-here-your-first-study-package) | Copy, inspect, and register a synthetic YAML package. |
+| 4. Choose an integration | [Validation](guides/cross-layer-validation.md), [Django](guides/django-host-integration.md), or [FHIR](guides/fhir-lxdm-mapping-diagrams.md) | Apply the models in a host application. |
+| 5. Contribute what you learn | [Contributing](https://github.com/wg-lux/lx-data-models/blob/main/CONTRIBUTING.md) | Report a confusing step, improve an example, or prepare a code change. |
+
+For terminology work, continue with [knowledge-base authoring](guides/knowledge-base-authoring.md).
+For reporting, use [report-template authoring](guides/report-template-authoring.md).
+The [API reference](api/index.md) provides details for individual models and functions.
+
+## Project direction
+
+The package is in alpha. Public imports may change before `1.0`; release notes
+record breaking changes. Check the
+[issue tracker](https://github.com/wg-lux/lx-data-models/issues) for open work
+and discuss larger proposals there before implementation.
+
+Useful starting points include clearer examples, reproducible bug reports,
+terminology validation, and host integration. Choose a small task you can verify.
+Documentation and domain feedback are welcome alongside code contributions.
 
 ## Contents
 ```{toctree}
@@ -46,4 +73,5 @@ guides/report-template-findings-validator-migration
 - Issue tracker: https://github.com/wg-lux/lx-data-models/issues
 - Python Package Index: https://pypi.org/project/lx-dtypes/
 
-Need another topic? Open a discussion or file an issue and we will expand the docs.
+If a topic is missing or a step is unclear, open an issue with what you tried
+and what you expected.

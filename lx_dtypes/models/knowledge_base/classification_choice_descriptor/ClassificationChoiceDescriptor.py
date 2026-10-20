@@ -1,3 +1,5 @@
+import math
+
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
 )
@@ -59,6 +61,42 @@ class ClassificationChoiceDescriptor(
             ddict_class (type[ClassificationChoiceDescriptorDataDict]): The class used to represent this descriptor's data dictionary.
         """
         return ClassificationChoiceDescriptorDataDict
+
+    def validate_value(self, value: DescriptorValue) -> DescriptorValue:
+        """Validate an observed value without coercion using this KB definition."""
+        if self.is_numeric:
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or (isinstance(value, float) and not math.isfinite(value))
+                or not self.numeric_min <= value <= self.numeric_max
+            ):
+                raise ValueError("Descriptor requires a finite number within KB bounds")
+        elif self.is_boolean:
+            if not isinstance(value, bool):
+                raise ValueError("Descriptor requires a boolean")
+        elif self.is_text:
+            if not isinstance(value, str) or len(value) > self.text_max_length:
+                raise ValueError("Descriptor requires text within KB maximum length")
+        elif self.is_selection:
+            if not isinstance(value, list) or not all(
+                isinstance(item, str) for item in value
+            ):
+                raise ValueError("Descriptor requires a list of selection names")
+            if len(set(value)) != len(value) or not set(value).issubset(
+                self.selection_options
+            ):
+                raise ValueError("Unknown or repeated descriptor selection")
+            if (not self.selection_multiple and len(value) != 1) or (
+                self.selection_multiple
+                and not self.selection_multiple_n_min
+                <= len(value)
+                <= self.selection_multiple_n_max
+            ):
+                raise ValueError("Descriptor selection cardinality is invalid")
+        else:
+            raise ValueError("Unsupported descriptor type")
+        return value
 
     def normalize_value(self, value: DescriptorValue) -> DescriptorValue:
         """Normalize a ledger value according to this descriptor's type.

@@ -18,6 +18,9 @@ from django.db.models import QuerySet
 from django.utils import timezone
 from pydantic import BaseModel, Field
 
+from lx_dtypes.models.contracts.dtypes_record_persistence import (
+    DtypesRecordPersistencePayload,
+)
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.terminology.terminology_loader import (
     active_kb_identity,
@@ -289,12 +292,77 @@ def _active_patient_findings_queryset(
     )
 
 
+def _stored_descriptor_payloads(
+    records: list[object],
+    *,
+    patient: str,
+    examination: str,
+    module: str,
+    version: str | None,
+) -> dict[tuple[str, str, str, str], list[dict[str, object]]]:
+    result: dict[tuple[str, str, str, str], list[dict[str, object]]] = {}
+    for record in records:
+        if record is None or record == {}:
+            continue
+        if isinstance(record, DtypesRecordPersistencePayload):
+            record = record.model_dump(mode="python")
+        parsed = DtypesRecordPersistencePayload.model_validate(record)
+        if (
+            parsed.patient,
+            parsed.examination,
+            parsed.knowledge_base_module,
+            parsed.knowledge_base_version,
+        ) != (patient, examination, module, version):
+            raise ValueError(
+                "Stored descriptor ledger identity does not match the host examination"
+            )
+        seen: set[tuple[str, str, str, str]] = set()
+        for finding in parsed.patient_findings:
+            for group in finding.patient_finding_classifications:
+                for choice in group.patient_finding_classification_choices:
+                    key = (
+                        str(finding.uuid),
+                        finding.finding,
+                        choice.classification,
+                        choice.classification_choice,
+                    )
+                    descriptors = (
+                        choice.patient_finding_classification_choice_descriptors
+                    )
+                    names = [
+                        item.classification_choice_descriptor for item in descriptors
+                    ]
+                    if key in seen or len(names) != len(set(names)):
+                        raise ValueError("Duplicate stored descriptor relation or name")
+                    seen.add(key)
+                    values = [item.model_dump(mode="json") for item in descriptors]
+                    previous = {
+                        item["classification_choice_descriptor"]: item
+                        for item in result.get(key, [])
+                    }
+                    for item in values:
+                        name = item["classification_choice_descriptor"]
+                        old = previous.get(name)
+                        if old is not None and (
+                            type(old["descriptor_value"])
+                            is not type(item["descriptor_value"])
+                            or old["descriptor_value"] != item["descriptor_value"]
+                        ):
+                            raise ValueError(
+                                "Conflicting stored and supplied descriptor observations"
+                            )
+                        previous[name] = item
+                    result[key] = list(previous.values())
+    return result
+
+
 def build_p_examination_payload_from_host_ledger(
     patient_examination: object,
     *,
     route_module_name: str,
     orm_models: Callable[[], dict[str, Any]],
     active_patient_findings_queryset: Callable[[], Any] | None = None,
+    descriptor_source: DtypesRecordPersistencePayload | None = None,
 ) -> PExamination:
     patient_examination_id = getattr(patient_examination, "id", None)
     if patient_examination_id is None:
@@ -323,6 +391,14 @@ def build_p_examination_payload_from_host_ledger(
     version_from_ledger = str(
         getattr(patient_examination, "knowledge_base_version", "") or ""
     ).strip()
+
+    stored_descriptors = _stored_descriptor_payloads(
+        [getattr(patient_examination, "dtypes_record", None), descriptor_source],
+        patient=patient_token,
+        examination=examination_name,
+        module=module_from_ledger or route_module_name,
+        version=version_from_ledger or None,
+    )
 
     queryset_provider = (
         active_patient_findings_queryset
@@ -357,17 +433,54 @@ def build_p_examination_payload_from_host_ledger(
                 choice_name = classification_name
 
             choice_ref = f"pe_{patient_examination_id}_pf_{patient_finding.id}_choice_{index + 1}"
+            descriptors = _runtime_descriptor_payloads_from_mapping(
+                getattr(item, "numerical_descriptors", {}),
+                parent_choice_ref=choice_ref,
+            )
+            canonical = stored_descriptors.get(
+                (
+                    str(patient_finding.instance_id),
+                    finding_name,
+                    classification_name,
+                    choice_name,
+                )
+            )
+            if canonical is not None:
+                canonical_values = {
+                    entry["classification_choice_descriptor"]: entry["descriptor_value"]
+                    for entry in canonical
+                }
+                if any(
+                    entry["classification_choice_descriptor"] in canonical_values
+                    and (
+                        type(
+                            canonical_values[entry["classification_choice_descriptor"]]
+                        )
+                        is not type(entry["descriptor_value"])
+                        or canonical_values[entry["classification_choice_descriptor"]]
+                        != entry["descriptor_value"]
+                    )
+                    for entry in descriptors
+                ):
+                    raise ValueError(
+                        "Conflicting host and canonical descriptor observations"
+                    )
+                canonical_names = set(canonical_values)
+                descriptors = [
+                    entry
+                    for entry in descriptors
+                    if entry["classification_choice_descriptor"] not in canonical_names
+                ]
+                descriptors.extend(
+                    {**entry, "patient_finding_classification_choice": choice_ref}
+                    for entry in canonical
+                )
             classifications_payload.append(
                 {
                     "classification": classification_name,
                     "classification_choice": choice_name,
                     "patient_finding_classifications": str(item.id),
-                    "patient_finding_classification_choice_descriptors": (
-                        _runtime_descriptor_payloads_from_mapping(
-                            getattr(item, "numerical_descriptors", {}),
-                            parent_choice_ref=choice_ref,
-                        )
-                    ),
+                    "patient_finding_classification_choice_descriptors": descriptors,
                 }
             )
 

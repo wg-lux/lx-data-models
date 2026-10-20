@@ -45,9 +45,14 @@ class StudySetupDefinition(BaseModel):
 
     @property
     def content_sha256(self) -> str:
-        canonical = json.dumps(
-            self.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
-        )
+        payload = self.model_dump(mode="json")
+        # Adding optional analysis authoring must not change the identity of
+        # already imported setup documents that contain no analysis definitions.
+        for cohort in payload["cohorts"]:
+            metadata = cohort["study_metadata"]
+            if not metadata["analysis_definitions"]:
+                metadata.pop("analysis_definitions")
+        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return sha256(canonical.encode("utf-8")).hexdigest()
 
     @model_validator(mode="after")

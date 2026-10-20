@@ -11,6 +11,9 @@ boundaries:
 - Context metadata is not a KB record or package config.yaml
 - Patient data, runtime registries, and generated exports do not belong here
 entrypoints:
+- name: ColoReg study analyses
+  file: study_metadata/coloreg_resection.yml
+  purpose: Versioned comparison hypotheses with explicit executable descriptive rules and unresolved protocol drafts
 - name: Resource guide
   file: README.md
   purpose: Resource ownership and path contracts

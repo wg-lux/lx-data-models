@@ -165,10 +165,10 @@ class SelectedExaminationExport(RevisionContract):
 
 
 class SelectedCaseExport(RevisionContract):
-    schema_version: Literal["1.0"] = "1.0"
+    schema_version: Literal["2.0"] = "2.0"
     generated_at: AwareDatetime
     case_id: UUID
-    patient_pseudonym: str = Field(min_length=1)
+    patient_id: PositiveId
     center_key: str | None
     is_closed: bool
     examinations: list[SelectedExaminationExport] = Field(min_length=1)

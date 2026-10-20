@@ -4,6 +4,7 @@ import pytest
 import yaml
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
+from tests.fixtures.lx_dtypes.models.interface import separate_report_terminology
 
 
 def _write_module(
@@ -36,6 +37,7 @@ def _write_module(
         yaml.safe_dump(records, sort_keys=False),
         encoding="utf-8",
     )
+    separate_report_terminology(module_dir, generated_dir / "template.yaml")
     (generated_dir / "report_template_registry.yaml").write_text(
         yaml.safe_dump(
             {
