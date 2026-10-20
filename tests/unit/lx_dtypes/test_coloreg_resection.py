@@ -27,6 +27,7 @@ from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor import (
     PFindingClassificationChoiceDescriptor,
 )
 from lx_dtypes.models.ledger.p_finding_classifications import PFindingClassifications
+from lx_dtypes.stats.study import validate_study_analysis
 from lx_dtypes.utils.study_setup_yaml import parse_study_setup_yaml
 
 
@@ -238,7 +239,7 @@ def test_coverage_checks_actual_electricity_settings(
     assert item.validation_status == expected
 
 
-def test_study_hypotheses_pin_terminology_and_do_not_claim_automatic_analysis(
+def test_study_hypotheses_pin_terminology_and_expose_explicit_analysis(
     kb: KnowledgeBase,
 ) -> None:
     root = package_data_root()
@@ -246,6 +247,7 @@ def test_study_hypotheses_pin_terminology_and_do_not_claim_automatic_analysis(
         (root / "study_metadata/coloreg_resection.yml").read_text()
     )
     assert len(study.cohorts) == 4
+    assert study.definition_version == "1.1.0"
     for cohort in study.cohorts:
         assert "H0:" in cohort.hypothesis and "H1:" in cohort.hypothesis
         assert ">= 20 mm" in cohort.hypothesis
@@ -254,10 +256,21 @@ def test_study_hypotheses_pin_terminology_and_do_not_claim_automatic_analysis(
             (r.module, r.version)
             for r in cohort.study_metadata.terminology_requirements
         ] == [("coloreg", "0.3.0")]
+        assert len(cohort.study_metadata.analysis_definitions) == 1
+        validate_study_analysis(cohort.study_metadata.analysis_definitions[0], kb)
         for criterion in cohort.study_metadata.inclusion_criteria:
             assert "not executable cohort filters" in criterion.description
             for concept in criterion.concepts:
                 assert concept.name in kb.finding
+    r0 = study.cohorts[1].study_metadata.analysis_definitions[0]
+    assert r0.status == "ready"
+    assert {endpoint.name for endpoint in r0.endpoints} == {
+        "histological_r0_among_assessable",
+        "histology_rx_among_documented",
+        "histology_pending_among_documented",
+        "histology_no_specimen_among_documented",
+        "histology_unknown_among_documented",
+    }
     spec = yaml.safe_load(
         (
             Path(__file__).resolve().parents[3]

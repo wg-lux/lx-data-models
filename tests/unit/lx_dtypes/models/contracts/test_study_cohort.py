@@ -12,13 +12,11 @@ def _grouped_case_payload() -> dict[str, object]:
     examinations = [
         {
             "patient_examination_id": 22,
-            "case_hash": "follow-up-hash",
             "examination_name": "follow-up",
             "examination_date": date(2026, 8, 1),
         },
         {
             "patient_examination_id": 11,
-            "case_hash": "initial-hash",
             "examination_name": "initial",
             "examination_date": date(2026, 1, 1),
         },
@@ -26,9 +24,7 @@ def _grouped_case_payload() -> dict[str, object]:
     return {
         "patient_examination_id": 22,
         "patient_examination_ids": [22, 11],
-        "case_hash": "follow-up-hash",
-        "case_hashes": ["follow-up-hash", "initial-hash"],
-        "patient_hash": "same-patient-identity",
+        "patient_id": 1,
         "examination_name": "follow-up",
         "examination_date": date(2026, 8, 1),
         "examinations": examinations,
@@ -56,7 +52,7 @@ def _grouped_case_payload() -> dict[str, object]:
 def test_study_cohort_case_groups_follow_up_examinations_in_one_patient_row() -> None:
     row = StudyCohortCaseRow.model_validate(_grouped_case_payload())
 
-    assert row.patient_hash == "same-patient-identity"
+    assert row.patient_id == 1
     assert row.patient_examination_ids == [22, 11]
     assert len(row.examinations) == 2
     assert [report.id for report in row.reports] == [7]
@@ -68,4 +64,12 @@ def test_study_cohort_case_rejects_inconsistent_examination_identity_lists() -> 
     payload["patient_examination_ids"] = [11, 22]
 
     with pytest.raises(ValidationError, match="patient_examination_ids"):
+        StudyCohortCaseRow.model_validate(payload)
+
+
+@pytest.mark.parametrize("field", ["patient_hash", "case_hash", "case_hashes"])
+def test_study_cohort_rejects_identity_hash_fields(field: str) -> None:
+    payload = _grouped_case_payload()
+    payload[field] = "source-only-identity"
+    with pytest.raises(ValidationError, match=field):
         StudyCohortCaseRow.model_validate(payload)

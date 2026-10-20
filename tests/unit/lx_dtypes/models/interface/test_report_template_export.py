@@ -3,6 +3,7 @@ from pathlib import Path
 import yaml
 
 from lx_dtypes.models.interface.DataLoader import DataLoader
+from tests.fixtures.lx_dtypes.models.interface import separate_report_terminology
 
 
 def test_report_template_export(tmp_path: Path) -> None:
@@ -138,6 +139,7 @@ def test_report_template_export(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
+    separate_report_terminology(module_dir, data_path)
     loader = DataLoader(input_dirs=[tmp_path])
     loader.load_module_configs()
     kb = loader.load_knowledge_base("report_module")

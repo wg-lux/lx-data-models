@@ -53,6 +53,11 @@ replace the default package list.
 - Missing descriptions for template findings, broken classification input chains,
   descriptor units, and descriptor-backed coverage paths.
 - Runtime Pydantic model validation, dependency resolution, and definition conflicts.
+- Canonical concept-graph validation, including dangling terminology references.
+  Supported record kinds and aliases come from the runtime registry; dependency
+  selection uses `DataLoader`, including semantic names that differ from folders.
+  Ambiguous references and directory names used instead of declared module names
+  are errors; no candidate is selected by filesystem order.
 - Concepts defined locally in reporting/study packages, including inherited reporting
   packages; use terminology dependencies instead (`report_template_concept_definition`).
 - Compilation and readiness of every loaded report template, including missing
@@ -83,3 +88,6 @@ The repository wrapper `python scripts/lint_kb_yaml.py` runs the same checks.
 Keep pytest for runtime behavior and host integration tests.
 
 See [knowledge-base authoring](knowledge-base-authoring.md) for publication workflows.
+For creation, strict loading, and validation with ledger examples, use the
+[`lx_dtypes.packages` workflow](dtypes-package-structure.md#create-load-and-validate-from-python).
+It calls this same package checker and the existing ledger assessment API.

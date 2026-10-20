@@ -21,7 +21,6 @@ class StudyCohortExaminationRow(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     patient_examination_id: int = Field(ge=1)
-    case_hash: str = Field(min_length=1)
     examination_name: str
     examination_date: date | None = None
 
@@ -33,13 +32,11 @@ class StudyCohortCaseRow(BaseModel):
 
     # Retained as the latest examination for additive consumer compatibility.
     patient_examination_id: int = Field(ge=1)
-    case_hash: str = Field(min_length=1)
     examination_name: str
     examination_date: date | None = None
 
-    patient_hash: str = Field(min_length=1)
+    patient_id: int = Field(ge=1)
     patient_examination_ids: list[int] = Field(min_length=1)
-    case_hashes: list[str] = Field(min_length=1)
     examinations: list[StudyCohortExaminationRow] = Field(min_length=1)
     center_keys: list[str] = Field(default_factory=list)
     findings: list[str] = Field(default_factory=list)
@@ -52,7 +49,6 @@ class StudyCohortCaseRow(BaseModel):
         examination_ids = [
             examination.patient_examination_id for examination in self.examinations
         ]
-        case_hashes = [examination.case_hash for examination in self.examinations]
         if len(examination_ids) != len(set(examination_ids)):
             raise ValueError(
                 "examinations must contain unique patient_examination_id values"
@@ -61,13 +57,10 @@ class StudyCohortCaseRow(BaseModel):
             raise ValueError(
                 "patient_examination_ids must match examinations in the same order"
             )
-        if self.case_hashes != case_hashes:
-            raise ValueError("case_hashes must match examinations in the same order")
 
         latest = self.examinations[0]
         if (
             self.patient_examination_id != latest.patient_examination_id
-            or self.case_hash != latest.case_hash
             or self.examination_name != latest.examination_name
             or self.examination_date != latest.examination_date
         ):

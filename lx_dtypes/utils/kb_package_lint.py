@@ -3,13 +3,20 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
+from pydantic import ValidationError
 
+from lx_dtypes.models.contracts.adapters import kb_to_core_concepts_payload
 from lx_dtypes.models.interface.data_roots import module_search_root
 from lx_dtypes.models.interface.DataLoader import DataLoader
-from lx_dtypes.models.interface.KnowledgeBase import ReportTemplateConceptWarning
+from lx_dtypes.models.interface.KnowledgeBase import (
+    KnowledgeBase,
+    ReportTemplateConceptWarning,
+)
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
     ReportTemplateReadinessSummary,
@@ -22,14 +29,40 @@ from lx_dtypes.utils.kb_yaml_lint import (
 )
 
 
+@dataclass(frozen=True)
+class KbPackageCheck:
+    knowledge_base: KnowledgeBase | None
+    files: tuple[Path, ...]
+    issues: tuple[KbYamlLintIssue, ...]
+
+
 def lint_kb_package(
     config_path: Path, *, strict_aliases: bool = True, strict_mixed_styles: bool = True
 ) -> tuple[list[Path], list[KbYamlLintIssue]]:
+    """Compatibility entry point for the CLI's source-located diagnostics."""
+    result = check_kb_package(
+        config_path,
+        strict_aliases=strict_aliases,
+        strict_mixed_styles=strict_mixed_styles,
+    )
+    return list(result.files), list(result.issues)
+
+
+def check_kb_package(
+    config_path: Path,
+    *,
+    strict_aliases: bool = True,
+    strict_mixed_styles: bool = True,
+    input_dirs: Sequence[Path] | None = None,
+) -> KbPackageCheck:
     """Check one dependency closure, never merging independent package releases."""
     config_path = config_path.resolve()
     selected_configs: set[Path] = set()
     files, issues = discover_yaml_files(
-        paths=[], config_paths=[config_path], resolved_configs=selected_configs
+        paths=[],
+        config_paths=[config_path],
+        resolved_configs=selected_configs,
+        input_dirs=input_dirs,
     )
     issues.extend(
         lint_kb_yaml_files(
@@ -43,12 +76,16 @@ def lint_kb_package(
         issue.severity == "error" and issue.code != "version_in_name"
         for issue in issues
     ):
-        return files, issues
+        return KbPackageCheck(None, tuple(files), tuple(issues))
 
     with warnings.catch_warnings(record=True) as captured:
         warnings.simplefilter("always", ReportTemplateConceptWarning)
         try:
-            loader = DataLoader(input_dirs=[module_search_root(config_path)])
+            loader = DataLoader(
+                input_dirs=list(input_dirs)
+                if input_dirs is not None
+                else [module_search_root(config_path)]
+            )
             for path in sorted(selected_configs):
                 selected = KnowledgeBaseConfig.from_yaml_file(path)
                 issues.extend(
@@ -99,7 +136,21 @@ def lint_kb_package(
                 )
             )
     if kb is None:
-        return files, issues
+        return KbPackageCheck(None, tuple(files), tuple(issues))
+
+    try:
+        kb_to_core_concepts_payload(kb)
+    except ValidationError as exc:
+        issues.append(
+            KbYamlLintIssue(
+                code="invalid_knowledge_base",
+                severity="error",
+                file=config_path,
+                line=1,
+                column=1,
+                message=str(exc),
+            )
+        )
 
     for name, template in sorted(kb.report_template.items()):
         source, source_line, source_column = kb.definition_source(
@@ -160,4 +211,4 @@ def lint_kb_package(
                     message=issue.message,
                 )
             )
-    return files, issues
+    return KbPackageCheck(kb, tuple(files), tuple(issues))

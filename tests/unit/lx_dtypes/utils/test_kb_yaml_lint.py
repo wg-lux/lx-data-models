@@ -452,7 +452,7 @@ def test_discover_yaml_files_expands_module_config(tmp_path: Path) -> None:
     assert files == [target_file.resolve()]
 
 
-def test_discovery_warns_when_aggregator_name_differs_from_directory(
+def test_discovery_rejects_directory_name_instead_of_declared_module(
     tmp_path: Path,
 ) -> None:
     child_dir = tmp_path / "child"
@@ -478,12 +478,9 @@ def test_discovery_warns_when_aggregator_name_differs_from_directory(
 
     _, issues = discover_yaml_files(paths=[], config_paths=[consumer_config])
 
-    issue = next(
-        issue for issue in issues if issue.code == "aggregator_name_directory_mismatch"
-    )
-    assert issue.severity == "warning"
+    issue = next(issue for issue in issues if issue.code == "module_resolution_error")
+    assert issue.severity == "error"
     assert "terminology" in issue.message
-    assert "example_terminology" in issue.message
 
 
 def test_lx_kb_lint_shim_imports_runtime_module(tmp_path: Path) -> None:

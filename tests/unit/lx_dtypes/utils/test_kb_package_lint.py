@@ -2,7 +2,9 @@ from pathlib import Path
 
 import pytest
 
+from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.scripts import lint_kb_yaml as cli
+from lx_dtypes.utils.kb_package_lint import check_kb_package
 
 
 def module(root: Path, name: str, records: str, dependencies: str = "") -> Path:
@@ -30,6 +32,55 @@ def module(root: Path, name: str, records: str, dependencies: str = "") -> Path:
 def run(monkeypatch: pytest.MonkeyPatch, *args: str) -> int:
     monkeypatch.setattr("sys.argv", ["ok", *args])
     return cli.main()
+
+
+@pytest.mark.parametrize("selector", ["file", "dir"])
+def test_lint_uses_runtime_data_selectors(tmp_path: Path, selector: str) -> None:
+    config = module(tmp_path, "terms", "- model: finding\n  name: selected\n")
+    records = config.parent / "records.yml"
+    value = "records.yml"
+    if selector == "dir":
+        (config.parent / "data").mkdir()
+        records = records.rename(config.parent / "data/records.yml")
+        value = "data"
+    config.write_text(f'name: terms\nversion: "1.0.0"\ndata:\n  {selector}: {value}\n')
+    result = check_kb_package(config)
+    assert not result.issues
+    assert result.knowledge_base is not None
+    assert "selected" in result.knowledge_base.finding
+    assert result.files == (records,)
+
+
+def test_semantic_module_names_resolve_in_current_release_scope(tmp_path: Path) -> None:
+    root = tmp_path / "data"
+    current = module(root / "terminology", "renamed_folder", "[]")
+    current.write_text(
+        current.read_text().replace("name: renamed_folder", "name: terms")
+    )
+    retained = module(root / "terminology/versions/release/1.0.0", "terms", "[]")
+    config = module(root / "report_templates", "report", "[]", "depends_on: [terms]\n")
+    runtime = DataLoader(input_dirs=[root]).resolved_module_configs("report")
+    assert {item.source_file for item in runtime} == {config, current}
+    assert retained not in {item.source_file for item in runtime}
+    result = check_kb_package(config)
+    assert not result.issues
+    assert set(result.files) == {
+        config.parent / "records.yml",
+        current.parent / "records.yml",
+    }
+
+
+def test_equally_scoped_candidates_are_rejected(tmp_path: Path) -> None:
+    for folder in ("first", "second"):
+        config = module(tmp_path, folder, "[]")
+        config.write_text(config.read_text().replace(f"name: {folder}", "name: terms"))
+    config = module(tmp_path, "report", "[]", "depends_on: [terms]\n")
+    result = check_kb_package(config)
+    assert result.knowledge_base is None
+    assert any(
+        issue.code == "module_resolution_error" and "ambiguous" in issue.message
+        for issue in result.issues
+    )
 
 
 def test_default_scope_is_all_current_packages_and_strict(

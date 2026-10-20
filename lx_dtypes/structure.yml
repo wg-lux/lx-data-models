@@ -11,12 +11,27 @@ boundaries:
 - Do not import tests or repository scripts into the public package
 - Do not take ownership of host deployment workflows
 entrypoints:
+- name: Study workbook exchange
+  file: study_exchange.py
+  purpose: Bounded lossless Excel transport of canonical study exchange bundles and readable projections
+- name: Study statistics
+  file: stats/study.py
+  purpose: Evaluate versioned declarative analysis rules on validated ledger units and return typed descriptive statistics
+- name: ColoReg lesion linkage
+  file: stats/study_linkage.py
+  purpose: Assemble analysis roles only from explicit authorized lesion references
 - name: Public exports
   file: __init__.py
   purpose: Stable lazy public API
 - name: Advisory validation
   file: validation.py
   purpose: Typed validation entry points
+- name: Package workflow
+  file: packages.py
+  purpose: Create, build, import, export, load, and validate packages through the core KB and ledger contracts
+- name: Package archive boundary
+  file: package_archive.py
+  purpose: Shared bounded ZIP decoding and portable member paths for authoring and registry uploads
 - name: FHIR mapping
   file: utils/fhir_lxdm_mapping.py
   purpose: FHIR and LXDM conversions

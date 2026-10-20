@@ -16,7 +16,8 @@ study_metadata:
   purpose: Research dataset and cohort example; no approved center or age restrictions declared.
 - path: study_metadata/coloreg_resection.yml
   contract: lx_dtypes.models.contracts.study_setup.StudySetupDefinition
-  purpose: EMR/ESD comparison hypotheses, candidate cohorts, and exact terminology dependency.
+  purpose: EMR/ESD hypotheses, candidate cohorts, exact terminology dependency, executable descriptive
+    R0 analysis and explicit protocol-dependent analysis drafts.
 terminology:
 - manifest: terminology/DGVS_Terminology/config.yaml
   module: DGVS_Terminology

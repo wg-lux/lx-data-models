@@ -7,11 +7,10 @@
 [![codecov](https://codecov.io/github/wg-lux/lx-data-models/graph/badge.svg?token=132HVE8KSF)](https://codecov.io/github/wg-lux/lx-data-models)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-`lx-dtypes` validates research data against predefined study rules and versioned
-medical terminology. Applications can collect structured validation findings
-without interrupting data capture, while using strict typed contracts at storage
-and exchange boundaries. The package also provides FHIR interoperability and
-Django host integration.
+`lx-dtypes` provides typed models for clinical research data. It checks data
+against study rules and versioned medical terminology. Applications can collect
+validation findings during data capture and validate records before storage or
+exchange. The package also supports FHIR conversion and Django integration.
 
 > [!IMPORTANT]
 > This project is research software. It is not a medical device and must not be
@@ -19,15 +18,14 @@ Django host integration.
 
 ## Highlights
 
-- Strict, reusable contracts for knowledge-base, ledger, reporting, and host
-  integration boundaries.
-- Version-aware YAML knowledge bases and deterministic loaders.
-- Report-template graph, structure, coverage, and runtime validation.
-- FHIR clinical and terminology conversion contracts.
-- Typed package data with Pyright, pytest, and documentation checks in CI.
+- Reusable models for terminology, patient records, reports, and host integration.
+- Versioned YAML knowledge bases with deterministic loading.
+- Report-template checks for structure, coverage, and captured data.
+- FHIR clinical data and terminology conversion.
+- Type, test, and documentation checks in CI.
 
-The package is currently in **alpha**. Public imports are kept stable where
-possible, but releases before `1.0` may contain documented breaking changes.
+The package is in **alpha**. We aim to keep public imports stable. Releases
+before `1.0` may include documented breaking changes.
 
 ## Installation
 
@@ -69,10 +67,9 @@ print(knowledge_base.config.knowledge_base_identity)
 print(sorted(knowledge_base.report_template))
 ```
 
-Registry-backed deployments should supply the exact module version. See the
-[knowledge-base authoring guide](docs/guides/knowledge-base-authoring.md) and
-[graph API guide](docs/guides/knowledge-base-graph-api.md) for the complete
-workflow.
+Registry-backed deployments require an exact module version. The
+[knowledge-base authoring guide](docs/guides/knowledge-base-authoring.md)
+explains versioning and deployment.
 
 Provision the packaged catalog before starting a registry-backed host:
 
@@ -81,20 +78,14 @@ export LX_DTYPES_KB_REGISTRY=/var/lib/my-host/terminology/registry.json
 lx-dtypes-kb-registry bootstrap
 ```
 
-This boundary is strict: invalid registry state or an unloadable packaged
-identity exits nonzero and must block host startup.
+The command exits nonzero if the registry is invalid or a packaged identity
+cannot load. Hosts must treat that failure as a startup blocker.
 
 ## Documentation
 
-Start with the [documentation index](docs/index.md). Key guides include:
-
-- [Package boundaries](docs/guides/package_boundary.md)
-- [Data-model concept map](docs/guides/data-model-concept-map.md)
-- [Knowledge-base authoring](docs/guides/knowledge-base-authoring.md)
-- [Reproduce versioned classifications](docs/guides/knowledge-base-authoring.md#reproduce-and-maintain-versioned-numeric-classifications)
-- [Report-template infrastructure](docs/guides/report-template-infrastructure.md)
-- [FHIR to LXDM mapping](docs/guides/fhir-lxdm-mapping-diagrams.md)
-- [Django host integration](docs/guides/django-host-integration.md)
+Follow the [reader roadmap](docs/index.md#reader-roadmap) from the model overview
+to a working example, then choose terminology, reporting, or application
+integration. You can start with the topic that fits your work.
 
 Build the documentation locally with:
 
@@ -105,23 +96,10 @@ make -C docs html
 
 ## Development
 
-```bash
-git clone https://github.com/wg-lux/lx-data-models.git
-cd lx-data-models
-uv sync --extra dev
-uv run python scripts/lint_structure.py
-uv run pyright
-uv run pytest -q
-uv run make -C docs html
-```
-
-Knowledge-base fixtures and tests must not contain patient data, credentials,
-or machine-local paths. Generated output belongs in `temp/generated_exports/`
-or a test-local temporary directory.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor and release
-workflow, [CHANGELOG.md](CHANGELOG.md) for release notes, and
-[SECURITY.md](SECURITY.md) for responsible vulnerability reporting.
+Questions, documentation fixes, synthetic examples, and code changes are useful
+ways to contribute. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for setup,
+checks, and pull requests. See [CHANGELOG.md](CHANGELOG.md) for release notes
+and [SECURITY.md](SECURITY.md) for vulnerability reporting.
 
 For scoped repository navigation, start at [structure.yml](structure.yml) and
 follow the [agent context guide](docs/agent_context.md).

@@ -108,6 +108,8 @@ def _editor_graph_bundle_zip() -> bytes:
                 [
                     "- model: finding",
                     "  name: editor_finding",
+                    "  name_de: Editorbefund",
+                    "  name_en: Editor finding",
                     "  description: Finding published by the terminology editor.",
                 ]
             )
@@ -135,6 +137,8 @@ def _editor_graph_bundle_zip() -> bytes:
                 [
                     "- model: examination",
                     "  name: editor_examination",
+                    "  name_de: Editoruntersuchung",
+                    "  name_en: Editor examination",
                     "  description: Examination published by the terminology editor.",
                     "  findings:",
                     "    - editor_finding",

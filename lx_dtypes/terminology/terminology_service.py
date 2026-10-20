@@ -10,16 +10,13 @@ import fcntl
 import json
 import os
 import shutil
-import stat
-import zipfile
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from hashlib import sha256
-from io import BytesIO
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory
-from typing import Any, Protocol
+from typing import Any
 
 import yaml
 
@@ -39,6 +36,11 @@ from lx_dtypes.models.interface.remote_data_roots import (
     resolve_remote_data_root,
 )
 from lx_dtypes.models.knowledge_base import KB_MODEL_NAMES_ORDERED
+from lx_dtypes.package_archive import (
+    BinaryUpload,
+    PackageArchiveError,
+    read_package_zip,
+)
 from lx_dtypes.utils.parser import camel_to_snake
 
 from .terminology_schemas import (
@@ -49,10 +51,6 @@ from .terminology_schemas import (
 )
 
 Identity = tuple[str, str]
-
-
-class BinaryUpload(Protocol):
-    def read(self, size: int = -1, /) -> bytes: ...
 
 
 class TerminologyError(Exception):
@@ -278,6 +276,8 @@ class TerminologyService:
         )
 
     def import_zip(self, upload: BinaryUpload) -> ImportTerminologyBundleResponse:
+        from lx_dtypes.packages import PackageValidationError, load_package
+
         files = self._zip_files(upload)
         try:
             config = yaml.safe_load(files["config.yaml"].decode("utf-8"))
@@ -303,6 +303,10 @@ class TerminologyService:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(content)
             self._load_paths(identity, [staged])
+            try:
+                load_package(staged / name / "config.yaml")
+            except PackageValidationError as exc:
+                raise TerminologyError(400, str(exc)) from exc
             with self._lock():
                 payload, _ = self._snapshot(allow_missing=True)
                 versions = payload.modules.setdefault(name, {})
@@ -576,75 +580,11 @@ class TerminologyService:
 
     def _zip_files(self, upload: BinaryUpload) -> dict[str, bytes]:
         try:
-            content = upload.read(self.max_zip_bytes + 1)
-        except (OSError, ValueError) as exc:
-            raise TerminologyError(400, "Terminology ZIP could not be read.") from exc
-        if len(content) > self.max_zip_bytes:
-            raise TerminologyError(413, "Terminology ZIP exceeds the upload limit.")
-        files: dict[str, bytes] = {}
-        directories: set[str] = set()
-        try:
-            with zipfile.ZipFile(BytesIO(content)) as archive:
-                if len(archive.infolist()) > self.max_files:
-                    raise TerminologyError(
-                        413, "Terminology ZIP contains too many entries."
-                    )
-                remaining = self.max_unpacked_bytes
-                for info in archive.infolist():
-                    raw = info.orig_filename.replace("\\", "/")
-                    path = PurePosixPath(raw)
-                    if (
-                        path.is_absolute()
-                        or ".." in path.parts
-                        or "\0" in raw
-                        or not path.parts
-                    ):
-                        raise TerminologyError(400, "Unsafe ZIP entry path.")
-                    if stat.S_ISLNK(info.external_attr >> 16):
-                        raise TerminologyError(400, "ZIP symlinks are not supported.")
-                    if (
-                        info.is_dir()
-                        or raw.endswith("/")
-                        or path.parts[0] == "__MACOSX"
-                        or path.name == ".DS_Store"
-                    ):
-                        continue
-                    name = path.as_posix()
-                    parents = {
-                        parent.as_posix() for parent in path.parents if parent.parts
-                    }
-                    if (
-                        name in files
-                        or name in directories
-                        or parents.intersection(files)
-                    ):
-                        raise TerminologyError(
-                            400,
-                            "ZIP contains duplicate or conflicting file paths.",
-                        )
-                    directories.update(parents)
-                    if info.file_size > remaining:
-                        raise TerminologyError(
-                            413, "Unpacked terminology exceeds the size limit."
-                        )
-                    with archive.open(info) as source:
-                        data = source.read(remaining + 1)
-                    remaining -= len(data)
-                    if remaining < 0:
-                        raise TerminologyError(
-                            413, "Unpacked terminology exceeds the size limit."
-                        )
-                    files[name] = data
-        except (zipfile.BadZipFile, RuntimeError, NotImplementedError, OSError) as exc:
-            raise TerminologyError(
-                400, "Terminology upload must be a readable ZIP file."
-            ) from exc
-        if "config.yaml" not in files and files:
-            roots = {name.split("/", 1)[0] for name in files}
-            if len(roots) == 1 and all("/" in name for name in files):
-                files = {name.split("/", 1)[1]: value for name, value in files.items()}
-        if "config.yaml" not in files:
-            raise TerminologyError(
-                400, "Terminology ZIP must contain a root config.yaml."
+            return read_package_zip(
+                upload,
+                max_zip_bytes=self.max_zip_bytes,
+                max_unpacked_bytes=self.max_unpacked_bytes,
+                max_files=self.max_files,
             )
-        return files
+        except PackageArchiveError as exc:
+            raise TerminologyError(exc.status, str(exc)) from exc

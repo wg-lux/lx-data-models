@@ -1,7 +1,19 @@
 # Contributing to lx-data-models
 
-Thanks for helping improve `lx-dtypes`! This guide describes how to work on the
-project, from setting up your environment to preparing releases.
+You can help through questions, domain feedback, documentation, examples, tests,
+or code. This guide covers setup, review, and releases.
+
+## Choose a starting point
+
+1. Follow the [reader roadmap](docs/index.md#reader-roadmap) to explore the package.
+2. Try an example with synthetic data. Report unclear steps or unexpected results
+   in the [issue tracker](https://github.com/wg-lux/lx-data-models/issues).
+3. Choose a small fix. For larger changes, open an issue to discuss scope and
+   compatibility with maintainers.
+4. Submit a focused pull request with your changes and verification results.
+
+You can suggest a documentation correction without setting up Python. Use the
+environment below to run examples, build documentation, or change code.
 
 ## Code of Conduct
 
@@ -19,7 +31,7 @@ participation to keep the community safe and productive.
    git remote add upstream https://github.com/wg-lux/lx-data-models.git
    ```
 
-2. **Install the development environment** (Python 3.12 only)
+2. **Install the development environment** with Python 3.12 and `uv`
 
    ```bash
    uv sync --extra dev
@@ -34,67 +46,67 @@ participation to keep the community safe and productive.
 
 ## Development Workflow
 
-- **Coding style**: Use `ruff format` (or `black`) and `ruff check`. Configure
-  IDEs to enforce 88-character lines.
-- **Static typing**: Run `uv run pyright` before submitting. CI also checks the
-  package with mypy.
-- **Testing**: All changes must pass `pytest` with coverage ≥70% (configured via
-  `pyproject.toml`).
-- **Docs**: If you change APIs or behavior, update the Sphinx docs in `docs/`
-   and relevant docstrings. Always rebuild locally before opening a PR.
-- **Commits**: Keep commits focused. Use descriptive titles (optionally
-  Conventional Commits). Reference issues/PRs when applicable.
+- **Style**: Run `uv run ruff format` and `uv run ruff check`. Use 88-character lines.
+- **Types**: Run `uv run pyright` for code changes.
+- **Tests**: Run focused tests while developing. CI runs the full suite with a
+  70% coverage threshold.
+- **Docs**: Update the guides and docstrings when APIs or behavior change.
+  Build changed documentation before opening a pull request.
+- **Commits**: Keep each change focused and use a descriptive title.
 
 ### Package Boundary Rules
 
-- Treat `lx-data-models` as a package consumed by sibling services.
-- Prefer imports from public package modules instead of deep leaf modules when
-  those exports exist.
-- Never import package tests, test fixtures, or example scripts from consumer
-  applications.
-- Example/demo outputs belong under `temp/generated_exports/`.
-- Tests must use `tmp_path` or dedicated fixture directories rather than
-  repository-root generated files.
+Use public package imports in consuming applications. Keep fixtures and example
+scripts in development workflows. Write generated examples to
+`temp/generated_exports/` and test output to `tmp_path`. Keep fixtures synthetic
+and free of patient data, credentials, and machine-local paths.
+
+See the [package boundary guide](docs/guides/package_boundary.md) for the full
+contract. Before authoring terminology YAML, read the
+[package structure guide](docs/guides/dtypes-package-structure.md).
 
 ## Pre-commit Hooks (optional but recommended)
 
 ```bash
-pip install pre-commit
-pre-commit install
-pre-commit run --all-files
+uv run pre-commit install
+uv run pre-commit run --all-files
 ```
 
-The provided configuration runs the same commands as CI, but with local
-auto-fix for lint/format issues: `ruff --fix lx_dtypes tests`, `ruff format
-lx_dtypes tests`, `mypy lx_dtypes`, and the full `pytest` suite. Because the
-hooks run against the whole repository (`pass_filenames: false`), a passing
-local run guarantees that CI will agree.
+The hooks run Ruff, context-manifest validation, and knowledge-base YAML linting
+across the repository. Ruff may update files. CI also runs Pyright and pytest;
+passing the hooks covers part of those checks.
 
 ## Documentation Workflow
 
-1. Install the documentation extras (already included in `.[dev]`):
+The development environment includes the documentation dependencies.
+
+1. Edit the existing guide for the topic. Keep sentences short and link to
+   detailed contracts instead of repeating them. Give new guides a clear owner
+   and topic.
+2. Build the site and check links:
    ```bash
-   pip install -e ".[docs]"
-   ```
-2. Build the HTML site and verify links:
-   ```bash
-   make -C docs html
-   make -C docs linkcheck
+   uv run make -C docs html
+   uv run make -C docs linkcheck
    ```
 3. Keep generated files under `docs/_build/` out of version control.
 
 ## Submitting Changes
 
-1. Ensure lint, type-checks, and tests pass:
+1. Run the checks relevant to your change. For code changes:
    ```bash
-   ruff check lx_dtypes tests
-   pyright
-   pytest
+   uv run ruff check lx_dtypes tests
+   uv run pyright
+   uv run pytest tests -q --cov=lx_dtypes
    ```
-2. Update `CHANGELOG.md` under `Unreleased`.
+   For every change, validate the repository context:
+   ```bash
+   uv run python scripts/lint_structure.py
+   ```
+2. Update `CHANGELOG.md` under `Unreleased` for user-visible changes.
 3. Push your branch and open a pull request against `wg-lux:main`.
-4. Fill out the PR template describing motivation, changes, and testing.
-5. Address review feedback promptly; stay responsive until merge.
+4. Describe the problem, resulting behavior, and checks run in the PR template.
+   Include any failures or checks you could not run.
+5. Work with reviewers to resolve feedback.
 
 ## Release Checklist
 
@@ -131,5 +143,6 @@ lx-dtypes-kb-registry add-current /path/to/kb_registry.json --module report_temp
 
 ## Need Help?
 
-Open a discussion or issue on GitHub, or reach out to the maintainers listed in
-`pyproject.toml`. Happy modeling!
+Open an issue on GitHub or contact the maintainers listed in `pyproject.toml`.
+Include the step you tried, your expected result, and a synthetic example when
+reporting a problem.

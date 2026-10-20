@@ -116,10 +116,10 @@ def test_selected_export_validates_serialized_identity_and_finalization() -> Non
         },
     }
     payload = {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "generated_at": "2026-10-13T09:00:00Z",
         "case_id": "12345678-1234-1234-1234-123456789012",
-        "patient_pseudonym": "synthetic",
+        "patient_id": 1,
         "center_key": None,
         "is_closed": False,
         "examinations": [record],

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
 from typing import Literal, NotRequired, TypedDict, cast
+from uuid import UUID
 
 from pydantic import (
     BaseModel,
@@ -13,6 +15,7 @@ from pydantic import (
 )
 
 from .json_types import JsonObject, JsonValue
+from .study_exchange import StudyExchangeBundle
 from .video_provenance import VideoProvenanceBundle, VideoProvenanceRecovery
 
 type HubTransferJsonScalar = str | int | float | bool | None
@@ -38,8 +41,8 @@ class HubTransferVideoFilePayloadData(TypedDict):
 
 
 class HubTransferSensitiveMetaPayloadData(TypedDict):
-    patient_hash: str
-    examination_hash: str
+    patient_uuid: str
+    examination_uuid: str
 
 
 class HubTransferVideoStatePayloadData(TypedDict, total=False):
@@ -159,7 +162,7 @@ class HubTransferVideoTransferPayloadData(TypedDict):
     processing_policy: str
     processing_intent: str
     cleanup_policy: str
-    payload_schema_version: Literal["3.0"]
+    payload_schema_version: Literal["5.0"]
     resource_rows: HubTransferVideoResourceRowsData
     processing_snapshot: HubTransferProcessingSnapshotData
     provenance: NotRequired[HubTransferProvenanceData]
@@ -176,7 +179,7 @@ class HubTransferReportTransferPayloadData(TypedDict):
     processing_policy: str
     processing_intent: str
     cleanup_policy: str
-    payload_schema_version: Literal["3.0"]
+    payload_schema_version: Literal["5.0"]
     resource_rows: HubTransferReportResourceRowsData
     processing_snapshot: HubTransferProcessingSnapshotData
     provenance: NotRequired[HubTransferProvenanceData]
@@ -200,8 +203,8 @@ class HubTransferVideoFilePayload(_StrictPayload):
 
 
 class HubTransferSensitiveMetaPayload(_StrictPayload):
-    patient_hash: str = Field(min_length=1)
-    examination_hash: str = Field(min_length=1)
+    patient_uuid: UUID = Field(strict=False)
+    examination_uuid: UUID = Field(strict=False)
 
 
 class HubTransferVideoStatePayload(_StrictPayload):
@@ -354,7 +357,7 @@ class _HubTransferPayload(_StrictPayload):
     processing_policy: str = Field(min_length=1)
     processing_intent: str = Field(min_length=1)
     cleanup_policy: str = Field(min_length=1)
-    payload_schema_version: Literal["3.0"]
+    payload_schema_version: Literal["5.0"]
     processing_snapshot: HubTransferProcessingSnapshotPayload
     provenance: HubTransferProvenancePayload | None = None
 
@@ -412,6 +415,62 @@ class HubTransferVideoTransferPayload(_HubTransferPayload):
 class HubTransferReportTransferPayload(_HubTransferPayload):
     resource_kind: Literal["report"]
     resource_rows: HubTransferReportResourceRowsPayload
+
+
+class HubTransferStudyResourceRowsPayload(_StrictPayload):
+    study_exchange: StudyExchangeBundle
+
+    @field_validator("study_exchange", mode="before")
+    @classmethod
+    def parse_exchange(cls, value: object) -> StudyExchangeBundle:
+        from lx_dtypes.study_exchange import parse_study_exchange
+
+        if isinstance(value, StudyExchangeBundle):
+            return parse_study_exchange(value.model_dump_json())
+        if isinstance(value, dict):
+            return parse_study_exchange(json.dumps(value))
+        raise ValueError("study_exchange must be a typed bundle or JSON object")
+
+
+class HubTransferStudyTransferPayload(_HubTransferPayload):
+    """Standalone immutable study evidence; no media processing is requested."""
+
+    resource_kind: Literal["study"] = "study"
+    resource_rows: HubTransferStudyResourceRowsPayload
+    transfer_mode: str = "metadata_only"
+    processing_policy: str = "ingest_only_no_processing"
+    processing_intent: str = "sender_requests_archive_only"
+    cleanup_policy: str = "retain_all"
+    transfer_key: str = Field(min_length=1, max_length=255)
+
+    @model_validator(mode="after")
+    def validate_study_identity(self) -> HubTransferStudyTransferPayload:
+        from lx_dtypes.study_exchange import study_exchange_digest
+
+        expected_policies = {
+            "transfer_mode": "metadata_only",
+            "processing_policy": "ingest_only_no_processing",
+            "processing_intent": "sender_requests_archive_only",
+            "cleanup_policy": "retain_all",
+        }
+        if any(
+            getattr(self, name) != value for name, value in expected_policies.items()
+        ):
+            raise ValueError("Study transfers require metadata-only archival policies")
+        digest = study_exchange_digest(self.resource_rows.study_exchange)
+        if self.resource_hash != digest:
+            raise ValueError("Study resource_hash must match canonical bundle digest")
+        if self.transfer_key != f"{self.source_node_key}__study__{digest}__metadata_v1":
+            raise ValueError("Study transfer_key must match source and bundle identity")
+        if not self.processing_snapshot.sender_processing_success:
+            raise ValueError("Study transfer requires validated sender metadata")
+        return self
+
+
+def validate_hub_transfer_study_payload(
+    value: Mapping[str, JsonValue],
+) -> HubTransferJsonObject:
+    return _validate_payload(HubTransferStudyTransferPayload, value)
 
 
 def _validate_payload(
@@ -499,6 +558,8 @@ __all__ = [
     "HubTransferSegmentValidationState",
     "HubTransferSensitiveMetaPayload",
     "HubTransferSensitiveMetaPayloadData",
+    "HubTransferStudyResourceRowsPayload",
+    "HubTransferStudyTransferPayload",
     "HubTransferVideoFilePayload",
     "HubTransferVideoFilePayloadData",
     "HubTransferVideoResourceRowsData",
@@ -512,6 +573,7 @@ __all__ = [
     "validate_hub_transfer_processing_snapshot",
     "validate_hub_transfer_report_payload",
     "validate_hub_transfer_report_resource_rows",
+    "validate_hub_transfer_study_payload",
     "validate_hub_transfer_video_payload",
     "validate_hub_transfer_video_resource_rows",
 ]

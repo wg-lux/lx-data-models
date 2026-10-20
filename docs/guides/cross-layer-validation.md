@@ -8,6 +8,22 @@ rules from loose dictionaries.
 This contract is maintained by the `lx_dtypes` maintainers and is the canonical
 guide to advisory validation and strict boundary validation.
 
+## Single source of truth
+
+The knowledge-base model registry defines supported package records; the parser
+owns aliases; `KnowledgeBaseConfig` and `DataLoader` own manifest normalization
+and dependency selection. Authoring checks consume these definitions rather than
+maintaining a second schema or dependency resolver. `CoreConceptCollection`
+owns concept-graph invariants, and the reporting readiness engine owns template
+publication checks.
+
+For one explicit manifest, `lx_dtypes.packages.validate_package` composes those
+checks with optional ledger examinations through `assess_examination`. It does
+not introduce another clinical rule engine. Invalid package graphs prevent ledger
+assessment. Creation and strict loading use the same package check as the `ok`
+CLI; the [package workflow](dtypes-package-structure.md#create-load-and-validate-from-python)
+documents the public API and its distinction from runtime registry loading.
+
 ## Advisory validation during data capture
 
 Use `lx_dtypes.validation` when incomplete or inconsistent input should produce
@@ -127,6 +143,26 @@ loaded knowledge base. `canonical_payload_to_storage()` validates an incoming
 snapshot before producing storage-oriented records. An incomplete graph is
 therefore rejected on either side of the contract boundary.
 
+## Complete package persistence
+
+`build_package_snapshot(kb)` and `restore_package_snapshot(snapshot)`, exported
+from `lx_dtypes.models.contracts`, preserve all registered knowledge-base record
+families using their owning models. This includes validators, study presets,
+reference catalogues and optional employee definitions in addition to the
+frontend concept graph. Snapshots retain exact resolved module versions and
+report-template lifecycle states, validate canonical graph relationships, and
+exclude local source and data paths.
+
+Hosts compare the semantic `snapshot_id` when enforcing immutable imports.
+Digest normalization excludes runtime UUID/timestamp metadata on owning
+`AppBaseModel` instances; it does not discard similarly named keys from arbitrary
+domain payloads. Persisted snapshots are validated again before restoration.
+Older projection-only receipts remain readable but cannot reconstruct omitted
+package families; they must not be silently presented as complete snapshots.
+The snapshot contract requires an explicit migration when the runtime model-family
+registry changes; missing families are not filled from current package files.
+Persistence tables, access control and import transactions remain host-owned.
+
 ## Localization ownership
 
 Localization is domain data, not frontend presentation inference:
@@ -154,6 +190,125 @@ columns by the host application rather than only inside editor JSON.
 This package does not own application transactions, ORM relations, or frontend
 state. Those layers can rely on the validated contract but remain responsible
 for authorization, atomic persistence, and presentation behavior.
+
+## Study collection persistence
+
+`lx_dtypes.models.contracts.StudyCollectionRecord` binds the existing
+`DtypesRecordPersistencePayload` and `ValidationReport` to persistent study,
+optional cohort, and host examination UUIDs. It requires complete matching KB
+identities, assessment time and language, and the report template name whenever
+study rules were evaluated. Contract or terminology errors prevent collection;
+failed study criteria remain valid observations and retain their original issues.
+Ledger UUIDs and host examination UUIDs are separate identities.
+The required `package_snapshot_id` pins the immutable `PackageSnapshot` digest
+used for assessment. Hosts resolve this reference to their preserved snapshot and
+verify its digest before evaluating or restoring collection data.
+Canonical `StudyDefinition` and optional `CohortDefinition` snapshots preserve
+the definitions at collection time; cohort identity and definition are paired.
+
+Hosts compute the report with `assess_examination` against the selected package
+and supplied ledger before constructing the record. The contract verifies shape
+and provenance consistency; it cannot prove that an externally supplied report
+was actually computed for that ledger. Hosts must verify study/cohort membership
+and examination/patient linkage, and store the observation and assessment
+atomically. Raw ledger descriptor values are retained without substituting study
+results. Read JSON with `StudyCollectionRecord.model_validate_json`; normal
+`model_dump_json` round trips include and verify the report's computed `ok` value.
+
+## Dataset study statistics
+
+`StudyMetadata.analysis_definitions` carries versioned
+`StudyAnalysisDefinition` objects alongside authored hypotheses. Definitions
+declare an exact terminology identity, the finding used as the analysis unit,
+population rules, comparison groups and explicit positive/negative endpoint
+rules. Every analysis dependency must also appear in
+`terminology_requirements`. Drafts may describe unresolved protocol decisions;
+they cannot produce statistics until those decisions have been resolved.
+An absent or empty analysis list preserves legacy setup and package digests;
+authored analysis rules become part of their content identity.
+
+`lx_dtypes.stats.evaluate_study_dataset` validates definitions against the
+knowledge base and evaluates authorized canonical ledger examinations. Rules
+combine bounded predicates with `all` or `any`; no Python, SQL or arbitrary
+expressions are accepted. Missing inputs remain unknown rather than becoming
+negative outcomes. Results retain the analysis digest and exact KB identity,
+population exclusions, ambiguous group assignments and per-endpoint numerator,
+denominator, missingness and conflict counts. A zero denominator produces
+`rate=None`.
+
+The host owns dataset access and candidate membership. It must report missing
+ledger records and records excluded for a different terminology version, and
+must not substitute the current active package for historical observations.
+The lx-annotate cohort editor saves these same definitions and requests server
+evaluation over the complete authorized dataset scope, independently of the
+paginated examination preview.
+
+For ColoReg, `assemble_coloreg_analysis_units` binds the original polyp,
+index resection and follow-up roles using explicit lesion references. Missing
+or out-of-scope history remains unavailable. The
+[ColoReg specification](coloreg-resection-study.yml) owns endpoint meanings,
+protocol decisions and denominator choices.
+
+This is a descriptive statistics method, not a hypothesis significance test.
+Additional methods can consume the versioned definitions, validated analysis
+units and typed results without adding a second terminology or ledger
+validator. Inferential estimates, patient-level clustering, observation-window
+event aggregation and protocol adjudication require their own explicit method
+contracts; this implementation does not infer them from a displayed rate.
+
+## Study exchange and researcher spreadsheets
+
+`StudyExchangeBundle` is the shared evidence contract for hub transfer and
+Excel. It contains current study/cohort definitions, historical
+`StudyCollectionRecord` observations and assessments, exact `PackageSnapshot`
+dependencies, and persistent patient/examination UUID links. Historical
+definitions remain distinct from currently edited definitions. Local study
+primary keys, dataset primary keys and sender permissions are not portable.
+
+The bundle validates dependency closure and recomputes each assessment through
+the canonical knowledge base and ledger validator. Hosts convert local ledger
+patient references to persistent UUIDs on export and resolve them back only
+within the receiving researcher's authorized scope. A receiving host must
+already have the exact package snapshots and matching patient/examination
+identities. Import is explicit and transactional; conflicting content is never
+merged by guessing, and an identical replay is idempotent.
+
+```python
+from lx_dtypes.study_exchange import (
+    parse_study_exchange,
+    study_exchange_from_xlsx,
+    study_exchange_to_xlsx,
+)
+
+bundle = parse_study_exchange(canonical_json)
+workbook_bytes = study_exchange_to_xlsx(bundle)
+restored = study_exchange_from_xlsx(workbook_bytes)
+```
+
+The workbook provides readable definitions, collection provenance, repeated
+finding identities, typed scalar observations, units and evaluation issues.
+Chunked canonical JSON retains the complete contract. Strings are literal
+cells, and archive, worksheet and cell bounds prevent silent truncation.
+Import verifies readable sheets against the canonical representation and
+rejects formulas or edited projections. This workbook is a lossless exchange
+format, not a second editable ledger.
+
+For existing or edited research spreadsheets, use the separate, existing
+`TableMapping` contract in `lx_dtypes.models.contracts.table_import`. Explicit
+column names and `values` mappings translate local wording to exact-version
+concept identifiers. A classification may use the original column shorthand,
+or `choice` plus a `descriptors` mapping. Each descriptor names its source
+column and source representation (`text`, `integer`, `number`, `boolean` or
+`selection`); its knowledge-base definition remains authoritative for type,
+bounds and admissible values. The parser converts source representation and
+delegates value validation to that owning definition. It does not invent
+terminology or execute mapping expressions.
+
+These transports share the same stored collections. Host workflows explicitly
+capture validated ledger observations before export; export itself does not
+create evidence. Receiving a hub archive does not assign a local owner or
+activate a cohort. The authenticated receiving researcher accepts it through
+the same host import service used for workbooks.
 
 ## Consumer review checklist
 

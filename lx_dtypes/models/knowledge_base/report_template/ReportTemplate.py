@@ -1,6 +1,7 @@
 import datetime
+import json
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
@@ -59,6 +60,21 @@ class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):
     validators: ReportTemplateValidators = Field(
         default_factory=ReportTemplateValidators
     )
+
+    @field_validator("guideline_references", mode="before")
+    @classmethod
+    def parse_json_guideline_references(
+        cls, value: object, info: ValidationInfo
+    ) -> object:
+        # The inherited list-normalization validator materializes JSON objects
+        # as Python dictionaries. Restore JSON semantics for strict native dates
+        # without accepting string dates at the Python construction boundary.
+        if info.mode == "json" and isinstance(value, list):
+            return [
+                ReportTemplateGuidelineReference.model_validate_json(json.dumps(item))
+                for item in value
+            ]
+        return value
 
     @classmethod
     def list_type_fields(cls) -> list[str]:

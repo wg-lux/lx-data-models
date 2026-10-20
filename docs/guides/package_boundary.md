@@ -13,6 +13,13 @@ applications such as `endoreg-db`.
 
 ## Rules
 
+Browser patient contracts expose local record IDs, never identity matching
+hashes. `PatientExaminationPatientDataPayload` and `PatientPseudonymPayload`
+omit `patient_hash`; `StudyCohortCaseRow` uses `patient_id` and examination IDs
+instead of patient/case hashes. This is a breaking wire-contract change;
+upgrade backend producers and frontend consumers together. Local hash matching
+remains the host application's responsibility.
+
 - Import through public package modules when an `__init__.py` export exists.
 - Do not import test modules, test fixtures, or example scripts from consuming
   applications.
@@ -84,3 +91,18 @@ canonical persisted attempt transitions and the host retains fencing/publication
 A validated empty provider response may continue the configured local extraction
 chain. In that case fallback records `provider_attempted=true` without a failure
 code; this distinguishes normal empty-response fallback from provider failure.
+
+## Hub patient linkage
+
+Hub transfer version `5.0` uses `patient_uuid` and `examination_uuid`, following
+lx-data-models' persisted random UUID identity policy. The source generates each
+UUID once; transfers and retries preserve it. Local integer primary keys and
+demographic hashes are rejected. Content hashes continue to identify source
+artifacts and verify processed bytes; they do not identify patients.
+
+Receivers preserve both UUIDs and enforce authenticated source ownership and
+examination-to-patient linkage. Conflicting ownership fails rather than merging
+patients. Neither identity hashes nor identity salts are exchanged. Deploy shared
+contracts, sender, receiver and the host UUID backfill migration together.
+Versions `3.0` and `4.0` are rejected; existing transfers require explicit
+reconciliation rather than guessed identity mappings.

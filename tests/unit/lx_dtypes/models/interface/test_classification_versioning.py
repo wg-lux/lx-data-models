@@ -29,6 +29,7 @@ from lx_dtypes.numeric_classification import (
     read_rules,
     validate_measurement_source,
 )
+from tests.fixtures.lx_dtypes.models.interface import assert_retained_release_warnings
 
 ROOT = Path(__file__).resolve().parents[5]
 
@@ -91,8 +92,10 @@ def measurement(value: float = 6.0, **changes: object) -> NumericMeasurement:
 
 
 def test_table4_through_registry_preserves_sources() -> None:
-    results = run_comparison(
-        ROOT / "demo-data/classification_versioning/measurements.yml"
+    results = assert_retained_release_warnings(
+        lambda: run_comparison(
+            ROOT / "demo-data/classification_versioning/measurements.yml"
+        )
     )
     assert len(results) == 10
     for old, new in zip(results[:5], results[5:], strict=True):
@@ -231,7 +234,9 @@ def test_duplicate_yaml_rule_keys_fail(tmp_path: Path) -> None:
 
 
 def test_repaired_star_snapshot_and_real_ledger_measurements() -> None:
-    kb: KnowledgeBase = load_knowledge_base("star_upper_gi", version="0.1.1.post1")
+    kb: KnowledgeBase = assert_retained_release_warnings(
+        lambda: load_knowledge_base("star_upper_gi", version="0.1.1.post1")
+    )
     kb.export_core_concepts()
     assert (len(kb.finding), len(kb.classification), len(kb.classification_choice)) == (
         22,

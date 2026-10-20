@@ -10,6 +10,7 @@ from pytest import MonkeyPatch
 
 from lx_dtypes.django.api import main as api_main
 from lx_dtypes.terminology import terminology_loader as central
+from tests.fixtures.lx_dtypes.models.interface import separate_report_terminology
 
 
 @pytest.mark.parametrize("access", ["allowed", "anonymous", "denied"])
@@ -120,6 +121,7 @@ def test_builder_save_publish_and_unpublish_flow(
         encoding="utf-8",
     )
 
+    separate_report_terminology(module_dir, module_dir / "kb.yaml")
     client = Client()
     save_response = client.post(
         "/base_api/report-templates/builder/templates",
@@ -262,6 +264,7 @@ def test_builder_module_kb_loader_uses_resolved_version(
         _fake_load_knowledge_base,
     )
 
+    separate_report_terminology(module_dir, module_dir / "kb.yaml")
     client = Client()
     response = client.post(
         "/base_api/report-templates/builder/templates",

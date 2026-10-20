@@ -27,7 +27,6 @@ class PatientPseudonymPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     patient_id: int | str
-    patient_hash: str = Field(min_length=1)
     source: Literal["server"]
     persisted: bool
     message: str = Field(min_length=1)

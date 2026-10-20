@@ -1,22 +1,24 @@
-from typing import TypedDict, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, TypedDict, Union
 
 from .DataDict import (
     PIndicationClassificationDataDict,
     SerializedPIndicationClassificationDataDict,
 )
-from .Django import PIndicationClassificationDjango
 from .Pydantic import PIndicationClassification
+
+if TYPE_CHECKING:
+    from .Django import PIndicationClassificationDjango
+
+    l_p_indication_classification_django_lookup: (
+        LPIndicationClassificationDjangoLookupType
+    )
+    type l_p_indication_classification_django_models = PIndicationClassificationDjango
 
 
 class LPIndicationClassificationDjangoLookupType(TypedDict):
     PIndicationClassification: type[PIndicationClassificationDjango]
-
-
-l_p_indication_classification_django_lookup = (
-    LPIndicationClassificationDjangoLookupType(
-        PIndicationClassification=PIndicationClassificationDjango,
-    )
-)
 
 
 class LPIndicationClassificationLookupType(TypedDict):
@@ -39,7 +41,6 @@ l_p_indication_classification_ddicts = Union[
     PIndicationClassificationDataDict,
     SerializedPIndicationClassificationDataDict,
 ]
-l_p_indication_classification_django_models = Union[PIndicationClassificationDjango]
 
 __all__ = [
     "LPIndicationClassificationDjangoLookupType",
@@ -53,3 +54,23 @@ __all__ = [
     "l_p_indication_classification_lookup",
     "l_p_indication_classification_models",
 ]
+
+
+def __getattr__(name: str) -> object:
+    if name not in {
+        "PIndicationClassificationDjango",
+        "l_p_indication_classification_django_lookup",
+        "l_p_indication_classification_django_models",
+    }:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    from .Django import PIndicationClassificationDjango
+
+    exports: dict[str, object] = {
+        "PIndicationClassificationDjango": PIndicationClassificationDjango,
+        "l_p_indication_classification_django_lookup": LPIndicationClassificationDjangoLookupType(
+            PIndicationClassification=PIndicationClassificationDjango
+        ),
+        "l_p_indication_classification_django_models": PIndicationClassificationDjango,
+    }
+    globals().update(exports)
+    return exports[name]

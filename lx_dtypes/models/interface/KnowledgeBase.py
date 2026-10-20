@@ -21,6 +21,7 @@ from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelUUIDTags import (
 )
 from lx_dtypes.models.contracts import kb_to_core_concepts_payload
 from lx_dtypes.models.contracts.finding_extraction import FindingTextExtractor
+from lx_dtypes.models.descriptor_value import DescriptorValue
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.interface.LookupTracker import KnowledgeBaseLookupTracker
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
@@ -360,6 +361,9 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         default_factory=dict
     )
     _reporting_modules: set[str] = PrivateAttr(default_factory=set)
+    _resolved_module_configs: dict[str, KnowledgeBaseConfig] = PrivateAttr(
+        default_factory=dict
+    )
 
     @property
     def is_reporting_package(self) -> bool:
@@ -1098,6 +1102,16 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             )
         return requirements
 
+    def _assert_descriptor_value(self, name: str, value: DescriptorValue) -> None:
+        definition = self.classification_choice_descriptor.get(name)
+        if definition is not None:
+            try:
+                definition.validate_value(value)
+            except ValueError as error:
+                raise SemanticAdmissibilityError(
+                    f"Invalid value for classification choice descriptor '{name}'."
+                ) from error
+
     def _assert_finding_classification_choice(
         self,
         finding_name: str,
@@ -1162,6 +1176,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                     "permitted for classification choice "
                     f"'{choice.classification_choice}'."
                 )
+            self._assert_descriptor_value(descriptor_name, descriptor.descriptor_value)
 
     def _assert_finding_admissibility(
         self,
@@ -1278,6 +1293,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                     "permitted for classification choice "
                     f"'{classification.classification_choice}'."
                 )
+            self._assert_descriptor_value(descriptor_name, descriptor.descriptor_value)
 
     def _assert_indication_admissibility(
         self,

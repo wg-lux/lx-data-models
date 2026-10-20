@@ -67,6 +67,104 @@ or select one release tree containing all required modules. Avoid a broad parent
 directory containing several releases of the same module. Every process using
 the registry must be able to read the registered paths.
 
+## Create, load, and validate from Python
+
+Use `lx_dtypes.packages` for authoring against the core contracts. It uses the
+same quality gate as `ok`: the runtime model registry, manifest/dependency
+resolver, canonical concept graph, and report-template readiness engine.
+Optional examination examples go through `assess_examination`, which parses
+the ledger model and checks its terminology identity, admissibility, and
+selected template rules.
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from lx_dtypes.models.knowledge_base.examination import Examination
+from lx_dtypes.packages import create_package, load_package, validate_package
+
+with TemporaryDirectory() as directory:
+    manifest = create_package(
+        Path(directory) / "training_terminology",
+        name="training_terminology",
+        version="1.0.0",
+        records=[Examination(
+            name="training_examination",
+            name_de="Schulungsuntersuchung",
+            name_en="Training examination",
+        )],
+    )
+    kb = load_package(manifest)
+    result = validate_package(manifest, examinations=[{
+        "patient": "synthetic_patient",
+        "examination": "training_examination",
+        **kb.config.knowledge_base_identity.model_dump(),
+    }], language="en")
+    assert result.ok
+```
+
+`create_package` writes `config.yaml` and native-list `records.yml` from registered
+Pydantic models. It checks staged output before making the destination available,
+cleans failed staging, and refuses existing destinations. Omit `records` to
+start an empty terminology package. For reporting or study packages, create
+terminology first and pass its module name through `depends_on`; dependencies
+must be available in the enclosing module tree. Never mix clinical definitions
+with report-template or study-preset records.
+
+`validate_package` returns source-located authoring `issues`, the loaded
+`knowledge_base`, and examination reports in input order. Authoring errors or
+warnings make `ok` false and skip examination assessment. Ledger warnings retain
+the advisory API's semantics; inspect each report's `issues` and
+`study_evaluated`. Pass `template_name` when examples must satisfy a particular
+template. No examples means no ledger assessment was performed.
+`load_package` raises `PackageValidationError` with the complete `result` if
+the authoring quality gate fails. These operations neither register nor activate
+packages and never persist patient data.
+
+Existing `load_knowledge_base` and `TerminologyService` APIs remain the runtime
+identity and registry interfaces, including for retained legacy releases.
+`load_package` is the strict authoring workflow for an explicit manifest.
+
+### Build and transport customized packages
+
+`build_package(destination, files, config_path="config.yaml")` accepts a mapping
+of portable relative filenames to UTF-8 strings or bytes. Include all module
+manifests and dependencies in the mapping; validation runs in an isolated staging
+tree before publishing the new folder. This is the common boundary for editors
+and report/study package builders. `create_package` remains the convenient typed
+record constructor when dependencies already live in the enclosing source tree.
+
+```python
+from lx_dtypes.packages import export_package, import_package
+
+archive = export_package(manifest, Path("/tmp/training-package.zip"))
+installed_manifest = import_package(archive, Path("/srv/terminology/training-package"))
+```
+
+Export preserves internal folder layout and opaque resources and includes the
+resolved dependency closure. External dependencies are copied below
+`dependencies/<module>/`; manifests must use portable relative data paths.
+Import accepts a `Path` or binary stream, with `config.yaml` at the ZIP root or
+inside a single enclosing folder. Both operations apply the strict package
+quality gate. ZIP decoding is shared with `TerminologyService`: the defaults
+are 32 MiB compressed, 128 MiB unpacked, and 4096 entries. Duplicate/conflicting
+paths, traversal, symlinks, and invalid packages fail before publication.
+Existing destination folders and ZIP files are never replaced. These functions
+do not register, activate, or persist clinical data.
+
+Hosts owning filesystem policy can use `read_package_archive` and
+`export_package_files` for validated `dict[str, bytes]` mappings, and
+`package_archive_bytes` for validated ZIP bytes, then publish using their own
+storage adapter. `load_registered_package(module_name, version=..., service=...)`
+resolves the exact host registry identity and validates it with the registered
+source roots, including dependencies in separate directories. It never switches
+to shipped defaults. Registered reads reject structural and graph errors but
+emit advisory authoring diagnostics as `PackageAuthoringWarning`, preserving
+historical package compatibility. The create/build/import/export and explicit
+`load_package` authoring workflows continue to reject all authoring warnings.
+For explicit manifests whose dependencies live in separate source directories,
+pass `input_dirs=[...]` to validation, loading, or export helpers; this replaces
+the inferred enclosing search tree.
+
 ## Choose where packages live
 
 There are three different locations; they need not be siblings:
@@ -361,10 +459,13 @@ lint the clinical data file:
 python scripts/lint_kb_yaml.py docs/examples/dtypes_packages/training_preset/training_terminology/examinations.yml
 ```
 
-The current standalone linter's model allowlist does not yet include
-`study_preset` and `center_employee_list`; linting the entire example manifest
-reports `unknown_model`. These records are supported by the normal package
-loader. Do not rename or discard them to satisfy that older allowlist.
+The linter derives supported record kinds and aliases from the runtime registry,
+including `study_preset`, `center_employee_list`, and `reference_catalog`.
+Check the complete example and dependency closure with:
+
+```sh
+ok --config docs/examples/dtypes_packages/training_preset/config.yaml
+```
 
 Load the exact identity through the real resolver to validate the whole package.
 This reads and validates

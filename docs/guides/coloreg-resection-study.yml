@@ -7,7 +7,8 @@ terminology:
   template: coloreg_colonoscopy
   template_version: 2.0.0
 study_document: lx_dtypes/data/study_metadata/coloreg_resection.yml
-scope: Authored study specification, not executable cohort filtering or a statistical analysis implementation.
+scope: Authored study specification with typed descriptive analysis rules; cohort authorization remains
+  host-owned and protocol-dependent analyses remain drafts.
 population:
   unit: Index attempted resection of one lesion; keep different lesions and repeat visits distinct.
   size:
@@ -30,8 +31,8 @@ population:
     - coloreg_technique_eftr
     notes: EFTR remains collectable. Retain primary attempted technique after crossover; report completion
       technique separately and prespecify assignment for analysis.
-  candidate_filters: StudySetupDefinition cannot express size thresholds, technique groups, or longitudinal
-    joins. Hosts must apply these explicitly to the captured observations.
+  candidate_filters: Cohort filters select candidate examinations. study_metadata.analysis_definitions
+    separately express size thresholds, technique groups and endpoints on validated lesion units.
 linkage:
   case: coloreg_case_id
   lesion: coloreg_lesion_id
@@ -122,8 +123,34 @@ analysis_requirements:
   new resections.
 - H0 is equal rates and H1 is different rates; these are authored comparisons, not evidence that techniques
   differ.
-- Host projection, frontend controls, longitudinal querying and statistical estimation require downstream
-  integration; package loading alone does not implement them.
+- Package loading alone does not evaluate a dataset. Hosts explicitly evaluate saved analysis definitions
+  against authorized, persisted ledger records and report missing records and package-version exclusions.
+executable_analysis:
+  contract: lx_dtypes.models.contracts.study_analysis.StudyAnalysisDefinition
+  evaluator: lx_dtypes.stats.evaluate_study_dataset
+  linkage: lx_dtypes.stats.study_linkage.assemble_coloreg_analysis_units
+  authoring: lx-annotate cohort study-metadata editor; definitions persist with the cohort and travel in
+    StudySetupDefinition YAML.
+  input: Exact-version validated knowledge base and ledger examinations with all finding occurrences.
+    Hosts supply only authorized records; unresolved links cannot expand the authorized dataset.
+  unit: One index resection finding linked to its original polyp, with optional preceding and outcome
+    follow-up findings. Repeated examinations do not automatically create new resection units.
+  rules: Bounded all/any predicates over classification choices or typed descriptors, with explicit
+    positive and negative outcomes. Missing inputs remain unknown, including for negation.
+  ready:
+  - histological_r0_emr_vs_esd
+  drafts:
+    primary_success_emr_vs_esd: Require exact approved primary-success protocol identifier and version.
+    follow_up_emr_vs_esd: Confirm conditioning interpretation and prespecify a follow-up horizon.
+    complications_emr_vs_esd: Index-event rules are provided; complete hypothesis requires a defined
+      window and longitudinal event aggregation, which the current descriptive evaluator does not supply.
+  results: Per-group numerator, denominator, negative, missing, ineligible, unknown-eligibility and
+    conflicting counts, plus population exclusions and ambiguous groups. Zero denominators have no rate.
+  histology: R0 denominator includes only R0 and R1. Rx, pending, no specimen and unknown have separate
+    descriptive counters among documented margin states; absent margin observations remain missing.
+  extension_boundary: Versioned rule definitions and typed descriptive results are the extension point
+    for additional statistics methods. No hypothesis rejection, p-values, confidence intervals or
+    adjustment for patient-level clustering is implemented by this descriptive method.
 references:
 - title: ESGE colorectal polypectomy and EMR guideline, update 2024
   url: https://www.esge.com/assets/downloads/pdfs/guidelines/2024_a-2304-3219.pdf

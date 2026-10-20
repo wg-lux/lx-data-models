@@ -11,6 +11,18 @@ boundaries:
 - Use temporary directories for generated artifacts
 - Do not expose fixtures as public package dependencies or include patient data
 entrypoints:
+- name: Study exchange tests
+  file: unit/lx_dtypes/models/contracts/test_study_exchange.py
+  purpose: Verify canonical bundle closure, UUID linkage, typed workbook round trips and tampering rejection
+- name: Study analysis tests
+  file: unit/lx_dtypes/stats/test_study.py
+  purpose: Verify canonical rule validation, explicit denominators and shipped ColoReg R0 evaluation
+- name: Study linkage tests
+  file: unit/lx_dtypes/stats/test_study_linkage.py
+  purpose: Verify lesion identity, chronology, missing references and longitudinal analysis roles
+- name: Study collection contract tests
+  file: unit/lx_dtypes/models/contracts/test_study_collection.py
+  purpose: Verify persistence provenance, strict boundaries, and observation round trips
 - name: Fixtures
   file: conftest.py
   purpose: Shared fixture registration
@@ -20,6 +32,9 @@ entrypoints:
 - name: Context tests
   file: test_structure.py
   purpose: Schema and manifest graph drift checks
+- name: Package workflow tests
+  file: unit/lx_dtypes/test_packages.py
+  purpose: Verify creation, portable ZIP roundtrips, archive rejection, explicit registry dependency loading, core graph checks, and ledger assessment
 dependencies:
   internal:
   - ../lx_dtypes

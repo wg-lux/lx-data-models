@@ -15,6 +15,7 @@ from lx_dtypes.models.knowledge_base.report_template.ReportTemplate import (
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateGraph import (
     validate_report_template_structure,
 )
+from tests.fixtures.lx_dtypes.models.interface import separate_report_terminology
 
 
 def test_report_template_example_module_yaml_json_roundtrip() -> None:
@@ -390,6 +391,7 @@ def report_template_module(tmp_path: Path, request: pytest.FixtureRequest) -> Pa
         yaml.safe_dump(records, sort_keys=False),
         encoding="utf-8",
     )
+    separate_report_terminology(module_dir, module_dir / "report_template.yaml")
     return module_dir
 
 
@@ -471,6 +473,7 @@ def test_report_template_validator_broken_alias_surfaces_warning(
         encoding="utf-8",
     )
 
+    separate_report_terminology(module_dir, module_dir / "report_template.yaml")
     loader = DataLoader(input_dirs=[module_dir.parent])
     loader.load_module_configs()
     kb = loader.load_knowledge_base(module_dir.name)

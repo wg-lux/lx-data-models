@@ -12,46 +12,23 @@ from pydantic import ValidationError
 from lx_dtypes.language import LANGUAGE_LABELS
 from lx_dtypes.models.contracts.reference_catalog import ReferenceCatalogPayload
 from lx_dtypes.models.interface.data_roots import module_search_root
-from lx_dtypes.utils.parser import CLINICAL_CONCEPT_MODELS, _reject_duplicate_keys
+from lx_dtypes.models.interface.DataLoader import DataLoader
+from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
+from lx_dtypes.models.knowledge_base import knowledge_base_models_lookup
+from lx_dtypes.utils.parser import (
+    CLINICAL_CONCEPT_MODELS,
+    _reject_duplicate_keys,
+    camel_to_snake,
+    normalize_model_name,
+)
+from lx_dtypes.utils.parser import (
+    MODEL_NAME_ALIASES as MODEL_NAME_ALIASES,  # noqa: PLC0414 - Public re-export.
+)
 
 LintSeverity = Literal["error", "warning"]
 
-MODEL_NAME_ALIASES: dict[str, str] = {
-    "finding_validator": "findings_validator",
-}
-
-KNOWN_MODEL_NAMES: set[str] = {
-    "reference_catalog",
-    "citation",
-    "classification",
-    "classification_type",
-    "classification_choice",
-    "classification_choice_descriptor",
-    "examination",
-    "examination_type",
-    "finding",
-    "finding_type",
-    "indication",
-    "indication_type",
-    "intervention",
-    "intervention_type",
-    "unit",
-    "unit_type",
-    "information_source",
-    "information_source_type",
-    "report_template_section",
-    "report_finding",
-    "findings_validator",
-    "classification_validator",
-    "intervention_validator",
-    "unit_validator",
-    "examination_validator",
-    "report_template",
-}
-
-
-def normalize_model_name(model_name: str) -> str:
-    return MODEL_NAME_ALIASES.get(model_name, model_name)
+# Runtime models and aliases are the authority for authoring tools too.
+KNOWN_MODEL_NAMES = {camel_to_snake(name) for name in knowledge_base_models_lookup}
 
 
 @dataclass(frozen=True)
@@ -188,145 +165,67 @@ def _discover_yaml_files_from_module_config(
             if isinstance(module_name, str) and module_name.strip():
                 module_index.setdefault(module_name.strip(), []).append(nested_resolved)
 
-    data = loaded.get("data")
-    if data is None:
-        # Aggregator modules can define only `modules`/`depends_on` without local YAML.
-        files: list[Path] = []
-    elif not isinstance(data, dict):
+    try:
+        config = KnowledgeBaseConfig.from_yaml_file(config_path)
+    except (ValueError, TypeError, OSError, yaml.YAMLError) as exc:
         return [], [
             _issue(
-                code="missing_config_data",
+                code="invalid_config",
                 severity="error",
                 file=config_path,
                 line=1,
                 column=1,
-                message="Config YAML must define a mapping under key 'data'.",
+                message=str(exc),
             )
         ]
-    else:
-        base_dir = config_path.parent
-        files = []
-
-        configured_files = data.get("files", [])
-        if isinstance(configured_files, list):
-            for rel_path in configured_files:
-                if not isinstance(rel_path, str):
-                    continue
-                file_path = (base_dir / rel_path).resolve()
-                if file_path.suffix in {".yaml", ".yml"}:
-                    files.append(file_path)
-
-        configured_dirs = data.get("dirs", [])
-        if isinstance(configured_dirs, list):
-            for rel_dir in configured_dirs:
-                if not isinstance(rel_dir, str):
-                    continue
-                dir_path = (base_dir / rel_dir).resolve()
-                if not dir_path.exists():
-                    issues.append(
-                        _issue(
-                            code="missing_config_data_dir",
-                            severity="warning",
-                            file=config_path,
-                            line=1,
-                            column=1,
-                            message=(
-                                f"Configured data directory does not exist: {dir_path}"
-                            ),
-                        )
-                    )
-                    continue
-                files.extend(sorted(dir_path.rglob("*.yaml")))
-                files.extend(sorted(dir_path.rglob("*.yml")))
-
-    def _resolve_module_config(
-        module_name: str,
-    ) -> tuple[Path | None, list[KbYamlLintIssue]]:
-        candidates = sorted(set(module_index.get(module_name, [])))
-        if not candidates:
-            directory_candidates = sorted(
-                {
-                    candidate
-                    for indexed_configs in module_index.values()
-                    for candidate in indexed_configs
-                    if candidate.parent.name == module_name
-                }
-            )
-            if len(directory_candidates) == 1:
-                mismatched_config = directory_candidates[0]
-                mismatched_loaded = yaml.safe_load(
-                    mismatched_config.read_text(encoding="utf-8")
-                )
-                declared_name = (
-                    mismatched_loaded.get("name")
-                    if isinstance(mismatched_loaded, dict)
-                    else None
-                )
-                declared_modules = (
-                    mismatched_loaded.get("modules")
-                    if isinstance(mismatched_loaded, dict)
-                    else None
-                )
-                if (
-                    isinstance(declared_name, str)
-                    and declared_name.strip()
-                    and isinstance(declared_modules, list)
-                    and declared_modules
-                ):
-                    return None, [
-                        _issue(
-                            code="aggregator_name_directory_mismatch",
-                            severity="warning",
-                            file=config_path,
-                            line=1,
-                            column=1,
-                            message=(
-                                f"Referenced aggregator directory '{module_name}' "
-                                f"declares module name '{declared_name.strip()}'. "
-                                "Request the declared module name or align the two "
-                                "names."
-                            ),
-                        )
-                    ]
-            return None, [
+    files = sorted(
+        set(config.data.get_files_with_suffix(".yaml"))
+        | set(config.data.get_files_with_suffix(".yml"))
+    )
+    directories = [*config.data.dirs, *([config.data.dir] if config.data.dir else [])]
+    for directory in directories:
+        if not directory.is_dir():
+            issues.append(
                 _issue(
-                    code="missing_config_module",
+                    code="missing_config_data_dir",
                     severity="warning",
                     file=config_path,
                     line=1,
                     column=1,
-                    message=f"Referenced module '{module_name}' has no config.yaml.",
+                    message=f"Configured data directory does not exist: {directory}",
+                )
+            )
+
+    def _resolve_module_config(
+        module_name: str,
+    ) -> tuple[Path | None, list[KbYamlLintIssue]]:
+        # Use runtime selection priorities; never pick the first ambiguous candidate.
+        try:
+            candidates = [
+                KnowledgeBaseConfig.from_yaml_file(path)
+                for path in sorted(set(module_index.get(module_name, [])))
+            ]
+            loader = DataLoader(
+                input_dirs=[module_search_root(config_path)],
+                module_config_candidates={module_name: candidates},
+            )
+            selected = loader.resolve_module_config(
+                module_name,
+                context_config=config,
+                relation="module" if module_name in config.modules else "dependency",
+            )
+            return selected.source_file, []
+        except (ValueError, TypeError, OSError, yaml.YAMLError) as exc:
+            return None, [
+                _issue(
+                    code="module_resolution_error",
+                    severity="error",
+                    file=config_path,
+                    line=1,
+                    column=1,
+                    message=str(exc),
                 )
             ]
-        if len(candidates) == 1:
-            return candidates[0], []
-
-        visited_matches = [c for c in candidates if c in visited_configs]
-        if visited_matches:
-            selected = min(visited_matches)
-            return selected, []
-
-        current_group = module_search_root(config_path).resolve()
-        same_group = [
-            c for c in candidates if module_search_root(c).resolve() == current_group
-        ]
-        if len(same_group) == 1:
-            return same_group[0], []
-
-        selected = same_group[0] if same_group else candidates[0]
-        return selected, [
-            _issue(
-                code="ambiguous_module_config",
-                severity="warning",
-                file=config_path,
-                line=1,
-                column=1,
-                message=(
-                    f"Module '{module_name}' is defined in multiple configs; "
-                    f"selected '{selected}'."
-                ),
-            )
-        ]
 
     referenced_modules: list[str] = []
     for key in ("depends_on", "modules"):
@@ -366,6 +265,7 @@ def discover_yaml_files(
     paths: Sequence[Path],
     config_paths: Sequence[Path],
     resolved_configs: set[Path] | None = None,
+    input_dirs: Sequence[Path] | None = None,
 ) -> tuple[list[Path], list[KbYamlLintIssue]]:
     issues: list[KbYamlLintIssue] = []
     files: list[Path] = []
@@ -387,7 +287,9 @@ def discover_yaml_files(
                 module_index.setdefault(module_name.strip(), []).append(nested_resolved)
 
     search_roots = sorted(
-        {module_search_root(path.resolve()) for path in config_paths},
+        {path.resolve() for path in input_dirs}
+        if input_dirs is not None
+        else {module_search_root(path.resolve()) for path in config_paths},
         key=lambda path: (len(path.parts), str(path)),
     )
     indexed_roots: list[Path] = []
