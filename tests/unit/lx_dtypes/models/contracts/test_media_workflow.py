@@ -3,6 +3,7 @@ from pydantic import ValidationError
 
 from lx_dtypes.models.contracts.media_workflow import (
     ANNOTATION_TRANSITIONS,
+    EVENT_ORIGINS,
     GDPR_DELETION_EVENTS,
     PRIVACY_TRANSITIONS,
     RELEASE_TRANSITIONS,
@@ -62,31 +63,11 @@ def test_deletion_points_map_to_distinct_events() -> None:
     assert len(set(GDPR_DELETION_EVENTS.values())) == len(GdprDeletionPoint)
 
 
-def test_export_requires_purged_raw_media() -> None:
-    with pytest.raises(ValidationError, match="purged"):
-        MediaWorkflowState(
-            privacy_state=PrivacyStage.VALIDATED,
-            annotation_state=AnnotationStage.VALIDATED,
-            release_state=ReleaseStage.EXPORT_READY,
-            version=1,
-        )
-
-
-def test_export_requires_validated_annotation() -> None:
-    with pytest.raises(ValidationError, match="annotation"):
-        MediaWorkflowState(
-            privacy_state=PrivacyStage.RAW_PURGED,
-            annotation_state=AnnotationStage.IN_PROGRESS,
-            release_state=ReleaseStage.EXPORT_READY,
-            version=1,
-        )
-
-
-def test_released_state_is_valid_when_both_tracks_complete() -> None:
+def test_state_uses_wire_field_names() -> None:
     state = MediaWorkflowState(
-        privacy_state=PrivacyStage.RAW_PURGED,
-        annotation_state=AnnotationStage.VALIDATED,
-        release_state=ReleaseStage.EXPORT_READY,
+        privacy=PrivacyStage.RAW_PURGED,
+        annotation=AnnotationStage.VALIDATED,
+        release=ReleaseStage.EXPORT_READY,
         version=7,
     )
     assert state.version == 7
@@ -99,28 +80,51 @@ def test_released_state_is_valid_when_both_tracks_complete() -> None:
             "event": "exported",
             "expected_version": -1,
             "idempotency_key": "key-12345",
-            "actor": "a",
         },
         {
             "event": "exported",
             "expected_version": 1,
             "idempotency_key": "short",
-            "actor": "a",
         },
         {
             "event": "unknown",
             "expected_version": 1,
             "idempotency_key": "key-12345",
-            "actor": "a",
-        },
-        {
-            "event": "exported",
-            "expected_version": 1,
-            "idempotency_key": "key-12345",
-            "actor": "",
         },
     ],
 )
 def test_invalid_transition_requests_are_rejected(payload: dict[str, object]) -> None:
     with pytest.raises(ValidationError):
         MediaWorkflowTransitionRequest.model_validate(payload)
+
+
+def test_every_event_has_an_origin() -> None:
+    assert set(EVENT_ORIGINS) == set(WorkflowEvent)
+
+
+@pytest.mark.parametrize(
+    "event",
+    [
+        WorkflowEvent.RAW_PURGED,
+        WorkflowEvent.ARTIFACT_PUBLISHED,
+        WorkflowEvent.INTEGRITY_LOST,
+        WorkflowEvent.EXPORTED,
+    ],
+)
+def test_system_events_are_not_postable(event: WorkflowEvent) -> None:
+    with pytest.raises(ValidationError, match="System events"):
+        MediaWorkflowTransitionRequest(
+            event=event, expected_version=1, idempotency_key="key-12345"
+        )
+
+
+def test_client_cannot_supply_actor() -> None:
+    with pytest.raises(ValidationError):
+        MediaWorkflowTransitionRequest.model_validate(
+            {
+                "event": "export_approved",
+                "expected_version": 1,
+                "idempotency_key": "key-12345",
+                "actor": "someone",
+            }
+        )

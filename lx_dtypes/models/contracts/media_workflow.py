@@ -168,39 +168,95 @@ def event_track_tables() -> tuple[
     return PRIVACY_TRANSITIONS, ANNOTATION_TRANSITIONS, RELEASE_TRANSITIONS
 
 
+class MediaKind(StrEnum):
+    VIDEO = "video"
+    REPORT = "report"
+
+
+class ExportApproval(StrEnum):
+    NONE = "none"
+    CURRENT = "current"
+    # Approval exists but is bound to another processed-artifact generation.
+    STALE = "stale"
+
+
+class TransitionRejection(StrEnum):
+    EVENT_NOT_PERMITTED_IN_STATE = "event_not_permitted_in_state"
+    RECORD_INACTIVE = "record_inactive"
+    VALIDATION_IS_FINAL = "validation_is_final"
+    IDENTITY_NOT_VERIFIED = "identity_not_verified"
+    PRIVACY_TRACK_INCOMPLETE = "privacy_track_incomplete"
+    ANNOTATION_TRACK_INCOMPLETE = "annotation_track_incomplete"
+    ALREADY_RELEASED = "already_released"
+
+
+class EventOrigin(StrEnum):
+    """Who may post an event; system events are never accepted from an API client."""
+
+    USER = "user"
+    SYSTEM = "system"
+
+
+_ORIGIN_USER = EventOrigin.USER
+_ORIGIN_SYSTEM = EventOrigin.SYSTEM
+
+# Token classification only; guards and roles stay in the reducer and authz.
+EVENT_ORIGINS: Final[Mapping[_E, EventOrigin]] = MappingProxyType(
+    {
+        _E.IMPORT_STARTED: _ORIGIN_SYSTEM,
+        _E.QUARANTINED: _ORIGIN_SYSTEM,
+        _E.QUARANTINE_RELEASED: _ORIGIN_USER,
+        _E.ARTIFACT_PUBLISHED: _ORIGIN_SYSTEM,
+        _E.CORRECTION_REQUESTED: _ORIGIN_USER,
+        _E.ANONYMIZATION_VALIDATED: _ORIGIN_USER,
+        _E.RAW_PURGED: _ORIGIN_SYSTEM,
+        _E.PROCESSING_FAILED: _ORIGIN_SYSTEM,
+        _E.INTEGRITY_LOST: _ORIGIN_SYSTEM,
+        _E.RETRY_REQUESTED: _ORIGIN_USER,
+        _E.RECONCILE_RETRY: _ORIGIN_USER,
+        _E.RECONCILE_FAIL: _ORIGIN_USER,
+        _E.CONSENT_WITHDRAWN: _ORIGIN_USER,
+        _E.ANNOTATION_COMPLETED: _ORIGIN_USER,
+        _E.ANNOTATION_REOPENED: _ORIGIN_USER,
+        _E.EXPORT_APPROVED: _ORIGIN_USER,
+        _E.EXPORT_REVOKED: _ORIGIN_USER,
+        _E.EXPORTED: _ORIGIN_SYSTEM,
+        _E.DATASET_INGESTED: _ORIGIN_SYSTEM,
+    }
+)
+
+
+class WorklistStage(StrEnum):
+    VALIDATE = "validate"
+    ANNOTATE = "annotate"
+    APPROVE_EXPORT = "approve_export"
+
+
 class MediaWorkflowState(BaseModel):
     """Persisted state of one media item; ``version`` is the compare-and-swap token."""
 
     model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
-    privacy_state: PrivacyStage
-    annotation_state: AnnotationStage
-    release_state: ReleaseStage
+    privacy: PrivacyStage
+    annotation: AnnotationStage
+    release: ReleaseStage
     version: int = Field(ge=0)
-
-    @model_validator(mode="after")
-    def reject_impossible_combination(self) -> Self:
-        if self.release_state is not ReleaseStage.NOT_RELEASED and (
-            self.privacy_state is not PrivacyStage.RAW_PURGED
-        ):
-            raise ValueError("Release requires the raw media to be purged first")
-        if (
-            self.release_state is not ReleaseStage.NOT_RELEASED
-            and self.annotation_state is not AnnotationStage.VALIDATED
-        ):
-            raise ValueError("Release requires validated annotation")
-        return self
 
 
 class MediaWorkflowTransitionRequest(BaseModel):
-    """Transition command; a repeated key with the same expected version is a no-op."""
+    """Transition command; the actor comes from the authenticated session, never the body."""
 
     model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     event: WorkflowEvent
     expected_version: int = Field(ge=0)
     idempotency_key: str = Field(min_length=8, max_length=128)
-    actor: str = Field(min_length=1, max_length=255)
+
+    @model_validator(mode="after")
+    def only_user_events(self) -> Self:
+        if EVENT_ORIGINS[self.event] is not EventOrigin.USER:
+            raise ValueError("System events cannot be posted by a client")
+        return self
 
 
 def validate_transition_tables() -> None:
@@ -211,6 +267,8 @@ def validate_transition_tables() -> None:
         raise ValueError("An event may belong to exactly one track")
     if set().union(*event_tracks) != set(WorkflowEvent):
         raise ValueError("Every event must belong to a track")
+    if set(EVENT_ORIGINS) != set(WorkflowEvent):
+        raise ValueError("Every event needs an origin")
     if set(GDPR_DELETION_EVENTS) != set(GdprDeletionPoint):
         raise ValueError("Every deletion point needs exactly one event")
     for sources in privacy.values():
