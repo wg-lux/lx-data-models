@@ -25,6 +25,12 @@ entrypoints:
 - name: Study collection
   file: contracts/study_collection.py
   purpose: Bind canonical ledger observations to versioned assessment and study provenance
+- name: Media workflow states and transitions
+  file: contracts/media_workflow.py
+  purpose: Privacy, annotation and release track tokens, transition tables and deletion points for one media item
+- name: Media workflow policy payloads
+  file: contracts/media_workflow_policy.py
+  purpose: Validation acknowledgement, examination link key, shared-salt precondition and consent withdrawal outcome
 - name: Contracts
   file: contracts/__init__.py
   purpose: Shared interchange exports
