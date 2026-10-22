@@ -160,8 +160,8 @@ def test_transfer_identity_preserves_uuid_roundtrip(as_string: bool) -> None:
 
     from lx_dtypes.models.contracts.hub_transfer import HubTransferSensitiveMetaPayload
 
-    patient = UUID("821d81f1-fb20-4e38-b777-01c67fe03001")
-    examination = UUID("821d81f1-fb20-4e38-b777-01c67fe03002")
+    patient = UUID("821d81f1-fb20-8e38-b777-01c67fe03001")
+    examination = UUID("821d81f1-fb20-8e38-b777-01c67fe03002")
     identity = HubTransferSensitiveMetaPayload.model_validate(
         {
             "patient_uuid": str(patient) if as_string else patient,
@@ -186,8 +186,8 @@ def test_transfer_identity_rejects_invalid_uuid(field: str, invalid: object) -> 
     from lx_dtypes.models.contracts.hub_transfer import HubTransferSensitiveMetaPayload
 
     payload: dict[str, object] = {
-        "patient_uuid": "821d81f1-fb20-4e38-b777-01c67fe03001",
-        "examination_uuid": "821d81f1-fb20-4e38-b777-01c67fe03002",
+        "patient_uuid": "821d81f1-fb20-8e38-b777-01c67fe03001",
+        "examination_uuid": "821d81f1-fb20-8e38-b777-01c67fe03002",
     }
     payload[field] = invalid
     with pytest.raises(ValueError):
@@ -211,4 +211,27 @@ def test_transfer_identity_rejects_legacy_hashes_and_invalid_ids(
     from lx_dtypes.models.contracts.hub_transfer import HubTransferSensitiveMetaPayload
 
     with pytest.raises(ValueError):
+        HubTransferSensitiveMetaPayload.model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    "local_uuid",
+    [
+        "821d81f1-fb20-4e38-b777-01c67fe03001",  # persisted random local UUID
+        "821d81f1-fb20-1e38-b777-01c67fe03001",
+        "821d81f1-fb20-8e38-7777-01c67fe03001",  # version nibble without RFC variant
+    ],
+)
+@pytest.mark.parametrize("field", ["patient_uuid", "examination_uuid"])
+def test_transfer_identity_rejects_site_local_uuids(
+    field: str, local_uuid: str
+) -> None:
+    from lx_dtypes.models.contracts.hub_transfer import HubTransferSensitiveMetaPayload
+
+    payload: dict[str, object] = {
+        "patient_uuid": "821d81f1-fb20-8e38-b777-01c67fe03001",
+        "examination_uuid": "821d81f1-fb20-8e38-b777-01c67fe03002",
+    }
+    payload[field] = local_uuid
+    with pytest.raises(ValueError, match="UUIDv8 pseudonyms"):
         HubTransferSensitiveMetaPayload.model_validate(payload)

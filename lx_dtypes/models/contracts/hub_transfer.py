@@ -162,7 +162,7 @@ class HubTransferVideoTransferPayloadData(TypedDict):
     processing_policy: str
     processing_intent: str
     cleanup_policy: str
-    payload_schema_version: Literal["5.0"]
+    payload_schema_version: Literal["6.0"]
     resource_rows: HubTransferVideoResourceRowsData
     processing_snapshot: HubTransferProcessingSnapshotData
     provenance: NotRequired[HubTransferProvenanceData]
@@ -179,7 +179,7 @@ class HubTransferReportTransferPayloadData(TypedDict):
     processing_policy: str
     processing_intent: str
     cleanup_policy: str
-    payload_schema_version: Literal["5.0"]
+    payload_schema_version: Literal["6.0"]
     resource_rows: HubTransferReportResourceRowsData
     processing_snapshot: HubTransferProcessingSnapshotData
     provenance: NotRequired[HubTransferProvenanceData]
@@ -202,9 +202,30 @@ class HubTransferVideoFilePayload(_StrictPayload):
     height: int | None = Field(default=None, ge=1)
 
 
+HUB_RECORD_PSEUDONYM_UUID_VERSION = 8
+
+
+def require_hub_record_pseudonym(value: UUID) -> UUID:
+    """Hub records carry site-salted UUIDv8 pseudonyms, never site-local UUIDs.
+
+    The receiver cannot verify the keyed derivation; the version check rejects
+    the legacy path that sent persisted random (version 4) local UUIDs.
+    """
+    if value.version != HUB_RECORD_PSEUDONYM_UUID_VERSION:
+        raise ValueError(
+            "Hub records require site-salted UUIDv8 pseudonyms, not local UUIDs"
+        )
+    return value
+
+
 class HubTransferSensitiveMetaPayload(_StrictPayload):
     patient_uuid: UUID = Field(strict=False)
     examination_uuid: UUID = Field(strict=False)
+
+    @field_validator("patient_uuid", "examination_uuid", mode="after")
+    @classmethod
+    def _require_pseudonyms(cls, value: UUID) -> UUID:
+        return require_hub_record_pseudonym(value)
 
 
 class HubTransferVideoStatePayload(_StrictPayload):
@@ -357,7 +378,7 @@ class _HubTransferPayload(_StrictPayload):
     processing_policy: str = Field(min_length=1)
     processing_intent: str = Field(min_length=1)
     cleanup_policy: str = Field(min_length=1)
-    payload_schema_version: Literal["5.0"]
+    payload_schema_version: Literal["6.0"]
     processing_snapshot: HubTransferProcessingSnapshotPayload
     provenance: HubTransferProvenancePayload | None = None
 
@@ -430,6 +451,14 @@ class HubTransferStudyResourceRowsPayload(_StrictPayload):
         if isinstance(value, dict):
             return parse_study_exchange(json.dumps(value))
         raise ValueError("study_exchange must be a typed bundle or JSON object")
+
+    @field_validator("study_exchange", mode="after")
+    @classmethod
+    def _require_pseudonyms(cls, value: StudyExchangeBundle) -> StudyExchangeBundle:
+        for link in value.patients:
+            require_hub_record_pseudonym(link.patient_uuid)
+            require_hub_record_pseudonym(link.patient_examination_uuid)
+        return value
 
 
 class HubTransferStudyTransferPayload(_HubTransferPayload):

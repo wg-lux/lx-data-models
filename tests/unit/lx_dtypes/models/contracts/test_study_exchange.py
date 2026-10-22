@@ -256,3 +256,57 @@ def test_readable_observations_keep_lesion_identity_and_scalar_types(
     assert sheet.cell(2, 12).data_type == cell_type
     assert sheet.cell(2, 11).value == "mm"
     workbook.close()
+
+
+def _with_patient_link(
+    original: StudyExchangeBundle, patient: UUID, examination: UUID
+) -> StudyExchangeBundle:
+    data = original.model_dump(mode="json")
+    data["patients"] = [
+        {"patient_examination_uuid": str(examination), "patient_uuid": str(patient)}
+    ]
+    data["collections"][0]["patient_examination_uuid"] = str(examination)
+    data["collections"][0]["record"]["patient"] = str(patient)
+    import json
+
+    return parse_study_exchange(json.dumps(data))
+
+
+@pytest.mark.parametrize(
+    "patient,examination,accepted",
+    [
+        (
+            UUID("821d81f1-fb20-8e38-b777-01c67fe03001"),
+            UUID("821d81f1-fb20-8e38-b777-01c67fe03002"),
+            True,
+        ),
+        (
+            UUID("821d81f1-fb20-4e38-b777-01c67fe03001"),
+            UUID("821d81f1-fb20-8e38-b777-01c67fe03002"),
+            False,
+        ),
+        (
+            UUID("821d81f1-fb20-8e38-b777-01c67fe03001"),
+            UUID("821d81f1-fb20-4e38-b777-01c67fe03002"),
+            False,
+        ),
+    ],
+)
+def test_hub_study_rows_require_hub_pseudonyms(
+    patient: UUID, examination: UUID, accepted: bool
+) -> None:
+    from lx_dtypes.models.contracts.hub_transfer import (
+        HubTransferStudyResourceRowsPayload,
+    )
+
+    exchange = _with_patient_link(bundle(), patient, examination)
+    if accepted:
+        rows = HubTransferStudyResourceRowsPayload.model_validate(
+            {"study_exchange": exchange}
+        )
+        assert rows.study_exchange.patients[0].patient_uuid == patient
+    else:
+        with pytest.raises(ValidationError, match="UUIDv8 pseudonyms"):
+            HubTransferStudyResourceRowsPayload.model_validate(
+                {"study_exchange": exchange}
+            )

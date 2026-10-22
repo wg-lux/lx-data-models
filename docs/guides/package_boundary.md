@@ -94,15 +94,23 @@ code; this distinguishes normal empty-response fallback from provider failure.
 
 ## Hub patient linkage
 
-Hub transfer version `5.0` uses `patient_uuid` and `examination_uuid`, following
-lx-data-models' persisted random UUID identity policy. The source generates each
-UUID once; transfers and retries preserve it. Local integer primary keys and
-demographic hashes are rejected. Content hashes continue to identify source
-artifacts and verify processed bytes; they do not identify patients.
+Hub transfer version `6.0` keeps the field names `patient_uuid` and
+`examination_uuid`, but their values are **hub-scoped pseudonyms**, not the
+source's persisted random UUIDs. The source derives each value locally as
+HMAC-SHA-256 under its local identity salt over the record kind, the local UUID
+and the target hub node key, formatted as an RFC 9562 UUIDv8. Repeated transfers
+of one local record to one hub yield the same pseudonym, so the hub can group
+follow-up examinations, but it cannot recover the local UUID, and pseudonyms for
+different hubs are unlinkable without the salt. The contract rejects any other
+UUID version, so a sender that still emits local (version 4) UUIDs fails closed.
+The UUIDv8 check cannot verify the keyed derivation itself. Local integer primary
+keys and demographic hashes remain rejected. Content hashes continue to identify
+source artifacts and verify processed bytes; they do not identify patients.
 
-Receivers preserve both UUIDs and enforce authenticated source ownership and
+Receivers preserve both pseudonyms and enforce authenticated source ownership and
 examination-to-patient linkage. Conflicting ownership fails rather than merging
-patients. Neither identity hashes nor identity salts are exchanged. Deploy shared
-contracts, sender, receiver and the host UUID backfill migration together.
-Versions `3.0` and `4.0` are rejected; existing transfers require explicit
-reconciliation rather than guessed identity mappings.
+patients. Neither identity hashes, identity salts nor local UUIDs are exchanged.
+Study exchange bundles sent to a hub carry the same pseudonyms. Deploy shared
+contracts, sender and receiver together. Versions `3.0`, `4.0` and `5.0` are
+rejected; hub rows received under `5.0` still hold local UUIDs and require an
+explicit, reviewed reconciliation rather than guessed identity mappings.
