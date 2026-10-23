@@ -8,7 +8,7 @@ responsibilities:
 - Define strict Pydantic contracts and typed dictionary representations
 - Own versioned report extraction evidence and staging receipts; lifecycle transitions belong to the host native core.
 - Maintain knowledge-base/report-template graphs and ledger identities
-- Own hub transfer version 5 with persistent patient and examination UUIDs instead of demographic hashes
+- Own hub transfer version 7 with hub-scoped UUIDv8 pseudonyms and exact segment timeline coordinates
 boundaries:
 - Keep application service orchestration outside shared models
 - Preserve raw video identity across processing and transfer

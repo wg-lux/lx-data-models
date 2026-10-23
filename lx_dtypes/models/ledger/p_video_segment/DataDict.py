@@ -1,5 +1,10 @@
+from typing import NotRequired
+
 from lx_dtypes.models.base.app_base_model.ddict.LedgerBaseModelDataDict import (
     LedgerBaseModelDataDict,
+)
+from lx_dtypes.models.contracts.video_segment_timeline import (
+    VideoSegmentTimelineCoordinatesData,
 )
 
 
@@ -10,6 +15,7 @@ class SerializedPVideoSegmentDataDict(LedgerBaseModelDataDict):
     label: str  # name of label in KB
     labelset: str  # name of labelset in KB
     export_segment: bool
+    timeline_coordinates: NotRequired[VideoSegmentTimelineCoordinatesData | None]
     # annotation_meta: AnnotationMetaDataDict
 
 
@@ -20,4 +26,5 @@ class PVideoSegmentDataDict(LedgerBaseModelDataDict):
     label: str  # name of label in KB
     labelset: str  # name of labelset in KB
     export_segment: bool
+    timeline_coordinates: NotRequired[VideoSegmentTimelineCoordinatesData | None]
     # annotation_meta: AnnotationMetaDataDict

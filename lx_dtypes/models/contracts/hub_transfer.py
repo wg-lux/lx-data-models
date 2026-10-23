@@ -17,6 +17,10 @@ from pydantic import (
 from .json_types import JsonObject, JsonValue
 from .study_exchange import StudyExchangeBundle
 from .video_provenance import VideoProvenanceBundle, VideoProvenanceRecovery
+from .video_segment_timeline import (
+    VideoSegmentTimelineCoordinates,
+    VideoSegmentTimelineCoordinatesData,
+)
 
 type HubTransferJsonScalar = str | int | float | bool | None
 type HubTransferJsonValue = (
@@ -90,6 +94,7 @@ class HubTransferVideoSegmentPayloadData(TypedDict):
     validation_state: HubTransferSegmentValidationState
     export_segment: bool
     anonymous_provenance: HubTransferSegmentProvenancePayloadData
+    timeline_coordinates: VideoSegmentTimelineCoordinatesData
     model_name: NotRequired[str]
     model_version: NotRequired[str]
 
@@ -162,7 +167,7 @@ class HubTransferVideoTransferPayloadData(TypedDict):
     processing_policy: str
     processing_intent: str
     cleanup_policy: str
-    payload_schema_version: Literal["6.0"]
+    payload_schema_version: Literal["7.0"]
     resource_rows: HubTransferVideoResourceRowsData
     processing_snapshot: HubTransferProcessingSnapshotData
     provenance: NotRequired[HubTransferProvenanceData]
@@ -179,7 +184,7 @@ class HubTransferReportTransferPayloadData(TypedDict):
     processing_policy: str
     processing_intent: str
     cleanup_policy: str
-    payload_schema_version: Literal["6.0"]
+    payload_schema_version: Literal["7.0"]
     resource_rows: HubTransferReportResourceRowsData
     processing_snapshot: HubTransferProcessingSnapshotData
     provenance: NotRequired[HubTransferProvenanceData]
@@ -273,6 +278,7 @@ class HubTransferVideoSegmentPayload(_StrictPayload):
     validation_state: HubTransferSegmentValidationState
     export_segment: bool
     anonymous_provenance: HubTransferSegmentProvenancePayload
+    timeline_coordinates: VideoSegmentTimelineCoordinates
     model_name: str | None = None
     model_version: str | None = None
 
@@ -295,6 +301,14 @@ class HubTransferVideoSegmentPayload(_StrictPayload):
         if self.end_frame_number_exclusive <= self.start_frame_number:
             raise ValueError(
                 "end_frame_number_exclusive must exceed start_frame_number"
+            )
+        generation = self.timeline_coordinates.generation
+        if (generation.first_frame_number, generation.last_frame_number) != (
+            self.start_frame_number,
+            self.end_frame_number_exclusive - 1,
+        ):
+            raise ValueError(
+                "timeline_coordinates must describe the first and last included frame"
             )
         has_model_name = self.model_name is not None
         has_model_version = self.model_version is not None
@@ -378,7 +392,7 @@ class _HubTransferPayload(_StrictPayload):
     processing_policy: str = Field(min_length=1)
     processing_intent: str = Field(min_length=1)
     cleanup_policy: str = Field(min_length=1)
-    payload_schema_version: Literal["6.0"]
+    payload_schema_version: Literal["7.0"]
     processing_snapshot: HubTransferProcessingSnapshotPayload
     provenance: HubTransferProvenancePayload | None = None
 
@@ -430,7 +444,56 @@ class HubTransferVideoTransferPayload(_HubTransferPayload):
                 raise ValueError(
                     "video segment raw_video_hash must match resource_hash"
                 )
+            self._validate_segment_timeline(segment.timeline_coordinates)
         return self
+
+    def _validate_segment_timeline(
+        self, coordinates: VideoSegmentTimelineCoordinates
+    ) -> None:
+        """Bind segment ticks to the transferred processed timeline.
+
+        Original-recording ticks depend on composed ancestry; receivers verify
+        them by recomputing from the provenance bundle.
+        """
+        provenance = self.provenance
+        if provenance is not None and provenance.video_frame_provenance is not None:
+            processed = provenance.video_frame_provenance.transformations[-1].output
+            expected_status = "verified"
+        elif (
+            provenance is not None and provenance.video_provenance_recovery is not None
+        ):
+            processed = provenance.video_provenance_recovery.processed_timeline
+            expected_status = "unresolved"
+        else:
+            raise ValueError(
+                "Video segments require frame provenance or an unresolved receipt"
+            )
+        if coordinates.recording_mapping_status != expected_status:
+            raise ValueError(
+                "Segment recording_mapping_status must match transferred provenance"
+            )
+        generation = coordinates.generation
+        ticks = processed.presentation_timestamps
+        if (
+            generation.content_hash != processed.content_hash
+            or (generation.time_base_num, generation.time_base_den)
+            != (processed.time_base_num, processed.time_base_den)
+            or generation.last_frame_number >= len(ticks)
+            or ticks[generation.first_frame_number]
+            != generation.first_presentation_timestamp
+            or ticks[generation.last_frame_number]
+            != generation.last_presentation_timestamp
+        ):
+            raise ValueError(
+                "Segment generation coordinates disagree with the processed timeline"
+            )
+        if (
+            coordinates.recording is not None
+            and coordinates.recording.recording_content_hash != self.resource_hash
+        ):
+            raise ValueError(
+                "Segment recording coordinates belong to another recording"
+            )
 
 
 class HubTransferReportTransferPayload(_HubTransferPayload):

@@ -3,6 +3,9 @@ from pydantic import ValidationInfo, field_validator, model_validator
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
 )
+from lx_dtypes.models.contracts.video_segment_timeline import (
+    VideoSegmentTimelineCoordinates,
+)
 from lx_dtypes.names import (
     PATIENT_VIDEO_SEGMENT_MODEL_LIST_TYPE_FIELDS,
     PATIENT_VIDEO_SEGMENT_MODEL_NESTED_FIELDS,
@@ -19,6 +22,7 @@ class SerializedPVideoSegment(LedgerBaseModel[SerializedPVideoSegmentDataDict]):
     label: str  # name of label in KB
     labelset: str  # name of labelset in KB
     export_segment: bool = False
+    timeline_coordinates: VideoSegmentTimelineCoordinates | None = None
     patient_video_segment_state: str
 
     @property
@@ -42,6 +46,9 @@ class PVideoSegment(LedgerBaseModel[PVideoSegmentDataDict]):
     labelset: str  # name of labelset in KB
     # annotation info: annotator, time, ..
     export_segment: bool = False
+    # Exact first/last included frame ticks; exporters bound to a published
+    # processed generation must set them.
+    timeline_coordinates: VideoSegmentTimelineCoordinates | None = None
     patient_video_segment_state: "PVideoSegmentState | None" = None
 
     @property
@@ -86,6 +93,18 @@ class PVideoSegment(LedgerBaseModel[PVideoSegmentDataDict]):
         if start_frame_number is not None and end_frame_number <= start_frame_number:
             raise ValueError("end_frame_number must be greater than start_frame_number")
         return end_frame_number
+
+    @model_validator(mode="after")
+    def check_timeline_coordinates(self) -> "PVideoSegment":
+        coordinates = self.timeline_coordinates
+        if coordinates is not None and (
+            coordinates.generation.first_frame_number,
+            coordinates.generation.last_frame_number,
+        ) != (self.start_frame_number, self.end_frame_number - 1):
+            raise ValueError(
+                "timeline_coordinates must describe the first and last included frame"
+            )
+        return self
 
     @property
     def ddict_class(self) -> type[PVideoSegmentDataDict]:

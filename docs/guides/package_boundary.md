@@ -94,7 +94,7 @@ code; this distinguishes normal empty-response fallback from provider failure.
 
 ## Hub patient linkage
 
-Hub transfer version `6.0` keeps the field names `patient_uuid` and
+Hub transfer version `7.0` keeps the field names `patient_uuid` and
 `examination_uuid`, but their values are **hub-scoped pseudonyms**, not the
 source's persisted random UUIDs. The source derives each value locally as
 HMAC-SHA-256 under its local identity salt over the record kind, the local UUID
@@ -111,6 +111,20 @@ Receivers preserve both pseudonyms and enforce authenticated source ownership an
 examination-to-patient linkage. Conflicting ownership fails rather than merging
 patients. Neither identity hashes, identity salts nor local UUIDs are exchanged.
 Study exchange bundles sent to a hub carry the same pseudonyms. Deploy shared
-contracts, sender and receiver together. Versions `3.0`, `4.0` and `5.0` are
+contracts, sender and receiver together. Versions `3.0` through `6.0` are
 rejected; hub rows received under `5.0` still hold local UUIDs and require an
 explicit, reviewed reconciliation rather than guessed identity mappings.
+
+## Hub segment timeline coordinates
+
+Version `7.0` requires `timeline_coordinates`
+(`contracts/video_segment_timeline.py`) on every transferred video segment. They
+carry the integer presentation timestamp ticks of the first and last included
+frame on the transferred processed generation, with its rational time base and
+content hash. With verified frame provenance they also carry the original
+recording frame indices and ticks, composed from `source_frame_indices`; with an
+unresolved provenance receipt the mapping status is `unresolved` and no original
+values are sent. The contract rejects segments without provenance, a mapping
+status that disagrees with the transferred provenance, and generation ticks that
+disagree with the processed timeline. Receivers recompute the original-recording
+coordinates from the provenance bundle and reject any mismatch.

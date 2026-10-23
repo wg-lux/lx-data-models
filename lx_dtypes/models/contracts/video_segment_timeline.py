@@ -9,11 +9,38 @@ never inferred from timestamp proximity.
 
 from __future__ import annotations
 
-from typing import Literal, Self
+from typing import Literal, NotRequired, Self, TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 RecordingMappingStatus = Literal["verified", "unresolved"]
+
+
+class VideoSegmentGenerationCoordinatesData(TypedDict):
+    content_hash: str
+    time_base_num: int
+    time_base_den: int
+    first_frame_number: int
+    last_frame_number: int
+    first_presentation_timestamp: int
+    last_presentation_timestamp: int
+
+
+class VideoSegmentRecordingCoordinatesData(TypedDict):
+    recording_content_hash: str
+    time_base_num: int
+    time_base_den: int
+    first_frame_index: int
+    last_frame_index: int
+    first_presentation_timestamp: int
+    last_presentation_timestamp: int
+
+
+class VideoSegmentTimelineCoordinatesData(TypedDict):
+    schema_version: Literal["1"]
+    generation: VideoSegmentGenerationCoordinatesData
+    recording_mapping_status: RecordingMappingStatus
+    recording: NotRequired[VideoSegmentRecordingCoordinatesData | None]
 
 
 class VideoSegmentGenerationCoordinates(BaseModel):
@@ -92,6 +119,9 @@ class VideoSegmentTimelineCoordinates(BaseModel):
 __all__ = [
     "RecordingMappingStatus",
     "VideoSegmentGenerationCoordinates",
+    "VideoSegmentGenerationCoordinatesData",
     "VideoSegmentRecordingCoordinates",
+    "VideoSegmentRecordingCoordinatesData",
     "VideoSegmentTimelineCoordinates",
+    "VideoSegmentTimelineCoordinatesData",
 ]
