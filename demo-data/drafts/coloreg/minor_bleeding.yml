@@ -1,0 +1,7 @@
+- model: report_finding
+  name: Minor bleeding
+  finding: bleeding
+  required: true
+  multiple_allowed: true
+  classifications:
+  - classification: 

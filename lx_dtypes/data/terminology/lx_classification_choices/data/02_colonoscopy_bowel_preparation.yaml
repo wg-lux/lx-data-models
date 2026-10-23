@@ -1,41 +1,106 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_classification_choices
 # Boston
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022), BBPS and colonoscopy quality: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
 - model: classification_choice
   name: "bowel_prep_boston_0"
-  # name_de: "0"
+  name_de: "0 – nicht beurteilbar"
+  name_en: "0 – not assessable"
   # name_en: "bowel_prep_boston_0"
 
 - model: classification_choice
   name: "bowel_prep_boston_1"
-  # name_de: "1"
+  name_de: "1 – teilweise einsehbar"
+  name_en: "1 – partially visible"
   # name_en: "bowel_prep_boston_1"
 
 - model: classification_choice
   name: "bowel_prep_boston_2"
-  # name_de: "2"
+  name_de: "2 – gut einsehbar"
+  name_en: "2 – well visualized"
   # name_en: "bowel_prep_boston_2"
 
 - model: classification_choice
   name: "bowel_prep_boston_3"
-  # name_de: "3"
+  name_de: "3 – vollständig einsehbar"
+  name_en: "3 – fully visualized"
   # name_en: "bowel_prep_boston_3"
+
+- model: classification_choice
+  name: "bbps_total_0"
+  name_de: "BBPS-Gesamtwert 0"
+  name_en: "BBPS total score 0"
+
+- model: classification_choice
+  name: "bbps_total_1"
+  name_de: "BBPS-Gesamtwert 1"
+  name_en: "BBPS total score 1"
+
+- model: classification_choice
+  name: "bbps_total_2"
+  name_de: "BBPS-Gesamtwert 2"
+  name_en: "BBPS total score 2"
+
+- model: classification_choice
+  name: "bbps_total_3"
+  name_de: "BBPS-Gesamtwert 3"
+  name_en: "BBPS total score 3"
+
+- model: classification_choice
+  name: "bbps_total_4"
+  name_de: "BBPS-Gesamtwert 4"
+  name_en: "BBPS total score 4"
+
+- model: classification_choice
+  name: "bbps_total_5"
+  name_de: "BBPS-Gesamtwert 5"
+  name_en: "BBPS total score 5"
+
+- model: classification_choice
+  name: "bbps_total_6"
+  name_de: "BBPS-Gesamtwert 6"
+  name_en: "BBPS total score 6"
+
+- model: classification_choice
+  name: "bbps_total_7"
+  name_de: "BBPS-Gesamtwert 7"
+  name_en: "BBPS total score 7"
+
+- model: classification_choice
+  name: "bbps_total_8"
+  name_de: "BBPS-Gesamtwert 8"
+  name_en: "BBPS total score 8"
+
+- model: classification_choice
+  name: "bbps_total_9"
+  name_de: "BBPS-Gesamtwert 9"
+  name_en: "BBPS total score 9"
 
 # Aronchick
 - model: classification_choice
   name: "bowel_prep_aronchick_0"
+  name_de: "Aronchick: 0"
+  name_en: "Aronchick: 0"
   # name_de: "Inadäquat"
   # name_en: "Inadequate"
 
 - model: classification_choice
   name: "bowel_prep_aronchick_1"
+  name_de: "Aronchick: 1"
+  name_en: "Aronchick: 1"
   # name_en: "Fair"
   # name_de: "Ausreichend"
 
 - model: classification_choice
   name: "bowel_prep_aronchick_2"
+  name_de: "Aronchick: 2"
+  name_en: "Aronchick: 2"
   # name_en: "Good"
   # name_de: "Gut"
 
 - model: classification_choice
   name: "bowel_prep_aronchick_3"
+  name_de: "Aronchick: 3"
+  name_en: "Aronchick: 3"
   # name_en: "Excellent"
   # name_de: "Exzellent"

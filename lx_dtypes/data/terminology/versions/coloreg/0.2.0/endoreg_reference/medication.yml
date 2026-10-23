@@ -1,0 +1,116 @@
+- model: reference_catalog
+  name: medication
+  name_de: "Medikamente"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: apixaban
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: true
+      adapt_to_weight: false
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: aspirin
+      record_type: medication
+      adapt_to_renal_function: false
+      adapt_to_hepatic_function: false
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null
+    - name: clopidogrel
+      record_type: medication
+      adapt_to_renal_function: false
+      adapt_to_hepatic_function: false
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null
+    - name: dabigatran
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: true
+      adapt_to_weight: false
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: edoxaban
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: true
+      adapt_to_weight: false
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: enoxaparin
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: false
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: true
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: prasugrel
+      record_type: medication
+      adapt_to_renal_function: false
+      adapt_to_hepatic_function: false
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null
+    - name: rivaroxaban
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: true
+      adapt_to_weight: false
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: ticagrelor
+      record_type: medication
+      adapt_to_renal_function: false
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null
+    - name: tirofiban
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null

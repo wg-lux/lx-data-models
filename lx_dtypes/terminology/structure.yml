@@ -1,0 +1,40 @@
+version: 1
+tier: service
+path: lx_dtypes/terminology
+parent: ../structure.yml
+summary: Versioned terminology resolution, registry lifecycle, and host-configured loading. Explicit service
+  instances isolate registries and caller-owned storage.
+responsibilities:
+- Resolve exact knowledge-base identities and dependency closures
+- Validate registration, uploads, and source provenance
+- Reuse the shared package archive boundary and authoring gate for uploaded packages
+boundaries:
+- Registration does not select a package or project host database rows
+- Do not silently fall back from an explicit registry service
+entrypoints:
+- name: TerminologyService
+  file: terminology_service.py
+  purpose: Registry and upload lifecycle
+- name: Loader
+  file: terminology_loader.py
+  purpose: Explicit service-aware loading
+- name: Lookup tracker
+  file: lookup_tracker.py
+  purpose: Resolution tracking
+dependencies:
+  internal:
+  - ../models
+  - ../data
+  external:
+  - Pydantic v2
+  - PyYAML
+  - Django
+submodules: []
+contracts:
+- name: Terminology lifecycle
+  doc: ../../docs/guides/terminology.md
+- name: Package authoring
+  doc: ../../docs/guides/dtypes-package-structure.md
+tests:
+  directory: ../../tests/unit/lx_dtypes
+  command: uv run pytest tests/unit/lx_dtypes/test_terminology_storage.py -q

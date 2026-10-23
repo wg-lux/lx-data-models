@@ -1,12 +1,14 @@
-from typing import List
+from typing import NotRequired
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
 )
+from lx_dtypes.models.contracts.json_types import JsonValue
 
 
 class FindingDataDict(KnowledgebaseBaseModelDataDict):
-    classifications: List[str]
-    interventions: List[str]
-    caused_by_interventions: List[str]
-    finding_types: List[str]
+    text_extraction: NotRequired[list[dict[str, JsonValue]]]
+    classifications: list[str]
+    interventions: list[str]
+    caused_by_interventions: list[str]
+    finding_types: list[str]

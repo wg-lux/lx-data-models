@@ -1,0 +1,6 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.star_upper_gi_terminology
+- model: intervention
+  name: "star_upper_gi_biopsy_performed"
+  name_de: "Biopsie durchgeführt"
+  name_en: "Biopsy performed"
+  description: "Upper-GI biopsy; sampling type, location, count, vials, and specimens are documented by the linked biopsy findings."

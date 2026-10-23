@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, Mapping, TypeVar, cast, Iterable, Set
+from collections.abc import Iterable, Mapping
+from typing import Any, Generic, TypeVar, cast
 
+from pydantic import SerializationInfo, field_serializer, model_validator
 
-from pydantic import model_validator, field_serializer, SerializationInfo
 from lx_dtypes.serialization import parse_str_list, serialize_str_list
 
 DDictT = TypeVar("DDictT")
@@ -33,23 +34,31 @@ class DDictMixIn(Generic[DDictT], ABC):
 
 class ListFieldSerializationMixIn(ABC):
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         """Default implementation, to be overridden by subclasses."""
         return []
 
     @classmethod
-    def _get_all_list_fields(cls) -> Set[str]:
-        """Safely aggregates fields from the MRO."""
-        all_fields: Set[str] = set()
+    def _get_all_list_fields(cls) -> set[str]:
+        """Aggregate declared list fields across the MRO, failing on bad declarations."""
+        all_fields: set[str] = set()
         for base in cls.__mro__:
             func = getattr(base, "list_type_fields", None)
-            if func and callable(func):
-                try:
-                    fields = func()
-                    if isinstance(fields, Iterable):
-                        all_fields.update(cast(Iterable[str], fields))
-                except Exception:
-                    continue
+            if func is None or not callable(func):
+                continue
+            fields = func()
+            if isinstance(fields, (str, bytes)) or not isinstance(fields, Iterable):
+                raise TypeError(
+                    f"{base.__module__}.{base.__qualname__}.list_type_fields() "
+                    "must return an iterable of field names."
+                )
+            normalized_fields = list(fields)
+            if not all(isinstance(field, str) for field in normalized_fields):
+                raise TypeError(
+                    f"{base.__module__}.{base.__qualname__}.list_type_fields() "
+                    "must contain only strings."
+                )
+            all_fields.update(cast(list[str], normalized_fields))
         return all_fields
 
     @model_validator(mode="before")
@@ -72,9 +81,9 @@ class ListFieldSerializationMixIn(ABC):
             return serialize_str_list(value)
         return value
 
-    def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+    def model_dump(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         """Serialize list fields to their configured string representation."""
-        dumped = cast(Dict[str, Any], super().model_dump(*args, **kwargs))  # type: ignore
+        dumped = cast(dict[str, Any], super().model_dump(*args, **kwargs))  # type: ignore
         for field in self._get_all_list_fields():
             value = dumped.get(field)
             if isinstance(value, str):

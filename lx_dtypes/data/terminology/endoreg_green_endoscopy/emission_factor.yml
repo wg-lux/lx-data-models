@@ -1,0 +1,162 @@
+- model: reference_catalog
+  name: emission_factor
+  name_de: "Emissionsfaktoren"
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: emission_factor
+      name: material_emission_cardboard
+      unit:
+        name: kilogram
+        version: null
+      value: 0.828
+    - record_type: emission_factor
+      name: material_emission_foil
+      unit:
+        name: kilogram
+        version: null
+      value: 2.574
+    - record_type: emission_factor
+      name: material_emission_gold
+      unit:
+        name: kilogram
+        version: null
+      value: 4.018
+    - record_type: emission_factor
+      name: material_emission_metal
+      unit:
+        name: kilogram
+        version: null
+      value: 4.018
+    - record_type: emission_factor
+      name: material_emission_nickel
+      unit:
+        name: kilogram
+        version: null
+      value: 4.018
+    - record_type: emission_factor
+      name: material_emission_paper
+      unit:
+        name: kilogram
+        version: null
+      value: 0.919
+    - record_type: emission_factor
+      name: material_emission_paper_coated
+      unit:
+        name: kilogram
+        version: null
+      value: 2.0175
+    - record_type: emission_factor
+      name: material_emission_plastic
+      unit:
+        name: kilogram
+        version: null
+      value: 3.116
+    - record_type: emission_factor
+      name: material_emission_plastic_coated
+      unit:
+        name: kilogram
+        version: null
+      value: 3.116
+    - record_type: emission_factor
+      name: material_emission_silicone
+      unit:
+        name: kilogram
+        version: null
+      value: 2.0
+    - record_type: emission_factor
+      name: material_emission_steel
+      unit:
+        name: kilogram
+        version: null
+      value: 4.018
+    - record_type: emission_factor
+      name: material_emission_tantal
+      unit:
+        name: kilogram
+        version: null
+      value: 4.018
+    - record_type: emission_factor
+      name: material_emission_textile
+      unit:
+        name: kilogram
+        version: null
+      value: 2.0
+    - record_type: emission_factor
+      name: material_emission_titan
+      unit:
+        name: kilogram
+        version: null
+      value: 4.018
+    - record_type: emission_factor
+      name: transport_product_emission_generic_europe
+      unit:
+        name: kilogram
+        version: null
+      value: 0.13213
+    - record_type: emission_factor
+      name: transport_product_emission_generic_overseas
+      unit:
+        name: kilogram
+        version: null
+      value: 1.308373
+    - record_type: emission_factor
+      name: transport_resource_emission_ukw_electricity_extern
+      unit:
+        name: kilowatt-hours
+        version: null
+      value: 0.05048
+    - record_type: emission_factor
+      name: transport_resource_emission_ukw_electricity_selfmade
+      unit:
+        name: kilowatt-hours
+        version: null
+      value: 0.0
+    - record_type: emission_factor
+      name: transport_resource_emission_ukw_gas
+      unit:
+        name: liter
+        version: null
+      value: 0.3434
+    - record_type: emission_factor
+      name: transport_resource_emission_ukw_oil
+      unit:
+        name: cubic_meter
+        version: null
+      value: 0.69723
+    - record_type: emission_factor
+      name: use_resource_emission_ukw_electricity_extern
+      unit:
+        name: kilowatt-hours
+        version: null
+      value: 0.0
+    - record_type: emission_factor
+      name: use_resource_emission_ukw_electricity_selfmade
+      unit:
+        name: kilowatt-hours
+        version: null
+      value: 0.0
+    - record_type: emission_factor
+      name: use_resource_emission_ukw_gas
+      unit:
+        name: liter
+        version: null
+      value: 2.01574
+    - record_type: emission_factor
+      name: use_resource_emission_ukw_oil
+      unit:
+        name: cubic_meter
+        version: null
+      value: 3.17522
+    - record_type: emission_factor
+      name: waste_emission_general
+      unit:
+        name: kilogram
+        version: null
+      value: 0.0212801937984496
+    - record_type: emission_factor
+      name: waste_emission_medical
+      unit:
+        name: kilogram
+        version: null
+      value: 0.0212801937984496

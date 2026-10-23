@@ -1,14 +1,25 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_interventions
 - model: intervention
   name: egd_percutaneous_gastroenterostomy
+  name_de: "Perkutane Gastroenterostomie"
+  name_en: "Percutaneous gastroenterostomy"
 
 - model: intervention
   name: egd_percutaneous_jejunostomy
+  name_de: "Perkutane Jejunostomie"
+  name_en: "Percutaneous jejunostomy"
 
 - model: intervention
   name: egd_poem
+  name_de: "Perorale endoskopische Myotomie (POEM)"
+  name_en: "Peroral endoscopic myotomy (POEM)"
 
 - model: intervention
   name: egd_stepwise_biopsy
+  name_de: "Stufenbiopsien"
+  name_en: "Stepwise biopsies"
 
 - model: intervention
   name: egd_esophagus_injection_botox
+  name_de: "Botulinumtoxin-Injektion in den Ösophagus"
+  name_en: "Botulinum toxin injection into the esophagus"

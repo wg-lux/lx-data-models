@@ -1,0 +1,8 @@
+name: lx_units
+name_de: "LX Einheiten"
+description: ""
+version: 0.1.0.post1
+modules: []
+data:
+  dirs:
+    - ./data

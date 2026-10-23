@@ -1,0 +1,7 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.star_upper_gi_terminology
+- model: classification_choice
+  name: additional_text_info
+  name_de: "Zusätzliche Angaben"
+  name_en: "Additional information"
+  classification_choice_descriptors:
+    - additional_text_info

@@ -1,0 +1,20 @@
+- model: reference_catalog
+  name: information_source_type
+  name_de: "Informationsquellentypen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: annotation
+      record_type: information_source_type
+      description: null
+      information_sources:
+      - name: default_annotation
+        version: null
+      - name: lx_anonymizer_evaluation
+        version: null
+    - name: prediction
+      record_type: information_source_type
+      description: null
+      information_sources:
+      - name: default_prediction
+        version: null

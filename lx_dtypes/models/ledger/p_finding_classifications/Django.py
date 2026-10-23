@@ -40,7 +40,7 @@ class PFindingClassificationsDjango(
 
     if TYPE_CHECKING:
         patient_finding_classification_choices: models.Manager[
-            "PFindingClassificationChoiceDjango"
+            PFindingClassificationChoiceDjango
         ]
 
     @property

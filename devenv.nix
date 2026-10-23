@@ -19,6 +19,12 @@ let
     protobuf
     libglvnd
   ];
+  runtimeLibraries = with pkgs; [
+    stdenv.cc.cc.lib
+    libglvnd
+    glib
+    zlib
+  ];
   runtimePackages = with pkgs; [
     stdenv.cc.cc
     ffmpeg-headless.bin
@@ -44,7 +50,7 @@ in
   dotenv.enable = true;
   dotenv.disableHint = true;
 
-  packages = lib.unique (runtimePackages ++ buildInputs);
+  packages = lib.unique (runtimePackages ++ buildInputs ++ runtimeLibraries);
   outputs =
     lib.optionalAttrs (inputs ? pyproject-nix) (
       let
@@ -66,6 +72,7 @@ in
       lib.makeLibraryPath (buildInputs ++ runtimePackages)
       + ":/run/opengl-driver/lib:/run/opengl-driver-32/lib";
     LX_DTYPES_EDITOR_KB_REGISTRY = "../lx-terminology-editor/.published/kb_registry.json";
+    UV_PROJECT_ENVIRONMENT = "${config.devenv.state}/venv";
   };
 
   languages.python = {

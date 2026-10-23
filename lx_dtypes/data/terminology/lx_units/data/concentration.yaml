@@ -2,7 +2,7 @@
 - model: unit
 
   name: "picogram per mililiter"
-  name_de: "Pikogramm pro Mililiter"
+  name_de: "Pikogramm pro Milliliter"
   name_en: "picogram per mililiter"
   abbreviation: "pg/ml"
 
@@ -25,7 +25,7 @@
 - model: unit
 
   name: "nanogram per mililiter"
-  name_de: "Nanogramm pro Mililiter"
+  name_de: "Nanogramm pro Milliliter"
   name_en: "nanogram per mililiter"
   abbreviation: "ng/ml"
 
@@ -38,7 +38,7 @@
 - model: unit
 
   name: "microgram per mililiter"
-  name_de: "Microgramm pro Mililiter"
+  name_de: "Mikrogramm pro Milliliter"
   name_en: "microgram per mililiter"
   abbreviation: "µg/ml"
 
@@ -61,7 +61,7 @@
 
   name: "milimole per liter"
   abbreviation: "mmol/L"
-  name_de: "milimol pro Liter"
+  name_de: "Millimol pro Liter"
   name_en: "milimole per liter"
   description: "milimoles per liter, a unit of measurement for concentration in blood."
 
@@ -69,7 +69,7 @@
 
   name: "miliequivalent per liter"
   abbreviation: "mEq/L"
-  name_de: "miliäquivalent pro Liter"
+  name_de: "Milliäquivalent pro Liter"
   name_en: "miliequivalent per liter"
   description: "miliequivalents per liter, used for electrolytes concentration."
 
@@ -77,7 +77,7 @@
 
   name: "miligram per deciliter"
   abbreviation: "mg/dL"
-  name_de: "miligramm pro Deziliter"
+  name_de: "Milligramm pro Deziliter"
   name_en: "miligram per deciliter"
   description: "miligrams per deciliter, commonly used for various blood measurements."
 
@@ -85,7 +85,7 @@
 
   name: "miligram per liter"
   abbreviation: "mg/L"
-  name_de: "miligramm pro Liter"
+  name_de: "Milligramm pro Liter"
   name_en: "miligram per liter"
   description: "miligrams per liter, a unit of measurement for concentration in blood."
 
@@ -102,13 +102,13 @@
 - model: unit
 
   name: "units per liter"
-  name_de: "units pro Liter"
+  name_de: "Einheiten pro Liter"
   name_en: "units per liter"
   abbreviation: "U/l"
 
 - model: unit
 
   name: "microinternational units per mililiter"
-  name_de: "Mikro-Internationale Einheiten pro Mililiter"
+  name_de: "Mikro-Internationale Einheiten pro Milliliter"
   name_en: "micro-international units per mililiter"
   abbreviation: "µU/ml"

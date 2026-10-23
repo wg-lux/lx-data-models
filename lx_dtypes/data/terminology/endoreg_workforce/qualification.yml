@@ -1,0 +1,147 @@
+- model: reference_catalog
+  name: qualification
+  name_de: "Qualifikationen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - record_type: qualification
+      name: endoscopy_base
+      description: null
+      is_active: true
+      qualification_types:
+      - name: endoscopy
+        version: null
+      - name: shift_requirement
+        version: null
+    - record_type: qualification
+      name: endoscopy_ercp
+      description: null
+      is_active: true
+      qualification_types:
+      - name: endoscopy
+        version: null
+      - name: shift_requirement
+        version: null
+    - record_type: qualification
+      name: endoscopy_eus
+      description: null
+      is_active: true
+      qualification_types:
+      - name: endoscopy
+        version: null
+      - name: shift_requirement
+        version: null
+    - record_type: qualification
+      name: endoscopy_supervised
+      description: null
+      is_active: true
+      qualification_types:
+      - name: endoscopy
+        version: null
+      - name: shift_requirement
+        version: null
+    - record_type: qualification
+      name: outpatient_ibd
+      description: null
+      is_active: true
+      qualification_types:
+      - name: outpatient_clinic
+        version: null
+      - name: shift_requirement
+        version: null
+    - record_type: qualification
+      name: outpatient_informed_consent
+      description: null
+      is_active: true
+      qualification_types:
+      - name: outpatient_clinic
+        version: null
+    - record_type: qualification
+      name: outpatient_net
+      description: null
+      is_active: true
+      qualification_types:
+      - name: outpatient_clinic
+        version: null
+      - name: shift_requirement
+        version: null
+    - record_type: qualification
+      name: outpatient_rare_diseases
+      description: null
+      is_active: true
+      qualification_types:
+      - name: outpatient_clinic
+        version: null
+      - name: shift_requirement
+        version: null
+    - record_type: qualification
+      name: sonography_base
+      description: null
+      is_active: true
+      qualification_types:
+      - name: shift_requirement
+        version: null
+      - name: sonography
+        version: null
+    - record_type: qualification
+      name: sonography_liver_biopsy
+      description: null
+      is_active: true
+      qualification_types:
+      - name: shift_requirement
+        version: null
+      - name: sonography
+        version: null
+    - record_type: qualification
+      name: sonography_supervised
+      description: null
+      is_active: true
+      qualification_types:
+      - name: shift_requirement
+        version: null
+      - name: sonography
+        version: null
+    - record_type: qualification
+      name: sonography_supervision
+      description: null
+      is_active: true
+      qualification_types:
+      - name: shift_requirement
+        version: null
+      - name: sonography
+        version: null
+    - record_type: qualification
+      name: wr_m41
+      description: null
+      is_active: true
+      qualification_types:
+      - name: ward_rounds
+        version: null
+    - record_type: qualification
+      name: wr_m42g
+      description: null
+      is_active: true
+      qualification_types:
+      - name: ward_rounds
+        version: null
+    - record_type: qualification
+      name: wr_m42h
+      description: null
+      is_active: true
+      qualification_types:
+      - name: ward_rounds
+        version: null
+    - record_type: qualification
+      name: wr_m43
+      description: null
+      is_active: true
+      qualification_types:
+      - name: ward_rounds
+        version: null
+    - record_type: qualification
+      name: wr_m52
+      description: null
+      is_active: true
+      qualification_types:
+      - name: ward_rounds
+        version: null

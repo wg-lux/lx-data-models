@@ -1,0 +1,19 @@
+schema_version: coloreg_annotation_mapping_v1
+knowledge_base_module: coloreg
+knowledge_base_version: 0.1.0
+labelset_names:
+  - multilabel_classification_colonoscopy_default
+  - colonoscopy_video_segmentation_raw
+mappings:
+  - label: cold_snare
+    modalities:
+      - segment
+      - frame
+    finding_name: colon_polyp
+    intervention_name: endoscopy_cold_snare_resection_generic
+  - label: hot_snare
+    modalities:
+      - segment
+      - frame
+    finding_name: colon_polyp
+    intervention_name: endoscopy_diathermic_snare_resection_generic

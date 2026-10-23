@@ -1,0 +1,38 @@
+version: 1
+tier: tool
+path: scripts
+parent: ../structure.yml
+summary: Repository-only authoring, audit, import, and context validation commands. Installed application
+  CLIs live separately in lx_dtypes/scripts.
+responsibilities:
+- Validate context metadata without importing application code
+- Support explicit authoring and conversion tasks
+boundaries:
+- Do not import repository scripts from consuming applications
+- Generated authoring output belongs in temporary storage
+entrypoints:
+- name: Context validator
+  file: lint_structure.py
+  purpose: Check strict schemas, references, and graph consistency
+- name: KB lint wrapper
+  file: lint_kb_yaml.py
+  purpose: Delegate to the canonical package linter
+- name: MST import
+  file: import_mst_excel.py
+  purpose: Explicit source conversion tooling
+dependencies:
+  internal:
+  - ../lx_dtypes
+  external:
+  - Git
+  - Pydantic v2
+  - PyYAML
+submodules: []
+contracts:
+- name: KB linting
+  doc: ../docs/guides/kb-yaml-linting.md
+- name: Agent context
+  doc: ../docs/agent_context.md
+tests:
+  directory: ../tests
+  command: uv run pytest tests/test_structure.py -q

@@ -1,7 +1,7 @@
 from pathlib import Path
 from shutil import which
 from subprocess import DEVNULL, CalledProcessError, run
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 
@@ -20,7 +20,7 @@ def _load_cv2_video_tools() -> tuple[Any, Any]:
 
 
 def validate_django_fixture(
-    model_fixture: Union[KB_MODELS_DJANGO, L_MODELS_DJANGO],
+    model_fixture: KB_MODELS_DJANGO | L_MODELS_DJANGO,
 ) -> None:
     _ddict = model_fixture.ddict
     assert _ddict["uuid"] == model_fixture.uuid

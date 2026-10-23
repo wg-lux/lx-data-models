@@ -1,0 +1,12 @@
+name: coloreg
+name_de: ColoReg
+description: ColoReg lesion-linked resection, complications and longitudinal follow-up
+  reporting.
+version: 0.3.0
+medical_field: gastroenterology
+modules: []
+depends_on:
+- coloreg_terminology
+data:
+  files:
+  - ./report_templates.yml

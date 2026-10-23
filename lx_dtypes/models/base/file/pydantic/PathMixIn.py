@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, List, Optional
 
 from pydantic import Field, field_validator
 
@@ -7,10 +7,10 @@ from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModel import AppBaseMo
 
 
 class PathMixin(AppBaseModel):
-    file: Optional[Path] = None
-    dir: Optional[Path] = None
-    files: List[Path] = Field(default_factory=list)
-    dirs: List[Path] = Field(default_factory=list)
+    file: Path | None = None
+    dir: Path | None = None
+    files: list[Path] = Field(default_factory=list)
+    dirs: list[Path] = Field(default_factory=list)
 
     @staticmethod
     def _ensure_path(value: Path | str) -> Path:
@@ -41,7 +41,7 @@ class PathMixin(AppBaseModel):
 
     @field_validator("files", "dirs", mode="before")
     @classmethod
-    def validate_paths(cls, value: Iterable[Path | str] | None) -> List[Path]:
+    def validate_paths(cls, value: Iterable[Path | str] | None) -> list[Path]:
         if value is None:
             return []
         if isinstance(value, list):

@@ -1,0 +1,31 @@
+version: 1
+tier: domain
+path: demo-data
+parent: ../structure.yml
+summary: Synthetic authoring examples, classification versioning demonstrations, and legacy exports. These
+  resources are separate from the packaged release catalog.
+responsibilities:
+- Provide deterministic examples for authoring and version comparisons
+- Retain unfinished drafts and legacy exports outside distributable data
+boundaries:
+- Examples do not establish clinical approval or host configuration
+- Do not add runtime storage, patient data, or secrets
+entrypoints:
+- name: Versioning observations
+  file: classification_versioning/measurements.yml
+  purpose: Deterministic version comparison inputs
+- name: Demo config
+  file: star_upper_gi/config.yaml
+  purpose: Example knowledge-base selection
+dependencies:
+  internal:
+  - ../lx_dtypes/models
+  external:
+  - YAML
+submodules: []
+contracts:
+- name: Authoring workflow
+  doc: ../docs/guides/knowledge-base-authoring.md
+tests:
+  directory: ../tests/unit/lx_dtypes
+  command: uv run pytest tests/unit/lx_dtypes/test_packaged_knowledge_bases.py -q

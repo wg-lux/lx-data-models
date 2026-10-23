@@ -1,0 +1,661 @@
+schema_version: '1.0'
+owner: lx-dtypes maintainers
+purpose: Definition contracts and resource inventory; not a runtime package manifest.
+criteria:
+- Terminology uses a config.yaml with an exact name/version and explicitly selected flat model records.
+- Resolve each dependency closure without competing releases, then validate with DataLoader and strict
+  KB YAML lint.
+- Study documents use StudySetupDefinition or StudyMetadata and are never selected as KB record lists.
+- Historical package YAML paths and bytes retain their published content_sha256.
+- Structural validity does not establish clinical approval or downstream host projection support.
+- Current report_templates packages contain reporting records and validators only; concept definitions
+  belong in terminology dependencies.
+study_metadata:
+- path: study_metadata/research.yml
+  contract: lx_dtypes.models.contracts.study_setup.StudySetupDefinition
+  purpose: Research dataset and cohort example; no approved center or age restrictions declared.
+- path: study_metadata/coloreg_resection.yml
+  contract: lx_dtypes.models.contracts.study_setup.StudySetupDefinition
+  purpose: EMR/ESD hypotheses, candidate cohorts, exact terminology dependency, executable descriptive
+    R0 analysis and explicit protocol-dependent analysis drafts.
+terminology:
+- manifest: terminology/DGVS_Terminology/config.yaml
+  module: DGVS_Terminology
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/citations/config.yaml
+  module: citations
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/endoreg_green_endoscopy/config.yaml
+  module: endoreg_green_endoscopy
+  version: 1.0.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/endoreg_reference/config.yaml
+  module: endoreg_reference
+  version: 1.0.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/endoreg_workforce/config.yaml
+  module: endoreg_workforce
+  version: 1.0.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/information_source_data/config.yaml
+  module: information_source_data
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_classification_choices/config.yaml
+  module: lx_classification_choices
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_classifications/config.yaml
+  module: lx_classifications
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_descriptors/config.yaml
+  module: lx_descriptors
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_examinations/config.yaml
+  module: lx_examinations
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_findings/config.yaml
+  module: lx_findings
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_hardware/config.yaml
+  module: lx_hardware
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_indications/config.yaml
+  module: lx_indications
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_interventions/config.yaml
+  module: lx_interventions
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_units/config.yaml
+  module: lx_units
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_utils/config.yaml
+  module: lx_utils
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_utils/gender/config.yaml
+  module: gender_data
+  version: 0.1.0
+  role: compatibility_placeholder
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+  notes: Empty compatibility module; canonical records are in endoreg_reference. Legacy unselected files
+    are outside packaged definitions.
+- manifest: terminology/lx_utils/tag/config.yaml
+  module: tag_data
+  version: 0.1.0
+  role: compatibility_placeholder
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+  notes: Empty compatibility module; canonical records are in endoreg_reference. Legacy unselected files
+    are outside packaged definitions.
+- manifest: terminology/lx_utils/unit/config.yaml
+  module: lx_utils_units
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/lx_utils/unit_type/config.yaml
+  module: lx_unit_types
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/polyp_size_category/config.yaml
+  module: polyp_size_category
+  version: 2.0.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/sample_knowledge_base/config.yaml
+  module: lx_knowledge_base
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/coloreg/config.yaml
+  module: coloreg
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/information_source_data/config.yaml
+  module: information_source_data
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/lx_utils/config.yaml
+  module: lx_utils
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/lx_utils/gender/config.yaml
+  module: gender_data
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/lx_utils/tag/config.yaml
+  module: tag_data
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/lx_utils/unit/config.yaml
+  module: lx_utils_units
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/lx_utils/unit_type/config.yaml
+  module: lx_unit_types
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/config.yaml
+  module: DGVS_Terminology
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/lx_classification_choices/config.yaml
+  module: lx_classification_choices
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/lx_classifications/config.yaml
+  module: lx_classifications
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/lx_descriptors/config.yaml
+  module: lx_descriptors
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/lx_examinations/config.yaml
+  module: lx_examinations
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/lx_findings/config.yaml
+  module: lx_findings
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/lx_hardware/config.yaml
+  module: lx_hardware
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/lx_indications/config.yaml
+  module: lx_indications
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/lx_interventions/config.yaml
+  module: lx_interventions
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.1.0/terminology/lx_units/config.yaml
+  module: lx_units
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/polyp_size_category/1.0.0/polyp_size_category/config.yaml
+  module: polyp_size_category
+  version: 1.0.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/star_upper_gi/0.1.1.post1/star_upper_gi/config.yaml
+  module: star_upper_gi
+  version: 0.1.1.post1
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - documented_historical_lint_exceptions
+- manifest: terminology/versions/star_upper_gi/0.1.1.post1/star_upper_gi/lx_units/config.yaml
+  module: lx_units
+  version: 0.1.0.post1
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/DGVS_Terminology/config.yaml
+  module: DGVS_Terminology
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/coloreg/config.yaml
+  module: coloreg
+  version: 0.2.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/endoreg_reference/config.yaml
+  module: endoreg_reference
+  version: 1.0.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/information_source_data/config.yaml
+  module: information_source_data
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_classification_choices/config.yaml
+  module: lx_classification_choices
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_classifications/config.yaml
+  module: lx_classifications
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_descriptors/config.yaml
+  module: lx_descriptors
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_examinations/config.yaml
+  module: lx_examinations
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_findings/config.yaml
+  module: lx_findings
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_hardware/config.yaml
+  module: lx_hardware
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_indications/config.yaml
+  module: lx_indications
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_interventions/config.yaml
+  module: lx_interventions
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_units/config.yaml
+  module: lx_units
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_utils/config.yaml
+  module: lx_utils
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_utils/gender/config.yaml
+  module: gender_data
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_utils/tag/config.yaml
+  module: tag_data
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_utils/unit/config.yaml
+  module: lx_utils_units
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/coloreg/0.2.0/lx_utils/unit_type/config.yaml
+  module: lx_unit_types
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/coloreg_terminology/config.yaml
+  module: coloreg_terminology
+  version: 0.3.0
+  role: current
+  required_checks: &id001
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/mst_3_0_terminology/config.yaml
+  module: mst_3_0_terminology
+  version: 3.0.0
+  role: current
+  required_checks: &id002
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/report_template_examples_terminology/config.yaml
+  module: report_template_examples_terminology
+  version: 0.1.1
+  role: current
+  required_checks: &id003
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/star_upper_gi_terminology/config.yaml
+  module: star_upper_gi_terminology
+  version: 0.1.2
+  role: current
+  required_checks: &id004
+  - exact_identity_loading
+  - strict_kb_lint
+sidecars:
+- path: terminology/mst_3_0_terminology/excel_source.yml
+  contract: MST Excel source evidence
+  notes: Workbook cells, attribute provenance and reviewed import decisions; not KB records.
+  validation: Regenerated and checked by scripts/import_mst_excel.py using ImportSpec and Workbook.
+- path: terminology/coloreg_terminology/annotation_mappings.yml
+  contract: coloreg_annotation_mapping_v1
+  notes: Mapping declares coloreg@0.1.0 intentionally; directory location does not change its declared
+    target.
+  validation: Host-owned sidecar schema; not validated by the core KB record loader.
+- path: terminology/polyp_size_category/numeric_rules.yml
+  contract: NumericClassificationRules
+  notes: Versioned executable numeric classification rules.
+- path: terminology/versions/coloreg/0.1.0/coloreg/annotation_mappings.yml
+  contract: coloreg_annotation_mapping_v1
+  notes: Mapping declares coloreg@0.1.0 intentionally; directory location does not change its declared
+    target.
+  validation: Host-owned sidecar schema; not validated by the core KB record loader.
+- path: terminology/versions/polyp_size_category/1.0.0/polyp_size_category/numeric_rules.yml
+  contract: NumericClassificationRules
+  notes: Versioned executable numeric classification rules.
+- path: terminology/versions/coloreg/0.2.0/coloreg/annotation_mappings.yml
+  contract: coloreg_annotation_mapping_v1
+  notes: Retained unchanged; declared mapping target remains coloreg@0.1.0.
+  validation: Host-owned sidecar schema; not validated by the core KB record loader.
+historical_exceptions:
+- path: terminology/versions/coloreg/0.1.0/lx_utils/gender/default.yaml
+  reason: Unselected legacy Django fixture, not a valid KB model record. Retained only to preserve the
+    historical artifact.
+- path: terminology/versions/coloreg/0.1.0/lx_utils/tag/default.yaml
+  reason: Unselected empty placeholder; not a definition.
+- path: terminology/versions/star_upper_gi/0.1.1.post1/star_upper_gi/star_u_gi_interventions/data.yaml
+  reason: Unselected biopsy intervention draft. It is not part of the resolved historical KB; retained
+    as published.
+- path: terminology/versions/star_upper_gi/0.1.1.post1/star_upper_gi/config.yaml
+  reason: 22 template_finding_missing_description warnings; use current star_upper_gi@0.1.2 for complete
+    descriptions.
+excluded_resources:
+- path: ../../demo-data/legacy_exports/
+  reason: Legacy CSV exports and unselected Django gender fixture; not packaged definitions.
+- path: ../../demo-data/drafts/
+  reason: Incomplete authoring examples. ColoReg findings draft had an invalid modl key and no definition
+    identity; now an explicit empty record list.
+- path: ../../demo-data/drafts/coloreg/minor_bleeding.yml
+  reason: Preserved concurrent draft verbatim; finding bleeding is not declared in the ColoReg graph and
+    classification is empty. Requires author clarification before inclusion.
+migration:
+  terminology: data/<package> -> data/terminology/<package>
+  study_metadata: data/study_setup/research.yml -> data/study_metadata/research.yml
+  dgvs_manifest: data/terminology/config.yaml -> data/terminology/DGVS_Terminology/config.yaml
+  compatibility: Reporting module names and versions are preserved; current paths, concept provenance
+    and content digests change. Historical release bytes and existing hydrated registry copies are unchanged.
+  report_templates: Current reporting packages move to data/report_templates/<package>; concept definitions
+    move to data/terminology/<package>_terminology.
+report_templates:
+- manifest: report_templates/coloreg/config.yaml
+  module: coloreg
+  version: 0.3.0
+  role: current
+  required_checks: *id001
+- manifest: report_templates/dgvs_reporting/config.yaml
+  module: dgvs_reporting
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: report_templates/mst_3_0/config.yaml
+  module: mst_3_0
+  version: 3.0.0
+  role: current
+  required_checks: *id002
+- manifest: report_templates/report_template_examples/config.yaml
+  module: report_template_examples
+  version: 0.1.1
+  role: current
+  required_checks: *id003
+- manifest: report_templates/star_upper_gi/config.yaml
+  module: star_upper_gi
+  version: 0.1.2
+  role: current
+  required_checks: *id004
+
+source_provenance:
+  owner: lx-dtypes maintainers
+  scope: Current working packages; retained release bytes and attribution remain unchanged.
+  interpretation: >-
+    Module sources describe origin and applicability, not a claim that every record
+    is a verbatim guideline term. File-level source comments and report-template
+    guideline_references identify the guideline-derived subsets. Unsourced legacy
+    records remain explicitly local vocabulary; do not infer clinical approval.
+  translation_policy: >-
+    English display labels translate the existing German labels. Established score,
+    classification and product names may be identical in both languages. Labels do
+    not change identifiers, numerical boundaries, requiredness or clinical meaning.
+  sources:
+    local_vocabulary:
+      kind: repository_authored
+      authority: lx-dtypes maintainers
+      canonical_document: README.md
+      scope: Legacy clinical vocabulary, technical types, units, device labels and composition modules.
+      limitation: No record-level external guideline attribution is asserted unless supplied in the owning YAML.
+    dgvs_quality_2_1:
+      kind: guideline_adaptation
+      authority: DGVS
+      version: '2.1'
+      url: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
+      scope: Explicitly cited endoscopy documentation, process and quality requirements; see source comments and cited_sections.
+    dgvs_sedation_2023:
+      kind: guideline_adaptation
+      authority: DGVS
+      version: '2023'
+      url: https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
+      scope: Explicitly cited sedation, medication and monitoring records.
+    esge_star_2025:
+      kind: guideline_adaptation
+      authority: ESGE
+      version: '2025'
+      url: https://www.esge.com/assets/downloads/pdfs/guidelines/2025_a-2652-8941.pdf
+      doi: 10.1055/a-2652-8941
+      scope: Upper-GI reporting requirements and associated local capture terminology, not treatment recommendations.
+    weo_mst_3_0:
+      kind: terminology_adaptation
+      authority: World Endoscopy Organization
+      version: '3.0'
+      url: https://www.worldendo.org/assets-craft/pdf/resources/mst-3-0.pdf
+      scope: MST concepts with section references in the owning YAML; reporting adapters are repository-authored.
+      limitation: See docs/data-reconciliation.yml for the limits of the source audit; no unsupported severity table is claimed.
+    esge_polypectomy_2024:
+      kind: guideline_adaptation
+      authority: ESGE
+      version: '2024'
+      url: https://www.esge.com/assets/downloads/pdfs/guidelines/2024_a-2304-3219.pdf
+      doi: 10.1055/a-2304-3219
+      scope: Size grouping only; treatment recommendations and lesion context are outside this executable classifier.
+    ucum:
+      kind: technical_standard
+      authority: UCUM
+      url: https://ucum.org/ucum
+      scope: Only unit records explicitly citing UCUM; this catalogue is not a complete UCUM implementation.
+    endoreg_reference_snapshot:
+      kind: repository_snapshot
+      authority: EndoReg database reference catalogue maintainers
+      canonical_document: docs/guides/dtypes-package-structure.md
+      scope: Typed reference, workforce and sustainability snapshots; no external clinical guideline attribution is inferred.
+    coloreg_protocol:
+      kind: study_authored
+      authority: ColoReg study authors
+      canonical_document: docs/guides/coloreg-resection-study.yml
+      study_document: lx_dtypes/data/study_metadata/coloreg_resection.yml
+      scope: Study capture and linkage definitions; cohort selection remains a separate host contract.
+    synthetic_examples:
+      kind: educational
+      authority: lx-dtypes maintainers
+      canonical_document: lx_dtypes/data/report_templates/report_template_examples/README.md
+      scope: Synthetic authoring examples; not clinical or institutional reporting protocols.
+  module_sources:
+    DGVS_Terminology: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
+    citations: [local_vocabulary]
+    information_source_data: [local_vocabulary]
+    lx_classification_choices: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
+    lx_classifications: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
+    lx_descriptors: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
+    lx_examinations: [local_vocabulary]
+    lx_findings: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
+    lx_hardware: [local_vocabulary]
+    lx_indications: [local_vocabulary]
+    lx_interventions: [local_vocabulary, dgvs_quality_2_1]
+    lx_units: [local_vocabulary, ucum, dgvs_sedation_2023]
+    lx_utils: [local_vocabulary]
+    lx_utils_units: [local_vocabulary, ucum, dgvs_sedation_2023]
+    lx_unit_types: [local_vocabulary]
+    gender_data: [endoreg_reference_snapshot]
+    tag_data: [endoreg_reference_snapshot]
+    lx_knowledge_base: [local_vocabulary]
+    endoreg_reference: [endoreg_reference_snapshot]
+    endoreg_workforce: [endoreg_reference_snapshot]
+    endoreg_green_endoscopy: [endoreg_reference_snapshot]
+    polyp_size_category: [esge_polypectomy_2024]
+    coloreg_terminology: [coloreg_protocol]
+    coloreg: [coloreg_protocol]
+    mst_3_0_terminology: [weo_mst_3_0]
+    mst_3_0: [weo_mst_3_0]
+    star_upper_gi_terminology: [esge_star_2025]
+    star_upper_gi: [esge_star_2025]
+    report_template_examples_terminology: [synthetic_examples]
+    report_template_examples: [synthetic_examples]
+    dgvs_reporting: [dgvs_quality_2_1, dgvs_sedation_2023]

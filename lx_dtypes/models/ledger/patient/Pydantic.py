@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
@@ -17,7 +15,7 @@ class Patient(LedgerBaseModel[PatientDataDict], Person):
     center: str = Field(default_factory=str)
 
     @classmethod
-    def list_type_fields(cls) -> List[str]:
+    def list_type_fields(cls) -> list[str]:
         return PATIENT_MODEL_LIST_TYPE_FIELDS
 
     @property
@@ -25,5 +23,5 @@ class Patient(LedgerBaseModel[PatientDataDict], Person):
         return PatientDataDict
 
     @classmethod
-    def nested_fields(cls) -> List[str]:
+    def nested_fields(cls) -> list[str]:
         return PATIENT_MODEL_NESTED_FIELDS

@@ -1,0 +1,42 @@
+- model: reference_catalog
+  name: disease
+  name_de: "Erkrankungen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: chronic_kidney_disease
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: congestive_heart_failure
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: coronary_artery_disease
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: diabetes_mellitus_I
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: diabetes_mellitus_II
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: disease_is_malignoma_unspecified
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: hypertension
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: liver_cirrhosis
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: non_valvular_atrial_fibrillation
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}

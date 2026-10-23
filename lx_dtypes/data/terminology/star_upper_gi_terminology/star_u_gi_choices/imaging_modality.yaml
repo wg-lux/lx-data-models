@@ -1,0 +1,20 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.star_upper_gi_terminology
+- model: classification_choice
+  name: "star_upper_gi_imaging_modality_white_light"
+  name_de: "Weißlichtendoskopie"
+  name_en: "White-light endoscopy"
+
+- model: classification_choice
+  name: "star_upper_gi_imaging_modality_narrow_band_imaging"
+  name_de: "Narrow-Band Imaging (NBI)"
+  name_en: "Narrow-band imaging (NBI)"
+
+- model: classification_choice
+  name: "star_upper_gi_imaging_modality_chromoendoscopy"
+  name_de: "Chromoendoskopie"
+  name_en: "Chromoendoscopy"
+
+- model: classification_choice
+  name: "star_upper_gi_imaging_modality_acidic_staining"
+  name_de: "Säurefärbung"
+  name_en: "Acid staining"

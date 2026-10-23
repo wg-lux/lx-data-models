@@ -31,7 +31,7 @@ class InformationSourceDjango(
     )
 
     @property
-    def ddict_class(self) -> type["InformationSourceDataDict"]:
+    def ddict_class(self) -> type[InformationSourceDataDict]:
         """
         Expose the data-dictionary class associated with this model.
 

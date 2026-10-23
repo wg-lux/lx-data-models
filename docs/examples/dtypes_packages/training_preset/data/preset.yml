@@ -1,0 +1,24 @@
+# All entries in this package are synthetic documentation examples.
+- model: study_preset
+  name: training_setup
+  centers:
+    - name: training_center
+  genders:
+    - name: unknown
+      abbreviation: "?"
+    - name: female
+      abbreviation: f
+    - name: male
+      abbreviation: m
+  label_types:
+    - name: training_quality
+      description: Training image quality labels.
+  labels:
+    - name: training_low_quality
+      label_type: training_quality
+      description: Image unsuitable for the training task.
+  label_sets:
+    - name: training_review
+      version: 1
+      labels:
+        - training_low_quality

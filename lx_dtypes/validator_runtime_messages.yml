@@ -1,0 +1,104 @@
+# Runtime issue messages. Maintained by lx-dtypes; identifiers and codes stay language independent.
+de:
+  unknown_finding: Befund '{finding}' ist nicht in der Wissensbasis enthalten.
+  finding_not_present: Befund '{target_finding}' wird von Prüfregel '{name}' benötigt, ist aber nicht
+    vorhanden.
+  intervention_not_present: Intervention '{intervention}' wird von Prüfregel '{name}' benötigt, ist aber
+    nicht vorhanden.
+  unit_not_present: Einheit '{unit}' wird von Prüfregel '{name}' benötigt, ist aber nicht vorhanden.
+  failed_finding_validator_dependency: Untersuchungsprüfregel '{validator_name}' hängt von der nicht erfüllten
+    Befundprüfregel '{dep_name}' ab.
+  failed_examination_validator_dependency: Untersuchungsprüfregel '{validator_name}' hängt von der nicht
+    erfüllten Untersuchungsprüfregel '{dep_name}' ab.
+  unknown_classification: Klassifikation '{classification_name}' ist nicht in der Wissensbasis enthalten.
+  classification_not_allowed_for_finding: Klassifikation '{classification_name}' ist für Befund '{finding}'
+    nicht zulässig.
+  finding_present_but_should_be_missing: Befund '{target_finding}' darf laut Prüfregel '{name}' nicht
+    vorhanden sein.
+  unsupported_operator: Operator '{operator}' wird von der Validierungsengine nicht unterstützt.
+  finding_not_present_for_classification_validator: Befund '{target_finding}' ist für Klassifikationsprüfregel
+    '{name}' nicht vorhanden.
+  classification_value_not_present: Klassifikation '{target_classification}' wird von Prüfregel '{name}'
+    benötigt, hat aber keinen auswertbaren Deskriptorwert.
+  classification_not_present: Klassifikation '{target_classification}' wird von Prüfregel '{name}' benötigt,
+    ist aber nicht vorhanden.
+  classification_present_but_should_be_missing: Klassifikation '{target_classification}' darf laut Prüfregel
+    '{name}' nicht vorhanden sein.
+  intervention_present_but_should_be_missing: Intervention '{intervention}' darf laut Prüfregel '{name}'
+    nicht vorhanden sein.
+  unit_present_but_should_be_missing: Einheit '{unit}' darf laut Prüfregel '{name}' nicht vorhanden sein.
+  classification_choice_not_allowed: Auswahl '{value_name}' ist für Klassifikation '{classification_name}'
+    nicht zulässig.
+  unknown_unit: Einheit '{unit_name}' ist nicht in der Wissensbasis enthalten.
+  invalid_conditional_validator_definition: Prüfregel '{name}' verwendet den Operator 'condition', hat
+    aber keinen Bedingungsblock.
+  unknown_classification_validator_reference: Klassifikationsprüfregel '{validator_name}' wird referenziert,
+    ist aber nicht definiert.
+  unknown_findings_validator_reference: Befundprüfregel '{validator_name}' wird referenziert, ist aber
+    nicht definiert.
+  unknown_intervention_validator_reference: Interventionsprüfregel '{validator_name}' wird referenziert,
+    ist aber nicht definiert.
+  unknown_unit_validator_reference: Einheitenprüfregel '{validator_name}' wird referenziert, ist aber
+    nicht definiert.
+  circular_examination_validator_dependency: 'Zyklische Abhängigkeit zwischen Untersuchungsprüfregeln
+    erkannt: {cycle}'
+  unknown_examination_validator_reference: Untersuchungsprüfregel '{validator_name}' wird referenziert,
+    ist aber nicht definiert.
+  missing_required_classification: 'Prüfregel ''{name}'' benötigt bei erfüllter Bedingung: {requirements}.'
+  missing_required_intervention: Prüfregel '{name}' benötigt Intervention '{intervention}', wenn die Bedingung
+    erfüllt ist.
+  missing_required_unit: Prüfregel '{name}' benötigt Einheit '{unit}', wenn die Bedingung erfüllt ist.
+  missing_data_requirement: 'Prüfregel ''{name}'' kann ihre Bedingung nicht auswerten, weil erforderliche
+    Ausgangsdaten fehlen: {requirements}.'
+  conditional_classification_requirement: Prüfregel '{name}' benötigt Klassifikation '{classification}'{additional},
+    wenn die Bedingung erfüllt ist.
+  additional_requirements: ' und {requirements}'
+en:
+  unknown_finding: Finding '{finding}' is not in the KB.
+  finding_not_present: Finding '{target_finding}' is required by validator '{name}' but is not present.
+  intervention_not_present: Intervention '{intervention}' is required by validator '{name}' but is not
+    present.
+  unit_not_present: Unit '{unit}' is required by validator '{name}' but is not present.
+  failed_finding_validator_dependency: Examination validator '{validator_name}' depends on failing findings
+    validator '{dep_name}'.
+  failed_examination_validator_dependency: Examination validator '{validator_name}' depends on failing
+    examination validator '{dep_name}'.
+  unknown_classification: Classification '{classification_name}' is not in the KB.
+  classification_not_allowed_for_finding: Classification '{classification_name}' is not allowed for finding
+    '{finding}'.
+  finding_present_but_should_be_missing: Finding '{target_finding}' should be absent for validator '{name}'.
+  unsupported_operator: Operator '{operator}' is not supported by the runtime validator engine.
+  finding_not_present_for_classification_validator: Finding '{target_finding}' is not present for classification
+    validator '{name}'.
+  classification_value_not_present: Classification '{target_classification}' is required by validator
+    '{name}' but has no evaluable descriptor value.
+  classification_not_present: Classification '{target_classification}' is required by validator '{name}'
+    but is not present.
+  classification_present_but_should_be_missing: Classification '{target_classification}' should be absent
+    for validator '{name}'.
+  intervention_present_but_should_be_missing: Intervention '{intervention}' should be absent for validator
+    '{name}'.
+  unit_present_but_should_be_missing: Unit '{unit}' should be absent for validator '{name}'.
+  classification_choice_not_allowed: Choice '{value_name}' is not allowed for classification '{classification_name}'.
+  unknown_unit: Unit '{unit_name}' is not in the KB.
+  invalid_conditional_validator_definition: Validator '{name}' uses 'condition' operator but has no condition
+    block.
+  unknown_classification_validator_reference: Classification validator '{validator_name}' is referenced
+    but is not defined.
+  unknown_findings_validator_reference: Findings validator '{validator_name}' is referenced but is not
+    defined.
+  unknown_intervention_validator_reference: Intervention validator '{validator_name}' is referenced but
+    is not defined.
+  unknown_unit_validator_reference: Unit validator '{validator_name}' is referenced but is not defined.
+  circular_examination_validator_dependency: 'Circular examination-validator dependency detected: {cycle}'
+  unknown_examination_validator_reference: Examination validator '{validator_name}' is referenced but
+    is not defined.
+  missing_required_classification: Validator '{name}' requires {requirements} when condition is met.
+  missing_required_intervention: Validator '{name}' requires intervention '{intervention}' when condition
+    is met.
+  missing_required_unit: Validator '{name}' requires unit '{unit}' when condition is met.
+  missing_data_requirement: 'Validator ''{name}'' cannot evaluate its condition because required source
+    data is missing: {requirements}.'
+  conditional_classification_requirement: Validator '{name}' requires classification '{classification}'{additional}
+    when condition is met.
+  additional_requirements: ' and {requirements}'

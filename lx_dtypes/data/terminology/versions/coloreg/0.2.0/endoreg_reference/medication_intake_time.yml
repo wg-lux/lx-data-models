@@ -1,0 +1,22 @@
+- model: reference_catalog
+  name: medication_intake_time
+  name_de: "Medikamenteneinnahmezeiten"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: daily-evening
+      record_type: medication_intake_time
+      repeats: daily
+      time: '19:00:00'
+    - name: daily-morning
+      record_type: medication_intake_time
+      repeats: daily
+      time: 07:00:00
+    - name: daily-night
+      record_type: medication_intake_time
+      repeats: daily
+      time: 01:00:00
+    - name: daily-noon
+      record_type: medication_intake_time
+      repeats: daily
+      time: '13:00:00'

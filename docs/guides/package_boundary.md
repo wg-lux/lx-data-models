@@ -1,9 +1,24 @@
 # Package Boundary Guide
 
+## Host presets and optional employees
+
+For the canonical package layout, field contracts, optional employees, and
+validation/import commands, see [Structure of a valid lx-dtypes package](dtypes-package-structure.md).
+That guide includes a loadable documentation example and an agent/reviewer
+checklist. Reuse the existing ledger `Center` and `Examiner`/`ExaminerDataDict`
+contracts; package parsing remains independent of Django setup.
+
 `lx-data-models` should be treated as a package boundary when used from sibling
 applications such as `endoreg-db`.
 
 ## Rules
+
+Browser patient contracts expose local record IDs, never identity matching
+hashes. `PatientExaminationPatientDataPayload` and `PatientPseudonymPayload`
+omit `patient_hash`; `StudyCohortCaseRow` uses `patient_id` and examination IDs
+instead of patient/case hashes. This is a breaking wire-contract change;
+upgrade backend producers and frontend consumers together. Local hash matching
+remains the host application's responsibility.
 
 - Import through public package modules when an `__init__.py` export exists.
 - Do not import test modules, test fixtures, or example scripts from consuming
@@ -20,3 +35,96 @@ applications such as `endoreg-db`.
 - Tests should use `tmp_path` and assert on generated files there.
 - Golden fixtures, if intentionally committed, should live under explicit test
   data directories rather than package roots.
+- Storage ownership, loading and cleanup follow the
+  [terminology storage lifecycle](terminology.md#storage-ownership-and-lifetime).
+  Shared legacy test exports use process-scoped temporary storage and are cleaned
+  at normal interpreter shutdown; new tests should prefer `tmp_path`.
+
+## Test Layout
+
+- Unit tests mirror the production package beneath `tests/unit/lx_dtypes/`.
+- Python fixture providers and golden inputs live beneath `tests/fixtures/`.
+- Repository-wide integration and package-boundary tests live directly beneath
+  `tests/`.
+- Test-only Django settings and pytest configuration belong to `tests/`, never
+  to the distributable `lx_dtypes` package.
+
+## Raw video identity
+
+Video identity is named `raw_video_hash` across ledger models, processing history,
+exports, and hub transfer contracts. Compute it from the original input before
+processing. Reimport resolves that same identity even after anonymization,
+transcoding, or other image operations change the processed artifact.
+`processed_video_hash` verifies a particular processed artifact; it must never
+replace the raw identity or determine the resource's transfer key.
+
+This is an intentional breaking field rename from `video_hash`. Payloads must use
+`raw_video_hash`; there is no legacy alias. Upgrade producers and consumers
+together. The Django RenameField migration preserves existing identity values.
+
+## Unresolved video frame provenance
+
+`VideoProvenanceRecovery` is a separate strict exchange contract from
+`VideoProvenanceBundle`. It binds an explicit `unresolved` mapping status to a
+recording hash and processed timeline, retains optional original presentation
+timestamps and timezone-qualified recording start/end, and permanently sets
+`electrical_matching_eligible` to false. It contains no inferred frame indices.
+A transfer selects either verified ancestry or an unresolved receipt and must
+bind both endpoint hashes. Publishers and receivers must upgrade together;
+older strict schemas reject the new field. Persistence, user acknowledgment,
+audit and media verification belong to endoreg-db, not this package.
+
+## Report extraction evidence
+
+The wire contract is now `report_anonymization_v2`; v1 payloads are rejected.
+`ReportAnonymizationResult.extraction_evidence` is required. Producers and hosts
+must upgrade together; old results fail validation rather than implying success
+from an empty metadata object. The evidence records actual provider invocation,
+validated findings or empty output, and validated deterministic fallback, including
+a bounded provider failure code when a provider failed after selection. A valid
+empty fallback is permitted; failure to run or validate fallback raises the typed
+anonymization failure instead of returning a result. `used_llm` records the actual
+extraction backend, not readiness or selection. These are observations, not
+lifecycle states: endoreg-db's existing Rust reducer exclusively authorizes the
+canonical persisted attempt transitions and the host retains fencing/publication.
+
+A validated empty provider response may continue the configured local extraction
+chain. In that case fallback records `provider_attempted=true` without a failure
+code; this distinguishes normal empty-response fallback from provider failure.
+
+## Hub patient linkage
+
+Hub transfer version `7.0` keeps the field names `patient_uuid` and
+`examination_uuid`, but their values are **hub-scoped pseudonyms**, not the
+source's persisted random UUIDs. The source derives each value locally as
+HMAC-SHA-256 under its local identity salt over the record kind, the local UUID
+and the target hub node key, formatted as an RFC 9562 UUIDv8. Repeated transfers
+of one local record to one hub yield the same pseudonym, so the hub can group
+follow-up examinations, but it cannot recover the local UUID, and pseudonyms for
+different hubs are unlinkable without the salt. The contract rejects any other
+UUID version, so a sender that still emits local (version 4) UUIDs fails closed.
+The UUIDv8 check cannot verify the keyed derivation itself. Local integer primary
+keys and demographic hashes remain rejected. Content hashes continue to identify
+source artifacts and verify processed bytes; they do not identify patients.
+
+Receivers preserve both pseudonyms and enforce authenticated source ownership and
+examination-to-patient linkage. Conflicting ownership fails rather than merging
+patients. Neither identity hashes, identity salts nor local UUIDs are exchanged.
+Study exchange bundles sent to a hub carry the same pseudonyms. Deploy shared
+contracts, sender and receiver together. Versions `3.0` through `6.0` are
+rejected; hub rows received under `5.0` still hold local UUIDs and require an
+explicit, reviewed reconciliation rather than guessed identity mappings.
+
+## Hub segment timeline coordinates
+
+Version `7.0` requires `timeline_coordinates`
+(`contracts/video_segment_timeline.py`) on every transferred video segment. They
+carry the integer presentation timestamp ticks of the first and last included
+frame on the transferred processed generation, with its rational time base and
+content hash. With verified frame provenance they also carry the original
+recording frame indices and ticks, composed from `source_frame_indices`; with an
+unresolved provenance receipt the mapping status is `unresolved` and no original
+values are sent. The contract rejects segments without provenance, a mapping
+status that disagrees with the transferred provenance, and generation ticks that
+disagree with the processed timeline. Receivers recompute the original-recording
+coordinates from the provenance bundle and reject any mismatch.

@@ -1,17 +1,30 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_interventions
 - model: intervention_type
   name: "default_intervention_type"
+  name_de: "Standard-Interventionstyp"
+  name_en: "Default intervention type"
 
 - model: intervention_type
   name: "therapeutic"
+  name_de: "Therapeutisch"
+  name_en: "Therapeutic"
 
 - model: intervention_type
   name: "diagnostic"
+  name_de: "Diagnostisch"
+  name_en: "Diagnostic"
 
 - model: intervention_type
   name: "invasive"
+  name_de: "Invasiv"
+  name_en: "Invasive"
 
 - model: intervention_type
   name: "foreign_body"
+  name_de: "Fremdkörper"
+  name_en: "Foreign body"
 
 - model: intervention_type
   name: "histology_sampling"
+  name_de: "Histologische Probenentnahme"
+  name_en: "Histological sampling"

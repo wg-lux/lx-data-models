@@ -1,0 +1,916 @@
+schema_version: '1'
+source_sha256: f4cf8e2fb50b74d9910295974b96f34c5bcb2813a8eb55796fb9e4ced5b98564
+version: 3.0.0
+bindings:
+  Anatomy:
+    B5: {label: Esophagus, name: mst_esophagus_esophagus}
+    B6: {label: Cricopharynx, name: mst_esophagus_cricopharynx}
+    B7: {label: Upper third, name: mst_esophagus_upper_third}
+    B8: {label: Middle third, name: mst_esophagus_middle_third}
+    B9: {label: Lower third, name: mst_esophagus_lower_third}
+    B10: {label: z-line, name: mst_esophagus_z_line}
+    B11: {label: Cardia, name: mst_esophagus_cardia}
+    B12: {label: Whole esophagus, name: mst_esophagus_whole_esophagus}
+    B13: {label: Anastomosis, name: mst_esophagus_anastomosis}
+    B15: {label: Stomach, name: mst_stomach_stomach}
+    B16: {label: Cardia, name: mst_stomach_cardia}
+    B17: {label: Fundus, name: mst_stomach_fundus}
+    B18: {label: Body, name: mst_stomach_body}
+    B19: {label: Incisura/angulus, name: mst_stomach_incisura_angulus}
+    B20: {label: Antrum, name: mst_stomach_antrum}
+    B21: {label: Prepyloric region, name: mst_stomach_prepyloric_region}
+    B22: {label: Pylorus, name: mst_stomach_pylorus}
+    B23: {label: Whole stomach, name: mst_stomach_whole_stomach}
+    B24: {label: Anastomosis, name: mst_stomach_anastomosis}
+    B25: {label: Hiatal hernia, name: mst_stomach_hiatal_hernia}
+    B26: {label: Diaphragma orifice, name: mst_stomach_diaphragma_orifice}
+    B28: {label: Duodenum, name: mst_duodenum_duodenum}
+    B29: {label: Duodenal bulb, name: mst_duodenum_bulb}
+    B30: {label: D2 - 2nd part of duodenum, name: mst_duodenum_d2}
+    B31: {label: D3 - 3rd part of duodenum, name: mst_duodenum_d3}
+    B32: {label: D4 - 4th part of duodenum, name: mst_duodenum_d4}
+    B33: {label: Upper duodenal knee/ superior duodenal angulus, name: mst_duodenum_upper_knee}
+    B34: {label: Ampullary region, name: mst_duodenum_ampullary_region}
+    B35: {label: Major papilla, name: mst_duodenum_major_papilla}
+    B36: {label: Minor papilla, name: mst_duodenum_minor_papilla}
+    B37: {label: Lower duodenal knee/ inferior duodenal angulus, name: mst_duodenum_lower_knee}
+    B38: {label: Anastomosis, name: mst_duodenum_anastomosis}
+    B41: {label: Jejunum, name: mst_jejunum_jejunum}
+    B42: {label: Ligament of Treitz, name: mst_jejunum_ligament_of_treitz}
+    B43: {label: Afferent loop, name: mst_jejunum_afferent_loop}
+    B44: {label: Efferent loop, name: mst_jejunum_efferent_loop}
+    B45: {label: Jejunal crest, name: mst_jejunum_jejunal_crest}
+    B46: {label: Roux-y-limb, name: mst_jejunum_roux_y_limb}
+    B47: {label: anastomosis, name: mst_jejunum_anastomosis}
+    B48: {label: stoma, name: mst_jejunum_stoma}
+    B50: {label: Ileum, name: mst_ileum_ileum}
+    B51: {label: Stoma, name: mst_ileum_stoma}
+    B58: {label: Colon, name: mst_colon_colon}
+    B59: {label: anus, name: mst_colon_anus}
+    B60: {label: rectum, name: mst_colon_rectum}
+    B61: {label: Sigmoid colon, name: mst_colon_sigmoid}
+    B62: {label: Descending colon, name: mst_colon_descending}
+    B63: {label: Splenic flexure, name: mst_colon_splenic_flexure}
+    B64: {label: Transverse colon, name: mst_colon_transverse}
+    B65: {label: Hepatic flexure, name: mst_colon_hepatic_flexure}
+    B66: {label: Ascending colon, name: mst_colon_ascending}
+    B67: {label: Cecum, name: mst_colon_cecum}
+    B68: {label: Ileocecal valve, name: mst_colon_ileocecal_valve}
+    B69: {label: Anastomosis, name: mst_colon_anastomosis}
+    B70: {label: Pouch, name: mst_colon_pouch}
+    B71: {label: Stoma, name: mst_colon_stoma}
+    B75: {label: Major papilla, name: mst_biliary_major_papilla}
+    B76: {label: Whole biliary tree, name: mst_biliary_whole_tree}
+    B77: {label: Common bile duct, name: mst_biliary_common_bile_duct}
+    B85: {label: Cystic duct, name: mst_biliary_cystic_duct}
+    B86: {label: Cystic duct takeoff, name: mst_biliary_cystic_duct_takeoff}
+    B87: {label: Gallbladder, name: mst_biliary_gallbladder}
+    B88: {label: Bifurcation, name: mst_biliary_bifurcation_hilum}
+    B89: {label: Anastomosis, name: mst_biliary_anastomosis}
+    B90: {label: Left main duct, name: mst_biliary_left_hepatic_duct}
+    B91: {label: Right main duct, name: mst_biliary_right_hepatic_duct}
+    B92: {label: Left intrahepatic branches, name: mst_biliary_left_intrahepatic_branches}
+    B93: {label: Right intrahepatic branches, name: mst_biliary_right_intrahepatic_branches}
+    B94: {label: Segment xx branch, name: mst_biliary_segment_branch}
+    B96: {label: Major papilla, name: mst_pancreatic_major_papilla}
+    B97: {label: Minor papilla, name: mst_pancreatic_minor_papilla}
+    B98: {label: Whole pancreatic duct, name: mst_pancreatic_whole_duct}
+    B99: {label: head, name: mst_pancreatic_head}
+    B100: {label: neck, name: mst_pancreatic_neck}
+    B101: {label: body, name: mst_pancreatic_body}
+    B102: {label: tail, name: mst_pancreatic_tail}
+    B103: {label: Uncinate process, name: mst_pancreatic_uncinate_process}
+    B104: {label: ventral duct, name: mst_pancreatic_ventral_duct}
+    B105: {label: dorsal duct, name: mst_pancreatic_dorsal_duct}
+    B106: {label: Duct of Santorini, name: mst_pancreatic_duct_of_santorini}
+    B107: {label: Duct of Wirsungi, name: mst_pancreatic_duct_of_wirsung}
+    B108: {label: Side branches, name: mst_pancreatic_side_branches}
+  EUSanatomy:
+    B5: {label: esophageal wall, name: mst_eus_esophageal_wall}
+    B6: {label: upper esophagus, name: mst_eus_upper_esophagus}
+    B7: {label: mid esophagus, name: mst_eus_mid_esophagus}
+    B8: {label: lower esophagus, name: mst_eus_lower_esophagus}
+    B9: {label: cardia, name: mst_eus_cardia}
+    B10: {label: mediastinum, name: mst_eus_mediastinum}
+    B11: {label: periesophageal, name: mst_eus_periesophageal}
+    B12: {label: paraesophageal, name: mst_eus_paraesophageal}
+    B13: {label: subcarina, name: mst_eus_subcarina}
+    B14: {label: pleura, name: mst_eus_pleura}
+    B15: {label: lung, name: mst_eus_lung}
+    B16: {label: trachea, name: mst_eus_trachea}
+    B17: {label: main bronchus, name: mst_eus_main_bronchus}
+    B18: {label: left atrium, name: mst_eus_left_atrium}
+    B19: {label: pericardium, name: mst_eus_pericardium}
+    B20: {label: aortopulmonary window, name: mst_eus_aortopulmonary_window}
+    B21: {label: diaphragm, name: mst_eus_diaphragm}
+    B22: {label: crus, name: mst_eus_crus}
+    B23: {label: spine, name: mst_eus_spine}
+    B24: {label: carotid artery, name: mst_eus_carotid_artery}
+    B25: {label: Subclavian artery, name: mst_eus_subclavian_artery}
+    B26: {label: aortic arch, name: mst_eus_aortic_arch}
+    B27: {label: thoracic aorta, name: mst_eus_thoracic_aorta}
+    B28: {label: pulmonary artery, name: mst_eus_pulmonary_artery}
+    B29: {label: superior vena cava, name: mst_eus_superior_vena_cava}
+    B30: {label: inferior vena cava, name: mst_eus_inferior_vena_cava}
+    B31: {label: azygos vein, name: mst_eus_azygos_vein}
+    B32: {label: lymph node station xx, name: mst_eus_lymph_node_station}
+    B34: {label: Stomach, name: mst_eus_stomach}
+    B35: {label: Cardia, name: mst_eus_stomach_cardia}
+    B36: {label: Fundus, name: mst_eus_stomach_fundus}
+    B37: {label: Body, name: mst_eus_stomach_body}
+    B38: {label: Incisura, name: mst_eus_stomach_incisura}
+    B39: {label: Antrum, name: mst_eus_stomach_antrum}
+    B40: {label: Prepyloric region, name: mst_eus_stomach_prepyloric}
+    B41: {label: Pylorus, name: mst_eus_stomach_pylorus}
+    B42: {label: Whole stomach, name: mst_eus_whole_stomach}
+    B43: {label: Anastomosis, name: mst_eus_stomach_anastomosis}
+    B44: {label: Hiatal hernia, name: mst_eus_stomach_hiatal_hernia}
+    B45: {label: Gastric wall, name: mst_eus_gastric_wall}
+    B46: {label: celiac axis, name: mst_eus_celiac_axis}
+    B47: {label: perigastric, name: mst_eus_perigastric}
+    B48: {label: left kidney, name: mst_eus_left_kidney}
+    B49: {label: spleen, name: mst_eus_spleen}
+    B50: {label: splenic hilum, name: mst_eus_splenic_hilum}
+    B51: {label: left adrenal, name: mst_eus_left_adrenal}
+    B52: {label: portal vein, name: mst_eus_portal_vein}
+    B53: {label: splenic vein, name: mst_eus_splenic_vein}
+    B54: {label: portal confluence, name: mst_eus_portal_confluence}
+    B55: {label: splenic artery, name: mst_eus_splenic_artery}
+    B56: {label: left renal artery, name: mst_eus_left_renal_artery}
+    B57: {label: left renal vein, name: mst_eus_left_renal_vein}
+    B58: {label: hepatic artery, name: mst_eus_hepatic_artery}
+    B59: {label: superior mes artery, name: mst_eus_superior_mes_artery}
+    B60: {label: superior mes vein, name: mst_eus_superior_mes_vein}
+    B61: {label: left gastric artery, name: mst_eus_left_gastric_artery}
+    B63: {label: Duodenum, name: mst_eus_duodenum}
+    B64: {label: Duodenal bulb, name: mst_eus_duodenal_bulb}
+    B65: {label: D2 - 2nd part of duodenum, name: mst_eus_duodenum_d2}
+    B66: {label: D3 - 3rd part of duodenum, name: mst_eus_duodenum_d3}
+    B67: {label: D4 - 4th part of duodenum, name: mst_eus_duodenum_d4}
+    B68: {label: Upper duodenal knee, name: mst_eus_duodenum_upper_knee}
+    B69: {label: Ampullary region, name: mst_eus_ampullary_region}
+    B70: {label: Major papilla, name: mst_eus_major_papilla}
+    B71: {label: Minor papilla, name: mst_eus_minor_papilla}
+    B72: {label: Anastomosis, name: mst_eus_duodenum_anastomosis}
+    B73: {label: duiodenal wall, name: mst_eus_duodenal_wall}
+    B74: {label: periduodenal, name: mst_eus_periduodenal}
+    B75: {label: right kidney, name: mst_eus_right_kidney}
+    B76: {label: right adrenal, name: mst_eus_right_adrenal}
+    B77: {label: Inferior vena cava, name: mst_eus_duodenum_inferior_vena_cava}
+    B78: {label: Aorta (abdominal), name: mst_eus_abdominal_aorta}
+    B80: {label: Major papilla, name: mst_eus_biliary_major_papilla}
+    B81: {label: Whole biliary tree, name: mst_eus_whole_biliary_tree}
+    B82: {label: Common bile duct, name: mst_eus_common_bile_duct}
+    B90: {label: Cystic duct, name: mst_eus_cystic_duct}
+    B91: {label: Cystic duct takeoff, name: mst_eus_cystic_duct_takeoff}
+    B92: {label: Gallbladder, name: mst_eus_gallbladder}
+    B93: {label: Bifurcation, name: mst_eus_bifurcation}
+    B94: {label: generalized, name: mst_eus_biliary_generalized}
+    B95: {label: peribiliary, name: mst_eus_peribiliary}
+    B97: {label: Major papilla, name: mst_eus_pancreas_major_papilla}
+    B98: {label: Minor papilla, name: mst_eus_pancreas_minor_papilla}
+    B99: {label: Whole pancreatic duct, name: mst_eus_whole_pancreatic_duct}
+    B100: {label: head, name: mst_eus_pancreas_head}
+    B101: {label: neck, name: mst_eus_pancreas_neck}
+    B102: {label: body, name: mst_eus_pancreas_body}
+    B103: {label: tail, name: mst_eus_pancreas_tail}
+    B104: {label: Uncinate process, name: mst_eus_pancreas_uncinate}
+    B105: {label: ventral duct, name: mst_eus_ventral_duct}
+    B106: {label: dorsal duct, name: mst_eus_dorsal_duct}
+    B107: {label: Duct of Santorini, name: mst_eus_duct_santorini}
+    B108: {label: Duct of Wirsungi, name: mst_eus_duct_wirsungi}
+    B109: {label: Side branches, name: mst_eus_side_branches}
+    B110: {label: generalized, name: mst_eus_pancreas_generalized}
+    B111: {label: peripancreatic, name: mst_eus_peripancreatic}
+    B113: {label: colorectal wall, name: mst_eus_colorectal_wall}
+    B114: {label: anal canal, name: mst_eus_anal_canal}
+    B115: {label: lower rectum, name: mst_eus_lower_rectum}
+    B116: {label: mid rectum, name: mst_eus_mid_rectum}
+    B117: {label: upper rectum, name: mst_eus_upper_rectum}
+    B118: {label: rectosigmoid junction, name: mst_eus_rectosigmoid_junction}
+    B119: {label: sigmoid, name: mst_eus_sigmoid}
+    B120: {label: descending colon, name: mst_eus_descending_colon}
+    B121: {label: transverse colon, name: mst_eus_transverse_colon}
+    B122: {label: ascending colon, name: mst_eus_ascending_colon}
+    B123: {label: cecum, name: mst_eus_cecum}
+    B124: {label: terminal ileum, name: mst_eus_terminal_ileum}
+    B125: {label: perianal, name: mst_eus_perianal}
+    B126: {label: 'perirectal ', name: mst_eus_perirectal}
+    B127: {label: pericolonic, name: mst_eus_pericolonic}
+    B128: {label: prostate gland, name: mst_eus_prostate_gland}
+    B129: {label: seminal vesicles, name: mst_eus_seminal_vesicles}
+    B130: {label: urinary bladder, name: mst_eus_urinary_bladder}
+    B131: {label: uterus, name: mst_eus_uterus}
+    B132: {label: vagina, name: mst_eus_vagina}
+    B133: {label: sacrum, name: mst_eus_sacrum}
+    B134: {label: puborectalis muscle, name: mst_eus_puborectalis_muscle}
+    B135: {label: internal sphincter, name: mst_eus_internal_sphincter}
+    B136: {label: external sphincter, name: mst_eus_external_sphincter}
+    B137: {label: anastomosis, name: mst_eus_colorectal_anastomosis}
+  Luminal_findings:
+    B5: {label: Normal, name: mst_luminal_normal}
+    B6: {label: Dilation, name: mst_luminal_dilation}
+    B7: {label: Stenosis, name: mst_luminal_stenosis}
+    B13: {label: Compression, name: mst_luminal_compression}
+    B15: {label: Diverticulum, name: mst_luminal_diverticulum}
+    B25: {label: Previous surgery, name: mst_luminal_previous_surgery}
+    B26: {label: Deformity, name: mst_luminal_deformity}
+    B27: {label: Ring/web, name: mst_luminal_ring_web}
+    B28: {label: Hiatal hernia, name: mst_luminal_hiatal_hernia}
+    B30: {label: Z-line, name: mst_luminal_z_line}
+    B33: {label: Foreign body, name: mst_content_foreign_body}
+    B34: {label: Blood, name: mst_content_blood}
+    B37: {label: Food, name: mst_content_food}
+    B38: {label: Bezoar, name: mst_content_bezoar}
+    B39: {label: Fluid, name: mst_content_fluid}
+    B40: {label: Parasites, name: mst_content_parasites}
+    B41: {label: Stent, name: mst_content_stent}
+    B42: {label: Gastrostomy, name: mst_content_gastrostomy}
+    B43: {label: Faeces, name: mst_content_faeces}
+    B44: {label: Exudate, name: mst_content_exudate}
+    B46: {label: Erythematous, name: mst_mucosa_erythematous}
+    B47: {label: Edematous, name: mst_mucosa_edematous}
+    B48: {label: Granular, name: mst_mucosa_granular}
+    B49: {label: Nodular, name: mst_mucosa_nodular}
+    B50: {label: Friable, name: mst_mucosa_friable}
+    B51: {label: Hemorrhagic, name: mst_mucosa_hemorrhagic}
+    B52: {label: Petechial, name: mst_mucosa_petechial}
+    B53: {label: Atrophic, name: mst_mucosa_atrophic}
+    B54: {label: Sclerosis/scarring, name: mst_mucosa_sclerosis_scarring}
+    B55: {label: Barretts esophagus, name: mst_mucosa_barretts_esophagus}
+    B56: {label: Esophagitis, name: mst_mucosa_esophagitis}
+    B60: {label: Candidosis/candidiasis, name: mst_mucosa_candidosis}
+    B61: {label: Scalloping, name: mst_mucosa_scalloping}
+    B62: {label: Pathological vascular pattern, name: mst_mucosa_pathological_vascular_pattern}
+    B63: {label: Ulcerated mucosa, name: mst_mucosa_ulcerated}
+    B64: {label: Pseudomembranes, name: mst_mucosa_pseudomembranes}
+    B65: {label: Melanosis, name: mst_mucosa_melanosis}
+    B67: {label: Angiectasia, name: mst_flat_angioectasia}
+    B71: {label: Dieulafoy lesion, name: mst_flat_dieulafoy_lesion}
+    B77: {label: Ectopic gastric mucosa, name: mst_flat_ectopic_gastric_mucosa}
+    B78: {label: Flat/elevated superficial lesion, name: mst_flat_superficial_lesion}
+    B88: {label: Nodule, name: mst_protruding_nodule}
+    B90: {label: Polyp, name: mst_protruding_polyp}
+    B106: {label: Tumor/mass, name: mst_protruding_tumor_mass}
+    B116: {label: Varices, name: mst_protruding_varices}
+    B125: {label: Enlarged folds, name: mst_protruding_enlarged_folds}
+    B127: {label: Ectopic pancreas, name: mst_protruding_ectopic_pancreas}
+    B128: {label: Enlarged Brunners glands, name: mst_protruding_enlarged_brunners_glands}
+    B129: {label: Hemorrhoids, name: mst_protruding_hemorrhoids}
+    B131: {label: Condylomas, name: mst_protruding_condylomas}
+    B134: {label: Erosion, name: mst_excavated_erosion}
+    B139: {label: Depressed superficial lesion, name: mst_excavated_depressed_superficial_lesion}
+    B148: {label: Ulcer, name: mst_excavated_ulcer}
+    B156: {label: Scar, name: mst_excavated_scar}
+    B157: {label: Fistula, name: mst_excavated_fistula}
+    B158: {label: Perforation, name: mst_excavated_perforation}
+    B161: {label: Mallory-Weiss tear, name: mst_excavated_mallory_weiss_tear}
+    B165: {label: Anal fissure, name: mst_excavated_anal_fissure}
+  ERCP findings:
+    B30: {label: Pancreas divisum, name: mst_ercp_pancreas_divisum}
+    B32: {label: Pancreas annulare, name: mst_ercp_pancreas_annulare}
+    B33: {label: Common channel, name: mst_ercp_common_channel}
+    B34: {label: Cystic duct implant, name: mst_ercp_cystic_duct_implant}
+    B36: {label: hepatic duct anomaly, name: mst_ercp_hepatic_duct_anomaly}
+    B40: {label: Irregularity, name: mst_ercp_irregularity}
+    B42: {label: Dilation, name: mst_ercp_dilation}
+    B44: {label: Stenosis, name: mst_ercp_stenosis}
+    B51: {label: Stone, name: mst_ercp_stone}
+    B56: {label: Tumor, name: mst_ercp_tumor}
+    B62: {label: Cavity, name: mst_ercp_cavity}
+    B65: {label: Fistula, name: mst_ercp_fistula}
+    B66: {label: Leak, name: mst_ercp_leak}
+    B69: {label: Extravasation, name: mst_ercp_extravasation}
+    B70: {label: Parenchymal filling, name: mst_ercp_parenchymal_filling}
+    B71: {label: Stent, name: mst_ercp_stent}
+    B75: {label: Filling defects, name: mst_ercp_filling_defects}
+    B82: {label: Previous surgery, name: mst_ercp_previous_surgery}
+    A5: {label: Papillary features, name: mst_ercp_papillary_features}
+  EUS findings:
+    A4: {label: Intramural lesion, name: mst_eus_intramural_lesion}
+    A5: {label: Wall thickening, name: mst_eus_wall_thickening}
+    A6: {label: Polyp, name: mst_eus_polyp}
+    A7: {label: Mass, name: mst_eus_mass}
+    A8: {label: Lymph node(s), name: mst_eus_lymph_nodes}
+    A9: {label: Stricture, name: mst_eus_stricture}
+    A10: {label: Extramural mass, name: mst_eus_extramural_mass}
+    A11: {label: Varices, name: mst_eus_varices}
+    A12: {label: Collaterals, name: mst_eus_collaterals}
+    A13: {label: Pleural effusion, name: mst_eus_pleural_effusion}
+    A14: {label: Cardiac effusion, name: mst_eus_cardiac_effusion}
+    A15: {label: Ascites, name: mst_eus_ascites}
+    A16: {label: Cyst, name: mst_eus_cyst}
+    A17: {label: Parenchymal changes, name: mst_eus_parenchymal_changes}
+    A18: {label: Pancreatic duct changes, name: mst_eus_pancreatic_duct_changes}
+    A19: {label: Calcification, name: mst_eus_calcification}
+    A20: {label: Ventral anlage, name: mst_eus_ventral_anlage}
+    A21: {label: Pancreatic stent, name: mst_eus_pancreatic_stent}
+    A22: {label: Bile duct changes, name: mst_eus_bile_duct_changes}
+    A23: {label: Cholelithiasis, name: mst_eus_cholelithiasis}
+    A24: {label: Gallbladder sludge, name: mst_eus_gallbladder_sludge}
+    A25: {label: Biliary stent, name: mst_eus_biliary_stent}
+    A26: {label: Pancreas divisum, name: mst_eus_pancreas_divisum}
+  Luminal_findings_organ:
+    B6: {label: Dilation, name: mst_luminal_dilation}
+    B7: {label: Stenosis, name: mst_luminal_stenosis}
+    B8: {label: Extrinsic compression, name: mst_luminal_compression}
+    B9: {label: Diverticulum, name: mst_luminal_diverticulum}
+    B10: {label: Previous surgery, name: mst_luminal_previous_surgery}
+    B11: {label: Deformity, name: mst_luminal_deformity}
+    B12: {label: Ring/web, name: mst_luminal_ring_web}
+    B13: {label: Hiatal hernia, name: mst_luminal_hiatal_hernia}
+    B14: {label: Z-line, name: mst_luminal_z_line}
+    B16: {label: Foreign body, name: mst_content_foreign_body}
+    B17: {label: Blood, name: mst_content_blood}
+    B18: {label: Food, name: mst_content_food}
+    B19: {label: Bezoar, name: mst_content_bezoar}
+    B20: {label: Fluid, name: mst_content_fluid}
+    B21: {label: Parasites, name: mst_content_parasites}
+    B22: {label: Stent, name: mst_content_stent}
+    B23: {label: Rubber band, name: mst_content_rubber_band}
+    B24: {label: Metal Clip, name: mst_content_metal_clip}
+    B25: {label: Gastrostomy, name: mst_content_gastrostomy}
+    B26: {label: Faeces, name: mst_content_faeces}
+    B27: {label: Exudate, name: mst_content_exudate}
+    B29: {label: Erythematous, name: mst_mucosa_erythematous}
+    B30: {label: Edematous, name: mst_mucosa_edematous}
+    B31: {label: Granular, name: mst_mucosa_granular}
+    B32: {label: Nodular, name: mst_mucosa_nodular}
+    B33: {label: Friable, name: mst_mucosa_friable}
+    B34: {label: Hemorrhagic, name: mst_mucosa_hemorrhagic}
+    B35: {label: (Petechial), name: mst_mucosa_petechial}
+    B36: {label: Atrophic, name: mst_mucosa_atrophic}
+    B37: {label: Scarring, name: mst_mucosa_sclerosis_scarring}
+    B38: {label: Barretts esophagus, name: mst_mucosa_barretts_esophagus}
+    B39: {label: Esophagitis, name: mst_mucosa_esophagitis}
+    B40: {label: Candidosis, name: mst_mucosa_candidosis}
+    B41: {label: Scalloping, name: mst_mucosa_scalloping}
+    B42: {label: Path.  vascular pattern, name: mst_mucosa_pathological_vascular_pattern}
+    B43: {label: Ulcerated mucosa, name: mst_mucosa_ulcerated}
+    B44: {label: Pseudomembranes, name: mst_mucosa_pseudomembranes}
+    B45: {label: Melanosis, name: mst_mucosa_melanosis}
+    B47: {label: Angiectasia, name: mst_flat_angioectasia}
+    B48: {label: Ectopic gastric mucosa, name: mst_flat_ectopic_gastric_mucosa}
+    B49: {label: Dieulafoy lesion, name: mst_flat_dieulafoy_lesion}
+    B50: {label: Flat/elevated superficial lesion, name: mst_flat_superficial_lesion}
+    B54: {label: Nodule, name: mst_protruding_nodule}
+    B55: {label: Polyp, name: mst_protruding_polyp}
+    B56: {label: Tumor/mass, name: mst_protruding_tumor_mass}
+    B57: {label: Varices, name: mst_protruding_varices}
+    B58: {label: Enlarged folds, name: mst_protruding_enlarged_folds}
+    B59: {label: Ectopic pancreas, name: mst_protruding_ectopic_pancreas}
+    B60: {label: Enlarged Brunners glands, name: mst_protruding_enlarged_brunners_glands}
+    B61: {label: Hemorrhoids, name: mst_protruding_hemorrhoids}
+    B63: {label: Erosion, name: mst_excavated_erosion}
+    B64: {label: Depressed superficial lesion, name: mst_excavated_depressed_superficial_lesion}
+    B65: {label: Ulcer, name: mst_excavated_ulcer}
+    B66: {label: Scar, name: mst_excavated_scar}
+    B67: {label: Fistula, name: mst_excavated_fistula}
+    B68: {label: Perforation, name: mst_excavated_perforation}
+    B69: {label: Mallory-Weiss tear, name: mst_excavated_mallory_weiss_tear}
+    B70: {label: Anal fissure, name: mst_excavated_anal_fissure}
+  ERCP_findings_organ:
+    B30: {label: Pancreas divisum, name: mst_ercp_pancreas_divisum}
+    B31: {label: Pancreas annulare, name: mst_ercp_pancreas_annulare}
+    B32: {label: Cystic duct implant, name: mst_ercp_cystic_duct_implant}
+    B33: {label: Hepatic duct implant, name: mst_ercp_hepatic_duct_implant}
+    B36: {label: Irregularity, name: mst_ercp_irregularity}
+    B37: {label: Dilation, name: mst_ercp_dilation}
+    B38: {label: Stenosis, name: mst_ercp_stenosis}
+    B39: {label: Stone, name: mst_ercp_stone}
+    B40: {label: Tumor, name: mst_ercp_tumor}
+    B41: {label: Cavity, name: mst_ercp_cavity}
+    B42: {label: Fistula, name: mst_ercp_fistula}
+    B43: {label: Leak, name: mst_ercp_leak}
+    B44: {label: Extravasation, name: mst_ercp_extravasation}
+    B45: {label: Parenchymal filling, name: mst_ercp_parenchymal_filling}
+    B46: {label: Stent, name: mst_ercp_stent}
+    B47: {label: Filling defects, name: mst_ercp_filling_defects}
+    B48: {label: Previous surgery, name: mst_ercp_previous_surgery}
+  EUS findings_organ:
+    A4: {label: Intramural lesion, name: mst_eus_intramural_lesion}
+    A5: {label: Wall thickening, name: mst_eus_wall_thickening}
+    A6: {label: Polyp, name: mst_eus_polyp}
+    A7: {label: Mass, name: mst_eus_mass}
+    A8: {label: Lymph node(s), name: mst_eus_lymph_nodes}
+    A9: {label: Stricture, name: mst_eus_stricture}
+    A10: {label: Extramural mass, name: mst_eus_extramural_mass}
+    A11: {label: Cyst, name: mst_eus_cyst}
+    A12: {label: Varices, name: mst_eus_varices}
+    A13: {label: Collaterals, name: mst_eus_collaterals}
+    A14: {label: Pleural effusion, name: mst_eus_pleural_effusion}
+    A15: {label: Cardiac effusion, name: mst_eus_cardiac_effusion}
+    A16: {label: Ascites, name: mst_eus_ascites}
+    A17: {label: Perianal fistula, name: mst_eus_perianal_fistula}
+    A18: {label: Parenchymal changes, name: mst_eus_parenchymal_changes}
+    A19: {label: Pancreatic duct changes, name: mst_eus_pancreatic_duct_changes}
+    A20: {label: Calcification, name: mst_eus_calcification}
+    A21: {label: Ventral anlage, name: mst_eus_ventral_anlage}
+    A22: {label: Pancreatic stent, name: mst_eus_pancreatic_stent}
+    A23: {label: Bile duct changes, name: mst_eus_bile_duct_changes}
+    A24: {label: Cholelithiasis, name: mst_eus_cholelithiasis}
+    A25: {label: Choledochocele, name: mst_eus_choledochocele}
+    A26: {label: Gallbladder sludge, name: mst_eus_gallbladder_sludge}
+    A27: {label: Biliary stent, name: mst_eus_biliary_stent}
+    A28: {label: Other, name: mst_eus_other}
+  EUS findings_attribute lists:
+    A4: {label: Intramural lesion, name: mst_eus_intramural_lesion}
+    A5: {label: Polyp, name: mst_eus_polyp}
+    A6: {label: Mass, name: mst_eus_mass}
+    A7: {label: Lymph node(s), name: mst_eus_lymph_nodes}
+    A8: {label: Extramural mass, name: mst_eus_extramural_mass}
+    A9: {label: Varices, name: mst_eus_varices}
+    A10: {label: Collaterals, name: mst_eus_collaterals}
+    A11: {label: Cyst, name: mst_eus_cyst}
+    A12: {label: Parenchymal changes, name: mst_eus_parenchymal_changes}
+    A13: {label: Pancr.  duct changes, name: mst_eus_pancreatic_duct_changes}
+    A14: {label: Calcification, name: mst_eus_calcification}
+    A17: {label: Intramural lesion, name: mst_eus_intramural_lesion}
+    A18: {label: Polyp, name: mst_eus_polyp}
+    A19: {label: Mass, name: mst_eus_mass}
+    A20: {label: Lymph node(s), name: mst_eus_lymph_nodes}
+    A21: {label: Extramural mass, name: mst_eus_extramural_mass}
+    A22: {label: Varices, name: mst_eus_varices}
+    A23: {label: Collaterals, name: mst_eus_collaterals}
+    A24: {label: Cyst, name: mst_eus_cyst}
+    A25: {label: Parenchymal changes, name: mst_eus_parenchymal_changes}
+    A26: {label: Pancr.  duct changes, name: mst_eus_pancreatic_duct_changes}
+    A27: {label: Calcification, name: mst_eus_calcification}
+    A30: {label: Intramural lesion, name: mst_eus_intramural_lesion}
+    A31: {label: Wall thickening, name: mst_eus_wall_thickening}
+    A32: {label: Polyp, name: mst_eus_polyp}
+    A33: {label: Mass, name: mst_eus_mass}
+    A34: {label: Lymph node(s), name: mst_eus_lymph_nodes}
+    A35: {label: Extramural mass, name: mst_eus_extramural_mass}
+    A36: {label: Parenchymal changes, name: mst_eus_parenchymal_changes}
+    A37: {label: Cholelithiasis, name: mst_eus_cholelithiasis}
+    A41: {label: Intramural lesion, name: mst_eus_intramural_lesion}
+    A42: {label: Wall thickening, name: mst_eus_wall_thickening}
+    A43: {label: Polyp, name: mst_eus_polyp}
+    A44: {label: Mass, name: mst_eus_mass}
+    A45: {label: Lymph node(s), name: mst_eus_lymph_nodes}
+    A46: {label: Extramural mass, name: mst_eus_extramural_mass}
+    A47: {label: Parenchymal changes, name: mst_eus_parenchymal_changes}
+    A48: {label: Cholelithiasis, name: mst_eus_cholelithiasis}
+  Reasons:
+    B5: {label: Abdominal distress/pain, name: mst_upper_symptom_abdominal_distress_pain}
+    B6: {label: Dyspepsia, name: mst_upper_symptom_dyspepsia}
+    B7: {label: Heartburn, name: mst_upper_symptom_heartburn}
+    B8: {label: Dysphagia, name: mst_upper_symptom_dysphagia}
+    B9: {label: Odynophagia, name: mst_upper_symptom_odynophagia}
+    B10: {label: Vomiting, name: mst_upper_symptom_vomiting}
+    B11: {label: Hematemesis, name: mst_upper_symptom_hematemesis}
+    B12: {label: Melena, name: mst_upper_symptom_melena}
+    B13: {label: Nausea, name: mst_upper_symptom_nausea}
+    B14: {label: Weight loss, name: mst_upper_symptom_weight_loss}
+    B15: {label: Anemia, name: mst_upper_symptom_anemia}
+    B16: {label: Diarrhea, name: mst_upper_symptom_diarrhea}
+    B18: {label: Achalasia, name: mst_upper_disease_achalasia}
+    B19: {label: Anastomic leak, name: mst_upper_disease_anastomic_leak}
+    B20: {label: Angiectasia, name: mst_upper_disease_angioectasia}
+    B21: {label: Atrophic gastritis, name: mst_upper_disease_atrophic_gastritis}
+    B22: {label: Barretts esophagus, name: mst_upper_disease_barretts_esophagus}
+    B23: {label: Caustic ingestion, name: mst_upper_disease_caustic_ingestion}
+    B24: {label: Celiac disease, name: mst_upper_disease_celiac_disease}
+    B25: {label: Diverticulum, name: mst_upper_disease_diverticulum}
+    B26: {label: Duodenal stricture, name: mst_upper_disease_duodenal_stricture}
+    B27: {label: Duodenal ulcer, name: mst_upper_disease_duodenal_ulcer}
+    B28: {label: Esophageal stricture, name: mst_upper_disease_esophageal_stricture}
+    B29: {label: Esophageal varices, name: mst_upper_disease_esophageal_varices}
+    B30: {label: Fistula, name: mst_upper_disease_fistula}
+    B31: {label: Foreign body, name: mst_upper_disease_foreign_body}
+    B32: {label: Gastric ulcer, name: mst_upper_disease_gastric_ulcer}
+    B33: {label: Gastric varices, name: mst_upper_disease_gastric_varices}
+    B34: {label: GERD, name: mst_upper_disease_gerd}
+    B35: {label: Lymphoma, name: mst_upper_disease_lymphoma}
+    B36: {label: 'Metastasis, unknown origin', name: mst_upper_disease_metastasis_unknown_origin}
+    B37: {label: Other esophagitis, name: mst_upper_disease_other_esophagitis}
+    B38: {label: Pernicious anaemia, name: mst_upper_disease_pernicious_anaemia}
+    B39: {label: Polyp, name: mst_upper_disease_polyp}
+    B40: {label: Precancrous lesions, name: mst_upper_disease_precancrous_lesions}
+    B41: {label: Pyloric stenosis, name: mst_upper_disease_pyloric_stenosis}
+    B42: {label: Reflux esophagitis, name: mst_upper_disease_reflux_esophagitis}
+    B43: {label: Superficial neoplastic lesion, name: mst_upper_disease_superficial_neoplastic_lesion}
+    B44: {label: Tumor/mass, name: mst_upper_disease_tumor_mass}
+    B48: {label: Hematochezia, name: mst_colon_symptom_hematochezia}
+    B49: {label: Melena, name: mst_colon_symptom_melena}
+    B50: {label: Diarrhea, name: mst_colon_symptom_diarrhea}
+    B51: {label: Abdominal distress/pain, name: mst_colon_symptom_abdominal_distress_pain}
+    B52: {label: Altered bowel habits, name: mst_colon_symptom_altered_bowel_habits}
+    B53: {label: Anemia, name: mst_colon_symptom_anemia}
+    B54: {label: Weight loss, name: mst_colon_symptom_weight_loss}
+    B55: {label: Constipation, name: mst_colon_symptom_constipation}
+    B56: {label: Defecation disorder, name: mst_colon_symptom_defecation_disorder}
+    B57: {label: Abdominal mass, name: mst_colon_symptom_abdominal_mass}
+    B59: {label: Anastomotic leak, name: mst_colon_disease_anastomotic_leak}
+    B60: {label: Angiectasia, name: mst_colon_disease_angioectasia}
+    B61: {label: Colonic obstruction, name: mst_colon_disease_colonic_obstruction}
+    B62: {label: Colorectal cancer, name: mst_colon_disease_colorectal_cancer}
+    B63: {label: Crohns disease, name: mst_colon_disease_crohns_disease}
+    B64: {label: Diverticula, name: mst_colon_disease_diverticula}
+    B65: {label: Endocrine mass, name: mst_colon_disease_endocrine_mass}
+    B66: {label: Fistula, name: mst_colon_disease_fistula}
+    B67: {label: Ischemic colitis, name: mst_colon_disease_ischemic_colitis}
+    B68: {label: 'Metastasis, unknown origin', name: mst_colon_disease_metastasis_unknown_origin}
+    B69: {label: Other colitis, name: mst_colon_disease_other_colitis}
+    B70: {label: Polyps, name: mst_colon_disease_polyps}
+    B71: {label: Pouchitis, name: mst_colon_disease_pouchitis}
+    B72: {label: Pseudomembranous colitis, name: mst_colon_disease_pseudomembranous_colitis}
+    B73: {label: Superficial neoplastic lesion, name: mst_colon_disease_superficial_neoplastic_lesion}
+    B74: {label: Ulcerative colitis, name: mst_colon_disease_ulcerative_colitis}
+    B80: {label: Abdominal distress/pain, name: mst_enteroscopy_symptom_abdominal_distress_pain}
+    B81: {label: Vomiting, name: mst_enteroscopy_symptom_vomiting}
+    B82: {label: Melena, name: mst_enteroscopy_symptom_melena}
+    B83: {label: Anemia, name: mst_enteroscopy_symptom_anemia}
+    B84: {label: Diarrhea, name: mst_enteroscopy_symptom_diarrhea}
+    B86: {label: Angiectasia, name: mst_enteroscopy_disease_angioectasia}
+    B87: {label: Celiac disease, name: mst_enteroscopy_disease_celiac_disease}
+    B88: {label: Crohns disease, name: mst_enteroscopy_disease_crohns_disease}
+    B89: {label: Hereditary polyposis syndrome, name: mst_enteroscopy_disease_hereditary_polyposis_syndrome}
+    B90: {label: Lymphoma, name: mst_enteroscopy_disease_lymphoma}
+    B91: {label: NSAID enteropathy, name: mst_enteroscopy_disease_nsaid_enteropathy}
+    B92: {label: Polyps, name: mst_enteroscopy_disease_polyps}
+    B93: {label: Stricture, name: mst_enteroscopy_disease_stricture}
+    B94: {label: mass, name: mst_enteroscopy_disease_mass}
+    B99: {label: Jaundice, name: mst_ercp_symptom_jaundice}
+    B100: {label: Pancreatobiliary pain, name: mst_ercp_symptom_pancreatobiliary_pain}
+    B101: {label: Pruritus, name: mst_ercp_symptom_pruritus}
+    B103: {label: Acute pancreatitis, name: mst_ercp_disease_acute_pancreatitis}
+    B104: {label: Ampullary mass, name: mst_ercp_disease_ampullary_mass}
+    B105: {label: Anastomotic stricture, name: mst_ercp_disease_anastomotic_stricture}
+    B106: {label: Bile duct injury, name: mst_ercp_disease_bile_duct_injury}
+    B107: {label: Bile duct leak, name: mst_ercp_disease_bile_duct_leak}
+    B108: {label: Bile duct stone, name: mst_ercp_disease_bile_duct_stone}
+    B109: {label: Bile duct stricture, name: mst_ercp_disease_bile_duct_stricture}
+    B110: {label: Carolis disease, name: mst_ercp_disease_carolis_disease}
+    B111: {label: Choledochal cyst, name: mst_ercp_disease_choledochal_cyst}
+    B112: {label: Choledochocele, name: mst_ercp_disease_choledochocele}
+    B113: {label: Chronic pancreatitis, name: mst_ercp_disease_chronic_pancreatitis}
+    B114: {label: Fistula, name: mst_ercp_disease_fistula}
+    B115: {label: Gallbladder polyp, name: mst_ercp_disease_gallbladder_polyp}
+    B116: {label: Gallbladder stone, name: mst_ercp_disease_gallbladder_stone}
+    B117: {label: Gallbladder mass, name: mst_ercp_disease_gallbladder_mass}
+    B118: {label: Hepatobiliary mass, name: mst_ercp_disease_hepatobiliary_mass}
+    B119: {label: IPMT, name: mst_ercp_disease_ipmt}
+    B120: {label: Mirizzi syndrome, name: mst_ercp_disease_mirizzi_syndrome}
+    B121: {label: Pancreatic duct leak, name: mst_ercp_disease_pancreatic_duct_leak}
+    B122: {label: Pancreatic injury, name: mst_ercp_disease_pancreatic_injury}
+    B123: {label: Pancreatic pseudocyst, name: mst_ercp_disease_pancreatic_pseudocyst}
+    B124: {label: Pancreatic stone, name: mst_ercp_disease_pancreatic_stone}
+    B125: {label: Pancreatic mass, name: mst_ercp_disease_pancreatic_mass}
+    B126: {label: Papillary dysfunction, name: mst_ercp_disease_papillary_dysfunction}
+    B127: {label: Parasites, name: mst_ercp_disease_parasites}
+    B128: {label: Parenchymal liver disease, name: mst_ercp_disease_parenchymal_liver_disease}
+    B129: {label: Primary sclerosing cholangitis, name: mst_ercp_disease_primary_sclerosing_cholangitis}
+    B130: {label: Purulent cholangitis, name: mst_ercp_disease_purulent_cholangitis}
+    B131: {label: Stent dysfunction, name: mst_ercp_disease_stent_dysfunction}
+    B136: {label: Abdominal pain, name: mst_eus_symptom_abdominal_pain}
+    B137: {label: Diarrhea, name: mst_eus_symptom_diarrhea}
+    B138: {label: Jaundice, name: mst_eus_symptom_jaundice}
+    B139: {label: Pancreatobiliary pain, name: mst_eus_symptom_pancreatobiliary_pain}
+    B140: {label: Weight loss, name: mst_eus_symptom_weight_loss}
+    B141: {label: Abdominal mass, name: mst_eus_disease_abdominal_mass}
+    B142: {label: Ampullary mass, name: mst_eus_disease_ampullary_mass}
+    B143: {label: Bile duct mass, name: mst_eus_disease_bile_duct_mass}
+    B144: {label: Bile duct stone, name: mst_eus_disease_bile_duct_stone}
+    B145: {label: Bile duct stricture, name: mst_eus_disease_bile_duct_stricture}
+    B146: {label: Colorectal intramural lesion, name: mst_eus_disease_colorectal_intramural_lesion}
+    B147: {label: Colorectal mass, name: mst_eus_disease_colorectal_mass}
+    B148: {label: Colorectal stricture, name: mst_eus_disease_colorectal_stricture}
+    B149: {label: Duodenal intramural lesion, name: mst_eus_disease_duodenal_intramural_lesion}
+    B150: {label: Duodenal mass, name: mst_eus_disease_duodenal_mass}
+    B151: {label: Duodenal stricture, name: mst_eus_disease_duodenal_stricture}
+    B152: {label: Esophageal intramural lesion, name: mst_eus_disease_esophageal_intramural_lesion}
+    B153: {label: Esophageal mass, name: mst_eus_disease_esophageal_mass}
+    B154: {label: Esophageal stricture, name: mst_eus_disease_esophageal_stricture}
+    B155: {label: Gastric intramural lesion, name: mst_eus_disease_gastric_intramural_lesion}
+    B156: {label: Gastric mass, name: mst_eus_disease_gastric_mass}
+    B157: {label: Liver mass, name: mst_eus_disease_liver_mass}
+    B158: {label: Mediastinal lymph node/mass, name: mst_eus_disease_mediastinal_lymph_node_mass}
+    B159: {label: Pancreatic cyst, name: mst_eus_disease_pancreatic_cyst}
+    B160: {label: Pancreatic mass, name: mst_eus_disease_pancreatic_mass}
+    B161: {label: Pancreatic pseudocyst, name: mst_eus_disease_pancreatic_pseudocyst}
+    B162: {label: Pancreatic stone, name: mst_eus_disease_pancreatic_stone}
+    B163: {label: Pancreatitis - acute, name: mst_eus_disease_pancreatitis_acute}
+    B164: {label: Pancreatitis - chronic, name: mst_eus_disease_pancreatitis_chronic}
+    B165: {label: Perirectal mass, name: mst_eus_disease_perirectal_mass}
+    B166: {label: Pulmonary mass, name: mst_eus_disease_pulmonary_mass}
+  Diagnoses:
+    B5: {label: Aberrant pancreas, name: mst_dx_upper_aberrant_pancreas}
+    B6: {label: Achalasia, name: mst_dx_upper_achalasia}
+    B7: {label: Barretts esophagus, name: mst_dx_upper_barretts_esophagus}
+    B8: {label: Benign stricture, name: mst_dx_upper_benign_stricture}
+    B9: {label: Bleeding of unknown origin, name: mst_dx_upper_bleeding_unknown_origin}
+    B10: {label: Coeliac disease, name: mst_dx_upper_coeliac_disease}
+    B11: {label: Crohns disease, name: mst_dx_upper_crohns_disease}
+    B12: {label: Dieulafoy lesion, name: mst_dx_upper_dieulafoy_lesion}
+    B13: {label: Duodenal benign tumor, name: mst_dx_upper_duodenal_benign_tumor}
+    B14: {label: Duodenal bulb deformity, name: mst_dx_upper_duodenal_bulb_deformity}
+    B15: {label: Duodenal cancer, name: mst_dx_upper_duodenal_cancer}
+    B16: {label: Duodenal diverticulum, name: mst_dx_upper_duodenal_diverticulum}
+    B17: {label: Duodenal fistula, name: mst_dx_upper_duodenal_fistula}
+    B18: {label: Duodenal polyp, name: mst_dx_upper_duodenal_polyp}
+    B19: {label: Duodenal postoperative appearance, name: mst_dx_upper_duodenal_postoperative_appearance}
+    B20: {label: Duodenal submucosal tumor, name: mst_dx_upper_duodenal_submucosal_tumor}
+    B21: {label: Duodenal superficial neoplasm, name: mst_dx_upper_duodenal_superficial_neoplasm}
+    B22: {label: Duodenal ulcer, name: mst_dx_upper_duodenal_ulcer}
+    B23: {label: Duodenal ulcer with bleeding, name: mst_dx_upper_duodenal_ulcer_bleeding}
+    B24: {label: Duodenopathy - erosive, name: mst_dx_upper_duodenopathy_erosive}
+    B25: {label: Duodenopathy - hemorrhagic, name: mst_dx_upper_duodenopathy_hemorrhagic}
+    B26: {label: Duodenopathy - hyperemic, name: mst_dx_upper_duodenopathy_hyperemic}
+    B27: {label: Eosinophilic esophagitis, name: mst_dx_upper_eosinophilic_esophagitis}
+    B28: {label: Esophageal benign tumor, name: mst_dx_upper_esophageal_benign_tumor}
+    B29: {label: Esophageal caustic injury, name: mst_dx_upper_esophageal_caustic_injury}
+    B30: {label: Esophageal cancer, name: mst_dx_upper_esophageal_cancer}
+    B31: {label: Esophageal candidiasis, name: mst_dx_upper_esophageal_candidiasis}
+    B32: {label: Esophageal diverticulum, name: mst_dx_upper_esophageal_diverticulum}
+    B33: {label: Esophageal fistula, name: mst_dx_upper_esophageal_fistula}
+    B34: {label: Esophageal foreign body, name: mst_dx_upper_esophageal_foreign_body}
+    B35: {label: Esophageal polyp, name: mst_dx_upper_esophageal_polyp}
+    B36: {label: Esophageal postoperative apperance, name: mst_dx_upper_esophageal_postoperative_appearance}
+    B37: {label: Esophageal stricture, name: mst_dx_upper_esophageal_stricture}
+    B38: {label: Esophageal superficial neoplasm, name: mst_dx_upper_esophageal_superficial_neoplasm}
+    B39: {label: Esophageal submucosal tumor, name: mst_dx_upper_esophageal_submucosal_tumor}
+    B40: {label: Esophageal varices, name: mst_dx_upper_esophageal_varices}
+    B41: {label: Extrinsic compression, name: mst_dx_upper_extrinsic_compression}
+    B42: {label: Gastric benign tumor, name: mst_dx_upper_gastric_benign_tumor}
+    B43: {label: Gastric cancer, name: mst_dx_upper_gastric_cancer}
+    B44: {label: Gastric diverticulum, name: mst_dx_upper_gastric_diverticulum}
+    B45: {label: Gastric fistula, name: mst_dx_upper_gastric_fistula}
+    B46: {label: Gastric foreign body, name: mst_dx_upper_gastric_foreign_body}
+    B47: {label: Gastric caustic injury, name: mst_dx_upper_gastric_caustic_injury}
+    B48: {label: Gastric lymphoma, name: mst_dx_upper_gastric_lymphoma}
+    B49: {label: Gastric polyp(s), name: mst_dx_upper_gastric_polyps}
+    B50: {label: Gastric postoperative appearance, name: mst_dx_upper_gastric_postoperative_appearance}
+    B51: {label: Gastric retention, name: mst_dx_upper_gastric_retention}
+    B52: {label: Gastric submucosal tumor, name: mst_dx_upper_gastric_submucosal_tumor}
+    B53: {label: Gastric superficial neoplasm, name: mst_dx_upper_gastric_superficial_neoplasm}
+    B54: {label: Gastric ulcer, name: mst_dx_upper_gastric_ulcer}
+    B55: {label: Gastric ulcer with bleeding, name: mst_dx_upper_gastric_ulcer_bleeding}
+    B56: {label: Gastric ulcer-anastomotic, name: mst_dx_upper_gastric_ulcer_anastomotic}
+    B57: {label: Gastric varices, name: mst_dx_upper_gastric_varices}
+    B58: {label: Gastropathy-erosive, name: mst_dx_upper_gastropathy_erosive}
+    B59: {label: Gastropathy-hemorrhagic, name: mst_dx_upper_gastropathy_hemorrhagic}
+    B60: {label: Gastropathy-hyperemic, name: mst_dx_upper_gastropathy_hyperemic}
+    B61: {label: Gastropathy-hypertrophic, name: mst_dx_upper_gastropathy_hypertrophic}
+    B62: {label: Gastropathy-NSAID-related, name: mst_dx_upper_gastropathy_nsaid_related}
+    B63: {label: Gastropathy-portal hypertensive, name: mst_dx_upper_gastropathy_portal_hypertensive}
+    B64: {label: Gastropathy-varioloform, name: mst_dx_upper_gastropathy_varioloform}
+    B65: {label: Hiatus hernia, name: mst_dx_upper_hiatus_hernia}
+    B66: {label: Mallory-Weiss tear, name: mst_dx_upper_mallory_weiss_tear}
+    B67: {label: Other esophagitis, name: mst_dx_upper_other_esophagitis}
+    B68: {label: Parasites, name: mst_dx_upper_parasites}
+    B69: {label: Post sclerotherapy appearance, name: mst_dx_upper_post_sclerotherapy_appearance}
+    B70: {label: Pyloric stenosis, name: mst_dx_upper_pyloric_stenosis}
+    B71: {label: Reflux esophagitis, name: mst_dx_upper_reflux_esophagitis}
+    B72: {label: Schatzki ring, name: mst_dx_upper_schatzki_ring}
+    B73: {label: Scar, name: mst_dx_upper_scar}
+    B74: {label: Submucosal tumor, name: mst_dx_upper_submucosal_tumor}
+    B77: {label: Angiectasia, name: mst_dx_enteroscopy_angioectasia}
+    B78: {label: 'Bleeding, unknown origin', name: mst_dx_enteroscopy_bleeding_unknown_origin}
+    B79: {label: Celiac disease, name: mst_dx_enteroscopy_celiac_disease}
+    B80: {label: Crohns disease, name: mst_dx_enteroscopy_crohns_disease}
+    B81: {label: Diverticula, name: mst_dx_enteroscopy_diverticula}
+    B82: {label: Enteropathy - erosive, name: mst_dx_enteroscopy_enteropathy_erosive}
+    B83: {label: Enteropathy - hemorrhagic, name: mst_dx_enteroscopy_enteropathy_hemorrhagic}
+    B84: {label: Enteropathy - hyperemic, name: mst_dx_enteroscopy_enteropathy_hyperemic}
+    B85: {label: Enteropathy - NSAID-related, name: mst_dx_enteroscopy_enteropathy_nsaid_related}
+    B86: {label: Erosions, name: mst_dx_enteroscopy_erosions}
+    B87: {label: FAP, name: mst_dx_enteroscopy_fap}
+    B88: {label: GIST, name: mst_dx_enteroscopy_gist}
+    B89: {label: Graft v host disease, name: mst_dx_enteroscopy_graft_v_host}
+    B90: {label: Juvenile polyposis, name: mst_dx_enteroscopy_juvenile_polyposis}
+    B91: {label: Lipoma, name: mst_dx_enteroscopy_lipoma}
+    B92: {label: Lymphangiectasia, name: mst_dx_enteroscopy_lymphangioectasia}
+    B93: {label: Lymphoma, name: mst_dx_enteroscopy_lymphoma}
+    B94: {label: NSAID-enteropathy, name: mst_dx_enteroscopy_nsaid_enteropathy}
+    B95: {label: Parasites, name: mst_dx_enteroscopy_parasites}
+    B96: {label: Peutz-Jæger polyposis, name: mst_dx_enteroscopy_peutz_jaeger}
+    B97: {label: Polyp(s), name: mst_dx_enteroscopy_polyps}
+    B98: {label: Radiation enteritis, name: mst_dx_enteroscopy_radiation_enteritis}
+    B99: {label: Small bowel benign tumor, name: mst_dx_enteroscopy_small_bowel_benign_tumor}
+    B100: {label: Small bowel malignant tumor, name: mst_dx_enteroscopy_small_bowel_malignant_tumor}
+    B101: {label: Small bowel superficial neoplasm, name: mst_dx_enteroscopy_small_bowel_superficial_neoplasm}
+    B102: {label: Submucosal tumor, name: mst_dx_enteroscopy_submucosal_tumor}
+    B103: {label: Ulcer, name: mst_dx_enteroscopy_ulcer}
+    B106: {label: angiectasia, name: mst_dx_colon_angiodysplasia}
+    B107: {label: Bleeding of unknown origin, name: mst_dx_colon_bleeding_unknown_origin}
+    B108: {label: Colitis - ischemic, name: mst_dx_colon_colitis_ischemic}
+    B109: {label: Colitis - pseudomembranous, name: mst_dx_colon_colitis_pseudomembranous}
+    B110: {label: Colorectal cancer, name: mst_dx_colon_colorectal_cancer}
+    B111: {label: Colorectal superficial neoplasm, name: mst_dx_colon_colorectal_superficial_neoplasm}
+    B112: {label: Condylomata, name: mst_dx_colon_condylomata}
+    B113: {label: Crohns disease - active, name: mst_dx_colon_crohns_active}
+    B114: {label: Crohns disease - fulminant, name: mst_dx_colon_crohns_fulminant}
+    B115: {label: Crohns disease - quiescent, name: mst_dx_colon_crohns_quiescent}
+    B116: {label: Diverticulitis, name: mst_dx_colon_diverticulitis}
+    B117: {label: Diverticulosis, name: mst_dx_colon_diverticulosis}
+    B118: {label: Fistula, name: mst_dx_colon_fistula}
+    B119: {label: Foreign body, name: mst_dx_colon_foreign_body}
+    B120: {label: Hemorrhoids, name: mst_dx_colon_hemorrhoids}
+    B121: {label: Ileitis, name: mst_dx_colon_ileitis}
+    B122: {label: Lipoma, name: mst_dx_colon_lipoma}
+    B123: {label: Lymphoma, name: mst_dx_colon_lymphoma}
+    B124: {label: Melanosis, name: mst_dx_colon_melanosis}
+    B125: {label: Parasites, name: mst_dx_colon_parasites}
+    B126: {label: Pneumatosis coli, name: mst_dx_colon_pneumatosis_coli}
+    B127: {label: Polyp, name: mst_dx_colon_polyp}
+    B128: {label: Polyposis syndrome, name: mst_dx_colon_polyposis_syndrome}
+    B129: {label: Postoperative appearance, name: mst_dx_colon_postoperative_appearance}
+    B130: {label: Proctitis, name: mst_dx_colon_proctitis}
+    B131: {label: Rectal ulcer, name: mst_dx_colon_rectal_ulcer}
+    B132: {label: Solitary ulcer, name: mst_dx_colon_solitary_ulcer}
+    B133: {label: Stricture - inflammatory, name: mst_dx_colon_stricture_inflammatory}
+    B134: {label: Stricture - malignant, name: mst_dx_colon_stricture_malignant}
+    B135: {label: Stricture - postoperative, name: mst_dx_colon_stricture_postoperative}
+    B136: {label: Submucosal tumor, name: mst_dx_colon_submucosal_tumor}
+    B137: {label: Ulcerative colitis - active, name: mst_dx_colon_uc_active}
+    B138: {label: Ulcerative colitis - fulminant, name: mst_dx_colon_uc_fulminant}
+    B139: {label: Ulcerative colitis - quiescent, name: mst_dx_colon_uc_quiescent}
+    B142: {label: Abnormal pancreatobiliary junction, name: mst_dx_ercp_abnormal_pancreatobiliary_junction}
+    B143: {label: Anastomotic stricture, name: mst_dx_ercp_anastomotic_stricture}
+    B144: {label: Biliary fistula/leak, name: mst_dx_ercp_biliary_fistula_leak}
+    B145: {label: Biliary injury, name: mst_dx_ercp_biliary_injury}
+    B146: {label: Biliary occlusion, name: mst_dx_ercp_biliary_occlusion}
+    B147: {label: Biliary stent occlusion, name: mst_dx_ercp_biliary_stent_occlusion}
+    B148: {label: Biliary stone(s), name: mst_dx_ercp_biliary_stones}
+    B149: {label: Biliary stricture, name: mst_dx_ercp_biliary_stricture}
+    B150: {label: Carolis disease, name: mst_dx_ercp_carolis_disease}
+    B151: {label: Choledochal cyst, name: mst_dx_ercp_choledochal_cyst}
+    B152: {label: Choledochocele, name: mst_dx_ercp_choledochocele}
+    B153: {label: Cystic duct stones, name: mst_dx_ercp_cystic_duct_stones}
+    B154: {label: Gallbladder stone(s), name: mst_dx_ercp_gallbladder_stones}
+    B155: {label: Gallbladder tumor, name: mst_dx_ercp_gallbladder_tumor}
+    B156: {label: Hemobilia, name: mst_dx_ercp_hemobilia}
+    B157: {label: IPMT, name: mst_dx_ercp_ipmt}
+    B158: {label: Kolangiocarcinoma, name: mst_dx_ercp_kolangiocarcinoma}
+    B159: {label: Liver parenchymal disease, name: mst_dx_ercp_liver_parenchymal_disease}
+    B160: {label: Mirizzi syndrome, name: mst_dx_ercp_mirizzi_syndrome}
+    B161: {label: Pancreas annulare, name: mst_dx_ercp_pancreas_annulare}
+    B162: {label: Pancreas divisum, name: mst_dx_ercp_pancreas_divisum}
+    B163: {label: Pancreatic cyst, name: mst_dx_ercp_pancreatic_cyst}
+    B164: {label: Pancreatic duct fistula/leak, name: mst_dx_ercp_pancreatic_duct_fistula_leak}
+    B165: {label: Pancreatic duct injury, name: mst_dx_ercp_pancreatic_duct_injury}
+    B166: {label: Pancreatic duct stricture, name: mst_dx_ercp_pancreatic_duct_stricture}
+    B167: {label: Pancreatic stent occlusion, name: mst_dx_ercp_pancreatic_stent_occlusion}
+    B168: {label: Pancreatic stone, name: mst_dx_ercp_pancreatic_stone}
+    B169: {label: Pancreatic tumor, name: mst_dx_ercp_pancreatic_tumor}
+    B170: {label: Pancreatitis - acute, name: mst_dx_ercp_pancreatitis_acute}
+    B171: {label: Pancreatitis - chronic, name: mst_dx_ercp_pancreatitis_chronic}
+    B172: {label: Papillary stenosis, name: mst_dx_ercp_papillary_stenosis}
+    B173: {label: Papillary tumor, name: mst_dx_ercp_papillary_tumor}
+    B174: {label: Primary sclerosing cholangitis, name: mst_dx_ercp_primary_sclerosing_cholangitis}
+    B175: {label: Sump syndrome, name: mst_dx_ercp_sump_syndrome}
+    B176: {label: Suppurative cholangitis, name: mst_dx_ercp_suppurative_cholangitis}
+    B179: {label: Aortic aneurysm, name: mst_dx_eus_aortic_aneurysm}
+    B180: {label: Ascites, name: mst_dx_eus_ascites}
+    B181: {label: Bile duct dilation, name: mst_dx_eus_bile_duct_dilation}
+    B182: {label: Bile duct stone, name: mst_dx_eus_bile_duct_stone}
+    B183: {label: Bile duct stricture, name: mst_dx_eus_bile_duct_stricture}
+    B184: {label: Bile duct tumor, name: mst_dx_eus_bile_duct_tumor}
+    B185: {label: Biliary sludge, name: mst_dx_eus_biliary_sludge}
+    B186: {label: Colorectal cancer, name: mst_dx_eus_colorectal_cancer}
+    B187: {label: Colorectal polyp, name: mst_dx_eus_colorectal_polyp}
+    B188: {label: Colorectal stricture, name: mst_dx_eus_colorectal_stricture}
+    B189: {label: Colorectal submucosal mass, name: mst_dx_eus_colorectal_submucosal_mass}
+    B190: {label: Colorectal ulcer, name: mst_dx_eus_colorectal_ulcer}
+    B191: {label: Crohns disease, name: mst_dx_eus_crohns_disease}
+    B192: {label: Duodenal cancer, name: mst_dx_eus_duodenal_cancer}
+    B193: {label: Duodenal polyp, name: mst_dx_eus_duodenal_polyp}
+    B194: {label: Duodenal stricture, name: mst_dx_eus_duodenal_stricture}
+    B195: {label: Duodenal submucosal mass, name: mst_dx_eus_duodenal_submucosal_mass}
+    B196: {label: Duodenal ulcer, name: mst_dx_eus_duodenal_ulcer}
+    B197: {label: Endocrine tumor, name: mst_dx_eus_endocrine_tumor}
+    B198: {label: Esophageal cancer, name: mst_dx_eus_esophageal_cancer}
+    B199: {label: Esophageal mass, name: mst_dx_eus_esophageal_mass}
+    B200: {label: Esophageal polyp, name: mst_dx_eus_esophageal_polyp}
+    B201: {label: Esophageal stricture, name: mst_dx_eus_esophageal_stricture}
+    B202: {label: Esophageal submucosal mass, name: mst_dx_eus_esophageal_submucosal_mass}
+    B203: {label: Esophageal ulcer, name: mst_dx_eus_esophageal_ulcer}
+    B204: {label: Gallbladder sludge, name: mst_dx_eus_gallbladder_sludge}
+    B205: {label: Gallbladder stone, name: mst_dx_eus_gallbladder_stone}
+    B206: {label: Gastric cancer, name: mst_dx_eus_gastric_cancer}
+    B207: {label: Gastric polyp, name: mst_dx_eus_gastric_polyp}
+    B208: {label: Gastric submucosal mass, name: mst_dx_eus_gastric_submucosal_mass}
+    B209: {label: Gastric ulcer, name: mst_dx_eus_gastric_ulcer}
+    B210: {label: GIST tumor, name: mst_dx_eus_gist_tumor}
+    B211: {label: IPMT, name: mst_dx_eus_ipmt}
+    B212: {label: linitis plastica, name: mst_dx_eus_linitis_plastica}
+    B213: {label: lipoma, name: mst_dx_eus_lipoma}
+    B214: {label: lymphoma, name: mst_dx_eus_lymphoma}
+    B215: {label: Mediastinal lymph node(s), name: mst_dx_eus_mediastinal_lymph_nodes}
+    B216: {label: Mediastinal mass, name: mst_dx_eus_mediastinal_mass}
+    B217: {label: Menetrier’s disease, name: mst_dx_eus_menetriers_disease}
+    B218: {label: Mesenteric artery aneurysm, name: mst_dx_eus_mesenteric_artery_aneurysm}
+    B219: {label: Pancreas divisum, name: mst_dx_eus_pancreas_divisum}
+    B220: {label: Pancreatic cancer, name: mst_dx_eus_pancreatic_cancer}
+    B221: {label: Pancreatic duct dilation, name: mst_dx_eus_pancreatic_duct_dilation}
+    B222: {label: Pancreatic duct stricture, name: mst_dx_eus_pancreatic_duct_stricture}
+    B223: {label: Pancreatic mass, name: mst_dx_eus_pancreatic_mass}
+    B224: {label: Pancreatic pseudocyst, name: mst_dx_eus_pancreatic_pseudocyst}
+    B225: {label: Pancreatic stone, name: mst_dx_eus_pancreatic_stone}
+    B226: {label: Pancreatitis - acute, name: mst_dx_eus_pancreatitis_acute}
+    B227: {label: Pancreatitis - chronic, name: mst_dx_eus_pancreatitis_chronic}
+    B228: {label: Papillary mass, name: mst_dx_eus_papillary_mass}
+    B229: {label: Pericardial effusion, name: mst_dx_eus_pericardial_effusion}
+    B230: {label: Pleural effusion, name: mst_dx_eus_pleural_effusion}
+    B231: {label: Polyp, name: mst_dx_eus_polyp}
+    B232: {label: portal vein thrombosis, name: mst_dx_eus_portal_vein_thrombosis}
+    B233: {label: postradiation changes, name: mst_dx_eus_postradiation_changes}
+    B234: {label: pseudoaneurysm, name: mst_dx_eus_pseudoaneurysm}
+    B235: {label: Splenic artery aneurysm, name: mst_dx_eus_splenic_artery_aneurysm}
+    B236: {label: Submucosal tumor, name: mst_dx_eus_submucosal_tumor}
+    B237: {label: TNM-stage, name: mst_dx_eus_tnm_stage}
+    B238: {label: Ulcerative colitis, name: mst_dx_eus_ulcerative_colitis}
+    B239: {label: Varices, name: mst_dx_eus_varices}
+    B240: {label: Wall thickening, name: mst_dx_eus_wall_thickening}
+  Procedures:
+    A4: {label: Sampling, name: mst_proc_luminal_sampling}
+    A13: {label: Balloon dilation, name: mst_proc_luminal_balloon_dilation}
+    A17: {label: Bougie dilation, name: mst_proc_luminal_bougie_dilation}
+    A19: {label: Band ligation, name: mst_proc_luminal_band_ligation}
+    A23: {label: Injection therapy, name: mst_proc_luminal_injection_therapy}
+    A28: {label: Clipping, name: mst_proc_luminal_clipping}
+    A33: {label: Cautery, name: mst_proc_luminal_cautery}
+    A37: {label: APC, name: mst_proc_luminal_apc}
+    A41: {label: Polypectomy, name: mst_proc_luminal_polypectomy}
+    A50: {label: Hot biopsy, name: mst_proc_luminal_hot_biopsy}
+    A54: {label: Foreign body removal, name: mst_proc_luminal_foreign_body_removal}
+    A58: {label: EMR, name: mst_proc_luminal_emr}
+    A66: {label: ESD, name: mst_proc_luminal_esd}
+    A75: {label: Stent placement, name: mst_proc_luminal_stent_placement}
+    A81: {label: PEG placement, name: mst_proc_luminal_peg_placement}
+    A85: {label: Tube placement, name: mst_proc_luminal_tube_placement}
+    A91: {label: Transmural drainage, name: mst_proc_luminal_transmural_drainage}
+    A100: {label: Ablation therapy, name: mst_proc_luminal_ablation_therapy}
+    A106: {label: Cannulation, name: mst_proc_ercp_cannulation}
+    A119: {label: Opacification, name: mst_proc_ercp_opacification}
+    A127: {label: Papillotomy, name: mst_proc_ercp_papillotomy}
+    A135: {label: Balloon dilatation, name: mst_proc_ercp_balloon_dilatation}
+    A137: {label: Bougie dilatation, name: mst_proc_ercp_bougie_dilatation}
+    A139: {label: Stone extraction, name: mst_proc_ercp_stone_extraction}
+    A146: {label: Stent placement, name: mst_proc_ercp_stent_placement}
+    A149: {label: Stent removal, name: mst_proc_ercp_stent_removal}
+    A154: {label: Hemostasis, name: mst_proc_ercp_hemostasis}
+    A165: {label: FNA, name: mst_proc_eus_fna}
+    A172: {label: Thru cut biopsy, name: mst_proc_eus_thru_cut_biopsy}
+    A174: {label: Celiac plexus block, name: mst_proc_eus_celiac_plexus_block}
+    A179: {label: Contrast injection, name: mst_proc_eus_contrast_injection}
+    A183: {label: Duct drainage, name: mst_proc_eus_duct_drainage}
+  Adv events:
+    A6: {label: Perforation of lumen, name: mst_event_intraprocedure_perforation}
+    A14: {label: Bleeding, name: mst_event_intraprocedure_bleeding}
+    A15: {label: Cardiopulmonary, name: mst_event_intraprocedure_cardiopulmonary}
+    A26: {label: Equipment malfunction, name: mst_event_intraprocedure_equipment_malfunction}
+    A27: {label: Equipment impaction, name: mst_event_intraprocedure_equipment_impaction}
+    A28: {label: Allergic reaction, name: mst_event_intraprocedure_allergic_reaction}
+    A33: {label: Other events, name: mst_event_intraprocedure_other}
+    A38: {label: cardiopulmonary event, name: mst_event_postprocedure_cardiopulmonary}
+    A43: {label: Abdominal pain, name: mst_event_postprocedure_abdominal_pain}
+    A47: {label: Infection, name: mst_event_postprocedure_infection}
+    A52: {label: Thromboembolic event, name: mst_event_postprocedure_thromboembolic}
+    A57: {label: Late perforation, name: mst_event_postprocedure_late_perforation}
+    A61: {label: Late bleeding, name: mst_event_postprocedure_late_bleeding}
+    A65: {label: Pancreatitis, name: mst_event_postprocedure_pancreatitis}
+numeric_values: {xx cm: mst_centimeter, xx mm: mst_millimeter, xx mm (max): mst_millimeter, mm (max): mst_millimeter, in mm: mst_millimeter,
+  mm: mst_millimeter, mm (biggest): mst_millimeter, '#': mst_count, ml: mst_milliliter, French: mst_french, cm from incisors: mst_centimeter,
+  number: mst_count, no of cysts: mst_count, microcyst size: mst_millimeter, wall thickness: mst_millimeter}
+text_values: [Specify, Specify.., specify.., specify, specify..., To relevant structure(s), Link to relevant finding OR, Normal
+    location(s), Late entry, 'Incomplete, missing...', 'No biliary, due to...', 'No pancreatic, due to..', Specify or N/A,
+  no/mm, relevant organs]
+classification_values: {CM-classification: mst_prague_cm, LA-classification: mst_los_angeles, Japan classification: mst_jgca_superficial_neoplastic_lesions,
+  Kudo classification: mst_kudo, Forrest classification: mst_forrest, Paris type 0-4: mst_excel_paris_type_0_4, Japan class for type 0: mst_jgca_superficial_neoplastic_lesions,
+  1-3: mst_esophageal_varices_size, 1-4: mst_goligher, Type I-IV: mst_bismuth}
+decisions: [Excel is the source for attributes and matrices; legacy labels and identifiers are retained as aliases., 'Luminal
+    Distribution values on rows 46:48 apply through row 53 (v continuation markers); rows 60:62 apply through row 65. Row
+    54 is not assigned this attribute.', Finding/organ matrices restrict locations where supplied. Terms absent from a matrix
+    receive no inferred organ restrictions., 'EUS lesion-specific shape and echo lists take precedence over the general value
+    lists, including linear, which occurs only in the specific list.', Papillary Output None exists only in the organ matrix;
+    Mucin exists only in the attribute table. Preserve both with their source references., The severity table leaves exactly
+    three hospitalization nights unspecified; preserve its literal outcome categories without inferring thresholds., Procedures
+    are represented by companion findings linked to stable intervention identifiers because interventions cannot own classifications.,
+  Source-only English labels are retained for new concepts; German translations are not fabricated., Anatomy modifiers are
+    explicit descriptor inputs. Biliary modifier sub-blocks apply only to their listed duct sites; station number applies
+    only to the EUS lymph-node station., 'Numeric count placeholders use the existing count unit; EUS microcyst size and wall
+    thickness use millimeters, consistent with the sheet size header.', T-stage and N-stage remain explicit text inputs because
+    the workbook does not enumerate staging values., 'The workbook organ matrices provide allowed locations; cross-field dependencies
+    such as papillary choices conditional on major/minor papilla remain source constraints, not automatic validators.']
+modifier_scopes:
+- {sheet: Anatomy, first: 5, last: 5, site_first: 5, site_last: 13}
+- {sheet: Anatomy, first: 15, last: 21, site_first: 15, site_last: 26}
+- {sheet: Anatomy, first: 28, last: 31, site_first: 28, site_last: 38}
+- {sheet: Anatomy, first: 41, last: 46, site_first: 41, site_last: 48}
+- {sheet: Anatomy, first: 47, last: 47, site_first: 47, site_last: 47}
+- {sheet: Anatomy, first: 50, last: 56, site_first: 50, site_last: 51}
+- {sheet: Anatomy, first: 58, last: 64, site_first: 58, site_last: 71}
+- {sheet: Anatomy, first: 69, last: 69, site_first: 69, site_last: 69}
+- {sheet: Anatomy, first: 77, last: 84, site_first: 77, site_last: 77}
+- {sheet: Anatomy, first: 90, last: 91, site_first: 90, site_last: 94}
+- {sheet: Anatomy, first: 96, last: 101, site_first: 96, site_last: 108}
+- {sheet: EUSanatomy, first: 5, last: 7, site_first: 5, site_last: 32}
+- {sheet: EUSanatomy, first: 32, last: 32, site_first: 32, site_last: 32}
+- {sheet: EUSanatomy, first: 34, last: 42, site_first: 34, site_last: 61}
+- {sheet: EUSanatomy, first: 63, last: 65, site_first: 63, site_last: 78}
+- {sheet: EUSanatomy, first: 82, last: 89, site_first: 82, site_last: 82}
+- {sheet: EUSanatomy, first: 97, last: 102, site_first: 97, site_last: 111}
+- {sheet: EUSanatomy, first: 113, last: 117, site_first: 113, site_last: 137}

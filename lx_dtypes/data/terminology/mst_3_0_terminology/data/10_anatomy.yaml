@@ -1,0 +1,610 @@
+# Copyright 2008 World Endoscopy Organization (formerly known as OMED). All rights reserved.
+# Source: MST 3.0 sections 2.1, 2.2 and 2.4. Modifiers are retained in each
+# classification description; site choices preserve the standard's labels.
+- {
+    model: classification,
+    name: mst_location_esophagus,
+    name_en: Esophagus location,
+    name_de: "Lokalisation im Ösophagus",
+    classification_types: [mst_location],
+    description: "MST 3.0 §2.1. Modifiers: xx cm from incisors/nares.",
+    classification_choices:
+      [
+        mst_esophagus_esophagus,
+        mst_esophagus_cricopharynx,
+        mst_esophagus_upper_third,
+        mst_esophagus_middle_third,
+        mst_esophagus_lower_third,
+        mst_esophagus_z_line,
+        mst_esophagus_cardia,
+        mst_esophagus_whole_esophagus,
+        mst_esophagus_anastomosis,
+      ],
+  }
+- {
+    model: classification,
+    name: mst_location_stomach,
+    name_en: Stomach location,
+    name_de: "Lokalisation im Magen",
+    classification_types: [mst_location],
+    description: "MST 3.0 §2.1. Modifiers: greater/lesser curve; anterior/posterior wall; distance from incisors, GE junction, or pylorus.",
+    classification_choices:
+      [
+        mst_stomach_stomach,
+        mst_stomach_cardia,
+        mst_stomach_fundus,
+        mst_stomach_body,
+        mst_stomach_incisura_angulus,
+        mst_stomach_antrum,
+        mst_stomach_prepyloric_region,
+        mst_stomach_pylorus,
+        mst_stomach_whole_stomach,
+        mst_stomach_anastomosis,
+        mst_stomach_hiatal_hernia,
+        mst_stomach_diaphragma_orifice,
+      ],
+  }
+- {
+    model: classification,
+    name: mst_location_duodenum,
+    name_en: Duodenum location,
+    name_de: "Lokalisation im Duodenum",
+    classification_types: [mst_location],
+    description: "MST 3.0 §2.1. Modifiers: proximal, distal, whole, whole examined.",
+    classification_choices:
+      [
+        mst_duodenum_duodenum,
+        mst_duodenum_bulb,
+        mst_duodenum_d2,
+        mst_duodenum_d3,
+        mst_duodenum_d4,
+        mst_duodenum_upper_knee,
+        mst_duodenum_ampullary_region,
+        mst_duodenum_major_papilla,
+        mst_duodenum_minor_papilla,
+        mst_duodenum_lower_knee,
+        mst_duodenum_anastomosis,
+      ],
+  }
+- {
+    model: classification,
+    name: mst_location_jejunum,
+    name_en: Jejunum location,
+    name_de: "Lokalisation im Jejunum",
+    classification_types: [mst_location],
+    description: "MST 3.0 §2.1. Modifiers: distance from ligament of Treitz/pylorus; proximal, distal, whole, whole examined; type.",
+    classification_choices:
+      [
+        mst_jejunum_jejunum,
+        mst_jejunum_ligament_of_treitz,
+        mst_jejunum_afferent_loop,
+        mst_jejunum_efferent_loop,
+        mst_jejunum_jejunal_crest,
+        mst_jejunum_roux_y_limb,
+        mst_jejunum_anastomosis,
+        mst_jejunum_stoma,
+      ],
+  }
+- {
+    model: classification,
+    name: mst_location_ileum,
+    name_en: Ileum location,
+    name_de: "Lokalisation im Ileum",
+    classification_types: [mst_location],
+    description: "MST 3.0 §2.1. Modifiers: distance from ileocecal valve/stoma; time from cecum; proximal, distal, whole, whole examined.",
+    classification_choices: [mst_ileum_ileum, mst_ileum_stoma],
+  }
+- {
+    model: classification,
+    name: mst_location_colon,
+    name_en: Colon location,
+    name_de: "Lokalisation im Kolon",
+    classification_types: [mst_location],
+    description: "MST 3.0 §2.1. Modifiers: distance from anus/stoma; proximal, mid, distal, whole, whole examined; anastomosis type.",
+    classification_choices:
+      [
+        mst_colon_colon,
+        mst_colon_anus,
+        mst_colon_rectum,
+        mst_colon_sigmoid,
+        mst_colon_descending,
+        mst_colon_splenic_flexure,
+        mst_colon_transverse,
+        mst_colon_hepatic_flexure,
+        mst_colon_ascending,
+        mst_colon_cecum,
+        mst_colon_ileocecal_valve,
+        mst_colon_anastomosis,
+        mst_colon_pouch,
+        mst_colon_stoma,
+      ],
+  }
+- {
+    model: classification,
+    name: mst_location_biliary_tree,
+    name_en: Biliary tree location,
+    name_de: "Lokalisation im Gallenwegssystem",
+    classification_types: [mst_location],
+    description: "MST 3.0 §2.2. Modifiers: whole, upper, mid, lower, terminal, distance from papilla, above/below, central/peripheral.",
+    classification_choices:
+      [
+        mst_biliary_major_papilla,
+        mst_biliary_whole_tree,
+        mst_biliary_common_bile_duct,
+        mst_biliary_cystic_duct,
+        mst_biliary_cystic_duct_takeoff,
+        mst_biliary_gallbladder,
+        mst_biliary_bifurcation_hilum,
+        mst_biliary_anastomosis,
+        mst_biliary_left_hepatic_duct,
+        mst_biliary_right_hepatic_duct,
+        mst_biliary_left_intrahepatic_branches,
+        mst_biliary_right_intrahepatic_branches,
+        mst_biliary_segment_branch,
+      ],
+  }
+- {
+    model: classification,
+    name: mst_location_pancreatic_duct,
+    name_en: Pancreatic duct location,
+    name_de: "Lokalisation im Pankreasgang",
+    classification_types: [mst_location],
+    description: "MST 3.0 §2.2. Modifiers: distance from papilla; whole, upstream/downstream, central/peripheral.",
+    classification_choices:
+      [
+        mst_pancreatic_major_papilla,
+        mst_pancreatic_minor_papilla,
+        mst_pancreatic_whole_duct,
+        mst_pancreatic_head,
+        mst_pancreatic_neck,
+        mst_pancreatic_body,
+        mst_pancreatic_tail,
+        mst_pancreatic_uncinate_process,
+        mst_pancreatic_ventral_duct,
+        mst_pancreatic_dorsal_duct,
+        mst_pancreatic_duct_of_santorini,
+        mst_pancreatic_duct_of_wirsung,
+        mst_pancreatic_side_branches,
+      ],
+  }
+
+- model: classification_choice
+  name: mst_esophagus_esophagus
+  name_en: Esophagus
+  name_de: Ösophagus
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors]
+- model: classification_choice
+  name: mst_esophagus_cricopharynx
+  name_en: Cricopharynx
+  name_de: Krikopharyngealer Bereich
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors]
+- model: classification_choice
+  name: mst_esophagus_upper_third
+  name_en: Upper third
+  name_de: Oberes Drittel
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors]
+- model: classification_choice
+  name: mst_esophagus_middle_third
+  name_en: Middle third
+  name_de: Mittleres Drittel
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors]
+- model: classification_choice
+  name: mst_esophagus_lower_third
+  name_en: Lower third
+  name_de: Unteres Drittel
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors]
+- model: classification_choice
+  name: mst_esophagus_z_line
+  name_en: z-line
+  name_de: Z-Linie
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors]
+- model: classification_choice
+  name: mst_esophagus_cardia
+  name_en: Cardia
+  name_de: Kardia
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors]
+- model: classification_choice
+  name: mst_esophagus_whole_esophagus
+  name_en: Whole esophagus
+  name_de: Gesamter Ösophagus
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors]
+- model: classification_choice
+  name: mst_esophagus_anastomosis
+  name_en: Anastomosis
+  name_de: Anastomose
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors]
+- model: classification_choice
+  name: mst_stomach_stomach
+  name_en: Stomach
+  name_de: Magen
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_cardia
+  name_en: Cardia
+  name_de: Kardia
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_fundus
+  name_en: Fundus
+  name_de: Fundus
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_body
+  name_en: Body
+  name_de: Korpus
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_incisura_angulus
+  name_en: Incisura/angulus
+  name_de: Incisura angularis
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_antrum
+  name_en: Antrum
+  name_de: Antrum
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_prepyloric_region
+  name_en: Prepyloric region
+  name_de: Präpylorische Region
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_pylorus
+  name_en: Pylorus
+  name_de: Pylorus
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_whole_stomach
+  name_en: Whole stomach
+  name_de: Gesamter Magen
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_anastomosis
+  name_en: Anastomosis
+  name_de: Anastomose
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_hiatal_hernia
+  name_en: Hiatal hernia
+  name_de: Hiatushernie
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_stomach_diaphragma_orifice
+  name_en: Diaphragma orifice
+  name_de: Zwerchfellöffnung
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_incisors, mst_excel_modifier_xx_cm_from_the_ge_junction,
+    mst_excel_modifier_xx_cm_from_pylorus, mst_excel_modifier_anatomy_15]
+- model: classification_choice
+  name: mst_duodenum_duodenum
+  name_en: Duodenum
+  name_de: Duodenum
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_bulb
+  name_en: Duodenal bulb
+  name_de: Bulbus duodeni
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_d2
+  name_en: D2 - 2nd part of duodenum
+  name_de: D2 – Pars descendens duodeni
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_d3
+  name_en: D3 - 3rd part of duodenum
+  name_de: D3 – Pars horizontalis duodeni
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_d4
+  name_en: D4 - 4th part of duodenum
+  name_de: D4 – Pars ascendens duodeni
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_upper_knee
+  name_en: Upper duodenal knee/superior duodenal angulus
+  name_de: Obere Duodenalflexur
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_ampullary_region
+  name_en: Ampullary region
+  name_de: Ampullenregion
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_major_papilla
+  name_en: Major papilla
+  name_de: Papilla duodeni major
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_minor_papilla
+  name_en: Minor papilla
+  name_de: Papilla duodeni minor
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_lower_knee
+  name_en: Lower duodenal knee/inferior duodenal angulus
+  name_de: Untere Duodenalflexur
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_duodenum_anastomosis
+  name_en: Anastomosis
+  name_de: Anastomose
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_28]
+- model: classification_choice
+  name: mst_jejunum_jejunum
+  name_en: Jejunum
+  name_de: Jejunum
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_lig_of_treitz, mst_excel_modifier_xx_min_from_pylorus,
+    mst_excel_modifier_anatomy_41]
+- model: classification_choice
+  name: mst_jejunum_ligament_of_treitz
+  name_en: Ligament of Treitz
+  name_de: Treitz-Band
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_lig_of_treitz, mst_excel_modifier_xx_min_from_pylorus,
+    mst_excel_modifier_anatomy_41]
+- model: classification_choice
+  name: mst_jejunum_afferent_loop
+  name_en: Afferent loop
+  name_de: Zuführende Schlinge
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_lig_of_treitz, mst_excel_modifier_xx_min_from_pylorus,
+    mst_excel_modifier_anatomy_41]
+- model: classification_choice
+  name: mst_jejunum_efferent_loop
+  name_en: Efferent loop
+  name_de: Abführende Schlinge
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_lig_of_treitz, mst_excel_modifier_xx_min_from_pylorus,
+    mst_excel_modifier_anatomy_41]
+- model: classification_choice
+  name: mst_jejunum_jejunal_crest
+  name_en: Jejunal crest
+  name_de: Jejunalkamm
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_lig_of_treitz, mst_excel_modifier_xx_min_from_pylorus,
+    mst_excel_modifier_anatomy_41]
+- model: classification_choice
+  name: mst_jejunum_roux_y_limb
+  name_en: Roux-y-limb
+  name_de: Roux-Y-Schlinge
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_lig_of_treitz, mst_excel_modifier_xx_min_from_pylorus,
+    mst_excel_modifier_anatomy_41]
+- model: classification_choice
+  name: mst_jejunum_anastomosis
+  name_en: anastomosis
+  name_de: Anastomose
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_lig_of_treitz, mst_excel_modifier_xx_min_from_pylorus,
+    mst_excel_modifier_anatomy_41, mst_excel_modifier_type_specify]
+- model: classification_choice
+  name: mst_jejunum_stoma
+  name_en: stoma
+  name_de: Stoma
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_lig_of_treitz, mst_excel_modifier_xx_min_from_pylorus,
+    mst_excel_modifier_anatomy_41]
+- model: classification_choice
+  name: mst_ileum_ileum
+  name_en: Ileum
+  name_de: Ileum
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_ileocecal_valve, mst_excel_modifier_xx_cm_from_stoma,
+    mst_excel_modifier_xx_min_from_cecum, mst_excel_modifier_anatomy_50]
+- model: classification_choice
+  name: mst_ileum_stoma
+  name_en: Stoma
+  name_de: Stoma
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_ileocecal_valve, mst_excel_modifier_xx_cm_from_stoma,
+    mst_excel_modifier_xx_min_from_cecum, mst_excel_modifier_anatomy_50]
+- model: classification_choice
+  name: mst_colon_colon
+  name_en: Colon
+  name_de: Kolon
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_anus
+  name_en: anus
+  name_de: Anus
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_rectum
+  name_en: rectum
+  name_de: Rektum
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_sigmoid
+  name_en: Sigmoid colon
+  name_de: Colon sigmoideum
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_descending
+  name_en: Descending colon
+  name_de: Colon descendens
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_splenic_flexure
+  name_en: Splenic flexure
+  name_de: Linke Kolonflexur
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_transverse
+  name_en: Transverse colon
+  name_de: Colon transversum
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_hepatic_flexure
+  name_en: Hepatic flexure
+  name_de: Rechte Kolonflexur
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_ascending
+  name_en: Ascending colon
+  name_de: Colon ascendens
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_cecum
+  name_en: Cecum
+  name_de: Zökum
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_ileocecal_valve
+  name_en: Ileocecal valve
+  name_de: Ileozökalklappe
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_anastomosis
+  name_en: Anastomosis
+  name_de: Anastomose
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58,
+    mst_excel_modifier_type_specify]
+- model: classification_choice
+  name: mst_colon_pouch
+  name_en: Pouch
+  name_de: Pouch
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- model: classification_choice
+  name: mst_colon_stoma
+  name_en: Stoma
+  name_de: Stoma
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_anus, mst_excel_modifier_xx_cm_from_stoma, mst_excel_modifier_anatomy_58]
+- {
+    model: classification_choice,
+    name: mst_biliary_major_papilla,
+    name_en: Major papilla,
+    name_de: "Papilla duodeni major",
+  }
+- {
+    model: classification_choice,
+    name: mst_biliary_whole_tree,
+    name_en: Whole biliary tree,
+    name_de: "Gesamtes Gallenwegssystem",
+  }
+- model: classification_choice
+  name: mst_biliary_common_bile_duct
+  name_en: Common bile duct
+  name_de: Ductus choledochus
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_papilla, mst_excel_modifier_anatomy_77]
+- {
+    model: classification_choice,
+    name: mst_biliary_cystic_duct,
+    name_en: Cystic duct,
+    name_de: "Ductus cysticus",
+  }
+- {
+    model: classification_choice,
+    name: mst_biliary_cystic_duct_takeoff,
+    name_en: Cystic duct takeoff,
+    name_de: "Abgang des Ductus cysticus",
+  }
+- {
+    model: classification_choice,
+    name: mst_biliary_gallbladder,
+    name_en: Gallbladder,
+    name_de: "Gallenblase",
+  }
+- {
+    model: classification_choice,
+    name: mst_biliary_bifurcation_hilum,
+    name_en: Bifurcation/Hilum,
+    name_de: "Bifurkation/Hilus",
+  }
+- {
+    model: classification_choice,
+    name: mst_biliary_anastomosis,
+    name_en: Anastomosis,
+    name_de: "Anastomose",
+  }
+- model: classification_choice
+  name: mst_biliary_left_hepatic_duct
+  name_en: Left hepatic duct
+  name_de: Ductus hepaticus sinister
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_90]
+- model: classification_choice
+  name: mst_biliary_right_hepatic_duct
+  name_en: Right hepatic duct
+  name_de: Ductus hepaticus dexter
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_90]
+- model: classification_choice
+  name: mst_biliary_left_intrahepatic_branches
+  name_en: Left intrahepatic branches
+  name_de: Linke intrahepatische Äste
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_90]
+- model: classification_choice
+  name: mst_biliary_right_intrahepatic_branches
+  name_en: Right intrahepatic branches
+  name_de: Rechte intrahepatische Äste
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_90]
+- model: classification_choice
+  name: mst_biliary_segment_branch
+  name_en: Segment xx branch
+  name_de: Ast zu Segment xx
+  classification_choice_descriptors: [mst_excel_modifier_anatomy_90]
+- model: classification_choice
+  name: mst_pancreatic_major_papilla
+  name_en: Major papilla
+  name_de: Papilla duodeni major
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_minor_papilla
+  name_en: Minor papilla
+  name_de: Papilla duodeni minor
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_whole_duct
+  name_en: Whole pancreatic duct
+  name_de: Gesamter Pankreasgang
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_head
+  name_en: Head
+  name_de: Kopf
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_neck
+  name_en: Neck
+  name_de: Hals
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_body
+  name_en: Body
+  name_de: Korpus
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_tail
+  name_en: Tail
+  name_de: Schwanz
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_uncinate_process
+  name_en: Uncinate process
+  name_de: Processus uncinatus
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_ventral_duct
+  name_en: Ventral duct
+  name_de: Ventraler Gang
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_dorsal_duct
+  name_en: Dorsal duct
+  name_de: Dorsaler Gang
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_duct_of_santorini
+  name_en: Duct of Santorini
+  name_de: Ductus pancreaticus accessorius (Santorini)
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_duct_of_wirsung
+  name_en: Duct of Wirsungi
+  name_de: Ductus pancreaticus (Wirsung)
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]
+- model: classification_choice
+  name: mst_pancreatic_side_branches
+  name_en: Side branches
+  name_de: Seitengänge
+  classification_choice_descriptors: [mst_excel_modifier_xx_cm_from_the_papilla, mst_excel_modifier_anatomy_96]

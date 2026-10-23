@@ -1,6 +1,7 @@
-from typing import TypedDict, Union
+from importlib import import_module
+from typing import TYPE_CHECKING, TypeAlias, TypedDict, Union
 
-from .ClassificationValidator import (
+from lx_dtypes.models.knowledge_base.validators.ClassificationValidator import (
     CLASSIFICATION_VALIDATOR_OPERATORS,
     CLASSIFICATION_VALIDATOR_PRECEDENCE,
     ClassificationValidator,
@@ -10,31 +11,19 @@ from .ClassificationValidator import (
     ClassificationValidatorPrecedence,
     ClassificationValidatorQuery,
 )
-from .ClassificationValidatorDataDict import (
+from lx_dtypes.models.knowledge_base.validators.ClassificationValidatorDataDict import (
     ClassificationValidatorConditionDataDict,
     ClassificationValidatorDataDict,
     ClassificationValidatorHintDataDict,
     ClassificationValidatorQueryDataDict,
 )
-from .InterventionValidator import (
-    INTERVENTION_VALIDATOR_OPERATORS,
-    INTERVENTION_VALIDATOR_PRECEDENCE,
-    InterventionValidator,
-    InterventionValidatorCondition,
-    InterventionValidatorConditionClause,
-    InterventionValidatorOperator,
-    InterventionValidatorPrecedence,
-    InterventionValidatorQuery,
+from lx_dtypes.models.knowledge_base.validators.ExaminationValidator import (
+    ExaminationValidator,
 )
-from .InterventionValidatorDataDict import (
-    InterventionValidatorConditionDataDict,
-    InterventionValidatorDataDict,
-    InterventionValidatorHintDataDict,
-    InterventionValidatorQueryDataDict,
+from lx_dtypes.models.knowledge_base.validators.ExaminationValidatorDataDict import (
+    ExaminationValidatorDataDict,
 )
-from .ExaminationValidator import ExaminationValidator
-from .ExaminationValidatorDataDict import ExaminationValidatorDataDict
-from .FindingsValidator import (
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
     DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES,
     FINDINGS_VALIDATOR_COMPARATORS,
     FINDINGS_VALIDATOR_OPERATORS,
@@ -46,13 +35,34 @@ from .FindingsValidator import (
     FindingsValidatorQuery,
     FindingsValidatorRequiredClassification,
 )
-from .FindingsValidator import FindingsValidator as FindingsValidatorModel
-from .FindingsValidatorDataDict import (
+from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
+    FindingsValidator as FindingsValidatorModel,
+)
+from lx_dtypes.models.knowledge_base.validators.FindingsValidatorDataDict import (
     FindingsValidatorConditionDataDict,
     FindingsValidatorDataDict,
     FindingsValidatorQueryDataDict,
 )
-from .UnitValidator import (
+from lx_dtypes.models.knowledge_base.validators.FindingTerminologyValidation import (
+    validate_reported_findings_against_terminology,
+)
+from lx_dtypes.models.knowledge_base.validators.InterventionValidator import (
+    INTERVENTION_VALIDATOR_OPERATORS,
+    INTERVENTION_VALIDATOR_PRECEDENCE,
+    InterventionValidator,
+    InterventionValidatorCondition,
+    InterventionValidatorConditionClause,
+    InterventionValidatorOperator,
+    InterventionValidatorPrecedence,
+    InterventionValidatorQuery,
+)
+from lx_dtypes.models.knowledge_base.validators.InterventionValidatorDataDict import (
+    InterventionValidatorConditionDataDict,
+    InterventionValidatorDataDict,
+    InterventionValidatorHintDataDict,
+    InterventionValidatorQueryDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.UnitValidator import (
     UNIT_VALIDATOR_OPERATORS,
     UNIT_VALIDATOR_PRECEDENCE,
     UnitValidator,
@@ -62,20 +72,43 @@ from .UnitValidator import (
     UnitValidatorPrecedence,
     UnitValidatorQuery,
 )
-from .UnitValidatorDataDict import (
+from lx_dtypes.models.knowledge_base.validators.UnitValidatorDataDict import (
     UnitValidatorConditionDataDict,
     UnitValidatorDataDict,
     UnitValidatorHintDataDict,
     UnitValidatorQueryDataDict,
 )
-from .ValidatorRequirementReference import (
+from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReference import (
     ValidatorRequirementKind,
     ValidatorRequirementReference,
 )
-from .ValidatorRequirementReferenceDataDict import (
+from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReferenceDataDict import (
     ValidatorRequirementKindLiteral,
     ValidatorRequirementReferenceDataDict,
 )
+from lx_dtypes.models.knowledge_base.validators.ValidatorRuntimeDataDict import (
+    ClassificationValidatorExecutionDataDict,
+    ExaminationValidatorDependencyStatusDataDict,
+    ExaminationValidatorExecutionDataDict,
+    FindingsValidatorExecutionDataDict,
+    InterventionValidatorExecutionDataDict,
+    ReportTemplateRuntimeValidationResultDataDict,
+    RuntimeValidationIssueDataDict,
+    UnitValidatorExecutionDataDict,
+)
+
+from .ReportConceptCoverage import (
+    REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION,
+    ReportConceptApplicability,
+    ReportConceptApplicabilityStatus,
+    ReportConceptCoverage,
+    ReportConceptCoverageContractVersion,
+    ReportConceptCoverageIdentity,
+    ReportConceptCoverageItem,
+    ReportConceptCoverageProvenance,
+    ReportConceptValidationStatus,
+)
+from .ReportConceptCoverageBuilder import build_report_concept_coverage
 from .ReportFinding import (
     ReportFinding,
     ReportTemplateClassificationRequirement,
@@ -87,19 +120,13 @@ from .ReportFindingDataDict import (
     ReportTemplateFindingRequirementDataDict,
 )
 from .ReportTemplate import ReportTemplate, ReportTemplateValidators
+from .ReportTemplateCoverage import (
+    ReportTemplateCoverageConcept,
+    ReportTemplateCoverageFindingSelector,
+)
 from .ReportTemplateDataDict import (
     ReportTemplateDataDict,
     ReportTemplateValidatorsDataDict,
-)
-from .TemplateReadiness import (
-    ReportTemplateIssueScopeLiteral,
-    ReportTemplateIssueSeverityLiteral,
-    ReportTemplateLifecycleStatusLiteral,
-    ReportTemplateReadinessIssue,
-    ReportTemplateReadinessIssueDataDict,
-    ReportTemplateReadinessLiteral,
-    ReportTemplateReadinessSummary,
-    ReportTemplateReadinessSummaryDataDict,
 )
 from .ReportTemplateGraph import (
     ReportTemplateGraph,
@@ -123,21 +150,32 @@ from .ReportTemplateSectionDataDict import (
     ReportTemplateSectionDataDict,
     ReportTemplateSectionFieldDataDict,
 )
-from .ValidatorRuntime import (
-    ClassificationValidatorExecutionDataDict,
-    InterventionValidatorExecutionDataDict,
-    ExaminationValidatorDependencyStatusDataDict,
-    ExaminationValidatorExecutionDataDict,
-    FindingsValidatorExecutionDataDict,
-    ReportTemplateRuntimeValidationResultDataDict,
-    RuntimeValidationIssueDataDict,
-    UnitValidatorExecutionDataDict,
-    evaluate_classification_validator_runtime,
-    evaluate_findings_validator_runtime,
-    evaluate_intervention_validator_runtime,
-    evaluate_report_template_validators_runtime,
-    evaluate_unit_validator_runtime,
+from .TemplateReadiness import (
+    ReportTemplateIssueScopeLiteral,
+    ReportTemplateIssueSeverityLiteral,
+    ReportTemplateLifecycleStatusLiteral,
+    ReportTemplateReadinessIssue,
+    ReportTemplateReadinessIssueDataDict,
+    ReportTemplateReadinessLiteral,
+    ReportTemplateReadinessSummary,
+    ReportTemplateReadinessSummaryDataDict,
 )
+
+if TYPE_CHECKING:
+    from lx_dtypes.models.knowledge_base.fhir.findings import (
+        FhirTerminologyValidatedFindingResultDataDict,
+        export_reported_findings_to_fhir_observations,
+        export_terminology_validated_fhir_observations,
+        import_fhir_observations_to_reported_findings,
+        import_terminology_validated_fhir_observations,
+    )
+    from lx_dtypes.models.knowledge_base.validators.ValidatorRuntime import (
+        evaluate_classification_validator_runtime,
+        evaluate_findings_validator_runtime,
+        evaluate_intervention_validator_runtime,
+        evaluate_report_template_validators_runtime,
+        evaluate_unit_validator_runtime,
+    )
 
 FindingsValidator = FindingsValidatorModel
 
@@ -184,18 +222,18 @@ kb_report_template_lookup = KbReportTemplateLookupType(
     ExaminationValidatorDataDict=ExaminationValidatorDataDict,
 )
 
-kb_report_template_models = Union[
+kb_report_template_models: TypeAlias = Union[
     ReportTemplate,
     ReportTemplateSection,
     ReportFinding,
     ClassificationValidator,
     InterventionValidator,
     UnitValidator,
-    FindingsValidator,
+    FindingsValidatorModel,
     ExaminationValidator,
 ]
 
-kb_report_template_ddicts = Union[
+kb_report_template_ddicts: TypeAlias = Union[
     ReportTemplateDataDict,
     ReportTemplateGraphDataDict,
     ReportTemplateSectionDataDict,
@@ -208,112 +246,152 @@ kb_report_template_ddicts = Union[
 ]
 
 __all__ = [
+    "CLASSIFICATION_VALIDATOR_OPERATORS",
+    "CLASSIFICATION_VALIDATOR_PRECEDENCE",
+    "DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES",
+    "FINDINGS_VALIDATOR_COMPARATORS",
+    "FINDINGS_VALIDATOR_OPERATORS",
+    "INTERVENTION_VALIDATOR_OPERATORS",
+    "INTERVENTION_VALIDATOR_PRECEDENCE",
+    "REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION",
+    "UNIT_VALIDATOR_OPERATORS",
+    "UNIT_VALIDATOR_PRECEDENCE",
+    "ClassificationValidator",
+    "ClassificationValidatorCondition",
+    "ClassificationValidatorConditionClause",
+    "ClassificationValidatorConditionDataDict",
+    "ClassificationValidatorDataDict",
+    "ClassificationValidatorExecutionDataDict",
+    "ClassificationValidatorHintDataDict",
+    "ClassificationValidatorOperator",
+    "ClassificationValidatorPrecedence",
+    "ClassificationValidatorQuery",
+    "ClassificationValidatorQueryDataDict",
+    "DeprecatedReportTemplateValueWarning",
+    "ExaminationValidator",
+    "ExaminationValidatorDataDict",
+    "ExaminationValidatorDependencyStatusDataDict",
+    "ExaminationValidatorExecutionDataDict",
+    "FhirTerminologyValidatedFindingResultDataDict",
+    "FindingsValidator",
+    "FindingsValidatorComparator",
+    "FindingsValidatorCondition",
+    "FindingsValidatorConditionClause",
+    "FindingsValidatorConditionDataDict",
+    "FindingsValidatorDataDict",
+    "FindingsValidatorExecutionDataDict",
+    "FindingsValidatorOperator",
+    "FindingsValidatorQuery",
+    "FindingsValidatorQueryDataDict",
+    "FindingsValidatorRequiredClassification",
+    "InterventionValidator",
+    "InterventionValidatorCondition",
+    "InterventionValidatorConditionClause",
+    "InterventionValidatorConditionDataDict",
+    "InterventionValidatorDataDict",
+    "InterventionValidatorExecutionDataDict",
+    "InterventionValidatorHintDataDict",
+    "InterventionValidatorOperator",
+    "InterventionValidatorPrecedence",
+    "InterventionValidatorQuery",
+    "InterventionValidatorQueryDataDict",
+    "KbReportTemplateLookupType",
+    "ReportConceptApplicability",
+    "ReportConceptApplicabilityStatus",
+    "ReportConceptCoverage",
+    "ReportConceptCoverageContractVersion",
+    "ReportConceptCoverageIdentity",
+    "ReportConceptCoverageItem",
+    "ReportConceptCoverageProvenance",
+    "ReportConceptValidationStatus",
+    "ReportFinding",
+    "ReportFindingDataDict",
     "ReportTemplate",
+    "ReportTemplateClassificationRequirement",
+    "ReportTemplateClassificationRequirementDataDict",
+    "ReportTemplateCoverageConcept",
+    "ReportTemplateCoverageFindingSelector",
     "ReportTemplateDataDict",
+    "ReportTemplateFindingRequirement",
+    "ReportTemplateFindingRequirementDataDict",
     "ReportTemplateGraph",
     "ReportTemplateGraphDataDict",
-    "ReportTemplateGraphNode",
-    "ReportTemplateGraphNodeDataDict",
     "ReportTemplateGraphEdge",
     "ReportTemplateGraphEdgeDataDict",
-    "ReportTemplateStructureIssue",
-    "ReportTemplateStructureIssueDataDict",
-    "ReportTemplateStructureValidationResult",
-    "ReportTemplateStructureValidationResultDataDict",
+    "ReportTemplateGraphNode",
+    "ReportTemplateGraphNodeDataDict",
+    "ReportTemplateIssueScopeLiteral",
+    "ReportTemplateIssueSeverityLiteral",
+    "ReportTemplateLifecycleStatusLiteral",
+    "ReportTemplateReadinessIssue",
+    "ReportTemplateReadinessIssueDataDict",
+    "ReportTemplateReadinessLiteral",
+    "ReportTemplateReadinessSummary",
+    "ReportTemplateReadinessSummaryDataDict",
+    "ReportTemplateRuntimeValidationResultDataDict",
     "ReportTemplateSection",
     "ReportTemplateSectionDataDict",
     "ReportTemplateSectionField",
     "ReportTemplateSectionFieldDataDict",
-    "ReportFinding",
-    "ReportFindingDataDict",
-    "ReportTemplateClassificationRequirement",
-    "ReportTemplateClassificationRequirementDataDict",
-    "ReportTemplateFindingRequirement",
-    "ReportTemplateFindingRequirementDataDict",
+    "ReportTemplateStructureIssue",
+    "ReportTemplateStructureIssueDataDict",
+    "ReportTemplateStructureValidationResult",
+    "ReportTemplateStructureValidationResultDataDict",
     "ReportTemplateValidators",
     "ReportTemplateValidatorsDataDict",
-    "ReportTemplateLifecycleStatusLiteral",
-    "ReportTemplateReadinessLiteral",
-    "ReportTemplateIssueSeverityLiteral",
-    "ReportTemplateIssueScopeLiteral",
-    "ReportTemplateReadinessIssue",
-    "ReportTemplateReadinessIssueDataDict",
-    "ReportTemplateReadinessSummary",
-    "ReportTemplateReadinessSummaryDataDict",
-    "ClassificationValidator",
-    "ClassificationValidatorDataDict",
-    "ClassificationValidatorOperator",
-    "CLASSIFICATION_VALIDATOR_OPERATORS",
-    "ClassificationValidatorPrecedence",
-    "CLASSIFICATION_VALIDATOR_PRECEDENCE",
-    "ClassificationValidatorQuery",
-    "ClassificationValidatorQueryDataDict",
-    "ClassificationValidatorCondition",
-    "ClassificationValidatorConditionDataDict",
-    "ClassificationValidatorConditionClause",
-    "ClassificationValidatorHintDataDict",
-    "InterventionValidator",
-    "InterventionValidatorDataDict",
-    "InterventionValidatorOperator",
-    "INTERVENTION_VALIDATOR_OPERATORS",
-    "InterventionValidatorPrecedence",
-    "INTERVENTION_VALIDATOR_PRECEDENCE",
-    "InterventionValidatorQuery",
-    "InterventionValidatorQueryDataDict",
-    "InterventionValidatorCondition",
-    "InterventionValidatorConditionDataDict",
-    "InterventionValidatorConditionClause",
-    "InterventionValidatorHintDataDict",
+    "RuntimeValidationIssueDataDict",
     "UnitValidator",
+    "UnitValidatorCondition",
+    "UnitValidatorConditionClause",
+    "UnitValidatorConditionDataDict",
     "UnitValidatorDataDict",
+    "UnitValidatorExecutionDataDict",
+    "UnitValidatorHintDataDict",
     "UnitValidatorOperator",
-    "UNIT_VALIDATOR_OPERATORS",
     "UnitValidatorPrecedence",
-    "UNIT_VALIDATOR_PRECEDENCE",
     "UnitValidatorQuery",
     "UnitValidatorQueryDataDict",
-    "UnitValidatorCondition",
-    "UnitValidatorConditionDataDict",
-    "UnitValidatorConditionClause",
-    "UnitValidatorHintDataDict",
-    "FindingsValidator",
-    "FindingsValidatorDataDict",
-    "FindingsValidatorOperator",
-    "FindingsValidatorComparator",
-    "FINDINGS_VALIDATOR_OPERATORS",
-    "FINDINGS_VALIDATOR_COMPARATORS",
-    "DEPRECATED_FINDINGS_VALIDATOR_COMPARATOR_ALIASES",
-    "DeprecatedReportTemplateValueWarning",
-    "ValidatorRequirementReference",
-    "ValidatorRequirementReferenceDataDict",
     "ValidatorRequirementKind",
     "ValidatorRequirementKindLiteral",
-    "FindingsValidatorQuery",
-    "FindingsValidatorQueryDataDict",
-    "FindingsValidatorCondition",
-    "FindingsValidatorConditionDataDict",
-    "FindingsValidatorConditionClause",
-    "FindingsValidatorRequiredClassification",
-    "ExaminationValidator",
-    "ExaminationValidatorDataDict",
-    "RuntimeValidationIssueDataDict",
-    "ClassificationValidatorExecutionDataDict",
-    "InterventionValidatorExecutionDataDict",
-    "ExaminationValidatorDependencyStatusDataDict",
-    "FindingsValidatorExecutionDataDict",
-    "ExaminationValidatorExecutionDataDict",
-    "UnitValidatorExecutionDataDict",
-    "ReportTemplateRuntimeValidationResultDataDict",
+    "ValidatorRequirementReference",
+    "ValidatorRequirementReferenceDataDict",
+    "build_report_concept_coverage",
+    "build_report_template_graph",
     "evaluate_classification_validator_runtime",
     "evaluate_findings_validator_runtime",
     "evaluate_intervention_validator_runtime",
     "evaluate_report_template_validators_runtime",
     "evaluate_unit_validator_runtime",
-    "build_report_template_graph",
-    "validate_report_template_structure",
-    "validate_report_template_knowledge_base",
-    "KbReportTemplateLookupType",
+    "export_reported_findings_to_fhir_observations",
+    "export_terminology_validated_fhir_observations",
+    "import_fhir_observations_to_reported_findings",
+    "import_terminology_validated_fhir_observations",
+    "kb_report_template_ddicts",
     "kb_report_template_lookup",
     "kb_report_template_models",
-    "kb_report_template_ddicts",
+    "validate_report_template_knowledge_base",
+    "validate_report_template_structure",
+    "validate_reported_findings_against_terminology",
 ]
+
+
+_RUNTIME_EXPORTS = {
+    "evaluate_classification_validator_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "evaluate_findings_validator_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "evaluate_intervention_validator_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "evaluate_report_template_validators_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "evaluate_unit_validator_runtime": "lx_dtypes.models.knowledge_base.validators.ValidatorRuntime",
+    "FhirTerminologyValidatedFindingResultDataDict": "lx_dtypes.models.knowledge_base.fhir.findings",
+    "export_reported_findings_to_fhir_observations": "lx_dtypes.models.knowledge_base.fhir.findings",
+    "export_terminology_validated_fhir_observations": "lx_dtypes.models.knowledge_base.fhir.findings",
+    "import_fhir_observations_to_reported_findings": "lx_dtypes.models.knowledge_base.fhir.findings",
+    "import_terminology_validated_fhir_observations": "lx_dtypes.models.knowledge_base.fhir.findings",
+}
+
+
+def __getattr__(name: str) -> object:
+    if name not in _RUNTIME_EXPORTS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    value = getattr(import_module(_RUNTIME_EXPORTS[name]), name)
+    globals()[name] = value
+    return value

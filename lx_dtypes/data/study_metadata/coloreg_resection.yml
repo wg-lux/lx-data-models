@@ -1,0 +1,450 @@
+# Owner: ColoReg study authors; structural contract: StudySetupDefinition.
+# Descriptive rules never imply a significance test; unresolved protocol choices remain drafts.
+# Canonical endpoint and linkage specification: docs/guides/coloreg-resection-study.yml.
+# These cohorts select candidate examinations, not an automatically evaluated >=20 mm analysis population.
+# Empty dataset_refs preserves the existing authorized scope; it does not grant access.
+schema_version: '1.0'
+definition_id: coloreg_resection_comparison
+definition_version: 1.1.0
+datasets: []
+cohorts:
+- definition_id: coloreg_primary_success
+  name: Primärer Resektionserfolg
+  hypothesis: 'H0: Bei Polypen mit einem maximalen Ausgangsdurchmesser >= 20 mm sind die Raten an primär
+    erfolgreichen endoskopischen Abtragungen zwischen EMR und ESD gleich. H1: Die Raten unterscheiden
+    sich zwischen EMR und ESD. Die Definition des primären Erfolgs bleibt protokollabhängig; Protokollkennung
+    und Version müssen vor Auswertung festgelegt sein.'
+  dataset_refs: []
+  filters:
+    examination_name: colonoscopy
+  study_metadata:
+    analysis_definitions:
+    - schema_version: '1'
+      name: primary_success_emr_vs_esd
+      module: coloreg
+      version: 0.3.0
+      unit_finding: coloreg_polyp_resection
+      status: draft
+      unresolved_requirements:
+      - Specify an approved primary-success protocol identifier and version; replace the presence rule with
+        equality to that exact protocol before evaluation.
+      inclusion:
+        mode: all
+        predicates:
+        - role: polyp
+          classification: lesion_size_mm
+          operator: ge
+          descriptor: lesion_size_mm_value
+          value: 20.0
+      groups:
+      - name: EMR
+        rule:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_resection_technique
+            operator: eq
+            value: coloreg_technique_emr
+      - name: ESD
+        rule:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_resection_technique
+            operator: eq
+            value: coloreg_technique_esd
+      endpoints:
+      - name: protocol_adjudicated_primary_success
+        positive:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_primary_success
+            operator: eq
+            value: 'yes'
+        negative:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_primary_success
+            operator: eq
+            value: 'no'
+        eligible:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_primary_success_protocol
+            operator: present
+            descriptor: coloreg_primary_success_protocol_value
+    terminology_requirements:
+    - module: coloreg
+      version: 0.3.0
+    inclusion_criteria:
+    - name: coloreg_resection_or_follow_up
+      description: Candidate examinations only. The analysis layer joins lesion histories and applies
+        the numeric size threshold and EMR/ESD comparison; these are not executable cohort filters.
+      concepts:
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_resection
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_follow_up
+- definition_id: coloreg_r0
+  name: Histologischer R0-Resektionsstatus
+  hypothesis: 'H0: Bei Polypen mit einem maximalen Ausgangsdurchmesser >= 20 mm sind die Raten an histologisch
+    bestätigten R0-Resektionen zwischen EMR und ESD gleich. H1: Die Raten unterscheiden sich zwischen
+    EMR und ESD. R0 wird ausschließlich aus dem histologischen Resektionsstatus abgeleitet, nicht aus
+    En-bloc-Resektion oder makroskopischer Vollständigkeit. Rx, ausstehend und unbekannt separat ausweisen.'
+  dataset_refs: []
+  filters:
+    examination_name: colonoscopy
+  study_metadata:
+    analysis_definitions:
+    - schema_version: '1'
+      name: histological_r0_emr_vs_esd
+      module: coloreg
+      version: 0.3.0
+      unit_finding: coloreg_polyp_resection
+      status: ready
+      unresolved_requirements: []
+      inclusion:
+        mode: all
+        predicates:
+        - role: polyp
+          classification: lesion_size_mm
+          operator: ge
+          descriptor: lesion_size_mm_value
+          value: 20.0
+      groups:
+      - name: EMR
+        rule:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_resection_technique
+            operator: eq
+            value: coloreg_technique_emr
+      - name: ESD
+        rule:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_resection_technique
+            operator: eq
+            value: coloreg_technique_esd
+      endpoints:
+      - name: histological_r0_among_assessable
+        positive:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: eq
+            value: coloreg_margin_r0
+        negative:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: eq
+            value: coloreg_margin_r1
+      - name: histology_rx_among_documented
+        positive:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: eq
+            value: coloreg_margin_rx
+        negative:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: in
+            value:
+            - coloreg_margin_r0
+            - coloreg_margin_r1
+            - coloreg_margin_pending
+            - coloreg_margin_no_specimen
+            - coloreg_margin_unknown
+      - name: histology_pending_among_documented
+        positive:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: eq
+            value: coloreg_margin_pending
+        negative:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: in
+            value:
+            - coloreg_margin_r0
+            - coloreg_margin_r1
+            - coloreg_margin_rx
+            - coloreg_margin_no_specimen
+            - coloreg_margin_unknown
+      - name: histology_no_specimen_among_documented
+        positive:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: eq
+            value: coloreg_margin_no_specimen
+        negative:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: in
+            value:
+            - coloreg_margin_r0
+            - coloreg_margin_r1
+            - coloreg_margin_rx
+            - coloreg_margin_pending
+            - coloreg_margin_unknown
+      - name: histology_unknown_among_documented
+        positive:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: eq
+            value: coloreg_margin_unknown
+        negative:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_histological_margin_status
+            operator: in
+            value:
+            - coloreg_margin_r0
+            - coloreg_margin_r1
+            - coloreg_margin_rx
+            - coloreg_margin_pending
+            - coloreg_margin_no_specimen
+    terminology_requirements:
+    - module: coloreg
+      version: 0.3.0
+    inclusion_criteria:
+    - name: coloreg_resection_or_follow_up
+      description: Candidate examinations only. The analysis layer joins lesion histories and applies
+        the numeric size threshold and EMR/ESD comparison; these are not executable cohort filters.
+      concepts:
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_resection
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_follow_up
+- definition_id: coloreg_follow_up
+  name: Longitudinale Nachsorge
+  hypothesis: 'H0: Bei Polypen mit einem maximalen Ausgangsdurchmesser >= 20 mm sind die Raten an unauffälligen
+    Nachsorgeuntersuchungen zwischen EMR und ESD gleich. H1: Die Raten unterscheiden sich zwischen EMR
+    und ESD. Vorherige Untersuchungen desselben Falles und derselben Läsion einschließen. Nach unauffälliger
+    früherer Nachsorge wird die nächste auswertbare Nachsorge verglichen; deren Ergebnis darf auffällig
+    oder unauffällig sein.'
+  dataset_refs: []
+  filters:
+    examination_name: colonoscopy
+  study_metadata:
+    analysis_definitions:
+    - schema_version: '1'
+      name: follow_up_emr_vs_esd
+      module: coloreg
+      version: 0.3.0
+      unit_finding: coloreg_polyp_resection
+      status: draft
+      unresolved_requirements:
+      - Confirm the earlier-unremarkable then next-evaluable visit interpretation and prespecify the follow-up
+        horizon.
+      inclusion:
+        mode: all
+        predicates:
+        - role: polyp
+          classification: lesion_size_mm
+          operator: ge
+          descriptor: lesion_size_mm_value
+          value: 20.0
+      groups:
+      - name: EMR
+        rule:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_resection_technique
+            operator: eq
+            value: coloreg_technique_emr
+      - name: ESD
+        rule:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_resection_technique
+            operator: eq
+            value: coloreg_technique_esd
+      endpoints:
+      - name: next_evaluable_follow_up_unremarkable
+        positive:
+          mode: all
+          predicates:
+          - role: follow_up
+            classification: coloreg_follow_up_result
+            operator: eq
+            value: coloreg_follow_up_unremarkable
+        negative:
+          mode: all
+          predicates:
+          - role: follow_up
+            classification: coloreg_follow_up_result
+            operator: eq
+            value: coloreg_follow_up_abnormal
+        eligible:
+          mode: all
+          predicates:
+          - role: previous_follow_up
+            classification: coloreg_follow_up_result
+            operator: eq
+            value: coloreg_follow_up_unremarkable
+    terminology_requirements:
+    - module: coloreg
+      version: 0.3.0
+    inclusion_criteria:
+    - name: coloreg_resection_or_follow_up
+      description: Candidate examinations only. The analysis layer joins lesion histories and applies
+        the numeric size threshold and EMR/ESD comparison; these are not executable cohort filters.
+      concepts:
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_resection
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_follow_up
+- definition_id: coloreg_complications
+  name: Blutungen und Perforationen
+  hypothesis: 'H0: Bei Polypen mit einem maximalen Ausgangsdurchmesser >= 20 mm sind die Raten an endoskopisch
+    nicht kontrollierbaren Blutungen oder Perforationen zwischen EMR und ESD gleich. H1: Die Raten unterscheiden
+    sich zwischen EMR und ESD. Blutung und Perforation sowohl separat als auch als zusammengesetzten Endpunkt
+    ausweisen. Index- und Intervallereignisse innerhalb eines vorab definierten Beobachtungsfensters derselben
+    Läsion zuordnen.'
+  dataset_refs: []
+  filters:
+    examination_name: colonoscopy
+  study_metadata:
+    analysis_definitions:
+    - schema_version: '1'
+      name: complications_emr_vs_esd
+      module: coloreg
+      version: 0.3.0
+      unit_finding: coloreg_polyp_resection
+      status: draft
+      unresolved_requirements:
+      - These rules describe index complications only. Prespecify the observation window and add validated
+        longitudinal event aggregation before claiming the complete index-and-interval hypothesis.
+      inclusion:
+        mode: all
+        predicates:
+        - role: polyp
+          classification: lesion_size_mm
+          operator: ge
+          descriptor: lesion_size_mm_value
+          value: 20.0
+      groups:
+      - name: EMR
+        rule:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_resection_technique
+            operator: eq
+            value: coloreg_technique_emr
+      - name: ESD
+        rule:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_resection_technique
+            operator: eq
+            value: coloreg_technique_esd
+      endpoints:
+      - name: index_uncontrolled_bleeding
+        positive:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_index_uncontrolled_bleeding
+            operator: eq
+            value: 'yes'
+        negative:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_index_uncontrolled_bleeding
+            operator: eq
+            value: 'no'
+      - name: index_perforation
+        positive:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_index_perforation
+            operator: eq
+            value: 'yes'
+        negative:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_index_perforation
+            operator: eq
+            value: 'no'
+      - name: index_bleeding_or_perforation
+        positive:
+          mode: any
+          predicates:
+          - role: index
+            classification: coloreg_index_uncontrolled_bleeding
+            operator: eq
+            value: 'yes'
+          - role: index
+            classification: coloreg_index_perforation
+            operator: eq
+            value: 'yes'
+        negative:
+          mode: all
+          predicates:
+          - role: index
+            classification: coloreg_index_uncontrolled_bleeding
+            operator: eq
+            value: 'no'
+          - role: index
+            classification: coloreg_index_perforation
+            operator: eq
+            value: 'no'
+    terminology_requirements:
+    - module: coloreg
+      version: 0.3.0
+    inclusion_criteria:
+    - name: coloreg_resection_or_follow_up
+      description: Candidate examinations only. The analysis layer joins lesion histories and applies
+        the numeric size threshold and EMR/ESD comparison; these are not executable cohort filters.
+      concepts:
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_resection
+      - module: coloreg
+        version: 0.3.0
+        kind: finding
+        name: coloreg_polyp_follow_up

@@ -1,0 +1,7 @@
+created_at,uuid,tags,name,name_de,name_en,description,kb_module_name
+2026-09-04 06:36:56.658339+00:00,8b808af7-d5ee-4283-b9f1-9af2daa503d4,,preprocedure,unknown,unknown,unknown,star_upper_gi
+2026-09-04 06:36:56.658377+00:00,104da7d6-3c62-4d1a-8165-e18d645f499c,,periprocedure,unknown,unknown,unknown,star_upper_gi
+2026-09-04 06:36:56.658398+00:00,a594e09a-75bd-4516-a235-77fbdcc2b4cd,,postprocedure,unknown,unknown,unknown,star_upper_gi
+2026-09-04 06:36:56.658415+00:00,40b141e5-3071-48f4-8f2a-132f197af783,,mandatory,unknown,unknown,unknown,star_upper_gi
+2026-09-04 06:36:56.658432+00:00,d5e87748-3feb-4697-adc8-e097f8911cd5,,optional,unknown,unknown,unknown,star_upper_gi
+2026-09-04 06:36:56.658449+00:00,4a16a99d-ec09-49bc-85d0-d6dbe5ab6478,,conditonal,unknown,unknown,unknown,star_upper_gi

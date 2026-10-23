@@ -1,0 +1,74 @@
+version: 1
+tier: domain
+path: lx_dtypes/models
+parent: ../structure.yml
+summary: Typed domain, knowledge-base, ledger, interface, and external exchange contracts. Backend-specific
+  representations share explicit contract boundaries.
+responsibilities:
+- Define strict Pydantic contracts and typed dictionary representations
+- Own versioned report extraction evidence and staging receipts; lifecycle transitions belong to the host native core.
+- Maintain knowledge-base/report-template graphs and ledger identities
+- Own hub transfer version 7 with hub-scoped UUIDv8 pseudonyms and exact segment timeline coordinates
+boundaries:
+- Keep application service orchestration outside shared models
+- Preserve raw video identity across processing and transfer
+entrypoints:
+- name: Study exchange
+  file: contracts/study_exchange.py
+  purpose: Canonical portable study definitions, collections, evaluations and package closure for hub and Excel
+- name: Study analysis definitions
+  file: contracts/study_analysis.py
+  purpose: Shared declarative predicates, analysis provenance, and descriptive result contracts
+- name: Complete package snapshot
+  file: contracts/package_snapshot.py
+  purpose: Preserve every registered knowledge-base concept in a typed package snapshot
+- name: Study collection
+  file: contracts/study_collection.py
+  purpose: Bind canonical ledger observations to versioned assessment and study provenance
+- name: Video segment timeline coordinates
+  file: contracts/video_segment_timeline.py
+  purpose: Exact segment presentation timestamps on the processed generation and, with verified ancestry, the
+    original recording
+- name: Media workflow states and transitions
+  file: contracts/media_workflow.py
+  purpose: Privacy, annotation and release track tokens, transition tables and deletion points for one media item
+- name: Media workflow API wire shapes
+  file: contracts/media_workflow_api.py
+  purpose: Item response, allowed events, blocked stages and worklist stage counts of the media workflow API
+- name: Media workflow policy payloads
+  file: contracts/media_workflow_policy.py
+  purpose: Validation acknowledgement, examination link key, shared-salt precondition and consent withdrawal outcome
+- name: Contracts
+  file: contracts/__init__.py
+  purpose: Shared interchange exports
+- name: Knowledge-base interface
+  file: interface/__init__.py
+  purpose: Version-aware loading API
+- name: Report templates
+  file: knowledge_base/report_template/__init__.py
+  purpose: Graph and validation contracts
+- name: Ledger
+  file: ledger/__init__.py
+  purpose: Observation model exports
+dependencies:
+  internal: []
+  external:
+  - Pydantic v2
+  - Django
+  - FHIR
+submodules: []
+contracts:
+- name: Model concepts
+  doc: ../../docs/guides/data-model-concept-map.md
+- name: Report-template infrastructure
+  doc: ../../docs/guides/report-template-infrastructure.md
+tests:
+  directory: ../../tests/unit/lx_dtypes/models
+  command: uv run pytest tests/unit/lx_dtypes/models/contracts -q
+files:
+- base
+- contracts
+- interface
+- knowledge_base
+- ledger
+- meta
