@@ -46,6 +46,24 @@ def test_retrying_upload_job_requires_complete_retry_metadata() -> None:
     assert payload.to_data()["retry_count"] == 1
 
 
+@pytest.mark.parametrize("status", ["error", "lost", "cancel_requested", "cancelled"])
+def test_interrupted_import_preserves_failure_diagnostics(status: str) -> None:
+    data = _upload_payload()
+    data.update(
+        status=status,
+        error_code="import_interrupted",
+        error_detail="Import was interrupted before completion.",
+        retryable=False,
+        next_retry_at=None,
+    )
+
+    payload = OverviewUploadJobMonitoringPayload.model_validate(data)
+
+    assert payload.to_data()["error_code"] == "import_interrupted"
+    assert payload.status == status
+    assert not payload.retryable
+
+
 @pytest.mark.parametrize("field", ["retryable", "next_retry_at"])
 def test_terminal_upload_job_rejects_retry_metadata(field: str) -> None:
     data = _upload_payload()

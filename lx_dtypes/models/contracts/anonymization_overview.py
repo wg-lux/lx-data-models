@@ -44,6 +44,7 @@ ImportErrorCode = Literal[
     "invalid_input",
     "media_integrity_failed",
     "processing_failed",
+    "import_interrupted",
     "source_missing",
 ]
 HlsArtifactKind = Literal["raw", "processed"]
