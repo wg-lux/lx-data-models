@@ -8,8 +8,12 @@ Derived from the four source documents in `docs/german-medication-plan/`:
 | `medikationsplan-anlage-1.pdf` | Annex 1 — operational rules for creation/update (handwritten fallback, etc.). Non-technical. |
 | `medikationsplan-anlage-2.pdf` | Annex 2 — recommendations/explanations for users (physicians, pharmacists) on how to fill individual fields. Non-technical but clarifies semantics. |
 | `medikationsplan-anlage-3.pdf` | Annex 3 — **the actual technical specification** ("Spezifikation für einen bundeseinheitlichen Medikationsplan (BMP)", **Version 2.8, dated 2025-10-01**, binding from **2026-07-01**). This is the primary source for everything below. |
+| `beispiel_1.xml` | Official sample carrier-segment XML (ground truth for the XML shape). |
+| `bmp_V2.8.xsd` | **Official W3C XML Schema for the carrier segment** (ground truth for element/attribute names, types, lengths, and validation constraints — supersedes any reconstruction from the PDF's text layer). |
 
 This summary is the normative-content extract needed to design data-model compatibility. It does **not** yet map anything onto our existing `LabValue`/`MedicationSchedule` models — that comparison is the next step.
+
+With the official XSD and sample now available, §9–§12 below are **confirmed against ground truth**, not reconstructed from PDF text.
 
 ---
 
@@ -84,11 +88,19 @@ An optional free-text line (≤31/200 chars depending on context) permanently at
 New in v2.8 (§6.2.11). For weekly medications (e.g. Methotrexat):
 
 - The 4-slot scheme column prints literally `"siehe nächste Zeile"`.
-- A dedicated extra row prints: `<Wochentag>s <morgens>-<mittags>-<abends>-<nachts>`.
-- No other content allowed in that row; no bound continuation line allowed in combination.
-- All weekly-dosed entries are **auto-grouped** under the fixed heading "Wöchentliche Anwendung" — users cannot assign them elsewhere.
-- Weekday is a controlled value 1=Montag … 7=Sonntag (Anhang 9, Rule 28).
+- A dedicated extra printed row shows: `<Wochentag>s <morgens>-<mittags>-<abends>-<nachts>`.
+- No other content allowed in that row; no bound continuation line allowed in combination (confirmed by XSD: attribute `x` "darf nur angegeben werden, wenn das Attribut wo nicht angegeben ist").
+- All weekly-dosed entries are **auto-grouped** under the fixed heading "Wöchentliche Anwendung" (code `425`) — users cannot assign them elsewhere.
+- Weekday is a controlled value 1=Montag … 7=Sonntag (Anhang 9, Rule 28; confirmed in XSD as attribute `wo` on the medication element itself).
 - Rule: the 4-slot (morgens-mittags-abends-nachts) scheme may **only** be used for daily dosing or for once-weekly dosing with a mandatory weekday attribute — never for other intervals (those must be free text, Kapitel 3.4).
+
+**Confirmed from the XSD/sample**: this is **not** a separate XML element/row. A weekly-dosed medication is still a single `<M>` element — it just also carries the `wo` (weekday) attribute alongside its normal `m`/`d`/`v`/`h` dose-slot attributes. The "separate row with 'siehe nächste Zeile'" is purely a **print-rendering rule**, not a distinct data node. E.g. from `beispiel_1.xml`:
+```xml
+<S c="425">
+  <M p="3159468" wo="1" m="1" du="1" i="Alkoholkonsum vermeiden" r="Rheuma" />
+  <M p="3971388" wo="2" m="1" du="1" r="Folsäure-Mangel" />
+</S>
+```
 
 ### 5.2 Rezeptureintrag (compounded-preparation entry)
 
@@ -100,7 +112,26 @@ Independent free-text note not tied to any drug (code 5.2); can be grouped with 
 
 ### 5.4 Zwischenüberschrift (sub-heading)
 
-Code 5.1. Either a **controlled value** from Anhang 2.3 Tabelle 6 (OID `1.2.276.0.76.3.1.1.5.2.42`, published at KBV's `schluesseltabellen.asp`) or free text — never both for the same block (Anhang 9, Rules 17/18). Known controlled headings include: Bedarfsmedikation, Dauermedikation, Intramuskuläre Anwendung, Besondere Anwendung, Intravenöse Anwendung, Anwendung unter die Haut, Fertigspritze, Selbstmedikation, Allergiehinweise, Wichtige Hinweise, Wichtige Angaben, "zu besonderen Zeiten anzuwendende Medikamente", "zeitlich befristet anzuwendende Medikamente", and the mandatory auto-heading **"Wöchentliche Anwendung"**. *(Exact numeric codes were not reliably extractable from the PDF's text layer — confirm against the published KBV table before implementing.)*
+Code 5.1. Either a **controlled value** (XSD attribute `S/@c`, enum below) or free text (`S/@t`, 1–50 chars) — never both for the same block (Anhang 9, Rules 17/18; XSD: "@t und @c DARF NICHT gleichzeitig angegeben werden"). The first block in a plan may omit the heading entirely; every block from the 2nd onward **must** have one.
+
+**Confirmed controlled values (`S/@c` enum, from `bmp_V2.8.xsd`)** — note code `420` is intentionally absent:
+
+| Code | Meaning |
+|---|---|
+| 411 | Bedarfsmedikation |
+| 412 | Dauermedikation |
+| 413 | Intramuskuläre Anwendung |
+| 414 | Besondere Anwendung |
+| 415 | Intravenöse Anwendung |
+| 416 | Anwendung unter die Haut |
+| 417 | Fertigspritze |
+| 418 | Selbstmedikation |
+| 419 | Allergiehinweise |
+| 421 | Wichtige Hinweise |
+| 422 | Wichtige Angaben |
+| 423 | zu besonderen Zeiten anzuwendende Medikamente |
+| 424 | zeitlich befristet anzuwendende Medikamente |
+| 425 | Wöchentliche Anwendung (the mandatory auto-heading for weekly dosing entries) |
 
 > Rule (Anhang 9, #17): from the second block onward, every block **must** have a heading (code or free text).
 
@@ -154,93 +185,137 @@ These are the **only** clinical/lab-like values the BMP carries — see §12 (re
 - **PZN (Pharmazentralnummer)**: 8-digit German drug product identifier. In the carrier segment it's transmitted as an **integer 1..99999999 without leading zeros**; for display, leading zeros are re-added to form the 8-digit PZN.
 - **Referenzdatenbank nach § 31b SGB V**: mandatory authoritative source for patient-friendly substance name, strength, and dosage-form (abbreviated) strings whenever a PZN-backed entry is used.
 - **ATC-code-driven substance ordering**: for combination products, substance/strength order follows the Referenzdatenbank's defined rank order; this order must be identical in print and in the carrier XML.
-- **Dosiereinheiten (dose units)** — Anhang 4, published table `S_BMP_DOSIEREINHEIT`, OID `1.2.276.0.76.3.1.1.5.2.41`. Attribute `DN` = display name (used on the printout), attribute `V` = code (used in the 2D barcode), attribute `Sortierung` = suggested UI ordering.
-- **Zwischenüberschriften (sub-headings)** — Anhang 2.3 Tabelle 6, published table `S_BMP_ZWISCHENUEBERSCHRIFT`, OID `1.2.276.0.76.3.1.1.5.2.42`.
-- **Fractions (Tabelle 7)**: only ½, ⅓, ¼, ⅔, ¾, ⅛ are allowed in the 4-slot dosing scheme; comma is the decimal separator; automatic fraction↔decimal conversion requires explicit user interaction (not automatic); leading zeros in decimals may not be dropped (e.g. `0,5` not `,5`); `0,125` instead of `1/8` is disallowed.
-- **Weekdays**: controlled integers 1 (Montag) … 7 (Sonntag) — used only for the weekly-dosing row.
-- **Länder-/Sprachcodes**: ISO 3166-1 alpha-2 / ISO 639-1 alpha-2.
+- **Dosiereinheiten (dose units)** — Anhang 4, published table `S_BMP_DOSIEREINHEIT`, OID `1.2.276.0.76.3.1.1.5.2.41`. Attribute `DN` = display name (used on the printout), attribute `V` = code (used in the 2D barcode), attribute `Sortierung` = suggested UI ordering. **Confirmed from the XSD**: the carrier-XML code (`M/@du`) is restricted to the single-character pattern `[#0-9a-v]` — i.e. a compact one-character alphabet of `#`, `0`–`9`, `a`–`v` (33 possible values) for up to 33 distinct controlled dose units; the sample uses `du="1"`, `du="p"`, `du="5"`.
+- **Zwischenüberschriften (sub-headings)** — see the confirmed enum in §5.4 above (XSD `S/@c`, OID `1.2.276.0.76.3.1.1.5.2.42`).
+- **Fractions (Tabelle 7)**: only ½, ⅓, ¼, ⅔, ¾, ⅛ are allowed in the 4-slot dosing scheme; comma is the decimal separator; automatic fraction↔decimal conversion requires explicit user interaction (not automatic); leading zeros in decimals may not be dropped (e.g. `0,5` not `,5`); `0,125` instead of `1/8` is disallowed. **Confirmed from the XSD** (`dosierungTyp` simple type), each of `M/@m`, `M/@d`, `M/@v`, `M/@h` must match: `([1-9]\d{0,3})|([1-9]\d,\d)|(\d,\d{1,2})|1/8|1/2|2/3|1/3|1/4|3/4` — i.e. a 1–4 digit integer with no leading zero, OR a 2-digit number with 1 decimal place, OR a 1-digit number with 1–2 decimal places, OR one of the 6 literal fraction strings `1/8`, `1/2`, `2/3`, `1/3`, `1/4`, `3/4`.
+- **Weekdays**: controlled integers 1 (Montag) … 7 (Sonntag) — XSD attribute `M/@wo` (confirmed; it lives directly on the medication element, see §5.1.2).
+- **Länder-/Sprachcodes**: combined as a single required attribute `MP/@l`, **fixed value `"de-DE"`** (confirmed from XSD — not two separate ISO codes as the PDF text implied).
 - **E-Mail syntax**: RFC 5322 (explicitly **not** RFC 6531 / internationalized addresses).
-- **Character set**: ISO/IEC 8859-1 (Latin-1) for the carrier segment; control chars 0–31 and 127 excluded; all other Latin-1 code points allowed.
+- **Character set**: the XSD itself declares `UTF-8` (not ISO-8859-1 — that constraint from the PDF text applied to the *barcode's serialized byte stream*, not the logical XSD declaration; worth clarifying with KBV/an actual encoded sample before assuming one or the other for a given data source). Control chars 0–31 and 127 excluded per the PDF.
 
-## 9. The 2D barcode / Carrier segment (§7, Anhang 8)
+## 9. The 2D barcode / Carrier segment (§7, Anhang 8) — confirmed against `bmp_V2.8.xsd` and `beispiel_1.xml`
 
 - Barcode symbology: **Datamatrix** per ISO/IEC 16022.
-- Payload: an XML document (the "Carriersegment") — a fairly literal serialization of the BMP's data fields, built from a KBV-maintained XSD (hosted at `https://update.kbv.de/ita-update/Verordnungen/Arzneimittel/BMP/`, not reproducible as text from this PDF since Annex 8 is embedded as diagram images, not machine text).
-- No compression/encryption. No XML prolog in the serialized form (encoding is implicitly ISO-8859-1, to be assumed `<?xml version="1.0" encoding="ISO-8859-1"?>` when parsing, but omitted when serializing). No whitespace/line breaks between elements (size optimization).
+- Payload: an XML document (the "Carriersegment") validated against the official `bmp_V2.8.xsd` (KBV-maintained, published at `https://update.kbv.de/ita-update/Verordnungen/Arzneimittel/BMP/`).
+- No compression/encryption. No XML prolog in the serialized barcode form. No whitespace/line breaks between elements in the actual barcode payload (size optimization) — the provided `beispiel_1.xml` is pretty-printed for readability, not the literal barcode bytes.
 - **Hard size limit: 1400 bytes/characters per barcode.** If content would exceed this, the software must either optimize or split content across additional pages; single-page output is preferred when possible.
-- Root element: `<MP U="{GUID}" v="{version}"> ... </MP>`
-  - `U` = Instance-ID, a GUID **without dashes**, regenerated on every single printout (even without content changes) (Anhang 9, Rule 1/15).
-  - `v` = plan spec version, zero-padded 3-digit form (e.g. `028` = v2.8).
-- **Data minimization principle (§7.3.2)**: if a PZN is given, the dependent fields (Handelsname, Darreichungsform, Wirkstoff, Stärke) should generally be *omitted* from the XML and derived from the drug database on read — they're only written explicitly when they deviate from the database.
-- Line breaks inside free-text fields use the literal tilde character `~` (ISO-8859-1 decimal 126); users must never be allowed to type `~` directly into those fields. Only specific fields allow embedded line breaks at all (Parameter-Freitext, Freitextzeile, Rezepturzeile, gebundene Zusatzzeile, weekly-dosing line, Hinweise, Behandlungsgrund), each capped at 1–2 embedded breaks depending on field (see Anhang 9 rules 16/25/26/27/29/30).
-- Medication-entry order in the carrier **must** be preserved exactly as the user ordered them on the printout; reordering is a user action only, not automatic.
-- Every block after the first **must** carry a sub-heading (code or free text) — this is how line grouping/association to a Zwischenüberschrift is structurally represented.
+- Root element: `<MP v="028" U="{GUID}" l="de-DE" ...>`.
+- **Data minimization principle (§7.3.2, confirmed in XSD annotation on `M`)**: *"Falls für eine Medikation eine PZN angegeben ist, so sind die anhand der PZN aus einer Arzneimitteldatenbank ableitbaren Attribute (inklusive Wirkstoffe) nicht anzugeben, außer Sie sind vom Anwender manuell anders erfasst."* — if a PZN is present, derivable fields (trade name, form, substances, strength) are normally omitted and only written when the user has manually overridden them relative to the drug database.
+- Line breaks inside free-text fields use the literal tilde character `~`; each affected field has its own max-tilde-count constraint, enforced in the XSD only via documentation annotations (**not** machine-enforced by the XSD's `maxLength`/`pattern` facets — an implementation must add this validation itself).
+- Medication-entry order in the carrier must be preserved exactly as authored; `<S>` blocks and the `<M>`/`<X>`/`<R>` choice sequence within them are ordered XML sequences, so document order **is** display order.
+- `<S>` (block) `minOccurs="0" maxOccurs="23"`; within a block, the `<M>`/`<X>`/`<R>` choice has `maxOccurs="45"`. The first `<S>` may omit both `@c` and `@t` (no heading); every subsequent `<S>` must set exactly one of them.
 
-### 9.1 Carrier element/attribute map (best-effort reconstruction from Tabelle 3 — **verify against the actual XSD before implementing**, since Annex 8 itself ships only as diagrams, not machine-readable text)
+### 9.1 Carrier element/attribute map — confirmed, from `bmp_V2.8.xsd`
 
 ```
-MP                     (root; U=Instance-ID GUID, v=version "0yy", p=patch#, a=page#, z=total pages, l=lang/country index)
-├─ MP.P                (patient)
-│    g=Vorname, f=Nachname, t=Titel, v=Vorsatzwort, z=Namenszusatz,
-│    egk=Patienten-ID (eGK), b=Geburtsdatum, s=Geschlecht
-├─ MP.A                (author/printer: physician, pharmacy, or institution)
-│    n=Name, lanr=LANR, idf=Apotheken-IDF, kik=Krankenhaus-IK,
-│    s=Straße, z=PLZ, c=Ort, p=Telefon, e=E-Mail, t=Ausdruck-Zeitstempel
-├─ MP.O                (optional clinical parameters — header parameter block)
-│    w=Gewicht, h=Körpergröße, c=Kreatinin, ai=Allergien/Unverträglichkeiten,
-│    [stillend]=?, [schwanger]=?, x=Parameter-Freitext   ⚠ exact attribute
-│    letters for "stillend"/"schwanger" could not be reliably read from the
-│    extracted PDF text (table reflow garbled columns) — confirm against XSD
-└─ MP.S                (one block per Zwischenüberschrift grouping)
-     c=Zwischenüberschrift-Code, t=Zwischenüberschrift-Freitext  (mutually excl.)
-     ├─ MP.S.M         (Medikationseintrag)
-     │    p=PZN, a=Arzneimittelname(Handelsname)
-     │    ├─ MP.S.M.W  (repeatable, one per substance, ≤3)
-     │    │    w=Wirkstoffname, s=Wirkstärke
-     │    f=Darreichungsform(code), fd=Darreichungsform(Freitext)   (mutually excl.)
-     │    wo=Wochentag (weekly dosing only)
-     │    m=morgens, d=mittags, v=abends, h=zur Nacht   (4-slot scheme)
-     │    t=Freitextdosierung                            (mutually excl. w/ m/d/v/h)
-     │    du=Dosiereinheit(code), dud=Dosiereinheit(Freitext)      (mutually excl.)
-     │    [Hinweise]=?, [Behandlungsgrund]=?             ⚠ exact attribute letters
-     │    unclear from extraction — likely single-letter attributes near "i"/"r"
-     │    x=gebundene Zusatzzeile
-     ├─ MP.S.R         (Rezeptureintrag)
-     │    t=Rezeptur-Freitext, x=gebundene Zusatzzeile
-     └─ MP.S.X         (Freitextzeile)
-          t=Freitext
+<MP>                                     root element
+  @v        required, fixed "028"       spec version (xxy format, zero-padded)
+  @p        PROHIBITED in this release  patch number (reserved; not usable yet)
+  @U        required                    Instance-ID: GUID, UPPERCASE HEX, 32 chars, NO dashes ([A-F0-9]{32})
+  @a        optional, int 1–5           page number; omit entirely for single-page plans
+  @z        optional, int 2–5           total pages; omit entirely for single-page plans
+  @l        required, fixed "de-DE"     combined language-country tag (single attribute, not split)
+
+  <P>                                    Patient (exactly one, required)
+    @g      required, 1–45 chars        Vorname
+    @f      required, 1–45 chars        Nachname
+    @egk    optional, pattern [A-Z]\d{9}  Versicherten-ID (10-char eGK insurance number)
+    @b      required, 8 chars           Geburtsdatum, format YYYYMMDD (day/month may be "00" for foreigners)
+    @s      optional, enum M|W|X|D      Geschlecht — must never be auto-filled by software
+    @t      optional, 1–20 chars        Titel (multiple titles space-separated)
+    @v      optional, 1–20 chars        Vorsatzwort (e.g. "von")
+    @z      optional, 1–20 chars        Namenszusatz (e.g. "Freifrau")
+
+  <A>                                    Ausdruckender (exactly one, required): physician/pharmacy/institution that printed
+    @lanr   optional, 9 digits          Lebenslange Arztnummer — at most ONE of lanr/idf/kik may be present
+    @idf    optional, 7 digits          Apotheken-IDF
+    @kik    optional, 9 digits          Krankenhaus-Institutionskennzeichen
+    @n      required, 1–80 chars        Name of the printing person/institution
+    @s      optional, 1–30 chars        Straße (+ Hausnummer)
+    @z      optional, 5 digits          PLZ
+    @c      optional, 1–20 chars        Ort
+    @p      optional, 1–20 chars        Telefon
+    @e      optional, 1–80 chars        E-Mail
+    @t      required, xs:dateTime       Ausdruckdatum, format YYYY-MM-DDThh:mm:ss — regenerated on every reprint
+
+  <O>                                    Parameter block (optional, at most one)
+    @ai     optional, 1–50 chars        Allergien und Unverträglichkeiten (free text)
+    @p      optional, enum "1" only     Schwanger — presence = true; absence = "no statement possible" (NOT "false")
+    @b      optional, enum "1" only     Stillend — presence = true; absence = "no statement possible"
+    @w      optional, decimal (0,999], 1 fraction digit   Gewicht in kg
+    @h      optional, int [10,299]      Größe in cm
+    @c      optional, decimal >=0, 2 fraction digits       Kreatininwert in mg/dl
+    @x      optional, 1–77 chars, max 2 "~"                Parameterfreitext
+
+  <S> (0..23, repeatable)                Block (Zwischenüberschrift grouping)
+    @t      optional, 1–50 chars        Freitextzwischenüberschrift      } mutually exclusive;
+    @c      optional, enum 411–425      Zwischenüberschrift-Code         } see §5.4 table
+                                         (first block may have neither; every later block needs exactly one)
+    choice, 1..45 of:
+      <M>                                Medikationseintrag
+        @p    optional, int [1,99999999]   Modifizierte PZN (no leading zeros)
+        @a    optional, 1–50 chars         Arzneimittelname (Handelsname)
+        <W> (0..3, repeatable, in substance order)   Wirkstoff
+          @w  required, 1–80 chars         Wirkstoffname
+          @s  optional, 1–15 chars         Wirkstärke (free text)
+        @f    optional, pattern [A-Za-zäüößÄÜÖ]{1,10}  Darreichungsform-Code   } mutually exclusive
+        @fd   optional, 1–7 chars          Darreichungsform-Freitext           } (f/fd)
+        @wo   optional, enum 1–7           Wochentag (weekly dosing only; requires m/d/v/h — see 5.1.2)
+        @m    optional, dosierungTyp       Dosierschema morgens   } 4-slot scheme;
+        @d    optional, dosierungTyp       Dosierschema mittags   } mutually exclusive
+        @v    optional, dosierungTyp       Dosierschema abends    } with @t as a group
+        @h    optional, dosierungTyp       Dosierschema zur Nacht }
+        @t    optional, 1–20 chars         Dosierschema-Freitext   (mutually excl. with m/d/v/h)
+        @du   optional, pattern [#0-9a-v]  Dosiereinheit-Code (Anhang 4)        } mutually exclusive
+        @dud  optional, 2–20 chars         Dosiereinheit-Freitext               } (du/dud)
+        @i    optional, 1–80 chars, max 1 "~"   Hinweise
+        @r    optional, 1–50 chars, max 1 "~"   Behandlungsgrund
+        @x    optional, 1–200 chars, max 1 "~"  gebundene Zusatzzeile (only if @wo absent)
+        (constraint: at least one attribute or one <W> must be given)
+      <X>                                Freitextzeile
+        @t    required, 1–200 chars, max 1 "~"
+      <R>                                Rezeptureintrag
+        @t    required, 1–200 chars, max 1 "~"   Rezeptur free text
+        @x    optional, 1–200 chars, max 1 "~"   gebundene Zusatzzeile
 ```
 
-## 10. Validation rules (Anhang 9 — normative, abridged)
+`dosierungTyp` (used by `M/@m`, `@d`, `@v`, `@h`): `([1-9]\d{0,3})|([1-9]\d,\d)|(\d,\d{1,2})|1/8|1/2|2/3|1/3|1/4|3/4`.
 
-Selected rules most relevant to a data model (full list has 30 entries):
+**Correction vs. the earlier PDF-text-based reconstruction**: the "Stillend"/"Schwanger" attribute letters are confirmed as `O/@b` = Stillend and `O/@p` = Schwanger (the initial guess had these swapped); "Hinweise"/"Behandlungsgrund" are confirmed as `M/@i` and `M/@r` respectively; there is no separate XML node for the weekly-dosing print row (see §5.1.2).
 
-1. Instance-ID is a GUID **without dashes**.
-2. Page number starts at 1 for multi-page plans; **must be omitted entirely for single-page plans**.
-3. Page number ≤ total page count.
-4. Patient identity fields (Versicherten-ID, name parts, DOB) follow eGK/VSDM formats; eGK values preferred when available.
-5. **Sex must never be auto-populated by software** — always an explicit user choice.
-6. At most **one** of LANR / Apotheken-IDF / Krankenhaus-IK may be present.
-7. Every reprint gets a **new Instance-ID and new print timestamp**.
-8. From the 2nd medication block onward, a heading (code or free text) is mandatory; a block may have **either** a coded or free-text heading, never both.
-9. PZNs are transmitted with leading zeros stripped.
-10. Coded dosage form (per Referenzdatenbank) and free-text dosage form are mutually exclusive per entry.
-11. Dosing scheme is **either** the structured 4-slot scheme (possibly with "siehe nächste Zeile" for weekly dosing) **or** free text — never mixed.
-12. Dose unit is either coded (Anhang 4) or free text, never both.
-13. Weekday values are restricted to 1–7 (Mon–Sun).
-14. Free-text fields with line-break support are capped at 1–2 embedded `~` characters depending on the field.
+## 10. Validation rules (Anhang 9 + XSD annotations — normative, abridged)
+
+Selected rules most relevant to a data model (full list has 30 entries in Anhang 9; the XSD encodes most of these either structurally via `xs:pattern`/`length`/`enumeration` facets, or only as documentation annotations that an implementation must still enforce itself — noted below):
+
+1. Instance-ID is a GUID, **uppercase hex, 32 chars, without dashes** — enforced structurally by the XSD pattern `[A-F0-9]{32}`.
+2. Page number (`@a`) starts at 1 for multi-page plans; **must be omitted entirely for single-page plans** (`@a`/`@z` are both `use="optional"`; the "must omit for single-page" / "must be present for multi-page" constraint is documentation-only, not structurally enforced).
+3. Page number ≤ total page count (documentation-only; `@a` range is 1–5, `@z` range is 2–5, but the ≤ relationship itself isn't structurally enforced).
+4. Patient identity fields (Versicherten-ID, name parts, DOB) follow eGK/VSDM formats; eGK values preferred when available. `@egk` pattern `[A-Z]\d{9}`, `@b` pattern enforces a real calendar month/day or `00` placeholders for foreign patients.
+5. **Sex must never be auto-populated by software** — always an explicit user choice (documentation-only; XSD just allows `@s` enum M|W|X|D, optional).
+6. At most **one** of LANR / Apotheken-IDF / Krankenhaus-IK may be present on `<A>` (documentation-only — the XSD does not use `xs:choice` here, so this is **not** structurally enforced and must be validated by application code).
+7. Every reprint gets a **new Instance-ID and new print timestamp** (documentation-only).
+8. From the 2nd block onward, a heading (`@c` xor `@t`) is mandatory; a block may have **either** a coded or free-text heading, never both (mutual exclusivity is documentation-only, not an XSD `xs:choice` — must be app-validated).
+9. PZNs are transmitted with leading zeros stripped — structurally enforced via `xs:int` range `[1, 99999999]` on `M/@p`.
+10. Coded dosage form (`@f`) and free-text dosage form (`@fd`) are mutually exclusive per entry (documentation-only).
+11. Dosing scheme is **either** the structured 4-slot scheme (`@m`/`@d`/`@v`/`@h`, each matching `dosierungTyp`) **or** free text (`@t`) — never mixed (documentation-only).
+12. Dose unit is either coded (`@du`, pattern `[#0-9a-v]`) or free text (`@dud`, 2–20 chars), never both (documentation-only, but `@du`'s pattern does structurally constrain it to a single character from a 33-symbol alphabet).
+13. Weekday values (`@wo`) are structurally restricted to enum 1–7 (Mon–Sun); the "requires at least one of m/d/v/h" and "excludes bound continuation line `@x`" constraints are documentation-only.
+14. Free-text fields with line-break support are capped at 1–2 embedded `~` characters depending on the field — **documentation-only in the XSD** (the string-length facets don't count tildes specifically); must be enforced in application code.
+
+**Practical implication for implementation**: a large share of the BMP's actual business rules live only in XSD `<xs:documentation>` annotations, not in machine-checkable schema constructs (no `xs:choice`/`xs:key`/`xs:assert` used for the cross-attribute mutual-exclusivity and conditional-requirement rules). An XSD-valid document is **necessary but not sufficient** for BMP conformance — our own import/export code must independently re-implement these documented constraints.
 
 ## 11. Relevance to the existing `LabValue` / `MedicationSchedule` models (flag for next step)
 
 - The BMP's **medication entries** map fairly directly onto something like a `MedicationSchedule` concept: substance(s), strength(s), dosage form, a structured W-X-Y-Z (or weekly, or free-text) dosing scheme, dose unit, notes, and treatment reason — plus PZN as an external drug-catalog key.
 - The BMP's **parameter block** (weight, height, creatinine, pregnant, breastfeeding, sex, allergies) is **not** a general lab-value model — it's exactly 3 numeric clinical values (weight/height/creatinine) plus boolean/categorical patient attributes, entered manually at print time, explicitly **never auto-populated** from stored patient data. If we want BMP-import/export to interoperate with our `LabValue` model, we'll need to decide: (a) treat these 3 values as a thin, special-cased subset mapped to specific LabValue types/units on import, and (b) decide whether pregnant/breastfeeding/sex/allergies belong in a patient-demographics model rather than `LabValue` at all.
-- `MedicationSchedule` compatibility will mainly be about the dosing-scheme representation (today's model vs. the mandatory W-X-Y-Z / weekly-dosing-row / free-text trichotomy) and whether we store/round-trip a PZN-keyed vs. free-text substance identity, since the spec treats those as mutually exclusive, order-correlated, and bound by strict mutual-exclusivity + line-break + length constraints.
-- Import/export of the **2D barcode carrier XML** is the actual interoperability surface (that's what other systems exchange) — not the print layout. Getting the actual KBV XSD (Annex 8 is diagrams only in this PDF) before implementation is strongly recommended, since several attribute names in §9.1 above are reconstructed from a column-reflowed text table and are only "best effort."
+- `MedicationSchedule` compatibility will mainly be about the dosing-scheme representation (today's model vs. the mandatory 4-slot / weekly-via-`@wo` / free-text trichotomy, with the `dosierungTyp` value grammar) and whether we store/round-trip a PZN-keyed vs. free-text substance identity, since the spec treats those as mutually exclusive, order-correlated, and bound by strict mutual-exclusivity + line-break + length constraints.
+- Import/export of the **2D barcode carrier XML** is the actual interoperability surface (that's what other systems exchange) — not the print layout — and is now fully specified by `bmp_V2.8.xsd` (§9.1).
+- Still missing: the actual Anhang 4 (Dosiereinheit) code table mapping each of the 33 `[#0-9a-v]` single-char codes to its display name/unit — needed to round-trip dose units; not present in any of the four source documents (only referenced by OID/URL).
 
 ## 12. Open items to resolve before implementation planning
 
-1. Obtain the actual machine-readable XSD from `https://update.kbv.de/ita-update/Verordnungen/Arzneimittel/BMP/` to confirm exact carrier-XML element/attribute names (several are uncertain above, esp. in the `MP.O` block and the Hinweise/Behandlungsgrund attribute letters in `MP.S.M`).
-2. Obtain the published keyword tables for Dosiereinheiten (OID `1.2.276.0.76.3.1.1.5.2.41`) and Zwischenüberschriften (OID `1.2.276.0.76.3.1.1.5.2.42`) from KBV's `schluesseltabellen.asp` service — the numeric codes for sub-headings were not reliably extractable from this PDF.
-3. Decide how/whether the 3 BMP clinical parameters (weight, height, creatinine) and the pregnant/breastfeeding/sex/allergy attributes should round-trip through our `LabValue` model vs. a separate patient-demographics concept.
-4. Decide how our current dosing-schedule representation maps onto the mandatory W-X-Y-Z / weekly / free-text trichotomy, including the "siehe nächste Zeile" + separate weekly-dosing-row mechanic.
-5. Decide how/whether to model PZN as a first-class external drug identifier on `MedicationSchedule`, including the "data minimization" convention (PZN present ⇒ other fields typically omitted and derived from a drug DB) and the combination-product (`Mehrkomponentenpräparat`/`Kombipräparat` with >3 substances) special cases.
+1. Obtain the published Dosiereinheiten keyword table (`S_BMP_DOSIEREINHEIT`, OID `1.2.276.0.76.3.1.1.5.2.41`) from KBV's `schluesseltabellen.asp` service to map each single-character `@du` code to its unit name — this is the one remaining externally-sourced table we don't have in the repo yet (the Zwischenüberschrift codes are now fully confirmed in the XSD, see §5.4).
+2. Decide how/whether the 3 BMP clinical parameters (weight, height, creatinine) and the pregnant/breastfeeding/sex/allergy attributes should round-trip through our `LabValue` model vs. a separate patient-demographics concept.
+3. Decide how our current dosing-schedule representation maps onto the confirmed 4-slot (`m`/`d`/`v`/`h`, `dosierungTyp`-constrained) / weekly (`wo` + 4-slot) / free-text (`t`) trichotomy on `<M>`.
+4. Decide how/whether to model PZN as a first-class external drug identifier on `MedicationSchedule`, including the "data minimization" convention (PZN present ⇒ other fields typically omitted and derived from a drug DB) and the combination-product (`Mehrkomponentenpräparat`/`Kombipräparat` with >3 substances, ≤3 `<W>` elements) special cases.
+5. Since many BMP business rules (mutual exclusivity, conditional requirements, tilde-count caps) live only in XSD documentation and are **not** machine-enforced by the schema itself, our own validation layer needs to re-implement them explicitly rather than relying on XSD validation alone.
