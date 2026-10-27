@@ -5,10 +5,22 @@ from datetime import date, datetime
 from typing import Protocol, cast
 from uuid import UUID, uuid5
 
-from lx_dtypes.models.contracts.json_types import JsonObject, JsonValue
+from lx_dtypes.models.contracts.json_types import JsonObject
 from lx_dtypes.models.contracts.lab_value import LabValueNormalRangeData
+from lx_dtypes.models.contracts.medication import (
+    MedicationDosingSchedule,
+    MedicationScheduleCompoundEntry,
+    MedicationScheduleFreeTextLine,
+    MedicationScheduleHeading,
+    MedicationSubstance,
+)
 
 from .Pydantic import (
+    MedicationScheduleBlock,
+    MedicationScheduleCompoundRow,
+    MedicationScheduleFreeTextRow,
+    MedicationScheduleMedicationRow,
+    MedicationScheduleRow,
     PatientDisease,
     PatientEvent,
     PatientLabSample,
@@ -81,12 +93,6 @@ def _json_object(value: object | None, field_name: str) -> JsonObject:
     if not isinstance(value, dict):
         raise TypeError(f"EndoReg field '{field_name}' must be a JSON object.")
     return cast(JsonObject, value)
-
-
-def _json_value(value: object | None, field_name: str) -> JsonValue:
-    if value is None or isinstance(value, (str, int, float, bool, list, dict)):
-        return cast(JsonValue, value)
-    raise TypeError(f"EndoReg field '{field_name}' is not JSON-compatible.")
 
 
 def _required_datetime(value: object, field_name: str) -> datetime:
@@ -237,7 +243,19 @@ def patient_lab_sample_from_endoreg(record: object) -> PatientLabSample:
     )
 
 
+def _medication_substance_from_endoreg(item: object) -> MedicationSubstance:
+    return MedicationSubstance.model_validate(
+        {
+            "name": getattr(item, "name", None),
+            "strength": getattr(item, "strength", None),
+        }
+    )
+
+
 def patient_medication_from_endoreg(record: object) -> PatientMedication:
+    dosing = MedicationDosingSchedule.model_validate(
+        _json_object(getattr(record, "dosing", None), "dosing")
+    )
     return PatientMedication.model_validate(
         {
             **_ledger_identity(record),
@@ -249,16 +267,75 @@ def patient_medication_from_endoreg(record: object) -> PatientMedication:
             "medication_indication": _optional_reference(
                 getattr(record, "medication_indication", None)
             ),
-            "medication": _required_reference(
-                getattr(record, "medication", None), "medication"
-            ),
-            "intake_times": [
-                _required_reference(item, "intake_times")
-                for item in _relation_values(getattr(record, "intake_times", None))
+            "medication": _optional_reference(getattr(record, "medication", None)),
+            "pzn": getattr(record, "pzn", None),
+            "substances": [
+                _medication_substance_from_endoreg(item)
+                for item in _relation_values(getattr(record, "substances", None))
             ],
+            "dosing": dosing,
+            "dosage_form": getattr(record, "dosage_form", None),
+            "dosage_form_code": getattr(record, "dosage_form_code", None),
             "unit": _optional_reference(getattr(record, "unit", None)),
-            "dosage": _json_value(getattr(record, "dosage", None), "dosage"),
+            "unit_code": getattr(record, "unit_code", None),
+            "notes": getattr(record, "notes", None),
+            "bound_note": getattr(record, "bound_note", None),
             "active": _required_bool(getattr(record, "active", True), "active"),
+        }
+    )
+
+
+def _medication_schedule_heading_from_endoreg(
+    block: object,
+) -> MedicationScheduleHeading | None:
+    code = getattr(block, "heading_code", None)
+    text = getattr(block, "heading_text", None)
+    if code is None and text is None:
+        return None
+    return MedicationScheduleHeading.model_validate({"code": code, "text": text})
+
+
+def _medication_schedule_row_from_endoreg(row: object) -> MedicationScheduleRow:
+    # NOTE: this mapping is provisional. The external "endoreg_db" Django app does not
+    # yet expose a blocks/rows relation matching BMP's grouped medication-table
+    # structure -- it is documented here as the expected duck-typed shape
+    # (`.kind` plus kind-specific attributes) for when that app grows one.
+    kind = getattr(row, "kind", None)
+    if kind == "medication":
+        medication = getattr(row, "medication", None)
+        if medication is None:
+            raise ValueError(
+                "EndoReg medication schedule row is missing 'medication'."
+            )
+        return MedicationScheduleMedicationRow(
+            medication=patient_medication_from_endoreg(medication)
+        )
+    if kind == "compound":
+        return MedicationScheduleCompoundRow(
+            entry=MedicationScheduleCompoundEntry.model_validate(
+                {
+                    "text": getattr(row, "text", None),
+                    "bound_note": getattr(row, "bound_note", None),
+                }
+            )
+        )
+    if kind == "free_text":
+        return MedicationScheduleFreeTextRow(
+            entry=MedicationScheduleFreeTextLine.model_validate(
+                {"text": getattr(row, "text", None)}
+            )
+        )
+    raise ValueError(f"EndoReg medication schedule row has unknown kind {kind!r}.")
+
+
+def _medication_schedule_block_from_endoreg(block: object) -> MedicationScheduleBlock:
+    return MedicationScheduleBlock.model_validate(
+        {
+            "heading": _medication_schedule_heading_from_endoreg(block),
+            "rows": [
+                _medication_schedule_row_from_endoreg(item)
+                for item in _relation_values(getattr(block, "rows", None))
+            ],
         }
     )
 
@@ -266,15 +343,19 @@ def patient_medication_from_endoreg(record: object) -> PatientMedication:
 def patient_medication_schedule_from_endoreg(
     record: object,
 ) -> PatientMedicationSchedule:
+    # NOTE: expects a provisional `record.blocks` relation (see
+    # `_medication_schedule_row_from_endoreg`) that does not yet exist on the external
+    # "endoreg_db" Django app -- this adapter is speculative until that app grows the
+    # grouped medication-table structure.
     return PatientMedicationSchedule.model_validate(
         {
             **_ledger_identity(record),
             "patient": _required_identity_reference(
                 getattr(record, "patient", None), "patient"
             ),
-            "medications": [
-                patient_medication_from_endoreg(item)
-                for item in _relation_values(getattr(record, "medication", None))
+            "medication_blocks": [
+                _medication_schedule_block_from_endoreg(item)
+                for item in _relation_values(getattr(record, "blocks", None))
             ],
             "schedule_created_at": _required_datetime(
                 getattr(record, "created_at", None), "created_at"

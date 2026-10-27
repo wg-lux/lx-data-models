@@ -1,16 +1,22 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import cast
+from typing import Annotated, Literal, Self, cast
 
-from pydantic import AwareDatetime, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
 )
-from lx_dtypes.models.contracts.json_types import JsonObject, JsonValue
+from lx_dtypes.models.contracts.json_types import JsonObject
 from lx_dtypes.models.contracts.lab_value import LabValueNormalRangeData
-from lx_dtypes.models.contracts.medication import MedicationPeriodFields
+from lx_dtypes.models.contracts.medication import (
+    MedicationEntryFields,
+    MedicationPeriodFields,
+    MedicationScheduleCompoundEntry,
+    MedicationScheduleFreeTextLine,
+    MedicationScheduleHeading,
+)
 
 from .DataDict import (
     PatientDiseaseDataDict,
@@ -127,28 +133,86 @@ class SerializedPatientLabSample(
 class PatientMedication(
     _MedicalLedgerModel,
     MedicationPeriodFields,
+    MedicationEntryFields,
     LedgerBaseModel[PatientMedicationDataDict],
 ):
     patient: str
-    medication_indication: str | None = None
-    medication: str
-    intake_times: list[str] = Field(default_factory=list)
-    unit: str | None = None
-    dosage: JsonValue = None
     active: bool = True
+
+    @model_validator(mode="after")
+    def validate_not_entirely_blank(self) -> Self:
+        if self.is_entirely_blank():
+            raise ValueError(
+                "a medication entry must set at least one identifying or "
+                "descriptive field"
+            )
+        return self
 
     @property
     def ddict_class(self) -> type[PatientMedicationDataDict]:
         return PatientMedicationDataDict
 
 
+class MedicationScheduleMedicationRow(BaseModel):
+    """A medication-table row backed by a full `PatientMedication` entry."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    kind: Literal["medication"] = "medication"
+    medication: PatientMedication
+
+
+class MedicationScheduleCompoundRow(BaseModel):
+    """A medication-table row for a compounded preparation (Rezeptureintrag)."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    kind: Literal["compound"] = "compound"
+    entry: MedicationScheduleCompoundEntry
+
+
+class MedicationScheduleFreeTextRow(BaseModel):
+    """A medication-table row holding an unattached free-text line (Freitextzeile)."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    kind: Literal["free_text"] = "free_text"
+    entry: MedicationScheduleFreeTextLine
+
+
+MedicationScheduleRow = Annotated[
+    MedicationScheduleMedicationRow
+    | MedicationScheduleCompoundRow
+    | MedicationScheduleFreeTextRow,
+    Field(discriminator="kind"),
+]
+
+
+class MedicationScheduleBlock(BaseModel):
+    """An ordered, optionally headed group of medication-table rows (BMP block)."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    heading: MedicationScheduleHeading | None = None
+    rows: list[MedicationScheduleRow] = Field(min_length=1, max_length=45)
+
+
 class PatientMedicationSchedule(
     _MedicalLedgerModel, LedgerBaseModel[PatientMedicationScheduleDataDict]
 ):
     patient: str
-    medications: list[PatientMedication] = Field(default_factory=list)
+    medication_blocks: list[MedicationScheduleBlock] = Field(default_factory=list)
     schedule_created_at: AwareDatetime
     updated_at: AwareDatetime
+
+    @model_validator(mode="after")
+    def validate_block_headings(self) -> Self:
+        for index, block in enumerate(self.medication_blocks):
+            if index > 0 and block.heading is None:
+                raise ValueError(
+                    "every medication block after the first must have a heading"
+                )
+        return self
 
     @property
     def ddict_class(self) -> type[PatientMedicationScheduleDataDict]:
@@ -156,7 +220,11 @@ class PatientMedicationSchedule(
 
     @classmethod
     def nested_fields(cls) -> list[str]:
-        return ["medications"]
+        return ["medication_blocks"]
+
+    @classmethod
+    def json_encoded_fields(cls) -> list[str]:
+        return ["medication_blocks"]
 
     @property
     def serialized_ddict_class(
@@ -180,7 +248,7 @@ class SerializedPatientMedicationSchedule(
     LedgerBaseModel[SerializedPatientMedicationScheduleDataDict],
 ):
     patient: str
-    medications: str = ""
+    medication_blocks: str = ""
     schedule_created_at: AwareDatetime
     updated_at: AwareDatetime
 

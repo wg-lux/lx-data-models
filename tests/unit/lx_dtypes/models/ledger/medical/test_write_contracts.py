@@ -13,15 +13,35 @@ from lx_dtypes.models.ledger.medical.Write import (
 )
 
 
-def test_medication_create_rejects_unknown_and_duplicate_intake_values() -> None:
+def test_medication_create_rejects_unknown_fields_and_invalid_dosing() -> None:
     with pytest.raises(ValidationError):
         PatientMedicationCreate.model_validate(
             {
                 "medication": "mesalazine",
-                "intake_times": ["morning", "morning"],
                 "unknown": True,
             }
         )
+
+    with pytest.raises(ValidationError):
+        PatientMedicationCreate.model_validate(
+            {
+                "medication": "mesalazine",
+                "dosing": {"morning": "0"},
+            }
+        )
+
+    with pytest.raises(ValidationError):
+        PatientMedicationCreate.model_validate(
+            {
+                "medication": "mesalazine",
+                "dosing": {"morning": "1", "free_text": "once daily"},
+            }
+        )
+
+
+def test_medication_create_rejects_entirely_blank_entry() -> None:
+    with pytest.raises(ValidationError, match="at least one identifying"):
+        PatientMedicationCreate.model_validate({})
 
 
 def test_medication_update_distinguishes_omitted_and_explicit_null_fields() -> None:
@@ -36,14 +56,63 @@ def test_medication_update_distinguishes_omitted_and_explicit_null_fields() -> N
 
 
 def test_schedule_create_requires_unique_positive_medication_ids() -> None:
-    assert PatientMedicationScheduleCreate.model_validate(
-        {"medication_ids": [1, 2]}
-    ).medication_ids == [1, 2]
+    schedule = PatientMedicationScheduleCreate.model_validate(
+        {
+            "blocks": [
+                {
+                    "rows": [
+                        {"kind": "medication", "medication_id": 1},
+                        {"kind": "medication", "medication_id": 2},
+                    ]
+                }
+            ]
+        }
+    )
+    assert [row.medication_id for row in schedule.blocks[0].rows] == [1, 2]
 
     with pytest.raises(ValidationError):
-        PatientMedicationScheduleCreate.model_validate({"medication_ids": [1, 1]})
+        PatientMedicationScheduleCreate.model_validate(
+            {
+                "blocks": [
+                    {
+                        "rows": [
+                            {"kind": "medication", "medication_id": 1},
+                            {"kind": "medication", "medication_id": 1},
+                        ]
+                    }
+                ]
+            }
+        )
     with pytest.raises(ValidationError):
-        PatientMedicationScheduleCreate.model_validate({"medication_ids": [0]})
+        PatientMedicationScheduleCreate.model_validate(
+            {"blocks": [{"rows": [{"kind": "medication", "medication_id": 0}]}]}
+        )
+
+
+def test_schedule_create_requires_heading_from_second_block() -> None:
+    with pytest.raises(ValidationError, match="heading"):
+        PatientMedicationScheduleCreate.model_validate(
+            {
+                "blocks": [
+                    {"rows": [{"kind": "medication", "medication_id": 1}]},
+                    {"rows": [{"kind": "medication", "medication_id": 2}]},
+                ]
+            }
+        )
+
+    schedule = PatientMedicationScheduleCreate.model_validate(
+        {
+            "blocks": [
+                {"rows": [{"kind": "medication", "medication_id": 1}]},
+                {
+                    "heading": {"code": 411},
+                    "rows": [{"kind": "medication", "medication_id": 2}],
+                },
+            ]
+        }
+    )
+    assert schedule.blocks[1].heading is not None
+    assert schedule.blocks[1].heading.code == 411
 
 
 def test_clinical_dates_values_and_unknown_fields_are_strict() -> None:
@@ -82,7 +151,35 @@ def test_aggregate_rejects_invalid_schedule_indices() -> None:
             {
                 "patient": "7",
                 "medications": [{"medication": "mesalazine"}],
-                "medication_schedules": [{"medication_indices": [1]}],
+                "medication_schedules": [
+                    {
+                        "blocks": [
+                            {"rows": [{"kind": "medication", "medication_index": 1}]}
+                        ]
+                    }
+                ],
+            }
+        )
+
+
+def test_aggregate_rejects_duplicate_schedule_indices() -> None:
+    with pytest.raises(ValidationError, match="unique"):
+        PatientMedicalLedgerCreate.model_validate(
+            {
+                "patient": "7",
+                "medications": [{"medication": "mesalazine"}],
+                "medication_schedules": [
+                    {
+                        "blocks": [
+                            {
+                                "rows": [
+                                    {"kind": "medication", "medication_index": 0},
+                                    {"kind": "medication", "medication_index": 0},
+                                ]
+                            }
+                        ]
+                    }
+                ],
             }
         )
 
