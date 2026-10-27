@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 
@@ -79,15 +80,31 @@ class PatientLabSample:
 
 
 @dataclass
+class MedicationSubstance:
+    name: str
+    strength: str | None = None
+
+
+@dataclass
 class PatientMedication:
     pk: int
     patient: NamedRecord
-    medication: NamedRecord
-    intake_times: Relation
+    medication: NamedRecord | None = None
     medication_indication: NamedRecord | None = None
+    pzn: str | None = None
+    substances: Relation = field(default_factory=Relation)
+    dosing: dict[str, object] = field(default_factory=dict)
+    dosage_form: str | None = None
+    dosage_form_code: str | None = None
     unit: NamedRecord | None = None
+    unit_code: str | None = None
+    notes: str | None = None
+    bound_note: str | None = None
     dosage: object | None = None
+    intake_times: Relation = field(default_factory=Relation)
     active: bool = True
+    start_at: datetime | None = None
+    end_at: datetime | None = None
 
 
 @dataclass
@@ -95,6 +112,7 @@ class PatientMedicationSchedule:
     pk: int
     patient: NamedRecord
     medication: Relation
+    blocks: list[dict[str, object]] | None
     created_at: datetime
     updated_at: datetime
 
@@ -143,14 +161,18 @@ def test_endoreg_patient_medical_graph_is_converted_without_orm_dependency() -> 
         patient=patient,
         medication=NamedRecord(pk=9, name="mesalazine"),
         medication_indication=NamedRecord(pk=10, name="ibd"),
-        intake_times=Relation([NamedRecord(pk=11, name="morning")]),
+        pzn="12345678",
+        substances=Relation(
+            [MedicationSubstance(name="Mesalazine", strength="500 mg")]
+        ),
+        dosing={"morning": "1"},
         unit=NamedRecord(pk=12, name="mg"),
-        dosage={"morning": 500},
     )
     schedule = PatientMedicationSchedule(
         pk=16,
         patient=patient,
         medication=Relation([medication]),
+        blocks=[{"rows": [{"kind": "medication", "medication_id": 15}]}],
         created_at=NOW,
         updated_at=NOW,
     )
@@ -169,8 +191,19 @@ def test_endoreg_patient_medical_graph_is_converted_without_orm_dependency() -> 
     assert ledger.diseases[0].disease == "crohns_disease"
     assert ledger.events[0].classification_choice == "confirmed"
     assert ledger.lab_samples[0].values[0].normal_range.max == 5.0
-    assert ledger.medications[0].dosage == {"morning": 500}
-    assert ledger.medication_schedules[0].medications[0].medication == "mesalazine"
+    assert ledger.medications[0].pzn == "12345678"
+    assert ledger.medications[0].dosing.morning == "1"
+    assert ledger.medications[0].substances[0].name == "Mesalazine"
+    assert (
+        ledger.medication_schedules[0].medication_blocks[0].rows[0].kind == "medication"
+    )
+    assert (
+        ledger.medication_schedules[0]
+        .medication_blocks[0]
+        .rows[0]
+        .medication.medication
+        == "mesalazine"
+    )
     assert ledger.medication_schedules[0].schedule_created_at == NOW
     assert ledger.external_ids == {"endoreg_db": "NamedRecord:7"}
 
@@ -245,20 +278,35 @@ def test_lab_sample_and_schedule_serialize_nested_records_as_ledger_links() -> N
         pk=15,
         patient=patient,
         medication=NamedRecord(pk=9, name="mesalazine"),
-        intake_times=Relation(),
     )
     schedule = patient_medication_schedule_from_endoreg(
         PatientMedicationSchedule(
             pk=16,
             patient=patient,
             medication=Relation([medication]),
+            blocks=[{"rows": [{"kind": "medication", "medication_id": 15}]}],
             created_at=NOW,
             updated_at=NOW,
         )
     )
 
     assert sample.serialized_model.values == str(sample.values[0].uuid)
-    assert schedule.serialized_model.medications == str(schedule.medications[0].uuid)
+
+    assert schedule.medication_blocks[0].rows[0].kind == "medication"
+    blocks = json.loads(schedule.serialized_model.medication_blocks)
+    assert blocks == [
+        {
+            "heading": None,
+            "rows": [
+                {
+                    "kind": "medication",
+                    "medication": str(
+                        schedule.medication_blocks[0].rows[0].medication.uuid
+                    ),
+                }
+            ],
+        }
+    ]
 
 
 def test_medical_models_are_available_from_the_ledger_registry() -> None:
@@ -266,3 +314,66 @@ def test_medical_models_are_available_from_the_ledger_registry() -> None:
     assert ledger_models_lookup["PatientMedicalLedger"].__name__ == (
         "PatientMedicalLedger"
     )
+
+
+def test_legacy_schedule_preserves_dosage_and_intake_times() -> None:
+    patient = NamedRecord(pk=7, name="synthetic")
+    medication = PatientMedication(
+        pk=15,
+        patient=patient,
+        medication=NamedRecord(pk=9, name="example"),
+        dosage={"morning": 500},
+        intake_times=Relation([NamedRecord(pk=11, name="morning")]),
+    )
+    schedule = patient_medication_schedule_from_endoreg(
+        PatientMedicationSchedule(
+            pk=16,
+            patient=patient,
+            medication=Relation([medication]),
+            blocks=None,
+            created_at=NOW,
+            updated_at=NOW,
+        )
+    )
+    assert schedule.medications[0].dosage == {"morning": 500}
+    assert schedule.medications[0].intake_times == ["morning"]
+    assert schedule.medication_blocks == []
+
+
+def test_empty_schedule_serializes_blocks_as_a_list() -> None:
+    schedule = patient_medication_schedule_from_endoreg(
+        PatientMedicationSchedule(
+            pk=16,
+            patient=NamedRecord(pk=7, name="synthetic"),
+            medication=Relation(),
+            blocks=[],
+            created_at=NOW,
+            updated_at=NOW,
+        )
+    )
+    assert json.loads(schedule.serialized_model.medication_blocks) == []
+
+
+@pytest.mark.parametrize(
+    "blocks",
+    [
+        [{"rows": [{"kind": "medication", "medication_id": 99}]}],
+        [{"rows": [{"kind": "free_text", "entry": {"text": "note"}}]}],
+    ],
+)
+def test_schedule_rejects_inconsistent_membership(
+    blocks: list[dict[str, object]],
+) -> None:
+    patient = NamedRecord(pk=7, name="synthetic")
+    medication = PatientMedication(pk=15, patient=patient, pzn="12345678")
+    with pytest.raises(ValueError, match="missing medication|membership disagree"):
+        patient_medication_schedule_from_endoreg(
+            PatientMedicationSchedule(
+                pk=16,
+                patient=patient,
+                medication=Relation([medication]),
+                blocks=blocks,
+                created_at=NOW,
+                updated_at=NOW,
+            )
+        )

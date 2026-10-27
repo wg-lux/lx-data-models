@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import NotRequired, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 from lx_dtypes.models.base.app_base_model.ddict.LedgerBaseModelDataDict import (
     LedgerBaseModelDataDict,
@@ -70,21 +70,85 @@ class SerializedPatientLabSampleDataDict(LedgerBaseModelDataDict):
     values: str
 
 
+class MedicationSubstanceDataDict(TypedDict):
+    name: str
+    strength: NotRequired[str | None]
+
+
+class MedicationDosingScheduleDataDict(TypedDict):
+    morning: NotRequired[str | None]
+    noon: NotRequired[str | None]
+    evening: NotRequired[str | None]
+    night: NotRequired[str | None]
+    weekday: NotRequired[int | None]
+    free_text: NotRequired[str | None]
+
+
+class MedicationScheduleHeadingDataDict(TypedDict):
+    code: NotRequired[int | None]
+    text: NotRequired[str | None]
+
+
+class MedicationScheduleFreeTextLineDataDict(TypedDict):
+    text: str
+
+
+class MedicationScheduleCompoundEntryDataDict(TypedDict):
+    text: str
+    bound_note: NotRequired[str | None]
+
+
 class PatientMedicationDataDict(LedgerBaseModelDataDict):
     start_at: NotRequired[datetime | None]
     end_at: NotRequired[datetime | None]
     patient: str
-    medication_indication: str | None
-    medication: str
-    intake_times: list[str]
-    unit: str | None
     dosage: JsonValue
+    intake_times: list[str]
+    medication: str | None
+    medication_indication: str | None
+    pzn: str | None
+    substances: list[MedicationSubstanceDataDict]
+    dosing: MedicationDosingScheduleDataDict
+    dosage_form: str | None
+    dosage_form_code: str | None
+    unit: str | None
+    unit_code: str | None
+    notes: str | None
+    bound_note: str | None
     active: bool
+
+
+class MedicationScheduleMedicationRowDataDict(TypedDict):
+    kind: Literal["medication"]
+    medication: PatientMedicationDataDict
+
+
+class MedicationScheduleCompoundRowDataDict(TypedDict):
+    kind: Literal["compound"]
+    entry: MedicationScheduleCompoundEntryDataDict
+
+
+class MedicationScheduleFreeTextRowDataDict(TypedDict):
+    kind: Literal["free_text"]
+    entry: MedicationScheduleFreeTextLineDataDict
+
+
+type MedicationScheduleRowDataDict = (
+    MedicationScheduleMedicationRowDataDict
+    | MedicationScheduleCompoundRowDataDict
+    | MedicationScheduleFreeTextRowDataDict
+)
+
+
+class MedicationScheduleBlockDataDict(TypedDict):
+    heading: NotRequired[MedicationScheduleHeadingDataDict | None]
+    rows: list[MedicationScheduleRowDataDict]
 
 
 class PatientMedicationScheduleDataDict(LedgerBaseModelDataDict):
     patient: str
     medications: list[PatientMedicationDataDict]
+    medication_blocks: list[MedicationScheduleBlockDataDict]
     schedule_created_at: datetime
     updated_at: datetime
 
@@ -92,6 +156,7 @@ class PatientMedicationScheduleDataDict(LedgerBaseModelDataDict):
 class SerializedPatientMedicationScheduleDataDict(LedgerBaseModelDataDict):
     patient: str
     medications: str
+    medication_blocks: str
     schedule_created_at: datetime
     updated_at: datetime
 

@@ -432,3 +432,28 @@ The intended stable contract is:
 
 Everything else should be treated as internal implementation detail unless
 documented here.
+
+
+## BMP medication persistence
+
+Owner: lx_dtypes maintainers. The EndoReg medical-ledger service remains the
+transactional writer; the adapters in this package validate and project its rows.
+EndoReg migration `0109_medication_bmp` adds `pzn`, ordered `substances`, `dosing`,
+`dosage_form`, `dosage_form_code`, `unit_code`, `notes`, and `bound_note`, and allows
+a medication without a catalog reference (for example a PZN-only entry).
+
+`PatientMedicationSchedule.blocks` stores the validated create-contract block
+list as JSON. Medication rows contain positive `medication_id` references;
+compound and free-text rows retain their typed entries inline. The existing
+`medication` relation retains exactly the referenced canonical rows. Reads reject
+missing, extra or foreign-patient membership. Loading order comes from the JSON
+blocks, never from the many-to-many relation. Hosts must validate merged patches
+and update blocks and membership within one transaction.
+
+Legacy `dosage` and `intake_times` remain unchanged and are never interpreted as
+BMP quantities. Supplying them together with nonempty BMP dosing is rejected.
+Legacy schedules have null/absent `blocks`; flat `medication_ids` and aggregate
+`medication_indices` writes remain supported. An explicit empty block list clears
+a plan's membership without deleting medication records. Legacy and block-based
+write shapes cannot be combined. Apply the host migration before enabling BMP
+writes, and deploy the corresponding shared package and host service together.

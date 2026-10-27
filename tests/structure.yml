@@ -11,6 +11,12 @@ boundaries:
 - Use temporary directories for generated artifacts
 - Do not expose fixtures as public package dependencies or include patient data
 entrypoints:
+- name: Standardized CSV export tests
+  file: unit/lx_dtypes/stats/test_standardized.py
+  purpose: Verify complete columns, medication plans, annotations and failed export preservation
+- name: Database CSV export tests
+  file: unit/lx_dtypes/django/test_standardized_export.py
+  purpose: Verify queryset scope, concrete fields and many-to-many links
 - name: Study exchange tests
   file: unit/lx_dtypes/models/contracts/test_study_exchange.py
   purpose: Verify canonical bundle closure, UUID linkage, typed workbook round trips and tampering rejection

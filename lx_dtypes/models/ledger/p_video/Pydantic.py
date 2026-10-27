@@ -21,6 +21,7 @@ from lx_dtypes.names import (
     # RAW_PATIENT_VIDEO_FILE_MODEL_LIST_TYPE_FIELDS,
     # RAW_PATIENT_VIDEO_FILE_MODEL_NESTED_FIELDS,
 )
+from lx_dtypes.serialization import serialize_str_list
 
 from .state import AnonymizationState
 
@@ -101,6 +102,12 @@ class PatientVideoFile(PatientFileMixIn, LedgerBaseModel[PatientVideoFileDataDic
 
         for field in self.nested_fields():
             data[field] = self._flatten_nested(data.get(field))
+        # Segments are keyed by UUID; reference them like other nested ledger items.
+        data["patient_video_segments"] = serialize_str_list(
+            [str(segment.uuid) for segment in self.patient_video_segments.values()]
+        )
+        # Identifying metadata stays out of serialized rows; only its UUID is referenced.
+        data["sensitive_meta"] = self._flatten_nested(data.get("sensitive_meta"))
 
         serialized_model = self.serialized_model_class().model_validate(data)
         return serialized_model
@@ -109,6 +116,10 @@ class PatientVideoFile(PatientFileMixIn, LedgerBaseModel[PatientVideoFileDataDic
 class SerializedPatientVideoFile(
     SerializedPatientFileMixIn, LedgerBaseModel[SerializedPatientVideoFileDataDict]
 ):
+    patient_video_segments: str = ""
+    anonymization_state: AnonymizationState = AnonymizationState.NOT_STARTED
+    sensitive_meta: str | None = None
+
     @property
     def ddict_class(self) -> type[SerializedPatientVideoFileDataDict]:
         return SerializedPatientVideoFileDataDict

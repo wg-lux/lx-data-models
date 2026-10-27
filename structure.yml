@@ -67,7 +67,6 @@ files:
 - .pre-commit-config.yaml
 - .github/workflows/ci.yml
 - features
-- data
 - templates
 - typings
 - .agents

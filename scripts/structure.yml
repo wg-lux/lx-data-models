@@ -11,6 +11,9 @@ boundaries:
 - Do not import repository scripts from consuming applications
 - Generated authoring output belongs in temporary storage
 entrypoints:
+- name: Standardized demo export
+  file: usage_example.py
+  purpose: Regenerate complete CSV tables from the synthetic STAR upper-GI ledger
 - name: Context validator
   file: lint_structure.py
   purpose: Check strict schemas, references, and graph consistency

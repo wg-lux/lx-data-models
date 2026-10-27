@@ -28,8 +28,16 @@ dependencies:
   - MyST
 submodules: []
 contracts:
+- name: Standardized CSV exports
+  doc: guides/standardized-csv-export.md
 - name: Package authoring
   doc: guides/dtypes-package-structure.md
+- name: ePA FHIR compatibility
+  doc: guides/epa-fhir-compatibility.md
 tests:
   directory: ../tests
   command: uv run make -C docs html
+
+files:
+- medication_plan_specification_summary.md
+- german-medication-plan

@@ -11,6 +11,9 @@ boundaries:
 - Cross-service payloads use Pydantic contracts rather than ORM models
 - Host applications own authentication policy, deployment, and study provisioning
 entrypoints:
+- name: Standardized database export
+  file: standardized_export.py
+  purpose: Read selected querysets and through relations using their configured database aliases
 - name: App config
   file: apps.py
   purpose: Django application registration

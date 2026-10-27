@@ -38,6 +38,15 @@ entrypoints:
 - name: Media workflow policy payloads
   file: contracts/media_workflow_policy.py
   purpose: Validation acknowledgement, examination link key, shared-salt precondition and consent withdrawal outcome
+- name: German FHIR identifiers
+  file: contracts/german_fhir.py
+  purpose: KVNR and PZN check digits and German base-profile system URIs
+- name: KBV key tables
+  file: contracts/kbv_key_tables.py
+  purpose: Generated BMP Dosiereinheit and KBV Darreichungsform tables bound by ePA medication profiles
+- name: ePA eMP projection
+  file: ledger/medical/epa.py
+  purpose: Fail-closed projection of patient medications onto gematik ePA eMP add and update Parameters
 - name: Contracts
   file: contracts/__init__.py
   purpose: Shared interchange exports
@@ -62,6 +71,8 @@ contracts:
   doc: ../../docs/guides/data-model-concept-map.md
 - name: Report-template infrastructure
   doc: ../../docs/guides/report-template-infrastructure.md
+- name: ePA FHIR compatibility
+  doc: ../../docs/guides/epa-fhir-compatibility.md
 tests:
   directory: ../../tests/unit/lx_dtypes/models
   command: uv run pytest tests/unit/lx_dtypes/models/contracts -q

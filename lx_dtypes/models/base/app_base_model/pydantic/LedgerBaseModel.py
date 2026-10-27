@@ -1,3 +1,4 @@
+import json
 from abc import abstractmethod
 from typing import Any, ClassVar, TypeVar
 
@@ -50,6 +51,25 @@ class LedgerBaseModel(
         """
 
     @classmethod
+    def json_encoded_fields(cls) -> list[str]:
+        """
+        Return the names of fields that must be JSON-encoded to a string in the serialized form.
+
+        Use this for fields whose flattened value (after `nested_fields()` processing) is not
+        guaranteed to collapse to a plain string -- e.g. a structure that mixes nested ledger
+        references with inline, non-ledger value objects. Only the flattened ledger references
+        inside such a structure are safe to JSON-encode as-is: a non-ledger field holding a raw
+        `datetime` (or other non-JSON-primitive) nested *inside* a field listed here would break
+        `json.dumps` -- this is safe today only because every current use collapses ledger items
+        (which may carry datetimes) to bare UUID strings via `nested_fields()` first.
+
+        Returns:
+            list[str]: Field names to JSON-encode when producing the serialized model/DataDict.
+        """
+
+        return []
+
+    @classmethod
     def serialized_model_class(cls) -> "type[LedgerBaseModel[Any]]":
         """
         Get the model class used for serialized export.
@@ -71,7 +91,11 @@ class LedgerBaseModel(
 
         data = self.model_dump()
         for field in self.nested_fields():
-            data[field] = self._flatten_nested(data.get(field))
+            data[field] = self._flatten_nested(
+                data.get(field), preserve_lists=field in self.json_encoded_fields()
+            )
+        for field in self.json_encoded_fields():
+            data[field] = json.dumps(data[field])
 
         serialized_model = self.serialized_model_class().model_validate(data)
         return serialized_model
@@ -87,7 +111,7 @@ class LedgerBaseModel(
         serialized_model = self.serialized_model
         return self.serialized_ddict_class(**serialized_model.model_dump())
 
-    def _flatten_nested(self, value: Any) -> Any:
+    def _flatten_nested(self, value: Any, *, preserve_lists: bool = False) -> Any:
         """
         Recursively flatten nested LedgerBaseModel instances, lists, and dicts into UUID strings or serialized collections.
 
@@ -105,14 +129,19 @@ class LedgerBaseModel(
         if isinstance(value, LedgerBaseModel):
             return str(value.uuid)
         if isinstance(value, list):
-            flattened_items = [self._flatten_nested(v) for v in value]
+            flattened_items = [
+                self._flatten_nested(v, preserve_lists=preserve_lists) for v in value
+            ]
             # If list contains only identifiers/strings (including empty), export as comma-separated string
-            if all(isinstance(v, str) for v in flattened_items):
+            if not preserve_lists and all(isinstance(v, str) for v in flattened_items):
                 return serialize_str_list(flattened_items)
             return flattened_items
         if isinstance(value, dict):
             # If the dict already looks like a ledger ddict, collapse to its UUID
             if "uuid" in value:
                 return str(value["uuid"])
-            return {k: self._flatten_nested(v) for k, v in value.items()}
+            return {
+                k: self._flatten_nested(v, preserve_lists=preserve_lists)
+                for k, v in value.items()
+            }
         return value

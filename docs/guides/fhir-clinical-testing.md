@@ -13,6 +13,8 @@ ordinary fields are retained; uninterpreted `modifierExtension` and `implicitRul
 are rejected because they may change clinical meaning. Unsupported Observation
 value choices and absent-result semantics require an explicit profile adapter.
 Do not treat retained extra fields as validated clinical content.
+For the German ePA medication plan, see
+[ePA FHIR compatibility](epa-fhir-compatibility.md).
 
 Numeric and boolean result fields reject coercion, nonfinite numbers, and
 contradictory value choices. Bundle link resolution builds one index per operation,

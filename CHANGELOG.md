@@ -7,12 +7,103 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.4.dev1] - Unreleased
 
+### Added
+- `PatientMedication` carries BMP-aligned fields: an optional PZN, up to three
+  ordered active substances with strengths, a structured dosing schedule
+  (day-segment quantities, an optional once-weekly weekday, or free text), a
+  dosage form (coded or free text), a dose-unit code alongside the existing
+  unit, and separate usage-notes and bound-continuation-line fields distinct
+  from the existing treatment-reason field.
+- `PatientMedicationSchedule` models an ordered, headed sequence of medication
+  blocks, each holding medication entries, compounded-preparation entries, or
+  free-text lines — matching the German "Bundeseinheitlicher Medikationsplan"
+  (BMP) medication-table structure.
+- A reusable `MedicationEntryFields`/`MedicationDosingSchedule`/
+  `MedicationSubstance`/`MedicationScheduleHeading` family of shared contract
+  types backs both the read ledger model and the write contracts.
+- A generic `json_encoded_fields()` hook on `LedgerBaseModel` serializes
+  structures that mix nested ledger references with inline value objects.
+- A technical specification summary of the BMP v2.8 carrier-XML format,
+  derived from the official KBV agreement, its annexes, the real XSD, and a
+  sample instance.
+- `project_emp_entry()` projects a `PatientMedication` onto the gematik ePA
+  Medication Service 1.3.5 electronic medication plan (eMP): an `emp-medication`
+  Medication and an `emp-medication-request` MedicationRequest with
+  `DosageDgMP`/`TimingDgMP` dosing, plus `$add-emp-entry` and `$update-emp-entry`
+  Parameters builders. Entries that cannot be represented without inference
+  raise `EpaProjectionError`.
+- `lx_dtypes.models.contracts.german_fhir` provides KVNR and PZN check-digit
+  validation (`Kvnr`, `Pzn`) and German base-profile system URIs.
+- `lx_dtypes.models.contracts.kbv_key_tables` carries the KBV
+  `S_BMP_DOSIEREINHEIT` V1.01 and `S_KBV_DARREICHUNGSFORM` V1.16 key tables.
+- `lx_dtypes.stats.standardized` writes complete, manifest-hashed CSV exports of
+  the knowledge base, examination ledger, cases, video segments and their states,
+  medical ledgers, image and box annotations, and a `frames` table whose
+  `export_path` locates frame images bundled through `write_csv_tables(files=...)`.
+- `lx_dtypes.django.standardized_export` exports explicitly selected Django
+  querysets (all concrete fields and many-to-many links, on the queryset's own
+  database) without writes. Binary columns require `binary="base64"`; querysets
+  that repeat a record through a join fail until `.distinct()` is applied.
+
+### Fixed
+- `PatientVideoFile.serialized_model` no longer fails for every video: the
+  serialized form now declares its anonymization state, segment UUID references
+  and sensitive-metadata UUID reference. Sensitive metadata is never inlined.
+
 ### Changed
 - Report anonymization v2 requires typed extraction evidence and owner-bound
   staging receipts. Provider failure is distinct from valid empty extraction;
   deterministic fallback preserves its actual backend and bounded failure code.
 - Producers and hosts must upgrade together; v1 payloads fail closed. This local
   prerelease candidate is not a published release.
+- `PatientMedication.medication` (trade/display name) is now optional: an
+  entry may instead be identified by PZN and/or active substances, per BMP's
+  data-minimization convention. A medication entry must still set at least
+  one identifying or descriptive field.
+- `PatientMedication.medication_indication` is now length- and
+  line-break-constrained to match BMP's treatment-reason field.
+- `PatientMedication.pzn` now rejects values with an invalid PZN check digit.
+- `PatientMedicationSchedule`'s create/update/aggregate-create write contracts
+  take an ordered list of headed blocks of rows (referencing a medication by
+  id or index, or holding a free-text line or compounded-preparation entry)
+  alongside the existing flat medication ids/indices; a request must choose one shape.
+
+### Compatibility
+- Legacy `dosage`, `intake_times`, flat schedule membership and write references
+  remain supported without inferred clinical conversion. BMP dosing cannot be
+  combined with populated legacy dosage/intake fields.
+- EndoReg stores ordered plan blocks as validated JSON references to canonical
+  patient medication rows. The adapter checks complete membership and ownership.
+  Apply the corresponding EndoReg migration before using the new fields.
+
+### Known limitations
+- This change only makes the internal data model BMP-shaped — it does not yet
+  encode or decode the actual BMP carrier-XML/2D-barcode payload. Several BMP
+  conformance rules (e.g. mutual exclusivity between coded/free-text fields)
+  exist only as documentation in the official XSD, not as machine-checked
+  schema constructs; this repo's validators re-implement the ones relevant to
+  our own fields, not the full wire format.
+- The eMP projection does not cover BMP headings, free-text lines, or
+  compounded-preparation rows, ICD-10-GM reason codes, or ATC/ASK codings, and
+  its rendered dosage text is not the HL7 Deutschland reference algorithm.
+- The pre-existing, disconnected catalog layer (`MedicationScheduleReference`
+  and related types in `contracts/reference_catalog.py`) still models dosing
+  as a clock-time regimen and was intentionally left untouched — it now
+  diverges further from `PatientMedication`'s BMP-shaped dosing.
+- `LabValue` models were explicitly out of scope for this change; BMP's three
+  clinical parameters (weight/height/creatinine) and its pregnant/
+  breastfeeding/sex/allergy flags have no home in this repo yet.
+
+### Follow-up work
+- Implement BMP carrier-XML encode/decode (the 2D-barcode payload) on top of
+  this data model.
+- Validate generated eMP Parameters with the HL7 FHIR validator against
+  `de.gematik.epa.medication#1.3.5` in CI.
+- Decide how/whether BMP's clinical parameters and demographic flags map onto
+  `LabValue` or a separate patient-demographics model.
+- Reconcile or retire the disconnected `MedicationScheduleReference` catalog
+  layer now that `PatientMedication` has its own BMP-shaped dosing.
+
 
 ## [0.2.37] - 2026-09-08
 

@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import date, datetime
 from math import isfinite
-from typing import Self
+from typing import Annotated, Literal, Self
 
 from pydantic import (
     AwareDatetime,
@@ -15,9 +16,15 @@ from pydantic import (
     model_validator,
 )
 
-from lx_dtypes.models.contracts.json_types import JsonObject, JsonValue
+from lx_dtypes.models.contracts.json_types import JsonObject
 from lx_dtypes.models.contracts.lab_value import LabValueNormalRangeData
-from lx_dtypes.models.contracts.medication import MedicationPeriodFields
+from lx_dtypes.models.contracts.medication import (
+    MedicationEntryFields,
+    MedicationPeriodFields,
+    MedicationScheduleCompoundEntry,
+    MedicationScheduleFreeTextLine,
+    MedicationScheduleHeading,
+)
 
 
 class _MedicalWriteModel(BaseModel):
@@ -149,87 +156,162 @@ class PatientLabSampleCreate(_MedicalWriteModel):
         return _parse_aware_datetime(value)
 
 
-class PatientMedicationCreate(MedicationPeriodFields, _MedicalWriteModel):
-    medication: str = Field(min_length=1)
-    medication_indication: str | None = Field(default=None, min_length=1)
-    intake_times: list[str] = Field(default_factory=list)
-    unit: str | None = Field(default=None, min_length=1)
-    dosage: JsonValue = None
+class PatientMedicationCreate(
+    MedicationPeriodFields, MedicationEntryFields, _MedicalWriteModel
+):
     active: bool = True
 
-    @field_validator("intake_times")
-    @classmethod
-    def validate_intake_times(cls, values: list[str]) -> list[str]:
-        return _validate_references(values)
+    @model_validator(mode="after")
+    def validate_not_entirely_blank(self) -> Self:
+        if self.is_entirely_blank():
+            raise ValueError(
+                "a medication entry must set at least one identifying or "
+                "descriptive field"
+            )
+        return self
 
 
-class PatientMedicationUpdate(_MedicalWriteModel):
+class PatientMedicationUpdate(MedicationEntryFields, _MedicalWriteModel):
     start_at: AwareDatetime | None = None
     end_at: AwareDatetime | None = None
+    active: bool | None = None
 
     @field_validator("start_at", "end_at", mode="before")
     @classmethod
     def parse_period_datetime(cls, value: object) -> object:
         return _parse_aware_datetime(value)
 
-    medication: str | None = Field(default=None, min_length=1)
-    medication_indication: str | None = Field(default=None, min_length=1)
-    intake_times: list[str] | None = None
-    unit: str | None = Field(default=None, min_length=1)
-    dosage: JsonValue = None
-    active: bool | None = None
-
-    @field_validator("intake_times")
-    @classmethod
-    def validate_intake_times(cls, values: list[str] | None) -> list[str] | None:
-        return None if values is None else _validate_references(values)
-
     @model_validator(mode="after")
     def validate_update(self) -> Self:
         if not self.model_fields_set:
             raise ValueError("at least one medication field must be provided")
-        non_nullable = {"medication", "intake_times", "active"}
-        null_fields = {
-            field_name
-            for field_name in self.model_fields_set & non_nullable
-            if getattr(self, field_name) is None
-        }
-        if null_fields:
-            raise ValueError(
-                f"{', '.join(sorted(null_fields))} must not be null when provided"
-            )
+        if "active" in self.model_fields_set and self.active is None:
+            raise ValueError("active must not be null when provided")
         return self
 
 
+class MedicationRowRefCreate(_MedicalWriteModel):
+    """A medication-table row referencing an existing `PatientMedication` by id."""
+
+    kind: Literal["medication"] = "medication"
+    medication_id: int = Field(gt=0)
+
+
+class MedicationRowFreeTextCreate(_MedicalWriteModel):
+    kind: Literal["free_text"] = "free_text"
+    entry: MedicationScheduleFreeTextLine
+
+
+class MedicationRowCompoundCreate(_MedicalWriteModel):
+    kind: Literal["compound"] = "compound"
+    entry: MedicationScheduleCompoundEntry
+
+
+MedicationScheduleRowCreate = Annotated[
+    MedicationRowRefCreate | MedicationRowFreeTextCreate | MedicationRowCompoundCreate,
+    Field(discriminator="kind"),
+]
+
+
+class MedicationScheduleBlockCreate(_MedicalWriteModel):
+    heading: MedicationScheduleHeading | None = None
+    rows: list[MedicationScheduleRowCreate] = Field(min_length=1, max_length=45)
+
+
+def _validate_block_headings(blocks: Sequence[object]) -> None:
+    for index, block in enumerate(blocks):
+        if index > 0 and getattr(block, "heading", None) is None:
+            raise ValueError(
+                "every medication block after the first must have a heading"
+            )
+
+
+def _validate_unique_medication_ids(
+    blocks: list[MedicationScheduleBlockCreate],
+) -> None:
+    ids = [
+        row.medication_id
+        for block in blocks
+        for row in block.rows
+        if isinstance(row, MedicationRowRefCreate)
+    ]
+    _validate_ids(ids)
+
+
 class PatientMedicationScheduleCreate(_MedicalWriteModel):
-    medication_ids: list[int] = Field(default_factory=lambda: list[int]())
+    medication_ids: list[int] = Field(default_factory=list)
 
-    @field_validator("medication_ids")
-    @classmethod
-    def validate_medication_ids(cls, values: list[int]) -> list[int]:
-        return _validate_ids(values)
+    blocks: list[MedicationScheduleBlockCreate] = Field(
+        default_factory=lambda: list[MedicationScheduleBlockCreate]()
+    )
+
+    @model_validator(mode="after")
+    def validate_blocks(self) -> Self:
+        if self.blocks and self.medication_ids:
+            raise ValueError("blocks and medication_ids are mutually exclusive")
+        _validate_ids(self.medication_ids)
+        _validate_block_headings(self.blocks)
+        _validate_unique_medication_ids(self.blocks)
+        return self
 
 
-class PatientMedicationScheduleUpdate(_MedicalWriteModel):
-    medication_ids: list[int]
+class PatientMedicationScheduleUpdate(PatientMedicationScheduleCreate):
+    @model_validator(mode="after")
+    def validate_update(self) -> Self:
+        if not self.model_fields_set:
+            raise ValueError("provide blocks or medication_ids")
+        return self
 
-    @field_validator("medication_ids")
-    @classmethod
-    def validate_medication_ids(cls, values: list[int]) -> list[int]:
-        return _validate_ids(values)
+
+class MedicationRowRefAggregateCreate(_MedicalWriteModel):
+    """A medication-table row referencing an inline medication by list index."""
+
+    kind: Literal["medication"] = "medication"
+    medication_index: int = Field(ge=0)
+
+
+# Only medication references differ between persisted IDs and aggregate indices.
+MedicationRowFreeTextAggregateCreate = MedicationRowFreeTextCreate
+MedicationRowCompoundAggregateCreate = MedicationRowCompoundCreate
+
+MedicationScheduleRowAggregateCreate = Annotated[
+    MedicationRowRefAggregateCreate
+    | MedicationRowFreeTextAggregateCreate
+    | MedicationRowCompoundAggregateCreate,
+    Field(discriminator="kind"),
+]
+
+
+class MedicationScheduleBlockAggregateCreate(_MedicalWriteModel):
+    heading: MedicationScheduleHeading | None = None
+    rows: list[MedicationScheduleRowAggregateCreate] = Field(
+        min_length=1, max_length=45
+    )
 
 
 class PatientMedicationScheduleAggregateCreate(_MedicalWriteModel):
-    medication_indices: list[int] = Field(default_factory=lambda: list[int]())
+    medication_indices: list[int] = Field(default_factory=list)
 
-    @field_validator("medication_indices")
-    @classmethod
-    def validate_medication_indices(cls, values: list[int]) -> list[int]:
-        if any(value < 0 for value in values):
+    blocks: list[MedicationScheduleBlockAggregateCreate] = Field(
+        default_factory=lambda: list[MedicationScheduleBlockAggregateCreate]()
+    )
+
+    @model_validator(mode="after")
+    def validate_blocks(self) -> Self:
+        _validate_block_headings(self.blocks)
+        if self.blocks and self.medication_indices:
+            raise ValueError("blocks and medication_indices are mutually exclusive")
+        if any(index < 0 for index in self.medication_indices):
             raise ValueError("medication indices must be non-negative")
-        if len(values) != len(set(values)):
+        indices = self.medication_indices + [
+            row.medication_index
+            for block in self.blocks
+            for row in block.rows
+            if isinstance(row, MedicationRowRefAggregateCreate)
+        ]
+        if len(indices) != len(set(indices)):
             raise ValueError("medication indices must be unique")
-        return values
+        return self
 
 
 class PatientMedicalLedgerCreate(_MedicalWriteModel):
@@ -257,16 +339,30 @@ class PatientMedicalLedgerCreate(_MedicalWriteModel):
     @model_validator(mode="after")
     def validate_schedule_indices(self) -> Self:
         medication_count = len(self.medications)
-        if any(
-            index >= medication_count
-            for schedule in self.medication_schedules
-            for index in schedule.medication_indices
-        ):
-            raise ValueError("medication schedule index is out of range")
+        for schedule in self.medication_schedules:
+            if any(index >= medication_count for index in schedule.medication_indices):
+                raise ValueError("medication schedule index is out of range")
+            for block in schedule.blocks:
+                for row in block.rows:
+                    if (
+                        isinstance(row, MedicationRowRefAggregateCreate)
+                        and row.medication_index >= medication_count
+                    ):
+                        raise ValueError("medication schedule index is out of range")
         return self
 
 
 __all__ = [
+    "MedicationRowCompoundAggregateCreate",
+    "MedicationRowCompoundCreate",
+    "MedicationRowFreeTextAggregateCreate",
+    "MedicationRowFreeTextCreate",
+    "MedicationRowRefAggregateCreate",
+    "MedicationRowRefCreate",
+    "MedicationScheduleBlockAggregateCreate",
+    "MedicationScheduleBlockCreate",
+    "MedicationScheduleRowAggregateCreate",
+    "MedicationScheduleRowCreate",
     "PatientDiseaseCreate",
     "PatientEventCreate",
     "PatientLabSampleCreate",

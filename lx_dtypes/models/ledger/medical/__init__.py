@@ -19,6 +19,12 @@ from .DataDict import (
     PatientMedicationDataDict,
     PatientMedicationScheduleDataDict,
 )
+from .epa import (
+    EmpEntryContext,
+    EmpEntryProjection,
+    EpaProjectionError,
+    project_emp_entry,
+)
 from .Pydantic import (
     PatientDisease,
     PatientEvent,
@@ -71,6 +77,9 @@ type l_medical_ddicts = (
 
 __all__ = [
     "ENDOREG_DB_LEDGER_NAMESPACE",
+    "EmpEntryContext",
+    "EmpEntryProjection",
+    "EpaProjectionError",
     "LMedicalLookupType",
     "PatientDisease",
     "PatientDiseaseDataDict",
@@ -96,4 +105,5 @@ __all__ = [
     "patient_lab_value_from_endoreg",
     "patient_medication_from_endoreg",
     "patient_medication_schedule_from_endoreg",
+    "project_emp_entry",
 ]

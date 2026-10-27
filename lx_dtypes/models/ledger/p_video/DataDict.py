@@ -23,3 +23,5 @@ class SerializedPatientVideoFileDataDict(
     SerializedPatientFileMixInDataDict, LedgerBaseModelDataDict
 ):
     anonymization_state: AnonymizationState
+    patient_video_segments: str
+    sensitive_meta: str | None

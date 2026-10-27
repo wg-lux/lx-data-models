@@ -11,6 +11,9 @@ boundaries:
 - Do not import tests or repository scripts into the public package
 - Do not take ownership of host deployment workflows
 entrypoints:
+- name: Complete standardized CSV export
+  file: stats/standardized.py
+  purpose: Export all KB and ledger record lists plus medical and image annotation tables
 - name: Study workbook exchange
   file: study_exchange.py
   purpose: Bounded lossless Excel transport of canonical study exchange bundles and readable projections

@@ -5,10 +5,19 @@ from datetime import date, datetime
 from typing import Protocol, cast
 from uuid import UUID, uuid5
 
-from lx_dtypes.models.contracts.json_types import JsonObject, JsonValue
+from lx_dtypes.models.contracts.json_types import JsonObject
 from lx_dtypes.models.contracts.lab_value import LabValueNormalRangeData
+from lx_dtypes.models.contracts.medication import (
+    MedicationDosingSchedule,
+    MedicationSubstance,
+)
 
 from .Pydantic import (
+    MedicationScheduleBlock,
+    MedicationScheduleCompoundRow,
+    MedicationScheduleFreeTextRow,
+    MedicationScheduleMedicationRow,
+    MedicationScheduleRow,
     PatientDisease,
     PatientEvent,
     PatientLabSample,
@@ -16,6 +25,11 @@ from .Pydantic import (
     PatientMedicalLedger,
     PatientMedication,
     PatientMedicationSchedule,
+)
+from .Write import (
+    MedicationRowCompoundCreate,
+    MedicationRowRefCreate,
+    PatientMedicationScheduleCreate,
 )
 
 ENDOREG_DB_LEDGER_NAMESPACE = UUID("57006ca0-0840-5a4a-8569-d33f60ba4549")
@@ -81,12 +95,6 @@ def _json_object(value: object | None, field_name: str) -> JsonObject:
     if not isinstance(value, dict):
         raise TypeError(f"EndoReg field '{field_name}' must be a JSON object.")
     return cast(JsonObject, value)
-
-
-def _json_value(value: object | None, field_name: str) -> JsonValue:
-    if value is None or isinstance(value, (str, int, float, bool, list, dict)):
-        return cast(JsonValue, value)
-    raise TypeError(f"EndoReg field '{field_name}' is not JSON-compatible.")
 
 
 def _required_datetime(value: object, field_name: str) -> datetime:
@@ -237,7 +245,21 @@ def patient_lab_sample_from_endoreg(record: object) -> PatientLabSample:
     )
 
 
+def _medication_substance_from_endoreg(item: object) -> MedicationSubstance:
+    if isinstance(item, dict):
+        return MedicationSubstance.model_validate(item)
+    return MedicationSubstance.model_validate(
+        {
+            "name": getattr(item, "name", None),
+            "strength": getattr(item, "strength", None),
+        }
+    )
+
+
 def patient_medication_from_endoreg(record: object) -> PatientMedication:
+    dosing = MedicationDosingSchedule.model_validate(
+        _json_object(getattr(record, "dosing", None), "dosing")
+    )
     return PatientMedication.model_validate(
         {
             **_ledger_identity(record),
@@ -249,15 +271,24 @@ def patient_medication_from_endoreg(record: object) -> PatientMedication:
             "medication_indication": _optional_reference(
                 getattr(record, "medication_indication", None)
             ),
-            "medication": _required_reference(
-                getattr(record, "medication", None), "medication"
-            ),
+            "medication": _optional_reference(getattr(record, "medication", None)),
+            "pzn": getattr(record, "pzn", None),
+            "substances": [
+                _medication_substance_from_endoreg(item)
+                for item in _relation_values(getattr(record, "substances", None))
+            ],
+            "dosing": dosing,
+            "dosage": getattr(record, "dosage", None),
             "intake_times": [
                 _required_reference(item, "intake_times")
                 for item in _relation_values(getattr(record, "intake_times", None))
             ],
+            "dosage_form": getattr(record, "dosage_form", None),
+            "dosage_form_code": getattr(record, "dosage_form_code", None),
             "unit": _optional_reference(getattr(record, "unit", None)),
-            "dosage": _json_value(getattr(record, "dosage", None), "dosage"),
+            "unit_code": getattr(record, "unit_code", None),
+            "notes": getattr(record, "notes", None),
+            "bound_note": getattr(record, "bound_note", None),
             "active": _required_bool(getattr(record, "active", True), "active"),
         }
     )
@@ -266,16 +297,54 @@ def patient_medication_from_endoreg(record: object) -> PatientMedication:
 def patient_medication_schedule_from_endoreg(
     record: object,
 ) -> PatientMedicationSchedule:
+    """Resolve validated ordered block references against patient-owned membership.
+
+    Null/absent blocks denotes an existing flat schedule. An explicit block list
+    is authoritative and must agree exactly with the host's medication relation.
+    """
+    patient = _required_identity_reference(getattr(record, "patient", None), "patient")
+    records = _relation_values(getattr(record, "medication", None))
+    medications: dict[int, PatientMedication] = {}
+    for item in records:
+        key = getattr(item, "pk", None)
+        if not isinstance(key, int) or isinstance(key, bool) or key <= 0:
+            raise ValueError("schedule medication requires a positive primary key")
+        converted = patient_medication_from_endoreg(item)
+        if converted.patient != patient:
+            raise ValueError("schedule medication belongs to another patient")
+        medications[key] = converted
+    raw_blocks = getattr(record, "blocks", None)
+    blocks: list[MedicationScheduleBlock] = []
+    if raw_blocks is not None:
+        payload = PatientMedicationScheduleCreate.model_validate({"blocks": raw_blocks})
+        referenced: set[int] = set()
+        for block in payload.blocks:
+            rows: list[MedicationScheduleRow] = []
+            for row in block.rows:
+                if isinstance(row, MedicationRowRefCreate):
+                    if row.medication_id not in medications:
+                        raise ValueError(
+                            "schedule block references a missing medication"
+                        )
+                    referenced.add(row.medication_id)
+                    rows.append(
+                        MedicationScheduleMedicationRow(
+                            medication=medications[row.medication_id]
+                        )
+                    )
+                elif isinstance(row, MedicationRowCompoundCreate):
+                    rows.append(MedicationScheduleCompoundRow(entry=row.entry))
+                else:
+                    rows.append(MedicationScheduleFreeTextRow(entry=row.entry))
+            blocks.append(MedicationScheduleBlock(heading=block.heading, rows=rows))
+        if referenced != set(medications):
+            raise ValueError("schedule blocks and medication membership disagree")
     return PatientMedicationSchedule.model_validate(
         {
             **_ledger_identity(record),
-            "patient": _required_identity_reference(
-                getattr(record, "patient", None), "patient"
-            ),
-            "medications": [
-                patient_medication_from_endoreg(item)
-                for item in _relation_values(getattr(record, "medication", None))
-            ],
+            "patient": patient,
+            "medications": list(medications.values()),
+            "medication_blocks": blocks,
             "schedule_created_at": _required_datetime(
                 getattr(record, "created_at", None), "created_at"
             ),
