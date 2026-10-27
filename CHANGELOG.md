@@ -7,12 +7,84 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.4.dev1] - Unreleased
 
+### Added
+- `PatientMedication` carries BMP-aligned fields: an optional PZN, up to three
+  ordered active substances with strengths, a structured dosing schedule
+  (day-segment quantities, an optional once-weekly weekday, or free text), a
+  dosage form (coded or free text), a dose-unit code alongside the existing
+  unit, and separate usage-notes and bound-continuation-line fields distinct
+  from the existing treatment-reason field.
+- `PatientMedicationSchedule` models an ordered, headed sequence of medication
+  blocks, each holding medication entries, compounded-preparation entries, or
+  free-text lines — matching the German "Bundeseinheitlicher Medikationsplan"
+  (BMP) medication-table structure.
+- A reusable `MedicationEntryFields`/`MedicationDosingSchedule`/
+  `MedicationSubstance`/`MedicationScheduleHeading` family of shared contract
+  types backs both the read ledger model and the write contracts.
+- A generic `json_encoded_fields()` hook on `LedgerBaseModel` serializes
+  structures that mix nested ledger references with inline value objects.
+- A technical specification summary of the BMP v2.8 carrier-XML format,
+  derived from the official KBV agreement, its annexes, the real XSD, and a
+  sample instance.
+
 ### Changed
 - Report anonymization v2 requires typed extraction evidence and owner-bound
   staging receipts. Provider failure is distinct from valid empty extraction;
   deterministic fallback preserves its actual backend and bounded failure code.
 - Producers and hosts must upgrade together; v1 payloads fail closed. This local
   prerelease candidate is not a published release.
+- `PatientMedication.medication` (trade/display name) is now optional: an
+  entry may instead be identified by PZN and/or active substances, per BMP's
+  data-minimization convention. A medication entry must still set at least
+  one identifying or descriptive field.
+- `PatientMedication.medication_indication` is now length- and
+  line-break-constrained to match BMP's treatment-reason field.
+- `PatientMedicationSchedule`'s create/update/aggregate-create write contracts
+  take an ordered list of headed blocks of rows (referencing a medication by
+  id or index, or holding a free-text line or compounded-preparation entry)
+  instead of a flat list of medication ids/indices.
+
+### Removed
+- `PatientMedication.intake_times` and the unstructured `PatientMedication.dosage`
+  JSON field, replaced by the structured dosing schedule above.
+
+### Known limitations
+- `patient_medication_schedule_from_endoreg` is speculative: the external
+  `endoreg_db` Django app has no blocks/rows relation yet matching this
+  structure; the adapter documents and expects a provisional shape that does
+  not exist until that app grows one.
+- This change only makes the internal data model BMP-shaped — it does not yet
+  encode or decode the actual BMP carrier-XML/2D-barcode payload. Several BMP
+  conformance rules (e.g. mutual exclusivity between coded/free-text fields)
+  exist only as documentation in the official XSD, not as machine-checked
+  schema constructs; this repo's validators re-implement the ones relevant to
+  our own fields, not the full wire format.
+- The official Dosiereinheit (dose-unit) code table (33 single-character
+  codes mapped to display names) is not in this repo; `unit_code` accepts any
+  value matching the expected character class without validating it against
+  the real table.
+- The pre-existing, disconnected catalog layer (`MedicationScheduleReference`
+  and related types in `contracts/reference_catalog.py`) still models dosing
+  as a clock-time regimen and was intentionally left untouched — it now
+  diverges further from `PatientMedication`'s BMP-shaped dosing.
+- `LabValue` models were explicitly out of scope for this change; BMP's three
+  clinical parameters (weight/height/creatinine) and its pregnant/
+  breastfeeding/sex/allergy flags have no home in this repo yet.
+
+### Follow-up work
+- Implement BMP carrier-XML encode/decode (the 2D-barcode payload) on top of
+  this data model.
+- Obtain and wire in the real KBV Dosiereinheit keyword table so `unit_code`
+  can be validated/resolved instead of pattern-matched.
+- Decide and implement how `endoreg_db` should expose the blocks/rows
+  relation `patient_medication_schedule_from_endoreg` currently assumes.
+- Decide how/whether BMP's clinical parameters and demographic flags map onto
+  `LabValue` or a separate patient-demographics model.
+- Reconcile or retire the disconnected `MedicationScheduleReference` catalog
+  layer now that `PatientMedication` has its own BMP-shaped dosing.
+- Add the corresponding Django-side migrations/fields in `endoreg_db` for the
+  new `PatientMedication` attributes and the schedule's blocks/rows structure
+  (out of scope for this repo).
 
 ## [0.2.37] - 2026-09-08
 
