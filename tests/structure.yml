@@ -11,6 +11,9 @@ boundaries:
 - Use temporary directories for generated artifacts
 - Do not expose fixtures as public package dependencies or include patient data
 entrypoints:
+- name: Text embedding contract tests
+  file: unit/lx_dtypes/models/contracts/test_text_embedding.py
+  purpose: Verify compatible cosine spaces and report-only span request boundaries
 - name: Standardized CSV export tests
   file: unit/lx_dtypes/stats/test_standardized.py
   purpose: Verify complete columns, medication plans, annotations and failed export preservation

@@ -13,6 +13,9 @@ boundaries:
 - Keep application service orchestration outside shared models
 - Preserve raw video identity across processing and transfer
 entrypoints:
+- name: Report text embeddings
+  file: contracts/text_embedding.py
+  purpose: Versioned finite text vectors and explicit annotated report-span references
 - name: Study exchange
   file: contracts/study_exchange.py
   purpose: Canonical portable study definitions, collections, evaluations and package closure for hub and Excel

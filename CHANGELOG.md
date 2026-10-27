@@ -45,6 +45,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   database) without writes. Binary columns require `binary="base64"`; querysets
   that repeat a record through a join fail until `.distinct()` is applied.
 
+- `lx_dtypes.models.contracts.text_embedding` defines versioned embedding spaces,
+  finite nonzero vectors with same-space cosine similarity, and
+  `ReportConceptSpan`, an annotation request that references a report span by
+  source hash and offsets and cannot carry free text or vectors.
+
 ### Fixed
 - `PatientVideoFile.serialized_model` no longer fails for every video: the
   serialized form now declares its anonymization state, segment UUID references
