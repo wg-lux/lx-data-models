@@ -339,8 +339,15 @@ instead of overriding it. This replaces the former last-import-wins behavior.
 Packages containing or transitively importing reporting records or study presets,
 and packages under `report_templates/`, emit `ReportTemplateConceptWarning`
 (a `UserWarning` subclass in `lx_dtypes.models.interface.KnowledgeBase`) for locally
-defined clinical concepts, including every finding definition. Concepts
-in their terminology dependencies do not trigger this warning. Conflict errors
+defined clinical concepts, including every finding definition. Runtime loading
+emits at most one warning per affected module. For multiple definitions, its
+`definitions` tuple retains a source-located warning for every concept; the
+summary's `source_file`, `line`, and `column` identify the first definition.
+A single definition retains the original warning format and an empty tuple.
+Package linting expands the tuple into individual diagnostics, and strict
+warning filters still reject affected packages. Retained historical releases
+keep their published bytes; current packages must reference terminology.
+Concepts in their terminology dependencies do not trigger this warning. Conflict errors
 preserve both YAML line locations and identify the terminology definition to keep
 when only one of the conflicting modules is a reporting package. For conflicts
 between two terminology packages, ownership requires author review. Move custom

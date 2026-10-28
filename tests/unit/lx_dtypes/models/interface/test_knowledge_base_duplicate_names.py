@@ -125,6 +125,64 @@ def test_reporting_references_dependency_without_warning(tmp_path: Path) -> None
     assert kb.finding["canonical"].kb_module_name == "child"
 
 
+@pytest.mark.parametrize("count", [1, 2, 5])
+def test_reporting_warning_retains_every_definition(tmp_path: Path, count: int) -> None:
+    from lx_dtypes.models.interface.KnowledgeBase import ReportTemplateConceptWarning
+
+    config_file = _write_module(
+        tmp_path,
+        "reporting",
+        "".join(
+            f"- model: finding\n  name: custom_{index}\n" for index in range(count)
+        ),
+    )
+    config = KnowledgeBaseConfig.from_yaml_file(config_file)
+    report_file = config_file.parent / "report.yml"
+    report_file.write_text(
+        "- model: report_finding\n  name: reference\n  finding: custom_0\n"
+    )
+    config.data.files.append(report_file)
+    config.normalize_data_paths(config_file)
+    with pytest.warns(ReportTemplateConceptWarning) as recorded:
+        kb = KnowledgeBase.create_from_config(config)
+    assert len(recorded) == 1
+    warning = recorded[0].message
+    assert isinstance(warning, ReportTemplateConceptWarning)
+    definitions = warning.definitions or (warning,)
+    assert len(definitions) == count
+    assert [definition.line for definition in definitions] == list(
+        range(1, count * 2, 2)
+    )
+    for index, definition in enumerate(definitions):
+        assert definition.source_file == config_file.parent / "records.yml"
+        assert definition.column == 3
+        assert f"'finding' definition 'custom_{index}'" in str(definition)
+    assert len(kb.finding) == count
+
+
+@pytest.mark.filterwarnings(
+    "error::lx_dtypes.models.interface.KnowledgeBase.ReportTemplateConceptWarning"
+)
+def test_reporting_warning_remains_an_error_under_strict_filters(
+    tmp_path: Path,
+) -> None:
+    from lx_dtypes.models.interface.KnowledgeBase import ReportTemplateConceptWarning
+
+    root = tmp_path / "report_templates"
+    root.mkdir()
+    path = _write_module(
+        root,
+        "study",
+        "- model: finding\n  name: first\n- model: finding\n  name: second\n",
+    )
+    config = KnowledgeBaseConfig.from_yaml_file(path)
+    config.normalize_data_paths(path)
+    with pytest.raises(
+        ReportTemplateConceptWarning, match="2 clinical concept definitions"
+    ):
+        KnowledgeBase.create_from_config(config)
+
+
 def test_failed_import_does_not_partially_mutate_knowledge_base(tmp_path: Path) -> None:
     def load(name: str, records: str) -> KnowledgeBase:
         path = _write_module(tmp_path, name, records)

@@ -13,6 +13,9 @@ boundaries:
 - Keep application service orchestration outside shared models
 - Preserve raw video identity across processing and transfer
 entrypoints:
+- name: Reporting concept diagnostics
+  file: interface/KnowledgeBase.py
+  purpose: One runtime warning per affected module retains all source-located definitions for package linting.
 - name: Report text embeddings
   file: contracts/text_embedding.py
   purpose: Versioned finite text vectors and explicit annotated report-span references

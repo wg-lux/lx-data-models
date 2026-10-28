@@ -109,15 +109,21 @@ def assert_retained_release_warnings[Result](load: Callable[[], Result]) -> Resu
     """Verify the immutable STAR release's known authoring debt."""
     with pytest.warns(ReportTemplateConceptWarning) as recorded:
         result = load()
+    assert len(recorded) == 1
     locations: set[tuple[Path, int, int]] = set()
     for warning in recorded:
         message = warning.message
         assert isinstance(message, ReportTemplateConceptWarning)
-        assert "/versions/star_upper_gi/0.1.1.post1/star_upper_gi/" in str(
-            message.source_file
+        assert "star_upper_gi@0.1.1.post1: 132 clinical concept definitions" in str(
+            message
         )
-        locations.add((message.source_file, message.line, message.column))
-    assert len(recorded) == len(locations) == 132
+        assert len(message.definitions) == 132
+        for definition in message.definitions:
+            assert "/versions/star_upper_gi/0.1.1.post1/star_upper_gi/" in str(
+                definition.source_file
+            )
+            locations.add((definition.source_file, definition.line, definition.column))
+    assert len(locations) == 132
     return result
 
 

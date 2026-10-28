@@ -222,11 +222,20 @@ if TYPE_CHECKING:
 class ReportTemplateConceptWarning(UserWarning):
     """A reporting/study package defines concepts instead of referencing terminology."""
 
-    def __init__(self, message: str, *, source_file: Path, line: int, column: int):
+    def __init__(
+        self,
+        message: str,
+        *,
+        source_file: Path,
+        line: int,
+        column: int,
+        definitions: tuple["ReportTemplateConceptWarning", ...] = (),
+    ) -> None:
         super().__init__(message)
         self.source_file = source_file
         self.line = line
         self.column = column
+        self.definitions = definitions
 
 
 class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
@@ -377,6 +386,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         if not (reporting_context or self.is_reporting_package):
             return
         self._reporting_modules.add(self.config.name)
+        definitions: list[ReportTemplateConceptWarning] = []
         for (model_name, name), location in self._definition_locations.items():
             if model_name not in CLINICAL_CONCEPT_MODELS:
                 continue
@@ -384,7 +394,7 @@ class KnowledgeBase(AppBaseModelUUIDTags):
             if record.kb_module_name != self.config.name:
                 continue
             file, line, column = location
-            warnings.warn(
+            definitions.append(
                 ReportTemplateConceptWarning(
                     f"{file}:{line}:{column}: '{model_name}' definition '{name}' "
                     f"in reporting/study module '{self.config.name}'. Move this custom "
@@ -396,9 +406,24 @@ class KnowledgeBase(AppBaseModelUUIDTags):
                     source_file=file,
                     line=line,
                     column=column,
-                ),
-                stacklevel=2,
+                )
             )
+        if not definitions:
+            return
+        first = definitions[0]
+        warning = first
+        if len(definitions) > 1:
+            warning = ReportTemplateConceptWarning(
+                f"{self.config.name}@{self.config.version}: {len(definitions)} clinical "
+                "concept definitions in a reporting/study module. "
+                f"First definition: {first} "
+                "All definitions are available in warning.definitions and package lint diagnostics.",
+                source_file=first.source_file,
+                line=first.line,
+                column=first.column,
+                definitions=tuple(definitions),
+            )
+        warnings.warn(warning, stacklevel=2)
 
     def definition_source(
         self, model_name: str, name: str

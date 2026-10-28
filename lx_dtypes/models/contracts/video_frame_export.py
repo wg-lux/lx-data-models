@@ -13,6 +13,9 @@ type YamlScalar = str | int | float | bool | JsonNull
 type YamlValue = YamlScalar | list[YamlValue] | dict[str, YamlValue]
 
 PositiveInt = Annotated[int, Field(ge=1)]
+# Constraints must sit on the int branch: a field-level constraint on a union
+# with the JsonNull alias is applied to None and raises TypeError.
+NonNegativeInt = Annotated[int, Field(ge=0)]
 type VideoFrameAnnotationExportFormat = Literal["csv", "json"]
 type VideoFrameAnnotationExportProfile = Literal[
     "legacy_table_v1",
@@ -40,7 +43,7 @@ class VideoFrameAnnotationExportConfigPayload(BaseModel):
     label_id: PositiveInt | JsonNull = None
     information_source_name: str | JsonNull = None
     only_true: bool | JsonNull = None
-    limit: int | JsonNull = Field(default=None, ge=0)
+    limit: NonNegativeInt | JsonNull = None
     load_base_data: bool = False
     export_videos: bool = False
     export_frames: bool = True

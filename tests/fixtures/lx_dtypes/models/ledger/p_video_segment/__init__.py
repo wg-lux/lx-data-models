@@ -32,4 +32,4 @@ def p_video_segment_data_dict_fixture(
 def p_video_segment_fixture(
     p_video_segment_data_dict_fixture: PVideoSegmentDataDict,
 ) -> PVideoSegment:
-    return PVideoSegment(**p_video_segment_data_dict_fixture)
+    return PVideoSegment.model_validate(p_video_segment_data_dict_fixture)

@@ -138,6 +138,34 @@ def test_inherited_reporting_warnings_fail_by_default(
     assert "1 warning(s)" in capsys.readouterr().out
 
 
+def test_grouped_runtime_warning_preserves_all_lint_locations(tmp_path: Path) -> None:
+    module(tmp_path, "terms", "- model: finding\n  name: canonical\n")
+    module(
+        tmp_path,
+        "report",
+        "- model: report_finding\n  name: reference\n  finding: canonical\n",
+        "depends_on: [terms]\n",
+    )
+    config = module(
+        tmp_path,
+        "study",
+        "- model: finding\n  name: first\n- model: finding\n  name: second\n",
+        "depends_on: [report]\n",
+    )
+    result = check_kb_package(config)
+    issues = [
+        issue
+        for issue in result.issues
+        if issue.code == "report_template_concept_definition"
+    ]
+    assert len(issues) == 2
+    assert {issue.file for issue in issues} == {config.parent / "records.yml"}
+    assert len({issue.line for issue in issues}) == 2
+    assert all(issue.column == 3 and issue.severity == "warning" for issue in issues)
+    for issue, name in zip(issues, ("first", "second"), strict=True):
+        assert f"'finding' definition '{name}'" in issue.message
+
+
 @pytest.mark.parametrize(
     "records,diagnostic",
     [

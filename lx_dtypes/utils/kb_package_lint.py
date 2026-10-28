@@ -112,18 +112,19 @@ def check_kb_package(
     for warning in captured:
         message = warning.message
         if isinstance(message, ReportTemplateConceptWarning):
-            issues.append(
-                KbYamlLintIssue(
-                    code="report_template_concept_definition",
-                    severity="warning",
-                    file=message.source_file,
-                    line=message.line,
-                    column=message.column,
-                    message=str(message).removeprefix(
-                        f"{message.source_file}:{message.line}:{message.column}: "
-                    ),
+            for definition in message.definitions or (message,):
+                issues.append(
+                    KbYamlLintIssue(
+                        code="report_template_concept_definition",
+                        severity="warning",
+                        file=definition.source_file,
+                        line=definition.line,
+                        column=definition.column,
+                        message=str(definition).removeprefix(
+                            f"{definition.source_file}:{definition.line}:{definition.column}: "
+                        ),
+                    )
                 )
-            )
         else:
             issues.append(
                 KbYamlLintIssue(
