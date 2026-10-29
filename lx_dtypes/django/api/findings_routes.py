@@ -503,11 +503,20 @@ def build_p_examination_payload_from_host_ledger(
                 }
             )
 
+        # Hosts may record where a finding came from; manual entry stays untagged
+        # so existing ledgers keep their content.
+        source = getattr(patient_finding, "source", None)
+        source_tags = (
+            [f"source:{source}"]
+            if isinstance(source, str) and source and source != "manual"
+            else []
+        )
         patient_findings_payload.append(
             {
                 "uuid": str(patient_finding.instance_id),
                 "finding": finding_name,
                 "patient_examination": examination_name,
+                **({"tags": source_tags} if source_tags else {}),
                 "patient_finding_classifications": [
                     {
                         "patient_finding": str(patient_finding.instance_id),

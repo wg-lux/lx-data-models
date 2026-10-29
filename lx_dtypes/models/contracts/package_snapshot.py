@@ -44,9 +44,15 @@ def _semantic_content(value: object, serialized: JsonValue) -> JsonValue:
             if isinstance(value, AppBaseModel)
             else set()
         )
-        if isinstance(value, StudyMetadata) and not value.analysis_definitions:
-            # Preserve imports authored before optional analysis rules existed.
-            excluded.add("analysis_definitions")
+        if isinstance(value, StudyMetadata):
+            # Preserve imports authored before optional analysis or text rules existed.
+            for optional in (
+                "analysis_definitions",
+                "text_extraction",
+                "classification_text_extraction",
+            ):
+                if not getattr(value, optional):
+                    excluded.add(optional)
         fields = {
             key: name
             for name, field in type(value).model_fields.items()

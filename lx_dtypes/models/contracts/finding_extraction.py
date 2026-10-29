@@ -33,6 +33,34 @@ class FindingMention(BaseModel):
         return self
 
 
+class ClassificationTextRule(BaseModel):
+    """Match a classification choice; hosts attach it only to a present finding."""
+
+    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+
+    classification: str = Field(min_length=1, max_length=255)
+    choice: str = Field(min_length=1, max_length=255)
+    pattern: list[dict[str, JsonValue]] = Field(min_length=1, max_length=100)
+
+
+class ClassificationMention(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+
+    finding: str = Field(min_length=1)
+    classification: str = Field(min_length=1)
+    choice: str = Field(min_length=1)
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def ordered_span(self) -> "ClassificationMention":
+        if self.end <= self.start:
+            raise ValueError(
+                "Classification mention must have a nonempty character span"
+            )
+        return self
+
+
 class FindingExtractionEvidence(KnowledgeBaseIdentity):
     source: Literal["anonymized_text"] = "anonymized_text"
     mentions: list[FindingMention]

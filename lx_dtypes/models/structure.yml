@@ -25,6 +25,9 @@ entrypoints:
 - name: Study analysis definitions
   file: contracts/study_analysis.py
   purpose: Shared declarative predicates, analysis provenance, and descriptive result contracts
+- name: Study report text extraction
+  file: contracts/study_text_extraction.py
+  purpose: Cohort-scoped anonymized report evidence, review suggestions and explicit approval requests
 - name: Complete package snapshot
   file: contracts/package_snapshot.py
   purpose: Preserve every registered knowledge-base concept in a typed package snapshot

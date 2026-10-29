@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from typing import Literal, Self, TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .deployment_setup import PackageName, PackageVersion
-from .json_types import JsonObject
+from .finding_extraction import FindingPresence
+from .json_types import JsonObject, JsonValue
 from .study_analysis import StudyAnalysisDefinition
 
 
@@ -55,6 +56,53 @@ class StudyInclusionCriterion(StudyMetadataModel):
         return self
 
 
+class StudyTextRuleModel(BaseModel):
+    # Matcher patterns keep whitespace exactly as authored.
+    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+
+    module: PackageName
+    version: PackageVersion
+    finding: str = Field(min_length=1, max_length=255)
+    pattern: list[dict[str, JsonValue]] = Field(min_length=1, max_length=100)
+
+    @field_validator("pattern", mode="before")
+    @classmethod
+    def canonical_pattern_keys(cls, value: object) -> object:
+        """Store spaCy keys in upper case so case-converting clients round-trip.
+
+        Browser clients convert keys to camelCase and back to snake_case, which
+        turns ``IS_ALPHA`` into ``is_alpha``. Custom ``_`` extension attributes
+        carry case-sensitive names and are therefore not supported here.
+        """
+
+        def canonical(item: object) -> object:
+            if isinstance(item, list):
+                return [canonical(entry) for entry in item]
+            if isinstance(item, dict):
+                keys = [key for key in item if isinstance(key, str)]
+                if "_" in keys:
+                    raise ValueError("custom extension attributes are not supported")
+                upper = [key.upper() for key in keys]
+                if len(set(upper)) != len(upper):
+                    raise ValueError("pattern keys must be unique ignoring case")
+                return {
+                    (key.upper() if isinstance(key, str) else key): canonical(entry)
+                    for key, entry in item.items()
+                }
+            return item
+
+        return canonical(value)
+
+
+class StudyFindingTextRule(StudyTextRuleModel):
+    presence: FindingPresence
+
+
+class StudyClassificationTextRule(StudyTextRuleModel):
+    classification: str = Field(min_length=1, max_length=255)
+    choice: str = Field(min_length=1, max_length=255)
+
+
 class StudyMetadata(StudyMetadataModel):
     participating_centers: list[ParticipatingCenter] = Field(
         default_factory=list, max_length=500
@@ -68,6 +116,12 @@ class StudyMetadata(StudyMetadataModel):
     )
     analysis_definitions: list[StudyAnalysisDefinition] = Field(
         default_factory=list, max_length=100
+    )
+    text_extraction: list[StudyFindingTextRule] = Field(
+        default_factory=list, max_length=500
+    )
+    classification_text_extraction: list[StudyClassificationTextRule] = Field(
+        default_factory=list, max_length=500
     )
 
     @model_validator(mode="after")
@@ -94,6 +148,23 @@ class StudyMetadata(StudyMetadataModel):
                     raise ValueError(
                         "inclusion concepts require a declared exact terminology dependency"
                     )
+        # The cohort decides what text extraction may suggest: only findings it
+        # names as inclusion concepts or analysis units.
+        extractable = {
+            (concept.module, concept.version, concept.name)
+            for criterion in self.inclusion_criteria
+            for concept in criterion.concepts
+            if concept.kind == "finding"
+        }
+        extractable.update(
+            (definition.module, definition.version, definition.unit_finding)
+            for definition in self.analysis_definitions
+        )
+        for rule in (*self.text_extraction, *self.classification_text_extraction):
+            if (rule.module, rule.version, rule.finding) not in extractable:
+                raise ValueError(
+                    "text extraction rules require a finding declared by the cohort"
+                )
         return self
 
 
@@ -124,9 +195,24 @@ class StudyInclusionCriterionDataDict(TypedDict):
     concepts: list[StudyConceptReferenceDataDict]
 
 
+class StudyFindingTextRuleDataDict(StudyTerminologyRequirementDataDict):
+    finding: str
+    presence: Literal["present", "absent", "uncertain"]
+    pattern: list[JsonObject]
+
+
+class StudyClassificationTextRuleDataDict(StudyTerminologyRequirementDataDict):
+    finding: str
+    classification: str
+    choice: str
+    pattern: list[JsonObject]
+
+
 class StudyMetadataDataDict(TypedDict):
     participating_centers: list[ParticipatingCenterDataDict]
     age_groups: list[StudyAgeGroupDataDict]
     terminology_requirements: list[StudyTerminologyRequirementDataDict]
     inclusion_criteria: list[StudyInclusionCriterionDataDict]
     analysis_definitions: list[JsonObject]
+    text_extraction: list[StudyFindingTextRuleDataDict]
+    classification_text_extraction: list[StudyClassificationTextRuleDataDict]
