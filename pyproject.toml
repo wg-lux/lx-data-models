@@ -34,6 +34,8 @@ dependencies = [
   "types-pyyaml>=6.0.12.20250915",
   "platformdirs>=4",
   "hl7>=0.4.5",
+  "defusedxml>=0.7.1",
+  "tomli-w>=1.2.0",
 ]
 description = "Typed clinical data models, terminology, and interoperability contracts"
 keywords = [
@@ -51,7 +53,7 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.6.1"
+version = "0.6.2"
 
 [project.optional-dependencies]
 dev = [
@@ -79,7 +81,7 @@ dev = [
   "twine>=6.2.0,<7",
   "opencv-python-headless>=4.12.0.88",
   "vulture>=2.16",
-
+  "types-defusedxml>=0.7.0",
 ]
 
 docs = [
@@ -98,6 +100,7 @@ lx-dtypes-prototype-kb-smoke = "lx_dtypes.scripts.prototype_kb_smoke:main"
 lx-dtypes-release = "lx_dtypes.scripts.release:main"
 lx-dtypes-verify-packaged-templates = "lx_dtypes.scripts.verify_packaged_report_templates:main"
 lx-dtypes-fhir-lxdm-diagram = "lx_dtypes.scripts.fhir_lxdm_diagram:main"
+lx-dtypes-convert = "lx_dtypes.scripts.convert_records:main"
 
 [project.urls]
 Changelog = "https://github.com/wg-lux/lx-data-models/blob/main/CHANGELOG.md"

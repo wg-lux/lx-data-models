@@ -2,7 +2,9 @@
 
 Owner: lx_dtypes maintainers. This guide owns CSV projection of complete clinical
 records and explicitly selected Django tables. Host authorization, database
-transactions, and patient selection remain the host's responsibility.
+transactions, and patient selection remain the host's responsibility. Import
+and export of lists of a single model in JSON, YAML, TOML, XML, FHIR, CSV, TSV
+or XLSX is covered by [record import and export formats](record-data-formats.md).
 
 ## Ledger and knowledge base
 

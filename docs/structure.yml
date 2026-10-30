@@ -30,6 +30,8 @@ submodules: []
 contracts:
 - name: Standardized CSV exports
   doc: guides/standardized-csv-export.md
+- name: Record import and export formats
+  doc: guides/record-data-formats.md
 - name: Package authoring
   doc: guides/dtypes-package-structure.md
 - name: ePA FHIR compatibility

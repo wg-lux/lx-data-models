@@ -59,6 +59,12 @@ entrypoints:
 - name: Contracts
   file: contracts/__init__.py
   purpose: Shared interchange exports
+- name: Data format syntax table
+  file: interface/data_formats/base.py
+  purpose: Identified JSON, YAML, TOML, XML, FHIR, delimited and XLSX formats with syntax tokens
+- name: Record import and export
+  file: interface/data_formats/codec.py
+  purpose: Validated, bounded dump and load of single records and record lists in every registered data format
 - name: Knowledge-base interface
   file: interface/__init__.py
   purpose: Version-aware loading API
@@ -80,6 +86,8 @@ contracts:
   doc: ../../docs/guides/data-model-concept-map.md
 - name: Report-template infrastructure
   doc: ../../docs/guides/report-template-infrastructure.md
+- name: Record import and export formats
+  doc: ../../docs/guides/record-data-formats.md
 - name: ePA FHIR compatibility
   doc: ../../docs/guides/epa-fhir-compatibility.md
 tests:

@@ -82,7 +82,9 @@ def test_video_frame_annotation_export_config_rejects_invalid_limit(
 
 
 def test_video_frame_annotation_export_config_round_trips_dumped_nulls() -> None:
-    config = validate_video_frame_annotation_export_config({"output_path": "frames.csv"})
+    config = validate_video_frame_annotation_export_config(
+        {"output_path": "frames.csv"}
+    )
 
     dumped = config.model_dump(mode="json")
 

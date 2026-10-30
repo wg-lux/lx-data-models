@@ -26,11 +26,11 @@ def test_evidence_requires_definition_digest_and_ordered_spans():
         "knowledge_base_module": "coloreg",
         "knowledge_base_version": "0.2.0",
         "cohort_definition_sha256": "a" * 64,
-        "mentions": [
-            {"finding": "polyp", "presence": "present", "start": 0, "end": 5}
-        ],
+        "mentions": [{"finding": "polyp", "presence": "present", "start": 0, "end": 5}],
     }
-    assert StudyTextExtractionEvidence.model_validate(base).classification_mentions == []
+    assert (
+        StudyTextExtractionEvidence.model_validate(base).classification_mentions == []
+    )
     with pytest.raises(ValidationError):
         StudyTextExtractionEvidence.model_validate(
             {**base, "cohort_definition_sha256": "not-a-digest"}

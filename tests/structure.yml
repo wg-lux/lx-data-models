@@ -32,6 +32,12 @@ entrypoints:
 - name: Study collection contract tests
   file: unit/lx_dtypes/models/contracts/test_study_collection.py
   purpose: Verify persistence provenance, strict boundaries, and observation round trips
+- name: Data format syntax tests
+  file: unit/lx_dtypes/models/interface/test_data_formats.py
+  purpose: Verify format identifiers, FHIR base syntax inheritance, lookups and unsupported-role failures
+- name: Record import and export tests
+  file: unit/lx_dtypes/models/interface/test_data_format_codec.py
+  purpose: Verify every format round trip, FHIR cardinality, hostile input refusal, atomic files and the CLI
 - name: Fixtures
   file: conftest.py
   purpose: Shared fixture registration

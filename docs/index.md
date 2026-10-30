@@ -52,6 +52,7 @@ guides/data-model-concept-map
 guides/cross-layer-validation
 guides/django-host-integration
 guides/standardized-csv-export
+guides/record-data-formats
 medication_plan_specification_summary
 guides/fhir-clinical-testing
 guides/epa-fhir-compatibility

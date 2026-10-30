@@ -41,6 +41,9 @@ entrypoints:
 - name: Registry CLI
   file: scripts/kb_registry.py
   purpose: Explicit registry provisioning
+- name: Record conversion CLI
+  file: scripts/convert_records.py
+  purpose: lx-dtypes-convert validates and converts record files between registered data formats
 dependencies:
   internal: []
   external:
@@ -50,6 +53,9 @@ dependencies:
   - NumPy
   - pandas
   - Pandera
+  - openpyxl
+  - defusedxml
+  - tomli-w
 submodules:
 - name: models
   path: models
