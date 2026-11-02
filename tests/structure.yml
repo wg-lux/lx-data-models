@@ -11,6 +11,15 @@ boundaries:
 - Use temporary directories for generated artifacts
 - Do not expose fixtures as public package dependencies or include patient data
 entrypoints:
+- name: Table import vocabulary tests
+  file: unit/lx_dtypes/models/interface/test_table_import_vocabulary.py
+  purpose: Validate packaged aliases, concept targets and ambiguous header suggestions
+- name: Categorical study tests
+  file: unit/lx_dtypes/stats/test_study_categorical.py
+  purpose: Numerical reference, sparse tables, diagnostic pairs and explicit missingness
+- name: Study inference tests
+  file: unit/lx_dtypes/stats/test_study_inference.py
+  purpose: Numerical references, complete cases, independent patients and invalid model rejection
 - name: Text embedding contract tests
   file: unit/lx_dtypes/models/contracts/test_text_embedding.py
   purpose: Verify compatible cosine spaces and report-only span request boundaries

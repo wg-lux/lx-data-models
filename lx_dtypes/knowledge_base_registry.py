@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
 import re
+from datetime import UTC, datetime
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as package_version
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
@@ -111,6 +115,128 @@ class KnowledgeBaseBootstrapResult(BaseModel):
     registry: Path
     module_name: str
     version: str
+    validated: tuple[str, ...] = ()
+    reused: tuple[str, ...] = ()
+
+
+VALIDATION_RECEIPTS_NAME = "validation-receipts.json"
+
+
+class ValidationReceipt(BaseModel):
+    """Proof that one identity validated with these exact inputs and validator."""
+
+    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+
+    inputs_digest: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
+    validator: str = Field(min_length=1)
+    validated_at: datetime = Field(strict=False)
+
+
+class ValidationReceipts(BaseModel):
+    """Persisted next to the registry so unchanged identities skip re-validation."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    schema_version: Literal["1"] = "1"
+    receipts: dict[str, ValidationReceipt] = Field(default_factory=dict)
+
+
+def validation_receipts_path(registry: Path) -> Path:
+    return registry.parent / VALIDATION_RECEIPTS_NAME
+
+
+def _validator_identity() -> str:
+    try:
+        return f"lx-dtypes {package_version('lx-dtypes')}"
+    except PackageNotFoundError as exc:
+        raise RuntimeError(
+            "lx-dtypes distribution metadata is required for validation receipts"
+        ) from exc
+
+
+def _read_receipts(path: Path) -> ValidationReceipts:
+    if not path.exists():
+        return ValidationReceipts()
+    try:
+        return ValidationReceipts.model_validate_json(path.read_bytes())
+    except (OSError, ValidationError):
+        # Receipts only ever skip work; an unreadable file means validate everything.
+        logger.warning(
+            json.dumps(
+                {
+                    "event": "lx_dtypes.knowledge_base_bootstrap.receipts_ignored",
+                    "receipts": str(path),
+                },
+                sort_keys=True,
+            )
+        )
+        return ValidationReceipts()
+
+
+def _write_receipts(path: Path, receipts: ValidationReceipts) -> None:
+    encoded = (receipts.model_dump_json(indent=2) + "\n").encode("utf-8")
+    _atomic_write_file(
+        destination=path,
+        content=[encoded],
+        required_bytes=len(encoded),
+        file_mode=0o600,
+    )
+
+
+def _directory_digest(root: Path, cache: dict[Path, str]) -> str:
+    resolved = root.resolve()
+    if resolved in cache:
+        return cache[resolved]
+    digest = hashlib.sha256()
+    if resolved.is_file():
+        files = [resolved]
+    else:
+        files = sorted(
+            path
+            for path in resolved.rglob("*")
+            if path.is_file() and "__pycache__" not in path.parts
+        )
+    for path in files:
+        relative = path.relative_to(resolved).as_posix() if path != resolved else ""
+        digest.update(relative.encode("utf-8") + b"\0")
+        digest.update(hashlib.sha256(path.read_bytes()).digest())
+    cache[resolved] = digest.hexdigest()
+    return cache[resolved]
+
+
+def _inputs_digest(
+    registry: Path,
+    module_name: str,
+    version: str,
+    validator: str,
+    cache: dict[Path, str],
+) -> str | None:
+    """Digest of everything validation reads; None when inputs cannot be hashed locally."""
+    from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+        resolve_registry_entry_inputs,
+    )
+
+    entry = read_registry(registry).modules[module_name][version]
+    entry_payload = entry.model_dump(mode="json", exclude_none=True)
+    inputs = resolve_registry_entry_inputs(module_name, version, entry_payload)
+    if any(is_remote_data_root(value) for value in inputs):
+        return None
+    digest = hashlib.sha256()
+    for part in (
+        ValidationReceipts().schema_version,
+        validator,
+        module_name,
+        version,
+        json.dumps(entry_payload, sort_keys=True),
+    ):
+        digest.update(part.encode("utf-8") + b"\0")
+    for value in inputs:
+        path = Path(value)
+        if not path.exists():
+            # Validation reports the missing input; never skip it.
+            return None
+        digest.update(_directory_digest(path, cache).encode("ascii") + b"\0")
+    return f"sha256:{digest.hexdigest()}"
 
 
 def configured_registry_path(value: Path | None = None) -> Path:
@@ -339,13 +465,18 @@ def bootstrap_packaged_knowledge_bases(
     registry: Path,
     *,
     default_module: str = DEFAULT_PACKAGED_KNOWLEDGE_BASE,
+    verify: bool = False,
 ) -> KnowledgeBaseBootstrapResult:
-    """Provision and fully validate every packaged knowledge base.
+    """Provision and validate every packaged knowledge base.
 
     Existing custom active identities are preserved. Missing active state uses
     ``default_module``. Recognized provider and installed-wheel entries may be
     repaired. Hydrated editable copies are preserved and validated, while
     collisions with unrelated deployment-owned sources fail closed.
+
+    An identity whose registry entry, input files and lx-dtypes version match
+    a persisted validation receipt is not loaded again, so repeated boots do
+    not re-run full validation. ``verify`` validates every identity regardless.
     """
 
     registry = registry.expanduser().resolve()
@@ -368,20 +499,67 @@ def bootstrap_packaged_knowledge_bases(
     if changed:
         _write_registry(registry, payload)
 
+    receipts_path = validation_receipts_path(registry)
+    receipts = _read_receipts(receipts_path)
+    validator = _validator_identity()
+    digests: dict[Path, str] = {}
+    validated: list[str] = []
+    reused: list[str] = []
+
+    def validate(module_name: str, version: str) -> None:
+        key = f"{module_name}@{version}"
+        digest = _inputs_digest(registry, module_name, version, validator, digests)
+        receipt = receipts.receipts.get(key)
+        if (
+            not verify
+            and digest is not None
+            and receipt is not None
+            and receipt.inputs_digest == digest
+            and receipt.validator == validator
+        ):
+            reused.append(key)
+            return
+        if receipts.receipts.pop(key, None) is not None:
+            # Invalidate durably first: a failed (re)validation must not be skipped next boot.
+            _write_receipts(receipts_path, receipts)
+        _validate_identity(registry, module_name, version)
+        validated.append(key)
+        if digest is not None:
+            receipts.receipts[key] = ValidationReceipt(
+                inputs_digest=digest,
+                validator=validator,
+                validated_at=datetime.now(UTC),
+            )
+            # Persist each success so a later failure does not repeat finished work.
+            _write_receipts(receipts_path, receipts)
+
     packaged_identities: set[tuple[str, str]] = set()
     for descriptor in list_packaged_knowledge_bases():
         identity = descriptor.module_name, descriptor.version
-        _validate_identity(registry, *identity)
+        validate(*identity)
         packaged_identities.add(identity)
 
     module_name, version = read_active_identity(registry)
     if (module_name, version) not in packaged_identities:
-        _validate_identity(registry, module_name, version)
+        validate(module_name, version)
 
+    logger.info(
+        json.dumps(
+            {
+                "event": "lx_dtypes.knowledge_base_bootstrap.validation",
+                "validated": validated,
+                "reused": reused,
+                "verify": verify,
+            },
+            sort_keys=True,
+        )
+    )
     return KnowledgeBaseBootstrapResult(
         registry=registry,
         module_name=module_name,
         version=version,
+        validated=tuple(validated),
+        reused=tuple(reused),
     )
 
 
@@ -392,6 +570,8 @@ __all__ = [
     "RegistryActiveIdentity",
     "RegistryEntry",
     "RegistryPayload",
+    "ValidationReceipt",
+    "ValidationReceipts",
     "bootstrap_packaged_knowledge_bases",
     "configured_registry_path",
     "read_active_identity",

@@ -1,0 +1,116 @@
+- model: reference_catalog
+  name: video_segmentation_label
+  name_de: "Videosegmentierungskennzeichnungen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: appendix
+      record_type: video_segmentation_label
+      description: Appendix
+      color: '#FF0000'
+      order_priority: 0
+    - name: bli
+      record_type: video_segmentation_label
+      description: Blue Light Imaging (high level for nbi and similar modes)
+      color: '#000080'
+      order_priority: 0
+    - name: blood
+      record_type: video_segmentation_label
+      description: Blood
+      color: '#00FF00'
+      order_priority: 0
+    - name: colon
+      record_type: video_segmentation_label
+      description: Colon
+      color: '#00FFFF'
+      order_priority: 0
+    - name: diverticule
+      record_type: video_segmentation_label
+      description: Diverticule
+      color: '#0000FF'
+      order_priority: 0
+    - name: duodenum
+      record_type: video_segmentation_label
+      description: Duodenum
+      color: '#FF00FF'
+      order_priority: 0
+    - name: esophagus
+      record_type: video_segmentation_label
+      description: Esophagus
+      color: '#0000FF'
+      order_priority: 0
+    - name: grasper
+      record_type: video_segmentation_label
+      description: Grasper
+      color: '#FFFF00'
+      order_priority: 0
+    - name: ileocaecalvalve
+      record_type: video_segmentation_label
+      description: Ileocaecalvalve
+      color: '#FF00FF'
+      order_priority: 0
+    - name: ileum
+      record_type: video_segmentation_label
+      description: Ileum
+      color: '#800000'
+      order_priority: 0
+    - name: instrument
+      record_type: video_segmentation_label
+      description: Instrument
+      color: '#808000'
+      order_priority: 0
+    - name: low_quality
+      record_type: video_segmentation_label
+      description: Low Quality
+      color: '#800080'
+      order_priority: 0
+    - name: lower_gi
+      record_type: video_segmentation_label
+      description: Lower GI
+      color: '#00FF00'
+      order_priority: 0
+    - name: nbi
+      record_type: video_segmentation_label
+      description: Narrow Band Imaging
+      color: '#00FFFF'
+      order_priority: 0
+    - name: needle
+      record_type: video_segmentation_label
+      description: Needle
+      color: '#800000'
+      order_priority: 0
+    - name: outside
+      record_type: video_segmentation_label
+      description: Out of Body
+      color: '#008000'
+      order_priority: 0
+    - name: polyp
+      record_type: video_segmentation_label
+      description: Polyp
+      color: '#008000'
+      order_priority: 0
+    - name: snare
+      record_type: video_segmentation_label
+      description: Snare
+      color: '#000080'
+      order_priority: 0
+    - name: stomach
+      record_type: video_segmentation_label
+      description: Stomach
+      color: '#FFFF00'
+      order_priority: 0
+    - name: upper_gi
+      record_type: video_segmentation_label
+      description: Upper GI
+      color: '#FF0000'
+      order_priority: 0
+    - name: water_jet
+      record_type: video_segmentation_label
+      description: Water Jet
+      color: '#800080'
+      order_priority: 0
+    - name: wound
+      record_type: video_segmentation_label
+      description: Wound
+      color: '#808000'
+      order_priority: 0

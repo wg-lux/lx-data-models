@@ -378,3 +378,184 @@ def test_shipped_coloreg_r0_plan_evaluates_linked_polyp_size() -> None:
         if item.endpoint == "histological_r0_among_assessable" and item.group == "EMR"
     )
     assert (r0.numerator, r0.denominator, r0.rate) == (1, 1, 1.0)
+
+
+def test_saved_numeric_analysis_uses_ledger_and_terminology(
+    kb: KnowledgeBase, definition: StudyAnalysisDefinition
+) -> None:
+    payload = definition.model_dump()
+    payload.update(
+        inclusion=None,
+        endpoints=[],
+        variables=[
+            {
+                "name": "size",
+                "role": "index",
+                "classification": "size",
+                "descriptor": "mm",
+            }
+        ],
+        inference=[
+            {
+                "name": "size_comparison",
+                "method": "welch_t_test",
+                "outcome": "size",
+                "groups": ["emr", "esd"],
+            }
+        ],
+    )
+    configured = StudyAnalysisDefinition.model_validate_json(
+        StudyAnalysisDefinition.model_validate(payload).model_dump_json()
+    )
+    records = [
+        observation(i + 1, size=size, technique="emr" if i < 3 else "esd")
+        for i, size in enumerate([10.0, 20.0, 30.0, 30.0, 50.0, 60.0])
+    ]
+    for i, record in enumerate(records):
+        record.patient = f"patient-{i}"
+    result = evaluate_study_dataset(configured, records, kb)
+    assert result.inference[0].observations == 6
+    assert result.inference[0].estimates[0].estimate == pytest.approx(-80 / 3)
+    assert result.endpoints == []
+    records[-1].patient = records[0].patient
+    with pytest.raises(ValueError, match="one analysis unit per patient"):
+        evaluate_study_dataset(configured, records, kb)
+    payload["variables"][0]["descriptor"] = "unknown"
+    with pytest.raises(ValueError, match="unknown rule descriptor"):
+        validate_study_analysis(StudyAnalysisDefinition.model_validate(payload), kb)
+
+
+def test_descriptive_definition_retains_pre_inference_serialization(
+    definition: StudyAnalysisDefinition,
+) -> None:
+    payload = definition.model_dump(mode="json")
+    assert "variables" not in payload
+    assert "inference" not in payload
+    assert "categorical" not in payload
+    assert (
+        StudyAnalysisDefinition.model_validate(
+            {**payload, "variables": [], "inference": [], "categorical": []}
+        ).model_dump(mode="json")
+        == payload
+    )
+
+
+def test_plot_labels_share_endpoint_rules_and_keep_missing_explicit(
+    kb: KnowledgeBase, definition: StudyAnalysisDefinition
+) -> None:
+    from lx_dtypes.models.contracts.study_analysis import StudyPlotConfiguration
+
+    definition.inclusion = None
+    definition.plots = StudyPlotConfiguration.model_validate(
+        {
+            "limit": 2,
+            "labels": [
+                {"name": "Margin", "source": "endpoint", "reference": "r0"},
+                {
+                    "name": "Frame label",
+                    "source": "image_annotation",
+                    "reference": "loaded_label",
+                },
+            ],
+        }
+    )
+    records = [
+        observation(1),
+        observation(2, margin="r1"),
+        observation(3, margin=None),
+        observation(4, margin="r1"),
+    ]
+    for index, record in enumerate(records):
+        record.patient = f"plot-patient-{index}"
+    result = evaluate_study_dataset(
+        definition,
+        records,
+        kb,
+        annotation_labels={str(records[0].uuid): {"Frame label": "positive"}},
+    )
+    plots = result.plots
+    assert plots is not None
+    assert plots.total == 4 and len(plots.points) == 2 and plots.omitted == 2
+    assert plots.points[0].labels[0].state == "positive"
+    assert plots.points[1].labels[0].state == "negative"
+    assert plots.points[1].labels[1].state == "missing"
+    rate = next(row for row in plots.rates if row.label == "Margin")
+    assert (rate.positive, rate.negative, rate.unknown) == (1, 2, 1)
+    assert rate.rate == pytest.approx(1 / 3)
+    assert rate.low == pytest.approx(0.06149194472039621)
+    assert rate.high == pytest.approx(0.7923403991979523)
+    assert (
+        "patient" not in plots.model_dump_json()
+        and "record_uuid" not in plots.model_dump_json()
+    )
+    records[-1].patient = records[0].patient
+    dependent = evaluate_study_dataset(
+        definition, records, kb, annotation_labels={}
+    ).plots
+    assert dependent is not None and not dependent.independent
+    assert all(row.low is None and row.high is None for row in dependent.rates)
+    with pytest.raises(ValueError, match="host-authorized"):
+        evaluate_study_dataset(definition, records, kb)
+
+
+@pytest.mark.parametrize(
+    "plots",
+    [
+        {"labels": [{"name": "x", "source": "endpoint", "reference": "unknown"}]},
+        {
+            "labels": [{"name": "x", "source": "endpoint", "reference": "r0"}],
+            "limit": 5001,
+        },
+        {"labels": [{"name": "x", "source": "sql", "reference": "r0"}]},
+        {"labels": [{"name": "x", "source": "endpoint", "reference": "r0"}] * 2},
+    ],
+)
+def test_invalid_plot_configuration_rejected(
+    definition: StudyAnalysisDefinition, plots: dict[str, object]
+) -> None:
+    with pytest.raises(ValueError):
+        StudyAnalysisDefinition.model_validate(
+            {**definition.model_dump(), "plots": plots}
+        )
+
+
+def test_categorical_definition_roundtrip_and_authorized_ledger_evaluation(
+    kb: KnowledgeBase,
+    definition: StudyAnalysisDefinition,
+) -> None:
+    import yaml
+
+    payload = definition.model_dump()
+    payload["inclusion"] = None
+    endpoint = definition.endpoints[0].name
+    payload["categorical"] = [
+        {
+            "name": "comparison",
+            "method": "fisher_exact",
+            "endpoint": endpoint,
+            "groups": ["emr", "esd"],
+            "design": "cohort",
+        }
+    ]
+    configured = StudyAnalysisDefinition.model_validate(
+        yaml.safe_load(yaml.safe_dump(payload))
+    )
+    records = [
+        observation(
+            i + 1,
+            technique="emr" if i < 5 else "esd",
+            margin="r0" if i in {0, 1, 2, 5} else "r1",
+        )
+        for i in range(10)
+    ]
+    for i, record in enumerate(records):
+        record.patient = f"patient-{i}"
+    result = evaluate_study_dataset(configured, records, kb)
+    assert result.categorical[0].table == [[3, 2], [1, 4]]
+    assert result.categorical[0].estimates[1].value == pytest.approx(3)
+    records[-1].patient = records[0].patient
+    with pytest.raises(ValueError, match="one analysis unit per patient"):
+        evaluate_study_dataset(configured, records, kb)
+    payload["categorical"][0]["endpoint"] = "unknown"
+    with pytest.raises(ValueError, match="unknown endpoint"):
+        StudyAnalysisDefinition.model_validate(payload)

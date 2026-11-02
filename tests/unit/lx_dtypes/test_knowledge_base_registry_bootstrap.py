@@ -172,13 +172,18 @@ def test_bootstrap_registers_and_validates_the_packaged_catalog(
         ]
 
     event = json.loads(capsys.readouterr().out)
+    validated = event.pop("validated")
     assert event == {
         "event": "lx_dtypes.knowledge_base_bootstrap",
         "module": "star_upper_gi",
         "registry": str(registry),
+        "reused": [],
         "status": "ok",
         "version": "0.1.2",
     }
+    # A first bootstrap has no receipts, so every packaged identity is validated.
+    assert "star_upper_gi@0.1.2" in validated
+    assert len(validated) == len(set(validated))
 
 
 def test_bootstrap_uses_environment_registry_and_requested_default(
@@ -438,3 +443,133 @@ def test_validation_runs_in_process_without_environment_mutation(
     with pytest.raises(ValueError, match="identity does not match"):
         registry_module._validate_identity(registry, "custom_reporting", "9.0.0")
     assert dict(os.environ) == before
+
+
+def _count_validations(monkeypatch: pytest.MonkeyPatch) -> list[str]:
+    """Record validations without loading knowledge bases; receipts are still written."""
+    calls: list[str] = []
+
+    def record(registry: Path, module: str, version: str) -> None:
+        del registry
+        calls.append(f"{module}@{version}")
+
+    monkeypatch.setattr(registry_module, "_validate_identity", record)
+    return calls
+
+
+def test_repeated_bootstrap_reuses_persisted_validation_receipts(
+    hydrated_registry: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls = _count_validations(monkeypatch)
+
+    first = registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+    assert first.validated
+    assert first.reused == ()
+    receipts = registry_module.validation_receipts_path(hydrated_registry)
+    assert stat.S_IMODE(receipts.stat().st_mode) == 0o600
+    count = len(calls)
+
+    # A new process reads the same receipts from disk.
+    second = registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+    assert len(calls) == count
+    assert second.validated == ()
+    assert set(second.reused) == set(first.validated)
+
+    verified = registry_module.bootstrap_packaged_knowledge_bases(
+        hydrated_registry, verify=True
+    )
+    assert set(verified.validated) == set(first.validated)
+    assert len(calls) == 2 * count
+
+
+def test_changed_inputs_and_validator_revalidate(
+    hydrated_registry: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls = _count_validations(monkeypatch)
+    registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+    payload = json.loads(hydrated_registry.read_text())
+    entry = payload["modules"]["dgvs_reporting"]["0.1.0"]
+    root = Path(entry["sources"][0]["input_dirs"][0])
+    config = root / "report_templates" / "dgvs_reporting" / "config.yaml"
+    config.write_bytes(config.read_bytes() + b"\n# Local builder edit\n")
+    calls.clear()
+
+    edited = registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+    assert "dgvs_reporting@0.1.0" in edited.validated
+    assert set(edited.validated) == set(calls)
+    assert edited.reused
+
+    monkeypatch.setattr(
+        registry_module, "_validator_identity", lambda: "lx-dtypes 99.0.0"
+    )
+    upgraded = registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+    assert upgraded.reused == ()
+
+
+def test_unreadable_receipts_validate_everything_again(
+    hydrated_registry: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls = _count_validations(monkeypatch)
+    first = registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+    receipts = registry_module.validation_receipts_path(hydrated_registry)
+    receipts.write_text("{not json")
+    calls.clear()
+
+    again = registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+
+    assert set(again.validated) == set(first.validated)
+    assert registry_module.ValidationReceipts.model_validate_json(
+        receipts.read_bytes()
+    ).receipts
+
+
+def test_failed_validation_drops_the_receipt_and_retries(
+    hydrated_registry: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls = _count_validations(monkeypatch)
+    registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+
+    def fail_for_dgvs(registry: Path, module: str, version: str) -> None:
+        if module == "dgvs_reporting":
+            raise ValueError("broken package")
+        calls.append(f"{module}@{version}")
+
+    monkeypatch.setattr(registry_module, "_validate_identity", fail_for_dgvs)
+    with pytest.raises(ValueError, match="broken package"):
+        registry_module.bootstrap_packaged_knowledge_bases(
+            hydrated_registry, verify=True
+        )
+    receipts = registry_module.ValidationReceipts.model_validate_json(
+        registry_module.validation_receipts_path(hydrated_registry).read_bytes()
+    )
+    assert "dgvs_reporting@0.1.0" not in receipts.receipts
+
+    calls = _count_validations(monkeypatch)
+    retried = registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+    assert "dgvs_reporting@0.1.0" in retried.validated
+
+
+@pytest.mark.parametrize("damage", ["marker", "digest", "path", "identity"])
+def test_receipts_never_hide_damaged_hydrated_copies(
+    hydrated_registry: Path, monkeypatch: pytest.MonkeyPatch, damage: str
+) -> None:
+    validate = registry_module._validate_identity
+    _count_validations(monkeypatch)
+    registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
+    monkeypatch.setattr(registry_module, "_validate_identity", validate)
+    payload = json.loads(hydrated_registry.read_text())
+    entry = payload["modules"]["dgvs_reporting"]["0.1.0"]
+    root = Path(entry["sources"][0]["input_dirs"][0])
+    tree = hydrated_registry.parent / "shipped" / entry["shipped_tree_sha256"]
+    if damage == "marker":
+        (tree / "origin.json").write_text("{}")
+    elif damage == "digest":
+        entry["hydrated_from_sha256"] = "0" * 64
+    elif damage == "path":
+        entry["sources"][0]["input_dirs"] = [str(root / "unrelated")]
+    else:
+        config = root / "report_templates" / "dgvs_reporting" / "config.yaml"
+        config.write_text(config.read_text().replace("0.1.0", "9.9.9"))
+    hydrated_registry.write_text(json.dumps(payload))
+
+    assert main(_bootstrap_args(hydrated_registry)) == 1

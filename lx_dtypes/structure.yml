@@ -19,7 +19,7 @@ entrypoints:
   purpose: Bounded lossless Excel transport of canonical study exchange bundles and readable projections
 - name: Study statistics
   file: stats/study.py
-  purpose: Evaluate versioned declarative analysis rules on validated ledger units and return typed descriptive statistics
+  purpose: Evaluate versioned declarative analysis rules on validated ledger units and return typed descriptive statistics configured local numeric/categorical inference, diagnostic accuracy and identifier-free label plot projections
 - name: ColoReg lesion linkage
   file: stats/study_linkage.py
   purpose: Assemble analysis roles only from explicit authorized lesion references
@@ -51,6 +51,7 @@ dependencies:
   - PyYAML
   - FHIR
   - NumPy
+  - SciPy
   - pandas
   - Pandera
   - openpyxl
@@ -86,6 +87,9 @@ tests:
   directory: ../tests/unit/lx_dtypes
   command: uv run pytest tests/test_fhir_lxdm_mapping.py -q
 files:
+- stats/study_plots.py
+- stats/study_inference.py
+- stats/study_categorical.py
 - utils
 - serialization
 - factories

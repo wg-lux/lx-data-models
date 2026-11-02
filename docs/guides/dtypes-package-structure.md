@@ -634,6 +634,16 @@ laboratory definitions and examination times. Operational records have explicit
 types too; patient records, employee names, model weights and active-model
 selection are outside this contract.
 
+`endoreg_reference@1.1.0`, shipped under
+`lx_dtypes/data/terminology/versions/endoreg_reference/1.1.0`, keeps every 1.0.0
+record unchanged and adds `gender_alias.yml`. Each `gender_alias` record maps
+one spelling found in source data, such as `weiblich` or `divers`, to a gender
+of the same catalogue. Its `name` is the spelling normalized by
+`normalize_gender_spelling` (case-folded, whitespace collapsed), so the
+catalogue's duplicate-identity check also rejects competing spellings. Hosts
+resolve source genders only through the projected names and aliases. The 1.0.0
+release stays the packaged default; hosts select 1.1.0 explicitly.
+
 Optional packages use the same format:
 
 - `endoreg_workforce@1.0.0`: 39 profession, qualification and shift reference

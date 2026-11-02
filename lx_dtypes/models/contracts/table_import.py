@@ -15,6 +15,7 @@ from lx_dtypes.models.descriptor_value import DescriptorValue
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
     ClassificationChoiceDescriptor,
 )
+from lx_dtypes.models.knowledge_base.pydantic_main import KB_MODEL_NAMES_LITERAL
 from lx_dtypes.models.meta.ReportMeta import ReportPatientInfo
 
 from .dtypes_record_persistence import DtypesRecordPersistencePayload
@@ -57,6 +58,108 @@ def _column_shorthand(value: object) -> object:
 
 
 ColumnMapping = Annotated[TableColumn, BeforeValidator(_column_shorthand)]
+
+
+TableField = Literal[
+    "row_id",
+    "first_name",
+    "last_name",
+    "dob",
+    "gender",
+    "examination_date",
+    "examination",
+    "finding",
+]
+
+
+class TableFieldVocabulary(BaseModel):
+    """Header suggestions and exact source-value translations for one field."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    aliases: list[str] = Field(min_length=1)
+    values: dict[str, str] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def valid_terms(self) -> Self:
+        normalized = [alias.strip().casefold() for alias in self.aliases]
+        if not all(normalized) or len(set(normalized)) != len(normalized):
+            raise ValueError("Header aliases must be nonempty and distinct")
+        if any(
+            not key.strip() or not value.strip() for key, value in self.values.items()
+        ):
+            raise ValueError("Value translations must be nonempty")
+        return self
+
+
+class TableConceptVocabulary(TableFieldVocabulary):
+    """A candidate in an explicitly selected KB closure, not an approved mapping."""
+
+    concept_type: KB_MODEL_NAMES_LITERAL
+    name: str = Field(min_length=1)
+    knowledge_base: KnowledgeBaseIdentity
+    source_module: str = Field(min_length=1)
+
+
+class TableImportVocabulary(BaseModel):
+    """Reviewable suggestions; never an executable or complete TableMapping."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    schema_version: Literal["1.0"]
+    fields: dict[TableField, TableFieldVocabulary] = Field(min_length=1)
+    concept_models: list[KB_MODEL_NAMES_LITERAL] = Field(default_factory=list)
+    concept_aliases: dict[KB_MODEL_NAMES_LITERAL, dict[str, list[str]]] = Field(
+        default_factory=dict
+    )
+    concepts: list[TableConceptVocabulary] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def distinct_fields(self) -> Self:
+        aliases = [
+            alias.strip().casefold()
+            for field in self.fields.values()
+            for alias in field.aliases
+        ]
+        if len(set(aliases)) != len(aliases):
+            raise ValueError("Header aliases must not identify multiple fields")
+        if len(set(self.concept_models)) != len(self.concept_models):
+            raise ValueError("Concept models must be unique")
+        for concept_type, entries in self.concept_aliases.items():
+            if concept_type not in self.concept_models:
+                raise ValueError("Concept aliases require a selected concept model")
+            for name, terms in entries.items():
+                if not name.strip():
+                    raise ValueError("Concept names must be nonempty")
+                TableFieldVocabulary(aliases=terms)
+        return self
+
+    def suggest_concepts(
+        self, term: str, *, concept_type: KB_MODEL_NAMES_LITERAL | None = None
+    ) -> list[TableConceptVocabulary]:
+        """Match identifiers/labels without guessing among shared clinical terms."""
+        normalized = term.strip().casefold()
+        return [
+            concept
+            for concept in self.concepts
+            if (concept_type is None or concept.concept_type == concept_type)
+            and normalized in {alias.strip().casefold() for alias in concept.aliases}
+        ]
+
+    def suggest_columns(self, columns: list[str]) -> dict[TableField, list[str]]:
+        """Keep all matching original headers, including ambiguous candidates."""
+        return {
+            name: matches
+            for name, field in self.fields.items()
+            if (
+                matches := [
+                    column
+                    for column in columns
+                    if column.strip().casefold()
+                    in {alias.strip().casefold() for alias in field.aliases}
+                ]
+            )
+        }
 
 
 class TableDescriptor(BaseModel):

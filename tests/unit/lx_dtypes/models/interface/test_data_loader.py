@@ -1,7 +1,9 @@
+import doctest
 from pathlib import Path
 
 import pytest
 
+import lx_dtypes.models.interface.DataLoader as data_loader_module
 from lx_dtypes.models.interface.DataLoader import (
     AmbiguousModuleConfigError,
     DataLoader,
@@ -304,3 +306,10 @@ class TestDataLoader:
         units = next(config for config in configs if config.name == "lx_units")
         assert units.source_file == editor_units_dir / "config.yaml"
         assert configs[0].name == "editor_bundle"
+
+
+def test_module_documentation_examples_run() -> None:
+    """The usage example in the DataLoader module docstring stays executable."""
+    result = doctest.testmod(data_loader_module, raise_on_error=False)
+    assert result.attempted > 0
+    assert result.failed == 0

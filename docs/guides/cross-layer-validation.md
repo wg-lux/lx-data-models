@@ -304,6 +304,60 @@ bounds and admissible values. The parser converts source representation and
 delegates value validation to that owning definition. It does not invent
 terminology or execute mapping expressions.
 
+Default English/German header aliases and common gender/examination translations
+live in `lx_dtypes/data/table_import_vocabulary.yml`. Load a fresh validated copy
+and obtain candidate source headers with:
+
+```python
+from lx_dtypes.models.interface.table_import import load_table_import_vocabulary
+
+vocabulary = load_table_import_vocabulary()
+candidates = vocabulary.suggest_columns(["Vorname", "Nachname", "Geburtsdatum"])
+# {"first_name": ["Vorname"], "last_name": ["Nachname"], "dob": ["Geburtsdatum"]}
+gender_values = vocabulary.fields["gender"].values
+```
+
+Header matching ignores surrounding whitespace and letter case only; it retains
+original headers and all candidates. Multiple candidates require a host/user
+choice, not concatenation. Generic `id`, `name`, `date`, patient IDs and free-text
+report columns are deliberately not inferred. Value translations are exact
+strings for copying into `TableColumn.values`; they do not normalize cells or
+supply missing values. Unknown gender codes and ambiguous numeric codes require
+an explicit local mapping. Hosts must review suggestions, verify target concepts
+against the selected exact KB version, and supply mapping identity, required
+fields, date formats and finding/classification groups. Loading this vocabulary
+does not change `TableMapping` validation or perform an import.
+
+For concept columns and cell values, pass the already resolved knowledge base:
+
+```python
+vocabulary = load_table_import_vocabulary(knowledge_base)
+choices = vocabulary.suggest_concepts("Koloskopie", concept_type="Examination")
+# Each candidate carries name, concept_type, source_module, and the selected KB identity.
+size_columns = vocabulary.suggest_concepts("Lesionsgröße", concept_type="Classification")
+```
+
+The YAML `concept_models` list selects 25 registered model collections: clinical
+concepts and their types, classification choices and descriptors, units,
+information sources, citations, report concepts and validators. Every record in
+those collections contributes its canonical identifier and authored English and
+German labels. This includes dependency and custom-package concepts without
+copying their definitions into another catalogue. `concept_aliases` adds curated
+abbreviations and common table terms only when the target exists in the selected
+KB. No KB argument means header/value defaults only; no package is selected
+implicitly. Employee lists, study presets and nested reference-catalogue records
+are outside this concept lookup.
+
+Concept lookup trims whitespace and ignores case, preserving all matching
+candidates. Optional `concept_type` uses registered names such as `Finding`,
+`ClassificationChoice`, `ClassificationChoiceDescriptor` or `Unit`. The candidate
+KB identity is the selected dependency closure; `source_module` identifies the
+defining module within it. Neither a matching label nor a matching identifier
+proves a concept is admissible for a particular examination, finding or
+classification. Hosts must review relationships through the selected KB before
+constructing `TableMapping` groups. The lookup does not infer lesion grouping,
+parse quantities, convert units, or add new fields to the table import contract.
+
 These transports share the same stored collections. Host workflows explicitly
 capture validated ledger observations before export; export itself does not
 create evidence. Receiving a hub archive does not assign a local owner or

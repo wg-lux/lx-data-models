@@ -120,7 +120,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         return int(args.func(args))
-    except (DataFormatError, ValueError, ImportError, AttributeError, OSError) as exc:
+    except (
+        DataFormatError,
+        ValueError,
+        TypeError,
+        ImportError,
+        AttributeError,
+        OSError,
+    ) as exc:
         print(f"lx-dtypes-convert: {exc}", file=sys.stderr)
         return 1
 

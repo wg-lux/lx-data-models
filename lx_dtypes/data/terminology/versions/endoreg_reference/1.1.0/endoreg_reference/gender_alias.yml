@@ -1,0 +1,57 @@
+- model: reference_catalog
+  name: gender_alias
+  name_de: "Geschlechtsschreibweisen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: f
+      record_type: gender_alias
+      gender: {name: female}
+    - name: w
+      record_type: gender_alias
+      gender: {name: female}
+    - name: weiblich
+      record_type: gender_alias
+      gender: {name: female}
+    - name: frau
+      record_type: gender_alias
+      gender: {name: female}
+    - name: woman
+      record_type: gender_alias
+      gender: {name: female}
+    - name: m
+      record_type: gender_alias
+      gender: {name: male}
+    - name: männlich
+      record_type: gender_alias
+      gender: {name: male}
+    - name: maennlich
+      record_type: gender_alias
+      gender: {name: male}
+    - name: mann
+      record_type: gender_alias
+      gender: {name: male}
+    - name: man
+      record_type: gender_alias
+      gender: {name: male}
+    - name: d
+      record_type: gender_alias
+      gender: {name: other}
+    - name: divers
+      record_type: gender_alias
+      gender: {name: other}
+    - name: diverse
+      record_type: gender_alias
+      gender: {name: other}
+    - name: x
+      record_type: gender_alias
+      gender: {name: other}
+    - name: u
+      record_type: gender_alias
+      gender: {name: unknown}
+    - name: unbekannt
+      record_type: gender_alias
+      gender: {name: unknown}
+    - name: '?'
+      record_type: gender_alias
+      gender: {name: unknown}

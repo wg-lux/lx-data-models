@@ -28,6 +28,8 @@ dependencies:
   - MyST
 submodules: []
 contracts:
+- name: Configured study inference
+  doc: guides/study-inference.md
 - name: Standardized CSV exports
   doc: guides/standardized-csv-export.md
 - name: Record import and export formats

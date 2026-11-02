@@ -1,16 +1,21 @@
-"""Validated descriptive analysis; inferential estimators can consume these counts."""
+"""Validated study rules, descriptive counts and configured local inference."""
 
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from hashlib import sha256
 from typing import cast
 
 from lx_dtypes.models.contracts.study_analysis import (
+    PlotState,
     StudyAnalysisDefinition,
+    StudyAnalysisEndpoint,
     StudyAnalysisUnit,
     StudyDatasetStatistics,
     StudyEndpointStatistics,
     StudyFindingReference,
+    StudyPlotPoint,
+    StudyPlotState,
+    StudyPlotValue,
     StudyPredicate,
     StudyRole,
     StudyRule,
@@ -20,7 +25,10 @@ from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
 from lx_dtypes.validation import assess_examination
 
+from .study_categorical import CategoricalObservation, evaluate_categorical
+from .study_inference import NumericObservation, evaluate_inference, numeric_values
 from .study_linkage import latest_study_choices
+from .study_plots import StudyPlotAccumulator
 
 
 def _names(value: str | list[str]) -> list[str]:
@@ -35,6 +43,21 @@ def _rules(definition: StudyAnalysisDefinition) -> list[StudyRule]:
         result.extend([endpoint.positive, endpoint.negative])
         if endpoint.eligible is not None:
             result.append(endpoint.eligible)
+    # Reuse numeric terminology validation; these predicates are never evaluated.
+    for variable in definition.variables:
+        result.append(
+            StudyRule(
+                predicates=[
+                    StudyPredicate(
+                        role=variable.role,
+                        classification=variable.classification,
+                        descriptor=variable.descriptor,
+                        operator="ge",
+                        value=0.0,
+                    )
+                ]
+            )
+        )
     return result
 
 
@@ -173,6 +196,27 @@ def _rule(rule: StudyRule | None, findings: dict[StudyRole, PFinding]) -> bool |
     return True if True in values else None if None in values else False
 
 
+def _endpoint_state(
+    endpoint: StudyAnalysisEndpoint, findings: dict[StudyRole, PFinding]
+) -> PlotState:
+    eligible = _rule(endpoint.eligible, findings)
+    if eligible is False:
+        return "ineligible"
+    if eligible is None:
+        return "eligibility_unknown"
+    positive, negative = (
+        _rule(endpoint.positive, findings),
+        _rule(endpoint.negative, findings),
+    )
+    if positive is True and negative is True:
+        return "conflicting"
+    if positive is True and negative is False:
+        return "positive"
+    if negative is True and positive is False:
+        return "negative"
+    return "missing"
+
+
 def _resolve(
     unit: StudyAnalysisUnit,
     records: dict[str, PExamination],
@@ -227,12 +271,13 @@ def evaluate_study_dataset(
     knowledge_base: KnowledgeBase,
     *,
     units: Sequence[StudyAnalysisUnit] | None = None,
+    annotation_labels: Mapping[str, Mapping[str, PlotState]] | None = None,
 ) -> StudyDatasetStatistics:
     """Return explicit binary denominators; unknowns never become negative outcomes.
 
     Hosts supply authorized records and verified linkage units. Without units,
     each matching finding is one index unit and other roles remain unavailable.
-    No significance test, causal contrast, or independence assumption is made.
+    Optional inference requires one unit per patient and explicit numeric variables.
     """
     definition = StudyAnalysisDefinition.model_validate(definition.model_dump())
     validate_study_analysis(definition, knowledge_base)
@@ -277,6 +322,19 @@ def evaluate_study_dataset(
         for group in definition.groups
         for endpoint in definition.endpoints
     }
+    plotter = (
+        StudyPlotAccumulator(definition.plots, [v.name for v in definition.variables])
+        if definition.plots
+        else None
+    )
+    if (
+        definition.plots
+        and any(label.source != "endpoint" for label in definition.plots.labels)
+        and annotation_labels is None
+    ):
+        raise ValueError("annotation plot labels require host-authorized evidence")
+    categorical_rows: list[CategoricalObservation] = []
+    numeric_rows: list[NumericObservation] = []
     included = excluded = unknown = unassigned = ambiguous = 0
     for source_unit in units:
         unit = StudyAnalysisUnit.model_validate(source_unit.model_dump())
@@ -303,25 +361,58 @@ def evaluate_study_dataset(
             unassigned += 1
             continue
         included += 1
-        for endpoint in definition.endpoints:
-            bucket = counts[(matches[0], endpoint.name)]
-            eligible = _rule(endpoint.eligible, findings)
-            if eligible is False:
-                bucket["ineligible"] += 1
-                continue
-            if eligible is None:
-                bucket["eligibility_unknown"] += 1
-                continue
-            positive = _rule(endpoint.positive, findings)
-            negative = _rule(endpoint.negative, findings)
-            if positive is True and negative is True:
-                bucket["conflicting"] += 1
-            elif positive is True and negative is False:
-                bucket["numerator"] += 1
-            elif negative is True and positive is False:
-                bucket["negative"] += 1
-            else:
-                bucket["missing"] += 1
+        values = (
+            numeric_values(definition.variables, findings)
+            if definition.inference or plotter
+            else {}
+        )
+        if definition.inference:
+            numeric_rows.append(
+                NumericObservation(
+                    patient=str(record_map[unit.index.record_uuid].patient),
+                    group=matches[0],
+                    values=values,
+                )
+            )
+        states: dict[str, PlotState] = {
+            endpoint.name: _endpoint_state(endpoint, findings)
+            for endpoint in definition.endpoints
+        }
+        if definition.categorical:
+            categorical_rows.append(
+                CategoricalObservation(
+                    patient=str(record_map[unit.index.record_uuid].patient),
+                    group=matches[0],
+                    states=states,
+                )
+            )
+        for endpoint, state in states.items():
+            counts[(matches[0], endpoint)][
+                "numerator" if state == "positive" else state
+            ] += 1
+        if plotter is not None:
+            annotations: Mapping[str, PlotState] = (annotation_labels or {}).get(
+                unit.index.record_uuid, {}
+            )
+            plotter.add(
+                str(record_map[unit.index.record_uuid].patient),
+                StudyPlotPoint(
+                    group=matches[0],
+                    values=[
+                        StudyPlotValue(name=name, value=value)
+                        for name, value in values.items()
+                    ],
+                    labels=[
+                        StudyPlotState(
+                            name=label.name,
+                            state=states[label.reference]
+                            if label.source == "endpoint"
+                            else annotations.get(label.name, "missing"),
+                        )
+                        for label in plotter.config.labels
+                    ],
+                ),
+            )
     endpoints: list[StudyEndpointStatistics] = []
     for (group, endpoint), values in counts.items():
         denominator = values["numerator"] + values["negative"]
@@ -352,4 +443,12 @@ def evaluate_study_dataset(
         unassigned_units=unassigned,
         ambiguous_units=ambiguous,
         endpoints=endpoints,
+        plots=plotter.result() if plotter else None,
+        inference=[
+            evaluate_inference(config, numeric_rows) for config in definition.inference
+        ],
+        categorical=[
+            evaluate_categorical(config, categorical_rows)
+            for config in definition.categorical
+        ],
     )

@@ -235,6 +235,7 @@ def cmd_bootstrap(args: argparse.Namespace) -> int:
         result = bootstrap_packaged_knowledge_bases(
             configured_registry_path(args.registry),
             default_module=args.module,
+            verify=args.verify,
         )
     except Exception as exc:  # noqa: BLE001 - CLI boundary emits structured failure
         print(
@@ -258,6 +259,8 @@ def cmd_bootstrap(args: argparse.Namespace) -> int:
                 "registry": str(result.registry),
                 "module": result.module_name,
                 "version": result.version,
+                "validated": list(result.validated),
+                "reused": list(result.reused),
             },
             sort_keys=True,
         )
@@ -344,6 +347,11 @@ def build_parser() -> argparse.ArgumentParser:
             "Packaged module to activate when no active identity exists. "
             f"Defaults to {DEFAULT_PACKAGED_KNOWLEDGE_BASE}."
         ),
+    )
+    bootstrap_parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="Validate every knowledge base even when a matching validation receipt exists.",
     )
     bootstrap_parser.set_defaults(func=cmd_bootstrap)
 

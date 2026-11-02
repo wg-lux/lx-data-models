@@ -66,6 +66,14 @@
       "default": true
     },
     {
+      "module_name": "endoreg_reference",
+      "version": "1.1.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/terminology/versions/endoreg_reference/1.1.0/endoreg_reference",
+      "content_sha256": "d5d00fd70f254eddde1b3efc1c086dd52b7e9b80990c12863fd263f5fedff289",
+      "default": false
+    },
+    {
       "module_name": "coloreg",
       "version": "0.2.0",
       "medical_field": "gastroenterology",

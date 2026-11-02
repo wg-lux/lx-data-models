@@ -1,0 +1,89 @@
+# Suggested headers and exact value translations, reviewed by the importing host.
+# Concepts must exist in the selected TableMapping knowledge-base version.
+schema_version: '1.0'
+fields:
+  row_id:
+    aliases: [row_id, row id, record_id, record id, source_id, source id, zeilen_id, datensatz_id]
+  first_name:
+    aliases: [first_name, first name, firstname, given_name, given name, vorname]
+  last_name:
+    aliases: [last_name, last name, lastname, surname, family_name, family name, nachname, familienname]
+  dob:
+    aliases: [dob, date_of_birth, date of birth, birth_date, birth date, geburtsdatum]
+  gender:
+    aliases: [gender, sex, geschlecht]
+    values:
+      female: female
+      Female: female
+      weiblich: female
+      f: female
+      w: female
+      male: male
+      Male: male
+      männlich: male
+      maennlich: male
+      m: male
+  examination_date:
+    aliases: [examination_date, examination date, exam_date, procedure_date, untersuchungsdatum]
+  examination:
+    aliases: [examination, examination_type, exam_type, procedure_type, untersuchung, untersuchungsart]
+    values:
+      colonoscopy: colonoscopy
+      Colonoscopy: colonoscopy
+      Koloskopie: colonoscopy
+      koloskopie: colonoscopy
+      ERCP: ercp
+      ercp: ercp
+      EUS: endoscopic_ultrasound
+      endoscopic_ultrasound: endoscopic_ultrasound
+      Endosonografie: endoscopic_ultrasound
+      Endosonographie: endoscopic_ultrasound
+  finding:
+    aliases: [finding, finding_name, finding name, befundkonzept]
+# Expand these model collections using identifiers and authored EN/DE labels
+# from an explicitly supplied KnowledgeBase, including its resolved dependencies.
+concept_models:
+  - Examination
+  - ExaminationType
+  - Finding
+  - FindingType
+  - Classification
+  - ClassificationType
+  - ClassificationChoice
+  - ClassificationChoiceDescriptor
+  - Indication
+  - IndicationType
+  - Intervention
+  - InterventionType
+  - Unit
+  - UnitType
+  - InformationSource
+  - InformationSourceType
+  - Citation
+  - ReportTemplate
+  - ReportTemplateSection
+  - ReportFinding
+  - ClassificationValidator
+  - InterventionValidator
+  - UnitValidator
+  - FindingsValidator
+  - ExaminationValidator
+# Supplement authored labels; absent targets in a selected KB are not suggested.
+# Broad labels can have multiple matches and always require context/review.
+concept_aliases:
+  Examination:
+    colonoscopy: [colonoscopy, Koloskopie, colo, kolo]
+    gastroscopy: [gastroscopy, Gastroskopie, EGD, ÖGD, OGD]
+    ercp: [ERCP]
+    endoscopic_ultrasound: [EUS, Endosonografie, Endosonographie]
+  Finding:
+    colon_polyp: [colon polyp, colorectal polyp, Kolonpolyp, Darmpolyp]
+  Classification:
+    colonoscopy_location_default: [colon location, colonic segment, Kolonsegment, Lokalisation]
+    colonoscopy_location_coarse: [colon region, Kolonregion, Lokalisation]
+    lesion_size_mm: [lesion size, lesion size mm, Lesionsgröße, Laesionsgroesse, Größe mm]
+    colon_lesion_size_categorical: [lesion size category, Größenkategorie, Groessenkategorie]
+    colonoscopy_polyp_histology: [polyp histology, Polypenhistologie, Histologie]
+    histology_dysplasia_default: [dysplasia, Dysplasie, dysplasia grade, Dysplasiegrad]
+    histology_dignity_default: [dignity, Dignität, Dignitaet]
+    histology_in_sano_default: [resection margin, Resektionsrand, R-Status]

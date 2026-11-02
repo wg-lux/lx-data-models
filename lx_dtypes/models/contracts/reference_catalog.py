@@ -12,7 +12,14 @@ from datetime import date, time
 from enum import StrEnum
 from typing import Annotated, ClassVar, Literal, Self, cast
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 from lx_dtypes.models.contracts.lab_value import LabValueNormalRangeData
 from lx_dtypes.models.contracts.reference_metadata import (
@@ -62,6 +69,7 @@ class ReferenceKind(StrEnum):
     FINDING_INTERVENTION_TYPE = "finding_intervention_type"
     FINDING_TYPE = "finding_type"
     GENDER = "gender"
+    GENDER_ALIAS = "gender_alias"
     INFORMATION_SOURCE = "information_source"
     INFORMATION_SOURCE_TYPE = "information_source_type"
     LAB_VALUE = "lab_value"
@@ -542,6 +550,29 @@ class GenderReference(CatalogRecordBase):
     name: str = Field(max_length=255, min_length=1)
     abbreviation: str | None = Field(max_length=255)
     description: str | None
+
+
+def normalize_gender_spelling(value: str) -> str:
+    """Canonical comparison form of a gender spelling read from source data."""
+    return " ".join(value.casefold().split())
+
+
+class GenderAliasReference(CatalogRecordBase):
+    """A source-data spelling of a gender; its identity is the normalized spelling."""
+
+    record_type: Literal[ReferenceKind.GENDER_ALIAS] = ReferenceKind.GENDER_ALIAS
+    relation_targets: ClassVar[dict[str, ReferenceKind]] = {
+        "gender": ReferenceKind.GENDER
+    }
+    name: str = Field(max_length=255, min_length=1)
+    gender: CatalogIdentity
+
+    @field_validator("name")
+    @classmethod
+    def normalized_spelling(cls, value: str) -> str:
+        if value != normalize_gender_spelling(value):
+            raise ValueError("Gender alias names must be normalized spellings")
+        return value
 
 
 class InformationSourceReference(CatalogRecordBase):
@@ -1063,6 +1094,7 @@ type ReferenceRecord = Annotated[
     | FindingInterventionTypeReference
     | FindingTypeReference
     | GenderReference
+    | GenderAliasReference
     | InformationSourceReference
     | InformationSourceTypeReference
     | LabValueReference
@@ -1156,6 +1188,7 @@ CATALOG_RECORD_TYPES: dict[ReferenceKind, type[CatalogRecordBase]] = {
     ReferenceKind.FINDING_INTERVENTION_TYPE: FindingInterventionTypeReference,
     ReferenceKind.FINDING_TYPE: FindingTypeReference,
     ReferenceKind.GENDER: GenderReference,
+    ReferenceKind.GENDER_ALIAS: GenderAliasReference,
     ReferenceKind.INFORMATION_SOURCE: InformationSourceReference,
     ReferenceKind.INFORMATION_SOURCE_TYPE: InformationSourceTypeReference,
     ReferenceKind.LAB_VALUE: LabValueReference,

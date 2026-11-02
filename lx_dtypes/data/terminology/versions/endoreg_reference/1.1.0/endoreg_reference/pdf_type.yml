@@ -1,0 +1,65 @@
+- model: reference_catalog
+  name: pdf_type
+  name_de: "PDF-Typen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: rkh-endoscopy-histology-report-generic
+      record_type: pdf_type
+      patient_info_line:
+        name: rkh-histology-generic-patient-info-line
+        version: null
+      endoscope_info_line:
+        name: ukw-examination-generic-endoscope-info-line
+        version: null
+      examiner_info_line:
+        name: ukw-examination-generic-examiner-info-line
+        version: null
+      cut_off_above_lines:
+      - name: ukw-examination-generic-anamnese-info-line
+        version: null
+      - name: ukw-examination-generic-endoscope-info-line
+        version: null
+      - name: ukw-examination-generic-examiner-info-line
+        version: null
+      cut_off_below_lines:
+      - name: rkh-histology-generic-cut-off-below-line
+        version: null
+    - name: ukw-endoscopy-examination-report-generic
+      record_type: pdf_type
+      patient_info_line:
+        name: ukw-examination-generic-patient-info-line
+        version: null
+      endoscope_info_line:
+        name: ukw-examination-generic-endoscope-info-line
+        version: null
+      examiner_info_line:
+        name: ukw-examination-generic-examiner-info-line
+        version: null
+      cut_off_above_lines:
+      - name: ukw-examination-generic-anamnese-info-line
+        version: null
+      - name: ukw-examination-generic-endoscope-info-line
+        version: null
+      - name: ukw-examination-generic-examiner-info-line
+        version: null
+      cut_off_below_lines:
+      - name: ukw-examination-generic-cut-off-below-line-01
+        version: null
+    - name: ukw-endoscopy-histology-report-generic
+      record_type: pdf_type
+      patient_info_line:
+        name: ukw-histology-generic-patient-info-line
+        version: null
+      endoscope_info_line:
+        name: ukw-histology-generic-endoscope-info-line
+        version: null
+      examiner_info_line:
+        name: ukw-histology-generic-examiner-info-line
+        version: null
+      cut_off_above_lines:
+      - name: ukw-histology-generic-patient-info-line
+        version: null
+      cut_off_below_lines:
+      - name: ukw-endoscopy-histology-cut-off-below-line-flag-01
+        version: null

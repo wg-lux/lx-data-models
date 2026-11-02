@@ -1,0 +1,246 @@
+- model: reference_catalog
+  name: examination
+  name_de: "Untersuchungen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: capsule_endoscopy
+      record_type: examination
+      description: null
+      examination_types:
+      - name: endoscopy
+        version: null
+      indications:
+      - name: capsule_endoscopy_generic
+        version: null
+      examination_times: []
+      findings: []
+      information_sources: []
+    - name: colonoscopy
+      record_type: examination
+      description: null
+      examination_types:
+      - name: endoscopy
+        version: null
+      indications:
+      - name: colonoscopy_diagnostic_acute_symptomatic
+        version: null
+      - name: colonoscopy_diagnostic_chronic_symptomatic
+        version: null
+      - name: colonoscopy_follow_up_post_eftr
+        version: null
+      - name: colonoscopy_follow_up_post_emr
+        version: null
+      - name: colonoscopy_follow_up_post_esd
+        version: null
+      - name: colonoscopy_follow_up_residual_or_recurrent_lesion
+        version: null
+      - name: colonoscopy_generic
+        version: null
+      - name: colonoscopy_lesion_removal_emr
+        version: null
+      - name: colonoscopy_lesion_removal_large
+        version: null
+      - name: colonoscopy_lesion_removal_small
+        version: null
+      - name: colonoscopy_screening
+        version: null
+      - name: colonoscopy_surveillance_cancer_history
+        version: null
+      - name: colonoscopy_surveillance_ibd
+        version: null
+      - name: colonoscopy_surveillance_post_polypectomy
+        version: null
+      examination_times: []
+      findings:
+      - name: anal_fissure
+        version: null
+      - name: anal_hemorrhoids
+        version: null
+      - name: appendiceal_orifice
+        version: null
+      - name: ascending_colon
+        version: null
+      - name: bowel_preparation_lc
+        version: null
+      - name: bowel_preparation_rc
+        version: null
+      - name: bowel_preparation_simplified
+        version: null
+      - name: bowel_preparation_tc
+        version: null
+      - name: cecum
+        version: null
+      - name: colon_erosion
+        version: null
+      - name: colon_inflammation
+        version: null
+      - name: colon_polyp
+        version: null
+      - name: colon_post_intervention_wound
+        version: null
+      - name: colon_scar
+        version: null
+      - name: colon_tumor_mass
+        version: null
+      - name: colon_ulcer
+        version: null
+      - name: colonoscopy_deepest_viewed_location
+        version: null
+      - name: complication_generic
+        version: null
+      - name: descending_colon
+        version: null
+      - name: examination_setting
+        version: null
+      - name: ileocecal_valve
+        version: null
+      - name: left_flexure
+        version: null
+      - name: rectum
+        version: null
+      - name: rectum_anus
+        version: null
+      - name: right_flexure
+        version: null
+      - name: sigmoid_colon
+        version: null
+      - name: terminal_ileum
+        version: null
+      - name: transverse_colon
+        version: null
+      information_sources: []
+    - name: endosonography_lower_gi
+      record_type: examination
+      description: null
+      examination_types:
+      - name: endoscopy
+        version: null
+      indications:
+      - name: endosonography_lower_gi_invasive
+        version: null
+      - name: endosonography_lower_gi_non_invasive
+        version: null
+      examination_times: []
+      findings: []
+      information_sources: []
+    - name: endosonography_upper_gi
+      record_type: examination
+      description: null
+      examination_types:
+      - name: endoscopy
+        version: null
+      indications:
+      - name: endosonography_upper_gi_invasive
+        version: null
+      - name: endosonography_upper_gi_non_invasive
+        version: null
+      examination_times: []
+      findings: []
+      information_sources: []
+    - name: ercp
+      record_type: examination
+      description: null
+      examination_types:
+      - name: endoscopy
+        version: null
+      indications: []
+      examination_times: []
+      findings: []
+      information_sources: []
+    - name: gastroscopy
+      record_type: examination
+      description: null
+      examination_types:
+      - name: endoscopy
+        version: null
+      indications:
+      - name: gastroscopy_generic
+        version: null
+      - name: gastroscopy_lesion_removal_large
+        version: null
+      - name: gastroscopy_lesion_removal_small
+        version: null
+      examination_times: []
+      findings:
+      - name: gastroscopy_angulus_flexure_mucosa
+        version: null
+      - name: gastroscopy_antrum_mucosa
+        version: null
+      - name: gastroscopy_bleeding
+        version: null
+      - name: gastroscopy_corpus_mucosa
+        version: null
+      - name: gastroscopy_diverticulum_duodenum
+        version: null
+      - name: gastroscopy_diverticulum_esophagus
+        version: null
+      - name: gastroscopy_duodenum_bulbus_mucosa
+        version: null
+      - name: gastroscopy_duodenum_mucosa
+        version: null
+      - name: gastroscopy_ectopic_gastric_mucosa
+        version: null
+      - name: gastroscopy_ectopic_pancreatic_tissue
+        version: null
+      - name: gastroscopy_erythema
+        version: null
+      - name: gastroscopy_esophagus_mucosa
+        version: null
+      - name: gastroscopy_fundus_mucosa
+        version: null
+      - name: gastroscopy_gastroesophageal_junction
+        version: null
+      - name: gastroscopy_obstruction_generic
+        version: null
+      - name: gastroscopy_polyp
+        version: null
+      - name: gastroscopy_pylorus
+        version: null
+      - name: gastroscopy_scar
+        version: null
+      - name: gastroscopy_stenosis
+        version: null
+      - name: gastroscopy_subepithelial_tumor
+        version: null
+      - name: gastroscopy_ulcer
+        version: null
+      - name: gastroscopy_varices_duodenal
+        version: null
+      - name: gastroscopy_varices_esophageal
+        version: null
+      - name: gastroscopy_varices_gastric
+        version: null
+      - name: sedation_endoscopy
+        version: null
+      information_sources: []
+    - name: percutaneous_transhepatic_biliary_intervention
+      record_type: examination
+      description: null
+      examination_types:
+      - name: endoscopy
+        version: null
+      - name: sonography
+        version: null
+      - name: xray
+        version: null
+      indications:
+      - name: percutaneous_transhepatic_biliary_drainage
+        version: null
+      - name: percutaneous_transhepatic_cholangiography
+        version: null
+      examination_times: []
+      findings: []
+      information_sources: []
+    - name: small_bowel_endoscopy
+      record_type: examination
+      description: null
+      examination_types:
+      - name: endoscopy
+        version: null
+      indications:
+      - name: small_bowel_endoscopy_generic
+        version: null
+      examination_times: []
+      findings: []
+      information_sources: []

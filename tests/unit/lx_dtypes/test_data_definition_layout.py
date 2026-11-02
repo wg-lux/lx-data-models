@@ -53,14 +53,20 @@ def test_current_definitions_load_and_have_no_unclassified_yaml() -> None:
         selected.update(module_files)
     inventory = yaml.safe_load((root / "definitions.yml").read_text())
     sidecars = {root / item["path"] for item in inventory["sidecars"]}
+    assert all(path.is_file() for path in sidecars)
+    categories = ("terminology", "report_templates")
     current_yaml = {
         p
-        for category in ("terminology", "report_templates")
+        for category in categories
         for p in (root / category).rglob("*")
         if p.suffix in {".yaml", ".yml"} and "versions" not in p.relative_to(root).parts
     }
+    # Root-level sidecars such as table_import_vocabulary.yml are outside KB categories.
     assert current_yaml == selected | set(manifests) | {
-        p for p in sidecars if "versions" not in p.relative_to(root).parts
+        p
+        for p in sidecars
+        if p.relative_to(root).parts[0] in categories
+        and "versions" not in p.relative_to(root).parts
     }
     assert not list(root.rglob("*.csv"))
 

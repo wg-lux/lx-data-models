@@ -113,7 +113,17 @@ virtual-environment, or Nix-store wheel path:
 - If the configured registry file is missing, empty, or has no active selection,
   bootstrap registers packaged provider descriptors and activates the
   configured/default packaged identity.
-- Every package-catalog identity is fully loaded during bootstrap.
+- Every package-catalog identity is fully loaded the first time bootstrap sees
+  it. A successful validation writes a receipt to `validation-receipts.json`
+  next to the registry (mode `0600`). Later runs skip an identity whose
+  registry entry, input files and lx-dtypes version produce the same digest,
+  so restarts do not repeat full validation.
+- Any change to those inputs, a new lx-dtypes release, an unreadable receipts
+  file, or a remote data root re-validates. A failed validation removes the
+  receipt before the error is raised, so the next run validates it again.
+  `--verify` validates every identity regardless of receipts. Hydrated-copy
+  integrity checks run on every bootstrap and are never skipped.
+- The JSON result lists the identities that were `validated` and `reused`.
 - A stale active built-in provider or legacy installed-wheel filesystem entry
   is atomically migrated to the matching current catalog identity.
 - Active custom/imported filesystem identities are preserved. Resolution never
@@ -686,3 +696,7 @@ selecting an active dataset, training, or taking a reviewed export snapshot.
 Validation does not provision database rows. Authorized dry-run/import, immutable
 owner-scoped provenance and concurrency protection are separate host requirements
 tracked in the feature YAML; this parser does not provide those operations.
+
+
+For numeric variable configuration, hypothesis tests and regression in saved study
+setup, see [Configured study inference](study-inference.md).

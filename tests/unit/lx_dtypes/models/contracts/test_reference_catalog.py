@@ -183,3 +183,107 @@ def test_concrete_catalog_discriminator_is_validated_through_base_interface() ->
         _ = invalid.kind
     with pytest.raises(AttributeError):
         _ = CatalogRecordBase().kind
+
+
+def _packaged_records(input_dir: Path) -> ReferenceCatalogPayload:
+    kb = DataLoader(input_dirs=[input_dir]).load_knowledge_base("endoreg_reference")
+    return ReferenceCatalogPayload.model_validate(
+        {
+            "records": [
+                record.model_dump(mode="json", by_alias=True)
+                for catalog in kb.reference_catalog.values()
+                for record in catalog.payload.records
+            ]
+        }
+    )
+
+
+def test_reference_1_1_0_only_adds_resolved_gender_aliases() -> None:
+    from lx_dtypes.models.contracts.reference_catalog import (
+        GenderAliasReference,
+        ReferenceKind,
+    )
+
+    root = Path(str(files("lx_dtypes").joinpath("data")))
+    released = _packaged_records(root)
+    current = _packaged_records(root / "terminology/versions/endoreg_reference/1.1.0")
+    added = [record for record in current.records if record not in released.records]
+    assert all(record in current.records for record in released.records)
+    assert added and all(isinstance(record, GenderAliasReference) for record in added)
+    identity = KnowledgeBaseIdentity(
+        knowledge_base_module="endoreg_reference", knowledge_base_version="1.1.0"
+    )
+    # Construction rejects aliases whose gender is absent from the snapshot.
+    ReferenceCatalogSnapshot(
+        identity=identity,
+        payload=current,
+        snapshot_id=ReferenceCatalogSnapshot.content_digest(identity, current),
+    )
+    targets = {
+        record.name: record.gender.name
+        for record in added
+        if isinstance(record, GenderAliasReference)
+    }
+    assert targets["weiblich"] == "female"
+    assert targets["männlich"] == "male"
+    assert {targets[name] for name in ("d", "divers", "diverse")} == {"other"}
+    genders = {
+        record.key[1]
+        for record in current.records
+        if record.kind is ReferenceKind.GENDER
+    }
+    assert not genders & set(targets)
+
+
+@pytest.mark.parametrize(
+    "spelling, normalized",
+    [
+        ("W", "w"),
+        ("  Weiblich ", "weiblich"),
+        ("MÄNNLICH", "männlich"),
+        ("not  given", "not given"),
+    ],
+)
+def test_gender_spelling_normalization(spelling: str, normalized: str) -> None:
+    from lx_dtypes.models.contracts.reference_catalog import normalize_gender_spelling
+
+    assert normalize_gender_spelling(spelling) == normalized
+
+
+@pytest.mark.parametrize("name", ["W", " w", "weib  lich", "", "x" * 256])
+def test_gender_alias_rejects_unnormalized_or_invalid_names(name: str) -> None:
+    with pytest.raises(ValidationError):
+        ReferenceCatalogPayload.model_validate(
+            {
+                "records": [
+                    {
+                        "record_type": "gender_alias",
+                        "name": name,
+                        "gender": {"name": "female"},
+                    }
+                ]
+            }
+        )
+
+
+def test_gender_alias_requires_gender_in_snapshot() -> None:
+    payload = ReferenceCatalogPayload.model_validate(
+        {
+            "records": [
+                {
+                    "record_type": "gender_alias",
+                    "name": "w",
+                    "gender": {"name": "female"},
+                }
+            ]
+        }
+    )
+    identity = KnowledgeBaseIdentity(
+        knowledge_base_module="clinical", knowledge_base_version="1.0.0"
+    )
+    with pytest.raises(ValidationError, match="Unresolved reference"):
+        ReferenceCatalogSnapshot(
+            identity=identity,
+            payload=payload,
+            snapshot_id=ReferenceCatalogSnapshot.content_digest(identity, payload),
+        )

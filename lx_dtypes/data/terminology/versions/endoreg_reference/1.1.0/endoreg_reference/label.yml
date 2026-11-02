@@ -1,0 +1,202 @@
+- model: reference_catalog
+  name: label
+  name_de: "Kennzeichnungen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: appendix
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: blood
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: bubbles
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: clip
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: cold_snare
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: digital_chromo_endoscopy
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: diverticule
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: grasper
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: hot_snare
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: ileocaecalvalve
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: ileum
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: instrument
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: low_quality
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nbi
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: needle
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nice_1
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nice_2a
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nice_2b
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nice_3
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: outside
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_1p
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_1s
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_2a
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_2b
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_2c
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_3
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: polyp
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: smoke
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: snare
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: tissue_on_snare
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: uncertain
+      record_type: label
+      label_type: null
+      description: null
+    - name: water_jet
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: wound
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null

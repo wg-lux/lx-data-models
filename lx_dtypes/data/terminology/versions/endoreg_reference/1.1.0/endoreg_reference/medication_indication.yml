@@ -1,0 +1,140 @@
+- model: reference_catalog
+  name: medication_indication
+  name_de: "Medikationsindikationen"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: dvt_treatment-apixaban-3mo
+      record_type: medication_indication
+      indication_type:
+        name: deep_vein_thrombosis-treatment
+        version: null
+      medication_schedules:
+      - name: apixaban-5g-twice_daily_3mo
+        version: null
+      - name: apixaban-5g-twice_daily_7d
+        version: null
+      diseases: []
+      events:
+      - name: deep_vein_thrombosis
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: pe_treatment-apixaban-3mo
+      record_type: medication_indication
+      indication_type:
+        name: pulmonary_embolism-treatment
+        version: null
+      medication_schedules:
+      - name: apixaban-5g-twice_daily_3mo
+        version: null
+      - name: apixaban-5g-twice_daily_7d
+        version: null
+      diseases: []
+      events:
+      - name: pulmonary_embolism
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: pe_treatment-apixaban-6mo
+      record_type: medication_indication
+      indication_type:
+        name: pulmonary_embolism-treatment
+        version: null
+      medication_schedules:
+      - name: apixaban-5g-twice_daily_6mo
+        version: null
+      - name: apixaban-5g-twice_daily_7d
+        version: null
+      diseases: []
+      events:
+      - name: pulmonary_embolism
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-after_hip-apixaban
+      record_type: medication_indication
+      indication_type:
+        name: thromboembolism-prevention-after_hip_replacement
+        version: null
+      medication_schedules:
+      - name: apixaban-2.5mg-twice_daily_32d
+        version: null
+      diseases: []
+      events:
+      - name: hip_replacement_surgery
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-after_knee-apixaban
+      record_type: medication_indication
+      indication_type:
+        name: thromboembolism-prevention-after_knee_replacement
+        version: null
+      medication_schedules:
+      - name: apixaban-2.5mg-twice_daily_10d
+        version: null
+      diseases: []
+      events:
+      - name: knee_replacement_surgery
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-non_valvular_af-apixaban
+      record_type: medication_indication
+      indication_type:
+        name: thromboembolism-prevention-non_valvular_af
+        version: null
+      medication_schedules:
+      - name: apixaban-5mg-twice_daily
+        version: null
+      diseases:
+      - name: non_valvular_atrial_fibrillation
+        version: null
+      events: []
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-non_valvular_af-apixaban-dr
+      record_type: medication_indication
+      indication_type:
+        name: thromboembolism-prevention-non_valvular_af
+        version: null
+      medication_schedules:
+      - name: apixaban-2.5mg-twice_daily
+        version: null
+      diseases:
+      - name: non_valvular_atrial_fibrillation
+        version: null
+      events: []
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-recurrent-te-apixaban
+      record_type: medication_indication
+      indication_type:
+        name: thrombembolism-prevention-recurrent_thrombembolism
+        version: null
+      medication_schedules:
+      - name: apixaban-2.5mg-twice_daily
+        version: null
+      diseases: []
+      events:
+      - name: recurrent_thrombembolism
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null

@@ -32,6 +32,7 @@ def test_actual_shipped_tree_copied_and_all_catalog_versions_load(seed):
         ("coloreg", "0.1.0"),
         ("coloreg", "0.2.0"),
         ("endoreg_reference", "1.0.0"),
+        ("endoreg_reference", "1.1.0"),
         ("endoreg_workforce", "1.0.0"),
         ("endoreg_green_endoscopy", "1.0.0"),
     }

@@ -47,6 +47,13 @@ terminology:
   required_checks:
   - exact_identity_loading
   - strict_kb_lint
+- manifest: terminology/versions/endoreg_reference/1.1.0/endoreg_reference/config.yaml
+  module: endoreg_reference
+  version: 1.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
 - manifest: terminology/endoreg_workforce/config.yaml
   module: endoreg_workforce
   version: 1.0.0
@@ -472,6 +479,10 @@ terminology:
   - exact_identity_loading
   - strict_kb_lint
 sidecars:
+- path: table_import_vocabulary.yml
+  contract: TableImportVocabulary
+  notes: Reviewed table header and exact value suggestions; not KB records or an executable mapping.
+  validation: load_table_import_vocabulary and focused vocabulary tests.
 - path: terminology/mst_3_0_terminology/excel_source.yml
   contract: MST Excel source evidence
   notes: Workbook cells, attribute provenance and reviewed import decisions; not KB records.

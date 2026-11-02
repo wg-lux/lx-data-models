@@ -1,3 +1,70 @@
+"""Discover knowledge-base ``config.yaml`` files and assemble one validated module graph.
+
+When to use it
+--------------
+Use :class:`DataLoader` where you deliberately work on knowledge-base *sources*:
+authoring tools, package linting and validation, registry bootstrap, and tests.
+It reads whatever ``config.yaml`` files exist under ``input_dirs``; it does not
+know which version a host has selected.
+
+Runtime and API code should not create ad-hoc loaders. Resolve one explicit
+``knowledge_base_module``/``knowledge_base_version`` identity through
+:func:`lx_dtypes.models.interface.load_knowledge_base` (the registry-aware
+resolver), which uses a ``DataLoader`` internally on exactly that identity's
+inputs. See ``docs/guides/knowledge-base-contract-migration.md``.
+
+How loading works
+-----------------
+1. **Discover**: :meth:`DataLoader.load_module_configs` finds every
+   ``config.yaml`` below ``input_dirs`` (missing directories are skipped) and
+   parses each into a :class:`KnowledgeBaseConfig`. Paths in ``data.dirs`` and
+   ``data.files`` are resolved against the ``config.yaml`` directory, so a
+   module directory can be moved as a whole.
+2. **Resolve**: :meth:`DataLoader.resolved_module_configs` selects the root
+   module and the transitive closure of its ``depends_on`` and ``modules``
+   references, dependencies first. Cycles raise :class:`ValueError`.
+3. **Assemble**: :meth:`DataLoader.load_knowledge_base` builds a
+   :class:`KnowledgeBase` per resolved config, imports them into the root
+   module's knowledge base in that order, and records the exact configs used.
+   Pydantic validation of every record happens here.
+
+Example (packaged data, no dependencies)::
+
+    >>> from lx_dtypes.models.interface.data_roots import package_data_root
+    >>> loader = DataLoader(input_dirs=[package_data_root()])
+    >>> kb = loader.load_knowledge_base("polyp_size_category")
+    >>> (kb.config.name, kb.config.version)
+    ('polyp_size_category', '2.0.0')
+    >>> [config.name for config in loader.resolved_module_configs("polyp_size_category")]
+    ['polyp_size_category']
+
+Which config wins when a name appears more than once
+----------------------------------------------------
+Retained releases and bundles can contain the same module name several times.
+A reference is resolved in this order, and anything still ambiguous fails:
+
+1. A config next to the referencing module (``<dir>/<name>/config.yaml`` or a
+   sibling directory), so a bundle uses its own copy.
+2. The canonical location ``<input_dir>/terminology|report_templates/<name>``,
+   then ``<input_dir>/<name>``, then a grouped ``terminology/config.yaml``.
+3. Candidates from the same release tree as the referencing module.
+4. The only remaining candidate. Several left raise
+   :class:`AmbiguousModuleConfigError`, listing every candidate path; narrow
+   ``input_dirs`` to the intended release instead of relying on order.
+
+A name with no config raises :class:`ModuleConfigNotFoundError`.
+
+Cost and repeated runs
+----------------------
+Loading parses and validates every YAML record of the closure, which takes
+seconds per module. A loader caches discovered configs; call
+:meth:`DataLoader.load_module_configs` again after files change, or create a
+new loader. Do not run full loads on every process start: the deployment
+bootstrap (``lx-dtypes-kb-registry bootstrap``) persists validation receipts
+and only reloads identities whose inputs or lx-dtypes version changed. See
+"Startup bootstrap and migration" in ``docs/guides/knowledge-base-authoring.md``.
+"""
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
@@ -24,6 +91,20 @@ class AmbiguousModuleConfigError(ValueError):
 
 
 class DataLoader(AppBaseModel):
+    """Loads knowledge-base modules from ``config.yaml`` sources; see the module docs.
+
+    Attributes:
+        input_dirs: Directories searched recursively for ``config.yaml``.
+            Defaults to the configured data roots (packaged data unless the
+            host overrides them). Pass the exact release directories you mean
+            to load; broad roots containing retained versions are more likely
+            to be ambiguous.
+        module_configs: The last discovered config per module name, filled by
+            :meth:`load_module_configs`.
+        module_config_candidates: Every discovered config per module name,
+            used to resolve duplicates.
+    """
+
     input_dirs: list[Path] = Field(default_factory=_default_dataloader_dirs_factory)
     module_configs: dict[str, "KnowledgeBaseConfig"] = Field(default_factory=dict)
     module_config_candidates: dict[str, list["KnowledgeBaseConfig"]] = Field(
@@ -31,11 +112,24 @@ class DataLoader(AppBaseModel):
     )
 
     def load_knowledge_base(self, module_name: str) -> "KnowledgeBase":
-        """
-        Assemble a KnowledgeBase for the given module name including its declared submodules.
+        """Build the validated knowledge base of ``module_name`` and its whole closure.
+
+        Discovers configs on first use, resolves the root module and its
+        dependencies (dependencies first), validates every module's records
+        and imports them into the root module's knowledge base. Local concept
+        definitions in reporting packages emit one warning per module.
+
+        Args:
+            module_name: Semantic module name from ``config.yaml`` (``name``),
+                not necessarily the directory name.
 
         Returns:
-            KnowledgeBase: The assembled knowledge base configured for the requested module with its ordered submodules imported.
+            The root module's knowledge base, including all imported modules.
+
+        Raises:
+            ModuleConfigNotFoundError: The module or a referenced one has no config.
+            AmbiguousModuleConfigError: A name resolves to several configs.
+            ValueError: A dependency cycle or invalid record was found.
         """
         from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
@@ -65,6 +159,10 @@ class DataLoader(AppBaseModel):
     ) -> tuple["KnowledgeBaseConfig", ...]:
         """Return the exact configurations consumed by loading, root first.
 
+        Use it to inspect which files a load would read (for example to lint
+        exactly those YAML files) without validating records. The root's
+        ``modules`` list is already in dependency order.
+
         Keep this shared with load_knowledge_base: dependency traversal alone
         is insufficient when a bundle scopes a module also available globally.
         """
@@ -82,12 +180,10 @@ class DataLoader(AppBaseModel):
         )
 
     def fetch_config_yamls(self) -> list[Path]:
-        """Screens the input directories to ensure they exist.
-        Then recursively iterates all directories to the end to locate all
-        files named 'config.yaml'.
+        """Return every ``config.yaml`` below the existing ``input_dirs``.
 
-        Returns:
-            List[Path]: A list of existing config_files.
+        Missing or non-directory inputs are skipped silently here; a module
+        that is then absent fails later with :class:`ModuleConfigNotFoundError`.
         """
         config_files: list[Path] = []
         for input_dir in self.input_dirs:
@@ -99,10 +195,14 @@ class DataLoader(AppBaseModel):
         return config_files
 
     def load_module_configs(self) -> None:
-        """
-        Load KnowledgeBaseConfig objects from discovered config YAMLs into the loader's module_configs.
+        """(Re)discover and parse every ``config.yaml``, replacing cached configs.
 
-        Discovers all "config.yaml" files under the DataLoader's input_dirs, loads each file into a KnowledgeBaseConfig, sets the config's data.source_file to the file path, normalizes data paths relative to that file, and stores the config in self.module_configs keyed by the config's name.
+        Each file becomes a :class:`KnowledgeBaseConfig` whose ``data`` paths
+        are resolved against the file's directory. Files are read in sorted
+        path order, so results do not depend on filesystem order. All
+        candidates per name are kept for resolution; ``module_configs`` holds
+        the last one only as a legacy convenience. Call this again after
+        changing files on disk.
         """
 
         config_files = sorted(
@@ -118,7 +218,11 @@ class DataLoader(AppBaseModel):
             self.module_configs[kb_config.name] = kb_config
 
     def get_initialized_config(self, module_name: str) -> "KnowledgeBaseConfig":
-        """Return the configuration with modules ordered by dependency graph."""
+        """Return a copy of the module's config with ``modules`` in dependency order.
+
+        ``modules`` then lists the full transitive closure, dependencies
+        before dependents, preserving declared order where possible.
+        """
 
         return self._get_initialized_config(module_name)
 
@@ -161,6 +265,7 @@ class DataLoader(AppBaseModel):
         return kb_config
 
     def _configs_for_name(self, module_name: str) -> list["KnowledgeBaseConfig"]:
+        """All discovered candidates; falls back to ``module_configs`` set directly by callers."""
         candidates = self.module_config_candidates.get(module_name)
         if candidates:
             return candidates
@@ -175,7 +280,19 @@ class DataLoader(AppBaseModel):
         context_config: "KnowledgeBaseConfig | None" = None,
         relation: Literal["root", "module", "dependency"] = "root",
     ) -> "KnowledgeBaseConfig":
-        """Select one declared module using the runtime's source-scope rules."""
+        """Select one config for ``module_name`` using the source-scope rules.
+
+        Args:
+            module_name: The referenced semantic module name.
+            context_config: The referencing module's config; its location makes
+                a bundle prefer its own copy of a module.
+            relation: ``root`` for the requested module, ``module`` for a
+                child listed in ``modules``, ``dependency`` for ``depends_on``.
+                It changes which neighbouring directory is tried first.
+
+        The order is documented in the module docstring under "Which config
+        wins when a name appears more than once".
+        """
         candidates = self._configs_for_name(module_name)
         if not candidates:
             if relation == "dependency":
@@ -232,6 +349,15 @@ class DataLoader(AppBaseModel):
         context_config: "KnowledgeBaseConfig | None",
         relation: Literal["root", "module", "dependency"],
     ) -> list[Path]:
+        """Exact ``config.yaml`` paths to try, most specific first.
+
+        With a referencing module: its own child/sibling directory (child
+        first for ``modules``, sibling first for ``depends_on``), then the
+        canonical category locations, then ``<input_dir>/<name>``, then grouped
+        ``terminology/config.yaml`` manifests. For a root request: a unique
+        ``<input_dir>/<name>`` match, else a unique canonical category match.
+        An empty list defers to release-tree scoping.
+        """
         if context_config is not None and context_config.source_file is not None:
             context_dir = context_config.source_file.parent
             if relation == "module":
@@ -344,6 +470,7 @@ class DataLoader(AppBaseModel):
         module_name: str,
         context_config: "KnowledgeBaseConfig | None",
     ) -> Literal["root", "module", "dependency"]:
+        """Classify a reference: requested directly, a listed child, or a dependency."""
         if context_config is None:
             return "root"
         if module_name in context_config.modules:

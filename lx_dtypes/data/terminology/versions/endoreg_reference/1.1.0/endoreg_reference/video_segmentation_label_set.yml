@@ -1,0 +1,38 @@
+- model: reference_catalog
+  name: video_segmentation_label_set
+  name_de: "Videosegmentierungs-Kennzeichnungssätze"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: colonoscopy_video_segmentation_raw
+      record_type: video_segmentation_label_set
+      description: null
+      labels:
+      - name: appendix
+        version: null
+      - name: blood
+        version: null
+      - name: diverticule
+        version: null
+      - name: grasper
+        version: null
+      - name: ileocaecalvalve
+        version: null
+      - name: ileum
+        version: null
+      - name: low_quality
+        version: null
+      - name: nbi
+        version: null
+      - name: needle
+        version: null
+      - name: outside
+        version: null
+      - name: polyp
+        version: null
+      - name: snare
+        version: null
+      - name: water_jet
+        version: null
+      - name: wound
+        version: null

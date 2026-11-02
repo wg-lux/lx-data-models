@@ -1,0 +1,69 @@
+- model: reference_catalog
+  name: risk
+  name_de: "Risiken"
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: bleeding_high
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: High bleeding risk
+      risk_value: 3.0
+      risk_type:
+        name: bleeding
+        version: null
+    - name: bleeding_low
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Low bleeding risk
+      risk_value: 1.0
+      risk_type:
+        name: bleeding
+        version: null
+    - name: bleeding_unknown
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Unknown bleeding risk
+      risk_value: 0.0
+      risk_type:
+        name: bleeding
+        version: null
+    - name: thrombosis_high
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: High thrombosis risk
+      risk_value: 3.0
+      risk_type:
+        name: thrombosis
+        version: null
+    - name: thrombosis_low
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Low thrombosis risk
+      risk_value: 1.0
+      risk_type:
+        name: thrombosis
+        version: null
+    - name: thrombosis_medium
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Medium thrombosis risk
+      risk_value: 2.0
+      risk_type:
+        name: thrombosis
+        version: null
+    - name: thrombosis_unknown
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Unknown thrombosis risk
+      risk_value: 0.0
+      risk_type:
+        name: thrombosis
+        version: null
