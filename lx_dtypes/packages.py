@@ -33,7 +33,7 @@ from lx_dtypes.terminology.terminology_service import TerminologyService
 from lx_dtypes.utils.kb_package_lint import check_kb_package
 from lx_dtypes.utils.kb_yaml_lint import KbYamlLintIssue, discover_yaml_files
 from lx_dtypes.utils.parser import camel_to_snake
-from lx_dtypes.validation import assess_examination
+from lx_dtypes.evaluation import assess_examination
 
 
 @dataclass(frozen=True)

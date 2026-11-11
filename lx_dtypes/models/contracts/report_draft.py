@@ -3,24 +3,20 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Literal, cast
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, ConfigDict, Field
 
 from lx_dtypes.language import DEFAULT_LANGUAGE, LanguageCode
+from lx_dtypes.models.model import StrictContractModel
 
 from .json_types import JsonObject
 
 REPORT_DRAFT_SCHEMA_VERSION: Literal["1.0"] = "1.0"
 
 
-class ReportDraftTemplateIdentity(BaseModel):
+class ReportDraftTemplateIdentity(StrictContractModel):
     """Stable template identity stored with an editor draft."""
 
-    model_config = ConfigDict(
-        allow_inf_nan=False,
-        extra="forbid",
-        strict=True,
-        str_strip_whitespace=True,
-    )
+    model_config = ConfigDict(allow_inf_nan=False, str_strip_whitespace=True)
 
     module_name: str = Field(
         default="",
@@ -47,34 +43,29 @@ class ReportDraftTemplateIdentity(BaseModel):
     )
 
 
-class ReportDraftIndication(BaseModel):
+class ReportDraftIndication(StrictContractModel):
     """One selected examination indication and optional choice."""
 
-    model_config = ConfigDict(allow_inf_nan=False, extra="forbid", strict=True)
+    model_config = ConfigDict(allow_inf_nan=False)
 
     examination_indication_id: int | None = Field(default=None, gt=0)
     indication_choice_id: int | None = Field(default=None, gt=0)
 
 
-class ReportDraftSectionState(BaseModel):
+class ReportDraftSectionState(StrictContractModel):
     """Editable presentation state for one report-template section."""
 
-    model_config = ConfigDict(allow_inf_nan=False, extra="forbid", strict=True)
+    model_config = ConfigDict(allow_inf_nan=False)
 
     note: str = ""
     include_patient_data: bool = False
     include_examination_data: bool = False
 
 
-class PatientExaminationReportDraft(BaseModel):
+class PatientExaminationReportDraft(StrictContractModel):
     """Versioned report-editor state persisted on a patient examination."""
 
-    model_config = ConfigDict(
-        allow_inf_nan=False,
-        extra="forbid",
-        strict=True,
-        str_strip_whitespace=True,
-    )
+    model_config = ConfigDict(allow_inf_nan=False, str_strip_whitespace=True)
 
     schema_version: Literal["1.0"] = REPORT_DRAFT_SCHEMA_VERSION
     revision: int = Field(default=0, ge=0)

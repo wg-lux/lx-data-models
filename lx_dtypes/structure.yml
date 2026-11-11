@@ -20,6 +20,9 @@ entrypoints:
 - name: Study statistics
   file: stats/study.py
   purpose: Evaluate versioned declarative analysis rules on validated ledger units and return typed descriptive statistics configured local numeric/categorical inference, diagnostic accuracy and identifier-free label plot projections
+- name: Electrical curve analysis
+  file: stats/electrical_curve.py
+  purpose: Extract HF activation curves and compare them with earlier curves by multivariate multiple regression
 - name: ColoReg lesion linkage
   file: stats/study_linkage.py
   purpose: Assemble analysis roles only from explicit authorized lesion references
@@ -28,7 +31,7 @@ entrypoints:
   purpose: Stable lazy public API
 - name: Advisory validation
   file: validation.py
-  purpose: Typed validation entry points
+  purpose: Compatibility imports for the canonical evaluation API
 - name: Package workflow
   file: packages.py
   purpose: Create, build, import, export, load, and validate packages through the core KB and ledger contracts
@@ -58,6 +61,10 @@ dependencies:
   - defusedxml
   - tomli-w
 submodules:
+- name: evaluation
+  path: evaluation
+  manifest: evaluation/structure.yml
+  summary: Canonical contract parsing and explicit cross-model evaluation with no persistence.
 - name: models
   path: models
   manifest: models/structure.yml

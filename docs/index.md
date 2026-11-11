@@ -56,6 +56,7 @@ guides/record-data-formats
 medication_plan_specification_summary
 guides/fhir-clinical-testing
 guides/epa-fhir-compatibility
+guides/electrosurgical-video-alignment
 guides/fhir-lxdm-mapping-diagrams
 guides/concept-relationships
 guides/knowledge-base-authoring

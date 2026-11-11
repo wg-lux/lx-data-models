@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
 
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
@@ -18,6 +18,7 @@ from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
 from lx_dtypes.models.knowledge_base.validators.ValueTypes import (
     ValidationScalar,
 )
+from lx_dtypes.models.model import DtypesModel
 from lx_dtypes.terminology.terminology_loader import resolve_module_path
 from lx_dtypes.terminology.terminology_service import TerminologyError
 from lx_dtypes.utils.report_template_registry import (
@@ -56,19 +57,19 @@ def slugify_name(value: str) -> str:
     return normalized or "report_template"
 
 
-class ReportTemplateBuilderField(BaseModel):
+class ReportTemplateBuilderField(DtypesModel):
     key: str = Field(min_length=1)
     label: str = ""
     source: Literal["patient", "patient_examination", "history"] = "patient"
     required: bool = False
 
 
-class ReportTemplateBuilderClassification(BaseModel):
+class ReportTemplateBuilderClassification(DtypesModel):
     classification: str = Field(min_length=1)
     required: bool = False
 
 
-class ReportTemplateBuilderValidatorCondition(BaseModel):
+class ReportTemplateBuilderValidatorCondition(DtypesModel):
     classification: str = ""
     comparator: Literal["eq", "ne", "gt", "gte", "lt", "lte", "in", "not_in"] = "eq"
     value: ValidationScalar | None = None
@@ -76,7 +77,7 @@ class ReportTemplateBuilderValidatorCondition(BaseModel):
     then_requires: list[str] = Field(default_factory=list)
 
 
-class ReportTemplateBuilderFindingValidator(BaseModel):
+class ReportTemplateBuilderFindingValidator(DtypesModel):
     enabled: bool = False
     name: str = ""
     operator: Literal["exists", "missing", "condition"] = "exists"
@@ -95,7 +96,7 @@ class ReportTemplateBuilderFindingValidator(BaseModel):
         return self
 
 
-class ReportTemplateBuilderFinding(BaseModel):
+class ReportTemplateBuilderFinding(DtypesModel):
     finding: str = Field(min_length=1)
     required: bool = False
     multiple_allowed: bool = False
@@ -107,7 +108,7 @@ class ReportTemplateBuilderFinding(BaseModel):
     )
 
 
-class ReportTemplateBuilderSection(BaseModel):
+class ReportTemplateBuilderSection(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     id: str | None = None
@@ -126,7 +127,7 @@ class ReportTemplateBuilderSection(BaseModel):
         return self
 
 
-class SaveReportTemplateRequest(BaseModel):
+class SaveReportTemplateRequest(DtypesModel):
     module_name: str = Field(min_length=1)
     module_version: str = Field(min_length=1)
     file_name: str = Field(min_length=1)
@@ -136,7 +137,7 @@ class SaveReportTemplateRequest(BaseModel):
     sections: list[ReportTemplateBuilderSection] = Field(default_factory=list)
 
 
-class SaveReportTemplateResponse(BaseModel):
+class SaveReportTemplateResponse(DtypesModel):
     module_name: str
     module_version: str
     file_name: str
@@ -153,14 +154,14 @@ class BuildReportTemplatePackageRequest(SaveReportTemplateRequest):
     depends_on: list[str] = Field(min_length=1)
 
 
-class ReportTemplatePackageResponse(BaseModel):
+class ReportTemplatePackageResponse(DtypesModel):
     package_name: str
     config_yaml: str
     report_templates_yaml: str
     validators_yaml: str
 
 
-class PublishReportTemplateResponse(BaseModel):
+class PublishReportTemplateResponse(DtypesModel):
     module_name: str
     module_version: str
     template_name: str
@@ -168,7 +169,7 @@ class PublishReportTemplateResponse(BaseModel):
     readiness: ReportTemplateReadinessSummaryDataDict | None = None
 
 
-class ReportTemplateModuleLocation(BaseModel):
+class ReportTemplateModuleLocation(DtypesModel):
     module_name: str = Field(min_length=1)
     version: str = Field(min_length=1)
     modules_root: Path

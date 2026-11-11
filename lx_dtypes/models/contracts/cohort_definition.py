@@ -5,16 +5,16 @@ from __future__ import annotations
 from datetime import date
 from typing import Annotated, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
+
+from lx_dtypes.models.model import StrictContractModel
 
 from .study_metadata import StudyMetadata
 
 PositiveId = Annotated[int, Field(strict=True, gt=0)]
 
 
-class CohortFilters(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class CohortFilters(StrictContractModel):
     date_from: str | None = None
     date_to: str | None = None
     center_key: str | None = None
@@ -47,8 +47,8 @@ class CohortFilters(BaseModel):
         return self
 
 
-class CohortDefinitionFields(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, str_strip_whitespace=True)
+class CohortDefinitionFields(StrictContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     name: str = Field(min_length=1, max_length=255)
     hypothesis: str = Field(min_length=1, max_length=10000)
@@ -67,9 +67,7 @@ class CohortDefinition(CohortDefinitionFields):
         return self
 
 
-class CohortDatasetLink(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class CohortDatasetLink(StrictContractModel):
     cohort_id: PositiveId
     linked: bool
 

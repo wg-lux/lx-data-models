@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class PatientFindingInterventionCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class PatientFindingInterventionCore(FrozenContractModel):
     patient_finding_id: int
     intervention_name: str
     is_active: bool = True

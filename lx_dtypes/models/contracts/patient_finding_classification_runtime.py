@@ -4,20 +4,17 @@ from math import isfinite
 from typing import Literal
 
 from pydantic import (
-    BaseModel,
     ConfigDict,
     Field,
-    RootModel,
     field_validator,
     model_validator,
 )
 
 from lx_dtypes.models.contracts.json_types import JsonObject
+from lx_dtypes.models.model import DtypesRootModel, FrozenContractModel
 
 
-class PatientFindingClassificationSubcategoryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class PatientFindingClassificationSubcategoryPayload(FrozenContractModel):
     required: bool = False
     choices: list[str] = Field(min_length=1)
     value: str | None = None
@@ -56,9 +53,7 @@ class PatientFindingClassificationSubcategoryPayload(BaseModel):
         return self
 
 
-class PatientFindingClassificationNumericalDescriptorPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class PatientFindingClassificationNumericalDescriptorPayload(FrozenContractModel):
     min: float = 0.0
     max: float = 1.0
     distribution: Literal["normal", "uniform"] = "normal"
@@ -87,13 +82,13 @@ class PatientFindingClassificationNumericalDescriptorPayload(BaseModel):
 
 
 class PatientFindingClassificationSubcategoriesPayload(
-    RootModel[dict[str, PatientFindingClassificationSubcategoryPayload]]
+    DtypesRootModel[dict[str, PatientFindingClassificationSubcategoryPayload]]
 ):
     model_config = ConfigDict(frozen=True, strict=True)
 
 
 class PatientFindingClassificationNumericalDescriptorsPayload(
-    RootModel[dict[str, PatientFindingClassificationNumericalDescriptorPayload]]
+    DtypesRootModel[dict[str, PatientFindingClassificationNumericalDescriptorPayload]]
 ):
     model_config = ConfigDict(frozen=True, strict=True)
 

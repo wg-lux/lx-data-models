@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class ExaminationTimeCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ExaminationTimeCore(FrozenContractModel):
     name: str
 
 
-class ExaminationTimeTypeCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ExaminationTimeTypeCore(FrozenContractModel):
     name: str
 
 

@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
+
+from lx_dtypes.models.model import StrictContractModel
 
 
-class TextAnonymizationMeta(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True)
+class TextAnonymizationMeta(StrictContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     pdf_hash: str = ""
     file_path: str = ""
@@ -52,17 +54,13 @@ class GenderDisplayLabel(str, Enum):
     NEUTRAL = "Neutral"
 
 
-class DateOfBirthCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class DateOfBirthCore(StrictContractModel):
     day: int = Field(ge=1, le=31)
     month: int = Field(ge=1, le=12)
     year: int = Field(ge=1900, le=2100)
 
 
-class PersonNameMetadata(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class PersonNameMetadata(StrictContractModel):
     first_name: str
     last_name: str
     dob: DateOfBirthCore
@@ -77,8 +75,8 @@ class PersonNameMetadata(BaseModel):
         return text
 
 
-class LLMMetadataPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True)
+class LLMMetadataPayload(StrictContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     first_name: str = ""
     last_name: str = ""

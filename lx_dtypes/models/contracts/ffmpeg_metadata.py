@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel, StrictContractModel
 
 from .json_types import JsonValue
 
@@ -12,10 +14,8 @@ type FfmpegProbeJsonValue = (
 type FfmpegProbeJsonObject = dict[str, FfmpegProbeJsonValue]
 
 
-class FfmpegProbeStreamPayload(BaseModel):
+class FfmpegProbeStreamPayload(StrictContractModel):
     """Validated subset of a single ffprobe stream entry."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     codec_type: str = Field(min_length=1)
     width: int | None = Field(default=None, ge=1)
@@ -30,9 +30,7 @@ class FfmpegProbeStreamPayload(BaseModel):
     nb_frames: str | None = None
 
 
-class FfmpegMetaPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FfmpegMetaPayload(FrozenContractModel):
     width: int | None = Field(default=None, ge=1)
     height: int | None = Field(default=None, ge=1)
     duration: float | None = Field(default=None, ge=0.0)
@@ -44,19 +42,15 @@ class FfmpegMetaPayload(BaseModel):
     raw_probe_data: FfmpegProbeJsonObject | None = None
 
 
-class FfmpegProbeFormatPayload(BaseModel):
+class FfmpegProbeFormatPayload(StrictContractModel):
     """Validated subset of the ffprobe format block."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     duration: str | None = None
     bit_rate: str | None = None
 
 
-class FfmpegProbeDataPayload(BaseModel):
+class FfmpegProbeDataPayload(StrictContractModel):
     """Validated ffprobe JSON payload used by video metadata extraction."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     streams: list[FfmpegProbeStreamPayload] = Field(default_factory=list)
     format: FfmpegProbeFormatPayload | None = None

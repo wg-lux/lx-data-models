@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any
 
 from pydantic import (
-    BaseModel,
     ConfigDict,
     Field,
     StrictBool,
@@ -18,6 +17,7 @@ from pydantic import (
 )
 
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta, SensitiveMetaDataDict
+from lx_dtypes.models.model import DtypesModel
 
 
 class ReportMeta(SensitiveMeta):
@@ -111,7 +111,7 @@ class ReportMeta(SensitiveMeta):
         return payload | explicit_nulls
 
 
-class ReportReaderFlags(BaseModel):
+class ReportReaderFlags(DtypesModel):
     """Typed configuration keys consumed by lx_anonymizer.report_reader.ReportReader."""
 
     model_config = ConfigDict(extra="allow")
@@ -156,10 +156,8 @@ class ReportReaderFlags(BaseModel):
         return [str(value).strip()] if str(value).strip() else []
 
 
-class ReportPatientInfo(BaseModel):
+class ReportPatientInfo(DtypesModel):
     """Patient metadata shape returned by report-reader extraction helpers."""
-
-    model_config = ConfigDict(extra="forbid")
 
     first_name: str | None = None
     last_name: str | None = None
@@ -178,10 +176,8 @@ class ReportPatientInfo(BaseModel):
         return _parse_date_like(value)
 
 
-class ReportExaminerInfo(BaseModel):
+class ReportExaminerInfo(DtypesModel):
     """Examiner keys merged into report metadata."""
-
-    model_config = ConfigDict(extra="forbid")
 
     examiner_first_name: str | None = None
     examiner_last_name: str | None = None
@@ -192,10 +188,8 @@ class ReportExaminerInfo(BaseModel):
         return _normalize_optional_string(value)
 
 
-class ReportExaminationInfo(BaseModel):
+class ReportExaminationInfo(DtypesModel):
     """Examination date/time keys merged into report metadata."""
-
-    model_config = ConfigDict(extra="forbid")
 
     examination_date: date | None = None
     examination_time: time | None = None
@@ -211,10 +205,8 @@ class ReportExaminationInfo(BaseModel):
         return _parse_time_like(value)
 
 
-class ReportEndoscopeInfo(BaseModel):
+class ReportEndoscopeInfo(DtypesModel):
     """Endoscope keys merged into report metadata."""
-
-    model_config = ConfigDict(extra="forbid")
 
     endoscope_type: str | None = None
     endoscope_sn: str | None = None
@@ -225,10 +217,8 @@ class ReportEndoscopeInfo(BaseModel):
         return _normalize_optional_string(value)
 
 
-class ReportRedactionSummary(BaseModel):
+class ReportRedactionSummary(DtypesModel):
     """Summary payload stored under report_meta['redaction_summary']."""
-
-    model_config = ConfigDict(extra="forbid")
 
     schema_version: str = "1.0"
     page_count: int = 0
@@ -268,10 +258,8 @@ class ReportRedactionSummary(BaseModel):
         return parsed
 
 
-class ReportAnonymizerProvenance(BaseModel):
+class ReportAnonymizerProvenance(DtypesModel):
     """Provenance payload stored under report_meta['anonymizer_provenance']."""
-
-    model_config = ConfigDict(extra="forbid")
 
     schema_version: str = "1.0"
     anonymizer_version: str = "unknown"
@@ -310,7 +298,7 @@ class ReportAnonymizerProvenance(BaseModel):
         return counts
 
 
-class ReportCropInfo(BaseModel):
+class ReportCropInfo(DtypesModel):
     """Cropping metadata appended by process_report_with_cropping."""
 
     model_config = ConfigDict(extra="allow")
@@ -359,10 +347,10 @@ class ReportMetaDataDict(SensitiveMetaDataDict):
     anonymized_pdf_error: str | None
 
 
-class ReportProcessRequest(BaseModel):
+class ReportProcessRequest(DtypesModel):
     """Typed inputs for ReportReader.process_report."""
 
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     pdf_path: Path | None = None
     image_path: Path | None = None
@@ -403,10 +391,10 @@ class ReportProcessRequest(BaseModel):
         return self
 
 
-class ReportProcessResult(BaseModel):
+class ReportProcessResult(DtypesModel):
     """Typed output from ReportReader.process_report."""
 
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     text: str
     anonymized_text: str
@@ -422,10 +410,10 @@ class ReportProcessResult(BaseModel):
         )
 
 
-class ReportCroppingRequest(BaseModel):
+class ReportCroppingRequest(DtypesModel):
     """Typed inputs for ReportReader.process_report_with_cropping."""
 
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     pdf_path: Path | None = None
     image_path: Path | None = None

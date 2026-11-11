@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import field_validator
+
+from lx_dtypes.models.model import StrictContractModel
 
 
-class VideoFrameDimensions(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class VideoFrameDimensions(StrictContractModel):
     width: int
     height: int
 

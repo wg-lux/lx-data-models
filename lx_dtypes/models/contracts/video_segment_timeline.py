@@ -11,7 +11,9 @@ from __future__ import annotations
 
 from typing import Literal, NotRequired, Self, TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 RecordingMappingStatus = Literal["verified", "unresolved"]
 
@@ -43,10 +45,8 @@ class VideoSegmentTimelineCoordinatesData(TypedDict):
     recording: NotRequired[VideoSegmentRecordingCoordinatesData | None]
 
 
-class VideoSegmentGenerationCoordinates(BaseModel):
+class VideoSegmentGenerationCoordinates(FrozenContractModel):
     """First and last included frame on the published processed generation."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     time_base_num: int = Field(gt=0)
@@ -69,10 +69,8 @@ class VideoSegmentGenerationCoordinates(BaseModel):
         return self
 
 
-class VideoSegmentRecordingCoordinates(BaseModel):
+class VideoSegmentRecordingCoordinates(FrozenContractModel):
     """Original-recording frames that produced the first and last included frame."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     recording_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     time_base_num: int = Field(gt=0)
@@ -96,10 +94,8 @@ class VideoSegmentRecordingCoordinates(BaseModel):
         return self
 
 
-class VideoSegmentTimelineCoordinates(BaseModel):
+class VideoSegmentTimelineCoordinates(FrozenContractModel):
     """Segment boundaries bound to exact generation and recording identities."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     schema_version: Literal["1"] = "1"
     generation: VideoSegmentGenerationCoordinates

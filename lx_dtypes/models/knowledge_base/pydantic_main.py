@@ -1,9 +1,3 @@
-from .reference_catalog import (
-    KbReferenceCatalogLookupType,
-    ReferenceCatalog,
-    ReferenceCatalogDataDict,
-)
-
 """Pydantic-only knowledge-base model aggregation.
 
 This module deliberately excludes every Django model so consumers can import the
@@ -71,6 +65,11 @@ from .intervention import (
     kb_intervention_lookup,
     kb_intervention_models,
 )
+from .reference_catalog import (
+    KbReferenceCatalogLookupType,
+    ReferenceCatalog,
+    ReferenceCatalogDataDict,
+)
 from .report_template import (
     KbReportTemplateLookupType,
     kb_report_template_ddicts,
@@ -78,6 +77,16 @@ from .report_template import (
     kb_report_template_models,
 )
 from .study_preset import KbStudyPresetLookupType, StudyPreset, StudyPresetDataDict
+from .electrical_curve_profile import (
+    ElectricalCurveProfile,
+    ElectricalCurveProfileDataDict,
+    KbElectricalCurveProfileLookupType,
+)
+from .time_reference import (
+    KbTimeReferenceLookupType,
+    TimeReference,
+    TimeReferenceDataDict,
+)
 from .unit import (
     KbUnitLookupType,
     kb_unit_ddicts,
@@ -87,6 +96,8 @@ from .unit import (
 
 
 class KnowledgeBaseModelsLookupType(
+    KbTimeReferenceLookupType,
+    KbElectricalCurveProfileLookupType,
     KbCenterEmployeeListLookupType,
     KbStudyPresetLookupType,
     KbReferenceCatalogLookupType,
@@ -106,6 +117,8 @@ class KnowledgeBaseModelsLookupType(
 
 
 knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
+    TimeReference=TimeReference,
+    ElectricalCurveProfile=ElectricalCurveProfile,
     CenterEmployeeList=CenterEmployeeList,
     StudyPreset=StudyPreset,
     ReferenceCatalog=ReferenceCatalog,
@@ -123,6 +136,8 @@ knowledge_base_models_lookup = KnowledgeBaseModelsLookupType(
 )
 
 KB_MODELS: TypeAlias = Union[
+    TimeReference,
+    ElectricalCurveProfile,
     StudyPreset,
     ReferenceCatalog,
     CenterEmployeeList,
@@ -140,6 +155,8 @@ KB_MODELS: TypeAlias = Union[
 ]
 
 KB_DDICTS: TypeAlias = Union[
+    TimeReferenceDataDict,
+    ElectricalCurveProfileDataDict,
     StudyPresetDataDict,
     ReferenceCatalogDataDict,
     CenterEmployeeListDataDict,
@@ -157,6 +174,8 @@ KB_DDICTS: TypeAlias = Union[
 ]
 
 KB_MODEL_NAMES_LITERAL = Literal[
+    "TimeReference",
+    "ElectricalCurveProfile",
     "CenterEmployeeList",
     "StudyPreset",
     "ReferenceCatalog",
@@ -188,6 +207,8 @@ KB_MODEL_NAMES_LITERAL = Literal[
 ]
 
 KB_MODEL_NAMES_ORDERED: list[KB_MODEL_NAMES_LITERAL] = [
+    "TimeReference",
+    "ElectricalCurveProfile",
     "CenterEmployeeList",
     "StudyPreset",
     "ReferenceCatalog",

@@ -2,7 +2,7 @@
 
 from typing import Self, TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
@@ -16,17 +16,18 @@ from lx_dtypes.models.contracts.study_metadata import (
 )
 from lx_dtypes.models.ledger.center.DataDict import CenterDataDict
 from lx_dtypes.models.ledger.center.Pydantic import Center
+from lx_dtypes.models.model import StrictContractModel
 
 
-class PresetGender(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, str_strip_whitespace=True)
+class PresetGender(StrictContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
     name: str = Field(min_length=1, max_length=255)
     abbreviation: str | None = Field(default=None, max_length=255)
     description: str | None = None
 
 
-class PresetLabelType(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, str_strip_whitespace=True)
+class PresetLabelType(StrictContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
     name: str = Field(min_length=1, max_length=255)
     description: str | None = None
 

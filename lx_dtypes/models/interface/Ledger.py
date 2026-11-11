@@ -49,9 +49,21 @@ from lx_dtypes.models.ledger.p_video import (
 from lx_dtypes.models.ledger.patient import Patient, PatientDataDict
 from lx_dtypes.models.ledger.report import Report, ReportDataDict
 from lx_dtypes.models.ledger.video_file import VideoFile, VideoFileDataDict
+from lx_dtypes.models.ledger.p_time_offset import PTimeOffset, PTimeOffsetDataDict
+from lx_dtypes.models.ledger.p_electrical_application import (
+    PElectricalApplication,
+    PElectricalApplicationDataDict,
+    PElectricalCurveComparison,
+    PElectricalCurveComparisonDataDict,
+)
 
 
 class LedgerRecordList(TypedDict):
+    p_time_offsets: NotRequired[list[PTimeOffsetDataDict]]
+    p_electrical_applications: NotRequired[list[PElectricalApplicationDataDict]]
+    p_electrical_curve_comparisons: NotRequired[
+        list[PElectricalCurveComparisonDataDict]
+    ]
     reports: NotRequired[list[ReportDataDict]]
     patients: list[PatientDataDict]
     p_examinations: list[SerializedPExaminationDataDict]
@@ -78,6 +90,11 @@ class LedgerRecordList(TypedDict):
 
 
 class LedgerDataDict(AppBaseModelUUIDTagsDataDict):
+    time_offsets: NotRequired[dict[str, PTimeOffsetDataDict]]
+    electrical_applications: NotRequired[dict[str, PElectricalApplicationDataDict]]
+    electrical_curve_comparisons: NotRequired[
+        dict[str, PElectricalCurveComparisonDataDict]
+    ]
     cases: dict[str, CaseDataDict]
     reports: NotRequired[dict[str, ReportDataDict]]
     video_files: NotRequired[dict[str, VideoFileDataDict]]
@@ -89,6 +106,13 @@ class LedgerDataDict(AppBaseModelUUIDTagsDataDict):
 
 
 class Ledger(AppBaseModelUUIDTags):
+    time_offsets: dict[str, PTimeOffset] = Field(default_factory=dict)
+    electrical_applications: dict[str, PElectricalApplication] = Field(
+        default_factory=dict
+    )
+    electrical_curve_comparisons: dict[str, PElectricalCurveComparison] = Field(
+        default_factory=dict
+    )
     cases: dict[str, Case] = Field(default_factory=dict)
     reports: dict[str, Report] = Field(default_factory=dict)
     patient_examinations: dict[str, PExamination] = Field(default_factory=dict)
@@ -301,6 +325,17 @@ class Ledger(AppBaseModelUUIDTags):
         ) = self.export_patient_examination_record_list()
 
         record_list: LedgerRecordList = LedgerRecordList(
+            p_time_offsets=[
+                record.serialized_ddict for record in self.time_offsets.values()
+            ],
+            p_electrical_applications=[
+                record.serialized_ddict
+                for record in self.electrical_applications.values()
+            ],
+            p_electrical_curve_comparisons=[
+                record.serialized_ddict
+                for record in self.electrical_curve_comparisons.values()
+            ],
             reports=report_dicts,
             patients=patient_dicts,
             p_examinations=p_examination_dicts,

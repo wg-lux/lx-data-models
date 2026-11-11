@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
 class ModelMetaInferenceDatasetConfigData(TypedDict):
@@ -60,9 +62,7 @@ def _coerce_int(value: object) -> int:
     raise ValueError("value must be an integer")
 
 
-class ModelMetaInferenceDatasetConfigPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ModelMetaInferenceDatasetConfigPayload(FrozenContractModel):
     mean: tuple[float, float, float]
     std: tuple[float, float, float]
     size_x: int = Field(ge=1)
@@ -98,9 +98,7 @@ class ModelMetaInferenceDatasetConfigPayload(BaseModel):
         raise ValueError("axes must contain exactly three integer values")
 
 
-class ModelMetaConfigPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ModelMetaConfigPayload(FrozenContractModel):
     name: str = Field(min_length=1)
     version: str = Field(min_length=1)
     model_name: str = Field(min_length=1)

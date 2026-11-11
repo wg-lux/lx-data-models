@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import ConfigDict, field_validator
+
+from lx_dtypes.models.model import StrictContractModel
 
 
-class AssessmentRecord(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True)
+class AssessmentRecord(StrictContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     file: str = ""
     report_id: str = ""

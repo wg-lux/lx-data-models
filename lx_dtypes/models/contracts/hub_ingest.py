@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from lx_dtypes.models.model import StrictContractModel
 
 from .json_types import JsonObject, JsonValue
 
 
-class UploadProvenancePayload(BaseModel):
-    model_config = ConfigDict(extra="allow", strict=True)
+class UploadProvenancePayload(StrictContractModel):
+    model_config = ConfigDict(extra="allow")
 
     entrypoint: str | None = None
     ingest_mode: str | None = None

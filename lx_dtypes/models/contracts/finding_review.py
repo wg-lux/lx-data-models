@@ -3,13 +3,14 @@
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import DtypesModel, StrictContractModel
 
 from .knowledge_base import KnowledgeBaseIdentity
 
 
-class LabelFindingMapping(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
+class LabelFindingMapping(StrictContractModel):
     label: str = Field(min_length=1)
     modalities: list[Literal["segment", "frame"]]
     finding_name: str = Field(min_length=1)
@@ -22,7 +23,7 @@ class AnnotationFindingMappings(KnowledgeBaseIdentity):
     mappings: list[LabelFindingMapping]
 
 
-class FindingSuggestion(BaseModel):
+class FindingSuggestion(DtypesModel):
     id: int = Field(gt=0)
     name: str
     title: str
@@ -33,7 +34,7 @@ class FindingSuggestion(BaseModel):
     approved: bool = False
 
 
-class FindingSuggestions(BaseModel):
+class FindingSuggestions(DtypesModel):
     examination: int | None
     candidates: list[FindingSuggestion] = Field(default_factory=list[FindingSuggestion])
     reason: str = ""

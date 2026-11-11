@@ -9,7 +9,7 @@ from datetime import date
 from typing import Annotated, Literal, Protocol, Self, cast
 from uuid import UUID
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
+from pydantic import BeforeValidator, Field, model_validator
 
 from lx_dtypes.models.descriptor_value import DescriptorValue
 from lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor import (
@@ -17,14 +17,13 @@ from lx_dtypes.models.knowledge_base.classification_choice_descriptor.Classifica
 )
 from lx_dtypes.models.knowledge_base.pydantic_main import KB_MODEL_NAMES_LITERAL
 from lx_dtypes.models.meta.ReportMeta import ReportPatientInfo
+from lx_dtypes.models.model import DtypesModel, FrozenContractModel, StrictContractModel
 
 from .dtypes_record_persistence import DtypesRecordPersistencePayload
 from .knowledge_base import KnowledgeBaseIdentity
 
 
-class TableColumn(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
+class TableColumn(FrozenContractModel):
     columns: list[str] = Field(default_factory=list, max_length=100)
     value: str | None = None
     separator: str = "\n"
@@ -72,10 +71,8 @@ TableField = Literal[
 ]
 
 
-class TableFieldVocabulary(BaseModel):
+class TableFieldVocabulary(StrictContractModel):
     """Header suggestions and exact source-value translations for one field."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     aliases: list[str] = Field(min_length=1)
     values: dict[str, str] = Field(default_factory=dict)
@@ -101,10 +98,8 @@ class TableConceptVocabulary(TableFieldVocabulary):
     source_module: str = Field(min_length=1)
 
 
-class TableImportVocabulary(BaseModel):
+class TableImportVocabulary(StrictContractModel):
     """Reviewable suggestions; never an executable or complete TableMapping."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     schema_version: Literal["1.0"]
     fields: dict[TableField, TableFieldVocabulary] = Field(min_length=1)
@@ -162,10 +157,8 @@ class TableImportVocabulary(BaseModel):
         }
 
 
-class TableDescriptor(BaseModel):
+class TableDescriptor(StrictContractModel):
     """Explicit source representation; the referenced KB owns admissible values."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     column: ColumnMapping
     value_type: Literal["text", "integer", "number", "boolean", "selection"]
@@ -221,18 +214,14 @@ class TableDescriptor(BaseModel):
         return descriptor.validate_value(parsed)
 
 
-class TableClassification(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class TableClassification(StrictContractModel):
     choice: ColumnMapping
     descriptors: dict[str, TableDescriptor] = Field(
         default_factory=dict, max_length=100
     )
 
 
-class TableFinding(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class TableFinding(StrictContractModel):
     finding: ColumnMapping
     classifications: dict[str, TableClassification | ColumnMapping] = Field(
         default_factory=dict
@@ -247,19 +236,15 @@ class TableFinding(BaseModel):
         }
 
 
-class TableSource(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class TableSource(StrictContractModel):
     delimiter: str = Field(default=",", min_length=1, max_length=1)
     encoding: Literal["utf-8-sig", "utf-8", "cp1252"] = "utf-8-sig"
     sheet: str | None = None
     header_row: int = Field(default=1, ge=1, le=100)
 
 
-class TableMapping(BaseModel):
+class TableMapping(StrictContractModel):
     """One row is one examination; named finding groups preserve lesion identity."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     schema_version: Literal["1.0"] = "1.0"
     mapping_id: UUID = Field(strict=False)
@@ -302,9 +287,7 @@ class TableMapping(BaseModel):
         return groups
 
 
-class TableRecord(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class TableRecord(DtypesModel):
     row_number: int = Field(ge=1)
     source_id: UUID
     patient: ReportPatientInfo
@@ -337,19 +320,15 @@ class TableRecord(BaseModel):
         return self
 
 
-class TableImportReceiptPayload(BaseModel):
+class TableImportReceiptPayload(DtypesModel):
     """No original names or source cells are retained in import receipts."""
-
-    model_config = ConfigDict(extra="forbid")
 
     patient_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     examination_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     record: DtypesRecordPersistencePayload
 
 
-class TableImportResult(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class TableImportResult(DtypesModel):
     row_count: int
     created_count: int
     replayed_count: int

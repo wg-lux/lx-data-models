@@ -2,24 +2,20 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
 
 from lx_dtypes.language import DEFAULT_LANGUAGE, LanguageCode
 from lx_dtypes.models.contracts.json_types import JsonObject
+from lx_dtypes.models.model import FrozenContractModel
 
 if TYPE_CHECKING:
     from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 
 
-class KnowledgeBaseIdentity(BaseModel):
+class KnowledgeBaseIdentity(FrozenContractModel):
     """Canonical, complete identity of one knowledge-base artifact."""
 
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        strict=True,
-        str_strip_whitespace=True,
-    )
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     knowledge_base_module: str = Field(min_length=1)
     knowledge_base_version: str = Field(min_length=1)

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import ConfigDict, field_validator, model_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .endoscopy_processor import RoiBoxCore
 
 
-class VideoEncoderConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoEncoderConfig(DtypesModel):
     name: str
     preset_param: str
     preset_value: str
@@ -34,9 +34,7 @@ class VideoEncoderConfig(BaseModel):
         return normalized
 
 
-class VideoMaskConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoMaskConfig(DtypesModel):
     x: int
     y: int
     width: int

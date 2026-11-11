@@ -32,10 +32,21 @@ __all__ = [
 ]
 
 
+_PYDANTIC_EXPORTS = {
+    "L_DDICTS",
+    "L_MODELS",
+    "ledger_models_lookup",
+    "L_MODEL_NAMES_LITERAL",
+    "L_MODEL_NAMES_ORDERED",
+    "LedgerModelsLookupType",
+}
+
+
 def __getattr__(name: str) -> Any:
     if name not in __all__:
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-    value = getattr(import_module(f"{__name__}.main"), name)
+    module = "pydantic_main" if name in _PYDANTIC_EXPORTS else "main"
+    value = getattr(import_module(f"{__name__}.{module}"), name)
     globals()[name] = value
     return value
 

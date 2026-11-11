@@ -14,19 +14,17 @@ from pydantic import (
 )
 
 from lx_dtypes.models.descriptor_value import DescriptorValue
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonValue
 from .knowledge_base import validate_optional_knowledge_base_identity
 
 
-class _DtypesRecordLedgerPayload(BaseModel):
+class _DtypesRecordLedgerPayload(DtypesModel):
     """JSON-visible fields shared by every persisted ledger node."""
 
     model_config = ConfigDict(
-        extra="forbid",
-        str_strip_whitespace=True,
-        validate_default=True,
-        allow_inf_nan=False,
+        str_strip_whitespace=True, validate_default=True, allow_inf_nan=False
     )
 
     created_at: AwareDatetime = Field(default_factory=lambda: datetime.now(UTC))

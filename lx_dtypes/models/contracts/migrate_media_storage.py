@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 type MigrateMediaStorageNull = None
 type MigrateMediaStorageLimit = int | MigrateMediaStorageNull
@@ -24,18 +26,14 @@ type MigrateMediaStorageRecordStatus = Literal[
 ]
 
 
-class MigrateMediaStorageIncludesPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MigrateMediaStorageIncludesPayload(FrozenContractModel):
     raw: bool
     processed: bool
     reports: bool
     streamable: bool
 
 
-class MigrateMediaStorageRecordPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MigrateMediaStorageRecordPayload(FrozenContractModel):
     field: str = Field(min_length=1)
     object_kind: MigrateMediaStorageObjectKind
     object_pk: str = Field(min_length=1)
@@ -48,9 +46,7 @@ class MigrateMediaStorageRecordPayload(BaseModel):
     cleanup_deleted: bool = False
 
 
-class MigrateMediaStorageSummaryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MigrateMediaStorageSummaryPayload(FrozenContractModel):
     apply: bool
     changed: int = Field(ge=0)
     cleanup_deleted: int = Field(ge=0)

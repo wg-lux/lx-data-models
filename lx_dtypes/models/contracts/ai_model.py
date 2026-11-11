@@ -1,20 +1,20 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from lx_dtypes.models.model import StrictContractModel
 
 from .json_types import JsonObject
 
 
-class AiModelSerializerInputPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class AiModelSerializerInputPayload(StrictContractModel):
     name: str = Field(min_length=1)
     description: str | None = None
     model_type: str = Field(min_length=1)
 
 
-class AiModelSerializerOutputPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True)
+class AiModelSerializerOutputPayload(StrictContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     name: str
     description: str | None = None

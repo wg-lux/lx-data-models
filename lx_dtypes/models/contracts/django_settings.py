@@ -1,64 +1,50 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class DjangoTemplateOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class DjangoTemplateOptionsPayload(FrozenContractModel):
     context_processors: tuple[str, ...] = Field(default_factory=tuple)
 
 
-class DjangoTemplateConfigPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class DjangoTemplateConfigPayload(FrozenContractModel):
     backend: str = Field(alias="BACKEND")
     dirs: tuple[str, ...] = Field(default_factory=tuple, alias="DIRS")
     app_dirs: bool = Field(alias="APP_DIRS")
     options: DjangoTemplateOptionsPayload = Field(alias="OPTIONS")
 
 
-class DjangoCacheConfigPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class DjangoCacheConfigPayload(FrozenContractModel):
     backend: str = Field(alias="BACKEND")
     location: str = Field(alias="LOCATION")
     timeout: int = Field(alias="TIMEOUT")
 
 
-class DjangoCacheSettingsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class DjangoCacheSettingsPayload(FrozenContractModel):
     default: DjangoCacheConfigPayload
 
 
-class DjangoThrottleRatesPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class DjangoThrottleRatesPayload(FrozenContractModel):
     user: str
     anon: str
 
 
-class DjangoRestFrameworkSettingsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class DjangoRestFrameworkSettingsPayload(FrozenContractModel):
     default_throttle_classes: tuple[str, ...] = Field(alias="DEFAULT_THROTTLE_CLASSES")
     default_throttle_rates: DjangoThrottleRatesPayload = Field(
         alias="DEFAULT_THROTTLE_RATES"
     )
 
 
-class DjangoBeatScheduleOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class DjangoBeatScheduleOptionsPayload(FrozenContractModel):
     queue: str
     routing_key: str
     expires: int
 
 
-class DjangoBeatScheduleEntryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class DjangoBeatScheduleEntryPayload(FrozenContractModel):
     task: str
     schedule: int
     options: DjangoBeatScheduleOptionsPayload

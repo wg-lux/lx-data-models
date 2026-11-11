@@ -3,7 +3,9 @@
 from collections.abc import Mapping, Sequence
 from typing import Literal, Protocol
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 from .json_types import JsonValue
 from .knowledge_base import KnowledgeBaseIdentity
@@ -11,16 +13,12 @@ from .knowledge_base import KnowledgeBaseIdentity
 type FindingPresence = Literal["present", "absent", "uncertain"]
 
 
-class FindingTextRule(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
+class FindingTextRule(FrozenContractModel):
     presence: FindingPresence
     pattern: list[dict[str, JsonValue]] = Field(min_length=1, max_length=100)
 
 
-class FindingMention(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
+class FindingMention(FrozenContractModel):
     finding: str = Field(min_length=1)
     presence: FindingPresence
     start: int = Field(ge=0)
@@ -33,19 +31,15 @@ class FindingMention(BaseModel):
         return self
 
 
-class ClassificationTextRule(BaseModel):
+class ClassificationTextRule(FrozenContractModel):
     """Match a classification choice; hosts attach it only to a present finding."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     classification: str = Field(min_length=1, max_length=255)
     choice: str = Field(min_length=1, max_length=255)
     pattern: list[dict[str, JsonValue]] = Field(min_length=1, max_length=100)
 
 
-class ClassificationMention(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
+class ClassificationMention(FrozenContractModel):
     finding: str = Field(min_length=1)
     classification: str = Field(min_length=1)
     choice: str = Field(min_length=1)

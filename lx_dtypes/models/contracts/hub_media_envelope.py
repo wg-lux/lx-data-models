@@ -6,7 +6,9 @@ import json
 import re
 from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 type HubMediaEnvelopeContractVersion = Literal["hub_media_envelope_v1"]
 type HubMediaEnvelopeProfile = Literal["x25519-hkdf-sha256-aes256gcm-v1"]
@@ -19,8 +21,8 @@ _IDENTIFIER_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9._:-]*$"
 _BASE64URL_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
 
 
-class _StrictFrozenContract(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+class _StrictFrozenContract(FrozenContractModel):
+    pass
 
 
 def _canonical_json_bytes(value: dict[str, object]) -> bytes:

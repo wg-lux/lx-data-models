@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from lx_dtypes.models.contracts.json_types import JsonObject
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class LabelVideoSegmentSummaryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class LabelVideoSegmentSummaryPayload(FrozenContractModel):
     id: int
     label_id: int | None = None
     label_name: str
@@ -21,9 +20,7 @@ class LabelVideoSegmentSummaryPayload(BaseModel):
     export_segment: bool = False
 
 
-class LabelVideoSegmentFrameClassificationPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class LabelVideoSegmentFrameClassificationPayload(FrozenContractModel):
     frame_filename: str
     frame_file_path: str
     frame_url: str
@@ -31,9 +28,7 @@ class LabelVideoSegmentFrameClassificationPayload(BaseModel):
     frame_id: int
 
 
-class LabelVideoSegmentTimeSegmentPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class LabelVideoSegmentTimeSegmentPayload(FrozenContractModel):
     segment_id: int
     segment_start: int
     segment_end: int

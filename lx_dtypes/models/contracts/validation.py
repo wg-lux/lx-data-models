@@ -2,14 +2,22 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, Field, computed_field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 from .knowledge_base import KnowledgeBaseIdentity
 
 
-class ValidationIssue(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+class SemanticValidationError(ValueError):
+    """Expected cross-model failure carrying a stable finding code."""
 
+    def __init__(self, code: str, message: str | None = None) -> None:
+        self.code = code
+        super().__init__(message or code)
+
+
+class ValidationIssue(FrozenContractModel):
     code: str = Field(min_length=1)
     message: str = Field(min_length=1)
     level: Literal["error", "warning"] = "error"
@@ -18,9 +26,7 @@ class ValidationIssue(BaseModel):
     validator_name: str | None = None
 
 
-class ValidationReport(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
+class ValidationReport(FrozenContractModel):
     schema_version: Literal["1.0"] = "1.0"
     issues: tuple[ValidationIssue, ...] = ()
     knowledge_base_identity: KnowledgeBaseIdentity | None = None
@@ -33,11 +39,14 @@ class ValidationReport(BaseModel):
         return not any(issue.level == "error" for issue in self.issues)
 
 
-class ContractValidationResult[T: BaseModel](BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
+class ContractValidationResult[T: BaseModel](FrozenContractModel):
     value: T | None
     report: ValidationReport
 
 
-__all__ = ["ContractValidationResult", "ValidationIssue", "ValidationReport"]
+__all__ = [
+    "ContractValidationResult",
+    "SemanticValidationError",
+    "ValidationIssue",
+    "ValidationReport",
+]

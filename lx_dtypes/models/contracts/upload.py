@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic import ConfigDict, Field, ValidationError, field_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 _UPLOAD_API_REQUEST_FIELD_NAMES = frozenset(
     {"center_key", "center_name", "source_system", "idempotency_key"}
@@ -18,13 +20,8 @@ class UploadApiRequestData(TypedDict, total=False):
     idempotency_key: str
 
 
-class UploadApiRequestPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        str_strip_whitespace=True,
-        strict=True,
-    )
+class UploadApiRequestPayload(FrozenContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     center_key: str = Field(default="", max_length=255)
     center_name: str = Field(default="", max_length=255)

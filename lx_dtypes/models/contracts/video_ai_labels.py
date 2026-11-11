@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonObject, JsonValue
 
@@ -30,19 +32,19 @@ def _strip_optional_text(value: str | float | bool | None) -> str | None:
     return str(value).strip() or None
 
 
-class VideoAiLabelPayload(BaseModel):
+class VideoAiLabelPayload(DtypesModel):
     """A minimal label reference returned by video AI endpoints."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     id: int = Field(ge=1)
     name: str = Field(min_length=1)
 
 
-class VideoAiLabelSetPayload(BaseModel):
+class VideoAiLabelSetPayload(DtypesModel):
     """Label-set metadata returned by the video AI label-set list endpoint."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     id: int = Field(ge=1)
     name: str = Field(min_length=1)
@@ -52,10 +54,10 @@ class VideoAiLabelSetPayload(BaseModel):
     labels: list[VideoAiLabelPayload] = Field(default_factory=_empty_label_list)
 
 
-class VideoAiPredictionModelMetaPayload(BaseModel):
+class VideoAiPredictionModelMetaPayload(DtypesModel):
     """Locally registered prediction model metadata for video AI endpoints."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     id: int = Field(ge=1)
     name: str = Field(min_length=1)
@@ -70,20 +72,20 @@ class VideoAiPredictionModelMetaPayload(BaseModel):
     is_active: bool
 
 
-class VideoAiHuggingFaceModelPayload(BaseModel):
+class VideoAiHuggingFaceModelPayload(DtypesModel):
     """Known Hugging Face model option exposed by the prediction model list."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     model_id: str = Field(min_length=1)
     label: str = Field(min_length=1)
     labelset_name: str = Field(min_length=1)
 
 
-class VideoAiPredictionModelListPayload(BaseModel):
+class VideoAiPredictionModelListPayload(DtypesModel):
     """Response payload for locally registered and materializable model choices."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     models: list[VideoAiPredictionModelMetaPayload] = Field(
         default_factory=_empty_model_meta_list
@@ -96,13 +98,11 @@ class VideoAiPredictionModelListPayload(BaseModel):
     )
 
 
-class VideoAiRerunPredictionRequestPayload(BaseModel):
+class VideoAiRerunPredictionRequestPayload(DtypesModel):
     """Validated request payload for rerunning video prediction segments."""
 
     model_config = ConfigDict(
-        extra="allow",
-        populate_by_name=True,
-        str_strip_whitespace=True,
+        extra="allow", populate_by_name=True, str_strip_whitespace=True
     )
 
     model_meta_id: int | None = Field(default=None, ge=1)
@@ -168,10 +168,10 @@ class VideoAiRerunPredictionRequestPayload(BaseModel):
         )
 
 
-class VideoAiPredictionJobPayload(BaseModel):
+class VideoAiPredictionJobPayload(DtypesModel):
     """Job metadata returned after dispatching prediction reruns."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     task_id: str
     history_id: int | None = Field(default=None, ge=1)
@@ -179,10 +179,10 @@ class VideoAiPredictionJobPayload(BaseModel):
     queue: str
 
 
-class VideoAiRerunPredictionResponsePayload(BaseModel):
+class VideoAiRerunPredictionResponsePayload(DtypesModel):
     """Response payload for the video prediction rerun endpoint."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     success: bool
     status: str = Field(min_length=1)
@@ -204,7 +204,7 @@ class VideoAiRerunPredictionResponsePayload(BaseModel):
         return cast(VideoAiJsonObject, payload)
 
 
-class VideoAiLabelNamePayload(BaseModel):
+class VideoAiLabelNamePayload(DtypesModel):
     """Request payload for creating or deleting a label by name."""
 
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
@@ -212,7 +212,7 @@ class VideoAiLabelNamePayload(BaseModel):
     name: str = Field(min_length=1)
 
 
-class VideoAiLabelRenamePayload(BaseModel):
+class VideoAiLabelRenamePayload(DtypesModel):
     """Request payload for renaming a label."""
 
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
@@ -221,10 +221,10 @@ class VideoAiLabelRenamePayload(BaseModel):
     name: str = Field(min_length=1)
 
 
-class VideoAiLabelMutationResponsePayload(BaseModel):
+class VideoAiLabelMutationResponsePayload(DtypesModel):
     """Response payload for label create, delete, and rename mutations."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     success: str = Field(min_length=1)
     id: int | None = Field(default=None, ge=1)

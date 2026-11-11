@@ -26,6 +26,7 @@ from lx_dtypes.models.knowledge_base.report_template.TemplateReadiness import (
     ReportTemplateLifecycleStatusLiteral,
     ReportTemplateReadinessSummary,
 )
+from lx_dtypes.models.model import DtypesModel
 from lx_dtypes.utils.parser import camel_to_snake
 
 from .json_types import JsonObject, JsonValue
@@ -34,6 +35,10 @@ from .study_metadata import StudyMetadata
 
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
+
+# Families added after snapshot v1. When empty they are omitted from the digest,
+# so existing package identities stay unchanged, and older snapshots may omit them.
+_LATER_FAMILIES: tuple[str, ...] = ("TimeReference", "ElectricalCurveProfile")
 
 
 def _semantic_content(value: object, serialized: JsonValue) -> JsonValue:
@@ -86,18 +91,25 @@ def _digest(content: dict[str, object]) -> str:
     }
     typed["records"] = PackageSnapshot.validate_records(content["records"])
     normalized = _semantic_content(typed, cast(JsonValue, content))
+    # Adding an unused family must not change existing package identities.
+    if isinstance(normalized, dict):
+        records = normalized.get("records")
+        if isinstance(records, dict):
+            for family in _LATER_FAMILIES:
+                if not records.get(family):
+                    records.pop(family, None)
     encoded = json.dumps(normalized, sort_keys=True, separators=(",", ":"))
     return "sha256:" + hashlib.sha256(encoded.encode()).hexdigest()
 
 
-class PackageSnapshot(BaseModel):
+class PackageSnapshot(DtypesModel):
     """Every runtime record family, validated by its canonical owning model.
 
     Unlike the frontend graph projection this includes validators, presets,
     reference catalogs and employee lists. Storage paths are intentionally absent.
     """
 
-    model_config = ConfigDict(extra="forbid", frozen=True, ser_json_inf_nan="strings")
+    model_config = ConfigDict(frozen=True, ser_json_inf_nan="strings")
 
     contract_version: Literal["package_snapshot_v1"] = "package_snapshot_v1"
     identity: KnowledgeBaseIdentity
@@ -113,7 +125,10 @@ class PackageSnapshot(BaseModel):
     def validate_records(cls, value: object) -> dict[str, list[KB_MODELS]]:
         if not isinstance(value, dict):
             raise ValueError("records must be a model-family mapping")  # noqa: TRY004 - Pydantic must emit ValidationError.
-        supplied = cast(dict[str, object], value)
+        supplied = dict(cast(dict[str, object], value))
+        # v1 snapshots written before these families did not carry them.
+        for family in _LATER_FAMILIES:
+            supplied.setdefault(family, [])
         if set(supplied) != set(KB_MODEL_NAMES_ORDERED):
             raise ValueError(
                 "records must contain exactly all registered model families"

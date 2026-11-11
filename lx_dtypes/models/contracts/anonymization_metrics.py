@@ -3,16 +3,16 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 from .json_types import JsonObject
 
 AnonymizationMetricsMediaType = Literal["video", "pdf"]
 
 
-class AnonymizationMetricsFiltersPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationMetricsFiltersPayload(FrozenContractModel):
     date_from: datetime
     date_to: datetime
     media_type: AnonymizationMetricsMediaType | None = None
@@ -21,16 +21,12 @@ class AnonymizationMetricsFiltersPayload(BaseModel):
     source_system: str | None = None
 
 
-class AnonymizationMetricsQueryBoundsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationMetricsQueryBoundsPayload(FrozenContractModel):
     max_window_days: int = Field(ge=1)
     max_phi_region_match_annotations: int = Field(ge=1)
 
 
-class AnonymizationWorkflowMetricsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationWorkflowMetricsPayload(FrozenContractModel):
     status_counts: dict[str, int]
     pending_validation_count: int = Field(ge=0)
     failed_count: int = Field(ge=0)
@@ -43,9 +39,7 @@ class AnonymizationWorkflowMetricsPayload(BaseModel):
     median_seconds_to_validation: float | None = None
 
 
-class AnonymizationFieldQualityPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationFieldQualityPayload(FrozenContractModel):
     field_name: str
     support: int = Field(ge=0)
     changed_count: int = Field(ge=0)
@@ -56,9 +50,7 @@ class AnonymizationFieldQualityPayload(BaseModel):
     missing_after_validation_count: int = Field(ge=0)
 
 
-class AnonymizationPhiRegionMetricsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationPhiRegionMetricsPayload(FrozenContractModel):
     proposal_count: int = Field(ge=0)
     human_annotation_count: int = Field(ge=0)
     matched_count: int | None = Field(default=None, ge=0)
@@ -69,9 +61,7 @@ class AnonymizationPhiRegionMetricsPayload(BaseModel):
     max_matching_annotations: int = Field(ge=1)
 
 
-class AnonymizationQualityMetricsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationQualityMetricsPayload(FrozenContractModel):
     evaluated_event_count: int = Field(ge=0)
     residual_phi_detected_count: int = Field(ge=0)
     residual_ocr_match_count: int = Field(ge=0)
@@ -82,9 +72,7 @@ class AnonymizationQualityMetricsPayload(BaseModel):
     sensitive_meta_policy_counts: dict[str, int]
 
 
-class AnonymizationMetricsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationMetricsPayload(FrozenContractModel):
     schema_version: str = "1.0"
     filters: AnonymizationMetricsFiltersPayload
     query_bounds: AnonymizationMetricsQueryBoundsPayload

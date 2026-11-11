@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import field_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .document_type import DocumentType
 
 
-class ReportContext(BaseModel):
+class ReportContext(DtypesModel):
     patient_examination_id: int
     patient_id: int
     document_type: DocumentType
@@ -16,8 +18,6 @@ class ReportContext(BaseModel):
     examination_hash: str | None = None
     patient_hash: str | None = None
     source_pdf_id: int | None = None
-
-    model_config = ConfigDict(extra="forbid")
 
     @field_validator("anonymized_text", mode="before")
     @classmethod

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class NginxAccelResponseHeadersPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class NginxAccelResponseHeadersPayload(FrozenContractModel):
     content_type: str = Field(min_length=1)
     x_accel_redirect: str = Field(min_length=1)
     x_accel_buffering: str = Field(min_length=1)

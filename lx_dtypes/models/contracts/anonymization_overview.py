@@ -4,7 +4,9 @@ from datetime import datetime
 from typing import Literal, TypedDict
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 AnonymizationOverviewFileType = Literal["video", "pdf", "unknown"]
 AnonymizationOverviewMediaType = Literal["video", "pdf"]
@@ -135,9 +137,7 @@ class UploadJobCancellationResponseData(TypedDict):
     source_preserved: Literal[True]
 
 
-class OverviewHlsMaterializationPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class OverviewHlsMaterializationPayload(FrozenContractModel):
     artifact_kind: HlsArtifactKind
     status: HlsMaterializationStatus
     triggering_upload_job_id: UUID | None = None
@@ -176,9 +176,7 @@ class OverviewHlsMaterializationPayload(BaseModel):
         )
 
 
-class OverviewUploadJobMonitoringPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class OverviewUploadJobMonitoringPayload(FrozenContractModel):
     id: UUID
     status: UploadJobMonitoringStatus
     ingest_mode: UploadJobIngestMode
@@ -281,10 +279,8 @@ class OverviewUploadJobMonitoringPayload(BaseModel):
         )
 
 
-class UploadJobCancellationResponsePayload(BaseModel):
+class UploadJobCancellationResponsePayload(FrozenContractModel):
     """Acknowledges cooperative cancellation without deleting the import source."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     upload_job: OverviewUploadJobMonitoringPayload
     cancellation_requested: Literal[True] = True
@@ -306,9 +302,7 @@ class UploadJobCancellationResponsePayload(BaseModel):
         )
 
 
-class OverviewUploadJobPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class OverviewUploadJobPayload(FrozenContractModel):
     sensitive_meta_id: int | None = Field(default=None, ge=1)
     content_hash: str = Field(default="", min_length=1)
 

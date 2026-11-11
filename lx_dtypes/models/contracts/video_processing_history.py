@@ -3,7 +3,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal, TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 type VideoProcessingHistoryOperation = Literal[
     "mask_overlay",
@@ -34,9 +36,7 @@ class VideoProcessingHistorySummaryData(TypedDict):
     duration_seconds: float | None
 
 
-class VideoProcessingHistorySummaryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class VideoProcessingHistorySummaryPayload(FrozenContractModel):
     raw_video_hash: str = Field(min_length=1)
     operation: VideoProcessingHistoryOperation
     status: VideoProcessingHistoryStatus

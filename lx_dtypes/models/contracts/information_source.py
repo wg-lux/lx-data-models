@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import ConfigDict, field_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 
 @runtime_checkable
@@ -16,7 +18,7 @@ def normalize_name_reference(value: str | NamedObject | None, *, default: str) -
     return normalized or default
 
 
-class InformationSourceRef(BaseModel):
+class InformationSourceRef(DtypesModel):
     model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
     name: str

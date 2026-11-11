@@ -4,7 +4,9 @@ from collections.abc import Mapping
 from datetime import date, datetime
 from typing import Literal, NotRequired, TypedDict, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonNull, JsonValue
 from .knowledge_base import KnowledgeBaseIdentity
@@ -223,15 +225,15 @@ class SegmentFrameSelectorPatchData(SegmentFrameSelectorQueryData, total=False):
     template_name: str | None
 
 
-class PatientReportIdentityPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class PatientReportIdentityPayload(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     first_name: str = Field(min_length=1, max_length=150)
     last_name: str = Field(min_length=1, max_length=150)
     dob: date
 
 
-class PatientExaminationReportSubmissionPayload(BaseModel):
+class PatientExaminationReportSubmissionPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     report_id: int | None = Field(default=None, ge=1)
@@ -262,17 +264,15 @@ class PatientExaminationReportSubmissionPayload(BaseModel):
         return self
 
 
-class PreferredReportFramePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+class PreferredReportFramePayload(DtypesModel):
+    model_config = ConfigDict(allow_inf_nan=False)
 
     video_id: int = Field(ge=1, strict=True)
     frame_number: int = Field(ge=0, strict=True)
     timestamp: float = Field(ge=0)
 
 
-class ReportFrameCandidatesQuery(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class ReportFrameCandidatesQuery(DtypesModel):
     patient_examination_id: int = Field(ge=1)
     label: str | None = Field(default=None, min_length=1, max_length=255)
     offset: int = Field(default=0, ge=0)
@@ -283,13 +283,13 @@ class ReportFrameCandidate(PreferredReportFramePayload):
     labels: list[str]
 
 
-class ReportFrameCandidatesResponse(BaseModel):
+class ReportFrameCandidatesResponse(DtypesModel):
     frames: list[ReportFrameCandidate]
     labels: list[str]
     next_offset: int | None
 
 
-class PatientExaminationReportMakeReportPayload(BaseModel):
+class PatientExaminationReportMakeReportPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     patient_examination_id: int = Field(ge=1)
@@ -324,9 +324,7 @@ class PatientExaminationReportMakeReportPayload(BaseModel):
         return self
 
 
-class ReportPersistedArtifactsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class ReportPersistedArtifactsPayload(DtypesModel):
     full_report_id: int | None = Field(default=None, ge=1)
     pdf_id: int | None = Field(default=None, ge=1)
     pdf_view_url: str | None = None
@@ -334,7 +332,7 @@ class ReportPersistedArtifactsPayload(BaseModel):
     patient_timeline_url: str | None = None
 
 
-class ReportSegmentFrameSelectionPayload(BaseModel):
+class ReportSegmentFrameSelectionPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     segment_id: int | None = Field(default=None, ge=1)
@@ -357,7 +355,7 @@ class ReportSegmentFrameSelectionPayload(BaseModel):
         return str(value).strip() or None
 
 
-class SegmentFrameSelectorQueryPayload(BaseModel):
+class SegmentFrameSelectorQueryPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     patient_examination_id: int = Field(ge=1)

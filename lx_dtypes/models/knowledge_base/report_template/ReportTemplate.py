@@ -1,7 +1,7 @@
 import datetime
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import Field, ValidationInfo, field_validator
 
 from lx_dtypes.factories.typed_lists import list_of_str_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
@@ -14,9 +14,10 @@ from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict impo
     ReportTemplateDataDict,
     ReportVerbosity,
 )
+from lx_dtypes.models.model import DtypesModel, FrozenContractModel
 
 
-class ReportTemplateValidators(BaseModel):
+class ReportTemplateValidators(DtypesModel):
     examination_validators: list[str] = Field(default_factory=list)
     findings_validators: list[str] = Field(default_factory=list)
     classification_validators: list[str] = Field(default_factory=list)
@@ -24,10 +25,8 @@ class ReportTemplateValidators(BaseModel):
     unit_validators: list[str] = Field(default_factory=list)
 
 
-class ReportTemplateGuidelineReference(BaseModel):
+class ReportTemplateGuidelineReference(FrozenContractModel):
     """Versioned guideline provenance exposed with a report template."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     guideline_id: str = Field(min_length=1)
     title: str = Field(min_length=1)

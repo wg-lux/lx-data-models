@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 MediaManagementCleanupType = Literal["unfinished", "failed", "stale", "all"]
 MediaManagementFileType = Literal["video", "pdf", "all"]
 
 
-class MediaManagementCleanupQueryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MediaManagementCleanupQueryPayload(FrozenContractModel):
     cleanup_type: MediaManagementCleanupType = "unfinished"
     force: bool = False
     media_type: MediaManagementFileType = "all"
@@ -33,9 +33,7 @@ class MediaManagementCleanupQueryPayload(BaseModel):
         raise ValueError("file_id must be an integer")
 
 
-class MediaManagementItemPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MediaManagementItemPayload(FrozenContractModel):
     id: int = Field(ge=1)
     type: Literal["video", "pdf"]
     filename: str | None = None
@@ -44,9 +42,7 @@ class MediaManagementItemPayload(BaseModel):
     stale_duration_hours: float | None = None
 
 
-class MediaManagementSummaryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MediaManagementSummaryPayload(FrozenContractModel):
     videos_removed: int = 0
     pdfs_removed: int = 0
     total_removed: int = 0
@@ -54,9 +50,7 @@ class MediaManagementSummaryPayload(BaseModel):
     dry_run: bool
 
 
-class MediaManagementCleanupResultPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MediaManagementCleanupResultPayload(FrozenContractModel):
     cleanup_type: MediaManagementCleanupType
     force: bool
     removed_items: list[MediaManagementItemPayload] = Field(default_factory=list)
@@ -65,17 +59,13 @@ class MediaManagementCleanupResultPayload(BaseModel):
     )
 
 
-class MediaManagementForceRemoveResponsePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MediaManagementForceRemoveResponsePayload(FrozenContractModel):
     detail: str
     file_type: Literal["video", "pdf"]
     file_id: int
 
 
-class MediaManagementResetStatusResponsePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MediaManagementResetStatusResponsePayload(FrozenContractModel):
     detail: str
     file_type: Literal["video", "pdf"]
     file_id: int

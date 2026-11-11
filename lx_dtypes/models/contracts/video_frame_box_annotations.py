@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import cast
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from lx_dtypes.models.model import DtypesModel, StrictContractModel
 
 from .json_types import JsonNumericObject, JsonObject, JsonScalar, JsonValue
 from .video_frame_annotations import FrameBoxAnnotationBulkEnvelopePayload
@@ -30,10 +32,8 @@ def _normalize_scalar(value: JsonValue) -> JsonScalar:
 VideoFrameBoxAnnotationRequestPayload = FrameBoxAnnotationBulkEnvelopePayload
 
 
-class VideoFrameBoxAnnotationListResponsePayload(BaseModel):
+class VideoFrameBoxAnnotationListResponsePayload(DtypesModel):
     """Response payload for listing frame box annotations."""
-
-    model_config = ConfigDict(extra="forbid")
 
     status: str = "success"
     frame_id: int = Field(ge=1)
@@ -47,10 +47,8 @@ class VideoFrameBoxAnnotationListResponsePayload(BaseModel):
         return cast(VideoFrameBoxJsonObject, self.model_dump(mode="json"))
 
 
-class VideoFrameBoxAnnotationMutationResponsePayload(BaseModel):
+class VideoFrameBoxAnnotationMutationResponsePayload(DtypesModel):
     """Response payload for frame box annotation upsert or delete operations."""
-
-    model_config = ConfigDict(extra="forbid")
 
     status: str = "success"
     video_id: int | None = Field(default=None, ge=1)
@@ -67,8 +65,8 @@ class VideoFrameBoxAnnotationMutationResponsePayload(BaseModel):
         )
 
 
-class VideoPhiRegionPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True, str_strip_whitespace=True)
+class VideoPhiRegionPayload(StrictContractModel):
+    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     x: float = Field(ge=0)
     y: float = Field(ge=0)
@@ -78,8 +76,8 @@ class VideoPhiRegionPayload(BaseModel):
     confidence: float | None = None
 
 
-class VideoPhiFrameObservationPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True)
+class VideoPhiFrameObservationPayload(StrictContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     frame_number: int | None = Field(default=None, ge=0)
     frame_id: int | None = Field(default=None, ge=0)

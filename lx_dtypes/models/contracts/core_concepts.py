@@ -3,12 +3,14 @@ from __future__ import annotations
 from math import isfinite
 from typing import ClassVar, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .knowledge_base import validate_optional_knowledge_base_identity
 
 
-class CoreConceptBase(BaseModel):
+class CoreConceptBase(DtypesModel):
     """Canonical cross-layer entity shape for KB-driven concepts."""
 
     id: int | None = Field(default=None, gt=0)
@@ -21,10 +23,7 @@ class CoreConceptBase(BaseModel):
     kb_module_name: str | None = None
 
     model_config = ConfigDict(
-        extra="forbid",
-        str_strip_whitespace=True,
-        validate_default=True,
-        revalidate_instances="always",
+        str_strip_whitespace=True, validate_default=True, revalidate_instances="always"
     )
 
     @field_validator("tags")
@@ -242,7 +241,7 @@ class CitationCore(CoreConceptBase):
     identifiers: dict[str, str] = Field(default_factory=dict)
 
 
-class CoreConceptCollection(BaseModel):
+class CoreConceptCollection(DtypesModel):
     """Complete, internally consistent terminology snapshot for API consumers."""
 
     module_name: str = Field(min_length=1)
@@ -273,10 +272,7 @@ class CoreConceptCollection(BaseModel):
     citation: list[CitationCore] = Field(default_factory=list)
 
     model_config = ConfigDict(
-        extra="forbid",
-        str_strip_whitespace=True,
-        validate_default=True,
-        revalidate_instances="always",
+        str_strip_whitespace=True, validate_default=True, revalidate_instances="always"
     )
 
     _REFERENCE_FIELDS: ClassVar[dict[str, dict[str, str]]] = {

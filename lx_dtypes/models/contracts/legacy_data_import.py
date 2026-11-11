@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from lx_dtypes.models.model import DtypesModel, FrozenContractModel
 
 type NullValue = None
 type LegacyExaminationIdValue = str | int | NullValue
@@ -10,8 +12,8 @@ type LegacyTextOrNull = str | NullValue
 type LegacyIntOrNull = int | NullValue
 
 
-class LegacyDataImportCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class LegacyDataImportCommandOptionsPayload(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     jsonl_path: str = Field(min_length=1)
     images_root: str = Field(min_length=1)
@@ -26,8 +28,8 @@ class LegacyDataImportCommandOptionsPayload(BaseModel):
     manifest_path: str = ""
 
 
-class LegacyImageImportRowPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class LegacyImageImportRowPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     filename: str = Field(min_length=1)
     labels: list[str] = Field(default_factory=list)
@@ -57,9 +59,7 @@ class LegacyImportManifestData(TypedDict):
     missing_image_count: int
 
 
-class LegacyImportManifestPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class LegacyImportManifestPayload(FrozenContractModel):
     command: str = Field(min_length=1)
     created_at: str = Field(min_length=1)
     jsonl_path: str = Field(min_length=1)

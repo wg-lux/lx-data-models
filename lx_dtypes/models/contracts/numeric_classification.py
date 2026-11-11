@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 from .knowledge_base import KnowledgeBaseIdentity
 
@@ -12,14 +14,8 @@ FiniteNumber = Annotated[float, Field(strict=True, allow_inf_nan=False)]
 Name = Annotated[str, Field(min_length=1)]
 
 
-class _StrictModel(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        strict=True,
-        frozen=True,
-        str_strip_whitespace=True,
-        validate_default=True,
-    )
+class _StrictModel(FrozenContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True, validate_default=True)
 
 
 class NumericMeasurement(_StrictModel):

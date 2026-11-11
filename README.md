@@ -19,6 +19,7 @@ exchange. The package also supports FHIR conversion and Django integration.
 ## Highlights
 
 - Reusable models for terminology, patient records, reports, and host integration.
+- Shared model policies and an explicit contract/evaluation boundary.
 - Versioned YAML knowledge bases with deterministic loading.
 - Report-template checks for structure, coverage, and captured data.
 - FHIR clinical data and terminology conversion.
@@ -41,7 +42,7 @@ Validate a study setup without raising for invalid input:
 
 ```python
 from lx_dtypes.models.contracts.study_setup import StudySetupDefinition
-from lx_dtypes.validation import validate_contract
+from lx_dtypes.evaluation import validate_contract
 
 result = validate_contract(StudySetupDefinition, {"schema_version": "1.0"})
 for issue in result.report.issues:

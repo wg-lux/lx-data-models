@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
+
+from lx_dtypes.models.model import DtypesModel, StrictContractModel
 
 
 def _empty_int_list() -> list[int]:
@@ -15,10 +17,8 @@ def _empty_str_list() -> list[str]:
     return []
 
 
-class TesseractOCRData(BaseModel):
+class TesseractOCRData(DtypesModel):
     """Normalized columnar OCR payload returned by pytesseract."""
-
-    model_config = ConfigDict(extra="forbid")
 
     left: list[int] = Field(default_factory=_empty_int_list)
     top: list[int] = Field(default_factory=_empty_int_list)
@@ -42,10 +42,10 @@ class TesseractOCRData(BaseModel):
         return self
 
 
-class TesseractWordConfidence(BaseModel):
+class TesseractWordConfidence(DtypesModel):
     """A validated word-level OCR detection and its confidence payload."""
 
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True)
 
     start_x: int = Field(alias="startX")
     start_y: int = Field(alias="startY")
@@ -65,10 +65,8 @@ class TesseractWordConfidence(BaseModel):
         return self
 
 
-class PixelBoundingBoxCore(BaseModel):
+class PixelBoundingBoxCore(StrictContractModel):
     """Strict pixel-space bounding box with absolute coordinates."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     x1: int
     y1: int
@@ -89,10 +87,8 @@ class PixelBoundingBoxCore(BaseModel):
         return (self.x1, self.y1, self.x2, self.y2)
 
 
-class OcrTextBoxCore(BaseModel):
+class OcrTextBoxCore(StrictContractModel):
     """Normalized OCR word payload with an absolute pixel box."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     text: str
     box: PixelBoundingBoxCore
@@ -107,10 +103,10 @@ class OcrTextBoxCore(BaseModel):
         return (self.text, self.box.as_tuple())
 
 
-class EastDetectionConfidenceCore(BaseModel):
+class EastDetectionConfidenceCore(StrictContractModel):
     """Confidence payload for EAST detections."""
 
-    model_config = ConfigDict(extra="forbid", populate_by_name=True, strict=True)
+    model_config = ConfigDict(populate_by_name=True)
 
     start_x: int = Field(alias="startX")
     start_y: int = Field(alias="startY")

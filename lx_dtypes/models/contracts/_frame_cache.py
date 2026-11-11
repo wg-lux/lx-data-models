@@ -1,9 +1,11 @@
 """Shared fields for the mutable and frozen frame-cache log contracts."""
 
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import DtypesModel
 
 
-class FrameCacheManifestFields(BaseModel):
+class FrameCacheManifestFields(DtypesModel):
     frame_dir: str
     file_count: int
     missing_frame_numbers: list[int] = Field(default_factory=list)
@@ -14,7 +16,7 @@ class FrameCacheManifestFields(BaseModel):
     expected_count: int | None = None
 
 
-class FrameCacheValidationFields(BaseModel):
+class FrameCacheValidationFields(DtypesModel):
     db_extracted_frame_count: int
     db_missing_frame_numbers: list[int] = Field(default_factory=list)
     db_extra_frame_numbers: list[int] = Field(default_factory=list)

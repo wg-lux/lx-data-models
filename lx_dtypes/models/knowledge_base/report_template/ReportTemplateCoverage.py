@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel, StrictContractModel
 
 
-class ReportTemplateCoverageFindingSelector(BaseModel):
+class ReportTemplateCoverageFindingSelector(FrozenContractModel):
     """Select every matching finding instance in examination order."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     finding_name: str = Field(min_length=1)
     classification_name: str | None = Field(default=None, min_length=1)
@@ -23,10 +23,8 @@ class ReportTemplateCoverageFindingSelector(BaseModel):
         return self
 
 
-class ReportTemplateCoverageConcept(BaseModel):
+class ReportTemplateCoverageConcept(StrictContractModel):
     """Authored, stable metadata used by the server-side coverage builder."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     concept_id: str = Field(pattern=r"^[a-z][a-z0-9_.:-]*$")
     label: str = Field(min_length=1)

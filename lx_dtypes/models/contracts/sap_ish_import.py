@@ -4,7 +4,9 @@ from collections.abc import Mapping
 from copy import deepcopy
 from datetime import date, datetime
 
-from pydantic import ConfigDict, RootModel
+from pydantic import ConfigDict
+
+from lx_dtypes.models.model import DtypesRootModel
 
 type SapIshImportPayloadScalar = str | int | float | bool | None | datetime | date
 type SapIshImportPayloadValue = (
@@ -15,7 +17,7 @@ type SapIshImportPayloadValue = (
 type SapIshImportPayload = dict[str, SapIshImportPayloadValue]
 
 
-class SapIshDropFilePayload(RootModel[dict[str, SapIshImportPayloadValue]]):
+class SapIshDropFilePayload(DtypesRootModel[dict[str, SapIshImportPayloadValue]]):
     model_config = ConfigDict(
         frozen=True, strict=True, allow_inf_nan=False, hide_input_in_errors=True
     )

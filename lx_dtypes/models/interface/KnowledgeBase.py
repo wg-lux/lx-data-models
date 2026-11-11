@@ -20,6 +20,7 @@ from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelUUIDTags import (
     AppBaseModelUUIDTags,
 )
 from lx_dtypes.models.contracts import kb_to_core_concepts_payload
+from lx_dtypes.models.contracts.validation import SemanticValidationError
 from lx_dtypes.models.contracts.finding_extraction import FindingTextExtractor
 from lx_dtypes.models.descriptor_value import DescriptorValue
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
@@ -115,6 +116,14 @@ from lx_dtypes.models.knowledge_base.reference_catalog import (
     ReferenceCatalog,
     ReferenceCatalogDataDict,
 )
+from lx_dtypes.models.knowledge_base.electrical_curve_profile import (
+    ElectricalCurveProfile,
+    ElectricalCurveProfileDataDict,
+)
+from lx_dtypes.models.knowledge_base.time_reference import (
+    TimeReference,
+    TimeReferenceDataDict,
+)
 from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
     ReportFinding,
     ReportTemplateClassificationRequirement,
@@ -207,6 +216,11 @@ from lx_dtypes.utils.report_template_registry import (
 )
 
 if TYPE_CHECKING:
+    from lx_dtypes.models.ledger.p_electrical_application import (
+        PElectricalApplication,
+        PElectricalCurveComparison,
+    )
+    from lx_dtypes.models.ledger.p_time_offset import PTimeOffset
     from lx_dtypes.models.interface.Ledger import Ledger
     from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
     from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
@@ -239,6 +253,8 @@ class ReportTemplateConceptWarning(UserWarning):
 
 
 class KnowledgeBaseDDict(AppBaseModelUUIDTagsDataDict):
+    time_reference: dict[str, TimeReferenceDataDict]
+    electrical_curve_profile: dict[str, ElectricalCurveProfileDataDict]
     study_preset: dict[str, StudyPresetDataDict]
     reference_catalog: dict[str, ReferenceCatalogDataDict]
     center_employee_list: dict[str, CenterEmployeeListDataDict]
@@ -283,6 +299,8 @@ YAML_IMPORT_SKIP_FIELDS = [
 
 
 class KnowledgeBaseRecordList(TypedDict):
+    time_references: list[TimeReferenceDataDict]
+    electrical_curve_profiles: list[ElectricalCurveProfileDataDict]
     study_presets: list[StudyPresetDataDict]
     reference_catalogs: list[ReferenceCatalogDataDict]
     center_employee_lists: list[CenterEmployeeListDataDict]
@@ -320,6 +338,10 @@ class SemanticAdmissibilityError(ValueError):
 
 
 class KnowledgeBase(AppBaseModelUUIDTags):
+    time_reference: dict[str, TimeReference] = Field(default_factory=dict)
+    electrical_curve_profile: dict[str, ElectricalCurveProfile] = Field(
+        default_factory=dict
+    )
     study_preset: dict[str, StudyPreset] = Field(default_factory=dict)
     reference_catalog: dict[str, ReferenceCatalog] = Field(default_factory=dict)
     center_employee_list: dict[str, CenterEmployeeList] = Field(default_factory=dict)
@@ -373,6 +395,32 @@ class KnowledgeBase(AppBaseModelUUIDTags):
     _resolved_module_configs: dict[str, KnowledgeBaseConfig] = PrivateAttr(
         default_factory=dict
     )
+
+    def validate_time_offset(self, observation: "PTimeOffset") -> None:
+        """Resolve the semantic reference and check its pinned module/version."""
+        reference = self.time_reference.get(observation.time_reference)
+        if reference is None:
+            raise SemanticValidationError("terminology.time_reference_unknown")
+        configs = self._resolved_module_configs or {self.config.name: self.config}
+        config = configs.get(reference.kb_module_name)
+        if config is None:
+            raise ValueError("Time reference module has no resolved version")
+        observation.validate_reference(reference, config.knowledge_base_identity)
+
+    def validate_electrical_observation(
+        self, observation: "PElectricalApplication | PElectricalCurveComparison"
+    ) -> None:
+        """Resolve the electrical curve profile and check its pinned module/version."""
+        profile = self.electrical_curve_profile.get(
+            observation.electrical_curve_profile
+        )
+        if profile is None:
+            raise ValueError("Unknown electrical curve profile")
+        configs = self._resolved_module_configs or {self.config.name: self.config}
+        config = configs.get(profile.kb_module_name)
+        if config is None:
+            raise ValueError("Electrical curve profile module has no resolved version")
+        observation.validate_profile(profile, config.knowledge_base_identity)
 
     @property
     def is_reporting_package(self) -> bool:
@@ -2033,6 +2081,10 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         Collects each knowledge-base model into lists of their ddict (data-dictionary) representations and returns them grouped in a KnowledgeBaseRecordList.
         """
         return KnowledgeBaseRecordList(
+            time_references=[record.ddict for record in self.time_reference.values()],
+            electrical_curve_profiles=[
+                record.ddict for record in self.electrical_curve_profile.values()
+            ],
             study_presets=[record.ddict for record in self.study_preset.values()],
             reference_catalogs=[
                 record.ddict for record in self.reference_catalog.values()

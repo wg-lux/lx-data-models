@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import Literal, Self, TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel, StrictContractModel
 
 from .deployment_setup import PackageName, PackageVersion
 from .finding_extraction import FindingPresence
@@ -12,8 +14,8 @@ from .json_types import JsonObject, JsonValue
 from .study_analysis import StudyAnalysisDefinition
 
 
-class StudyMetadataModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, str_strip_whitespace=True)
+class StudyMetadataModel(StrictContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class ParticipatingCenter(StudyMetadataModel):
@@ -56,9 +58,8 @@ class StudyInclusionCriterion(StudyMetadataModel):
         return self
 
 
-class StudyTextRuleModel(BaseModel):
+class StudyTextRuleModel(FrozenContractModel):
     # Matcher patterns keep whitespace exactly as authored.
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     module: PackageName
     version: PackageVersion

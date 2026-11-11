@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Final
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonNull, JsonValue
 from .patient_examination_report import ReportJsonObject, ReportStatus
@@ -16,10 +18,8 @@ type ReportMetaJsonValue = (
 type ReportMetaJsonObject = dict[str, ReportMetaJsonValue]
 
 
-class Report(BaseModel):
+class Report(DtypesModel):
     """Canonical contract shape for report records in the medical ledger."""
-
-    model_config = ConfigDict(extra="forbid")
 
     patient_examination: str = ""
     template_name: str = ""

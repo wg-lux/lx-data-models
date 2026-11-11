@@ -3,7 +3,9 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 AnonymizationQualityMediaType = Literal["video", "pdf"]
 
@@ -23,9 +25,7 @@ class QualityEvaluationStatus(StrEnum):
     NOT_MEASURABLE = "not_measurable"
 
 
-class AnonymizationQualityResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationQualityResult(FrozenContractModel):
     media_type: AnonymizationQualityMediaType
     media_id: int
     status: str
@@ -38,9 +38,7 @@ class AnonymizationQualityResult(BaseModel):
     warnings: list[str] = Field(default_factory=list)
 
 
-class AnonymizationQualitySummary(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationQualitySummary(FrozenContractModel):
     total: int
     residual_phi_detected_count: int
     leaked_field_count: int
@@ -49,9 +47,7 @@ class AnonymizationQualitySummary(BaseModel):
     status_counts: dict[str, int]
 
 
-class AnonymizationQualityPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AnonymizationQualityPayload(FrozenContractModel):
     schema_version: str = "1.0"
     sensitive_meta_policy: SensitiveMetaHandlingPolicy
     policy_applied: bool

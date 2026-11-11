@@ -8,8 +8,6 @@ from typing import Literal, Self
 
 from pydantic import (
     AwareDatetime,
-    BaseModel,
-    ConfigDict,
     Field,
     field_validator,
     model_validator,
@@ -17,9 +15,10 @@ from pydantic import (
 
 from lx_dtypes.models.contracts.german_fhir import Pzn
 from lx_dtypes.models.contracts.json_types import JsonValue
+from lx_dtypes.models.model import DtypesModel, FrozenContractModel
 
 
-class MedicationPeriodFields(BaseModel):
+class MedicationPeriodFields(DtypesModel):
     """Optional known treatment interval, independent of the active flag.
 
     This field mixin deliberately inherits configuration from its concrete model.
@@ -63,20 +62,18 @@ def validate_line_breaks(value: str | None, max_breaks: int) -> None:
         raise ValueError(f"must not contain more than {max_breaks} line break(s)")
 
 
-class MedicationSubstance(BaseModel):
+class MedicationSubstance(FrozenContractModel):
     """One active substance of a medication entry.
 
     BMP allows up to 3 of these per medication entry (``<W>``); order is
     significant and must match the order of strengths on the printed plan.
     """
 
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
     name: str = Field(min_length=1, max_length=80)
     strength: str | None = Field(default=None, min_length=1, max_length=15)
 
 
-class MedicationDosingSchedule(BaseModel):
+class MedicationDosingSchedule(FrozenContractModel):
     """BMP-compatible dosing scheme.
 
     Either the 4 day-segment quantities (``morning``/``noon``/``evening``/``night``,
@@ -84,8 +81,6 @@ class MedicationDosingSchedule(BaseModel):
     both. An entirely empty instance ("no dosing info recorded") is also legal, since
     BMP does not require a dosing scheme on every medication entry.
     """
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     morning: str | None = None
     noon: str | None = None
@@ -129,10 +124,8 @@ class MedicationDosingSchedule(BaseModel):
         )
 
 
-class MedicationScheduleHeading(BaseModel):
+class MedicationScheduleHeading(FrozenContractModel):
     """Zwischenüberschrift: a controlled code or free text, never both."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     code: _HEADING_CODE | None = None
     text: str | None = Field(default=None, min_length=1, max_length=50)
@@ -144,10 +137,8 @@ class MedicationScheduleHeading(BaseModel):
         return self
 
 
-class MedicationScheduleFreeTextLine(BaseModel):
+class MedicationScheduleFreeTextLine(FrozenContractModel):
     """Freitextzeile: a free-text line not tied to any medication entry."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     text: str = Field(min_length=1, max_length=200)
 
@@ -158,10 +149,8 @@ class MedicationScheduleFreeTextLine(BaseModel):
         return value
 
 
-class MedicationScheduleCompoundEntry(BaseModel):
+class MedicationScheduleCompoundEntry(FrozenContractModel):
     """Rezeptureintrag: a compounded-preparation entry with an optional bound note."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     text: str = Field(min_length=1, max_length=200)
     bound_note: str | None = Field(default=None, min_length=1, max_length=200)
@@ -179,7 +168,7 @@ class MedicationScheduleCompoundEntry(BaseModel):
         return value
 
 
-class MedicationEntryFields(BaseModel):
+class MedicationEntryFields(DtypesModel):
     """Shared BMP-aligned fields of a medication entry (BMP ``<M>``).
 
     Reused as-is by both the ledger read model (`PatientMedication`) and the write

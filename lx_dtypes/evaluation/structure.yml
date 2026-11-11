@@ -1,0 +1,38 @@
+version: 1
+tier: domain
+path: lx_dtypes/evaluation
+parent: ../structure.yml
+summary: Explicit contract parsing and cross-model evaluation without persistence.
+responsibilities:
+- Return canonical localized validation findings
+- Delegate terminology and study rules to the owning engines
+- Evaluate numeric interpretation and electrical frame alignment
+boundaries:
+- Do not persist records, select active packages, or authorize host actions
+- Contract schemas and local invariants remain in models
+entrypoints:
+- name: Advisory evaluation
+  file: __init__.py
+  purpose: Python/JSON contract validation and examination assessment
+- name: Electrical alignment
+  file: electrical.py
+  purpose: Evaluate exact clock mappings and electrical frame windows
+- name: Numeric classification
+  file: numeric.py
+  purpose: Resolve and evaluate versioned numeric rules
+- name: Time assessment
+  file: time.py
+  purpose: Validate clock evidence and exact KB reference identity through the canonical findings contract
+dependencies:
+  internal:
+  - ../models
+  external:
+  - Pydantic v2
+  - PyYAML
+submodules: []
+contracts:
+- name: Evaluation boundary
+  doc: ../../docs/guides/cross-layer-validation.md
+tests:
+  directory: ../../tests/unit/lx_dtypes
+  command: uv run pytest tests/unit/lx_dtypes/test_validation.py tests/unit/lx_dtypes/models/contracts/test_electrical_video_alignment.py -q

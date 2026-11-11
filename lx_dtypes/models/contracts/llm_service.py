@@ -2,30 +2,26 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import StrictContractModel
 
 
 def _empty_response_choices() -> list[LLMChatResponseChoicePayload]:
     return []
 
 
-class LLMChatMessagePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMChatMessagePayload(StrictContractModel):
     role: Literal["system", "user", "assistant"]
     content: str
 
 
-class LLMChatOllamaOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMChatOllamaOptionsPayload(StrictContractModel):
     temperature: float = Field(0.0, ge=0.0, le=2.0)
     num_ctx: int = Field(8192, ge=1)
 
 
-class LLMChatOllamaPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMChatOllamaPayload(StrictContractModel):
     model: str
     messages: list[LLMChatMessagePayload]
     stream: bool = False
@@ -33,9 +29,7 @@ class LLMChatOllamaPayload(BaseModel):
     format: str | None = None
 
 
-class LLMChatOpenAIPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMChatOpenAIPayload(StrictContractModel):
     model: str
     temperature: float = Field(0.0, ge=0.0, le=2.0)
     max_tokens: int | None = None
@@ -45,22 +39,16 @@ class LLMChatOpenAIPayload(BaseModel):
     messages: list[LLMChatMessagePayload]
 
 
-class LLMChatResponseMessagePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMChatResponseMessagePayload(StrictContractModel):
     role: str | None = None
     content: str = ""
 
 
-class LLMChatResponseChoicePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMChatResponseChoicePayload(StrictContractModel):
     message: LLMChatResponseMessagePayload
 
 
-class LLMChatResponsePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMChatResponsePayload(StrictContractModel):
     message: LLMChatResponseMessagePayload | None = None
     choices: list[LLMChatResponseChoicePayload] = Field(
         default_factory=_empty_response_choices

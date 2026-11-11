@@ -2,21 +2,19 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel, StrictContractModel
 
 
-class PatientFindingIdentityPayload(BaseModel):
+class PatientFindingIdentityPayload(StrictContractModel):
     """Stable lesion identity; omitted identifiers retain legacy singleton lookup."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     patient_finding_id: int | None = Field(default=None, ge=1)
     instance_id: UUID | None = Field(default=None, strict=False)
 
 
-class PatientFindingCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class PatientFindingCore(FrozenContractModel):
     patient_examination_id: int
     finding_name: str
     instance_id: UUID | None = None

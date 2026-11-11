@@ -26,4 +26,10 @@ repos:
         always_run: true
         language: system
         pass_filenames: false
+      - id: model-boundaries
+        name: shared model and evaluation boundary lint
+        entry: python scripts/lint_model_boundaries.py
+        always_run: true
+        language: system
+        pass_filenames: false
 

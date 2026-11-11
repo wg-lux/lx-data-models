@@ -3,20 +3,19 @@ from __future__ import annotations
 
 from typing import Literal, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
 
 from lx_dtypes.models.contracts.information_source import normalize_name_reference
 from lx_dtypes.models.contracts.json_types import JsonObject
+from lx_dtypes.models.model import DtypesModel, FrozenContractModel
 
 
-class FrameAnnotationLabelOptionPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameAnnotationLabelOptionPayload(FrozenContractModel):
     id: int
     name: str
 
 
-class FrameAnnotationQueueSpecPayload(BaseModel):
+class FrameAnnotationQueueSpecPayload(DtypesModel):
     """
     Validated transport contract for frame annotation queue requests.
 
@@ -25,11 +24,7 @@ class FrameAnnotationQueueSpecPayload(BaseModel):
     resolved by the endoreg_db adapter layer.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        arbitrary_types_allowed=True,
-    )
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
     limit: int
     task_mode: str = "random"
@@ -55,9 +50,7 @@ class FrameAnnotationQueueSpecPayload(BaseModel):
         return normalize_name_reference(value, default="manual_annotation")
 
 
-class FrameAnnotationAnnotationPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameAnnotationAnnotationPayload(FrozenContractModel):
     id: int
     label_id: int
     label_name: str
@@ -69,9 +62,7 @@ class FrameAnnotationAnnotationPayload(BaseModel):
     external_annotation_id: str | None = None
 
 
-class FrameAnnotationTaskPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameAnnotationTaskPayload(FrozenContractModel):
     frame_id: int
     video_id: int
     frame_number: int
@@ -96,9 +87,7 @@ class FrameAnnotationTaskPayload(BaseModel):
     decoded_frame_stream_path: str | None = None
 
 
-class FrameAnnotationQueueResultPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameAnnotationQueueResultPayload(FrozenContractModel):
     tasks: list[FrameAnnotationTaskPayload]
     selection_strategy: str
     label_distribution: list[JsonObject] = Field(default_factory=list)
@@ -108,9 +97,7 @@ class FrameAnnotationQueueResultPayload(BaseModel):
     bucket_counts: dict[str, int] = Field(default_factory=dict)
 
 
-class FrameAnnotationRandomTaskResponsePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameAnnotationRandomTaskResponsePayload(FrozenContractModel):
     status: Literal["success"] = "success"
     task: FrameAnnotationTaskPayload
     tasks: list[FrameAnnotationTaskPayload]
@@ -136,9 +123,7 @@ class FrameAnnotationRandomTaskResponsePayload(BaseModel):
         return cast(JsonObject, self.model_dump(mode="json", exclude_none=True))
 
 
-class FrameAnnotationSkipResponsePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameAnnotationSkipResponsePayload(FrozenContractModel):
     status: Literal["success"] = "success"
     skipped_frame_id: int
     video_id: int

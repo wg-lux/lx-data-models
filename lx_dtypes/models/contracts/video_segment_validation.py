@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Literal, TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 type VideoSegmentValidationNull = None
 type VideoSegmentValidationText = str | VideoSegmentValidationNull
@@ -16,9 +18,7 @@ class OutsideFrameBlackeningHistoryConfigData(TypedDict):
     queue: str
 
 
-class OutsideFrameBlackeningHistoryConfigPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class OutsideFrameBlackeningHistoryConfigPayload(FrozenContractModel):
     kind: OutsideFrameBlackeningKind = Field(default="outside_frame_blackening")
     only_validated: bool
     queue: str = Field(min_length=1)
@@ -41,9 +41,7 @@ class PostValidationRebuildSummaryData(TypedDict):
     completed_at: VideoSegmentValidationText
 
 
-class PostValidationRebuildSummaryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class PostValidationRebuildSummaryPayload(FrozenContractModel):
     id: int
     status: str = Field(min_length=1)
     task_id: VideoSegmentValidationText = None

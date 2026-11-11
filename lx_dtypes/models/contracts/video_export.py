@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Annotated, Literal, TypedDict, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 PositiveInt = Annotated[int, Field(ge=1)]
 type VideoAnnotationExportFormat = Literal["csv", "json"]
@@ -33,7 +35,7 @@ class VideoAnnotationExportConfigUpdateData(TypedDict, total=False):
     only_validated: bool
 
 
-class VideoAnnotationExportRequestPayload(BaseModel):
+class VideoAnnotationExportRequestPayload(DtypesModel):
     """Validated request payload for the annotated video export endpoint."""
 
     model_config = ConfigDict(extra="ignore")
@@ -87,10 +89,8 @@ class VideoAnnotationExportRequestPayload(BaseModel):
         return bool(value)
 
 
-class VideoAnnotationExportResultPayload(BaseModel):
+class VideoAnnotationExportResultPayload(DtypesModel):
     """Validated success response payload for annotated video exports."""
-
-    model_config = ConfigDict(extra="forbid")
 
     success: bool
     output_path: str = Field(min_length=1)
@@ -101,10 +101,10 @@ class VideoAnnotationExportResultPayload(BaseModel):
     frame_output_dir: str | None = None
 
 
-class VideoAnnotationExportErrorPayload(BaseModel):
+class VideoAnnotationExportErrorPayload(DtypesModel):
     """Validated error response payload for annotated video exports."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     success: Literal[False] = False
     error: str = Field(min_length=1)

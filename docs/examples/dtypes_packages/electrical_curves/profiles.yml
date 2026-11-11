@@ -1,0 +1,18 @@
+- model: electrical_curve_profile
+  name: synthetic_cut_impedance_response
+  description: >-
+    Synthetic example. Explains RMS current and power across one activation by
+    phase and tissue impedance. Not a clinically approved parameter definition.
+  curve_quantities: [current_rms, impedance, power]
+  response_quantities: [current_rms, power]
+  predictor_quantities: [impedance]
+  phase_bins: 10
+  phase_polynomial_degree: 2
+  min_duration_num: 1
+  min_duration_den: 10
+  max_duration_num: 5
+  max_duration_den: 1
+  max_sample_gap_num: 1
+  max_sample_gap_den: 100
+  min_reference_applications: 3
+  max_mean_mahalanobis_squared: 6.0

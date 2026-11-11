@@ -4,14 +4,16 @@ import hashlib
 import json
 from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .knowledge_base import KnowledgeBaseIdentity
 from .reference_catalog import CatalogIdentity, ReferenceCatalogPayload, ReferenceKind
 
 
-class ReferenceCatalogSnapshot(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+class ReferenceCatalogSnapshot(DtypesModel):
+    model_config = ConfigDict(frozen=True)
     identity: KnowledgeBaseIdentity
     projection: str = Field(default="all", min_length=1, max_length=2048)
     payload: ReferenceCatalogPayload
@@ -52,16 +54,16 @@ class ReferenceCatalogSnapshot(BaseModel):
         return self
 
 
-class CatalogBinding(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+class CatalogBinding(DtypesModel):
+    model_config = ConfigDict(frozen=True)
     kind: ReferenceKind
     identity: CatalogIdentity
     row_id: int = Field(gt=0)
     origin: Literal["created", "legacy_equivalent", "shared_import"]
 
 
-class ReferenceCatalogReceipt(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+class ReferenceCatalogReceipt(DtypesModel):
+    model_config = ConfigDict(frozen=True)
     schema_version: Literal["1.0"] = "1.0"
     snapshot: ReferenceCatalogSnapshot
     bindings: list[CatalogBinding]

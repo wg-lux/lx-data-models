@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from datetime import date, time
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class PdfTypeSummaryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class PdfTypeSummaryPayload(FrozenContractModel):
     name: str = Field(min_length=1)
     patient_info_line: str
     endoscope_info_line: str
@@ -16,9 +16,7 @@ class PdfTypeSummaryPayload(BaseModel):
     cut_off_below_lines: list[str] = Field(default_factory=list)
 
 
-class PdfMetaPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class PdfMetaPayload(FrozenContractModel):
     pdf_type: str = Field(min_length=1)
     date: date
     time: time

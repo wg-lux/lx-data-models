@@ -10,9 +10,45 @@ responsibilities:
 - Maintain knowledge-base/report-template graphs and ledger identities
 - Own hub transfer version 7 with hub-scoped UUIDv8 pseudonyms and exact segment timeline coordinates
 boundaries:
+- All package-owned Pydantic models use the shared model policies; explicit projection and extension exceptions are inventoried.
+- Runtime evaluation depends on contracts; retained reverse dependencies require an exact reviewed exception.
 - Keep application service orchestration outside shared models
 - Preserve raw video identity across processing and transfer
 entrypoints:
+- name: Shared model policies
+  file: model.py
+  purpose: Closed, strict, frozen and root-value profiles shared by every model family
+- name: Pydantic ledger registry
+  file: ledger/pydantic_main.py
+  purpose: Canonical ledger definitions without loading ORM adapters; main.py reuses the same registry
+- name: Combined Pydantic registry
+  file: pydantic_main.py
+  purpose: Combined model names and type unions without loading backend aggregation
+- name: Reporting vocabulary
+  file: contracts/reporting_types.py
+  purpose: Shared report verbosity tokens without a reverse dependency on KB representations
+- name: Electrical curve profiles
+  file: knowledge_base/electrical_curve_profile.py
+  purpose: Versioned HF application curve quantities, phase bins, limits and multivariate regression specification
+- name: Ledger electrical applications
+  file: ledger/p_electrical_application.py
+  purpose: Phase-binned HF application curves and regression comparisons with strictly earlier references,
+    pinned to exact KB profile identities
+- name: Electrical curve contracts
+  file: contracts/electrical_curve.py
+  purpose: Application curve, section status and self-consistent regression result contracts
+- name: Knowledge-base time references
+  file: knowledge_base/time_reference.py
+  purpose: Named clock relationships and labeled reference, training, validation and test examples
+- name: Ledger time observations
+  file: ledger/p_time_offset.py
+  purpose: Examination-specific offsets linked to exact KB definitions and video PTS evidence
+- name: Time evidence validation
+  file: contracts/time_reference.py
+  purpose: Bind clock anchors to existing generation or verified recording timeline coordinates
+- name: Clock timestamps and offsets
+  file: contracts/time.py
+  purpose: Exact PTS and electrosurgery ticks, UTC examination timestamps and signed clock anchors
 - name: Table import vocabulary
   file: interface/table_import.py
   purpose: Load validated header and value suggestions for explicit table mappings
@@ -41,6 +77,12 @@ entrypoints:
   file: contracts/video_segment_timeline.py
   purpose: Exact segment presentation timestamps on the processed generation and, with verified ancestry, the
     original recording
+- name: Electrosurgical measurements
+  file: contracts/electrosurgical_measurements.py
+  purpose: HF generator channels with canonical UCUM units bound to source hash, parser version and clock epoch
+- name: Electrical video alignment
+  file: contracts/electrical_video_alignment.py
+  purpose: Exact frame-window result contracts and compatibility delegates to evaluation/electrical.py
 - name: Media workflow states and transitions
   file: contracts/media_workflow.py
   purpose: Privacy, annotation and release track tokens, transition tables and deletion points for one media item
@@ -85,6 +127,10 @@ dependencies:
   - FHIR
 submodules: []
 contracts:
+- name: Model boundary inventory
+  doc: ../../docs/model-boundaries.yml
+- name: Dates, times and offsets
+  doc: ../../docs/guides/dates-and-times.md
 - name: Model concepts
   doc: ../../docs/guides/data-model-concept-map.md
 - name: Report-template infrastructure
@@ -93,6 +139,8 @@ contracts:
   doc: ../../docs/guides/record-data-formats.md
 - name: ePA FHIR compatibility
   doc: ../../docs/guides/epa-fhir-compatibility.md
+- name: Electrosurgical video alignment
+  doc: ../../docs/guides/electrosurgical-video-alignment.md
 tests:
   directory: ../../tests/unit/lx_dtypes/models
   command: uv run pytest tests/unit/lx_dtypes/models/contracts -q

@@ -4,7 +4,9 @@ from datetime import date
 from pathlib import Path
 from typing import TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from lx_dtypes.models.model import DtypesModel
 
 type JsonNull = None
 type SensitiveMetaRepairValue = str | date
@@ -18,8 +20,8 @@ class SensitiveMetaPatientRepairData(TypedDict, total=False):
     center_name: str
 
 
-class SensitiveMetaPatientRepairCreatePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
+class SensitiveMetaPatientRepairCreatePayload(DtypesModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
 
     patient_first_name: str = Field(default="Patient", min_length=1)
     patient_last_name: str = Field(default="Unknown", min_length=1)
@@ -28,8 +30,8 @@ class SensitiveMetaPatientRepairCreatePayload(BaseModel):
     center_name: str = Field(min_length=1)
 
 
-class SensitiveMetaPatientRepairUpdatePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
+class SensitiveMetaPatientRepairUpdatePayload(DtypesModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
 
     patient_first_name: str | JsonNull = None
     patient_last_name: str | JsonNull = None
@@ -37,8 +39,8 @@ class SensitiveMetaPatientRepairUpdatePayload(BaseModel):
     examination_date: date | JsonNull = None
 
 
-class VideoPathRepairFileInfoPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+class VideoPathRepairFileInfoPayload(DtypesModel):
+    model_config = ConfigDict(frozen=True)
 
     absolute_path: Path
     relative_path: Path

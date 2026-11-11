@@ -3,25 +3,21 @@ from pathlib import Path
 from typing import Any, Self
 
 import yaml
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, ConfigDict, Field
 
+from lx_dtypes.models.model import DtypesModel
 from lx_dtypes.serialization import serialize_path
 
 
-class AppBaseModel(BaseModel):
+class AppBaseModel(DtypesModel):
     # Exclude from serialization everywhere (including nested models)
     source_file: Path | None = Field(default=None, exclude=True)
     created_at: AwareDatetime = Field(
         default_factory=lambda: datetime.now(UTC),
     )
     model_config = ConfigDict(
-        # 1. Strips leading/trailing whitespace automatically ("  val  " -> "val")
         str_strip_whitespace=True,
-        # 2. Rejects extra fields not defined in the model (Security/Strictness)
-        extra="forbid",
-        # 3. Validates default values (ensures your defaults aren't broken)
         validate_default=True,
-        # 4. Allows population by alias (e.g. accepting "camelCase" input)
         populate_by_name=True,
         ser_json_timedelta="iso8601",
         ser_json_temporal="iso8601",

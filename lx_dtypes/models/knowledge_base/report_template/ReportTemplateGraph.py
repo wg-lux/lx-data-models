@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import DtypesModel
 
 from .PropertyGraph import PropertyGraph, PropertyGraphEdge, PropertyGraphNode
 from .ReportTemplate import ReportTemplate
@@ -54,7 +56,7 @@ def _tokenize(text: str | None) -> list[str]:
     return [part for part in normalized.split() if part]
 
 
-class ReportTemplateGraphNode(BaseModel):
+class ReportTemplateGraphNode(DtypesModel):
     node_id: str
     node_type: Literal[
         "template",
@@ -72,7 +74,7 @@ class ReportTemplateGraphNode(BaseModel):
         return cast(ReportTemplateGraphNodeDataDict, self.model_dump(mode="python"))
 
 
-class ReportTemplateGraphEdge(BaseModel):
+class ReportTemplateGraphEdge(DtypesModel):
     source_node_id: str
     target_node_id: str
     edge_type: Literal[
@@ -90,7 +92,7 @@ class ReportTemplateGraphEdge(BaseModel):
         return cast(ReportTemplateGraphEdgeDataDict, self.model_dump(mode="python"))
 
 
-class ReportTemplateGraph(BaseModel):
+class ReportTemplateGraph(DtypesModel):
     template_name: str
     examination: str
     start_node_id: str
@@ -102,7 +104,7 @@ class ReportTemplateGraph(BaseModel):
         return cast(ReportTemplateGraphDataDict, self.model_dump(mode="python"))
 
 
-class ReportTemplateStructureIssue(BaseModel):
+class ReportTemplateStructureIssue(DtypesModel):
     code: str
     message: str
     level: Literal["error", "warning"] = "error"
@@ -114,7 +116,7 @@ class ReportTemplateStructureIssue(BaseModel):
         )
 
 
-class ReportTemplateStructureValidationResult(BaseModel):
+class ReportTemplateStructureValidationResult(DtypesModel):
     template_name: str
     ok: bool
     graph: ReportTemplateGraph

@@ -3,7 +3,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal, TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 AnonymizationMediaType = Literal["video", "pdf"]
 AnonymizationStartResult = Literal["video", "pdf"]
@@ -28,8 +30,8 @@ class AnonymizationListItemData(TypedDict):
     updated_at: datetime | None
 
 
-class AnonymizationStatusPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
+class AnonymizationStatusPayload(DtypesModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
 
     media_type: AnonymizationMediaType
     anonymization_status: str
@@ -56,8 +58,8 @@ class AnonymizationStatusPayload(BaseModel):
         return str(value).strip() or None
 
 
-class AnonymizationListItemPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
+class AnonymizationListItemPayload(DtypesModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
 
     id: int = Field(ge=1)
     media_type: AnonymizationMediaType

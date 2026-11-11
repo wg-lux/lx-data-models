@@ -40,6 +40,13 @@ if TYPE_CHECKING:
         SensitiveMetaStateDataDict,
     )
 
+    from .model import (
+        DtypesModel,
+        DtypesRootModel,
+        FrozenContractModel,
+        StrictContractModel,
+    )
+
 _KNOWLEDGE_BASE_EXPORTS = {
     "KB_DDICTS",
     "KB_MODEL_NAMES_LITERAL",
@@ -79,8 +86,17 @@ _META_EXPORTS = {
     "SensitiveMetaStateDataDict",
 }
 
+_POLICY_EXPORTS = {
+    "DtypesModel",
+    "DtypesRootModel",
+    "FrozenContractModel",
+    "StrictContractModel",
+}
+
 
 def __getattr__(name: str) -> Any:
+    if name in _POLICY_EXPORTS:
+        return getattr(import_module("lx_dtypes.models.model"), name)
     if name in _KNOWLEDGE_BASE_EXPORTS:
         module = import_module("lx_dtypes.models.knowledge_base")
         return getattr(module, name)
@@ -90,7 +106,8 @@ def __getattr__(name: str) -> Any:
         return getattr(module, name)
 
     if name in _MAIN_EXPORTS:
-        module = import_module("lx_dtypes.models.main")
+        module_name = "main" if name == "MODELS_DJANGO" else "pydantic_main"
+        module = import_module(f"lx_dtypes.models.{module_name}")
         return getattr(module, name)
 
     if name in _META_EXPORTS:
@@ -101,6 +118,10 @@ def __getattr__(name: str) -> Any:
 
 
 __all__ = [
+    "DtypesModel",
+    "DtypesRootModel",
+    "FrozenContractModel",
+    "StrictContractModel",
     "DDICTS",
     "KB_DDICTS",
     "KB_MODELS",

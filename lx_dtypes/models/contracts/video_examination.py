@@ -4,9 +4,10 @@ from collections.abc import Mapping
 from datetime import date, datetime
 from typing import NotRequired, TypedDict, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
 
 from lx_dtypes.models.contracts.json_types import JsonValue
+from lx_dtypes.models.model import DtypesModel
 
 
 class VideoExaminationCreateData(TypedDict):
@@ -35,33 +36,27 @@ class VideoExaminationListQueryData(TypedDict, total=False):
     examination_id: int
 
 
-class VideoExaminationCreatePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoExaminationCreatePayload(DtypesModel):
     video_id: int = Field(ge=1)
     examination_id: int = Field(ge=1)
     date_start: date | None = None
     date_end: date | None = None
 
 
-class VideoExaminationUpdatePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoExaminationUpdatePayload(DtypesModel):
     examination_id: int | None = Field(default=None, ge=1)
     date_start: date | None = None
     date_end: date | None = None
 
 
-class VideoExaminationFindingPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoExaminationFindingPayload(DtypesModel):
     id: int = Field(ge=1)
     finding_id: int | None = Field(default=None, ge=1)
     finding_name: str | None = None
     created_at: datetime | None = None
 
 
-class VideoExaminationListQueryPayload(BaseModel):
+class VideoExaminationListQueryPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     video_id: int | None = Field(default=None, ge=1)
@@ -76,9 +71,7 @@ class VideoExaminationListQueryPayload(BaseModel):
         return value
 
 
-class VideoExaminationPathPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoExaminationPathPayload(DtypesModel):
     video_id: int = Field(ge=1)
 
 

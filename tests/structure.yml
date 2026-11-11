@@ -11,6 +11,24 @@ boundaries:
 - Use temporary directories for generated artifacts
 - Do not expose fixtures as public package dependencies or include patient data
 entrypoints:
+- name: Model boundary architecture tests
+  file: test_model_boundaries.py
+  purpose: Enforce common model inheritance, test ownership and reviewed dependency exceptions
+- name: Evaluation boundary tests
+  file: unit/lx_dtypes/test_evaluation_boundary.py
+  purpose: Verify identical model rules across contract, KB and ledger parsing and Django-free registry imports
+- name: Isolated route resolver tests
+  file: unit/lx_dtypes/django/api/isolated_routes/test_central_resolver.py
+  purpose: Previously package-local route harness now runs in the normal test tree
+- name: Isolated terminology verification
+  file: test_terminology_verification.py
+  purpose: Run framework-double checks from tests/isolated/terminology in a dedicated subprocess
+- name: Time KB and ledger tests
+  file: unit/lx_dtypes/models/contracts/test_time_reference.py
+  purpose: Validate YAML training packages, exact video PTS references, ledger exports and pinned KB identity
+- name: Time contract tests
+  file: unit/lx_dtypes/models/contracts/test_time.py
+  purpose: Verify exact mixed-clock offsets, timestamp validation and YAML persistence
 - name: Table import vocabulary tests
   file: unit/lx_dtypes/models/interface/test_table_import_vocabulary.py
   purpose: Validate packaged aliases, concept targets and ambiguous header suggestions
@@ -38,6 +56,13 @@ entrypoints:
 - name: Study linkage tests
   file: unit/lx_dtypes/stats/test_study_linkage.py
   purpose: Verify lesion identity, chronology, missing references and longitudinal analysis roles
+- name: Electrical curve tests
+  file: unit/lx_dtypes/stats/test_electrical_curve.py
+  purpose: Verify profile loading and snapshots, activation section status, ledger round trips, KB identity
+    pinning and regression verdicts with fail-loud degenerate designs
+- name: Electrical video alignment tests
+  file: unit/lx_dtypes/models/contracts/test_electrical_video_alignment.py
+  purpose: Verify CFR and VFR windows, drift, decimation, repetition, coverage status and fail-loud invariants
 - name: Study collection contract tests
   file: unit/lx_dtypes/models/contracts/test_study_collection.py
   purpose: Verify persistence provenance, strict boundaries, and observation round trips

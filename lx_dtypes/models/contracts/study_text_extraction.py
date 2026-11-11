@@ -3,7 +3,9 @@
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel, StrictContractModel
 
 from .finding_extraction import ClassificationMention, FindingMention, FindingPresence
 from .knowledge_base import KnowledgeBaseIdentity
@@ -20,18 +22,14 @@ class StudyTextExtractionEvidence(KnowledgeBaseIdentity):
     )
 
 
-class StudyClassificationSuggestion(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
+class StudyClassificationSuggestion(FrozenContractModel):
     classification: str = Field(min_length=1)
     choice: str = Field(min_length=1)
     title: str = Field(min_length=1)
     evidence: list[str]
 
 
-class StudyFindingSuggestion(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class StudyFindingSuggestion(StrictContractModel):
     report: int = Field(gt=0)
     examination: int = Field(gt=0)
     finding: str = Field(min_length=1)
@@ -46,17 +44,13 @@ class StudyFindingSuggestion(BaseModel):
     approved: bool = False
 
 
-class StudyClassificationSelection(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
+class StudyClassificationSelection(FrozenContractModel):
     classification: str = Field(min_length=1)
     choice: str = Field(min_length=1)
 
 
-class StudyFindingApprovalRequest(BaseModel):
+class StudyFindingApprovalRequest(StrictContractModel):
     """Approve one recomputed suggestion with a subset of its classifications."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     report: int = Field(gt=0)
     # JSON transports UUIDs as strings.

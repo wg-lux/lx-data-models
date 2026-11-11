@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
 class ModelMetaCreateFromFileKwargsData(TypedDict, total=False):
@@ -17,9 +19,7 @@ class ModelMetaCreateFromFileKwargsData(TypedDict, total=False):
     description: str
 
 
-class ModelMetaCreateFromFileKwargsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ModelMetaCreateFromFileKwargsPayload(FrozenContractModel):
     activation: str = Field(default="sigmoid", min_length=1)
     mean: str = Field(default="0.45211223,0.27139644,0.19264949", min_length=1)
     std: str = Field(default="0.31418097,0.21088019,0.16059452", min_length=1)
@@ -31,9 +31,7 @@ class ModelMetaCreateFromFileKwargsPayload(BaseModel):
     description: str = ""
 
 
-class ModelMetaCreateFromFilePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ModelMetaCreateFromFilePayload(FrozenContractModel):
     activation: str = Field(default="sigmoid", min_length=1)
     mean: str = Field(default="0.45211223,0.27139644,0.19264949", min_length=1)
     std: str = Field(default="0.31418097,0.21088019,0.16059452", min_length=1)
@@ -45,9 +43,7 @@ class ModelMetaCreateFromFilePayload(BaseModel):
     description: str = ""
 
 
-class ModelMetaInferredDefaultsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ModelMetaInferredDefaultsPayload(FrozenContractModel):
     name: str = Field(min_length=1)
     activation: str = Field(min_length=1)
     mean: tuple[float, float, float]

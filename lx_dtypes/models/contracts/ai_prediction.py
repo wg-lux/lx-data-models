@@ -4,7 +4,9 @@ from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import cast
 
-from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator
+from pydantic import ConfigDict, Field, field_validator
+
+from lx_dtypes.models.model import DtypesRootModel, FrozenContractModel
 
 type JsonPath = str
 type ActivationCallable = Callable[[float], float]
@@ -40,13 +42,8 @@ def _coerce_int(value: object) -> int:
     raise ValueError("value must be an integer")
 
 
-class AiPredictionConfigPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        strict=True,
-        arbitrary_types_allowed=True,
-    )
+class AiPredictionConfigPayload(FrozenContractModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     mean: tuple[float, float, float]
     std: tuple[float, float, float]
@@ -86,24 +83,18 @@ class AiPredictionConfigPayload(BaseModel):
         raise ValueError("axes must contain exactly three integer values")
 
 
-class AiPredictionResultPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AiPredictionResultPayload(FrozenContractModel):
     labels: list[str]
     paths: list[JsonPath]
     predictions: list[list[float]]
 
 
-class AiPredictionSequencePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AiPredictionSequencePayload(FrozenContractModel):
     start: int
     stop: int
 
 
-class AiPredictionPostProcessPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AiPredictionPostProcessPayload(FrozenContractModel):
     predictions: dict[str, list[float]]
     smooth_predictions: dict[str, list[float]]
     binary_predictions: dict[str, list[bool]]
@@ -111,9 +102,7 @@ class AiPredictionPostProcessPayload(BaseModel):
     filtered_sequences: dict[str, list[AiPredictionSequencePayload]]
 
 
-class AiPredictionSerializablePostProcessPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AiPredictionSerializablePostProcessPayload(FrozenContractModel):
     predictions: dict[str, list[float]]
     smooth_predictions: dict[str, list[float]]
     binary_predictions: dict[str, list[bool]]
@@ -121,7 +110,7 @@ class AiPredictionSerializablePostProcessPayload(BaseModel):
     filtered_sequences: dict[str, dict[str, list[int]]]
 
 
-class VideoSegmentsPayload(RootModel[dict[str, list[tuple[int, int]]]]):
+class VideoSegmentsPayload(DtypesRootModel[dict[str, list[tuple[int, int]]]]):
     model_config = ConfigDict(frozen=True, strict=True)
 
     @field_validator("root", mode="before")

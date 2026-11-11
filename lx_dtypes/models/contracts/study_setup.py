@@ -6,7 +6,9 @@ import json
 from hashlib import sha256
 from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import StrictContractModel
 
 from .ai_dataset import AIDataSetCreateContract
 from .cohort_definition import CohortDefinitionFields
@@ -32,9 +34,7 @@ class StudyCohortDefinition(CohortDefinitionFields):
         return self
 
 
-class StudySetupDefinition(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class StudySetupDefinition(StrictContractModel):
     schema_version: Literal["1.0"]
     definition_id: DefinitionId
     definition_version: Annotated[
@@ -79,14 +79,12 @@ class StudySetupDefinition(BaseModel):
         return self
 
 
-class StudySetupImportRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
+class StudySetupImportRequest(StrictContractModel):
     yaml: str = Field(max_length=1_048_576)
     mode: Literal["validate", "dry_run", "import"] = "validate"
 
 
-class StudySetupImportReceipt(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
+class StudySetupImportReceipt(StrictContractModel):
     definition: StudySetupDefinition
     datasets: dict[str, Annotated[int, Field(gt=0)]]
     cohorts: dict[str, Annotated[int, Field(gt=0)]]
@@ -106,8 +104,7 @@ class StudySetupImportReceipt(BaseModel):
         return self
 
 
-class StudySetupImportResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
+class StudySetupImportResult(StrictContractModel):
     status: Literal["planned", "created", "unchanged"]
     definition_id: DefinitionId
     definition_version: str

@@ -4,9 +4,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import ConfigDict, Field, ValidationInfo, field_validator
 
 from lx_dtypes.models.contracts.json_types import JsonNull, JsonValue
+from lx_dtypes.models.model import FrozenContractModel
 
 type FrameSourceMode = Literal["cache", "stream", "auto"]
 
@@ -20,10 +21,10 @@ type VideoFileMetaJsonValue = (
 type VideoFileMetaJsonObject = dict[str, VideoFileMetaJsonValue]
 
 
-class VideoFileIdentityPayload(BaseModel):
+class VideoFileIdentityPayload(FrozenContractModel):
     """Stable identity/reference fields for a VideoFile-like object."""
 
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(extra="ignore")
 
     pk: int | None = Field(default=None, ge=1)
     id: int | None = Field(default=None, ge=1)
@@ -36,10 +37,10 @@ class VideoFileIdentityPayload(BaseModel):
         return value
 
 
-class VideoFileTechnicalMetadataPayload(BaseModel):
+class VideoFileTechnicalMetadataPayload(FrozenContractModel):
     """Technical scalar metadata from VideoFile / ffmpeg / import state."""
 
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(extra="ignore")
 
     fps: float | None = Field(default=None, gt=0)
     duration: float | None = Field(default=None, ge=0)
@@ -50,10 +51,10 @@ class VideoFileTechnicalMetadataPayload(BaseModel):
     frame_dir: str = ""
 
 
-class VideoFileStoragePayload(BaseModel):
+class VideoFileStoragePayload(FrozenContractModel):
     """Storage and stream path metadata that is safe to pass across boundaries."""
 
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(extra="ignore")
 
     storage_mode: str = ""
     raw_streamable_relative_path: str = ""

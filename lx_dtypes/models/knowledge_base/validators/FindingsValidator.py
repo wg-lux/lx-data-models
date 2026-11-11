@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from typing import Literal, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from lx_dtypes.factories import str_unknown_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
@@ -20,6 +20,7 @@ from lx_dtypes.models.knowledge_base.validators.ValueTypes import (
     ValidationParams,
     ValidationScalar,
 )
+from lx_dtypes.models.model import DtypesModel
 
 FindingsValidatorOperator = Literal[
     "exists",
@@ -122,9 +123,7 @@ FindingsValidatorComparatorLiteral = Literal[
 ]
 
 
-class FindingsValidatorConditionClause(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class FindingsValidatorConditionClause(DtypesModel):
     classification: str
     comparator: FindingsValidatorComparatorLiteral = "eq"
     value: ValidationScalar | None = None
@@ -169,15 +168,11 @@ class FindingsValidatorConditionClause(BaseModel):
         return ()
 
 
-class FindingsValidatorRequiredClassification(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class FindingsValidatorRequiredClassification(DtypesModel):
     classification: str
 
 
-class FindingsValidatorCondition(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class FindingsValidatorCondition(DtypesModel):
     any: list[FindingsValidatorConditionClause] = Field(default_factory=list)
     all: list[FindingsValidatorConditionClause] = Field(default_factory=list)
     then_requires: list[ValidatorRequirementReference] = Field(default_factory=list)
@@ -195,9 +190,7 @@ class FindingsValidatorCondition(BaseModel):
         return cast(FindingsValidatorConditionDataDict, self.model_dump(mode="python"))
 
 
-class FindingsValidatorQuery(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class FindingsValidatorQuery(DtypesModel):
     finding: str | None = None
     operator: FindingsValidatorOperatorLiteral = "exists"
     params: ValidationParams = Field(default_factory=dict)

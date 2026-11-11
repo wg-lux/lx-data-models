@@ -4,9 +4,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import ConfigDict, Field, ValidationInfo, field_validator
 
 from lx_dtypes.models.contracts.json_types import JsonNull, JsonValue
+from lx_dtypes.models.model import FrozenContractModel
 
 type FrameSourceMode = Literal["raw", "anonymized"]
 
@@ -19,10 +20,10 @@ type PdfFileMetaJsonObject = dict[str, PdfFileMetaJsonValue]
 type PdfFileId = int | None
 
 
-class PdfFileIdentityPayload(BaseModel):
+class PdfFileIdentityPayload(FrozenContractModel):
     """Stable identity/reference fields for a PDF file-like object."""
 
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(extra="ignore")
 
     pk: int | None = Field(default=None, ge=1)
     id: int | None = Field(default=None, ge=1)
@@ -35,10 +36,10 @@ class PdfFileIdentityPayload(BaseModel):
         return value
 
 
-class PdfFileStoragePayload(BaseModel):
+class PdfFileStoragePayload(FrozenContractModel):
     """Storage and filename metadata that is safe to pass across boundaries."""
 
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(extra="ignore")
 
     storage_mode: str = ""
     raw_pdf_relative_path: str = ""
@@ -47,10 +48,10 @@ class PdfFileStoragePayload(BaseModel):
     is_anonymized: bool = False
 
 
-class PdfFileContextPayload(BaseModel):
+class PdfFileContextPayload(FrozenContractModel):
     """Context identifiers that stay in Django but are passed as stable references."""
 
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(extra="ignore")
 
     pdf_type_id: PdfFileId = None
     center_id: PdfFileId = None
@@ -60,10 +61,10 @@ class PdfFileContextPayload(BaseModel):
     sensitive_meta_id: PdfFileId = None
 
 
-class PdfFileProcessingStatePayload(BaseModel):
+class PdfFileProcessingStatePayload(FrozenContractModel):
     """Workflow flags for report processing and anonymization."""
 
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(extra="ignore")
 
     state_report_processing_required: bool = True
     state_report_processed: bool = False

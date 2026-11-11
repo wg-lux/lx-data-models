@@ -4,9 +4,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TypedDict
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import ConfigDict, field_validator
 
 from lx_dtypes.models.contracts.json_types import JsonValue
+from lx_dtypes.models.model import DtypesModel
 
 
 class VideoReadyForExportData(TypedDict):
@@ -14,8 +15,8 @@ class VideoReadyForExportData(TypedDict):
     processed_file_sha256: str | None
 
 
-class VideoReadyForExportPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class VideoReadyForExportPayload(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     center_key: str | None = None
     processed_file_sha256: str | None = None

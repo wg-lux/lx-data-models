@@ -180,6 +180,10 @@ levels:
       fields: [knowledge_base_module, knowledge_base_version]
       canonical_form: "module@version"
     concepts:
+      TimeReference:
+        fields: [reference_kind, target_kind, examples]
+      ElectricalCurveProfile:
+        fields: [curve_quantities, response_quantities, predictor_quantities, phase_bins, phase_polynomial_degree, min_duration, max_duration, max_sample_gap, min_reference_applications, max_mean_mahalanobis_squared]
       InformationSourceType: {kind: type}
       InformationSource:
         fields: [information_source_types]
@@ -254,6 +258,9 @@ levels:
   - id: 3
     name: "Patient ledger"
     context_concepts:
+      PTimeOffset: [patient_examination, time_reference, knowledge_base_module, knowledge_base_version, evidence]
+      PElectricalApplication: [patient_examination, electrical_curve_profile, knowledge_base_module, knowledge_base_version, measurement_source_sha256, clock_epoch, sample_range, started_at, curve]
+      PElectricalCurveComparison: [patient_examination, electrical_curve_profile, knowledge_base_module, knowledge_base_version, application, reference_applications, result]
       Center: [name, examiners]
       Examiner: [center, person_fields]
       Patient: [center, person_fields]

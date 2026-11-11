@@ -28,6 +28,12 @@ dependencies:
   - MyST
 submodules: []
 contracts:
+- name: Shared model and evaluation boundary
+  doc: guides/cross-layer-validation.md
+- name: Structural model outliers
+  doc: model-boundaries.yml
+- name: Dates, times and offsets
+  doc: guides/dates-and-times.md
 - name: Configured study inference
   doc: guides/study-inference.md
 - name: Standardized CSV exports
@@ -38,10 +44,14 @@ contracts:
   doc: guides/dtypes-package-structure.md
 - name: ePA FHIR compatibility
   doc: guides/epa-fhir-compatibility.md
+- name: Electrosurgical video alignment
+  doc: guides/electrosurgical-video-alignment.md
 tests:
   directory: ../tests
   command: uv run make -C docs html
 
 files:
+- examples/dtypes_packages/time_references
+- examples/dtypes_packages/electrical_curves
 - medication_plan_specification_summary.md
 - german-medication-plan

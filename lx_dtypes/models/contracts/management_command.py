@@ -4,21 +4,22 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
 
 from lx_dtypes.models.contracts.json_types import JsonObject
+from lx_dtypes.models.model import FrozenContractModel
 
 type FrameSegmentReconciliationTrack = Literal["all", "manual", "prediction"]
 
 
-class VerboseManagementCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class VerboseManagementCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     verbose: bool
 
 
-class ModelInputCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class ModelInputCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     dataset_id: int = Field(gt=0)
     annotation_source_scope: str
@@ -45,8 +46,8 @@ class ModelInputCommandOptionsPayload(BaseModel):
         raise ValueError("backbone_checkpoint must be a string")
 
 
-class ModelTrainingResultPayload(BaseModel):
-    model_config = ConfigDict(extra="allow", frozen=True, strict=True)
+class ModelTrainingResultPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="allow")
 
     model_path: str
 
@@ -62,8 +63,8 @@ def validate_model_training_result(value: JsonObject) -> ModelTrainingResultPayl
     return ModelTrainingResultPayload.model_validate(value)
 
 
-class TrainImageMultilabelModelCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class TrainImageMultilabelModelCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     dataset_id: int = Field(gt=0)
     annotation_source_scope: str
@@ -100,8 +101,8 @@ class TrainImageMultilabelModelCommandOptionsPayload(BaseModel):
         raise ValueError("backbone_checkpoint must be a string")
 
 
-class TrainPhiRegionDetectorCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class TrainPhiRegionDetectorCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     dataset_yaml: Path
     output_dir: Path
@@ -140,10 +141,8 @@ class TrainPhiRegionDetectorCommandOptionsPayload(BaseModel):
 type TranscodeVideoQualityMode = Literal["fast", "balanced", "quality"]
 
 
-class TranscodeVideoCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="ignore", frozen=True, strict=True, populate_by_name=True
-    )
+class TranscodeVideoCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     input_dir: str
     output_dir: str
@@ -194,16 +193,14 @@ class TranscodeVideoCommandOptionsPayload(BaseModel):
         raise ValueError("extension must be a string sequence")
 
 
-class ValidateRuntimeStorageContractCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="ignore", frozen=True, strict=True, populate_by_name=True
-    )
+class ValidateRuntimeStorageContractCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     json_output: bool = Field(validation_alias="json", serialization_alias="json")
 
 
-class RuntimeStorageContractPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class RuntimeStorageContractPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     protected_root: str
     data_root: str
@@ -216,8 +213,8 @@ class RuntimeStorageContractPayload(BaseModel):
 type ValidateVideoFileStatus = Literal["accessible", "missing", "corrupted", "unknown"]
 
 
-class ValidateVideoFilesCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class ValidateVideoFilesCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     video_id: int = Field(default=0, ge=0)
     verbose: bool
@@ -233,8 +230,8 @@ class ValidateVideoFilesCommandOptionsPayload(BaseModel):
         raise ValueError("video_id must be an integer")
 
 
-class ValidateVideoFileStatusPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class ValidateVideoFileStatusPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     video_id: int = Field(ge=0)
     video_uuid: str
@@ -244,10 +241,8 @@ class ValidateVideoFileStatusPayload(BaseModel):
     error: str = ""
 
 
-class ReapQuarantineCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="ignore", frozen=True, strict=True, populate_by_name=True
-    )
+class ReapQuarantineCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     older_than_days: int = Field(ge=0)
     dry_run: bool
@@ -255,8 +250,8 @@ class ReapQuarantineCommandOptionsPayload(BaseModel):
     json_output: bool = Field(validation_alias="json", serialization_alias="json")
 
 
-class ReapUploadJobSourcesCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class ReapUploadJobSourcesCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     limit: int = Field(default=0, ge=0)
     repeat_until_empty: bool
@@ -271,10 +266,8 @@ class ReapUploadJobSourcesCommandOptionsPayload(BaseModel):
         raise ValueError("limit must be an integer")
 
 
-class ReconcileFrameSegmentAnnotationsCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="ignore", frozen=True, strict=True, populate_by_name=True
-    )
+class ReconcileFrameSegmentAnnotationsCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     video_ids: tuple[int, ...] = Field(default_factory=tuple)
     segment_ids: tuple[int, ...] = Field(default_factory=tuple)
@@ -306,10 +299,8 @@ class ReconcileFrameSegmentAnnotationsCommandOptionsPayload(BaseModel):
         raise ValueError("annotator must be a string")
 
 
-class ReconcileMediaIntegrityCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="ignore", frozen=True, strict=True, populate_by_name=True
-    )
+class ReconcileMediaIntegrityCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     dry_run: bool
     json_output: bool = Field(validation_alias="json", serialization_alias="json")
@@ -332,8 +323,8 @@ class ReconcileMediaIntegrityCommandOptionsPayload(BaseModel):
         raise ValueError("id options must be lists of integers")
 
 
-class ReconcileSegmentValidationStateCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class ReconcileSegmentValidationStateCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     video_ids: list[int] = Field(default_factory=list)
     queue_cleanup: bool
@@ -348,10 +339,8 @@ class ReconcileSegmentValidationStateCommandOptionsPayload(BaseModel):
         raise ValueError("video_ids must be a list of integer primary keys")
 
 
-class ReconcileVideoFormatsCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="ignore", frozen=True, strict=True, populate_by_name=True
-    )
+class ReconcileVideoFormatsCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     root: list[str] = Field(default_factory=list)
     include_default_roots: bool
@@ -388,16 +377,16 @@ class ReconcileVideoFormatsCommandOptionsPayload(BaseModel):
         raise ValueError("max_files must be an integer")
 
 
-class RefreshAuditLedgerIntegrityCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class RefreshAuditLedgerIntegrityCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     once: bool
     pretty: bool
     fail_on_non_verified: bool
 
 
-class RegisterAiModelCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class RegisterAiModelCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     model_meta_path: str
 
@@ -409,8 +398,8 @@ class RegisterAiModelCommandOptionsPayload(BaseModel):
         raise ValueError("model_meta_path must be a non-empty string")
 
 
-class RegisterAiModelMetaPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class RegisterAiModelMetaPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     name: str
     version: str
@@ -448,16 +437,16 @@ class RegisterAiModelMetaPayload(BaseModel):
         raise ValueError("description must be a string")
 
 
-class SetupEndoregDbCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class SetupEndoregDbCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     skip_ai_setup: bool
     force_recreate: bool
     yaml_only: bool
 
 
-class ShowUrlsCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class ShowUrlsCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     format_style: str = ""
 
@@ -471,8 +460,8 @@ class ShowUrlsCommandOptionsPayload(BaseModel):
         raise ValueError("format_style must be a string")
 
 
-class ShowUrlsRoutePayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class ShowUrlsRoutePayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     url: str = ""
     module: str = ""
@@ -489,14 +478,14 @@ class ShowUrlsRoutePayload(BaseModel):
         return str(value)
 
 
-class ShowUrlsRoutesPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class ShowUrlsRoutesPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     routes: list[ShowUrlsRoutePayload]
 
 
-class StorageManagementCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class StorageManagementCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     dry_run: bool
     force: bool
@@ -508,8 +497,8 @@ class StorageManagementCommandOptionsPayload(BaseModel):
     emergency_threshold: float = Field(ge=0.0, le=100.0)
 
 
-class StorageManagementInfoPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class StorageManagementInfoPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     total_gb: float
     used_gb: float
@@ -520,18 +509,16 @@ class StorageManagementInfoPayload(BaseModel):
     warning: bool
 
 
-class MigrateDataDirCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class MigrateDataDirCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     source_root: str
     dry_run: bool
     manifest_path: str
 
 
-class MigrateMediaStorageCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="ignore", frozen=True, strict=True, populate_by_name=True
-    )
+class MigrateMediaStorageCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     apply: bool
     limit: int | None = None
@@ -565,8 +552,8 @@ class MigrateMediaStorageCommandOptionsPayload(BaseModel):
         raise ValueError("hash_value must be a string")
 
 
-class MigrateVideoStreamableStorageCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class MigrateVideoStreamableStorageCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     video_ids: list[int] = Field(default_factory=list)
     processed_only: bool
@@ -583,10 +570,8 @@ class MigrateVideoStreamableStorageCommandOptionsPayload(BaseModel):
         raise ValueError("video_ids must be a list of integer primary keys")
 
 
-class MigrationMarkEligibleCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="ignore", frozen=True, strict=True, populate_by_name=True
-    )
+class MigrationMarkEligibleCommandOptionsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     apply: bool
     limit: int = Field(default=0, ge=0)

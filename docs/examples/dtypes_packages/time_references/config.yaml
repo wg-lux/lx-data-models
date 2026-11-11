@@ -1,0 +1,8 @@
+name: time_references
+version: "1.0.0"
+description: Synthetic clock reference and training examples without patient data.
+modules: []
+depends_on: []
+data:
+  files:
+    - references.yml

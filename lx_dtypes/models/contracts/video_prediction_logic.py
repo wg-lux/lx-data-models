@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonValue
 
 
-class PredictionSegmentCreatePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, arbitrary_types_allowed=True)
+class PredictionSegmentCreatePayload(DtypesModel):
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
     start_frame_number: int = Field(ge=0)
     end_frame_number: int = Field(ge=0)

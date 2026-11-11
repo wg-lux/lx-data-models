@@ -1,29 +1,30 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from lx_dtypes.models.contracts.json_types import JsonValue
+from lx_dtypes.models.model import FrozenContractModel
 
 # Common configuration shared across your core DTOs
 # Keeps data immutable, strict, and prevents unexpected fields
-core_config = ConfigDict(extra="forbid", frozen=True, strict=True, from_attributes=True)
+core_config = ConfigDict(from_attributes=True)
 
 
-class EventCore(BaseModel):
+class EventCore(FrozenContractModel):
     model_config = core_config
 
     name: str
     description: str | None = None
 
 
-class EventClassificationCore(BaseModel):
+class EventClassificationCore(FrozenContractModel):
     model_config = core_config
 
     name: str
     event_name: str  # Matches your Django natural key approach
 
 
-class EventClassificationChoiceCore(BaseModel):
+class EventClassificationChoiceCore(FrozenContractModel):
     model_config = core_config
 
     name: str

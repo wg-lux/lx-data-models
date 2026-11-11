@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from datetime import date
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class StudyCohortMediaRow(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class StudyCohortMediaRow(FrozenContractModel):
     id: int = Field(ge=1)
     stream_url: str = Field(min_length=1)
     availability: str = Field(min_length=1)
@@ -17,18 +17,14 @@ class StudyCohortReportRow(StudyCohortMediaRow):
     document_type: str
 
 
-class StudyCohortExaminationRow(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class StudyCohortExaminationRow(FrozenContractModel):
     patient_examination_id: int = Field(ge=1)
     examination_name: str
     examination_date: date | None = None
 
 
-class StudyCohortCaseRow(BaseModel):
+class StudyCohortCaseRow(FrozenContractModel):
     """One pseudonymous patient row with all matching examination occurrences."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     # Retained as the latest examination for additive consumer compatibility.
     patient_examination_id: int = Field(ge=1)

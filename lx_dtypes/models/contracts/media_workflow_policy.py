@@ -12,13 +12,15 @@ from datetime import date
 from enum import StrEnum
 from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from pydantic import Field, StringConstraints, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 Sha256Hex = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
 
 
-class _Frozen(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+class _Frozen(FrozenContractModel):
+    pass
 
 
 class AnonymizationValidationAcknowledgement(_Frozen):

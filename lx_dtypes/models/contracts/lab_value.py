@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import Self
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import ConfigDict, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class LabValueNormalRangeBandPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid", frozen=True, strict=True, allow_inf_nan=False
-    )
+class LabValueNormalRangeBandPayload(FrozenContractModel):
+    model_config = ConfigDict(allow_inf_nan=False)
 
     min: float | None = None
     max: float | None = None

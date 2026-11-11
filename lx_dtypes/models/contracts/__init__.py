@@ -137,6 +137,19 @@ if TYPE_CHECKING:
         ExaminationIndicationCore,
     )
     from .examination_time import ExaminationTimeCore, ExaminationTimeTypeCore
+    from .time import (
+        ElectrosurgeryTimestamp,
+        ExaminationTimestamp,
+        PtsTimestamp,
+        TimeOffset,
+        Timestamp,
+    )
+    from .time_reference import (
+        TimeOffsetEvidence,
+        TimeOffsetExample,
+        TimeVideoReference,
+        TimestampKind,
+    )
     from .examination_type import ExaminationTypeCore
     from .export_ready import (
         ReadyForExportResult,
@@ -751,6 +764,15 @@ _EXPORT_MODULES: dict[str, str] = {
     "ExaminationIndicationClassificationCore": "examination_indication",
     "ExaminationIndicationCore": "examination_indication",
     "ExaminationTimeCore": "examination_time",
+    "ElectrosurgeryTimestamp": "time",
+    "ExaminationTimestamp": "time",
+    "PtsTimestamp": "time",
+    "TimeOffset": "time",
+    "TimeOffsetEvidence": "time_reference",
+    "TimeOffsetExample": "time_reference",
+    "TimeVideoReference": "time_reference",
+    "TimestampKind": "time_reference",
+    "Timestamp": "time",
     "ExaminationTimeTypeCore": "examination_time",
     "ExaminationTypeCore": "examination_type",
     "ReadyForExportResult": "export_ready",
@@ -1242,6 +1264,15 @@ __all__ = [
     "ExaminationIndicationCore",
     "ExaminationReportingContext",
     "ExaminationTimeCore",
+    "ElectrosurgeryTimestamp",
+    "ExaminationTimestamp",
+    "PtsTimestamp",
+    "TimeOffset",
+    "TimeOffsetEvidence",
+    "TimeOffsetExample",
+    "TimeVideoReference",
+    "TimestampKind",
+    "Timestamp",
     "ExaminationTimeTypeCore",
     "ExaminationTypeCore",
     "FfmpegActiveStreamThrottleState",

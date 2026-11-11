@@ -3,10 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict
-
 from lx_dtypes.models.contracts.json_types import JsonValue
 from lx_dtypes.models.meta.VideoMeta import VideoRoiBox
+from lx_dtypes.models.model import FrozenContractModel
 
 
 class RoiBoxCore(VideoRoiBox):
@@ -21,15 +20,11 @@ class EndoscopeImageRoiCore(RoiBoxCore):
     image_height: int
 
 
-class EndoscopyProcessorCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class EndoscopyProcessorCore(FrozenContractModel):
     name: str
 
 
-class MaskCallPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MaskCallPayload(FrozenContractModel):
     input_video: Path
     mask_config: RoiBoxCore
     output_video: Path

@@ -4,14 +4,14 @@ import json
 from collections.abc import Mapping
 from typing import Literal, cast
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import field_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonValue
 
 
-class PdfRedactionBox(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class PdfRedactionBox(DtypesModel):
     x: float
     y: float
     width: float
@@ -32,9 +32,7 @@ class PdfRedactionBox(BaseModel):
         return value
 
 
-class PdfRedactionPage(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class PdfRedactionPage(DtypesModel):
     page: int
     boxes: list[PdfRedactionBox]
 
@@ -46,9 +44,7 @@ class PdfRedactionPage(BaseModel):
         return value
 
 
-class PdfRedactionManifest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class PdfRedactionManifest(DtypesModel):
     version: int
     normalized: Literal[True]
     pages: list[PdfRedactionPage]
@@ -70,9 +66,7 @@ class PdfRedactionManifest(BaseModel):
         return value
 
 
-class PdfRedactionRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class PdfRedactionRequest(DtypesModel):
     source_type: Literal["raw", "processed"]
     redaction_manifest: PdfRedactionManifest
     note: str = ""
@@ -121,9 +115,7 @@ class PdfRedactionRequest(BaseModel):
         return value
 
 
-class PdfRedactionResponse(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class PdfRedactionResponse(DtypesModel):
     file_id: int
     revision_id: int
     processed_stream_url: str

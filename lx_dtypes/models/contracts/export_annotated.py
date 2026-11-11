@@ -7,10 +7,11 @@ from pathlib import Path
 from typing import Literal, cast
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from lx_dtypes.models.contracts.json_types import JsonValue
 from lx_dtypes.models.contracts.video_frame_export import export_config
+from lx_dtypes.models.model import DtypesModel
 
 
 def _coerce_int(value: object) -> int:
@@ -30,8 +31,8 @@ def _coerce_int(value: object) -> int:
     raise ValueError("segment ids must be integers")
 
 
-class ExportAnnotatedConfigContract(BaseModel):
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+class ExportAnnotatedConfigContract(DtypesModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     output_path: Path = Path("frames.csv")
     output_dir: Path

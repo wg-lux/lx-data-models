@@ -25,6 +25,11 @@ from lx_dtypes.utils.parser import camel_to_snake
 
 def _complete_kb() -> KnowledgeBase:
     extras: dict[str, dict[str, object]] = {
+        "ElectricalCurveProfile": load_package(
+            Path("docs/examples/dtypes_packages/electrical_curves/config.yaml")
+        )
+        .electrical_curve_profile["synthetic_cut_impedance_response"]
+        .model_dump(exclude={"name", "kb_module_name", "uuid", "created_at"}),
         "ClassificationChoiceDescriptor": {"numeric_min": 0.0, "numeric_max": 1.0},
         "CenterEmployeeList": {
             "examiners": [

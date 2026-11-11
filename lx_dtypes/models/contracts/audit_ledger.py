@@ -5,16 +5,15 @@ import json
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from lx_dtypes.models.contracts.json_types import JsonObject
+from lx_dtypes.models.model import FrozenContractModel
 
 SHA256_HEX_PATTERN = r"^[0-9a-f]{64}$"
 
 
-class AuditLedgerHashPayload(BaseModel):
-    model_config = ConfigDict(frozen=True, strict=True)
-
+class AuditLedgerHashPayload(FrozenContractModel):
     ts: str
     id: str
     uid: str | None = None
@@ -34,9 +33,7 @@ class AuditLedgerHashPayload(BaseModel):
         return hashlib.sha256(self.canonical_json().encode()).hexdigest()
 
 
-class AuditLedgerEntryPayload(BaseModel):
-    model_config = ConfigDict(frozen=True, strict=True)
-
+class AuditLedgerEntryPayload(FrozenContractModel):
     id: UUID
     ts: str
     user_id: str | None = None
@@ -48,9 +45,7 @@ class AuditLedgerEntryPayload(BaseModel):
     hash: str = Field(pattern=SHA256_HEX_PATTERN)
 
 
-class AuditLedgerIntegrityStatusPayload(BaseModel):
-    model_config = ConfigDict(frozen=True, strict=True)
-
+class AuditLedgerIntegrityStatusPayload(FrozenContractModel):
     status: Literal["unknown", "verified", "failed", "error"]
     verified: bool
     checked_at: str | None = None

@@ -13,7 +13,6 @@ from enum import StrEnum
 from typing import Annotated, ClassVar, Literal, Self, cast
 
 from pydantic import (
-    BaseModel,
     BeforeValidator,
     ConfigDict,
     Field,
@@ -26,6 +25,7 @@ from lx_dtypes.models.contracts.reference_metadata import (
     ClassificationNumericalDescriptorDefinition,
     ClassificationSubcategoryDefinition,
 )
+from lx_dtypes.models.model import FrozenContractModel, StrictContractModel
 
 
 def _date(value: object) -> object:
@@ -114,14 +114,13 @@ class ReferenceKind(StrEnum):
     WASTE = "waste"
 
 
-class CatalogIdentity(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+class CatalogIdentity(FrozenContractModel):
     name: str = Field(min_length=1)
     version: int | None = None
 
 
-class CatalogRecordBase(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, allow_inf_nan=False)
+class CatalogRecordBase(StrictContractModel):
+    model_config = ConfigDict(allow_inf_nan=False)
     identity_fields: ClassVar[tuple[str, ...]] = ()
     relation_targets: ClassVar[dict[str, ReferenceKind]] = {}
     many_relations: ClassVar[frozenset[str]] = frozenset()
@@ -1141,8 +1140,7 @@ type ReferenceRecord = Annotated[
 ]
 
 
-class ReferenceCatalogPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
+class ReferenceCatalogPayload(StrictContractModel):
     schema_version: Literal["1.0"] = "1.0"
     records: list[ReferenceRecord] = Field(min_length=1, max_length=10000)
 

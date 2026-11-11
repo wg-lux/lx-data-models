@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class ContraindicationCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ContraindicationCore(FrozenContractModel):
     name: str
     description: str | None = None
 

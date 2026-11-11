@@ -6,15 +6,14 @@ from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import (
-    BaseModel,
     ConfigDict,
     Field,
-    RootModel,
     field_validator,
     model_validator,
 )
 
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta, SensitiveMetaDataDict
+from lx_dtypes.models.model import DtypesModel, DtypesRootModel
 
 FrameCleanerSource = Literal["frame_extraction"]
 FrameObservationSourceTag = Literal[
@@ -47,16 +46,14 @@ class VideoMeta(SensitiveMeta):
         return VideoMetaDataDict
 
 
-class VideoRoiBox(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoRoiBox(DtypesModel):
     x: int = Field(ge=0)
     y: int = Field(ge=0)
     width: int = Field(gt=0)
     height: int = Field(gt=0)
 
 
-class VideoOcrRoi(RootModel[dict[str, VideoRoiBox]]):
+class VideoOcrRoi(DtypesRootModel[dict[str, VideoRoiBox]]):
     @field_validator("root")
     @classmethod
     def require_named_roi(cls, value: dict[str, VideoRoiBox]) -> dict[str, VideoRoiBox]:
@@ -99,7 +96,7 @@ class VideoPhiRegion(VideoRoiBox):
         return self
 
 
-class FrameCleanerAccumulatedMeta(BaseModel):
+class FrameCleanerAccumulatedMeta(DtypesModel):
     """Metadata dictionary initialized and merged inside FrameCleaner."""
 
     model_config = ConfigDict(extra="allow")
@@ -121,10 +118,8 @@ class FrameCleanerAccumulatedMeta(BaseModel):
     source: FrameCleanerSource = "frame_extraction"
 
 
-class FrameObservation(BaseModel):
+class FrameObservation(DtypesModel):
     """Per-sampled-frame observation appended by FrameCleaner."""
-
-    model_config = ConfigDict(extra="forbid")
 
     frame_number: int | None = Field(default=None, ge=0)
     frame_id: int | None = Field(default=None, ge=0)
@@ -149,10 +144,8 @@ class FrameObservation(BaseModel):
         return self
 
 
-class FrameCollectionItem(BaseModel):
+class FrameCollectionItem(DtypesModel):
     """OCR frame candidate kept for video-level LLM enrichment."""
-
-    model_config = ConfigDict(extra="forbid")
 
     frame_id: int | None = Field(default=None, ge=0)
     frame_number: int | None = Field(default=None, ge=0)
@@ -173,10 +166,8 @@ class FrameCollectionItem(BaseModel):
         return self
 
 
-class FrameAnalysisResult(BaseModel):
+class FrameAnalysisResult(DtypesModel):
     """Return contract for FrameCleaner._analyze_video_frames."""
-
-    model_config = ConfigDict(extra="forbid")
 
     accumulated: FrameCleanerAccumulatedMeta
     sensitive_idx: list[int] = Field(default_factory=list)
@@ -192,10 +183,8 @@ class FrameAnalysisResult(BaseModel):
         return value
 
 
-class FrameProcessResult(BaseModel):
+class FrameProcessResult(DtypesModel):
     """Strict result returned by frame-level OCR and sensitivity processing."""
-
-    model_config = ConfigDict(extra="forbid")
 
     is_sensitive: bool
     metadata: dict[str, Any] = Field(default_factory=dict)
@@ -211,7 +200,7 @@ class FrameProcessResult(BaseModel):
         )
 
 
-class VideoFormatProbe(BaseModel):
+class VideoFormatProbe(DtypesModel):
     """Subset of video_utils.detect_video_format consumed by FrameCleaner."""
 
     model_config = ConfigDict(extra="allow")
@@ -225,10 +214,8 @@ class VideoFormatProbe(BaseModel):
     can_stream_copy: bool | None = None
 
 
-class FrameRemovalPlan(BaseModel):
+class FrameRemovalPlan(DtypesModel):
     """Validated frame-removal execution plan."""
-
-    model_config = ConfigDict(extra="forbid")
 
     original_video: Path
     output_video: Path
@@ -250,19 +237,15 @@ class FrameRemovalPlan(BaseModel):
         return self.use_named_pipe and len(self.frames_to_remove) < frame_count * 0.1
 
 
-class FrameRemovalFilterArgs(BaseModel):
+class FrameRemovalFilterArgs(DtypesModel):
     """FFmpeg filter args and temporary filter scripts."""
-
-    model_config = ConfigDict(extra="forbid")
 
     vf_args: list[str] = Field(default_factory=list)
     af_args: list[str] = Field(default_factory=list)
     filter_script_paths: list[Path] = Field(default_factory=list)
 
 
-class VideoAnonymizerProvenance(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoAnonymizerProvenance(DtypesModel):
     schema_version: str = "1.0"
     anonymizer_version: str = "unknown"
     detector_sources: list[str] = Field(default_factory=list)
@@ -287,28 +270,26 @@ class VideoMetadataAnonymizationState(str, Enum):
 type VideoMetadataStatus = VideoMetadataAnonymizationState | Literal["BLANK"]
 
 
-class VideoFpsDetailsPayload(BaseModel):
+class VideoFpsDetailsPayload(DtypesModel):
     """Validated details payload for an FPS lookup failure."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     video_id: int = Field(ge=1)
     reason: str = Field(min_length=1)
 
 
-class VideoFpsErrorPayload(BaseModel):
+class VideoFpsErrorPayload(DtypesModel):
     """Validated error payload for the video FPS endpoint."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     error: str = Field(min_length=1)
     details: VideoFpsDetailsPayload
 
 
-class VideoFpsStatsPayload(BaseModel):
+class VideoFpsStatsPayload(DtypesModel):
     """Validated success payload for the video FPS endpoint."""
-
-    model_config = ConfigDict(extra="forbid")
 
     video_id: int = Field(ge=1)
     fps: float = Field(gt=0.0)
@@ -317,10 +298,10 @@ class VideoFpsStatsPayload(BaseModel):
 type VideoFpsPayload = VideoFpsStatsPayload | VideoFpsErrorPayload
 
 
-class VideoMetadataStatsPayload(BaseModel):
+class VideoMetadataStatsPayload(DtypesModel):
     """Validated response payload for the video metadata statistics endpoint."""
 
-    model_config = ConfigDict(extra="forbid", use_enum_values=True)
+    model_config = ConfigDict(use_enum_values=True)
 
     id: int = Field(ge=1)
     original_file_name: str = Field(min_length=1)

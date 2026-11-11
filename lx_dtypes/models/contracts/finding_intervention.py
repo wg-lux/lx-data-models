@@ -1,18 +1,14 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class FindingInterventionCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FindingInterventionCore(FrozenContractModel):
     name: str
     description: str | None = None
 
 
-class FindingInterventionTypeCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FindingInterventionTypeCore(FrozenContractModel):
     name: str
     description: str | None = None
 

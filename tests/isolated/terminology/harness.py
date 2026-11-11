@@ -87,15 +87,11 @@ module("ninja.files", UploadedFile=type("UploadedFile", (), {}))
 # This request DTO is imported by the findings module but not exercised here.
 module("lx_dtypes.models.ledger.p_examination.Pydantic", PExamination=BaseModel)
 
-from lx_dtypes.models.interface.KnowledgeBaseResolver import (
-    clear_knowledge_base_resolver_caches,
-)
-from lx_dtypes.terminology import terminology_loader as central
-from lx_dtypes.terminology.terminology_service import TerminologyService
-
 
 @pytest.fixture(scope="session")
 def seed(tmp_path_factory):
+    from lx_dtypes.terminology.terminology_service import TerminologyService
+
     root = tmp_path_factory.mktemp("real_lxdm_seed") / "terminology"
     service = TerminologyService(root / "registry.json")
     service.provision()
@@ -105,6 +101,11 @@ def seed(tmp_path_factory):
 @pytest.fixture
 def storage(seed, tmp_path, monkeypatch):
     import shutil
+
+    from lx_dtypes.models.interface.KnowledgeBaseResolver import (
+        clear_knowledge_base_resolver_caches,
+    )
+    from lx_dtypes.terminology import terminology_loader as central
 
     root = tmp_path / "runtime"
     shutil.copytree(seed, root)

@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import cast
 
-from pydantic import ConfigDict, RootModel, field_validator
+from pydantic import ConfigDict, field_validator
+
+from lx_dtypes.models.model import DtypesRootModel
 
 from .json_types import JsonNull, JsonValue
 
@@ -12,7 +14,7 @@ type VideoTextMetaValue = (
 )
 
 
-class VideoTextMetaPayload(RootModel[dict[str, VideoTextMetaValue]]):
+class VideoTextMetaPayload(DtypesRootModel[dict[str, VideoTextMetaValue]]):
     model_config = ConfigDict(frozen=True, strict=True)
 
     @field_validator("root", mode="before")

@@ -11,26 +11,27 @@ from pathlib import Path, PurePosixPath
 from typing import Literal, Self
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from lx_dtypes.models.interface.data_roots import module_search_root
+from lx_dtypes.models.model import DtypesModel
 
 BUILTIN_KNOWLEDGE_BASE_PROVIDER = "lx_dtypes.builtin"
 RESOURCE_ANCHOR = "lx_dtypes"
 CATALOG_RESOURCE = "data/catalog.json"
 
 
-class _PackagedModuleIdentity(BaseModel):
+class _PackagedModuleIdentity(DtypesModel):
     model_config = ConfigDict(extra="ignore", frozen=True)
 
     name: str = Field(min_length=1)
     version: str = Field(min_length=1)
 
 
-class PackagedKnowledgeBase(BaseModel):
+class PackagedKnowledgeBase(DtypesModel):
     """Identity and integrity metadata for one packaged knowledge base."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    model_config = ConfigDict(frozen=True)
 
     module_name: str = Field(min_length=1)
     version: str = Field(min_length=1)
@@ -101,8 +102,8 @@ class PackagedKnowledgeBase(BaseModel):
         return module_search_root(module_resource / "config.yaml")
 
 
-class PackagedKnowledgeBaseCatalog(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+class PackagedKnowledgeBaseCatalog(DtypesModel):
+    model_config = ConfigDict(frozen=True)
 
     schema_version: Literal[1]
     knowledge_bases: tuple[PackagedKnowledgeBase, ...]

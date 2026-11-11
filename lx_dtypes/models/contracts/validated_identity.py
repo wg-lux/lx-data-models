@@ -2,16 +2,15 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from lx_dtypes.models.contracts.json_types import JsonObject
+from lx_dtypes.models.model import FrozenContractModel
 
 MediaType = Literal["video", "pdf"]
 
 
-class ValidatedIdentityPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-
+class ValidatedIdentityPayload(FrozenContractModel):
     source: str = Field(min_length=1)
     media_type: MediaType
     media_pk: str = Field(min_length=1)

@@ -1,37 +1,28 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from lx_dtypes.models.contracts.text_anonymization import LLMMetadataPayload
+from lx_dtypes.models.model import StrictContractModel
 
 
-class LLMModelEntryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMModelEntryPayload(StrictContractModel):
     name: str
 
 
-class LLMModelCatalogEntryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMModelCatalogEntryPayload(StrictContractModel):
     id: str
 
 
-class LLMOllamaModelsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMOllamaModelsPayload(StrictContractModel):
     models: list[LLMModelEntryPayload] = Field(default_factory=list)
 
 
-class LLMVllmModelsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMVllmModelsPayload(StrictContractModel):
     data: list[LLMModelCatalogEntryPayload] = Field(default_factory=list)
 
 
-class LLMMetadataCacheStatsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMMetadataCacheStatsPayload(StrictContractModel):
     hit_count: int
     miss_count: int
     hit_rate: float
@@ -39,17 +30,15 @@ class LLMMetadataCacheStatsPayload(BaseModel):
     max_size: int
 
 
-class LLMModelInfoPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMModelInfoPayload(StrictContractModel):
     current_model: str | None = None
     available_models: list[str] = Field(default_factory=list)
     total_models: int = 0
     cache_stats: LLMMetadataCacheStatsPayload | None = None
 
 
-class LLMFrameDataPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True)
+class LLMFrameDataPayload(StrictContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     frame_index: int = 0
     timestamp: float = 0.0
@@ -71,9 +60,7 @@ class LLMFrameDataPayload(BaseModel):
         return fallback
 
 
-class LLMFrameContextPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMFrameContextPayload(StrictContractModel):
     total_frames: int = 0
     text_frames: int = 0
     quality_scores: list[float] = Field(default_factory=list)
@@ -81,17 +68,15 @@ class LLMFrameContextPayload(BaseModel):
     frame_types: dict[str, int] = Field(default_factory=dict)
 
 
-class LLMTextTimelineEntryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class LLMTextTimelineEntryPayload(StrictContractModel):
     frame_index: int
     timestamp: float
     text_snippet: str
     confidence: float = Field(ge=0.0, le=1.0)
 
 
-class LLMTemporalAnalysisPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True)
+class LLMTemporalAnalysisPayload(StrictContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     duration_analysis: dict[str, float] = Field(default_factory=dict)
     text_appearance_timeline: list[LLMTextTimelineEntryPayload] = Field(
@@ -101,8 +86,8 @@ class LLMTemporalAnalysisPayload(BaseModel):
     change_points: list[int] = Field(default_factory=list)
 
 
-class LLMEnrichedMetadataPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True)
+class LLMEnrichedMetadataPayload(StrictContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     llm_extracted: LLMMetadataPayload = Field(default_factory=LLMMetadataPayload)
     frame_context: LLMFrameContextPayload = Field(
@@ -115,8 +100,8 @@ class LLMEnrichedMetadataPayload(BaseModel):
     source_frames: list[LLMFrameDataPayload] = Field(default_factory=list)
 
 
-class LLMEvaluationResultPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", strict=True)
+class LLMEvaluationResultPayload(StrictContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     data_sources_used: list[str] = Field(default_factory=list)
     confidence_comparison: dict[str, float] = Field(default_factory=dict)

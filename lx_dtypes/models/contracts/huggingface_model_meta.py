@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic import ConfigDict, Field, ValidationError, field_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 type HuggingFaceModelMetaCommandValue = bool | int | str | None
 
@@ -16,13 +18,8 @@ class HuggingFaceModelMetaCommandData(TypedDict, total=False):
     labelset_version: int | None
 
 
-class HuggingFaceModelMetaCommandPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        str_strip_whitespace=True,
-        strict=True,
-    )
+class HuggingFaceModelMetaCommandPayload(FrozenContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     model_id: str = Field(min_length=1)
     model_name: str = Field(min_length=1)

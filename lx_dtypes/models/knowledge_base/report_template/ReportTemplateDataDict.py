@@ -1,11 +1,10 @@
 import datetime
-from typing import Literal, NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict import (
     KnowledgebaseBaseModelDataDict,
 )
-
-ReportVerbosity = Literal["short", "standard", "detailed"]
+from lx_dtypes.models.contracts.reporting_types import ReportVerbosity
 
 
 class ReportTemplateValidatorsDataDict(TypedDict):

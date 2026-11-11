@@ -4,13 +4,13 @@ from collections.abc import Mapping
 from typing import NotRequired, TypedDict, cast
 
 from pydantic import (
-    BaseModel,
     ConfigDict,
     Field,
-    RootModel,
     field_validator,
     model_validator,
 )
+
+from lx_dtypes.models.model import DtypesModel, DtypesRootModel
 
 from .json_types import JsonObject, JsonValue
 
@@ -52,8 +52,8 @@ class FrameBoxAnnotationBulkEnvelopeData(TypedDict, total=False):
     annotations: list[JsonObject]
 
 
-class FrameAnnotationBulkItemPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class FrameAnnotationBulkItemPayload(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     frame_id: int = Field(ge=1)
     label_id: int | None = Field(default=None, ge=1)
@@ -83,16 +83,14 @@ class FrameAnnotationBulkItemPayload(BaseModel):
         return self
 
 
-class FrameAnnotationBulkEnvelopePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class FrameAnnotationBulkEnvelopePayload(DtypesModel):
     video_id: int | None = Field(default=None, ge=1)
     ai_dataset_id: int | None = Field(default=None, ge=1)
     annotations: list[FrameAnnotationBulkItemPayload]
 
 
-class FrameAnnotationSkipPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class FrameAnnotationSkipPayload(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     frame_id: int = Field(ge=1)
     video_id: int | None = Field(default=None, ge=1)
@@ -132,8 +130,8 @@ class FrameBoxAnnotationBulkItemPayload(FrameAnnotationBulkItemPayload):
         return self
 
 
-class FrameBoxAnnotationBulkEnvelopePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class FrameBoxAnnotationBulkEnvelopePayload(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     frame_id: int | None = Field(default=None, ge=1)
     video_id: int | None = Field(default=None, ge=1)
@@ -221,7 +219,7 @@ class FrameBoxAnnotationBulkEnvelopePayload(BaseModel):
         return self.information_source_name or self.information_source
 
 
-class FrameAnnotationPayloadMapping(RootModel[JsonObject]):
+class FrameAnnotationPayloadMapping(DtypesRootModel[JsonObject]):
     model_config = ConfigDict(frozen=True)
 
     @field_validator("root", mode="before")

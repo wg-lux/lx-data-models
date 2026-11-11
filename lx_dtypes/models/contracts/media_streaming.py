@@ -3,7 +3,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal, NotRequired, Self, TypedDict, cast
 
-from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt, model_validator
+from pydantic import ConfigDict, Field, NonNegativeInt, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 from .json_types import JsonObject
 
@@ -12,9 +14,7 @@ type MediaStreamFileKind = Literal["processed", "raw"]
 type StreamThrottleMode = Literal["normal", "streaming"]
 
 
-class ByteRange(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ByteRange(FrozenContractModel):
     start: int = Field(ge=0)
     end: int = Field(ge=0)
 
@@ -34,13 +34,8 @@ class MediaOperationLeaseSummaryPayload(TypedDict):
     expires_at: datetime
 
 
-class MediaOperationLeaseSummary(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        str_strip_whitespace=True,
-        strict=True,
-    )
+class MediaOperationLeaseSummary(FrozenContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     lease_type: str
     expires_at: datetime
@@ -54,9 +49,7 @@ class FfmpegStreamThrottleStatePayload(TypedDict):
     next_stream_lease_expiry: NotRequired[str]
 
 
-class FfmpegStreamThrottleState(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FfmpegStreamThrottleState(FrozenContractModel):
     mode: StreamThrottleMode
     active_stream_leases: NonNegativeInt
     expired_leases: NonNegativeInt
@@ -67,8 +60,8 @@ class FfmpegActiveStreamThrottleState(FfmpegStreamThrottleState):
     next_stream_lease_expiry: datetime
 
 
-class FfmpegStreamProbeEntry(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class FfmpegStreamProbeEntry(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     codec_type: str = Field(min_length=1)
     codec_name: str = ""
@@ -80,8 +73,8 @@ class FfmpegStreamProbeEntry(BaseModel):
     r_frame_rate: str | None = None
 
 
-class FfmpegStreamInfo(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class FfmpegStreamInfo(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     streams: list[FfmpegStreamProbeEntry] = Field(min_length=1)
 

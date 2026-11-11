@@ -3,7 +3,9 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel, StrictContractModel
 
 
 class AIDataSetTargetFrameBucket(str, Enum):
@@ -15,16 +17,12 @@ class AIDataSetTargetFrameBucket(str, Enum):
         return self.value
 
 
-class AIDataSetFrameBucketCount(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AIDataSetFrameBucketCount(FrozenContractModel):
     bucket: AIDataSetTargetFrameBucket
     frame_count: int = 0
 
 
-class AIDataSetLabelDistributionEntry(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class AIDataSetLabelDistributionEntry(StrictContractModel):
     label_id: int
     label_name: str
     frame_positive: int = 0
@@ -33,17 +31,13 @@ class AIDataSetLabelDistributionEntry(BaseModel):
     total: int = 0
 
 
-class AIDataSetLabelFrameBucketCount(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AIDataSetLabelFrameBucketCount(FrozenContractModel):
     label_id: int
     label_name: str
     frame_count: int = 0
 
 
-class AIDataSetFrameBucketSummary(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AIDataSetFrameBucketSummary(FrozenContractModel):
     image_annotation_count: int = 0
     video_annotation_count: int = 0
     annotation_frame_count: int = 0
@@ -53,9 +47,7 @@ class AIDataSetFrameBucketSummary(BaseModel):
     label_count: int = 0
 
 
-class AIDataSetFrameBucketDistribution(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AIDataSetFrameBucketDistribution(FrozenContractModel):
     schema_version: str = "1.0"
     dataset_id: int
     name: str | None = None

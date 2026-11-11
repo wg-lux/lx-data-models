@@ -1,6 +1,6 @@
 from typing import Literal, Self
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import Field, model_validator
 
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
@@ -11,9 +11,10 @@ from lx_dtypes.models.knowledge_base.report_template.ReportFinding import (
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateSectionDataDict import (
     ReportTemplateSectionDataDict,
 )
+from lx_dtypes.models.model import DtypesModel
 
 
-class ReportTemplateSectionField(BaseModel):
+class ReportTemplateSectionField(DtypesModel):
     key: str
     required: bool = False
     label: str | None = None

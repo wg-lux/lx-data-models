@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 from .json_types import JsonValue
 
@@ -29,8 +31,8 @@ def _normalize_group_paths(group_paths: list[str]) -> list[str]:
     return normalized_groups
 
 
-class KeycloakRoleContainerPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class KeycloakRoleContainerPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     roles: list[str] = Field(default_factory=list)
 
@@ -40,8 +42,8 @@ class KeycloakRoleContainerPayload(BaseModel):
         return _normalize_role_names(value)
 
 
-class KeycloakClaimsPayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class KeycloakClaimsPayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     preferred_username: str = ""
     sub: str = ""
@@ -102,7 +104,7 @@ class KeycloakClaimsPayload(BaseModel):
         return roles
 
 
-class AuthzRouteLookupPayload(BaseModel):
+class AuthzRouteLookupPayload(FrozenContractModel):
     """
     Normalized route/method lookup payload for authz policy checks.
 
@@ -111,7 +113,7 @@ class AuthzRouteLookupPayload(BaseModel):
     unavailable.
     """
 
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+    model_config = ConfigDict(extra="ignore")
 
     route_name: str = ""
     method: str = ""
@@ -127,8 +129,8 @@ class AuthzRouteLookupPayload(BaseModel):
         return value.strip().upper()
 
 
-class KeycloakTokenResponsePayload(BaseModel):
-    model_config = ConfigDict(extra="ignore", frozen=True, strict=True)
+class KeycloakTokenResponsePayload(FrozenContractModel):
+    model_config = ConfigDict(extra="ignore")
 
     access_token: str = Field(min_length=1)
     refresh_token: str = ""

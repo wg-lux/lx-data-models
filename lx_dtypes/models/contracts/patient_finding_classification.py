@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TypedDict
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, PositiveInt
+from pydantic import AliasChoices, Field, PositiveInt
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
 class PatientFindingClassificationCreateData(TypedDict):
@@ -12,14 +14,12 @@ class PatientFindingClassificationCreateData(TypedDict):
     classification_choice_id: int
 
 
-class PatientFindingClassificationCreatePayload(BaseModel):
+class PatientFindingClassificationCreatePayload(FrozenContractModel):
     """Create payload for patient finding classification links.
 
     The canonical lx_dtypes finding route names are ``classification`` and
     ``choice``. Legacy endoreg REST callers may still send the ``*_id`` names.
     """
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     patient_finding: PositiveInt = Field(
         validation_alias=AliasChoices("patient_finding", "patient_finding_id"),

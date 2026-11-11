@@ -1,0 +1,419 @@
+version: 1
+owner: lx_dtypes maintainers
+canonical_topic: Shared model policies, evaluation direction and explicit architectural exceptions
+scope: Every package-owned Pydantic declaration under lx_dtypes; framework adapters are listed separately.
+rules:
+  source_of_truth: lx_dtypes/models/model.py
+  default: DtypesModel rejects unknown fields. StrictContractModel also rejects coercion; FrozenContractModel
+    also rejects assignment.
+  root_values: DtypesRootModel validates its declared root type; mapping keys are data, not extra object
+    fields.
+  local_invariants: Model field and cross-field invariants stay on the owning models. Existing per-model
+    strictness, mutability and serialization settings are retained.
+  evaluation: lx_dtypes.evaluation parses Python or JSON through the owning models, delegates semantic
+    rules and returns localized value-free findings. It performs no persistence.
+  dependency_direction: Evaluation depends on contracts. Contracts may depend on runtime engines only
+    through the exact reviewed exceptions below.
+  registries: Pydantic registry definitions have one owner; Django aggregation imports those definitions
+    and supplies ORM adapters only on request.
+  test_ownership: All executable tests belong under tests/, including isolated API harnesses.
+verification: uv run python scripts/lint_model_boundaries.py
+extra_field_exceptions:
+- path: lx_dtypes/django/api/report_template_builder.py
+  policy: ignore
+  models:
+  - ReportTemplateBuilderSection
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/knowledge_base_registry.py
+  policy: allow
+  models:
+  - RegistryEntry
+  - RegistryPayload
+  reason: Registry envelopes preserve forward-compatible artifact metadata without treating it as clinical
+    terminology.
+- path: lx_dtypes/knowledge_bases.py
+  policy: ignore
+  models:
+  - _PackagedModuleIdentity
+  reason: Packaged identity discovery projects identity fields from richer configuration documents.
+- path: lx_dtypes/models/contracts/ai_model.py
+  policy: ignore
+  models:
+  - AiModelSerializerOutputPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/assessment.py
+  policy: ignore
+  models:
+  - AssessmentRecord
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/authz.py
+  policy: ignore
+  models:
+  - AuthzRouteLookupPayload
+  - KeycloakClaimsPayload
+  - KeycloakRoleContainerPayload
+  - KeycloakTokenResponsePayload
+  reason: Identity-provider and route projections intentionally discard fields outside the selected authorization
+    contract.
+- path: lx_dtypes/models/contracts/fhir_clinical.py
+  policy: allow
+  models:
+  - FhirModel
+  reason: FHIR extension fields must survive round trips; the shared FHIR base keeps its explicit extension
+    policy.
+- path: lx_dtypes/models/contracts/hub_ingest.py
+  policy: allow
+  models:
+  - UploadProvenancePayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/legacy_data_import.py
+  policy: ignore
+  models:
+  - LegacyImageImportRowPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/llm_extractor.py
+  policy: ignore
+  models:
+  - LLMEnrichedMetadataPayload
+  - LLMEvaluationResultPayload
+  - LLMFrameDataPayload
+  - LLMTemporalAnalysisPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/management_command.py
+  policy: ignore
+  models:
+  - MigrateDataDirCommandOptionsPayload
+  - MigrateMediaStorageCommandOptionsPayload
+  - MigrateVideoStreamableStorageCommandOptionsPayload
+  - MigrationMarkEligibleCommandOptionsPayload
+  - ModelInputCommandOptionsPayload
+  - ReapQuarantineCommandOptionsPayload
+  - ReapUploadJobSourcesCommandOptionsPayload
+  - ReconcileFrameSegmentAnnotationsCommandOptionsPayload
+  - ReconcileMediaIntegrityCommandOptionsPayload
+  - ReconcileSegmentValidationStateCommandOptionsPayload
+  - ReconcileVideoFormatsCommandOptionsPayload
+  - RefreshAuditLedgerIntegrityCommandOptionsPayload
+  - RegisterAiModelCommandOptionsPayload
+  - RegisterAiModelMetaPayload
+  - RuntimeStorageContractPayload
+  - SetupEndoregDbCommandOptionsPayload
+  - ShowUrlsCommandOptionsPayload
+  - ShowUrlsRoutePayload
+  - ShowUrlsRoutesPayload
+  - StorageManagementCommandOptionsPayload
+  - StorageManagementInfoPayload
+  - TrainImageMultilabelModelCommandOptionsPayload
+  - TrainPhiRegionDetectorCommandOptionsPayload
+  - TranscodeVideoCommandOptionsPayload
+  - ValidateRuntimeStorageContractCommandOptionsPayload
+  - ValidateVideoFileStatusPayload
+  - ValidateVideoFilesCommandOptionsPayload
+  - VerboseManagementCommandOptionsPayload
+  reason: Legacy Django command projections ignore unrelated command options; training-result metadata
+    is extensible.
+- path: lx_dtypes/models/contracts/management_command.py
+  policy: allow
+  models:
+  - ModelTrainingResultPayload
+  reason: Legacy Django command projections ignore unrelated command options; training-result metadata
+    is extensible.
+- path: lx_dtypes/models/contracts/media_streaming.py
+  policy: ignore
+  models:
+  - FfmpegStreamInfo
+  - FfmpegStreamProbeEntry
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/patient_examination_report.py
+  policy: ignore
+  models:
+  - PatientExaminationReportMakeReportPayload
+  - PatientExaminationReportSubmissionPayload
+  - ReportSegmentFrameSelectionPayload
+  - SegmentFrameSelectorQueryPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/pdf_file.py
+  policy: ignore
+  models:
+  - PdfFileContextPayload
+  - PdfFileIdentityPayload
+  - PdfFilePayload
+  - PdfFileProcessingStatePayload
+  - PdfFileStoragePayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/text_anonymization.py
+  policy: ignore
+  models:
+  - LLMMetadataPayload
+  - TextAnonymizationMeta
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_ai_labels.py
+  policy: ignore
+  models:
+  - VideoAiLabelNamePayload
+  - VideoAiLabelRenamePayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_ai_labels.py
+  policy: allow
+  models:
+  - VideoAiRerunPredictionRequestPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_correction.py
+  policy: ignore
+  models:
+  - VideoCorrectionApplyMaskPayload
+  - VideoCorrectionFrameRemovalPayload
+  - VideoCorrectionRoiPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_examination.py
+  policy: ignore
+  models:
+  - VideoExaminationListQueryPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_export.py
+  policy: ignore
+  models:
+  - VideoAnnotationExportRequestPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_file.py
+  policy: ignore
+  models:
+  - VideoFileIdentityPayload
+  - VideoFilePayload
+  - VideoFileStoragePayload
+  - VideoFileTechnicalMetadataPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_frame_box_annotations.py
+  policy: ignore
+  models:
+  - VideoPhiFrameObservationPayload
+  - VideoPhiRegionPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_reimport.py
+  policy: allow
+  models:
+  - VideoReimportApiResponsePayload
+  - VideoReimportRequestPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_segments.py
+  policy: ignore
+  models:
+  - SegmentAnnotationEnsurePayload
+  - SegmentAnnotationInput
+  - SegmentAnnotationMetadataInput
+  - SegmentBlackenOutsidePayload
+  - SegmentBulkValidationItem
+  - SegmentBulkValidationPayload
+  - SegmentListQuery
+  - SegmentPredictionImportItem
+  - SegmentPredictionImportPayload
+  - SegmentValidationPayload
+  - SegmentValidationStatusPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_segments.py
+  policy: allow
+  models:
+  - SegmentCrudPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/contracts/video_temporal_inference.py
+  policy: ignore
+  models:
+  - TemporalInferenceHistoryConfigPayload
+  - TemporalInferenceHistoryResultPayload
+  reason: Retained explicit projection/extension behavior of the existing wire contract. New canonical
+    records use closed model profiles.
+- path: lx_dtypes/models/meta/ReportMeta.py
+  policy: allow
+  models:
+  - ReportCropInfo
+  - ReportReaderFlags
+  reason: Provider metadata extensions are retained in the declared metadata envelopes.
+- path: lx_dtypes/models/meta/VideoMeta.py
+  policy: allow
+  models:
+  - FrameCleanerAccumulatedMeta
+  - VideoFormatProbe
+  - VideoMeta
+  reason: Decoder and probe metadata retain provider-specific fields in their declared extension envelopes.
+contract_runtime_dependencies:
+- path: lx_dtypes/models/contracts/aidataset_export.py
+  dependencies:
+  - lx_dtypes.models.ledger.p_video.Pydantic
+  reason: Legacy dataset envelopes embed ledger video records. Preserve the existing wire shape; standalone
+    media contracts are preferred for new envelopes.
+- path: lx_dtypes/models/contracts/electrical_video_alignment.py
+  dependencies:
+  - lx_dtypes.evaluation.electrical
+  reason: Public legacy functions delegate lazily to evaluation.electrical; the algorithm has one implementation
+    and model imports remain independent.
+- path: lx_dtypes/models/contracts/examination_revision.py
+  dependencies:
+  - lx_dtypes.models.ledger.medical.Write
+  reason: Revision payloads reuse existing medical write DTOs. These shapes are still owned under ledger/medical/Write.py.
+- path: lx_dtypes/models/contracts/package_snapshot.py
+  dependencies:
+  - lx_dtypes.models.interface.KnowledgeBase
+  - lx_dtypes.models.interface.KnowledgeBaseConfig
+  - lx_dtypes.models.knowledge_base.pydantic_main
+  - lx_dtypes.models.knowledge_base.report_template.TemplateReadiness
+  reason: Snapshot digest, graph closure and published-template checks restore runtime KBs. Moving these
+    checks requires a versioned persistence-contract change.
+- path: lx_dtypes/models/contracts/study_exchange.py
+  dependencies:
+  - lx_dtypes.stats.study
+  - lx_dtypes.validation
+  reason: The current wire contract recomputes stored assessments and study rules during validation. Keep
+    these fail-closed checks until a versioned exchange boundary separates them.
+- path: lx_dtypes/models/contracts/table_import.py
+  dependencies:
+  - lx_dtypes.models.knowledge_base.classification_choice_descriptor.ClassificationChoiceDescriptor
+  - lx_dtypes.models.knowledge_base.pydantic_main
+  reason: Mappings derive model names and descriptor constraints from the canonical KB registry and definitions;
+    no second terminology schema is maintained.
+framework_adapters:
+- path: lx_dtypes/django/api/findings_routes.py
+  base: ninja.Schema
+  models:
+  - PatientFindingClassificationInput
+  - PatientFindingClassificationsRequest
+  - PatientFindingCreateRequest
+  - PatientFindingUpdateRequest
+  reason: Ninja request adapters follow their framework base; canonical domain payloads and evaluation
+    use package-owned models.
+formerly_implicit_extra_fields:
+- path: lx_dtypes/django/api/report_template_builder.py
+  models:
+  - ReportTemplateBuilderField
+  - ReportTemplateBuilderClassification
+  - ReportTemplateBuilderValidatorCondition
+  - ReportTemplateBuilderFindingValidator
+  - ReportTemplateBuilderFinding
+  - SaveReportTemplateRequest
+  - SaveReportTemplateResponse
+  - ReportTemplatePackageResponse
+  - PublishReportTemplateResponse
+  - ReportTemplateModuleLocation
+- path: lx_dtypes/knowledge_base_registry.py
+  models:
+  - KnowledgeBaseBootstrapResult
+- path: lx_dtypes/models/base/file/patient_file_mixin.py
+  models:
+  - PatientFileMixIn
+  - SerializedPatientFileMixIn
+- path: lx_dtypes/models/contracts/_frame_cache.py
+  models:
+  - FrameCacheManifestFields
+  - FrameCacheValidationFields
+- path: lx_dtypes/models/contracts/audit_ledger.py
+  models:
+  - AuditLedgerHashPayload
+  - AuditLedgerEntryPayload
+  - AuditLedgerIntegrityStatusPayload
+- path: lx_dtypes/models/contracts/fhir_clinical.py
+  models:
+  - ResolvedDiagnosticReport
+- path: lx_dtypes/models/contracts/finding_review.py
+  models:
+  - FindingSuggestion
+  - FindingSuggestions
+- path: lx_dtypes/models/contracts/information_source.py
+  models:
+  - InformationSourceRef
+- path: lx_dtypes/models/contracts/medication.py
+  models:
+  - MedicationPeriodFields
+  - MedicationEntryFields
+- path: lx_dtypes/models/contracts/patient_examination_report.py
+  models:
+  - ReportFrameCandidatesResponse
+- path: lx_dtypes/models/contracts/video_correction.py
+  models:
+  - VideoCorrectionProcessingMethodMixin
+- path: lx_dtypes/models/knowledge_base/classification_choice_descriptor/DescriptorTypeMixin.py
+  models:
+  - DescriptorTypeMixin
+- path: lx_dtypes/models/knowledge_base/classification_choice_descriptor/TextDescriptorMixin.py
+  models:
+  - TextDescriptorMixin
+- path: lx_dtypes/models/knowledge_base/classification_choice_descriptor/UnitMixin.py
+  models:
+  - UnitMixin
+- path: lx_dtypes/models/knowledge_base/report_template/PropertyGraph.py
+  models:
+  - PropertyGraphNode
+  - PropertyGraphEdge
+  - PropertyGraph
+- path: lx_dtypes/models/knowledge_base/report_template/ReportFinding.py
+  models:
+  - ReportTemplateClassificationRequirement
+  - ReportTemplateFindingRequirement
+- path: lx_dtypes/models/knowledge_base/report_template/ReportTemplate.py
+  models:
+  - ReportTemplateValidators
+- path: lx_dtypes/models/knowledge_base/report_template/ReportTemplateGraph.py
+  models:
+  - ReportTemplateGraphNode
+  - ReportTemplateGraphEdge
+  - ReportTemplateGraph
+  - ReportTemplateStructureIssue
+  - ReportTemplateStructureValidationResult
+- path: lx_dtypes/models/knowledge_base/report_template/ReportTemplateSection.py
+  models:
+  - ReportTemplateSectionField
+- path: lx_dtypes/models/knowledge_base/report_template/TemplateReadiness.py
+  models:
+  - ReportTemplateReadinessIssue
+  - ReportTemplateReadinessSummary
+- path: lx_dtypes/terminology/terminology_schemas.py
+  models:
+  - TerminologyBundleVersion
+  - TerminologyBundleListResponse
+  - SelectTerminologyBundleRequest
+  - SelectTerminologyBundleResponse
+  - ImportTerminologyBundleResponse
+structural_outliers:
+- path: lx_dtypes/models/interface/examples
+  kind: installed_examples
+  rule: New authoring examples belong in docs/examples or repository scripts. Existing module paths remain
+    for compatibility.
+- path: lx_dtypes/models/knowledge_base/report_template
+  kind: compatibility_modules
+  rule: ValidatorRuntime, RuntimeIssues and validator re-exports delegate to knowledge_base/validators.
+    Add new rules only to the owning validator engine.
+- path: lx_dtypes/models/base/app_base_model/django
+  kind: domain_colocated_orm_adapters
+  rule: Historical backend adapters remain beside domain types; production ORM aggregation belongs to
+    lx_dtypes/django and must not load through Pydantic imports.
+- path: lx_dtypes/models/contracts/video_frame_export.py
+  kind: legacy_file_loader
+  rule: load_video_frame_annotation_export_config performs explicit YAML file I/O beside its transport
+    model. New transport loaders belong under models/interface; model_validate itself remains free of
+    file I/O.
+- path: lx_dtypes/models/contracts/export_annotated.py
+  kind: legacy_file_loader
+  rule: from_api_payload and _load_yaml_payload optionally read a caller-selected configuration file.
+    Retained for existing callers; new file import APIs belong under models/interface.
+- path: lx_dtypes/models/contracts/ai_prediction.py
+  kind: in_process_callable_contract
+  rule: AiPredictionConfigPayload.activation is a Python callable. This model is an in-process value contract
+    and must not be presented as a universally JSON-serializable wire DTO.

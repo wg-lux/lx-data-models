@@ -7,14 +7,13 @@ from datetime import datetime
 from typing import Literal, cast
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from lx_dtypes.models.contracts.json_types import JsonObject
+from lx_dtypes.models.model import DtypesModel, StrictContractModel
 
 
-class AIDataSetScoredActiveLearningCandidateContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIDataSetScoredActiveLearningCandidateContract(DtypesModel):
     sample_index: int
     video_id: int
     frame_number: int
@@ -54,9 +53,7 @@ def _empty_selected_candidates() -> list[
     return []
 
 
-class AIDataSetActiveLearningConfigContractContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIDataSetActiveLearningConfigContractContract(DtypesModel):
     budget: int = 32
     segment_gap_frames: int = 150
     temporal_spacing_frames: int = 75
@@ -92,9 +89,7 @@ class AIDataSetActiveLearningConfigContractContract(BaseModel):
         return value
 
 
-class AIDataSetActiveLearningCandidateContractContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIDataSetActiveLearningCandidateContractContract(DtypesModel):
     sample_index: int
     video_id: int
     frame_number: int
@@ -127,9 +122,7 @@ AIDataSetScoredActiveLearningCandidateContractContract = (
 )
 
 
-class AIDataSetActiveLearningSelectionContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIDataSetActiveLearningSelectionContract(DtypesModel):
     config: AIDataSetActiveLearningConfigContractContract
     candidate_count: int
     segment_count: int
@@ -142,9 +135,7 @@ class AIDataSetActiveLearningSelectionContract(BaseModel):
     )
 
 
-class AIDataSetContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIDataSetContract(DtypesModel):
     id: int
     name: str
     description: str
@@ -183,9 +174,7 @@ class AIDataSetContract(BaseModel):
         return self
 
 
-class AIDataSetCreateContract(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class AIDataSetCreateContract(StrictContractModel):
     name: str
     description: str = ""
     dataset_type: DatasetType = "image"
@@ -246,10 +235,8 @@ class AIDataSetCreateContract(BaseModel):
         return self
 
 
-class AIDataSetAttachVideoContract(BaseModel):
+class AIDataSetAttachVideoContract(StrictContractModel):
     """Canonical request for explicit or bulk dataset annotation attachment."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     video_id: int | None = Field(default=None, ge=1)
     frame_annotation_ids: list[int] = Field(default_factory=list)
@@ -296,10 +283,8 @@ class AIDataSetAttachVideoContract(BaseModel):
         return self
 
 
-class AIDataSetAttachmentResultContract(BaseModel):
+class AIDataSetAttachmentResultContract(StrictContractModel):
     """Canonical result for explicit or bulk dataset annotation attachment."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     dataset_id: int = Field(ge=1)
     video_id: int | None = Field(default=None, ge=1)
@@ -318,9 +303,7 @@ class AIDataSetAttachmentResultContract(BaseModel):
         return value
 
 
-class AIModelTrainingRunContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIModelTrainingRunContract(DtypesModel):
     id: int
     run_id: UUID
     run_key: str
@@ -357,9 +340,7 @@ class AIModelTrainingRunContract(BaseModel):
     is_terminal: bool = False
 
 
-class AIModelTrainingRunCreateContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIModelTrainingRunCreateContract(DtypesModel):
     dataset_id: int
     training_target: str = "image_multilabel"
 
@@ -381,9 +362,7 @@ class AIModelTrainingRunCreateContract(BaseModel):
         return value
 
 
-class AIModelTrainingRunUpdateContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIModelTrainingRunUpdateContract(DtypesModel):
     status: TrainingRunStatus | None = None
     result: JsonObject | None = None
     artifact_paths: dict[str, str] | None = None
@@ -394,9 +373,7 @@ class AIModelTrainingRunUpdateContract(BaseModel):
     finished_at: datetime | None = None
 
 
-class AIDataSetExportArtifactContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIDataSetExportArtifactContract(DtypesModel):
     id: int
     artifact_id: UUID
     artifact_key: str
@@ -430,9 +407,7 @@ class AIDataSetExportArtifactContract(BaseModel):
         return value
 
 
-class AIDataSetExportCreateContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIDataSetExportCreateContract(DtypesModel):
     dataset_id: int
     ai_dataset_name: str
     ai_dataset_type: DatasetType
@@ -467,9 +442,7 @@ class AIDataSetExportCreateContract(BaseModel):
         return self
 
 
-class AITrainingManifestBuildContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AITrainingManifestBuildContract(DtypesModel):
     label_set_id: int
     treat_unlabeled_as_negative: bool = False
     include_file_paths: bool = False
@@ -497,9 +470,7 @@ class AITrainingManifestBuildContract(BaseModel):
         return value
 
 
-class AIDataSetStandardExportScopeContract(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class AIDataSetStandardExportScopeContract(DtypesModel):
     center_key: str
     all_centers: bool = False
     only_validated: bool = False

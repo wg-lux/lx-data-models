@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import Annotated, Literal, cast
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonNull
 
@@ -26,14 +28,10 @@ _TRUE_VALUES = {"1", "true", "yes", "on"}
 _FALSE_VALUES = {"0", "false", "no", "off", ""}
 
 
-class VideoFrameAnnotationExportConfigPayload(BaseModel):
+class VideoFrameAnnotationExportConfigPayload(DtypesModel):
     """Validated YAML config for frame annotation exports."""
 
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        str_strip_whitespace=True,
-    )
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
 
     output_path: str = Field(min_length=1)
     output_dir: str | JsonNull = None

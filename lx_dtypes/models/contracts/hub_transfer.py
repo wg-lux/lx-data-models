@@ -14,6 +14,8 @@ from pydantic import (
     model_validator,
 )
 
+from lx_dtypes.models.model import FrozenContractModel
+
 from .json_types import JsonObject, JsonValue
 from .study_exchange import StudyExchangeBundle
 from .video_provenance import VideoProvenanceBundle, VideoProvenanceRecovery
@@ -190,10 +192,8 @@ class HubTransferReportTransferPayloadData(TypedDict):
     provenance: NotRequired[HubTransferProvenanceData]
 
 
-class _StrictPayload(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid", frozen=True, strict=True, str_strip_whitespace=True
-    )
+class _StrictPayload(FrozenContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class HubTransferVideoFilePayload(_StrictPayload):

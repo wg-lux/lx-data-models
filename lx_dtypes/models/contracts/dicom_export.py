@@ -5,7 +5,9 @@ from datetime import date, datetime
 from typing import Literal, Self
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonObject
 
@@ -13,8 +15,8 @@ _DICOM_UID_PATTERN = re.compile(r"^[0-9]+(?:\.[0-9]+)+$")
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
 
-class DicomContractModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class DicomContractModel(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class DicomValidationResult(DicomContractModel):

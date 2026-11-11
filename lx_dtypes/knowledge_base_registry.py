@@ -13,7 +13,7 @@ from importlib.metadata import version as package_version
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic import ConfigDict, Field, ValidationError, model_validator
 
 from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
@@ -27,6 +27,7 @@ from lx_dtypes.models.interface.remote_data_roots import (
     is_remote_data_root,
     resolve_remote_data_root,
 )
+from lx_dtypes.models.model import DtypesModel, FrozenContractModel, StrictContractModel
 
 DEFAULT_PACKAGED_KNOWLEDGE_BASE = "star_upper_gi"
 PACKAGED_KNOWLEDGE_BASE_MODULES = tuple(
@@ -38,29 +39,23 @@ PACKAGED_KNOWLEDGE_BASE_MODULES = tuple(
 logger = logging.getLogger(__name__)
 
 
-class RegistryActiveIdentity(BaseModel):
+class RegistryActiveIdentity(DtypesModel):
     """Exact active knowledge-base identity."""
-
-    model_config = ConfigDict(extra="forbid")
 
     module_name: str = Field(min_length=1)
     version: str = Field(min_length=1)
 
 
-class ProviderSource(BaseModel):
+class ProviderSource(DtypesModel):
     """Stable package-provider registry source."""
-
-    model_config = ConfigDict(extra="forbid")
 
     kind: Literal["provider"] = "provider"
     provider: str = Field(min_length=1)
     content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
-class FilesystemSource(BaseModel):
+class FilesystemSource(DtypesModel):
     """Explicit deployment-owned filesystem registry source."""
-
-    model_config = ConfigDict(extra="forbid")
 
     kind: Literal["filesystem"] = "filesystem"
     input_dirs: list[str] = Field(min_length=1)
@@ -72,7 +67,7 @@ KnowledgeBaseSource = Annotated[
 ]
 
 
-class RegistryEntry(BaseModel):
+class RegistryEntry(DtypesModel):
     """Validated source entry for one module version."""
 
     model_config = ConfigDict(extra="allow")
@@ -89,7 +84,7 @@ class RegistryEntry(BaseModel):
         return self
 
 
-class RegistryPayload(BaseModel):
+class RegistryPayload(DtypesModel):
     """Persisted registry schema used by bootstrap provisioning."""
 
     model_config = ConfigDict(extra="allow")
@@ -107,7 +102,7 @@ class RegistryPayload(BaseModel):
         return self
 
 
-class KnowledgeBaseBootstrapResult(BaseModel):
+class KnowledgeBaseBootstrapResult(DtypesModel):
     """Successful strict bootstrap result."""
 
     model_config = ConfigDict(frozen=True)
@@ -122,20 +117,16 @@ class KnowledgeBaseBootstrapResult(BaseModel):
 VALIDATION_RECEIPTS_NAME = "validation-receipts.json"
 
 
-class ValidationReceipt(BaseModel):
+class ValidationReceipt(FrozenContractModel):
     """Proof that one identity validated with these exact inputs and validator."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     inputs_digest: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
     validator: str = Field(min_length=1)
     validated_at: datetime = Field(strict=False)
 
 
-class ValidationReceipts(BaseModel):
+class ValidationReceipts(StrictContractModel):
     """Persisted next to the registry so unchanged identities skip re-validation."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     schema_version: Literal["1"] = "1"
     receipts: dict[str, ValidationReceipt] = Field(default_factory=dict)

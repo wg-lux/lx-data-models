@@ -2,24 +2,21 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from lx_dtypes.models.ledger.p_video.Pydantic import PatientVideoFile
+from lx_dtypes.models.model import FrozenContractModel
 
 from .json_types import JsonObject
 
 
-class AIDataSetFrameLabelExport(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AIDataSetFrameLabelExport(FrozenContractModel):
     id: int
     name: str
     labelset_name: str | None = None
 
 
-class AIDataSetFrameAnnotationExport(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AIDataSetFrameAnnotationExport(FrozenContractModel):
     annotation_id: int
     frame_id: int
     frame_number: int
@@ -42,9 +39,7 @@ class AIDataSetFrameAnnotationExport(BaseModel):
     date_modified: datetime
 
 
-class AIDataSetExportSummary(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AIDataSetExportSummary(FrozenContractModel):
     image_annotation_count: int = 0
     video_annotation_count: int = 0
     frame_count: int = 0
@@ -52,9 +47,7 @@ class AIDataSetExportSummary(BaseModel):
     label_count: int = 0
 
 
-class AIDataSetExportPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class AIDataSetExportPayload(FrozenContractModel):
     schema_version: str = "1.0"
     dataset_id: int
     name: str | None = None

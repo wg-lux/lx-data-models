@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Literal, TypedDict, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonObject as BaseJsonObject
 from .json_types import JsonValue as BaseJsonValue
@@ -55,7 +57,7 @@ def _empty_json_object() -> JsonObject:
     return {}
 
 
-class VideoReimportRequestPayload(BaseModel):
+class VideoReimportRequestPayload(DtypesModel):
     """Validated request payload for video re-import endpoints."""
 
     model_config = ConfigDict(extra="allow", str_strip_whitespace=True)
@@ -104,10 +106,8 @@ class VideoReimportRequestPayload(BaseModel):
         )
 
 
-class VideoReimportHistoryConfig(BaseModel):
+class VideoReimportHistoryConfig(DtypesModel):
     """Persisted processing-history config for a video re-import job."""
-
-    model_config = ConfigDict(extra="forbid")
 
     kind: VideoReimportOperation = VIDEO_REIMPORT_OPERATION
     queue: str = Field(min_length=1)
@@ -115,10 +115,8 @@ class VideoReimportHistoryConfig(BaseModel):
     prediction_payload: JsonObject = Field(default_factory=_empty_json_object)
 
 
-class VideoReimportDispatchResult(BaseModel):
+class VideoReimportDispatchResult(DtypesModel):
     """Queue or inline execution result returned by video re-import dispatch."""
-
-    model_config = ConfigDict(extra="forbid")
 
     task_id: str
     mode: VideoReimportJobMode
@@ -136,10 +134,10 @@ class VideoReimportDispatchResult(BaseModel):
         return cast(JsonObject, self.model_dump(mode="json", exclude_none=True))
 
 
-class VideoReimportPredictionRefreshPayload(BaseModel):
+class VideoReimportPredictionRefreshPayload(DtypesModel):
     """Fallback prediction-refresh status produced after inline re-import."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     status: VideoReimportPredictionRefreshStatus
     queued: bool = False
@@ -173,7 +171,7 @@ class VideoReimportApiResponseData(TypedDict, total=False):
     prediction_refresh: JsonObject
 
 
-class VideoReimportApiResponsePayload(BaseModel):
+class VideoReimportApiResponsePayload(DtypesModel):
     """Validated API response payload for video re-import endpoints."""
 
     model_config = ConfigDict(extra="allow", str_strip_whitespace=True)

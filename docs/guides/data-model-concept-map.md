@@ -51,6 +51,10 @@ the package-owned contracts.
 
 Most domain models share a small inheritance backbone:
 
+The backbone inherits `DtypesModel`. Standalone contracts and helper models use
+the same closed, strict, frozen, or typed-root profiles. Evaluation and reviewed
+exceptions are defined in the [cross-layer contract](cross-layer-validation.md).
+
 ```text
 AppBaseModel                              source_file, created_at
 └── AppBaseModelUUIDTags                  uuid, tags
@@ -79,7 +83,7 @@ these validated boundaries once, rather than coexist with a loose dictionary.
 
 ![Knowledge-base terminology relationships](../diagrams/data_model_terminology.svg)
 
-The `KnowledgeBase` aggregates 25 registered model types. The terminology graph
+The `KnowledgeBase` aggregates registered model types. The terminology graph
 itself has 17 concepts; 7 are categorizing type concepts.
 
 | Definition | Direct references or special fields |
@@ -94,6 +98,8 @@ itself has 17 concepts; 7 are categorizing type concepts.
 | `Unit` | `abbreviation`, `unit_types` |
 | `InformationSource` | `information_source_types` |
 | `Citation` | bibliographic identity, authors, publication data, DOI/URL, identifiers |
+| `TimeReference` | reference/target clock kinds and labeled reference, training, validation, and test examples |
+| `ElectricalCurveProfile` | HF curve quantities, regression responses and predictors, phase bins, duration and gap limits, reference count, deviation threshold |
 
 The categorizing concepts are `ExaminationType`, `FindingType`,
 `IndicationType`, `InterventionType`, `ClassificationType`, `UnitType`, and
@@ -110,7 +116,7 @@ references, unknown fields, and incomplete knowledge-base identity pairs.
 
 ![Patient ledger and reporting relationships](../diagrams/data_model_runtime.svg)
 
-The ledger registry contains 24 named model types in four branches.
+The ledger registry contains named observation models across the branches below.
 
 ### Examination branch
 
@@ -146,6 +152,13 @@ integer, float, boolean, or a list of strings.
 - `VideoFile` and `PatientVideoFile` connect patient and examination context to
   technical metadata, segments, storage paths, anonymization state, and
   sensitive metadata.
+- `PTimeOffset` links an examination to a version-pinned `TimeReference` and
+  exact clock evidence using existing video PTS coordinates. See
+  [dates, times, and offsets](dates-and-times.md#knowledge-base-references-and-ledger-observations).
+- `PElectricalApplication` stores one HF activation as a phase-binned curve
+  pinned to an `ElectricalCurveProfile` version; `PElectricalCurveComparison`
+  stores its regression comparison with strictly earlier applications. See
+  [electrosurgical measurements](electrosurgical-video-alignment.md#application-curves-and-regression-comparison).
 
 The ledger has both nested and serialized forms. Nested forms are convenient for
 validation and traversal; serialized forms replace nested records with UUID

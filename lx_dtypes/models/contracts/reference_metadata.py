@@ -2,13 +2,13 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class ClassificationSubcategoryDefinition(BaseModel):
+class ClassificationSubcategoryDefinition(FrozenContractModel):
     """Persisted knowledge-base definition accepted by EndoReg 0.2.9."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     choices: list[str]
     default: str | None = None
@@ -29,10 +29,8 @@ class ClassificationSubcategoryDefinition(BaseModel):
         return self
 
 
-class ClassificationNumericalDescriptorDefinition(BaseModel):
+class ClassificationNumericalDescriptorDefinition(FrozenContractModel):
     """Persisted numerical descriptor definition used by the YAML knowledge base."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     unit: str
     required: bool

@@ -1,9 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 
+from lx_dtypes.models.model import DtypesModel
 from lx_dtypes.names import ClassificationChoiceDescriptorTypes
 
 
-class DescriptorTypeMixin(BaseModel):
+class DescriptorTypeMixin(DtypesModel):
     classification_choice_descriptor_type: ClassificationChoiceDescriptorTypes = Field(
         default_factory=lambda: ClassificationChoiceDescriptorTypes.NUMERIC
     )

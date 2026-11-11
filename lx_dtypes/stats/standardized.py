@@ -16,7 +16,7 @@ from tempfile import TemporaryDirectory
 from typing import NotRequired, cast, get_args, get_origin, get_type_hints
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
+from pydantic import BaseModel, Field, TypeAdapter, model_validator
 from pydantic_core import to_jsonable_python
 
 from lx_dtypes.models.contracts.aidataset_export import AIDataSetFrameAnnotationExport
@@ -37,14 +37,14 @@ from lx_dtypes.models.ledger.medical import (
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.ledger.p_video_segment.Pydantic import SerializedPVideoSegment
 from lx_dtypes.models.ledger.p_video_segment.state import PVideoSegmentState
+from lx_dtypes.models.model import StrictContractModel
 
 _JSON_ROW = TypeAdapter(JsonObject)
 
 
-class CsvTable(BaseModel):
+class CsvTable(StrictContractModel):
     """A complete table; complex cells use JSON, null uses an empty CSV cell."""
 
-    model_config = ConfigDict(extra="forbid", strict=True)
     columns: list[str] = Field(min_length=1)
     rows: list[JsonObject] = Field(default_factory=list)
 

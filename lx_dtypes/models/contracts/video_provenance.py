@@ -6,15 +6,15 @@ import itertools
 from datetime import datetime
 from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 FrameIndex = Annotated[int, Field(ge=0)]
 OpaqueClockId = Annotated[str, Field(pattern=r"^[0-9a-f]{32}$")]
 
 
-class VideoFrameTimeline(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class VideoFrameTimeline(FrozenContractModel):
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     time_base_num: int = Field(gt=0)
     time_base_den: int = Field(gt=0)
@@ -30,10 +30,8 @@ class VideoFrameTimeline(BaseModel):
         return self
 
 
-class VideoFrameProvenancePayload(BaseModel):
+class VideoFrameProvenancePayload(FrozenContractModel):
     """List position is the output presentation-frame index, never packet order."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     schema_version: Literal["1"] = "1"
     method: Literal["ffmpeg_encoder_input_v1", "opencv_decoder_input_v1"] = (
@@ -63,18 +61,16 @@ class VideoFrameProvenancePayload(BaseModel):
         return self
 
 
-class SynchronizationAnchor(BaseModel):
+class SynchronizationAnchor(FrozenContractModel):
     """One event observed on both recording clocks, captured during acquisition."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
     video_timestamp: int = Field(ge=0)
     electrical_timestamp: int
 
 
-class ElectricalTimestampSeries(BaseModel):
+class ElectricalTimestampSeries(FrozenContractModel):
     """Native ticks for one independent device's uninterrupted recording epoch."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
     session_id: OpaqueClockId
     clock_id: OpaqueClockId
     time_base_num: int = Field(gt=0)
@@ -91,9 +87,7 @@ class ElectricalTimestampSeries(BaseModel):
         return self
 
 
-class RecordingSynchronization(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class RecordingSynchronization(FrozenContractModel):
     session_id: OpaqueClockId
     video_clock_id: OpaqueClockId
     electrical_clock_id: OpaqueClockId
@@ -120,9 +114,7 @@ class RecordingSynchronization(BaseModel):
         return self
 
 
-class VideoProvenanceBundle(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class VideoProvenanceBundle(FrozenContractModel):
     schema_version: Literal["1"] = "1"
     transformations: list[VideoFrameProvenancePayload] = Field(
         min_length=1, max_length=128
@@ -146,13 +138,12 @@ class VideoProvenanceBundle(BaseModel):
         return self
 
 
-class RecordingTimeRange(BaseModel):
+class RecordingTimeRange(FrozenContractModel):
     """Validate optional recording clocks before any host media work begins.
 
     Original timezone-qualified strings remain the exchange representation.
     """
 
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
     recording_started_at: str | None = None
     recording_ended_at: str | None = None
 

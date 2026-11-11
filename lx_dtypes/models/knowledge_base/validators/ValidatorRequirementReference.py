@@ -1,12 +1,13 @@
 from collections.abc import Mapping
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
 
 from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReferenceDataDict import (
     ValidatorRequirementKindLiteral,
     ValidatorRequirementReferenceDataDict,
 )
+from lx_dtypes.models.model import DtypesModel
 
 ValidatorRequirementKind = Literal[
     "classification",
@@ -17,9 +18,7 @@ ValidatorRequirementKind = Literal[
 ]
 
 
-class ValidatorRequirementReference(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class ValidatorRequirementReference(DtypesModel):
     kind: ValidatorRequirementKindLiteral
     name: str = ""
     names: list[str] = Field(default_factory=list)

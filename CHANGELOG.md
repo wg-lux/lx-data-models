@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.4.dev1] - Unreleased
 
 ### Added
+- Shared model policies in `lx_dtypes.models.model` and canonical strict/advisory
+  Python and JSON entry points in `lx_dtypes.evaluation`. Legacy validation,
+  numeric classification and electrical-alignment imports remain available.
+- A checked YAML inventory of model policy exceptions and structural outliers,
+  enforced by pytest and the pre-commit quality gate.
 - `PatientMedication` carries BMP-aligned fields: an optional PZN, up to three
   ordered active substances with strengths, a structured dosing schedule
   (day-segment quantities, an optional once-weekly weekday, or free text), a
@@ -56,6 +61,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and sensitive-metadata UUID reference. Sensitive metadata is never inlined.
 
 ### Changed
+- Package-owned object models now reject unknown fields unless they explicitly
+  declare an extension/projection policy. The previously implicit cases are
+  enumerated in `docs/model-boundaries.yml`; clients must remove unsupported
+  fields. Explicit coercion, mutability and wire serialization remain unchanged.
+- Pydantic KB, ledger and combined registries no longer load Django adapters.
+  `VideoFileDjango` is available through the Django registry rather than the
+  Pydantic lookup. Production-local test harnesses moved into the repository test
+  tree, with framework doubles isolated in their required subprocess.
 - Report anonymization v2 requires typed extraction evidence and owner-bound
   staging receipts. Provider failure is distinct from valid empty extraction;
   deterministic fallback preserves its actual backend and bounded failure code.

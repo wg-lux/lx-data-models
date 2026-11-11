@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Annotated, Literal, Self, cast
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
+from pydantic import AwareDatetime, Field, model_validator
 
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
@@ -17,6 +17,7 @@ from lx_dtypes.models.contracts.medication import (
     MedicationScheduleFreeTextLine,
     MedicationScheduleHeading,
 )
+from lx_dtypes.models.model import StrictContractModel
 
 from .DataDict import (
     PatientDiseaseDataDict,
@@ -153,28 +154,22 @@ class PatientMedication(
         return PatientMedicationDataDict
 
 
-class MedicationScheduleMedicationRow(BaseModel):
+class MedicationScheduleMedicationRow(StrictContractModel):
     """A medication-table row backed by a full `PatientMedication` entry."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     kind: Literal["medication"] = "medication"
     medication: PatientMedication
 
 
-class MedicationScheduleCompoundRow(BaseModel):
+class MedicationScheduleCompoundRow(StrictContractModel):
     """A medication-table row for a compounded preparation (Rezeptureintrag)."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     kind: Literal["compound"] = "compound"
     entry: MedicationScheduleCompoundEntry
 
 
-class MedicationScheduleFreeTextRow(BaseModel):
+class MedicationScheduleFreeTextRow(StrictContractModel):
     """A medication-table row holding an unattached free-text line (Freitextzeile)."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     kind: Literal["free_text"] = "free_text"
     entry: MedicationScheduleFreeTextLine
@@ -188,10 +183,8 @@ MedicationScheduleRow = Annotated[
 ]
 
 
-class MedicationScheduleBlock(BaseModel):
+class MedicationScheduleBlock(StrictContractModel):
     """An ordered, optionally headed group of medication-table rows (BMP block)."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
 
     heading: MedicationScheduleHeading | None = None
     rows: list[MedicationScheduleRow] = Field(min_length=1, max_length=45)

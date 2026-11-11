@@ -1,0 +1,8 @@
+name: electrical_curves
+version: "1.0.0"
+description: Synthetic HF electrosurgical curve profile without patient data or clinical approval.
+modules: []
+depends_on: []
+data:
+  files:
+    - profiles.yml

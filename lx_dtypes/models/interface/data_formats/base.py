@@ -15,13 +15,13 @@ from types import MappingProxyType
 
 import pandas as pd
 from pydantic import (
-    BaseModel,
-    ConfigDict,
     Field,
     field_serializer,
     field_validator,
     model_validator,
 )
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
 class DataFormatId(StrEnum):
@@ -71,9 +71,7 @@ class SyntaxRole(StrEnum):
     NAMESPACE = "namespace"
 
 
-class DataFormat(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class DataFormat(FrozenContractModel):
     identifier: DataFormatId
     media_type: str = Field(pattern=r"^[a-z]+/[a-z0-9.+-]+$")
     file_extensions: tuple[str, ...] = Field(min_length=1)

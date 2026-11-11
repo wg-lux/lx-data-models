@@ -19,7 +19,7 @@ from decimal import Decimal
 from fractions import Fraction
 from typing import Final, Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, ConfigDict, Field
 
 from lx_dtypes.models.contracts.german_fhir import (
     IDENTIFIER_TYPE_DE_BASIS_SYSTEM,
@@ -35,6 +35,7 @@ from lx_dtypes.models.contracts.kbv_key_tables import (
     KBV_DARREICHUNGSFORM,
 )
 from lx_dtypes.models.contracts.medication import MedicationDosingSchedule
+from lx_dtypes.models.model import DtypesModel, FrozenContractModel
 
 from .Pydantic import PatientMedication
 
@@ -96,10 +97,8 @@ class EpaProjectionError(ValueError):
     """The medication entry cannot be represented in the eMP without loss or inference."""
 
 
-class EmpEntryContext(BaseModel):
+class EmpEntryContext(FrozenContractModel):
     """Host-supplied facts the ledger entry does not carry."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     kvnr: Kvnr
     authored_on: date | AwareDatetime
@@ -110,10 +109,10 @@ class EmpEntryContext(BaseModel):
     provider_note: str | None = Field(default=None, min_length=1)
 
 
-class EmpEntryProjection(BaseModel):
+class EmpEntryProjection(DtypesModel):
     """eMP Medication and MedicationRequest resources for one ledger entry."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    model_config = ConfigDict(frozen=True)
 
     medication: JsonObject
     medication_request: JsonObject

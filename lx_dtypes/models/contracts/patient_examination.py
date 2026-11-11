@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class PatientExaminationPatientDataPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class PatientExaminationPatientDataPayload(FrozenContractModel):
     id: int = Field(ge=1)
     first_name: str = Field(min_length=1)
     last_name: str = Field(min_length=1)

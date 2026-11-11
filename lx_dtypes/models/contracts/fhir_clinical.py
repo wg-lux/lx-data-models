@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import Annotated, Literal, Self, TypeVar
 
 from pydantic import (
-    BaseModel,
     ConfigDict,
     Field,
     StrictBool,
@@ -13,10 +12,12 @@ from pydantic import (
     model_validator,
 )
 
+from lx_dtypes.models.model import DtypesModel
+
 FhirId = Annotated[str, Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9.-]+$")]
 
 
-class FhirModel(BaseModel):
+class FhirModel(DtypesModel):
     """Small, lossless FHIR R4 contract base for fixture-driven validation."""
 
     model_config = ConfigDict(
@@ -192,7 +193,7 @@ class FhirClinicalBundleEntry(FhirModel):
     request: FhirBundleRequest | None = None
 
 
-class ResolvedDiagnosticReport(BaseModel):
+class ResolvedDiagnosticReport(DtypesModel):
     patient: FhirPatient
     report: FhirDiagnosticReport
     observations: list[FhirObservation]

@@ -3,9 +3,10 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
 
 from lx_dtypes.models.contracts.ai_dataset import AIModelType, DatasetType
+from lx_dtypes.models.model import FrozenContractModel
 
 type ApplicationSettingsDeploymentRole = Literal[
     "standalone",
@@ -15,9 +16,7 @@ type ApplicationSettingsDeploymentRole = Literal[
 ]
 
 
-class ApplicationSettingsBackupSourcePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ApplicationSettingsBackupSourcePayload(FrozenContractModel):
     label: str = Field(min_length=1)
     path: str = Field(min_length=1)
     exists: bool
@@ -30,9 +29,7 @@ class ApplicationSettingsBackupSourcePayload(BaseModel):
         return self
 
 
-class ApplicationSettingsBackupStatusPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ApplicationSettingsBackupStatusPayload(FrozenContractModel):
     ready: bool
     missing_paths: Sequence[str] = Field(default_factory=tuple)
     required_path_count: int = Field(ge=0)
@@ -65,9 +62,7 @@ class ApplicationSettingsBackupStatusPayload(BaseModel):
         return self
 
 
-class ApplicationSettingsDataSetEntryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ApplicationSettingsDataSetEntryPayload(FrozenContractModel):
     id: int | None = Field(default=None, ge=1)
     value: str = Field(min_length=1)
     label: str = Field(min_length=1)
@@ -90,9 +85,7 @@ class ApplicationSettingsDataSetEntryPayload(BaseModel):
         return self
 
 
-class ApplicationSettingsDeploymentProfilePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ApplicationSettingsDeploymentProfilePayload(FrozenContractModel):
     deployment_role: ApplicationSettingsDeploymentRole
     hub_mode: bool
     enable_hub_transfers: bool
@@ -117,9 +110,7 @@ class ApplicationSettingsDeploymentProfilePayload(BaseModel):
         return self
 
 
-class ApplicationSettingsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ApplicationSettingsPayload(FrozenContractModel):
     id: int | None = None
     center_id: int | None = None
     center_name: str = ""

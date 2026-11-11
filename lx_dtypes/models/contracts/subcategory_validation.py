@@ -2,20 +2,18 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class SubcategoryDictContract(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class SubcategoryDictContract(FrozenContractModel):
     choices: list[str]
     default: str
     required: Literal[True]
 
 
-class NumericalDescriptorContract(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class NumericalDescriptorContract(FrozenContractModel):
     unit: str
     required: bool
     minimum: float | None = Field(alias="min")

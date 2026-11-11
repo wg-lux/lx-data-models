@@ -16,7 +16,9 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import Final, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
 class PrivacyStage(StrEnum):
@@ -232,10 +234,8 @@ class WorklistStage(StrEnum):
     APPROVE_EXPORT = "approve_export"
 
 
-class MediaWorkflowState(BaseModel):
+class MediaWorkflowState(FrozenContractModel):
     """Persisted state of one media item; ``version`` is the compare-and-swap token."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     privacy: PrivacyStage
     annotation: AnnotationStage
@@ -243,10 +243,8 @@ class MediaWorkflowState(BaseModel):
     version: int = Field(ge=0)
 
 
-class MediaWorkflowTransitionRequest(BaseModel):
+class MediaWorkflowTransitionRequest(FrozenContractModel):
     """Transition command; the actor comes from the authenticated session, never the body."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     event: WorkflowEvent
     expected_version: int = Field(ge=0)

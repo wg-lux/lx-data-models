@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Literal, TypedDict, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonObject, JsonValue
 
@@ -26,7 +28,7 @@ class VideoCorrectionSegmentUpdateData(TypedDict):
     segments_unchanged: int
 
 
-class VideoCorrectionRoiPayload(BaseModel):
+class VideoCorrectionRoiPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     x: float = Field(ge=0)
@@ -96,7 +98,7 @@ def _normalize_optional_int_list(
     return [cast(int, value)]
 
 
-class VideoCorrectionProcessingMethodMixin(BaseModel):
+class VideoCorrectionProcessingMethodMixin(DtypesModel):
     processing_method: VideoCorrectionProcessingMethod | None = None
     use_streaming: bool | None = None
 
@@ -205,22 +207,20 @@ class VideoCorrectionFrameRemovalPayload(VideoCorrectionProcessingMethodMixin):
         return None
 
 
-class VideoCorrectionSegmentUpdatePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoCorrectionSegmentUpdatePayload(DtypesModel):
     segments_updated: int = Field(ge=0)
     segments_deleted: int = Field(ge=0)
     segments_unchanged: int = Field(ge=0)
 
 
-class VideoCorrectionErrorPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class VideoCorrectionErrorPayload(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     error: str = Field(min_length=1)
 
 
-class VideoCorrectionApplyMaskResponsePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class VideoCorrectionApplyMaskResponsePayload(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     task_id: str | None = None
     output_file: str = Field(min_length=1)
@@ -228,8 +228,8 @@ class VideoCorrectionApplyMaskResponsePayload(BaseModel):
     processing_time: float = Field(ge=0)
 
 
-class VideoCorrectionRemoveFramesResponsePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+class VideoCorrectionRemoveFramesResponsePayload(DtypesModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     task_id: str | None = None
     output_file: str = Field(min_length=1)

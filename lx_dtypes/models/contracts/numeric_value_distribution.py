@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
 class NumericValueDistributionType(str, Enum):
@@ -18,9 +20,7 @@ class NumericValueDescriptorOperator(str, Enum):
     DIVIDE = "/"
 
 
-class NumericValueDistributionPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class NumericValueDistributionPayload(FrozenContractModel):
     distribution_type: NumericValueDistributionType
     min_descriptor: str = Field(min_length=1)
     max_descriptor: str = Field(min_length=1)

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
 class MultiLabelBackboneName(str, Enum):
@@ -10,9 +12,7 @@ class MultiLabelBackboneName(str, Enum):
     REGNET_X_800MF = "RegNetX800MF"
 
 
-class MultiLabelClassificationConfigPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MultiLabelClassificationConfigPayload(FrozenContractModel):
     labels: list[str] = Field(min_length=1)
     lr: float = Field(gt=0)
     weight_decay: float = Field(ge=0)

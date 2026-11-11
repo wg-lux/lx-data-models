@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
     KnowledgebaseBaseModel,
@@ -8,9 +8,10 @@ from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import
 from lx_dtypes.models.knowledge_base.report_template.ReportFindingDataDict import (
     ReportFindingDataDict,
 )
+from lx_dtypes.models.model import DtypesModel
 
 
-class ReportTemplateClassificationRequirement(BaseModel):
+class ReportTemplateClassificationRequirement(DtypesModel):
     classification: str
     required: bool = False
     concept_id: str | None = None
@@ -21,7 +22,7 @@ class ReportTemplateClassificationRequirement(BaseModel):
     applicability_reason: str | None = None
 
 
-class ReportTemplateFindingRequirement(BaseModel):
+class ReportTemplateFindingRequirement(DtypesModel):
     finding: str
     required: bool = False
     multiple_allowed: bool = False

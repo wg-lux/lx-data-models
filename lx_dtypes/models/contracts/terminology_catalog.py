@@ -2,19 +2,18 @@ from __future__ import annotations
 
 from typing import Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonObject
 
 
-class LocalizedCatalogItem(BaseModel):
+class LocalizedCatalogItem(DtypesModel):
     """Localized semantic identity returned by terminology catalog routes."""
 
     model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        str_strip_whitespace=True,
-        validate_default=True,
+        frozen=True, str_strip_whitespace=True, validate_default=True
     )
 
     id: int = Field(gt=0)

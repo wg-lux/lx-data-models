@@ -8,6 +8,7 @@ responsibilities:
 - Expose ORM adapters, migrations, and graph/reporting APIs
 - Integrate shared contracts with configured host services
 boundaries:
+- Route tests and fixtures belong in tests/unit/lx_dtypes/django/api rather than in the installed package.
 - Cross-service payloads use Pydantic contracts rather than ORM models
 - Host applications own authentication policy, deployment, and study provisioning
 entrypoints:

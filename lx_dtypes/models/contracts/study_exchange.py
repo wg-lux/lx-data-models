@@ -3,7 +3,9 @@
 from typing import Literal, Self
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 from .cohort_definition import CohortDefinitionFields
 from .package_snapshot import PackageSnapshot, restore_package_snapshot
@@ -11,8 +13,8 @@ from .study import StudyDefinition
 from .study_collection import StudyCollectionRecord
 
 
-class StudyExchangeModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+class StudyExchangeModel(FrozenContractModel):
+    pass
 
 
 class StudyExchangeStudy(StudyExchangeModel):

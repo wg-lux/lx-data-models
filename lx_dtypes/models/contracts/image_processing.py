@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from lx_dtypes.models.contracts.json_types import JsonValue
+from lx_dtypes.models.model import StrictContractModel
 
 
 def _empty_combined_results() -> list[
@@ -17,9 +18,7 @@ def _empty_modified_images() -> dict[tuple[str, str], str]:
     return {}
 
 
-class ImageProcessingResultPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
-
+class ImageProcessingResultPayload(StrictContractModel):
     filename: Path
     file_type: str
     extracted_text: str

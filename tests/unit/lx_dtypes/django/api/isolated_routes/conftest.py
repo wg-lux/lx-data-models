@@ -6,11 +6,12 @@ our delivered route modules under a temporary package and restore sys.modules.
 
 from __future__ import annotations
 
+from lx_dtypes.models.model import DtypesModel
+
 import importlib.util
 import sys
 from contextlib import nullcontext
 from datetime import UTC, datetime
-from pathlib import Path
 from types import ModuleType
 from types import SimpleNamespace as NS
 from unittest.mock import Mock
@@ -19,7 +20,9 @@ from uuid import UUID
 import pytest
 from pydantic import BaseModel, ConfigDict
 
-ROOT = Path(__file__).resolve().parents[1]
+from tests.paths import PACKAGE_ROOT
+
+ROOT = PACKAGE_ROOT / "django" / "api"
 
 
 class ApiError(Exception):
@@ -114,7 +117,7 @@ class FakeApi:
         return self._register("DELETE", path)
 
 
-class PassthroughDTO(BaseModel):
+class PassthroughDTO(DtypesModel):
     model_config = ConfigDict(extra="allow")
 
 

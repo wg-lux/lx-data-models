@@ -1,36 +1,29 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from lx_dtypes.models.contracts.json_types import JsonValue
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class FindingClassificationTypeCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FindingClassificationTypeCore(FrozenContractModel):
     name: str
     description: str = ""
 
 
-class FindingClassificationCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FindingClassificationCore(FrozenContractModel):
     name: str
     description: str = ""
 
 
-class FindingClassificationChoiceCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FindingClassificationChoiceCore(FrozenContractModel):
     name: str
     description: str = ""
     subcategories: dict[str, JsonValue] = Field(default_factory=dict)
     numerical_descriptors: dict[str, JsonValue] = Field(default_factory=dict)
 
 
-class PatientFindingClassificationCore(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class PatientFindingClassificationCore(FrozenContractModel):
     patient_finding_id: int
     finding_name: str
     classification_name: str

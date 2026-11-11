@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 type QuasiIdentifierField = Literal[
     "first_name",
@@ -14,9 +16,7 @@ type QuasiIdentifierField = Literal[
 type QuasiIdentifierSubset = tuple[QuasiIdentifierField, ...]
 
 
-class KAnonymityResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class KAnonymityResult(FrozenContractModel):
     k_value: int = Field(ge=0)
     is_k_anonymous: bool
     threshold: int = Field(ge=1)
@@ -25,13 +25,8 @@ class KAnonymityResult(BaseModel):
         return self.k_value, self.is_k_anonymous
 
 
-class KPseudonymizationResult(BaseModel):
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra="forbid",
-        frozen=True,
-        strict=True,
-    )
+class KPseudonymizationResult(FrozenContractModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     k_value_after: int = Field(ge=0)
     is_k_anonymous_after: bool

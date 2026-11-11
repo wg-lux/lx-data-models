@@ -11,6 +11,9 @@ boundaries:
 - Do not import repository scripts from consuming applications
 - Generated authoring output belongs in temporary storage
 entrypoints:
+- name: Model boundary validator
+  file: lint_model_boundaries.py
+  purpose: Reject bypasses of shared model profiles and unreviewed contract dependencies or extra-field exceptions
 - name: Standardized demo export
   file: usage_example.py
   purpose: Regenerate complete CSV tables from the synthetic STAR upper-GI ledger
@@ -32,6 +35,8 @@ dependencies:
   - PyYAML
 submodules: []
 contracts:
+- name: Model boundary inventory
+  doc: ../docs/model-boundaries.yml
 - name: KB linting
   doc: ../docs/guides/kb-yaml-linting.md
 - name: Agent context

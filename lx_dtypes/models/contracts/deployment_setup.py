@@ -6,7 +6,9 @@ import hashlib
 import json
 from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 Sha256 = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 PackageName = Annotated[
@@ -17,8 +19,8 @@ PackageVersion = Annotated[
 ]
 
 
-class SetupModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+class SetupModel(FrozenContractModel):
+    pass
 
 
 class DeploymentSite(SetupModel):

@@ -6,7 +6,6 @@ from typing import Literal
 from uuid import UUID
 
 from pydantic import (
-    BaseModel,
     ConfigDict,
     Field,
     field_validator,
@@ -14,6 +13,7 @@ from pydantic import (
 )
 
 from lx_dtypes.models.meta.SensitiveMeta import SensitiveMeta
+from lx_dtypes.models.model import FrozenContractModel
 
 ReportAnonymizationContractVersion = Literal["report_anonymization_v2"]
 REPORT_ANONYMIZATION_CONTRACT_VERSION: ReportAnonymizationContractVersion = (
@@ -47,18 +47,14 @@ class ReportAnonymizationErrorCode(StrEnum):
     CANCELLED = "cancelled"
 
 
-class ReportAnonymizationOptions(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ReportAnonymizationOptions(FrozenContractModel):
     use_ensemble: bool = False
     verbose: bool = True
     use_llm: bool | None = None
 
 
-class ReportAnonymizationRequest(BaseModel):
+class ReportAnonymizationRequest(FrozenContractModel):
     """One immutable local report snapshot assigned to one host-owned attempt."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     contract_version: ReportAnonymizationContractVersion = (
         REPORT_ANONYMIZATION_CONTRACT_VERSION
@@ -87,9 +83,7 @@ class ReportAnonymizationRequest(BaseModel):
         return self
 
 
-class ReportAnonymizationProvenance(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ReportAnonymizationProvenance(FrozenContractModel):
     contract_version: ReportAnonymizationContractVersion = (
         REPORT_ANONYMIZATION_CONTRACT_VERSION
     )
@@ -133,10 +127,8 @@ class ReportAnonymizationProvenance(BaseModel):
         return value
 
 
-class ReportArtifactValidation(BaseModel):
+class ReportArtifactValidation(FrozenContractModel):
     """Evidence that the closed attempt artifact passed a full parser traversal."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     validator: Literal["pymupdf_full_parse_v1"] = "pymupdf_full_parse_v1"
     page_count: int = Field(gt=0)
@@ -144,17 +136,13 @@ class ReportArtifactValidation(BaseModel):
     repaired: bool
 
 
-class ReportAnonymizationWarning(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ReportAnonymizationWarning(FrozenContractModel):
     code: ReportAnonymizationWarningCode
     phase: ReportAnonymizationPhase
 
 
-class ReportExtractionEvidence(BaseModel):
+class ReportExtractionEvidence(FrozenContractModel):
     """Content-free extraction evidence, never an import lifecycle state."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     outcome: Literal["findings", "empty", "fallback"]
     backend: Literal["configured_llm", "spacy_regex"]
@@ -194,10 +182,8 @@ class ReportExtractionEvidence(BaseModel):
         return self
 
 
-class ReportExtractionReceipt(BaseModel):
+class ReportExtractionReceipt(FrozenContractModel):
     """Validated staging evidence bound to an owner; not publication or success."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     attempt_id: str = Field(pattern=r"^[0-9a-f]{32}$")
     source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -205,14 +191,8 @@ class ReportExtractionReceipt(BaseModel):
     extraction_evidence: ReportExtractionEvidence
 
 
-class ReportAnonymizationResult(BaseModel):
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra="forbid",
-        frozen=True,
-        strict=True,
-        str_strip_whitespace=False,
-    )
+class ReportAnonymizationResult(FrozenContractModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, str_strip_whitespace=False)
 
     contract_version: ReportAnonymizationContractVersion = (
         REPORT_ANONYMIZATION_CONTRACT_VERSION
@@ -240,10 +220,8 @@ class ReportAnonymizationResult(BaseModel):
         return self
 
 
-class ReportAnonymizationFailure(BaseModel):
+class ReportAnonymizationFailure(FrozenContractModel):
     """Machine-safe failure classification returned across integration boundaries."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     contract_version: ReportAnonymizationContractVersion = (
         REPORT_ANONYMIZATION_CONTRACT_VERSION

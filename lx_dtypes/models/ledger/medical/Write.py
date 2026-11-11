@@ -9,7 +9,6 @@ from typing import Annotated, Literal, Self
 
 from pydantic import (
     AwareDatetime,
-    BaseModel,
     ConfigDict,
     Field,
     field_validator,
@@ -25,15 +24,11 @@ from lx_dtypes.models.contracts.medication import (
     MedicationScheduleFreeTextLine,
     MedicationScheduleHeading,
 )
+from lx_dtypes.models.model import StrictContractModel
 
 
-class _MedicalWriteModel(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        strict=True,
-        str_strip_whitespace=True,
-        allow_inf_nan=False,
-    )
+class _MedicalWriteModel(StrictContractModel):
+    model_config = ConfigDict(str_strip_whitespace=True, allow_inf_nan=False)
 
 
 def _validate_references(values: list[str]) -> list[str]:

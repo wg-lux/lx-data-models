@@ -4,21 +4,21 @@ from collections.abc import Mapping
 from typing import cast
 
 from pydantic import (
-    BaseModel,
     ConfigDict,
     Field,
-    RootModel,
     ValidationError,
     field_validator,
     model_validator,
 )
+
+from lx_dtypes.models.model import DtypesModel, DtypesRootModel
 
 from .json_types import JsonObject, JsonValue
 
 type VideoSegmentsPayloadDict = dict[str, list[tuple[int, int]]]
 
 
-class VideoSegmentsPayload(RootModel[VideoSegmentsPayloadDict]):
+class VideoSegmentsPayload(DtypesRootModel[VideoSegmentsPayloadDict]):
     model_config = ConfigDict(strict=True)
 
     @field_validator("root", mode="before")
@@ -67,13 +67,13 @@ class VideoSegmentsPayload(RootModel[VideoSegmentsPayloadDict]):
         return self.root
 
 
-class SegmentAnnotationMetadataInput(BaseModel):
+class SegmentAnnotationMetadataInput(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     segment_id: int | None = None
 
 
-class SegmentAnnotationInput(BaseModel):
+class SegmentAnnotationInput(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     annotation_type: str = Field(alias="type")
@@ -140,11 +140,9 @@ def _empty_bulk_validation_item_list() -> list[SegmentBulkValidationItem]:
     return []
 
 
-class SegmentCrudPayload(BaseModel):
+class SegmentCrudPayload(DtypesModel):
     model_config = ConfigDict(
-        extra="allow",
-        populate_by_name=True,
-        str_strip_whitespace=True,
+        extra="allow", populate_by_name=True, str_strip_whitespace=True
     )
 
     ai_dataset_id: int | None = Field(default=None, ge=1)
@@ -205,7 +203,7 @@ class SegmentCrudPayload(BaseModel):
         return payload
 
 
-class SegmentListQuery(BaseModel):
+class SegmentListQuery(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     video_id: int | None = Field(default=None, ge=1)
@@ -220,13 +218,13 @@ class SegmentListQuery(BaseModel):
         return _blank_to_none(value)
 
 
-class SegmentBlackenOutsidePayload(BaseModel):
+class SegmentBlackenOutsidePayload(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     only_validated: bool = False
 
 
-class SegmentValidationPayload(BaseModel):
+class SegmentValidationPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     is_validated: bool = True
@@ -278,7 +276,7 @@ class SegmentValidationPayload(BaseModel):
         )
 
 
-class SegmentBulkValidationItem(BaseModel):
+class SegmentBulkValidationItem(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     id: int = Field(gt=0)
@@ -317,7 +315,7 @@ class SegmentBulkValidationItem(BaseModel):
         )
 
 
-class SegmentBulkValidationPayload(BaseModel):
+class SegmentBulkValidationPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     segment_ids: list[int] = Field(default_factory=_empty_segment_id_list)
@@ -371,7 +369,7 @@ class SegmentBulkValidationPayload(BaseModel):
         return {item.id: item for item in self.segments}
 
 
-class SegmentPredictionImportItem(BaseModel):
+class SegmentPredictionImportItem(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     label_name: str | None = None
@@ -410,14 +408,14 @@ class SegmentPredictionImportItem(BaseModel):
         }
 
 
-class SegmentPredictionImportPayload(BaseModel):
+class SegmentPredictionImportPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     segments: list[SegmentPredictionImportItem] = Field(min_length=1)
     replace_existing: bool = True
 
 
-class SegmentAnnotationEnsurePayload(BaseModel):
+class SegmentAnnotationEnsurePayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     video_ids: list[int] | None = None
@@ -454,7 +452,7 @@ class SegmentAnnotationEnsurePayload(BaseModel):
         return self
 
 
-class SegmentValidationStatusPayload(BaseModel):
+class SegmentValidationStatusPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     label_name: str | None = None

@@ -1,0 +1,35 @@
+- model: time_reference
+  name: video_generator_event
+  description: A synthetic event observed on video and generator clocks.
+  reference_kind: pts
+  target_kind: electrosurgery
+  examples:
+    - example_id: synthetic_training_event
+      role: training
+      evidence:
+        offset:
+          reference:
+            kind: pts
+            clock_id: video_generation_1
+            ticks: 90000
+            time_base_num: 1
+            time_base_den: 90000
+          target:
+            kind: electrosurgery
+            clock_id: generator_epoch_1
+            ticks: 1250
+            time_base_num: 1
+            time_base_den: 1000
+        video_references:
+          video_generation_1:
+            timeline: generation
+            coordinates:
+              generation:
+                content_hash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                time_base_num: 1
+                time_base_den: 90000
+                first_frame_number: 30
+                last_frame_number: 30
+                first_presentation_timestamp: 90000
+                last_presentation_timestamp: 90000
+              recording_mapping_status: unresolved

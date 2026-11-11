@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from typing import Literal, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from lx_dtypes.factories import str_unknown_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
@@ -24,6 +24,7 @@ from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReference im
 from lx_dtypes.models.knowledge_base.validators.ValueTypes import (
     ValidationParams,
 )
+from lx_dtypes.models.model import DtypesModel
 
 ClassificationValidatorOperator = Literal["exists", "missing", "condition"]
 ClassificationValidatorPrecedence = Literal["required", "optional"]
@@ -43,9 +44,7 @@ class ClassificationValidatorConditionClause(FindingsValidatorConditionClause):
     pass
 
 
-class ClassificationValidatorCondition(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class ClassificationValidatorCondition(DtypesModel):
     any: list[ClassificationValidatorConditionClause] = Field(default_factory=list)
     all: list[ClassificationValidatorConditionClause] = Field(default_factory=list)
     then_requires: list[ValidatorRequirementReference] = Field(default_factory=list)
@@ -65,9 +64,7 @@ class ClassificationValidatorCondition(BaseModel):
         )
 
 
-class ClassificationValidatorQuery(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class ClassificationValidatorQuery(DtypesModel):
     finding: str | None = None
     classification: str | None = None
     operator: ClassificationValidatorOperatorLiteral = "exists"

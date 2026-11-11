@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import cast
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 type TransferValidationLogScalar = str | int | float | bool | None
 type TransferValidationLogValue = (
@@ -12,9 +14,7 @@ type TransferValidationLogValue = (
 )
 
 
-class TransferValidationFailureLogPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class TransferValidationFailureLogPayload(FrozenContractModel):
     error_fields: list[str] = Field(default_factory=list)
     request_method: str
     remote_addr_sha256: str | None = None

@@ -11,7 +11,9 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 from .media_workflow import (
     AnnotationStage,
@@ -26,8 +28,8 @@ from .media_workflow import (
 )
 
 
-class _Frozen(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+class _Frozen(FrozenContractModel):
+    pass
 
 
 class StateSource(StrEnum):

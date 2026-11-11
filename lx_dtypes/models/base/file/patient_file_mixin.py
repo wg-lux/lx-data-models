@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import TypedDict
 
-from pydantic import BaseModel, field_validator
+from pydantic import field_validator
 
 from lx_dtypes.models.base.file.ddict import FilesAndDirsDataDict
 from lx_dtypes.models.base.file.pydantic.FilesAndDirs import FilesAndDirsModel
+from lx_dtypes.models.model import DtypesModel
 
 
 ########## DataDict
@@ -25,7 +26,7 @@ class SerializedPatientFileMixInDataDict(TypedDict):
 
 
 ########## Pydantic
-class PatientFileMixIn(BaseModel):
+class PatientFileMixIn(DtypesModel):
     patient: str | None = None  # UUID of the patient associated with the video
     patient_examination: str | None = (
         None  # UUID of the patient examination associated with the video
@@ -50,7 +51,7 @@ class PatientFileMixIn(BaseModel):
         return Path(f)
 
 
-class SerializedPatientFileMixIn(BaseModel):
+class SerializedPatientFileMixIn(DtypesModel):
     patient: str | None = None  # UUID of the patient associated with the video
     patient_examination: str | None = None
 

@@ -11,7 +11,7 @@ import csv
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
 from lx_dtypes.models.contracts.numeric_classification import (
@@ -20,6 +20,7 @@ from lx_dtypes.models.contracts.numeric_classification import (
 )
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.KnowledgeBaseResolver import load_knowledge_base
+from lx_dtypes.models.model import StrictContractModel
 from lx_dtypes.numeric_classification import (
     classify_measurement,
     load_numeric_classification,
@@ -27,14 +28,12 @@ from lx_dtypes.numeric_classification import (
 )
 
 
-class _Observation(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
+class _Observation(StrictContractModel):
     observation_id: str = Field(min_length=1)
     value: float = Field(allow_inf_nan=False)
 
 
-class ComparisonFixture(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
+class ComparisonFixture(StrictContractModel):
     source_knowledge_base: KnowledgeBaseIdentity
     descriptor: str = Field(min_length=1)
     unit: str = Field(min_length=1)

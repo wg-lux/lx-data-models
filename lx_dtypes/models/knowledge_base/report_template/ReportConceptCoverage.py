@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 ReportConceptCoverageContractVersion = Literal["report_concept_coverage_v1"]
 REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION: ReportConceptCoverageContractVersion = (
@@ -16,10 +18,8 @@ ReportConceptValidationStatus = Literal[
 ]
 
 
-class ReportConceptCoverageIdentity(BaseModel):
+class ReportConceptCoverageIdentity(FrozenContractModel):
     """Immutable identity of the module and template that produced coverage."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     module_name: str = Field(min_length=1)
     module_version: str = Field(min_length=1)
@@ -29,17 +29,13 @@ class ReportConceptCoverageIdentity(BaseModel):
     template_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
-class ReportConceptCoverageProvenance(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ReportConceptCoverageProvenance(FrozenContractModel):
     resolver: str = Field(min_length=1)
     resolver_version: str = Field(min_length=1)
     evidence_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
-class ReportConceptApplicability(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ReportConceptApplicability(FrozenContractModel):
     status: ReportConceptApplicabilityStatus
     rule: str | None = None
     reason: str | None = None
@@ -53,9 +49,7 @@ class ReportConceptApplicability(BaseModel):
         return self
 
 
-class ReportConceptCoverageItem(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class ReportConceptCoverageItem(FrozenContractModel):
     concept_id: str = Field(pattern=r"^[a-z][a-z0-9_.:-]*$")
     label: str = Field(min_length=1)
     applicability: ReportConceptApplicability
@@ -76,10 +70,8 @@ class ReportConceptCoverageItem(BaseModel):
         return self
 
 
-class ReportConceptCoverage(BaseModel):
+class ReportConceptCoverage(FrozenContractModel):
     """Versioned, reproducible technical coverage for one report template."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     contract_version: ReportConceptCoverageContractVersion = (
         REPORT_CONCEPT_COVERAGE_CONTRACT_VERSION

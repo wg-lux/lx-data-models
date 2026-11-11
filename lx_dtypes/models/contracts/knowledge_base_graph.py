@@ -6,12 +6,10 @@ from collections.abc import Mapping
 from copy import deepcopy
 from typing import Any, Literal, Protocol, cast
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
 from pydantic_core import to_jsonable_python
 
-from lx_dtypes.models.knowledge_base.report_template.ReportTemplateDataDict import (
-    ReportVerbosity,
-)
+from lx_dtypes.models.model import DtypesModel, FrozenContractModel
 
 from .core_concepts import (
     ClassificationChoiceCore,
@@ -26,6 +24,7 @@ from .core_concepts import (
 )
 from .json_types import JsonObject
 from .knowledge_base import KnowledgeBaseIdentity
+from .reporting_types import ReportVerbosity
 
 KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION: Literal["knowledge_base_graph_v1"] = (
     "knowledge_base_graph_v1"
@@ -65,25 +64,21 @@ type GraphRelationship = Literal[
 ]
 
 
-class KnowledgeBaseGraphNodeRef(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class KnowledgeBaseGraphNodeRef(FrozenContractModel):
     kind: GraphNodeKind
     name: str = Field(min_length=1)
 
 
-class KnowledgeBaseGraphEdge(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class KnowledgeBaseGraphEdge(FrozenContractModel):
     source: KnowledgeBaseGraphNodeRef
     relationship: GraphRelationship
     target: KnowledgeBaseGraphNodeRef
 
 
-class ReportTemplateGraphProjection(BaseModel):
+class ReportTemplateGraphProjection(DtypesModel):
     """Frontend-stable envelope for a compiled, published report template."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True)
 
     name: str = Field(min_length=1)
     name_de: str | None = None
@@ -104,8 +99,8 @@ class ReportTemplateGraphProjection(BaseModel):
     issues: list[JsonObject] = Field(default_factory=list)
 
 
-class KnowledgeBaseGraphSnapshot(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+class KnowledgeBaseGraphSnapshot(DtypesModel):
+    model_config = ConfigDict(frozen=True)
 
     contract_version: Literal["knowledge_base_graph_v1"] = (
         KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION
@@ -131,8 +126,8 @@ class KnowledgeBaseGraphSnapshot(BaseModel):
         return self
 
 
-class ExaminationReportingContext(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+class ExaminationReportingContext(DtypesModel):
+    model_config = ConfigDict(frozen=True)
 
     contract_version: Literal["knowledge_base_graph_v1"] = (
         KNOWLEDGE_BASE_GRAPH_CONTRACT_VERSION

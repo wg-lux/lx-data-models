@@ -4,17 +4,15 @@ from datetime import date
 from typing import Literal
 
 from pydantic import (
-    BaseModel,
-    ConfigDict,
     ValidationError,
     field_validator,
     model_validator,
 )
 
+from lx_dtypes.models.model import DtypesModel
 
-class CaseResolutionNewPatient(BaseModel):
-    model_config = ConfigDict(extra="forbid")
 
+class CaseResolutionNewPatient(DtypesModel):
     first_name: str
     last_name: str
     dob: date | None = None
@@ -41,9 +39,7 @@ class CaseResolutionNewPatient(BaseModel):
         return normalized or None
 
 
-class CaseResolutionRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class CaseResolutionRequest(DtypesModel):
     action: Literal["attach", "create", "defer"]
     patient_examination_id: int | None = None
     patient_id: int | None = None
@@ -99,9 +95,7 @@ class CaseResolutionRequest(BaseModel):
         return self
 
 
-class CaseResolutionResponse(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class CaseResolutionResponse(DtypesModel):
     media_type: Literal["video", "pdf"]
     media_id: int
     action: Literal["attach", "create", "defer"]

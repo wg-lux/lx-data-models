@@ -3,7 +3,6 @@
 from typing import Literal, Self
 
 from pydantic import (
-    BaseModel,
     ConfigDict,
     Field,
     SerializerFunctionWrapHandler,
@@ -11,14 +10,16 @@ from pydantic import (
     model_validator,
 )
 
+from lx_dtypes.models.model import StrictContractModel
+
 from .deployment_setup import PackageName, PackageVersion
 
 StudyRole = Literal["index", "polyp", "previous_follow_up", "follow_up"]
 StudyScalar = str | float | bool
 
 
-class StudyAnalysisModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, allow_inf_nan=False)
+class StudyAnalysisModel(StrictContractModel):
+    model_config = ConfigDict(allow_inf_nan=False)
 
 
 class StudyPredicate(StudyAnalysisModel):

@@ -7,7 +7,6 @@ from uuid import UUID
 from pydantic import (
     AwareDatetime,
     BaseModel,
-    ConfigDict,
     Field,
     ValidationInfo,
     ValidatorFunctionWrapHandler,
@@ -16,6 +15,7 @@ from pydantic import (
 )
 
 from lx_dtypes.language import DEFAULT_LANGUAGE, LanguageCode
+from lx_dtypes.models.model import FrozenContractModel
 
 from .cohort_definition import CohortDefinition
 from .dtypes_record_persistence import (
@@ -27,10 +27,8 @@ from .study import StudyDefinition
 from .validation import ValidationReport
 
 
-class StudyCollectionRecord(BaseModel):
+class StudyCollectionRecord(FrozenContractModel):
     """A ledger observation and its server-computed, version-pinned assessment."""
-
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
     record_uuid: UUID
     study_uuid: UUID

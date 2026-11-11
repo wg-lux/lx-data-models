@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import DtypesModel
 
 type JsonNull = None
 type LxAnonymizerPerformanceMediaType = Literal["video", "report"]
@@ -10,9 +12,7 @@ type LxAnonymizerPerformanceCsvCell = str | int | float | bool | JsonNull
 type LxAnonymizerPerformanceCsvRow = dict[str, LxAnonymizerPerformanceCsvCell]
 
 
-class LxAnonymizerDurationStatsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class LxAnonymizerDurationStatsPayload(DtypesModel):
     count: int = Field(ge=0)
     min: float = Field(ge=0.0)
     mean: float = Field(ge=0.0)
@@ -20,9 +20,7 @@ class LxAnonymizerDurationStatsPayload(BaseModel):
     p95: float = Field(ge=0.0)
 
 
-class LxAnonymizerPerformanceRunPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class LxAnonymizerPerformanceRunPayload(DtypesModel):
     source_path: str
     staged_path: str
     media_type: LxAnonymizerPerformanceMediaType
@@ -47,9 +45,7 @@ class LxAnonymizerPerformanceRunPayload(BaseModel):
     error: str = ""
 
 
-class LxAnonymizerPerformanceSummaryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class LxAnonymizerPerformanceSummaryPayload(DtypesModel):
     total_runs: int = Field(ge=0)
     ok_runs: int = Field(ge=0)
     failed_runs: int = Field(ge=0)
@@ -60,9 +56,7 @@ class LxAnonymizerPerformanceSummaryPayload(BaseModel):
     end_to_end_seconds: LxAnonymizerDurationStatsPayload
 
 
-class LxAnonymizerPerformancePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class LxAnonymizerPerformancePayload(DtypesModel):
     summary: LxAnonymizerPerformanceSummaryPayload
     runs: list[LxAnonymizerPerformanceRunPayload]
 

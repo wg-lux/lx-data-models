@@ -1,26 +1,22 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class CenterNameFixtureFieldsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class CenterNameFixtureFieldsPayload(FrozenContractModel):
     name: str
     first_names: list[str] = Field(default_factory=list)
     last_names: list[str] = Field(default_factory=list)
 
 
-class CenterNameFixturePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class CenterNameFixturePayload(FrozenContractModel):
     model: str
     fields: CenterNameFixtureFieldsPayload
 
 
-class NameRecordPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class NameRecordPayload(FrozenContractModel):
     model: str
     fields: dict[str, str]
 

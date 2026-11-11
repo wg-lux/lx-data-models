@@ -3,7 +3,7 @@
 from typing import Annotated, Literal, Self
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
+from pydantic import AwareDatetime, ConfigDict, Field, model_validator
 
 from lx_dtypes.models.contracts.dtypes_record_persistence import (
     DtypesRecordPersistencePayload,
@@ -12,12 +12,13 @@ from lx_dtypes.models.ledger.medical.Write import (
     PatientLabValueCreate,
     PatientMedicationCreate,
 )
+from lx_dtypes.models.model import StrictContractModel
 
 PositiveId = Annotated[int, Field(gt=0)]
 
 
-class RevisionContract(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, allow_inf_nan=False)
+class RevisionContract(StrictContractModel):
+    model_config = ConfigDict(allow_inf_nan=False)
 
 
 class ExaminationClinicalContent(RevisionContract):

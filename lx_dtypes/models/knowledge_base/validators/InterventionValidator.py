@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from typing import Literal, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from lx_dtypes.factories import str_unknown_factory
 from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import (
@@ -24,6 +24,7 @@ from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReference im
 from lx_dtypes.models.knowledge_base.validators.ValueTypes import (
     ValidationParams,
 )
+from lx_dtypes.models.model import DtypesModel
 
 InterventionValidatorOperator = Literal["exists", "missing", "condition"]
 InterventionValidatorPrecedence = Literal["required", "optional"]
@@ -43,9 +44,7 @@ class InterventionValidatorConditionClause(FindingsValidatorConditionClause):
     pass
 
 
-class InterventionValidatorCondition(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class InterventionValidatorCondition(DtypesModel):
     any: list[InterventionValidatorConditionClause] = Field(default_factory=list)
     all: list[InterventionValidatorConditionClause] = Field(default_factory=list)
     then_requires: list[ValidatorRequirementReference] = Field(default_factory=list)
@@ -65,9 +64,7 @@ class InterventionValidatorCondition(BaseModel):
         )
 
 
-class InterventionValidatorQuery(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class InterventionValidatorQuery(DtypesModel):
     finding: str | None = None
     intervention: str | None = None
     operator: InterventionValidatorOperatorLiteral = "exists"

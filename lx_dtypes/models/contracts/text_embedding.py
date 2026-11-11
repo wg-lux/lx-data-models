@@ -3,19 +3,19 @@
 from math import hypot
 from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, FiniteFloat, model_validator
+from pydantic import Field, FiniteFloat, model_validator
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class EmbeddingSpace(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+class EmbeddingSpace(FrozenContractModel):
     model: str = Field(min_length=1, max_length=255)
     revision: str = Field(min_length=1, max_length=255)
     dimensions: int = Field(ge=1, le=16384)
     preprocessing: str = Field(min_length=1, max_length=255)
 
 
-class TextEmbedding(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+class TextEmbedding(FrozenContractModel):
     space: EmbeddingSpace
     vector: list[FiniteFloat] = Field(min_length=1, max_length=16384)
 
@@ -43,8 +43,7 @@ class TextEmbedding(BaseModel):
         )
 
 
-class ReportConceptSpan(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+class ReportConceptSpan(FrozenContractModel):
     report_id: int = Field(gt=0)
     source_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     start: int = Field(ge=0)

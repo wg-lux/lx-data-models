@@ -1,22 +1,9 @@
-from .knowledge_base import (
-    KB_DDICTS,
-    KB_MODEL_NAMES_LITERAL,
-    KB_MODEL_NAMES_ORDERED,
-    KB_MODELS,
-    KB_MODELS_DJANGO,
-)
-from .ledger import (
-    L_DDICTS,
-    L_MODEL_NAMES_LITERAL,
-    L_MODEL_NAMES_ORDERED,
-    L_MODELS,
-    L_MODELS_DJANGO,
-)
+"""Backend aggregation reuses the canonical Pydantic model definitions."""
 
-type MODEL_NAMES_LITERAL = KB_MODEL_NAMES_LITERAL | L_MODEL_NAMES_LITERAL
+from .knowledge_base import KB_MODELS_DJANGO
+from .ledger import L_MODELS_DJANGO
+from .pydantic_main import DDICTS, MODEL_NAMES, MODEL_NAMES_LITERAL, MODELS
 
-MODEL_NAMES = KB_MODEL_NAMES_ORDERED + L_MODEL_NAMES_ORDERED
-
-type MODELS = KB_MODELS | L_MODELS
 type MODELS_DJANGO = KB_MODELS_DJANGO | L_MODELS_DJANGO
-type DDICTS = KB_DDICTS | L_DDICTS
+
+__all__ = ["DDICTS", "MODEL_NAMES", "MODEL_NAMES_LITERAL", "MODELS", "MODELS_DJANGO"]

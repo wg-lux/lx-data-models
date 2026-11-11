@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 
-class FrameVideoAnalysisResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameVideoAnalysisResult(FrozenContractModel):
     file_readable: bool = False
     has_video_stream: bool = False
     has_audio_stream: bool = False
@@ -19,18 +19,14 @@ class FrameVideoAnalysisResult(BaseModel):
     warnings: list[str] = Field(default_factory=list)
 
 
-class FrameStreamingCompatibilityResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameStreamingCompatibilityResult(FrozenContractModel):
     web_compatible: bool = False
     streaming_friendly: bool = False
     needs_conversion: bool = False
     recommendations: list[str] = Field(default_factory=list)
 
 
-class FrameDjangoAccessResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameDjangoAccessResult(FrozenContractModel):
     orm_accessible: bool = False
     has_raw_file: bool = False
     has_processed_file: bool = False
@@ -40,9 +36,7 @@ class FrameDjangoAccessResult(BaseModel):
     errors: list[str] = Field(default_factory=list)
 
 
-class FrameFileInfoResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameFileInfoResult(FrozenContractModel):
     filename: str
     size_bytes: int
     size_mb: float
@@ -52,9 +46,7 @@ class FrameFileInfoResult(BaseModel):
     exists: bool = True
 
 
-class FrameAnonymizationStatisticsResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class FrameAnonymizationStatisticsResult(FrozenContractModel):
     requests: dict[str, int]
     frames: dict[str, int]
     storage: dict[str, float | int]

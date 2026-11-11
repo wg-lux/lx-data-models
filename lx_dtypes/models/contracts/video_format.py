@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import field_validator
+
+from lx_dtypes.models.model import DtypesModel
 
 
-class VideoFormatInfo(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class VideoFormatInfo(DtypesModel):
     video_codec: str = "unknown"
     pixel_format: str = "unknown"
     width: int = 0

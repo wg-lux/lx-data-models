@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from lx_dtypes.models.model import StrictContractModel
 
 
-class VideoFrameStateContract(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, from_attributes=True)
+class VideoFrameStateContract(StrictContractModel):
+    model_config = ConfigDict(from_attributes=True)
 
     frame_count: int | None = Field(default=None, ge=0)
 

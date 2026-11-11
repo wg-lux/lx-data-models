@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import ConfigDict
+
+from lx_dtypes.models.model import DtypesModel
 
 
-class SensitiveMetaUpdatePayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
+class SensitiveMetaUpdatePayload(DtypesModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
 
     dob_verified: bool = False
     names_verified: bool = False

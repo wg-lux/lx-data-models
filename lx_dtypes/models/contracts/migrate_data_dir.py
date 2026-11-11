@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import FrozenContractModel
 
 type MigrateDataDirNull = None
 type MigrateDataDirManifestValue = str | bool | MigrateDataDirNull
 
 
-class MigrateDataDirCommandOptionsPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MigrateDataDirCommandOptionsPayload(FrozenContractModel):
     source_root: str = Field(min_length=1)
     dry_run: bool
     manifest_path: str = ""
@@ -31,9 +31,7 @@ class MigrateDataDirManifestEntryData(TypedDict):
     upload_job_id: MigrateDataDirManifestValue
 
 
-class MigrateDataDirManifestEntryPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MigrateDataDirManifestEntryPayload(FrozenContractModel):
     source_path: str = Field(min_length=1)
     destination_path: str = Field(min_length=1)
     storage_class: str = Field(min_length=1)
@@ -73,9 +71,7 @@ class MigrateDataDirManifestData(TypedDict):
     skipped_entries: list[MigrateDataDirManifestEntryData]
 
 
-class MigrateDataDirManifestPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
-
+class MigrateDataDirManifestPayload(FrozenContractModel):
     command: str = Field(min_length=1)
     created_at: str = Field(min_length=1)
     source_root: str = Field(min_length=1)

@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonObject, JsonValue
 
@@ -27,7 +29,7 @@ class TemporalInferenceDispatchResult:
         return asdict(self)
 
 
-class TemporalInferenceHistoryResultPayload(BaseModel):
+class TemporalInferenceHistoryResultPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", strict=False)
 
     backend: str | None = None
@@ -49,7 +51,7 @@ class TemporalInferenceHistoryResultPayload(BaseModel):
     score_vectors_stored: bool | None = None
 
 
-class TemporalInferenceHistoryConfigPayload(BaseModel):
+class TemporalInferenceHistoryConfigPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", strict=False)
 
     kind: str | None = None

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Literal, TypedDict
 
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from lx_dtypes.models.model import DtypesModel
 
 ReportTemplateIssueSeverityLiteral = Literal["info", "warning", "blocking"]
 ReportTemplateLifecycleStatusLiteral = Literal["draft", "published"]
@@ -45,7 +47,7 @@ class ReportTemplateReadinessSummaryDataDict(TypedDict):
     issues: list[ReportTemplateReadinessIssueDataDict]
 
 
-class ReportTemplateReadinessIssue(BaseModel):
+class ReportTemplateReadinessIssue(DtypesModel):
     code: str
     severity: ReportTemplateIssueSeverityLiteral
     message: str
@@ -56,7 +58,7 @@ class ReportTemplateReadinessIssue(BaseModel):
     source: ReportTemplateIssueSourceDataDict | None = None
 
 
-class ReportTemplateReadinessSummary(BaseModel):
+class ReportTemplateReadinessSummary(DtypesModel):
     lifecycle_status: ReportTemplateLifecycleStatusLiteral
     readiness: ReportTemplateReadinessLiteral
     can_preview: bool

@@ -10,12 +10,106 @@ guide to advisory validation and strict boundary validation.
 
 ## Single source of truth
 
+Every package-owned object model inherits a profile from
+`lx_dtypes.models.model`, including contracts, KB definitions, ledger records,
+metadata, configuration, and standalone helper models:
+
+| Profile | Common policy |
+| --- | --- |
+| `DtypesModel` | Reject unknown object fields; retain capture-model coercion and mutability. |
+| `StrictContractModel` | Also require native Python field types. |
+| `FrozenContractModel` | Also reject field assignment. |
+| `DtypesRootModel[T]` | Validate the declared root value; mapping keys are data rather than extra object fields. |
+
+Existing model-specific field constraints, validators, serializers, and deliberate
+normalization remain authoritative. A shared base does not imply that every
+timestamp is a UTC date, every number is nonnegative, or every model is immutable.
+Frozen objects may still contain mutable lists or dictionaries; evaluation
+boundaries reparse model instances instead of trusting their construction history.
+
+The [machine-readable boundary inventory](../model-boundaries.yml) records every
+explicit extra-field projection/extension, framework adapter, and retained
+contract dependency on runtime engines. It also lists models whose previously
+implicit extra-field behavior now rejects unknown fields. This is an intentional
+compatibility change: remove unsupported payload fields rather than relying on
+silent dropping. Explicit FHIR extensions, provider metadata and versioned host
+projections keep their declared policies. The inventory describes architecture;
+the executable policies live in the shared model classes.
+
 The knowledge-base model registry defines supported package records; the parser
 owns aliases; `KnowledgeBaseConfig` and `DataLoader` own manifest normalization
 and dependency selection. Authoring checks consume these definitions rather than
 maintaining a second schema or dependency resolver. `CoreConceptCollection`
 owns concept-graph invariants, and the reporting readiness engine owns template
 publication checks.
+
+Pydantic registries have one owner in each domain's `pydantic_main.py`. Django
+aggregation reuses those definitions and adds ORM adapters only when requested.
+`lx_dtypes.models.MODELS`, both domain lookups, and `Ledger` import without Django
+setup. `VideoFileDjango` belongs to `l_vid_file_django_lookup` rather than the
+Pydantic lookup; its existing explicit adapter import remains available.
+
+## Contract and evaluation ownership
+
+| Layer | Responsibility |
+| --- | --- |
+| Contracts and shared models | Data shapes, local field/cross-field invariants and transport serialization. |
+| Knowledge base | Versioned definitions, admissible relationships and declarative rules. |
+| Ledger | Observed values, identities and explicit terminology/evidence references. |
+| `lx_dtypes.evaluation` | Parse through the owning model, delegate semantic rules, return findings or derived results. |
+| Host adapters | Resolve authorized records, persist data and enforce transactions. |
+
+`parse_contract(Model, payload)` and `parse_contract_json(Model, text)` are strict
+boundaries: they return a validated model or raise its validation error.
+`validate_contract` and `validate_contract_json` use exactly those parsers but
+return the canonical findings contract for expected validation failures. JSON
+parsing retains Pydantic's native date and UUID semantics; decoding a JSON date
+into a Python string is not equivalent to passing a native datetime to a strict
+Python model.
+
+```python
+from lx_dtypes.evaluation import parse_contract, validate_contract_json
+from lx_dtypes.models.contracts.time import PtsTimestamp
+
+reading = parse_contract(PtsTimestamp, {
+    "clock_id": "video-generation-1", "ticks": 90000,
+    "time_base_num": 1, "time_base_den": 90000,
+})
+result = validate_contract_json(PtsTimestamp, reading.model_dump_json())
+assert result.value == reading
+```
+
+Examination and time-offset assessment delegate to the KB's existing rules.
+`assess_time_offset` uses the same contract/terminology report as examination
+assessment, checking the exact owning module/version and reference clock kinds.
+Expected semantic failures have machine-readable codes; broken configuration and
+programming errors propagate. Neither assessment authorizes persistence.
+Electrical frame alignment lives in `evaluation.electrical` and numeric rule
+interpretation in `evaluation.numeric`. Their legacy public imports delegate to
+these implementations; no second algorithm or rule set is maintained.
+
+The inventory makes the remaining structural outliers explicit. In particular,
+package snapshots still restore runtime KBs to check graph/digest/readiness, and
+study exchange still recomputes assessments while validating its current wire
+contract. Removing those checks would loosen existing persistence guarantees, so
+their reverse dependencies remain checked exceptions. Dataset envelopes embed
+ledger videos; revision payloads reuse medical write DTOs; table mappings depend
+on the canonical KB registry and descriptor definitions. Installed example modules,
+historical ORM placement, and report-template compatibility paths are also listed.
+Two legacy contract convenience helpers still load YAML files, and prediction
+configuration can carry a Python activation callable. These are identified
+separately from portable wire models; new file loaders belong under interfaces.
+
+All tests and fixtures belong in `tests/`. Former package-local API tests now run
+in the normal unit lane. Terminology checks that replace framework modules run
+through `tests/test_terminology_verification.py` in a dedicated subprocess; their
+doubles cannot replace Django in the main test process.
+
+Run `uv run python scripts/lint_model_boundaries.py` before submission. The same
+check runs in pytest and the pre-commit quality gate. It rejects direct Pydantic
+base bypasses, unreviewed extra-field policies or runtime imports, framework
+adapter drift, and stale exceptions. `--report` prints current observations
+without changing or approving the inventory.
 
 For one explicit manifest, `lx_dtypes.packages.validate_package` composes those
 checks with optional ledger examinations through `assess_examination`. It does
@@ -26,12 +120,12 @@ documents the public API and its distinction from runtime registry loading.
 
 ## Advisory validation during data capture
 
-Use `lx_dtypes.validation` when incomplete or inconsistent input should produce
+Use `lx_dtypes.evaluation` when incomplete or inconsistent input should produce
 feedback without interrupting the caller:
 
 ```python
 from lx_dtypes import load_knowledge_base
-from lx_dtypes.validation import assess_examination
+from lx_dtypes.evaluation import assess_examination
 
 kb = load_knowledge_base("report_template_examples")
 report = assess_examination(
@@ -45,6 +139,8 @@ report = assess_examination(
 )
 print(report.model_dump(mode="json"))
 ```
+
+`lx_dtypes.validation` remains a compatibility re-export of the same functions.
 
 The knowledge base owns terminology and predefined study rules. The ledger owns
 observations and their terminology provenance. Contracts own the exchange shape.

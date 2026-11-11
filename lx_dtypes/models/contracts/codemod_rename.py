@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from pydantic import ConfigDict, RootModel, field_validator
+from pydantic import ConfigDict, field_validator
+
+from lx_dtypes.models.model import DtypesRootModel
 
 from .json_types import JsonValue
 
 
-class CodemodRenameMapPayload(RootModel[dict[str, str]]):
+class CodemodRenameMapPayload(DtypesRootModel[dict[str, str]]):
     model_config = ConfigDict(frozen=True, strict=True)
 
     @field_validator("root", mode="after")
