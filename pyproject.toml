@@ -24,7 +24,6 @@ dependencies = [
   "pandas>=2.2.3",
   "pandas-stubs>=2.3.3.251201",
   "pandera[pandas,io,mypy]>=0.27.0",
-  "pillow>=11.3.0",
   "pydantic>=2.10.6",
   "python-ffmpeg>=2.0.12",
   "pyyaml>=6.0.2",
@@ -53,7 +52,7 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.6.5"
+version = "0.6.6"
 
 [project.optional-dependencies]
 dev = [

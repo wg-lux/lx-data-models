@@ -53,7 +53,6 @@ let
     pandas
     pandas-stubs
     pandera
-    pillow
     pydantic
     python-ffmpeg
     pyyaml
