@@ -3,6 +3,11 @@
 Maintained by the lx-dtypes maintainers. The structural contract is documented in
 [Structure of a valid lx-dtypes package](../../docs/guides/dtypes-package-structure.md).
 The machine-readable inventory is [definitions.yml](definitions.yml).
+Its `resource_contracts` section identifies the parser and selection boundary for
+each category. A study document configures research populations and analyses; a
+report template configures clinical capture and report output. Selecting either
+must not implicitly select or import the other. Concept-only terminology packages
+are valid packages and are not expected to contain a report template.
 Its `source_provenance` section identifies the authority and applicability of each
 current module's sources. File-level citations narrow guideline attribution to the
 records they describe; local and synthetic definitions are explicitly distinguished

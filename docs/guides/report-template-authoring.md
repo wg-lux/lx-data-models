@@ -73,8 +73,10 @@ separate numbers. Older packages can contain different questions and rules.
 
 Compare your question list with the existing template. Mark each question as
 “reuse”, “change”, or “add”. Reuse established definitions when their meaning
-matches your protocol. Keep an editable copy under a new study package identity
-when creating a different study; retain the original release for existing data.
+matches your protocol. Keep an editable copy under a new report-template package
+identity when creating a different study; retain the original release for existing
+data. Dataset/cohort setup and analysis definitions remain separate study documents
+under `data/study_metadata`; a reporting-package export does not create them.
 
 The [example package](../../lx_dtypes/data/report_templates/report_template_examples/report_templates.yml)
 shows the file format. The [package guide](dtypes-package-structure.md) provides

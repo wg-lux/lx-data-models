@@ -33,6 +33,7 @@ def test_current_definitions_load_and_have_no_unclassified_yaml() -> None:
     )
     loader = DataLoader(input_dirs=[p.parent for p in manifests])
     selected: set[Path] = set()
+    study_documents = set((root / "study_metadata").rglob("*.yml"))
     for manifest in manifests:
         config = yaml.safe_load(manifest.read_text())
         kb = loader.load_knowledge_base(config["name"])
@@ -50,6 +51,8 @@ def test_current_definitions_load_and_have_no_unclassified_yaml() -> None:
             strict_mixed_styles=True,
             check_authoring=True,
         )
+        # Reporting dependencies must not pull research setup into clinical capture.
+        assert not module_files & study_documents, manifest
         selected.update(module_files)
     inventory = yaml.safe_load((root / "definitions.yml").read_text())
     sidecars = {root / item["path"] for item in inventory["sidecars"]}
@@ -74,6 +77,14 @@ def test_current_definitions_load_and_have_no_unclassified_yaml() -> None:
 def test_study_documents_are_separate_and_validate() -> None:
     root = package_data_root()
     inventory = yaml.safe_load((root / "definitions.yml").read_text())
+    assert set(inventory["resource_contracts"]) == {
+        "study_metadata",
+        "terminology",
+        "report_templates",
+    }
+    assert inventory["resource_contracts"]["study_metadata"]["loader"] == (
+        "lx_dtypes.utils.study_setup_yaml.parse_study_setup_yaml"
+    )
     paths = {root / item["path"] for item in inventory["study_metadata"]}
     assert paths == set((root / "study_metadata").glob("*.yml"))
     for path in paths:

@@ -25,6 +25,8 @@ from lx_dtypes.knowledge_base_registry import (
     RegistryEntry,
     RegistryPayload,
 )
+from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
+from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,
@@ -45,6 +47,9 @@ from lx_dtypes.utils.parser import camel_to_snake
 
 from .terminology_schemas import (
     ImportTerminologyBundleResponse,
+    ReportTemplateCatalogBundle,
+    ReportTemplateCatalogResponse,
+    ReportTemplateCatalogTemplate,
     SelectTerminologyBundleResponse,
     TerminologyBundleListResponse,
     TerminologyBundleVersion,
@@ -140,6 +145,72 @@ class TerminologyService:
             active=next((bundle for bundle in bundles if bundle.is_active), None),
             bundles=bundles,
         )
+
+    def list_report_templates(
+        self, *, examination: str | None = None
+    ) -> ReportTemplateCatalogResponse:
+        """Discover usable templates without changing the active bundle.
+
+        Resolve each registered version independently: one unavailable source
+        must not hide valid templates in another version. Public errors never
+        expose registry paths or filesystem diagnostics.
+        """
+        payload, revision = self._snapshot()
+        active = self._active(payload)
+        bundles: list[ReportTemplateCatalogBundle] = []
+        for name, versions in sorted(payload.modules.items()):
+            for version, entry in sorted(versions.items()):
+                bundle = ReportTemplateCatalogBundle(
+                    module_name=name,
+                    version=version,
+                    is_active=(name, version) == active,
+                    templates=[],
+                )
+                try:
+                    metadata = self._bundle((name, version), entry, active)
+                    bundle.medical_field = metadata.medical_field
+                    kb = self._load((name, version), entry)
+                    validator = ReportTemplateValidator(
+                        kb=kb, compiler=ReportTemplateCompiler(kb=kb)
+                    )
+                    for template_name, template in sorted(kb.report_template.items()):
+                        if (
+                            examination is not None
+                            and template.examination != examination
+                        ):
+                            continue
+                        if (
+                            kb.get_report_template_lifecycle_status(template_name)
+                            != "published"
+                        ):
+                            continue
+                        compiled = validator.validate_and_compile(
+                            template_name, mode="production"
+                        )
+                        if not compiled["summary"].can_publish:
+                            continue
+                        bundle.templates.append(
+                            ReportTemplateCatalogTemplate(
+                                name=template_name,
+                                version=template.version,
+                                examination=template.examination,
+                                name_de=template.name_de,
+                                name_en=template.name_en,
+                            )
+                        )
+                except (
+                    TerminologyError,
+                    LookupError,
+                    ValueError,
+                    RuntimeError,
+                    OSError,
+                ):
+                    bundle.templates = []
+                    bundle.error = (
+                        "Bundle report templates could not be loaded or validated."
+                    )
+                bundles.append(bundle)
+        return ReportTemplateCatalogResponse(revision=revision, bundles=bundles)
 
     def load(self, module_name: str, version: str) -> KnowledgeBase:
         payload, _ = self._snapshot()

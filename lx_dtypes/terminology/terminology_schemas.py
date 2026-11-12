@@ -38,3 +38,21 @@ class ImportTerminologyBundleResponse(DtypesModel):
     revision: str
     imported: TerminologyBundleVersion
     counts: dict[str, int]
+
+
+class ReportTemplateCatalogTemplate(DtypesModel):
+    name: str
+    version: str | None
+    examination: str
+    name_de: str | None = None
+    name_en: str | None = None
+
+
+class ReportTemplateCatalogBundle(TerminologyBundleVersion):
+    templates: list[ReportTemplateCatalogTemplate]
+    error: str | None = None
+
+
+class ReportTemplateCatalogResponse(DtypesModel):
+    revision: str
+    bundles: list[ReportTemplateCatalogBundle]

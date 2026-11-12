@@ -13,6 +13,7 @@ from ninja.files import UploadedFile
 from lx_dtypes.terminology.lookup_tracker import register_runtime_lookup_tracker
 from lx_dtypes.terminology.terminology_schemas import (
     ImportTerminologyBundleResponse,
+    ReportTemplateCatalogResponse,
     SelectTerminologyBundleRequest,
     SelectTerminologyBundleResponse,
     TerminologyBundleListResponse,
@@ -57,6 +58,13 @@ def register_terminology_routes(
     def list_terminology_bundles(request: BaseRequest) -> TerminologyBundleListResponse:
         with _http_errors():
             return service.list_bundles()
+
+    @api.get("/terminology/report-templates", response=ReportTemplateCatalogResponse)
+    def list_report_template_catalog(
+        request: BaseRequest, examination: str | None = None
+    ) -> ReportTemplateCatalogResponse:
+        with _http_errors():
+            return service.list_report_templates(examination=examination)
 
     @api.get("/terminology/active/fhir", response=dict[str, Any])
     def export_active_terminology_fhir(request: BaseRequest) -> dict[str, Any]:

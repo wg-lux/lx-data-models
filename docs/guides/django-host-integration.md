@@ -77,6 +77,26 @@ LX_DTYPES_KB_REGISTRY = "/var/lib/host/terminology/registry.json"
 LX_DTYPES_TERMINOLOGY_IMPORT_ROOT = "/var/lib/host/terminology/terminology-packages"
 ```
 
+## Report-template discovery
+
+`GET /terminology/report-templates` discovers published, production-ready
+report templates across every registered module/version without changing the
+active preference. Optional `examination` filters template summaries by the
+canonical examination name. The response carries the registry `revision` and
+`bundles`; each bundle exposes its exact module/version, public metadata,
+`templates`, and nullable `error`. Summaries contain template name/version,
+examination, and localized names. A valid concept-only package returns an empty
+template list; an unavailable or invalid package returns an explicit error
+without preventing discovery of usable templates in other versions. Server
+filesystem paths are never part of these responses.
+
+Clients choose a template and its supplying bundle version together, then load
+it through `/report-templates/{module_name}/{template_name}?version=...` and
+persist the selected identity with the examination. Template versions identify
+the template definition; bundle versions identify the complete terminology
+graph. A template cannot safely be applied to an arbitrary different graph.
+Draft and readiness-blocked templates stay unavailable to normal reporting.
+
 ## URL Mounting
 
 Mount the API by including `lx_dtypes.django.urls` or by exposing

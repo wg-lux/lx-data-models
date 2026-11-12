@@ -10,6 +10,22 @@ criteria:
 - Structural validity does not establish clinical approval or downstream host projection support.
 - Current report_templates packages contain reporting records and validators only; concept definitions
   belong in terminology dependencies.
+resource_contracts:
+  study_metadata:
+    purpose: Dataset, cohort, eligibility and analysis definitions; never clinical capture templates.
+    contract: lx_dtypes.models.contracts.study_setup.StudySetupDefinition
+    loader: lx_dtypes.utils.study_setup_yaml.parse_study_setup_yaml
+    selection: Explicit study setup import; never KB discovery or active terminology selection.
+  terminology:
+    purpose: Reusable clinical concepts, examinations, classifications, units and reference catalogues.
+    contract: lx_dtypes.models.interface.KnowledgeBaseConfig.KnowledgeBaseConfig
+    loader: lx_dtypes.models.interface.KnowledgeBaseResolver.load_knowledge_base
+    selection: Exact registered module and version; concept-only packages need not ship report templates.
+  report_templates:
+    purpose: Report layout, finding references and validation rules over terminology dependencies.
+    contract: lx_dtypes.models.interface.KnowledgeBaseConfig.KnowledgeBaseConfig
+    loader: lx_dtypes.models.interface.KnowledgeBaseResolver.load_knowledge_base
+    selection: Published usable template plus its exact owning module and version; not a study definition.
 study_metadata:
 - path: study_metadata/research.yml
   contract: lx_dtypes.models.contracts.study_setup.StudySetupDefinition

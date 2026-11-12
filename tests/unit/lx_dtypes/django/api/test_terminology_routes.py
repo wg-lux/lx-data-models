@@ -956,3 +956,95 @@ def test_registry_identity_must_match_its_artifact(
         central.load_module_kb("published_terminology", version="2026.05.01")
     assert error.value.status == 409
     assert terminology_service.active_identity() is None
+
+
+def test_report_template_catalog_discovers_versions_without_activation(
+    terminology_api: TerminologyApi,
+) -> None:
+    from tests.paths import PACKAGE_ROOT
+
+    service = terminology_api.service
+    _write_registry(service.registry_path.parent, active=True)
+    registry = json.loads(service.registry_path.read_text())
+    registry["modules"]["report_template_examples"] = {
+        "0.1.1": {"input_dirs": [str(PACKAGE_ROOT / "data")]},
+        "unavailable-version": {"input_dirs": [str(PACKAGE_ROOT / "data")]},
+    }
+    service.registry_path.write_text(json.dumps(registry))
+    before = service.registry_path.read_bytes()
+
+    response = terminology_api.client.get(
+        "/base_api/terminology/report-templates?examination=colonoscopy", secure=True
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["revision"] == _registry_revision(service.registry_path)
+    bundles = {(b["module_name"], b["version"]): b for b in payload["bundles"]}
+    reporting = bundles[("report_template_examples", "0.1.1")]
+    assert reporting["is_active"] is False
+    assert reporting["error"] is None
+    assert {t["name"] for t in reporting["templates"]} >= {
+        "colonoscopy_training_basic"
+    }
+    assert all(t["examination"] == "colonoscopy" for t in reporting["templates"])
+    assert all(t["version"] for t in reporting["templates"])
+    concept_only = bundles[("published_terminology", "2026.04.30")]
+    assert concept_only["templates"] == []
+    assert concept_only["error"] is None
+    broken = bundles[("report_template_examples", "unavailable-version")]
+    assert broken["templates"] == []
+    assert broken["error"]
+    assert str(PACKAGE_ROOT) not in json.dumps(payload)
+    assert service.registry_path.read_bytes() == before
+
+
+def test_report_template_catalog_filters_unpublished_templates(
+    terminology_api: TerminologyApi,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests.paths import PACKAGE_ROOT
+
+    service = terminology_api.service
+    service.register_local(
+        "report_template_examples", "0.1.1", input_dirs=[PACKAGE_ROOT / "data"]
+    )
+    monkeypatch.setattr(
+        KnowledgeBase, "get_report_template_lifecycle_status", lambda self, name: "draft"
+    )
+
+    response = terminology_api.client.get(
+        "/base_api/terminology/report-templates", secure=True
+    )
+
+    assert response.status_code == 200
+    assert response.json()["bundles"][0]["templates"] == []
+    assert response.json()["bundles"][0]["error"] is None
+
+
+def test_report_template_catalog_rejects_readiness_blocked_templates(
+    terminology_api: TerminologyApi,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
+    from tests.paths import PACKAGE_ROOT
+
+    service = terminology_api.service
+    service.register_local(
+        "report_template_examples", "0.1.1", input_dirs=[PACKAGE_ROOT / "data"]
+    )
+    original = ReportTemplateValidator.validate_and_compile
+
+    def blocked(self: ReportTemplateValidator, name: str, *, mode: Any) -> dict[str, Any]:
+        assert mode == "production"
+        compiled = original(self, name, mode=mode)
+        compiled["summary"] = compiled["summary"].model_copy(update={"can_publish": False})
+        return compiled
+
+    monkeypatch.setattr(ReportTemplateValidator, "validate_and_compile", blocked)
+    response = terminology_api.client.get(
+        "/base_api/terminology/report-templates", secure=True
+    )
+    assert response.status_code == 200
+    assert response.json()["bundles"][0]["templates"] == []
+    assert response.json()["bundles"][0]["error"] is None
