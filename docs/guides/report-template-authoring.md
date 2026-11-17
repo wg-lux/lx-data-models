@@ -91,8 +91,11 @@ These are the few file terms you need:
 | `finding` | The observation being recorded, such as a polyp or resection attempt |
 | `classification` | A question or measurement about that observation |
 | `classification_choice` | An allowed answer to that question |
+| detail value (`classification_choice_descriptor`) | A number or text that an answer needs, such as a dose in mg; the unit is fixed |
+| `required: true` | Staff must answer this; the report shows it as missing until they do |
+| `multiple_allowed: true` | The observation can be recorded several times, such as one entry per drug given |
 | `report_finding` | Which observation and questions this template presents |
-| `report_template_section` | A group of observations shown together |
+| `report_template_section` | A group of observations shown together under one heading |
 | `findings_validator` | A rule that checks the recorded answers |
 | `report_template` | The sections and rules selected for this report |
 | `config.yaml` | The list of files and existing terminology packages to load |
@@ -179,7 +182,65 @@ sections, use unique names, increasing positions, and add their names to
 `report_sections`. `required: false` on the observation permits its absence;
 if your protocol requires at least one such observation, add a presence rule.
 
-## 5. Write the checks in ordinary language first
+## 5. Reuse the medication and electrosurgery sections
+
+Two sections are ready-made and shared by all colonoscopy reports. Add them
+instead of writing your own questions:
+
+| Section heading | What staff record | What must be answered |
+| --- | --- | --- |
+| Medikation (Medications) | Whether drugs were given; each drug given | For each drug: name and dose, route, form (bolus or infusion) and time |
+| HF-Chirurgie (Electrosurgery) | Whether high-frequency (HF) current was used; each use | For each use: mode and power setting |
+
+To add them, list both section names in your template and both packages in
+`config.yaml`:
+
+```yaml
+# report_templates.yml
+- model: report_template
+  name: my_study_report
+  examination: colonoscopy
+  report_sections:
+  - my_study_resection_section
+  - report_medications
+  - report_electrosurgery
+```
+
+```yaml
+# config.yaml
+depends_on:
+- report_medications
+- report_electrosurgery
+- coloreg
+```
+
+Read it as: “Show my resection questions, then the medication and electrosurgery
+sections.” The shared sections appear at the end of the report.
+
+Some answers need a value. A bolus needs nothing more, while an infusion also
+needs its flow rate. A power setting needs the number of watts. The application
+asks for the value only when the chosen answer needs one.
+
+By default staff do not have to say whether HF current was used. If your study
+needs that statement in every report, add the ready-made rule
+`elektrochirurgie_status_dokumentiert` under the template's
+`validators.findings_validators`; a complete example is in the
+[sample package](../examples/dtypes_packages/colonoscopy_medication_electrosurgery/report_templates.yml).
+
+Check the result with example records, as in step 7:
+
+| Example record | Expected feedback |
+| --- | --- |
+| Propofol, 120 mg, intravenous, bolus, 10:42 | Complete |
+| Propofol as an infusion, flow rate not entered | The flow rate is missing |
+| Electrosurgery recorded without a power setting | The power setting is missing |
+| Power setting of 900 W | Rejected: above the plausible limit of 400 W |
+| Nothing recorded about electrosurgery | No message, unless your template added the rule above |
+
+The packaged DGVS colonoscopy template (`dgvs_reporting@0.2.0`) already contains
+both sections and is a complete reference.
+
+## 6. Write the checks in ordinary language first
 
 For every rule, specify a trigger and an expected answer. For example:
 **“If a diathermic snare was used, electrosurgery settings must be documented.”**
@@ -209,12 +270,12 @@ of these choices”. The rule name already appears in the template's
 add new rules to `validators.yml`.
 
 Together, these examples form a draft for preview and review. Production use
-also needs the coverage metadata and publication described in step 7.
+also needs the coverage metadata and publication described in step 8.
 A rule can be present in a file without being selected by your template.
 Writing “required when a hot snare is used” in a description alone does not create
 a check. Technical rule names must agree exactly across files.
 
-## 6. Try example records and review the messages
+## 7. Try example records and review the messages
 
 Use invented records to check the draft together with your technical colleague.
 For the snare rule, these are the expected results:
@@ -235,7 +296,7 @@ A warning can mean “we need more information to evaluate this rule”. It does
 not necessarily mean the answer entered was wrong. Other template checks may
 still report missing fields even when this particular rule passes.
 
-## 7. Prepare the study for use
+## 8. Prepare the study for use
 
 Before installation, review these items with the study lead and administrator:
 
@@ -317,6 +378,31 @@ This trace describes checked-out source, not a running deployment. Historical
 ColoReg packages differ: `0.2.0` has only the polyp section. Confirm the request
 identity and registered source before comparing a browser response with YAML;
 editing this checkout does not update a host's registered release or cache.
+
+## Technical reference: medication and electrosurgery sections
+
+- `report_medications` has `section_kind: medications`: a patient-sourced
+  `medications` field (the regular medication list) plus the examination findings
+  `endoscopy_medication_status` and repeatable `endoscopy_medication_administration`.
+- `report_electrosurgery` is a normal findings section: optional
+  `endoscopy_electrosurgery_status` and repeatable
+  `endoscopy_electrosurgery_application` with required `electrosurgery_mode` and
+  `electrosurgery_power_setting` (W), and optional activation duration (s),
+  delivered energy (J) and curve comparison. Plausibility limits are technical
+  bounds, not clinical recommendations.
+- Ready-made rules in `report_electrosurgery`: `elektrochirurgie_status_dokumentiert`
+  (findings), `elektrochirurgie_modus_vollstaendig` and
+  `elektrochirurgie_leistung_vollstaendig` (classification, optional precedence).
+- A choice without detail values satisfies a required classification by itself;
+  a choice with detail values also needs each value. Client (lx-annotate
+  `reportingFindingReference.ts`) and server runtime apply the same rule.
+- Measured duration and energy come from a `PElectricalApplication`; the curve
+  comparison choice and its value come from a `PElectricalCurveComparison`
+  (`verdict`, `mean_mahalanobis_squared`). The host performs this mapping; the
+  comparison is a statistical similarity measure, not a clinical judgement. See
+  [electrosurgical measurements](electrosurgical-video-alignment.md#application-curves-and-regression-comparison).
+- `tests/unit/lx_dtypes/test_report_medication_electrosurgery.py` evaluates the
+  sample package with complete, incomplete and implausible records.
 
 ## Technical reference: validation commands
 

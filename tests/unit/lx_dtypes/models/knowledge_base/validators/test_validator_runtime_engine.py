@@ -686,3 +686,181 @@ def test_runtime_engine_simulates_medical_template_execution() -> None:
     assert complete_large_polyp["classification_validators"][0]["ok"] is True
     assert complete_large_polyp["intervention_validators"][0]["ok"] is True
     assert complete_large_polyp["unit_validators"][0]["ok"] is True
+
+
+def test_runtime_collects_failures_and_successes_after_unknown_rules_and_cycles() -> (
+    None
+):
+    template = ReportTemplate.model_validate(
+        {
+            "name": "collect_all",
+            "examination": "demo_exam",
+            "validators": {
+                "findings_validators": [
+                    "unknown_finding",
+                    "required_polyp",
+                    "absent_ulcer",
+                ],
+                "classification_validators": ["unknown_classification"],
+                "intervention_validators": ["unknown_intervention"],
+                "unit_validators": ["unknown_unit"],
+                "examination_validators": ["cycle", "unknown_exam", "independent_exam"],
+            },
+        }
+    )
+    result = evaluate_report_template_validators_runtime(
+        template,
+        findings_validators={
+            "required_polyp": FindingsValidator(name="required_polyp", finding="polyp"),
+            "absent_ulcer": FindingsValidator(
+                name="absent_ulcer", finding="ulcer", operator="missing"
+            ),
+        },
+        examination_validators={
+            "cycle": ExaminationValidator(
+                name="cycle", examination_validators=["cycle"]
+            ),
+            "independent_exam": ExaminationValidator(
+                name="independent_exam", finding_validators=["absent_ulcer"]
+            ),
+        },
+        classification_validators={},
+        intervention_validators={},
+        unit_validators={},
+        classifications={},
+        classification_choices={},
+        classification_choice_descriptors={},
+        interventions={},
+        units={},
+        reported_findings=[],
+    )
+    assert not result["ok"]
+    assert [(item["name"], item["ok"]) for item in result["findings_validators"]] == [
+        ("unknown_finding", False),
+        ("required_polyp", False),
+        ("absent_ulcer", True),
+    ]
+    assert [
+        (item["name"], item["ok"]) for item in result["examination_validators"]
+    ] == [
+        ("cycle", False),
+        ("unknown_exam", False),
+        ("independent_exam", True),
+    ]
+    assert {issue["code"] for issue in result["issues"]} >= {
+        "unknown_findings_validator_reference",
+        "unknown_classification_validator_reference",
+        "unknown_intervention_validator_reference",
+        "unknown_unit_validator_reference",
+        "unknown_examination_validator_reference",
+        "circular_examination_validator_dependency",
+    }
+    # Every failed result retains its own diagnostic in the aggregate response.
+    for results in (
+        result["findings_validators"],
+        result["classification_validators"],
+        result["intervention_validators"],
+        result["unit_validators"],
+        result["examination_validators"],
+    ):
+        for item in results:
+            assert bool(item["issues"]) is not item["ok"]
+            assert all(issue in result["issues"] for issue in item["issues"])
+
+
+def test_runtime_localizes_condition_requirements_without_changing_identifiers() -> (
+    None
+):
+    validator = FindingsValidator.model_validate(
+        {
+            "name": "medication_rule",
+            "name_de": "Medikamentengabe prüfen",
+            "finding": "medication",
+            "operator": "condition",
+            "query": {
+                "condition": {
+                    "all": [{"classification": "method", "value": "infusion"}],
+                    "then_requires": [{"classification": "flow_rate"}],
+                }
+            },
+        }
+    )
+    result = evaluate_findings_validator_runtime(
+        validator,
+        reported_findings=[
+            {
+                "finding": "medication",
+                "classifications": [
+                    {"classification": "method", "value": "infusion"},
+                ],
+            }
+        ],
+        display_names={"method": "Verabreichungsart", "flow_rate": "Flussrate"},
+    )
+    issue = result["issues"][0]
+    assert "Flussrate" in issue["message"]
+    assert "flow_rate" not in issue["message"]
+    assert issue["validator_name"] == "medication_rule"
+    assert issue["details"]["missing_requirements"] == ["classification:flow_rate"]
+    assert result["missing_required_classifications"] == ["flow_rate"]
+    assert result["finding"] == "medication"
+
+
+def test_runtime_display_names_prefer_available_translation_over_identity_defaults() -> (
+    None
+):
+    from lx_dtypes.models.knowledge_base.validators.RuntimeIssues import (
+        _runtime_display_names,
+    )
+
+    concepts = [
+        Classification(
+            name="german", name_de="Deutsche Bezeichnung", name_en="English label"
+        ),
+        Classification(
+            name="english_only", name_de="english_only", name_en="English fallback"
+        ),
+        Classification(name="blank", name_de="  ", name_en="English for blank"),
+        Classification(name="untranslated"),
+    ]
+    labels = _runtime_display_names("de", concepts)
+    assert labels == {
+        "german": "Deutsche Bezeichnung",
+        "english_only": "English fallback",
+        "blank": "English for blank",
+        "untranslated": "untranslated",
+    }
+    assert _runtime_display_names("en", concepts)["german"] == "English label"
+
+
+def test_terminology_relationship_feedback_uses_available_labels() -> None:
+    from lx_dtypes.models.knowledge_base.finding._Finding import Finding
+    from lx_dtypes.models.knowledge_base.validators.FindingTerminologyValidation import (
+        validate_reported_findings_against_terminology,
+    )
+
+    issues = validate_reported_findings_against_terminology(
+        [
+            {
+                "finding": "medication",
+                "classifications": [
+                    {"classification": "power", "value": 40},
+                ],
+            }
+        ],
+        findings={
+            "medication": Finding(
+                name="medication",
+                name_de="Medikamentengabe",
+                classifications=["dose"],
+            )
+        },
+        classifications={"power": Classification(name="power", name_de="Leistung")},
+        classification_choices={},
+        units={},
+    )
+    assert issues[0]["code"] == "classification_not_allowed_for_finding"
+    assert "Medikamentengabe" in issues[0]["message"]
+    assert "Leistung" in issues[0]["message"]
+    assert "medication" not in issues[0]["message"]
+    assert "power" not in issues[0]["message"]

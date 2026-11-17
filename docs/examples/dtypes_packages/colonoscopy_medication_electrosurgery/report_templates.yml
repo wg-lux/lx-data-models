@@ -1,0 +1,44 @@
+# A colonoscopy report that checks medication and electrosurgery documentation.
+# Synthetic example, not clinically approved. Every question and answer comes
+# from the shared packages listed in config.yaml; nothing is defined here.
+
+# Rule: "The report must say whether drugs were given."
+- model: findings_validator
+  name: example_medication_status_documented
+  name_de: "Dokumentation: Medikationsstatus"
+  name_en: "Documentation: medication status"
+  finding: endoscopy_medication_status
+  operator: exists
+  query:
+    finding: endoscopy_medication_status
+    operator: exists
+
+# Rule: "Both statements above must be present." The electrosurgery statement
+# is optional by default; listing its ready-made rule here makes it mandatory.
+- model: examination_validator
+  name: example_medication_and_electrosurgery_documented
+  name_de: "Medikation und HF-Chirurgie dokumentiert"
+  name_en: "Medication and electrosurgery documented"
+  finding_validators:
+    - example_medication_status_documented
+    - elektrochirurgie_status_dokumentiert
+  examination_validators: []
+
+# The report itself: two shared sections, checked by the rules above and by the
+# ready-made rules "every HF use needs a mode" and "... needs a power setting".
+- model: report_template
+  name: colonoscopy_medication_electrosurgery
+  name_de: "Koloskopie – Medikation und HF-Chirurgie"
+  name_en: "Colonoscopy – medication and electrosurgery"
+  version: "1.0.0"
+  verbosity_options: [short, standard, detailed]
+  examination: colonoscopy
+  report_sections:
+    - report_medications
+    - report_electrosurgery
+  validators:
+    examination_validators:
+      - example_medication_and_electrosurgery_documented
+    classification_validators:
+      - elektrochirurgie_modus_vollstaendig
+      - elektrochirurgie_leistung_vollstaendig

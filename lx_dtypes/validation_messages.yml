@@ -1,6 +1,7 @@
 # Canonical advisory boundary messages. Codes are the machine-readable API.
 de:
   terminology.time_reference_unknown: Die Zeitreferenz ist in dieser Wissensbasis nicht definiert.
+  terminology.electrical_curve_profile_unknown: Das elektrische Kurvenprofil ist in dieser Wissensbasis nicht definiert.
   terminology.time_reference_kind_mismatch: Die Uhrentypen stimmen nicht mit der Zeitreferenz überein.
   contract.invalid: Der Wert erfüllt die Vertragsbedingung nicht.
   contract.missing: Ein erforderliches Feld fehlt.
@@ -29,6 +30,7 @@ de:
   terminology.inadmissible: Die Untersuchung enthält eine unzulässige Terminologiereferenz oder Beziehung.
 en:
   terminology.time_reference_unknown: The time reference is not defined in this knowledge base.
+  terminology.electrical_curve_profile_unknown: The electrical curve profile is not defined in this knowledge base.
   terminology.time_reference_kind_mismatch: The clock kinds do not match the time reference.
   contract.invalid: The value does not satisfy the contract constraint.
   contract.missing: A required field is missing.

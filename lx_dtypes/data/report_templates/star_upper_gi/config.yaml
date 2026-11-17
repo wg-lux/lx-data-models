@@ -9,6 +9,7 @@ description: |
 version: 0.1.2
 medical_field: gastroenterology
 depends_on:
+- report_medications
 - star_upper_gi_terminology
 modules: []
 data:

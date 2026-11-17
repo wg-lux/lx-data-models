@@ -984,9 +984,7 @@ def test_report_template_catalog_discovers_versions_without_activation(
     reporting = bundles[("report_template_examples", "0.1.1")]
     assert reporting["is_active"] is False
     assert reporting["error"] is None
-    assert {t["name"] for t in reporting["templates"]} >= {
-        "colonoscopy_training_basic"
-    }
+    assert {t["name"] for t in reporting["templates"]} >= {"colonoscopy_training_basic"}
     assert all(t["examination"] == "colonoscopy" for t in reporting["templates"])
     assert all(t["version"] for t in reporting["templates"])
     concept_only = bundles[("published_terminology", "2026.04.30")]
@@ -1010,7 +1008,9 @@ def test_report_template_catalog_filters_unpublished_templates(
         "report_template_examples", "0.1.1", input_dirs=[PACKAGE_ROOT / "data"]
     )
     monkeypatch.setattr(
-        KnowledgeBase, "get_report_template_lifecycle_status", lambda self, name: "draft"
+        KnowledgeBase,
+        "get_report_template_lifecycle_status",
+        lambda self, name: "draft",
     )
 
     response = terminology_api.client.get(
@@ -1026,7 +1026,9 @@ def test_report_template_catalog_rejects_readiness_blocked_templates(
     terminology_api: TerminologyApi,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
+    from lx_dtypes.models.interface.ReportTemplateValidator import (
+        ReportTemplateValidator,
+    )
     from tests.paths import PACKAGE_ROOT
 
     service = terminology_api.service
@@ -1035,10 +1037,14 @@ def test_report_template_catalog_rejects_readiness_blocked_templates(
     )
     original = ReportTemplateValidator.validate_and_compile
 
-    def blocked(self: ReportTemplateValidator, name: str, *, mode: Any) -> dict[str, Any]:
+    def blocked(
+        self: ReportTemplateValidator, name: str, *, mode: Any
+    ) -> dict[str, Any]:
         assert mode == "production"
         compiled = original(self, name, mode=mode)
-        compiled["summary"] = compiled["summary"].model_copy(update={"can_publish": False})
+        compiled["summary"] = compiled["summary"].model_copy(
+            update={"can_publish": False}
+        )
         return compiled
 
     monkeypatch.setattr(ReportTemplateValidator, "validate_and_compile", blocked)

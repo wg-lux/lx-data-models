@@ -30,7 +30,7 @@ def test_report_template_example_module_yaml_json_roundtrip() -> None:
 
     assert exported_back["name"] == "star_upper_gi_main"
     assert exported_back["examination"] == "star_upper_gi_endoscopy"
-    assert len(exported_back["report_sections"]) == 1
+    assert len(exported_back["report_sections"]) == 2
     assert exported_back["readiness"]["can_preview"] is True
 
     template = kb.get_report_template("star_upper_gi_main")
@@ -183,6 +183,8 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
         "untersuchungsqualitaet_und_reichweite",
         "pathologische_befunde_und_interventionen",
         "komplikationen_und_empfehlungen",
+        "report_medications",
+        "report_electrosurgery",
     ]
     assert {
         section_name: section["title_de"] for section_name, section in sections.items()
@@ -197,6 +199,8 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
             "Pathologische Befunde und Interventionen"
         ),
         "komplikationen_und_empfehlungen": "Komplikationen und Empfehlungen",
+        "report_medications": "Medikation",
+        "report_electrosurgery": "HF-Chirurgie",
     }
     assert all(section["title_en"] for section in sections.values())
 
@@ -267,7 +271,7 @@ def test_colonoscopy_template_covers_guideline_report_documentation() -> None:
     } <= sedation_findings
     medication_finding = next(
         finding
-        for finding in sections["indikation_und_sedierung"]["findings"]
+        for finding in sections["report_medications"]["findings"]
         if finding["finding"] == "endoscopy_medication_administration"
     )
     assert medication_finding["multiple_allowed"] is True

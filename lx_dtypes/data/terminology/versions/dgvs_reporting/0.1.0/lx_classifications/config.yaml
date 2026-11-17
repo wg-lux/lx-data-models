@@ -1,0 +1,11 @@
+name: lx_classifications
+name_de: "LX Klassifikationen"
+description: ""
+version: 0.1.0
+modules: []
+depends_on:
+  - lx_classification_choices
+data:
+  dirs:
+    - ./data
+    - ./classification_types

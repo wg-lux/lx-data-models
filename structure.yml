@@ -19,6 +19,9 @@ entrypoints:
 - name: Structure linter
   file: scripts/lint_structure.py
   purpose: Validate the context graph
+- name: Development environment
+  file: devenv.nix
+  purpose: Non-mutating shell activation, explicit frozen dependency sync and editor KB helpers
 dependencies:
   internal: []
   external:
@@ -70,6 +73,5 @@ files:
 - templates
 - typings
 - .agents
-- devenv.nix
 - flake.nix
 - CONTRIBUTING.md

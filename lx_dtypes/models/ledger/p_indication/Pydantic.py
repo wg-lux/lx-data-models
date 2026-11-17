@@ -13,6 +13,7 @@ from lx_dtypes.names import (
 
 from .DataDict import (
     PIndicationDataDict,
+    SerializedPIndicationDataDict,
 )
 
 
@@ -31,6 +32,28 @@ class PIndication(LedgerBaseModel[PIndicationDataDict]):
     def ddict_class(self) -> type[PIndicationDataDict]:
         return PIndicationDataDict
 
+    @property
+    def serialized_ddict_class(self) -> type[SerializedPIndicationDataDict]:
+        return SerializedPIndicationDataDict
+
+    @classmethod
+    def serialized_model_class(cls) -> type["SerializedPIndication"]:
+        return SerializedPIndication
+
     @classmethod
     def nested_fields(cls) -> list[str]:
         return P_INDICATION_MODEL_NESTED_FIELDS
+
+
+class SerializedPIndication(LedgerBaseModel[SerializedPIndicationDataDict]):
+    indication: str
+    patient_examination: str
+    patient_indication_classifications: str = ""
+
+    @property
+    def ddict_class(self) -> type[SerializedPIndicationDataDict]:
+        return SerializedPIndicationDataDict
+
+    @classmethod
+    def nested_fields(cls) -> list[str]:
+        return []

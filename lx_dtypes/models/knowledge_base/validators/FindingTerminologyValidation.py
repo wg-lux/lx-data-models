@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from functools import partial
 
 from lx_dtypes.language import DEFAULT_LANGUAGE
 from lx_dtypes.language import validate_language as _validate_language
@@ -14,6 +15,7 @@ from lx_dtypes.models.knowledge_base.report_template.ReportedFindings import (
 from lx_dtypes.models.knowledge_base.validators.RuntimeIssues import (
     RuntimeValidationLanguage,
     _build_issue,
+    _runtime_display_names,
     _runtime_message,
 )
 from lx_dtypes.models.knowledge_base.validators.ValidatorRuntimeDataDict import (
@@ -38,6 +40,16 @@ def validate_reported_findings_against_terminology(
     """Validate normalized findings against the currently loaded YAML terminology."""
 
     _validate_language(language)
+    message = partial(
+        _runtime_message,
+        display_names=_runtime_display_names(
+            language,
+            findings.values(),
+            classifications.values(),
+            classification_choices.values(),
+            units.values(),
+        ),
+    )
     issues: list[RuntimeValidationIssueDataDict] = []
     for occurrence_index, occurrence in enumerate(
         _normalize_reported_findings(reported_findings)
@@ -47,7 +59,7 @@ def validate_reported_findings_against_terminology(
             issues.append(
                 _build_issue(
                     code="unknown_finding",
-                    message=_runtime_message(
+                    message=message(
                         "unknown_finding", language, finding=occurrence["finding"]
                     ),
                     validator_name="terminology",
@@ -64,7 +76,7 @@ def validate_reported_findings_against_terminology(
                 issues.append(
                     _build_issue(
                         code="unknown_classification",
-                        message=_runtime_message(
+                        message=message(
                             "unknown_classification",
                             language,
                             classification_name=classification_name,
@@ -82,7 +94,7 @@ def validate_reported_findings_against_terminology(
                 issues.append(
                     _build_issue(
                         code="classification_not_allowed_for_finding",
-                        message=_runtime_message(
+                        message=message(
                             "classification_not_allowed_for_finding",
                             language,
                             classification_name=classification_name,
@@ -107,7 +119,7 @@ def validate_reported_findings_against_terminology(
                     issues.append(
                         _build_issue(
                             code="classification_choice_not_allowed",
-                            message=_runtime_message(
+                            message=message(
                                 "classification_choice_not_allowed",
                                 language,
                                 value_name=value_name,
@@ -127,7 +139,7 @@ def validate_reported_findings_against_terminology(
                     issues.append(
                         _build_issue(
                             code="unknown_unit",
-                            message=_runtime_message(
+                            message=message(
                                 "unknown_unit", language, unit_name=unit_name
                             ),
                             validator_name="terminology",

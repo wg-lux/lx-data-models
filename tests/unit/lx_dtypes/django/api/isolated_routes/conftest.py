@@ -6,8 +6,6 @@ our delivered route modules under a temporary package and restore sys.modules.
 
 from __future__ import annotations
 
-from lx_dtypes.models.model import DtypesModel
-
 import importlib.util
 import sys
 from contextlib import nullcontext
@@ -20,6 +18,7 @@ from uuid import UUID
 import pytest
 from pydantic import BaseModel, ConfigDict
 
+from lx_dtypes.models.model import DtypesModel
 from tests.paths import PACKAGE_ROOT
 
 ROOT = PACKAGE_ROOT / "django" / "api"

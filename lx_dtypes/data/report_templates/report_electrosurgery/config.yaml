@@ -1,0 +1,10 @@
+name: report_electrosurgery
+name_de: Abschnitt HF-Chirurgie
+name_en: Electrosurgery section
+version: '0.1.0'
+modules: []
+depends_on:
+- lx_findings
+data:
+  files:
+  - ./report_sections.yml

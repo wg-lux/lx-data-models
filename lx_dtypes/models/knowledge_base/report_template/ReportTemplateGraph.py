@@ -287,7 +287,7 @@ class ReportTemplatePropertyGraphAdapter:
                 if not field_key:
                     continue
 
-                if section_kind == "patient_data":
+                if section_kind in {"patient_data", "medications"}:
                     field_kind = "patient_field"
                     edge_kind = "section_to_patient_field"
                 elif section_kind == "history":
@@ -555,7 +555,7 @@ def validate_report_template_structure(
                 )
             )
 
-        if section_kind != "findings" and section.findings:
+        if section_kind not in {"findings", "medications"} and section.findings:
             issues.append(
                 ReportTemplateStructureIssue(
                     code="non_finding_section_has_findings",
@@ -613,6 +613,8 @@ def validate_report_template_structure(
 
             if field_key in _PATIENT_DATA_FIELD_KEYS:
                 expected_kind = "patient_data"
+            elif field_key == "medications":
+                expected_kind = "medications"
             elif field_key in _HISTORY_FIELD_KEYS:
                 expected_kind = "history"
             else:
@@ -659,20 +661,23 @@ def validate_report_template_structure(
                         ),
                     )
                 )
-            if section_kind == "patient_data" and field_source == "history":
+            if (
+                section_kind in {"patient_data", "medications"}
+                and field_source == "history"
+            ):
                 issues.append(
                     ReportTemplateStructureIssue(
                         code="section_field_source_mismatch",
                         level="warning",
                         node_id=f"section:{section_name}",
                         message=(
-                            f"Field '{field_key}' in patient_data section "
+                            f"Field '{field_key}' in {section_kind} section "
                             f"'{section_name}' uses source 'history'."
                         ),
                     )
                 )
 
-        if section_kind != "findings":
+        if section_kind not in {"findings", "medications"}:
             continue
 
         for finding_ref in section.findings or []:

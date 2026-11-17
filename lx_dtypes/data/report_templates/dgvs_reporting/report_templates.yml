@@ -915,30 +915,6 @@
   - classification: last_oral_intake_type
     required: true
 - model: report_finding
-  name: koloskopie_medikationsstatus
-  name_de: "Medikationsstatus der Endoskopie"
-  finding: endoscopy_medication_status
-  required: true
-  multiple_allowed: false
-  classifications:
-  - classification: endoscopy_medication_documentation_status
-    required: true
-- model: report_finding
-  name: koloskopie_medikamentengabe
-  name_de: "Medikamentenverabreichung während der Endoskopie"
-  finding: endoscopy_medication_administration
-  required: false
-  multiple_allowed: true
-  classifications:
-  - classification: endoscopy_medication_product_and_dose
-    required: true
-  - classification: medication_administration_route
-    required: true
-  - classification: medication_administration_method
-    required: true
-  - classification: medication_administration_time
-    required: true
-- model: report_finding
   name: koloskopie_sedierungsmonitoring
   name_de: "Vitalparametermessung während der Sedierung"
   finding: endoscopy_sedation_monitoring_measurement
@@ -1311,8 +1287,6 @@
   - koloskopie_koerperliche_untersuchung_vor_sedierung
   - koloskopie_letzte_orale_aufnahme
   - koloskopie_team_timeout
-  - koloskopie_medikationsstatus
-  - koloskopie_medikamentengabe
   - koloskopie_sedierungsmonitoring
   - koloskopie_sauerstoffgabe
   - koloskopie_intravenoese_fluessigkeit_status
@@ -2191,6 +2165,8 @@
   - untersuchungsqualitaet_und_reichweite
   - pathologische_befunde_und_interventionen
   - komplikationen_und_empfehlungen
+  - report_medications
+  - report_electrosurgery
   validators:
     examination_validators:
     - koloskopie_mindestdokumentation
@@ -2246,6 +2222,8 @@
     - koloskopie_sign_out_dokumentation_vollstaendig
     - koloskopie_risikoassessment_zeitpunkt_vollstaendig
     - koloskopie_risikoassessment_protokoll_vollstaendig
+    - elektrochirurgie_modus_vollstaendig
+    - elektrochirurgie_leistung_vollstaendig
     findings_validators:
     - koloskopie_hardware_dokumentiert
     - koloskopie_sedierung_dokumentiert

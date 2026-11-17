@@ -11,6 +11,15 @@ boundaries:
 - Use temporary directories for generated artifacts
 - Do not expose fixtures as public package dependencies or include patient data
 entrypoints:
+- name: Development environment contract
+  file: test_devenv_environment.py
+  purpose: Guard non-mutating shell entry, explicit frozen sync and retained editor KB helpers
+- name: Observation package contracts
+  file: unit/lx_dtypes/models/ledger/test_observation_packages.py
+  purpose: Verify lazy Django imports, registry identity and persisted observation roundtrips
+- name: Validator query normalization tests
+  file: unit/lx_dtypes/models/knowledge_base/validators/test_query_normalization.py
+  purpose: Verify repeatable parsing, typed query preservation, input isolation and malformed query rejection
 - name: Model boundary architecture tests
   file: test_model_boundaries.py
   purpose: Enforce common model inheritance, test ownership and reviewed dependency exceptions
@@ -56,6 +65,16 @@ entrypoints:
 - name: Study linkage tests
   file: unit/lx_dtypes/stats/test_study_linkage.py
   purpose: Verify lesion identity, chronology, missing references and longitudinal analysis roles
+- name: Medication and electrosurgery report tests
+  file: unit/lx_dtypes/test_report_medication_electrosurgery.py
+  purpose: Verify shared sections, required classifications, validators, plausibility limits and descriptor-free choices
+- name: Electrosurgical activation CSV tests
+  file: unit/lx_dtypes/models/contracts/test_electrosurgical_activations.py
+  purpose: Verify export format, lossless decimals, timezone and daylight-saving handling, overlap and malformed-file
+    rejection
+- name: Registry consistency tests
+  file: unit/lx_dtypes/models/test_registry_consistency.py
+  purpose: Keep KB and ledger declarations derived from one registry; verify export order and idempotent round trips
 - name: Electrical curve tests
   file: unit/lx_dtypes/stats/test_electrical_curve.py
   purpose: Verify profile loading and snapshots, activation section status, ledger round trips, KB identity

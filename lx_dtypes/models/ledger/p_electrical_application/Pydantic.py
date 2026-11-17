@@ -1,14 +1,11 @@
-"""Electrosurgical application curves and their comparisons to earlier curves."""
+"""Validated ledger observations and their KB identity checks."""
 
 from datetime import UTC, datetime
 from fractions import Fraction
-from typing import Literal, Self, TypedDict
+from typing import Literal, Self
 
 from pydantic import AwareDatetime, Field, field_validator, model_validator
 
-from lx_dtypes.models.base.app_base_model.ddict.LedgerBaseModelDataDict import (
-    LedgerBaseModelDataDict,
-)
 from lx_dtypes.models.base.app_base_model.pydantic.LedgerBaseModel import (
     LedgerBaseModel,
 )
@@ -17,49 +14,17 @@ from lx_dtypes.models.contracts.electrical_curve import (
     ElectricalApplicationCurve,
     ElectricalCurveRegressionResult,
 )
-from lx_dtypes.models.contracts.json_types import JsonObject
 from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
 from lx_dtypes.models.knowledge_base.electrical_curve_profile import (
     ElectricalCurveProfile,
 )
+from lx_dtypes.models.ledger.kb_reference import ensure_pinned_definition
+
+from .DataDict import PElectricalApplicationDataDict, PElectricalCurveComparisonDataDict
 
 _SHA256 = r"^[0-9a-f]{64}$"
 _OPAQUE_ID = r"^[0-9a-f]{32}$"
 _IDENTITY_PART = r"^[^@]+$"
-
-
-def _validate_profile_identity(
-    names: tuple[str, str, str],
-    profile: ElectricalCurveProfile,
-    identity: KnowledgeBaseIdentity,
-) -> None:
-    profile_name, module, version = names
-    if profile_name != profile.name or (
-        module != profile.kb_module_name
-        or module != identity.knowledge_base_module
-        or version != identity.knowledge_base_version
-    ):
-        raise ValueError(
-            "Electrical observation must match its exact KB profile identity"
-        )
-
-
-class PElectricalApplicationDataDict(LedgerBaseModelDataDict):
-    patient_examination: str
-    electrical_curve_profile: str
-    knowledge_base_module: str
-    knowledge_base_version: str
-    measurement_source_sha256: str
-    session_id: str
-    clock_id: str
-    time_base_num: int
-    time_base_den: int
-    sample_start_index: int
-    sample_end_index: int
-    start_timestamp: int
-    end_timestamp: int
-    started_at: datetime
-    curve: JsonObject
 
 
 class PElectricalApplication(LedgerBaseModel[PElectricalApplicationDataDict]):
@@ -101,14 +66,13 @@ class PElectricalApplication(LedgerBaseModel[PElectricalApplicationDataDict]):
     def validate_profile(
         self, profile: ElectricalCurveProfile, identity: KnowledgeBaseIdentity
     ) -> None:
-        _validate_profile_identity(
-            (
-                self.electrical_curve_profile,
-                self.knowledge_base_module,
-                self.knowledge_base_version,
-            ),
-            profile,
-            identity,
+        ensure_pinned_definition(
+            name=self.electrical_curve_profile,
+            module=self.knowledge_base_module,
+            version=self.knowledge_base_version,
+            definition=profile,
+            identity=identity,
+            label="Electrical observation",
         )
         profile.validate_curve(self.curve)
         duration = (self.end_timestamp - self.start_timestamp) * Fraction(
@@ -128,17 +92,6 @@ class PElectricalApplication(LedgerBaseModel[PElectricalApplicationDataDict]):
     @classmethod
     def nested_fields(cls) -> list[str]:
         return []
-
-
-class PElectricalCurveComparisonDataDict(LedgerBaseModelDataDict):
-    patient_examination: str
-    electrical_curve_profile: str
-    knowledge_base_module: str
-    knowledge_base_version: str
-    algorithm: str
-    application: str
-    reference_applications: list[str]
-    result: JsonObject
 
 
 class PElectricalCurveComparison(LedgerBaseModel[PElectricalCurveComparisonDataDict]):
@@ -170,14 +123,13 @@ class PElectricalCurveComparison(LedgerBaseModel[PElectricalCurveComparisonDataD
     def validate_profile(
         self, profile: ElectricalCurveProfile, identity: KnowledgeBaseIdentity
     ) -> None:
-        _validate_profile_identity(
-            (
-                self.electrical_curve_profile,
-                self.knowledge_base_module,
-                self.knowledge_base_version,
-            ),
-            profile,
-            identity,
+        ensure_pinned_definition(
+            name=self.electrical_curve_profile,
+            module=self.knowledge_base_module,
+            version=self.knowledge_base_version,
+            definition=profile,
+            identity=identity,
+            label="Electrical observation",
         )
         if (
             self.result.design_terms != profile.design_terms
@@ -197,17 +149,3 @@ class PElectricalCurveComparison(LedgerBaseModel[PElectricalCurveComparisonDataD
     @classmethod
     def nested_fields(cls) -> list[str]:
         return []
-
-
-class LPElectricalApplicationLookupType(TypedDict):
-    PElectricalApplication: type[PElectricalApplication]
-    PElectricalCurveComparison: type[PElectricalCurveComparison]
-
-
-__all__ = [
-    "LPElectricalApplicationLookupType",
-    "PElectricalApplication",
-    "PElectricalApplicationDataDict",
-    "PElectricalCurveComparison",
-    "PElectricalCurveComparisonDataDict",
-]

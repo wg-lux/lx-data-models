@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypedDict, Union
 
-from .DataDict import PIndicationDataDict
-from .Pydantic import PIndication
+from .DataDict import PIndicationDataDict, SerializedPIndicationDataDict
+from .Pydantic import PIndication, SerializedPIndication
 
 if TYPE_CHECKING:
     from .Django import PIndicationDjango
@@ -19,11 +19,15 @@ class LPIndicationDjangoLookupType(TypedDict):
 class LPIndicationLookupType(TypedDict):
     PIndication: type[PIndication]
     PIndicationDataDict: type[PIndicationDataDict]
+    SerializedPIndication: type[SerializedPIndication]
+    SerializedPIndicationDataDict: type[SerializedPIndicationDataDict]
 
 
 l_p_indication_lookup = LPIndicationLookupType(
     PIndication=PIndication,
     PIndicationDataDict=PIndicationDataDict,
+    SerializedPIndication=SerializedPIndication,
+    SerializedPIndicationDataDict=SerializedPIndicationDataDict,
 )
 l_p_indication_models = Union[PIndication,]
 l_p_indication_ddicts = Union[PIndicationDataDict,]
@@ -33,6 +37,8 @@ __all__ = [
     "LPIndicationLookupType",
     "PIndication",
     "PIndicationDataDict",
+    "SerializedPIndication",
+    "SerializedPIndicationDataDict",
     "l_p_indication_ddicts",
     "l_p_indication_django_lookup",
     "l_p_indication_django_models",

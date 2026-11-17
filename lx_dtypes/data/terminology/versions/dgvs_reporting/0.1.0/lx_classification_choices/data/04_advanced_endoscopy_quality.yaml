@@ -1,0 +1,90 @@
+# Per-procedure documentation states derived from ESGE ERCP/EUS performance measures.
+- model: classification_choice
+  name: quality_adequate
+  name_de: Angemessen durchgeführt
+  name_en: Adequate
+
+- model: classification_choice
+  name: quality_inadequate
+  name_de: Nicht angemessen durchgeführt
+  name_en: Inadequate
+
+- model: classification_choice
+  name: quality_not_indicated
+  name_de: Nicht indiziert
+  name_en: Not indicated
+
+- model: classification_choice
+  name: quality_successful
+  name_de: Erfolgreich
+  name_en: Successful
+
+- model: classification_choice
+  name: quality_unsuccessful
+  name_de: Nicht erfolgreich
+  name_en: Unsuccessful
+
+- model: classification_choice
+  name: quality_not_attempted
+  name_de: Nicht versucht
+  name_en: Not attempted
+
+- model: classification_choice
+  name: quality_appropriate
+  name_de: Angemessen
+  name_en: Appropriate
+
+- model: classification_choice
+  name: quality_not_appropriate
+  name_de: Nicht angemessen
+  name_en: Not appropriate
+
+- model: classification_choice
+  name: quality_not_applicable
+  name_de: Nicht anwendbar
+  name_en: Not applicable
+
+- model: classification_choice
+  name: quality_complete
+  name_de: Vollständig
+  name_en: Complete
+
+- model: classification_choice
+  name: quality_incomplete
+  name_de: Unvollständig
+  name_en: Incomplete
+
+- model: classification_choice
+  name: quality_present
+  name_de: Vorhanden
+  name_en: Present
+
+- model: classification_choice
+  name: quality_absent
+  name_de: Nicht vorhanden
+  name_en: Absent
+
+- model: classification_choice
+  name: quality_unknown
+  name_de: Unbekannt
+  name_en: Unknown
+
+- model: classification_choice
+  name: quality_obtained
+  name_de: Eingeholt
+  name_en: Obtained
+
+- model: classification_choice
+  name: quality_not_obtained
+  name_de: Nicht eingeholt
+  name_en: Not obtained
+
+- model: classification_choice
+  name: quality_diagnostic
+  name_de: Diagnostisch verwertbar
+  name_en: Diagnostic
+
+- model: classification_choice
+  name: quality_nondiagnostic
+  name_de: Nicht diagnostisch verwertbar
+  name_en: Nondiagnostic

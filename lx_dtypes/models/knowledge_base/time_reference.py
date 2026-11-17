@@ -11,12 +11,12 @@ from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import
     KnowledgebaseBaseModel,
 )
 from lx_dtypes.models.contracts.json_types import JsonObject
-from lx_dtypes.models.contracts.validation import SemanticValidationError
 from lx_dtypes.models.contracts.time_reference import (
     TimeOffsetEvidence,
     TimeOffsetExample,
     TimestampKind,
 )
+from lx_dtypes.models.contracts.validation import SemanticValidationError
 
 
 class TimeReferenceDataDict(KnowledgebaseBaseModelDataDict):

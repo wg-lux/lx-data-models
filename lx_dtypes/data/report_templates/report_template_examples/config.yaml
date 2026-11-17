@@ -3,6 +3,7 @@ name_de: Bericht template examples
 version: 0.1.1
 modules: []
 depends_on:
+- report_medications
 - dgvs_reporting
 - star_upper_gi
 - report_template_examples_terminology

@@ -3,11 +3,19 @@
   "knowledge_bases": [
     {
       "module_name": "dgvs_reporting",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "medical_field": "gastroenterology",
       "resource_root": "data/report_templates/dgvs_reporting",
-      "content_sha256": "3641cde9c205b1c57140613abc01fd6e4c83a176870aca0963b8554e6e8e07b5",
+      "content_sha256": "6c63109dd2b3e1fd8d7546ef1996b101f68bd764740e1580544d3e4e087fd110",
       "default": true
+    },
+    {
+      "module_name": "dgvs_reporting",
+      "version": "0.1.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/terminology/versions/dgvs_reporting/0.1.0/dgvs_reporting",
+      "content_sha256": "3641cde9c205b1c57140613abc01fd6e4c83a176870aca0963b8554e6e8e07b5",
+      "default": false
     },
     {
       "module_name": "coloreg",
@@ -22,7 +30,7 @@
       "version": "3.0.0",
       "medical_field": "gastroenterology",
       "resource_root": "data/report_templates/mst_3_0",
-      "content_sha256": "edf6439f9654f773cbef4ac2c83c252c22033467d25534472dde4d71ac8b8607",
+      "content_sha256": "df0e1e60fb420484c3d10c36bceaee58109f3e88aa5b2a39dd1e4d4fe0cf5e5b",
       "default": true
     },
     {
@@ -30,7 +38,7 @@
       "version": "0.1.2",
       "medical_field": "gastroenterology",
       "resource_root": "data/report_templates/star_upper_gi",
-      "content_sha256": "cb5273a00abf017db38ef5d5cf0baa7746082f977994c9ee21698f6112ceebf4",
+      "content_sha256": "63aa8130b44dc040143754928256607b9413798d315e64725d79174d626ef770",
       "default": true
     },
     {
@@ -100,7 +108,7 @@
       "version": "0.3.0",
       "medical_field": "gastroenterology",
       "resource_root": "data/report_templates/coloreg",
-      "content_sha256": "1f8dcf81bb71452c3a0756655e65dd27b197d4604793332f645054445453f80b",
+      "content_sha256": "95b4035aa26d6c5eb573449a525ac21f05c37502d535c15d91b68cec4ae138ba",
       "default": true
     },
     {
@@ -133,6 +141,22 @@
       "medical_field": "gastroenterology",
       "resource_root": "data/terminology/star_upper_gi_terminology",
       "content_sha256": "0bb484c9c8a7d5b5ae505ed5767e2c489a5e22ccb8dc7b936a04ca4b5d996b68",
+      "default": true
+    },
+    {
+      "module_name": "report_medications",
+      "version": "0.1.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/report_templates/report_medications",
+      "content_sha256": "6b97762e88263837e404b458e316bbe1f86a0d39c1a60dc9a0b05f034a421611",
+      "default": true
+    },
+    {
+      "module_name": "report_electrosurgery",
+      "version": "0.1.0",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/report_templates/report_electrosurgery",
+      "content_sha256": "8e6a3b2d5c29d027d57dabbec8f457c6da15b24a81e5299b464b59a6fbff9f9d",
       "default": true
     }
   ]

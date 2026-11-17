@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from typing import Literal, cast
 
 from pydantic import Field, field_validator, model_validator
@@ -17,6 +16,11 @@ from lx_dtypes.models.knowledge_base.validators.ClassificationValidatorDataDict 
 from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
     FindingsValidatorConditionClause,
     _normalize_value,
+)
+from lx_dtypes.models.knowledge_base.validators.QueryNormalization import (
+    align_query,
+    normalize_query_defaults,
+    validate_operator_condition,
 )
 from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReference import (
     ValidatorRequirementReference,
@@ -80,11 +84,6 @@ class ClassificationValidatorQuery(DtypesModel):
             valid_values=CLASSIFICATION_VALIDATOR_OPERATORS,
         )
 
-    @field_validator("condition", mode="before")
-    @classmethod
-    def normalize_condition(cls, value: object) -> object:
-        return value
-
     @field_validator("classification", mode="before")
     @classmethod
     def normalize_classification(cls, value: object) -> object:
@@ -107,16 +106,7 @@ class ClassificationValidatorQuery(DtypesModel):
 
     @model_validator(mode="after")
     def validate_operator_semantics(self) -> "ClassificationValidatorQuery":
-        if self.operator == "condition":
-            if self.condition is None:
-                raise ValueError(
-                    "operator 'condition' requires a populated `condition` block."
-                )
-            return self
-        if self.condition is not None:
-            raise ValueError(
-                f"operator '{self.operator}' does not allow a `condition` block."
-            )
+        validate_operator_condition(self.operator, self.condition)
         return self
 
     @property
@@ -156,44 +146,23 @@ class ClassificationValidator(KnowledgebaseBaseModel[ClassificationValidatorData
     @model_validator(mode="before")
     @classmethod
     def normalize_query_defaults(cls, value: object) -> object:
-        if not isinstance(value, Mapping):
-            return value
-        data = dict(value)
-        query_raw = data.get("query")
-        query = dict(query_raw) if isinstance(query_raw, Mapping) else {}
-        if "finding" not in data and "finding" in query:
-            data["finding"] = query["finding"]
-        if "classification" not in data and "classification" in query:
-            data["classification"] = query["classification"]
-        if "operator" not in data and "operator" in query:
-            data["operator"] = query["operator"]
-        if "finding" in data and "finding" not in query:
-            query["finding"] = data["finding"]
-        if "classification" in data and "classification" not in query:
-            query["classification"] = data["classification"]
-        if "operator" in data and "operator" not in query:
-            query["operator"] = data["operator"]
-        data["query"] = query
-        return data
+        return normalize_query_defaults(
+            value,
+            ClassificationValidatorQuery,
+            ("finding", "classification", "operator"),
+        )
 
     @model_validator(mode="after")
     def validate_query_alignment(self) -> "ClassificationValidator":
-        if self.query.finding is None:
-            self.query.finding = self.finding
-        if self.query.classification is None:
-            self.query.classification = self.classification
-        if self.query.finding != self.finding:
-            raise ValueError(
-                "query.finding must match the top-level `finding` value for a validator."
-            )
-        if self.query.classification != self.classification:
-            raise ValueError(
-                "query.classification must match the top-level `classification` value for a validator."
-            )
-        if self.query.operator != self.operator:
-            raise ValueError(
-                "query.operator must match the top-level `operator` value for a validator."
-            )
+        self.query = align_query(
+            self.query,
+            {
+                "finding": self.finding,
+                "classification": self.classification,
+                "operator": self.operator,
+            },
+            suffix=" for a validator",
+        )
         return self
 
     @classmethod

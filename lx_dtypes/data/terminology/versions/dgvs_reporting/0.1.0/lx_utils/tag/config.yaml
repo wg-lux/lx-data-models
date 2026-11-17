@@ -1,0 +1,6 @@
+name: tag_data
+name_de: "Tag Daten"
+description: Commonly used tags.
+version: 0.1.0
+depends_on: []
+modules: []

@@ -220,6 +220,42 @@ If you are working from an older report-template summary, these are the importan
   - `condition` rules have explicit structure and requirement references
 - duplicate record names inside one module are now a hard load error with file and line information
 
+## Medication section
+
+Every current packaged template references the shared `report_medications`
+section from the reporting package of the same name. Historical releases remain
+unchanged. The section uses `section_kind: medications` and combines:
+
+- `fields: [{key: medications, source: patient, required: false}]`: the patient's
+  medication list, backed by the existing `PatientMedicalData.medications` /
+  `PatientMedication` contracts.
+- Finding `endoscopy_medication_status`: whether examination medication was given.
+- Repeatable finding `endoscopy_medication_administration`: product and dose,
+  administration route, method, and time, using the existing terminology and
+  `PExamination.patient_findings` payload.
+
+The section is composed once in `data/report_templates/report_medications/`;
+reporting packages declare it as a dependency rather than copying its contents.
+The compiler exports both the patient field and finding input descriptors. Graph
+validation represents the medication list as a patient field and validates the
+examination finding references normally.
+
+Hosts must support the new section kind and resolve the patient-sourced list
+from their medical-data API. Exporting a template does not fetch patient records,
+copy regular medications into examination administrations, or add medication-list
+validation to the examination validator runtime. Existing clinical rules and
+coverage matrices are unchanged; section presence does not certify medication
+completeness. Existing deployed packages and frontend renderers are not updated
+by changing these definitions.
+
+The report-template builder API accepts `section_type: medications`. It emits no
+section record: the generated template lists the shared `report_medications`
+section in `report_sections`. Such a section cannot define fields or findings,
+and a template may contain one. A portable package must list
+`report_medications` in `depends_on`; saving into an installed module requires
+that module's `config.yaml` to declare the same dependency. Both cases are
+rejected otherwise, so a built template never carries an unresolvable reference.
+
 ## How Loading Works
 
 1. `DataLoader.load_module_configs()` discovers module `config.yaml` files.
@@ -450,6 +486,26 @@ The validator model layer no longer uses open-ended `Any` for condition values o
 
 ### What each validator validates
 
+Finding, classification, intervention, and unit validator models share query
+defaulting, alignment, and operator/condition checks in `validators/QueryNormalization.py`.
+Missing query targets inherit their top-level values; explicit conflicts are
+rejected. Parsing preserves typed query content without modifying caller-owned
+queries, and validated model dumps can be parsed repeatedly without changing
+their content. Omit `query` to use defaults: explicit `null`, scalar, and list
+queries are now rejected rather than silently replaced with empty queries.
+
+Suggestion workflows use the advisory `lx_dtypes.evaluation.validate_contract`
+API to collect definition errors as a report; direct `model_validate()` calls
+remain strict and raise. A batch contract such as
+`DtypesRootModel[list[FindingsValidator]]` reports errors across definitions,
+including those after an invalid entry. An invalid batch returns `value=None`;
+validate entries individually when valid definitions must remain available.
+Runtime evaluation of parsed rules collects failures and successes across all
+validator families, including unknown references and dependency cycles, without
+stopping at the first failed rule. `ok=False` summarizes the findings; consumers
+should still display the complete diagnostics and suggestions. Invalid package
+loading and programming errors are not converted into successful evaluations.
+
 `findings_validator`
 
 - Target fields: `finding`, `operator`
@@ -531,6 +587,16 @@ This means identifier matching is string-oriented, but condition evaluation oper
 
 ### Functionality package ownership
 
+`models/interface/KnowledgeBase.py` owns KB storage, loading, merging, provenance,
+lookup, and serialization. Its compatibility methods delegate reporting work to
+`KnowledgeBaseReporting.py`, ledger semantic checks to
+`KnowledgeBaseAdmissibility.py`, and core-concept/FHIR exchange to
+`KnowledgeBaseInterop.py` in the same directory. These adapters use the existing
+KB instance and domain engines; they hold no separate record store or cached
+validation state. Public KB method signatures and the historical
+`SemanticAdmissibilityError` import remain available. Strict admissibility and
+advisory runtime diagnostic behavior are unchanged by this separation.
+
 The lx-dtypes maintainers own three sibling packages under
 `lx_dtypes/models/knowledge_base/`:
 
@@ -603,11 +669,17 @@ Runtime and `KnowledgeBase.evaluate_*` methods accept `language="de"` (the
 new default) or `language="en"`. The template `/validate`, `/validate-from-ledger`,
 and single-validator `/validate` API routes accept the same `language` query
 parameter; omitting it returns German messages for lx-annotate. Clients that
-require the previous English wording must explicitly request `language=en`.
+require English messages must explicitly request `language=en`.
 Unsupported languages are rejected, including when validation succeeds.
 
 Only issue `message` text is translated. Codes, identifiers, details, hints,
 result field names, and validation decisions remain language independent.
+Message references prefer the concept's display label in the selected language,
+then its label in the other supported language. Blank labels and labels that
+merely repeat the internal identifier do not count as translations. An identifier
+is a last resort when no human label exists. Ordinary missing-answer prompts
+omit technical rule names; clients should display the message rather than append
+the machine-readable rule identifier or issue code.
 Nested dependency issues use the selected language too. The lx-dtypes
 maintainers own the canonical text catalogue in
 `lx_dtypes/validator_runtime_messages.yml`. The shared `lx_dtypes.language` module

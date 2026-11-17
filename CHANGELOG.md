@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.7] - Unreleased
+
+### Added
+- Shared `report_medications` and `report_electrosurgery` report sections. Templates
+  list them in `report_sections` and declare the package in `depends_on`.
+- Electrosurgery terminology: status and repeatable application findings with mode,
+  power setting (W), activation duration (s), delivered energy (J) and curve
+  comparison. Adds the `watt` and `joule` units.
+- `dgvs_reporting@0.2.0`: the colonoscopy template includes the medication and
+  electrosurgery sections and their completeness validators.
+- `ElectrosurgicalMeasurementSeries`, PTS-based frame alignment
+  (`align_electrosurgical_measurements`), the `ElectricalCurveProfile` KB record,
+  `PElectricalApplication`/`PElectricalCurveComparison` ledger records and their
+  multivariate regression comparison.
+- `read_electrosurgical_activation_csv` for per-activation generator CSV exports;
+  the source timezone must be named explicitly.
+- Validation code `terminology.electrical_curve_profile_unknown`.
+
+### Changed
+- Classification validator hints may include `descriptor_free_choice_names`. A
+  selected choice without descriptors (for example a bolus) now satisfies a
+  required classification; descriptor-backed choices still need their value.
+- Identity mismatches for time offsets and electrical observations raise
+  `SemanticValidationError("terminology.identity_mismatch")` with one message.
+- `LedgerRecordList.p_indications` is typed `SerializedPIndicationDataDict`.
+- `KB_MODEL_NAMES_ORDERED`/`L_MODEL_NAMES_ORDERED` are derived from their `Literal`;
+  record-list exports are generated from the registries. Output is unchanged.
+- Removed the unused `LedgerBaseModel.serialized_model_cls`/`serialized_ddict_cls`
+  class attributes. Ledger models with nested records override
+  `serialized_model_class()`/`serialized_ddict_class`, the single mechanism.
+
+### Fixed
+- Exporting a ledger whose indications carry classifications no longer fails.
+- `LedgerDataDict` declares the `examiners` collection the `Ledger` model has.
+
+### Retained
+- The published `dgvs_reporting@0.1.0` and its dependency closure are kept unchanged
+  under `data/terminology/versions/dgvs_reporting/0.1.0/` for pinned examinations.
+
 ## [0.5.4.dev1] - Unreleased
 
 ### Added

@@ -466,6 +466,125 @@ terminology:
   required_checks:
   - exact_identity_loading
   - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/DGVS_Terminology/config.yaml
+  module: DGVS_Terminology
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/dgvs_reporting/config.yaml
+  module: dgvs_reporting
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/information_source_data/config.yaml
+  module: information_source_data
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_classification_choices/config.yaml
+  module: lx_classification_choices
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_classifications/config.yaml
+  module: lx_classifications
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_descriptors/config.yaml
+  module: lx_descriptors
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_examinations/config.yaml
+  module: lx_examinations
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_findings/config.yaml
+  module: lx_findings
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_hardware/config.yaml
+  module: lx_hardware
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_indications/config.yaml
+  module: lx_indications
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_interventions/config.yaml
+  module: lx_interventions
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_units/config.yaml
+  module: lx_units
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_utils/config.yaml
+  module: lx_utils
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_utils/gender/config.yaml
+  module: gender_data
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_utils/tag/config.yaml
+  module: tag_data
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_utils/unit/config.yaml
+  module: lx_utils_units
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/versions/dgvs_reporting/0.1.0/lx_utils/unit_type/config.yaml
+  module: lx_unit_types
+  version: 0.1.0
+  role: retained_release
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
 - manifest: terminology/coloreg_terminology/config.yaml
   module: coloreg_terminology
   version: 0.3.0
@@ -553,6 +672,20 @@ migration:
   report_templates: Current reporting packages move to data/report_templates/<package>; concept definitions
     move to data/terminology/<package>_terminology.
 report_templates:
+- manifest: report_templates/report_electrosurgery/config.yaml
+  module: report_electrosurgery
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: report_templates/report_medications/config.yaml
+  module: report_medications
+  version: 0.1.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
 - manifest: report_templates/coloreg/config.yaml
   module: coloreg
   version: 0.3.0
@@ -560,7 +693,7 @@ report_templates:
   required_checks: *id001
 - manifest: report_templates/dgvs_reporting/config.yaml
   module: dgvs_reporting
-  version: 0.1.0
+  version: 0.2.0
   role: current
   required_checks:
   - exact_identity_loading
@@ -685,4 +818,6 @@ source_provenance:
     star_upper_gi: [esge_star_2025]
     report_template_examples_terminology: [synthetic_examples]
     report_template_examples: [synthetic_examples]
+    report_medications: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
+    report_electrosurgery: [local_vocabulary]
     dgvs_reporting: [dgvs_quality_2_1, dgvs_sedation_2023]

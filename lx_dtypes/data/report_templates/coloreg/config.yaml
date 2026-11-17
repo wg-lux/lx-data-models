@@ -6,6 +6,7 @@ version: 0.3.0
 medical_field: gastroenterology
 modules: []
 depends_on:
+- report_medications
 - coloreg_terminology
 data:
   files:

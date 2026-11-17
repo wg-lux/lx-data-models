@@ -25,8 +25,6 @@ from lx_dtypes.knowledge_base_registry import (
     RegistryEntry,
     RegistryPayload,
 )
-from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
-from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,
@@ -37,6 +35,8 @@ from lx_dtypes.models.interface.remote_data_roots import (
     is_remote_data_root,
     resolve_remote_data_root,
 )
+from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
+from lx_dtypes.models.interface.ReportTemplateValidator import ReportTemplateValidator
 from lx_dtypes.models.knowledge_base import KB_MODEL_NAMES_ORDERED
 from lx_dtypes.package_archive import (
     BinaryUpload,

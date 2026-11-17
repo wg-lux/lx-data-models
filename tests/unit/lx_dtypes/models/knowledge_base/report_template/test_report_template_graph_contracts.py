@@ -359,3 +359,35 @@ def test_validate_report_template_structure_validates_non_finding_sections() -> 
     assert "unknown_section_field_key" in codes
     assert "section_field_source_mismatch" in codes
     assert "unknown_finding_reference" not in codes
+
+
+def test_medication_section_graph_tracks_patient_list_and_examination_findings() -> (
+    None
+):
+    template = ReportTemplate(
+        name="medication_report", examination="demo_endoscopy", report_sections=["meds"]
+    )
+    section = ReportTemplateSection.model_validate(
+        {
+            "name": "meds",
+            "section_kind": "medications",
+            "fields": [{"key": "medications", "source": "patient"}],
+            "findings": [{"finding": "administered_medication"}],
+        }
+    )
+    result = validate_report_template_structure(
+        template,
+        sections={"meds": section},
+        report_findings={},
+        findings={"administered_medication": object()},
+    )
+    assert result.ok
+    assert result.issues == []
+    assert {node.node_id for node in result.graph.nodes} >= {
+        "patient_field:medications",
+        "finding:administered_medication",
+    }
+    missing = validate_report_template_structure(
+        template, sections={"meds": section}, report_findings={}, findings={}
+    )
+    assert [issue.code for issue in missing.issues] == ["unknown_finding_reference"]

@@ -15,6 +15,18 @@ boundaries:
 - Keep application service orchestration outside shared models
 - Preserve raw video identity across processing and transfer
 entrypoints:
+- name: Knowledge-base reporting adapter
+  file: interface/KnowledgeBaseReporting.py
+  purpose: Compile reports, project ledger findings and evaluate runtime rules through the stable KB API
+- name: Knowledge-base admissibility adapter
+  file: interface/KnowledgeBaseAdmissibility.py
+  purpose: Check ledger observations against terminology and report requirements
+- name: Knowledge-base exchange adapter
+  file: interface/KnowledgeBaseInterop.py
+  purpose: Project core concepts and import or export FHIR terminology and observations
+- name: Validator query normalization
+  file: knowledge_base/validators/QueryNormalization.py
+  purpose: Shared query defaults, alignment and condition invariants without mutating caller inputs
 - name: Shared model policies
   file: model.py
   purpose: Closed, strict, frozen and root-value profiles shared by every model family
@@ -27,11 +39,18 @@ entrypoints:
 - name: Reporting vocabulary
   file: contracts/reporting_types.py
   purpose: Shared report verbosity tokens without a reverse dependency on KB representations
+- name: Electrosurgical activation CSV
+  file: contracts/electrosurgical_activations.py
+  purpose: Strict, lossless reader for per-activation HF generator summary CSV exports with explicit source
+    timezone
 - name: Electrical curve profiles
   file: knowledge_base/electrical_curve_profile.py
   purpose: Versioned HF application curve quantities, phase bins, limits and multivariate regression specification
+- name: Pinned KB definition identity
+  file: ledger/kb_reference.py
+  purpose: The single rule binding a ledger observation to its exact KB definition name, module and version
 - name: Ledger electrical applications
-  file: ledger/p_electrical_application.py
+  file: ledger/p_electrical_application/Pydantic.py
   purpose: Phase-binned HF application curves and regression comparisons with strictly earlier references,
     pinned to exact KB profile identities
 - name: Electrical curve contracts
@@ -41,7 +60,7 @@ entrypoints:
   file: knowledge_base/time_reference.py
   purpose: Named clock relationships and labeled reference, training, validation and test examples
 - name: Ledger time observations
-  file: ledger/p_time_offset.py
+  file: ledger/p_time_offset/Pydantic.py
   purpose: Examination-specific offsets linked to exact KB definitions and video PTS evidence
 - name: Time evidence validation
   file: contracts/time_reference.py

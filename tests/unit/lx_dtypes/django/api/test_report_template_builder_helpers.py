@@ -9,6 +9,7 @@ import yaml
 from lx_dtypes.django.api.report_template_builder import (
     DEFAULT_PATIENT_INFO_FIELDS,
     GENERATED_DIR_NAME,
+    MEDICATION_SECTION_NAME,
     BuildReportTemplatePackageRequest,
     ReportTemplateBuilderFinding,
     ReportTemplateBuilderFindingValidator,
@@ -390,3 +391,90 @@ def test_module_dir_does_not_alias_names_by_slugifying(tmp_path: Path) -> None:
     (tmp_path / "demo_module").mkdir()
     with pytest.raises(ValueError, match="Unknown or unsafe report-template module"):
         module_dir("demo module", modules_root=tmp_path)
+
+
+def medication_package_payload(
+    depends_on: list[str],
+) -> BuildReportTemplatePackageRequest:
+    data = study_package_payload().model_dump()
+    data["depends_on"] = depends_on
+    data["sections"].append({"section_type": "medications", "name": "medications"})
+    return BuildReportTemplatePackageRequest.model_validate(data)
+
+
+def test_medication_section_references_shared_section_without_copying_it() -> None:
+    package = build_report_template_package(
+        medication_package_payload(["coloreg", "report_medications"])
+    )
+    records = yaml.safe_load(package.report_templates_yaml)
+    template = next(r for r in records if r["model"] == "report_template")
+    assert template["report_sections"][-1] == MEDICATION_SECTION_NAME
+    assert not any(
+        r["model"] == "report_template_section" and r["name"] == MEDICATION_SECTION_NAME
+        for r in records
+    )
+    assert "report_medications" in yaml.safe_load(package.config_yaml)["depends_on"]
+
+
+def test_medication_section_requires_shared_package_dependency() -> None:
+    with pytest.raises(ValueError, match="report_medications"):
+        build_report_template_package(medication_package_payload(["coloreg"]))
+
+
+def test_medication_section_rejects_fields_and_duplicates() -> None:
+    base = study_package_payload().model_dump()
+    section = {"section_type": "medications", "name": "medications"}
+    with pytest.raises(ValueError, match="cannot define fields"):
+        ReportTemplateBuilderSection.model_validate(
+            {**section, "fields": [{"key": "medications"}]}
+        )
+    base["sections"] += [section, section]
+    with pytest.raises(ValueError, match="one medication section"):
+        BuildReportTemplatePackageRequest.model_validate(base)
+
+
+def test_saving_medication_section_requires_module_dependency(tmp_path: Path) -> None:
+    module_path = tmp_path / "local_module"
+    module_path.mkdir()
+    (module_path / "config.yaml").write_text(
+        yaml.safe_dump({"name": "local_module", "depends_on": ["coloreg"]}),
+        encoding="utf-8",
+    )
+    from lx_dtypes.django.api import report_template_builder as builder
+
+    with pytest.raises(ValueError, match="report_medications"):
+        builder._require_medication_section_dependency(module_path)
+    (module_path / "config.yaml").write_text(
+        yaml.safe_dump(
+            {"name": "local_module", "depends_on": ["coloreg", "report_medications"]}
+        ),
+        encoding="utf-8",
+    )
+    builder._require_medication_section_dependency(module_path)
+
+
+def test_exported_medication_package_resolves_the_shared_section(
+    tmp_path: Path,
+) -> None:
+    from lx_dtypes.knowledge_bases import get_packaged_knowledge_base
+    from lx_dtypes.models.interface.DataLoader import DataLoader
+
+    package = build_report_template_package(
+        medication_package_payload(["coloreg", "report_medications"])
+    )
+    target = tmp_path / package.package_name
+    target.mkdir()
+    for name, content in [
+        ("config.yaml", package.config_yaml),
+        ("report_templates.yml", package.report_templates_yaml),
+        ("validators.yml", package.validators_yaml),
+    ]:
+        (target / name).write_text(content)
+    source = get_packaged_knowledge_base("coloreg", "0.3.0").installed_data_root()
+    kb = DataLoader(input_dirs=[tmp_path, source]).load_knowledge_base("my_study")
+    section = kb.report_template_section[MEDICATION_SECTION_NAME]
+    assert section.section_kind == "medications"
+    assert [field.key for field in section.fields] == ["medications"]
+    assert (
+        MEDICATION_SECTION_NAME in kb.report_template["my_study_report"].report_sections
+    )

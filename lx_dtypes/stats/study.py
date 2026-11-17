@@ -5,6 +5,7 @@ from collections.abc import Mapping, Sequence
 from hashlib import sha256
 from typing import cast
 
+from lx_dtypes.evaluation import assess_examination
 from lx_dtypes.models.contracts.study_analysis import (
     PlotState,
     StudyAnalysisDefinition,
@@ -23,7 +24,6 @@ from lx_dtypes.models.contracts.study_analysis import (
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.ledger.p_examination.Pydantic import PExamination
 from lx_dtypes.models.ledger.p_finding.Pydantic import PFinding
-from lx_dtypes.evaluation import assess_examination
 
 from .study_categorical import CategoricalObservation, evaluate_categorical
 from .study_inference import NumericObservation, evaluate_inference, numeric_values

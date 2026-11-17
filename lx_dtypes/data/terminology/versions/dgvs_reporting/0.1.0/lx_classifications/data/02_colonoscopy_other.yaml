@@ -1,0 +1,15 @@
+# Sources for guideline-derived additions in this file:
+# - DGVS S2k quality guideline v2.1 (AWMF 021-022): https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
+- model: classification
+  name: "hemorrhoids_grade"
+  name_de: "Hämorrhoidengrad"
+  name_en: "Hemorrhoid grade"
+  classification_types: []
+  classification_choices:
+    [
+      "hemorrhoids_grade_0_no_hemorrhoids",
+      "hemorrhoids_grade_1",
+      "hemorrhoids_grade_2",
+      "hemorrhoids_grade_3",
+      "hemorrhoids_grade_4",
+    ]

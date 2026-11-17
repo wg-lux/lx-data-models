@@ -140,6 +140,8 @@ def test_colonoscopy_template_api_exposes_localized_guideline_provenance() -> No
         "Untersuchungsqualität und Reichweite",
         "Pathologische Befunde und Interventionen",
         "Komplikationen und Empfehlungen",
+        "Medikation",
+        "HF-Chirurgie",
     ]
     assert template["readiness"]["can_publish"] is True
     assert [

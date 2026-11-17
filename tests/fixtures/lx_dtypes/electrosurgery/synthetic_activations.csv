@@ -1,0 +1,8 @@
+,t,hfmode,hfmode_options,effect,duration_s,P_avg_W,E_tot_J,slot_number,instrument
+0,2000-01-03 09:00:00.000000,sprayCOAG,,5.0,0.0,5.9,1.0,4,Monopolar
+1,2000-01-03 09:00:02.500000,sprayCOAG,,5.0,2.4,35.0,84.0,4,Monopolar
+2,2000-01-03 09:00:05.000000,softCOAG bipolar,,2.3,0.4,22.5,9.0,1,Bipolar
+3,2000-01-03 09:00:06.000000,endoCUT Q,"interval: 6, duration: 1",3.0,2.1,5.0,11.0,2,Monopolar
+4,2000-01-03 09:00:09.000000,pulsedAPC,"flow 0.8l/min, fast",2.5,0.4,2.2,1.0,6,FiAPC plus-Sonde2
+5,2000-01-03 09:00:10.000000,pulsedAPC,flow 0.8l/min,5.5,0.0,141.9,3.0,6,FiAPC plus-Sonde2
+6,2000-01-04 10:00:00.000000,highCUT,,4.0,2.8,147.9,417.0,2,Monopolar

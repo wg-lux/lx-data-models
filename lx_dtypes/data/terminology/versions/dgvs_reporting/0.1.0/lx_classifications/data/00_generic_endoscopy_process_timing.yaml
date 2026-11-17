@@ -1,0 +1,49 @@
+# Sources for every record in this file:
+# - DGVS S2k quality guideline (AWMF 021-022), findings documentation: https://www.dgvs.de/new-leitlinien/chapter_69f4b1f9223d6/chapter_69f4b200dfa8a/chapter_69f4b200e16c2/
+- model: classification
+  name: "endoscopy_room_entry_time"
+  name_de: "Zeitpunkt Betreten des Untersuchungsraums"
+  name_en: "Endoscopy room entry time"
+  classification_types: []
+  classification_choices:
+    - endoscopy_room_entry_time_recorded
+
+- model: classification
+  name: "endoscope_insertion_time"
+  name_de: "Zeitpunkt Einführen des Endoskops"
+  name_en: "Endoscope insertion time"
+  classification_types: []
+  classification_choices:
+    - endoscope_insertion_time_recorded
+
+- model: classification
+  name: "colonoscopy_withdrawal_start_time"
+  name_de: "Zeitpunkt Beginn des Rückzuges"
+  name_en: "Colonoscope withdrawal start time"
+  classification_types: []
+  classification_choices:
+    - colonoscopy_withdrawal_start_time_recorded
+
+- model: classification
+  name: "endoscope_removal_time"
+  name_de: "Zeitpunkt Entfernen des Endoskops"
+  name_en: "Endoscope removal time"
+  classification_types: []
+  classification_choices:
+    - endoscope_removal_time_recorded
+
+- model: classification
+  name: "endoscopy_room_exit_time"
+  name_de: "Zeitpunkt Verlassen des Untersuchungsraums"
+  name_en: "Endoscopy room exit time"
+  classification_types: []
+  classification_choices:
+    - endoscopy_room_exit_time_recorded
+
+- model: classification
+  name: "endoscopy_department_exit_time"
+  name_de: "Zeitpunkt Verlassen der Endoskopieabteilung"
+  name_en: "Endoscopy department exit time"
+  classification_types: []
+  classification_choices:
+    - endoscopy_department_exit_time_recorded

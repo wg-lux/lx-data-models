@@ -1,0 +1,6 @@
+- model: unit
+
+  name: "mililiter per minute per 1.73m^2"
+  name_de: "ml/min/1.73m²"
+  name_en: "ml/min/1.73m²"
+  abbreviation: "ml/min/1.73m²"

@@ -85,7 +85,8 @@ def test_invalid_tick_readings_are_rejected(invalid: dict[str, object]):
 
 def test_naive_examination_and_unknown_timestamp_kind_are_rejected():
     with pytest.raises(ValidationError):
-        ExaminationTimestamp(clock_id="exam-1", timestamp=datetime(2026, 1, 1))
+        # Deliberately naive: the contract must reject it.
+        ExaminationTimestamp(clock_id="exam-1", timestamp=datetime(2026, 1, 1))  # noqa: DTZ001
     with pytest.raises(ValidationError):
         TimeOffset.model_validate_json(
             '{"reference":{"kind":"unknown"},"target":{"kind":"unknown"}}'

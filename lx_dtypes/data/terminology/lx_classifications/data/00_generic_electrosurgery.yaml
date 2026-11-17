@@ -1,0 +1,61 @@
+# Repository-authored vocabulary (local_vocabulary); no external guideline attribution is asserted.
+- model: classification
+  name: "endoscopy_electrosurgery_documentation_status"
+  name_de: "Dokumentationsstatus der HF-Chirurgie"
+  name_en: "Electrosurgery documentation status"
+  description: "Explizite Angabe, ob während der Untersuchung HF-Strom appliziert wurde."
+  classification_types: []
+  classification_choices:
+    - documented_none
+    - documented_present
+    - documented_unknown
+
+- model: classification
+  name: "electrosurgery_mode"
+  name_de: "HF-Modus"
+  name_en: "Electrosurgical mode"
+  description: "Tatsächlich verwendeter Strommodus der einzelnen HF-Aktivierung."
+  classification_types: []
+  classification_choices:
+    - electrosurgery_mode_cut
+    - electrosurgery_mode_coagulation
+    - electrosurgery_mode_blend
+    - electrosurgery_mode_other
+
+- model: classification
+  name: "electrosurgery_power_setting"
+  name_de: "HF-Leistungseinstellung"
+  name_en: "Electrosurgical power setting"
+  description: "Tatsächlich eingestellte Leistung der HF-Aktivierung."
+  classification_types: []
+  classification_choices:
+    - electrosurgery_power_setting_recorded
+
+- model: classification
+  name: "electrosurgery_activation_duration"
+  name_de: "HF-Aktivierungsdauer"
+  name_en: "Electrosurgical activation duration"
+  description: "Gemessene Dauer der HF-Aktivierung."
+  classification_types: []
+  classification_choices:
+    - electrosurgery_activation_duration_recorded
+
+- model: classification
+  name: "electrosurgery_delivered_energy"
+  name_de: "Abgegebene HF-Energie"
+  name_en: "Delivered electrosurgical energy"
+  description: "Vom Generator gemeldete abgegebene Energie der HF-Aktivierung."
+  classification_types: []
+  classification_choices:
+    - electrosurgery_delivered_energy_recorded
+
+- model: classification
+  name: "electrosurgery_curve_comparison"
+  name_de: "Kurvenvergleich der HF-Aktivierung"
+  name_en: "Electrosurgical curve comparison"
+  description: "Ergebnis des Regressionsvergleichs der Aktivierungskurve mit früheren Kurven desselben Kurvenprofils."
+  classification_types: []
+  classification_choices:
+    - electrosurgery_curve_within_reference
+    - electrosurgery_curve_deviates
+    - electrosurgery_curve_not_evaluated

@@ -234,7 +234,7 @@ def test_long_and_sparsely_binned_sections(profile: ElectricalCurveProfile) -> N
         update={"min_duration_num": 1, "min_duration_den": 1000}
     )
     # Samples every 8 ms inside the 10 ms gap limit leave some 5 ms bins empty.
-    ticks = [*range(0, 100), *range(100, 150, 8), *range(150, 300)]
+    ticks = [*range(100), *range(100, 150, 8), *range(150, 300)]
     activation_start = 100
     series = _series([(activation_start, 7, 1.0)], total=len(ticks), ticks=ticks)
     sections = extract_application_sections(series, sparse_profile)
@@ -348,7 +348,7 @@ def test_comparison_requires_earlier_unique_references(
         compare_electrical_application(
             profile, identity, current, [current, *references]
         )
-    with pytest.raises(ValueError, match="exact KB profile identity"):
+    with pytest.raises(ValueError, match="exact KB definition identity"):
         compare_electrical_application(
             profile,
             KnowledgeBaseIdentity(

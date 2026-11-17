@@ -1,0 +1,12 @@
+name: DGVS_Terminology
+name_de: "DGVS-Terminologie"
+description: ""
+version: 0.1.0
+medical_field: gastroenterology
+modules:
+  - lx_examinations
+  - lx_findings
+  - lx_interventions
+  - lx_classifications
+  - lx_classification_choices
+  - lx_descriptors

@@ -137,19 +137,6 @@ if TYPE_CHECKING:
         ExaminationIndicationCore,
     )
     from .examination_time import ExaminationTimeCore, ExaminationTimeTypeCore
-    from .time import (
-        ElectrosurgeryTimestamp,
-        ExaminationTimestamp,
-        PtsTimestamp,
-        TimeOffset,
-        Timestamp,
-    )
-    from .time_reference import (
-        TimeOffsetEvidence,
-        TimeOffsetExample,
-        TimeVideoReference,
-        TimestampKind,
-    )
     from .examination_type import ExaminationTypeCore
     from .export_ready import (
         ReadyForExportResult,
@@ -459,6 +446,19 @@ if TYPE_CHECKING:
         ExaminationCatalogDTO,
         IndicationCatalogDTO,
         LocalizedCatalogItem,
+    )
+    from .time import (
+        ElectrosurgeryTimestamp,
+        ExaminationTimestamp,
+        PtsTimestamp,
+        TimeOffset,
+        Timestamp,
+    )
+    from .time_reference import (
+        TimeOffsetEvidence,
+        TimeOffsetExample,
+        TimestampKind,
+        TimeVideoReference,
     )
     from .transfer_validation import (
         TransferValidationFailureLogPayload,
@@ -1252,6 +1252,7 @@ __all__ = [
     "DtypesRecordInterventionGroupPayload",
     "DtypesRecordInterventionPayload",
     "DtypesRecordPersistencePayload",
+    "ElectrosurgeryTimestamp",
     "EndoscopeImageRoiCore",
     "EndoscopyProcessorCore",
     "EventClassificationChoiceCore",
@@ -1264,16 +1265,8 @@ __all__ = [
     "ExaminationIndicationCore",
     "ExaminationReportingContext",
     "ExaminationTimeCore",
-    "ElectrosurgeryTimestamp",
-    "ExaminationTimestamp",
-    "PtsTimestamp",
-    "TimeOffset",
-    "TimeOffsetEvidence",
-    "TimeOffsetExample",
-    "TimeVideoReference",
-    "TimestampKind",
-    "Timestamp",
     "ExaminationTimeTypeCore",
+    "ExaminationTimestamp",
     "ExaminationTypeCore",
     "FfmpegActiveStreamThrottleState",
     "FfmpegStreamInfo",
@@ -1409,6 +1402,7 @@ __all__ = [
     "PdfTypeSummaryPayload",
     "PostValidationRebuildSummaryData",
     "PostValidationRebuildSummaryPayload",
+    "PtsTimestamp",
     "QualityEvaluationStatus",
     "QuasiIdentifierField",
     "QuasiIdentifierSubset",
@@ -1512,6 +1506,12 @@ __all__ = [
     "TemporalInferenceDispatchResult",
     "TemporalInferenceHistoryConfigPayload",
     "TemporalInferenceHistoryResultPayload",
+    "TimeOffset",
+    "TimeOffsetEvidence",
+    "TimeOffsetExample",
+    "TimeVideoReference",
+    "Timestamp",
+    "TimestampKind",
     "TrainImageMultilabelModelCommandOptionsPayload",
     "TrainPhiRegionDetectorCommandOptionsPayload",
     "TranscodeVideoCommandOptionsPayload",

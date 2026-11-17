@@ -67,7 +67,7 @@ def test_bootstrap_rejects_invalid_hydrated_copy(
     damage: str,
 ) -> None:
     payload = json.loads(hydrated_registry.read_text())
-    entry = payload["modules"]["dgvs_reporting"]["0.1.0"]
+    entry = payload["modules"]["dgvs_reporting"]["0.2.0"]
     root = Path(entry["sources"][0]["input_dirs"][0])
     tree = hydrated_registry.parent / "shipped" / entry["shipped_tree_sha256"]
     if damage == "marker":
@@ -78,7 +78,7 @@ def test_bootstrap_rejects_invalid_hydrated_copy(
         entry["sources"][0]["input_dirs"] = [str(root / "unrelated")]
     else:
         config = root / "report_templates" / "dgvs_reporting" / "config.yaml"
-        config.write_text(config.read_text().replace("0.1.0", "9.9.9"))
+        config.write_text(config.read_text().replace("0.2.0", "9.9.9"))
     hydrated_registry.write_text(json.dumps(payload))
     original = hydrated_registry.read_bytes()
 
@@ -198,7 +198,7 @@ def test_bootstrap_uses_environment_registry_and_requested_default(
     payload = json.loads(registry.read_text(encoding="utf-8"))
     assert payload["active"] == {
         "module_name": "dgvs_reporting",
-        "version": "0.1.0",
+        "version": "0.2.0",
     }
 
 
@@ -488,14 +488,14 @@ def test_changed_inputs_and_validator_revalidate(
     calls = _count_validations(monkeypatch)
     registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
     payload = json.loads(hydrated_registry.read_text())
-    entry = payload["modules"]["dgvs_reporting"]["0.1.0"]
+    entry = payload["modules"]["dgvs_reporting"]["0.2.0"]
     root = Path(entry["sources"][0]["input_dirs"][0])
     config = root / "report_templates" / "dgvs_reporting" / "config.yaml"
     config.write_bytes(config.read_bytes() + b"\n# Local builder edit\n")
     calls.clear()
 
     edited = registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
-    assert "dgvs_reporting@0.1.0" in edited.validated
+    assert "dgvs_reporting@0.2.0" in edited.validated
     assert set(edited.validated) == set(calls)
     assert edited.reused
 
@@ -542,11 +542,11 @@ def test_failed_validation_drops_the_receipt_and_retries(
     receipts = registry_module.ValidationReceipts.model_validate_json(
         registry_module.validation_receipts_path(hydrated_registry).read_bytes()
     )
-    assert "dgvs_reporting@0.1.0" not in receipts.receipts
+    assert "dgvs_reporting@0.2.0" not in receipts.receipts
 
     calls = _count_validations(monkeypatch)
     retried = registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
-    assert "dgvs_reporting@0.1.0" in retried.validated
+    assert "dgvs_reporting@0.2.0" in retried.validated
 
 
 @pytest.mark.parametrize("damage", ["marker", "digest", "path", "identity"])
@@ -558,7 +558,7 @@ def test_receipts_never_hide_damaged_hydrated_copies(
     registry_module.bootstrap_packaged_knowledge_bases(hydrated_registry)
     monkeypatch.setattr(registry_module, "_validate_identity", validate)
     payload = json.loads(hydrated_registry.read_text())
-    entry = payload["modules"]["dgvs_reporting"]["0.1.0"]
+    entry = payload["modules"]["dgvs_reporting"]["0.2.0"]
     root = Path(entry["sources"][0]["input_dirs"][0])
     tree = hydrated_registry.parent / "shipped" / entry["shipped_tree_sha256"]
     if damage == "marker":
@@ -569,7 +569,7 @@ def test_receipts_never_hide_damaged_hydrated_copies(
         entry["sources"][0]["input_dirs"] = [str(root / "unrelated")]
     else:
         config = root / "report_templates" / "dgvs_reporting" / "config.yaml"
-        config.write_text(config.read_text().replace("0.1.0", "9.9.9"))
+        config.write_text(config.read_text().replace("0.2.0", "9.9.9"))
     hydrated_registry.write_text(json.dumps(payload))
 
     assert main(_bootstrap_args(hydrated_registry)) == 1

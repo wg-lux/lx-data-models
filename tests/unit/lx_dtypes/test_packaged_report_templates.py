@@ -47,6 +47,34 @@ def test_reporting_catalog_has_bilingual_labels(
         ], template_name
         assert_label(template_name, exported[f"name_{language}"])
         assert exported["verbosity_options"] == ["short", "standard", "detailed"]
+        medication_sections = [
+            section
+            for section in exported["report_sections"]
+            if section["section_kind"] == "medications"
+        ]
+        assert len(medication_sections) == 1, template_name
+        medication_section = medication_sections[0]
+        assert medication_section["fields"] == [
+            {
+                "key": "medications",
+                "label": "Aktuelle Medikation",
+                "source": "patient",
+                "required": False,
+            }
+        ]
+        assert {finding["finding"] for finding in medication_section["findings"]} == {
+            "endoscopy_medication_status",
+            "endoscopy_medication_administration",
+        }
+        # Medication inputs must appear once, including in the DGVS template.
+        assert (
+            sum(
+                finding["finding"] == "endoscopy_medication_administration"
+                for section in exported["report_sections"]
+                for finding in section["findings"]
+            )
+            == 1
+        ), template_name
         examination = kb.examination[exported["examination"]]
         assert_label(examination.name, getattr(examination, f"name_{language}"))
         for section in exported["report_sections"]:

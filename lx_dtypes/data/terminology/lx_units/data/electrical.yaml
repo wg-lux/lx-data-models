@@ -1,0 +1,13 @@
+# Sources for every record in this file:
+# - UCUM specification: https://ucum.org/ucum
+- model: unit
+  name: "watt"
+  abbreviation: "W"
+  name_de: "Watt"
+  name_en: "Watt"
+
+- model: unit
+  name: "joule"
+  abbreviation: "J"
+  name_de: "Joule"
+  name_en: "Joule"

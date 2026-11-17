@@ -76,6 +76,7 @@
   examination: star_upper_gi_endoscopy
   report_sections:
     - examination_baseline
+    - report_medications
   validators:
     examination_validators:
       - gastroscopy_has_baseline_info
@@ -370,6 +371,7 @@
   examination: star_upper_gi_endoscopy
   report_sections:
     - upper_gi_quality_2025_landmarks_and_completeness
+    - report_medications
   validators:
     examination_validators:
       - upper_gi_quality_2025_minimum_documentation
@@ -391,6 +393,7 @@
   examination: star_upper_gi_endoscopy
   report_sections:
     - base_required_section
+    - report_medications
   validators:
     examination_validators: []
     findings_validators: []
@@ -424,6 +427,7 @@
   examination: star_upper_gi_endoscopy
   report_sections:
     - base_required_section
+    - report_medications
   validators:
     examination_validators: []
     findings_validators: []
@@ -605,7 +609,7 @@
       allowed_values: [quality_absent, quality_present, quality_unknown]
       guideline_citations: ["ESGE-ERCP-EUS-PM-2018: post-ERCP pancreatitis"]
   examination: ercp
-  report_sections: [ercp_quality_documentation_2018]
+  report_sections: [ercp_quality_documentation_2018, report_medications]
   validators:
     examination_validators: [ercp_quality_documentation_minimum]
     findings_validators:
@@ -785,7 +789,7 @@
       allowed_values: [quality_absent, quality_present, quality_unknown]
       guideline_citations: ["ESGE-EUS-PM-2025 measure 6: adverse events"]
   examination: endoscopic_ultrasound
-  report_sections: [eus_quality_documentation_2025]
+  report_sections: [eus_quality_documentation_2025, report_medications]
   validators:
     examination_validators: [eus_quality_2025_minimum_documentation]
     findings_validators:

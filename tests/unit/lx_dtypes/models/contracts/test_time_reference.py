@@ -12,9 +12,9 @@ from lx_dtypes.models.contracts.package_snapshot import (
     build_package_snapshot,
     restore_package_snapshot,
 )
+from lx_dtypes.models.interface.data_formats import read_record, write_record
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.Ledger import Ledger
-from lx_dtypes.models.interface.data_formats import read_record, write_record
 from lx_dtypes.models.knowledge_base.time_reference import TimeReference
 from lx_dtypes.models.ledger.p_time_offset import PTimeOffset
 from lx_dtypes.packages import build_package, load_package

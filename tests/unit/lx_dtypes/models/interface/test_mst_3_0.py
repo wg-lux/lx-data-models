@@ -26,9 +26,19 @@ def test_mst_3_0_loads(mst_3_0: KnowledgeBase) -> None:
 
 
 def test_mst_3_0_has_complete_data(mst_3_0: KnowledgeBase) -> None:
-    assert len(mst_3_0.finding) == 389
-    assert len(mst_3_0.classification) == 293
-    assert len(mst_3_0.classification_choice) == 546
+    # Shared reporting dependencies add concepts; retain exact MST-owned counts.
+    for records, expected in (
+        (mst_3_0.finding, 389),
+        (mst_3_0.classification, 293),
+        (mst_3_0.classification_choice, 546),
+    ):
+        assert (
+            sum(
+                item.kb_module_name == "mst_3_0_terminology"
+                for item in records.values()
+            )
+            == expected
+        )
 
 
 def test_mst_anatomy_location_exists(mst_3_0: KnowledgeBase) -> None:

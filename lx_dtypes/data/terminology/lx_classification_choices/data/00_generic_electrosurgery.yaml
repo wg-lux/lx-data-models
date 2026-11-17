@@ -1,0 +1,71 @@
+# Repository-authored vocabulary (local_vocabulary); no external guideline attribution is asserted.
+# Choices record what was actually used or measured; none is a recommended preset.
+- model: classification_choice
+  name: "electrosurgery_mode_cut"
+  name_de: "Schneiden"
+  name_en: "Cut"
+  description: "HF-Aktivierung im Schneidemodus."
+
+- model: classification_choice
+  name: "electrosurgery_mode_coagulation"
+  name_de: "Koagulation"
+  name_en: "Coagulation"
+  description: "HF-Aktivierung im Koagulationsmodus."
+
+- model: classification_choice
+  name: "electrosurgery_mode_blend"
+  name_de: "Mischstrom"
+  name_en: "Blended current"
+  description: "HF-Aktivierung mit kombiniertem Schneide- und Koagulationsstrom."
+
+- model: classification_choice
+  name: "electrosurgery_mode_other"
+  name_de: "Anderer Modus"
+  name_en: "Other mode"
+  description: "Anderer oder herstellerspezifischer HF-Modus."
+
+- model: classification_choice
+  name: "electrosurgery_power_setting_recorded"
+  name_de: "Leistungseinstellung dokumentiert"
+  name_en: "Power setting recorded"
+  description: "Die tatsächlich eingestellte Leistung ist anzugeben."
+  classification_choice_descriptors:
+    - electrosurgery_power_setting_watt_value
+
+- model: classification_choice
+  name: "electrosurgery_activation_duration_recorded"
+  name_de: "Aktivierungsdauer dokumentiert"
+  name_en: "Activation duration recorded"
+  description: "Die gemessene Aktivierungsdauer ist anzugeben."
+  classification_choice_descriptors:
+    - electrosurgery_activation_duration_seconds_value
+
+- model: classification_choice
+  name: "electrosurgery_delivered_energy_recorded"
+  name_de: "Abgegebene Energie dokumentiert"
+  name_en: "Delivered energy recorded"
+  description: "Die vom Generator gemeldete abgegebene Energie ist anzugeben."
+  classification_choice_descriptors:
+    - electrosurgery_delivered_energy_joule_value
+
+- model: classification_choice
+  name: "electrosurgery_curve_within_reference"
+  name_de: "Kurve innerhalb der Referenz"
+  name_en: "Curve within reference"
+  description: "Der Regressionsvergleich mit früheren Kurven ergab 'within_reference'."
+  classification_choice_descriptors:
+    - electrosurgery_curve_distance_value
+
+- model: classification_choice
+  name: "electrosurgery_curve_deviates"
+  name_de: "Kurve weicht von der Referenz ab"
+  name_en: "Curve deviates from reference"
+  description: "Der Regressionsvergleich mit früheren Kurven ergab 'deviates'. Statistisches Ähnlichkeitsmaß, kein klinisches Urteil."
+  classification_choice_descriptors:
+    - electrosurgery_curve_distance_value
+
+- model: classification_choice
+  name: "electrosurgery_curve_not_evaluated"
+  name_de: "Kurve nicht ausgewertet"
+  name_en: "Curve not evaluated"
+  description: "Kein Regressionsvergleich verfügbar, zum Beispiel wegen fehlender Messdaten oder zu weniger Referenzkurven."

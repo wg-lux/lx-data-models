@@ -4,7 +4,7 @@ This module deliberately excludes every Django model so consumers can import the
 official :class:`KnowledgeBase` type without configuring Django settings.
 """
 
-from typing import Literal, TypeAlias, Union
+from typing import Literal, TypeAlias, Union, get_args
 
 from .center.center_employee_list import (
     CenterEmployeeList,
@@ -34,6 +34,11 @@ from .classification_choice_descriptor import (
     kb_classification_choice_descriptor_ddicts,
     kb_classification_choice_descriptor_lookup,
     kb_classification_choice_descriptor_models,
+)
+from .electrical_curve_profile import (
+    ElectricalCurveProfile,
+    ElectricalCurveProfileDataDict,
+    KbElectricalCurveProfileLookupType,
 )
 from .examination import (
     KbExaminationLookupType,
@@ -77,11 +82,6 @@ from .report_template import (
     kb_report_template_models,
 )
 from .study_preset import KbStudyPresetLookupType, StudyPreset, StudyPresetDataDict
-from .electrical_curve_profile import (
-    ElectricalCurveProfile,
-    ElectricalCurveProfileDataDict,
-    KbElectricalCurveProfileLookupType,
-)
 from .time_reference import (
     KbTimeReferenceLookupType,
     TimeReference,
@@ -173,19 +173,22 @@ KB_DDICTS: TypeAlias = Union[
     kb_report_template_ddicts,
 ]
 
+# Single source of the family names, in dependency (load/export) order.
 KB_MODEL_NAMES_LITERAL = Literal[
     "TimeReference",
     "ElectricalCurveProfile",
     "CenterEmployeeList",
     "StudyPreset",
     "ReferenceCatalog",
+    "InformationSourceType",
+    "InformationSource",
+    "Citation",
     "UnitType",
     "Unit",
     "ClassificationChoiceDescriptor",
     "ClassificationChoice",
     "ClassificationType",
     "Classification",
-    "Citation",
     "InterventionType",
     "Intervention",
     "FindingType",
@@ -194,8 +197,6 @@ KB_MODEL_NAMES_LITERAL = Literal[
     "Indication",
     "ExaminationType",
     "Examination",
-    "InformationSourceType",
-    "InformationSource",
     "ReportTemplateSection",
     "ReportFinding",
     "ClassificationValidator",
@@ -206,38 +207,10 @@ KB_MODEL_NAMES_LITERAL = Literal[
     "ReportTemplate",
 ]
 
-KB_MODEL_NAMES_ORDERED: list[KB_MODEL_NAMES_LITERAL] = [
-    "TimeReference",
-    "ElectricalCurveProfile",
-    "CenterEmployeeList",
-    "StudyPreset",
-    "ReferenceCatalog",
-    "InformationSourceType",
-    "InformationSource",
-    "Citation",
-    "UnitType",
-    "Unit",
-    "ClassificationChoiceDescriptor",
-    "ClassificationChoice",
-    "ClassificationType",
-    "Classification",
-    "InterventionType",
-    "Intervention",
-    "FindingType",
-    "Finding",
-    "IndicationType",
-    "Indication",
-    "ExaminationType",
-    "Examination",
-    "ReportTemplateSection",
-    "ReportFinding",
-    "ClassificationValidator",
-    "InterventionValidator",
-    "UnitValidator",
-    "FindingsValidator",
-    "ExaminationValidator",
-    "ReportTemplate",
-]
+KB_MODEL_NAMES_ORDERED: list[KB_MODEL_NAMES_LITERAL] = list(
+    get_args(KB_MODEL_NAMES_LITERAL)
+)
+
 
 __all__ = [
     "KB_DDICTS",

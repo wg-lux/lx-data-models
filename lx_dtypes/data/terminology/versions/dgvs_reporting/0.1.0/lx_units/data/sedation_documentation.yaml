@@ -1,0 +1,30 @@
+# Sources for every record in this file:
+# - UCUM specification: https://ucum.org/ucum
+# - DGVS S3 sedation guideline (AWMF 021-014): https://register.awmf.org/assets/guidelines/021-014l_S3_Sedierung_in_der_gastrointestinalen_Endoskopie_2023-10.pdf
+- model: unit
+  name: "beats_per_minute"
+  abbreviation: "1/min"
+  name_de: "Schläge pro Minute"
+  name_en: "Beats per minute"
+  description: "Frequency unit for heart rate."
+
+- model: unit
+  name: "millimeter_mercury"
+  abbreviation: "mmHg"
+  name_de: "Millimeter Quecksilbersäule"
+  name_en: "Millimetres of mercury"
+  description: "Pressure unit used for blood pressure."
+
+- model: unit
+  name: "liters_per_minute"
+  abbreviation: "l/min"
+  name_de: "Liter pro Minute"
+  name_en: "Litres per minute"
+  description: "Flow-rate unit used for supplemental oxygen."
+
+- model: unit
+  name: "milliliter"
+  abbreviation: "ml"
+  name_de: "Milliliter"
+  name_en: "Millilitre"
+  description: "Volume unit used for intravenous fluids."

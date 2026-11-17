@@ -60,6 +60,15 @@ locations and database persistence.
 
 ## Knowledge-base references and ledger observations
 
+The ledger `p_time_offset` and `p_electrical_application` packages use the standard
+`DataDict.py`, `Pydantic.py`, `Django.py`, and `__init__.py` layout. Existing imports
+from either package remain valid. Django adapters load only when requested and
+are registered by the packaged Django app; migration
+`0008_electrical_and_time_observations` creates their tables. Evidence, curves, and
+regression results are stored as JSON; examination and definition references
+remain opaque strings. Parse through the Pydantic models and use the existing KB
+validation methods for semantic checks before storage.
+
 `models.knowledge_base.time_reference.TimeReference` is a standard KB record
 (`model: time_reference`). It declares the reference and target clock kinds and
 holds `TimeOffsetExample` entries, each with a unique `example_id`, a `role`

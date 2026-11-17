@@ -1,4 +1,4 @@
-from typing import NotRequired, TypedDict
+from typing import Final, NotRequired, TypedDict, cast
 
 from pydantic import Field
 
@@ -13,6 +13,12 @@ from lx_dtypes.models.ledger.case import Case, CaseDataDict
 from lx_dtypes.models.ledger.center import Center, CenterDataDict
 from lx_dtypes.models.ledger.examiner.DataDict import ExaminerDataDict
 from lx_dtypes.models.ledger.examiner.Pydantic import Examiner
+from lx_dtypes.models.ledger.p_electrical_application import (
+    PElectricalApplication,
+    PElectricalApplicationDataDict,
+    PElectricalCurveComparison,
+    PElectricalCurveComparisonDataDict,
+)
 from lx_dtypes.models.ledger.p_examination import PExamination, PExaminationDataDict
 from lx_dtypes.models.ledger.p_examination.DataDict import (
     SerializedPExaminationDataDict,
@@ -29,7 +35,7 @@ from lx_dtypes.models.ledger.p_finding_classification_choice_descriptor.DataDict
 from lx_dtypes.models.ledger.p_finding_classifications.DataDict import (
     SerializedPFindingClassificationsDataDict,
 )
-from lx_dtypes.models.ledger.p_indication.DataDict import PIndicationDataDict
+from lx_dtypes.models.ledger.p_indication.DataDict import SerializedPIndicationDataDict
 from lx_dtypes.models.ledger.p_indication_classification.DataDict import (
     SerializedPIndicationClassificationDataDict,
 )
@@ -40,6 +46,7 @@ from lx_dtypes.models.ledger.p_intervention.DataDict import PFindingIntervention
 from lx_dtypes.models.ledger.p_interventions.DataDict import (
     SerializedPFindingInterventionsDataDict,
 )
+from lx_dtypes.models.ledger.p_time_offset import PTimeOffset, PTimeOffsetDataDict
 from lx_dtypes.models.ledger.p_video import (
     PatientVideoFile,
     PatientVideoFileDataDict,
@@ -49,13 +56,6 @@ from lx_dtypes.models.ledger.p_video import (
 from lx_dtypes.models.ledger.patient import Patient, PatientDataDict
 from lx_dtypes.models.ledger.report import Report, ReportDataDict
 from lx_dtypes.models.ledger.video_file import VideoFile, VideoFileDataDict
-from lx_dtypes.models.ledger.p_time_offset import PTimeOffset, PTimeOffsetDataDict
-from lx_dtypes.models.ledger.p_electrical_application import (
-    PElectricalApplication,
-    PElectricalApplicationDataDict,
-    PElectricalCurveComparison,
-    PElectricalCurveComparisonDataDict,
-)
 
 
 class LedgerRecordList(TypedDict):
@@ -70,7 +70,7 @@ class LedgerRecordList(TypedDict):
     centers: list[CenterDataDict]
     examiners: list[ExaminerDataDict]
     p_findings: list[SerializedPFindingDataDict]
-    p_indications: list[PIndicationDataDict]
+    p_indications: list[SerializedPIndicationDataDict]
     p_indication_classifications: list[SerializedPIndicationClassificationDataDict]
     p_indication_classification_descriptors: list[
         PIndicationClassificationDescriptorDataDict
@@ -101,8 +101,36 @@ class LedgerDataDict(AppBaseModelUUIDTagsDataDict):
     patient_examinations: dict[str, PExaminationDataDict]
     patients: dict[str, PatientDataDict]
     centers: dict[str, CenterDataDict]
+    examiners: dict[str, ExaminerDataDict]
     patient_videos: dict[str, PatientVideoFileDataDict]
     # raw_patient_videos: Dict[str, RawPatientVideoFileDataDict]
+
+
+# Export key -> Ledger field for collections exported one record per entry.
+FLAT_LEDGER_COLLECTIONS: Final[dict[str, str]] = {
+    "p_time_offsets": "time_offsets",
+    "p_electrical_applications": "electrical_applications",
+    "p_electrical_curve_comparisons": "electrical_curve_comparisons",
+    "reports": "reports",
+    "patients": "patients",
+    "centers": "centers",
+    "examiners": "examiners",
+    "video_files": "video_files",
+    "p_videos": "patient_videos",
+}
+# Export keys of ``export_patient_examination_record_list``, in tuple order.
+EXAMINATION_RECORD_LIST_KEYS: Final = (
+    "p_examinations",
+    "p_findings",
+    "p_indications",
+    "p_indication_classifications",
+    "p_indication_classification_descriptors",
+    "p_finding_classifications",
+    "p_finding_classification_choices",
+    "p_finding_classification_choice_descriptors",
+    "p_finding_interventions",
+    "p_finding_intervention",
+)
 
 
 class Ledger(AppBaseModelUUIDTags):
@@ -154,7 +182,7 @@ class Ledger(AppBaseModelUUIDTags):
     ) -> tuple[
         list[SerializedPExaminationDataDict],
         list[SerializedPFindingDataDict],
-        list[PIndicationDataDict],
+        list[SerializedPIndicationDataDict],
         list[SerializedPIndicationClassificationDataDict],
         list[PIndicationClassificationDescriptorDataDict],
         list[SerializedPFindingClassificationsDataDict],
@@ -163,197 +191,67 @@ class Ledger(AppBaseModelUUIDTags):
         list[SerializedPFindingInterventionsDataDict],
         list[PFindingInterventionDataDict],
     ]:
+        """Flatten every examination tree into one list per record level.
+
+        Each level is traversed in parent order, so every list preserves the
+        nesting order. Tuple order is the declared return order.
         """
-        Collects and serializes all patient-examination-related records into eight separate lists.
-
-        Returns:
-            Tuple containing, in order:
-            - p_examination_dicts (List[SerializedPExaminationDataDict]): Serialized patient examination records.
-            - p_finding_dicts (List[SerializedPFindingDataDict]): Serialized findings associated with examinations.
-            - p_indication_dicts (List[PIndicationDataDict]): Serialized indications associated with examinations.
-            - p_finding_classifications_dicts (List[SerializedPFindingClassificationsDataDict]): Serialized finding-classification records.
-            - p_finding_classification_choice_dicts (List[SerializedPFindingClassificationChoiceDataDict]): Serialized classification choice records.
-            - p_finding_classification_choice_descriptor_dicts (List[PFindingClassificationChoiceDescriptorDataDict]): Descriptor dictionaries for classification choices.
-            - p_finding_interventions_dicts (List[SerializedPFindingInterventionsDataDict]): Serialized intervention-group records for findings.
-            - p_finding_intervention_dicts (List[PFindingInterventionDataDict]): Serialized individual intervention records.
-        """
-        p_examination_dicts: list[SerializedPExaminationDataDict] = []
-        p_finding_dicts: list[SerializedPFindingDataDict] = []
-        p_indication_dicts: list[PIndicationDataDict] = []
-        p_indication_classification_dicts: list[
-            SerializedPIndicationClassificationDataDict
-        ] = []
-        p_indication_classification_descriptor_dicts: list[
-            PIndicationClassificationDescriptorDataDict
-        ] = []
-        p_finding_classifications_dicts: list[
-            SerializedPFindingClassificationsDataDict
-        ] = []
-        p_finding_classification_choice_dicts: list[
-            SerializedPFindingClassificationChoiceDataDict
-        ] = []
-        p_finding_classification_choice_descriptor_dicts: list[
-            PFindingClassificationChoiceDescriptorDataDict
-        ] = []
-        p_finding_interventions_dicts: list[
-            SerializedPFindingInterventionsDataDict
-        ] = []
-        p_finding_intervention_dicts: list[PFindingInterventionDataDict] = []
-
-        for p_examination in self.patient_examinations.values():
-            # 1. Export PExamination
-            p_examination_dicts.append(p_examination.serialized_ddict)
-
-            # 2. Export PIndication
-            for p_indication in p_examination.patient_indications:
-                p_indication_dicts.append(p_indication.serialized_ddict)
-                for (
-                    p_indication_classification
-                ) in p_indication.patient_indication_classifications:
-                    p_indication_classification_dicts.append(
-                        p_indication_classification.serialized_ddict
-                    )
-                    for p_indication_classification_descriptor in p_indication_classification.patient_indication_classification_descriptors:
-                        p_indication_classification_descriptor_dicts.append(
-                            p_indication_classification_descriptor.ddict
-                        )
-
-            # 3. Export PFinding and nested classifications
-            for p_finding in p_examination.patient_findings:
-                p_finding_dicts.append(p_finding.serialized_ddict)
-
-                # 4. Export PFindingClassifications and nested choices
-                for (
-                    p_finding_classifications
-                ) in p_finding.patient_finding_classifications:
-                    p_finding_classifications_dicts.append(
-                        p_finding_classifications.serialized_ddict
-                    )
-
-                    # 5. Export PFindingClassificationChoice and nested descriptors
-                    for p_finding_classification_choice in (
-                        p_finding_classifications.patient_finding_classification_choices
-                    ):
-                        p_finding_classification_choice_dicts.append(
-                            p_finding_classification_choice.serialized_ddict
-                        )
-
-                        # 6. Export PFindingClassificationChoiceDescriptor
-                        for p_finding_classification_choice_descriptor in p_finding_classification_choice.patient_finding_classification_choice_descriptors:
-                            p_finding_classification_choice_descriptor_dicts.append(
-                                p_finding_classification_choice_descriptor.ddict
-                            )
-                # 7. Export PFindingInterventions and nested PFindingIntervention
-                for p_finding_interventions in p_finding.patient_finding_interventions:
-                    p_finding_interventions_dicts.append(
-                        p_finding_interventions.serialized_ddict
-                    )
-
-                    # 8. Export PFindingIntervention
-                    for (
-                        p_finding_intervention
-                    ) in p_finding_interventions.patient_finding_interventions:
-                        p_finding_intervention_dicts.append(
-                            p_finding_intervention.serialized_ddict
-                        )
-
+        examinations = list(self.patient_examinations.values())
+        indications = [i for e in examinations for i in e.patient_indications]
+        indication_classifications = [
+            c for i in indications for c in i.patient_indication_classifications
+        ]
+        indication_descriptors = [
+            d
+            for c in indication_classifications
+            for d in c.patient_indication_classification_descriptors
+        ]
+        findings = [f for e in examinations for f in e.patient_findings]
+        classifications = [
+            c for f in findings for c in f.patient_finding_classifications
+        ]
+        choices = [
+            c for g in classifications for c in g.patient_finding_classification_choices
+        ]
+        choice_descriptors = [
+            d
+            for c in choices
+            for d in c.patient_finding_classification_choice_descriptors
+        ]
+        intervention_groups = [
+            g for f in findings for g in f.patient_finding_interventions
+        ]
+        interventions = [
+            i for g in intervention_groups for i in g.patient_finding_interventions
+        ]
         return (
-            p_examination_dicts,
-            p_finding_dicts,
-            p_indication_dicts,
-            p_indication_classification_dicts,
-            p_indication_classification_descriptor_dicts,
-            p_finding_classifications_dicts,
-            p_finding_classification_choice_dicts,
-            p_finding_classification_choice_descriptor_dicts,
-            p_finding_interventions_dicts,
-            p_finding_intervention_dicts,
+            [e.serialized_ddict for e in examinations],
+            [f.serialized_ddict for f in findings],
+            [i.serialized_ddict for i in indications],
+            [c.serialized_ddict for c in indication_classifications],
+            [d.ddict for d in indication_descriptors],
+            [c.serialized_ddict for c in classifications],
+            [c.serialized_ddict for c in choices],
+            [d.ddict for d in choice_descriptors],
+            [g.serialized_ddict for g in intervention_groups],
+            [i.serialized_ddict for i in interventions],
         )
 
     def export_record_lists(self) -> LedgerRecordList:
+        """Serialized records of every ledger collection, keyed as ``LedgerRecordList``.
+
+        Flat collections come from ``FLAT_LEDGER_COLLECTIONS``; examination trees
+        are flattened by ``export_patient_examination_record_list``.
         """
-        Collects serialized representations of all ledger entities and returns them as a LedgerRecordList suitable for export.
-
-        The returned record list contains flattened lists for patients, patient examinations, centers, examiners, findings, indications, finding classifications, classification choices, classification choice descriptors, finding interventions, and individual finding intervention records.
-
-        Returns:
-            LedgerRecordList: A TypedDict with these keys populated:
-                - patients: List of patient data dicts.
-                - p_examinations: List of serialized patient examination data dicts.
-                - centers: List of center data dicts.
-                - examiners: List of examiner data dicts.
-                - p_findings: List of serialized finding data dicts.
-                - p_indications: List of indication data dicts.
-                - p_finding_classifications: List of serialized finding classifications data dicts.
-                - p_finding_classification_choices: List of serialized classification choice data dicts.
-                - p_finding_classification_choice_descriptors: List of classification choice descriptor data dicts.
-                - p_finding_interventions: List of serialized finding interventions data dicts.
-                - p_finding_intervention: List of individual finding intervention data dicts.
-                - video_files: List of serialized technical VideoFile records.
-                - patient_video_file_dicts (List[PatientVideoFileDataDict]): Serialized patient video file records.
-        """
-        report_dicts: list[ReportDataDict] = [
-            r.serialized_ddict for r in self.reports.values()
-        ]
-        patient_dicts: list[PatientDataDict] = [
-            r.serialized_ddict for r in self.patients.values()
-        ]
-        examiner_dicts: list[ExaminerDataDict] = [
-            r.serialized_ddict for r in self.examiners.values()
-        ]
-        center_dicts: list[CenterDataDict] = [
-            r.serialized_ddict for r in self.centers.values()
-        ]
-
-        video_file_dicts: list[VideoFileDataDict] = [
-            r.serialized_ddict for r in self.video_files.values()
-        ]
-        video_dicts = [r.serialized_ddict for r in self.patient_videos.values()]
-        # raw_video_dicts = [r.serialized_ddict for r in self.raw_patient_videos.values()]
-
-        (
-            p_examination_dicts,
-            p_finding_dicts,
-            p_indication_dicts,
-            p_indication_classification_dicts,
-            p_indication_classification_descriptor_dicts,
-            p_finding_classifications_dicts,
-            p_finding_classification_choice_dicts,
-            p_finding_classification_choice_descriptor_dicts,
-            p_finding_interventions_dicts,
-            p_finding_intervention_dicts,
-        ) = self.export_patient_examination_record_list()
-
-        record_list: LedgerRecordList = LedgerRecordList(
-            p_time_offsets=[
-                record.serialized_ddict for record in self.time_offsets.values()
-            ],
-            p_electrical_applications=[
-                record.serialized_ddict
-                for record in self.electrical_applications.values()
-            ],
-            p_electrical_curve_comparisons=[
-                record.serialized_ddict
-                for record in self.electrical_curve_comparisons.values()
-            ],
-            reports=report_dicts,
-            patients=patient_dicts,
-            p_examinations=p_examination_dicts,
-            centers=center_dicts,
-            examiners=examiner_dicts,
-            p_findings=p_finding_dicts,
-            p_indications=p_indication_dicts,
-            p_indication_classifications=p_indication_classification_dicts,
-            p_indication_classification_descriptors=(
-                p_indication_classification_descriptor_dicts
-            ),
-            p_finding_classifications=p_finding_classifications_dicts,
-            p_finding_classification_choices=p_finding_classification_choice_dicts,
-            p_finding_classification_choice_descriptors=p_finding_classification_choice_descriptor_dicts,
-            p_finding_interventions=p_finding_interventions_dicts,
-            p_finding_intervention=p_finding_intervention_dicts,
-            video_files=video_file_dicts,
-            p_videos=video_dicts,
-            # p_raw_videos=raw_video_dicts,
+        records: dict[str, object] = {
+            key: [record.serialized_ddict for record in getattr(self, field).values()]
+            for key, field in FLAT_LEDGER_COLLECTIONS.items()
+        }
+        records.update(
+            zip(
+                EXAMINATION_RECORD_LIST_KEYS,
+                self.export_patient_examination_record_list(),
+                strict=True,
+            )
         )
-        return record_list
+        return cast(LedgerRecordList, records)

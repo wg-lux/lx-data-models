@@ -7,6 +7,7 @@ version: 3.0.0
 medical_field: gastroenterology
 modules: []
 depends_on:
+- report_medications
 - mst_3_0_terminology
 data:
   files:

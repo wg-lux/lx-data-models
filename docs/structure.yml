@@ -44,6 +44,8 @@ contracts:
   doc: guides/dtypes-package-structure.md
 - name: ePA FHIR compatibility
   doc: guides/epa-fhir-compatibility.md
+- name: Report template authoring for study staff
+  doc: guides/report-template-authoring.md
 - name: Electrosurgical video alignment
   doc: guides/electrosurgical-video-alignment.md
 tests:
@@ -53,5 +55,6 @@ tests:
 files:
 - examples/dtypes_packages/time_references
 - examples/dtypes_packages/electrical_curves
+- examples/dtypes_packages/colonoscopy_medication_electrosurgery
 - medication_plan_specification_summary.md
 - german-medication-plan

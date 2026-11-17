@@ -1,6 +1,6 @@
 import json
 from abc import abstractmethod
-from typing import Any, ClassVar, TypeVar
+from typing import Any, TypeVar
 
 from pydantic import Field
 
@@ -24,21 +24,11 @@ class LedgerBaseModel(
     # Generic[DDictT],
 ):
     external_ids: dict[str, str] = Field(default_factory=dict)
-    serialized_model_cls: ClassVar[Any] = None
-    serialized_ddict_cls: ClassVar[Any] = None
 
     @property
     def serialized_ddict_class(self) -> type[Any]:
-        """
-        The DataDict class used for serialized export.
-
-        If the class sets `serialized_ddict_cls`, that class is returned; otherwise `ddict_class` is returned.
-
-        Returns:
-            type[Any]: The DataDict class to use for serialized exports.
-        """
-
-        return self.serialized_ddict_cls or self.ddict_class
+        """DataDict for serialized export; models with nested records override it."""
+        return self.ddict_class
 
     @classmethod
     @abstractmethod
@@ -71,14 +61,8 @@ class LedgerBaseModel(
 
     @classmethod
     def serialized_model_class(cls) -> "type[LedgerBaseModel[Any]]":
-        """
-        Get the model class used for serialized export.
-
-        Returns:
-            model_cls (type[LedgerBaseModel[Any]]): The class to use when producing serialized representations; `serialized_model_cls` if set on the class, otherwise the class itself.
-        """
-
-        return cls.serialized_model_cls or cls
+        """Model for serialized export; models with nested records override it."""
+        return cls
 
     @property
     def serialized_model(self) -> "LedgerBaseModel[Any]":

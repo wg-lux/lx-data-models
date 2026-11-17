@@ -5,6 +5,7 @@ import inspect
 from types import SimpleNamespace as NS
 
 import pytest
+
 from .conftest import ROOT, ApiError, TerminologyError, api_error
 
 

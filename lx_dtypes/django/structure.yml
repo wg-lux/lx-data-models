@@ -12,6 +12,9 @@ boundaries:
 - Cross-service payloads use Pydantic contracts rather than ORM models
 - Host applications own authentication policy, deployment, and study provisioning
 entrypoints:
+- name: Electrical and time observation tables
+  file: migrations/0008_electrical_and_time_observations.py
+  purpose: Persist time evidence, electrical application curves and regression comparisons
 - name: Standardized database export
   file: standardized_export.py
   purpose: Read selected querysets and through relations using their configured database aliases

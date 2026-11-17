@@ -13,6 +13,11 @@ from lx_dtypes.models.knowledge_base.validators.FindingsValidatorDataDict import
     FindingsValidatorOperatorLiteral,
     FindingsValidatorQueryDataDict,
 )
+from lx_dtypes.models.knowledge_base.validators.QueryNormalization import (
+    align_query,
+    normalize_query_defaults,
+    validate_operator_condition,
+)
 from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReference import (
     ValidatorRequirementReference,
 )
@@ -207,16 +212,7 @@ class FindingsValidatorQuery(DtypesModel):
 
     @model_validator(mode="after")
     def validate_operator_semantics(self) -> "FindingsValidatorQuery":
-        if self.operator == "condition":
-            if self.condition is None:
-                raise ValueError(
-                    "operator 'condition' requires a populated `condition` block."
-                )
-            return self
-        if self.condition is not None:
-            raise ValueError(
-                f"operator '{self.operator}' does not allow a `condition` block."
-            )
+        validate_operator_condition(self.operator, self.condition)
         return self
 
     @property
@@ -241,34 +237,17 @@ class FindingsValidator(KnowledgebaseBaseModel[FindingsValidatorDataDict]):
     @model_validator(mode="before")
     @classmethod
     def normalize_query_defaults(cls, value: object) -> object:
-        if not isinstance(value, Mapping):
-            return value
-        data = dict(value)
-        query_raw = data.get("query")
-        query = dict(query_raw) if isinstance(query_raw, Mapping) else {}
-        if "finding" not in data and "finding" in query:
-            data["finding"] = query["finding"]
-        if "operator" not in data and "operator" in query:
-            data["operator"] = query["operator"]
-        if "finding" in data and "finding" not in query:
-            query["finding"] = data["finding"]
-        if "operator" in data and "operator" not in query:
-            query["operator"] = data["operator"]
-        data["query"] = query
-        return data
+        return normalize_query_defaults(
+            value, FindingsValidatorQuery, ("finding", "operator")
+        )
 
     @model_validator(mode="after")
     def validate_query_alignment(self) -> "FindingsValidator":
-        if self.query.finding is None:
-            self.query.finding = self.finding
-        if self.query.finding != self.finding:
-            raise ValueError(
-                "query.finding must match the top-level `finding` value for a validator."
-            )
-        if self.query.operator != self.operator:
-            raise ValueError(
-                "query.operator must match the top-level `operator` value for a validator."
-            )
+        self.query = align_query(
+            self.query,
+            {"finding": self.finding, "operator": self.operator},
+            suffix=" for a validator",
+        )
         return self
 
     @classmethod

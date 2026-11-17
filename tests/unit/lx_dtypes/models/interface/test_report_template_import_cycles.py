@@ -58,3 +58,15 @@ def test_functionality_packages_import_in_any_order(modules: tuple[str, ...]) ->
         "lx_dtypes.models.interface.KnowledgeBase",
     )
     assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize(
+    "adapter",
+    ["KnowledgeBaseReporting", "KnowledgeBaseAdmissibility", "KnowledgeBaseInterop"],
+)
+def test_knowledge_base_adapters_can_be_imported_first(adapter: str) -> None:
+    result = _run_import_order(
+        f"lx_dtypes.models.interface.{adapter}",
+        "lx_dtypes.models.interface.KnowledgeBase",
+    )
+    assert result.returncode == 0, result.stderr

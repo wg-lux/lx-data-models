@@ -84,21 +84,20 @@ def test_atomic_validator_language_changes_only_messages(kind: str) -> None:
     german, english = evaluate("de"), evaluate("en")
     assert german["ok"] is english["ok"] is False
     assert german["issues"][0]["message"] != english["issues"][0]["message"]
-    assert "rule" in german["issues"][0]["message"]
+    assert "rule" not in german["issues"][0]["message"]
+    assert german["issues"][0]["validator_name"] == "rule"
     german["issues"][0]["message"] = english["issues"][0]["message"]
     assert german == english
 
 
-def test_default_is_german_and_english_wording_is_preserved() -> None:
+def test_default_is_german_and_both_languages_give_readable_instructions() -> None:
     validator = FindingsValidator(name="rule", finding="polyp", operator="exists")
     default = runtime.evaluate_findings_validator_runtime(validator)
     english = runtime.evaluate_findings_validator_runtime(validator, language="en")
     assert default["issues"][0]["message"] == (
-        "Befund 'polyp' wird von Prüfregel 'rule' benötigt, ist aber nicht vorhanden."
+        "Bitte den Befund 'polyp' dokumentieren."
     )
-    assert english["issues"][0]["message"] == (
-        "Finding 'polyp' is required by validator 'rule' but is not present."
-    )
+    assert english["issues"][0]["message"] == ("Please document the finding 'polyp'.")
     with pytest.raises(ValueError, match="language"):
         runtime.evaluate_findings_validator_runtime(
             validator,
@@ -155,6 +154,12 @@ def test_template_dependency_and_cycle_messages_use_selected_language(
         "circular_examination_validator_dependency",
     }
     for issue in result["issues"]:
+        if issue["code"] == "finding_not_present":
+            assert issue["message"].startswith(
+                "Bitte" if language == "de" else "Please"
+            )
+            assert issue["validator_name"] == "rule"
+            continue
         assert (
             ("Prüfregel" in issue["message"] or "prüfregel" in issue["message"])
             if language == "de"
@@ -186,7 +191,7 @@ def test_missing_condition_data_is_localized_without_changing_details() -> None:
         validator, language="en", reported_findings=findings
     )
     assert german["issues"][0]["code"] == "missing_data_requirement"
-    assert "Ausgangsdaten fehlen: size" in german["issues"][0]["message"]
+    assert "fehlen noch Angaben: size" in german["issues"][0]["message"]
     comparable = deepcopy(german)
     comparable["issues"][0]["message"] = english["issues"][0]["message"]
     assert comparable == english

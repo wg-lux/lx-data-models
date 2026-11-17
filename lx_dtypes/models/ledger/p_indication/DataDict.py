@@ -14,3 +14,11 @@ class PIndicationDataDict(LedgerBaseModelDataDict):
     indication: str
     patient_examination: str
     patient_indication_classifications: list["PIndicationClassificationDataDict"]
+
+
+class SerializedPIndicationDataDict(LedgerBaseModelDataDict):
+    """Export form: nested classifications are replaced by their UUIDs."""
+
+    indication: str
+    patient_examination: str
+    patient_indication_classifications: str

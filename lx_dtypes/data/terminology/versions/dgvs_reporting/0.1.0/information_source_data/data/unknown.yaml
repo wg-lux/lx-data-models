@@ -1,0 +1,4 @@
+- model: information_source
+  name: unknown
+  name_de: "Unbekannt"
+  description: Data source is unknown.

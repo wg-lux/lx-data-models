@@ -240,6 +240,45 @@ The comparison is a statistical similarity measure, not a clinical judgement.
 Its validity depends on comparable references, for example the same generator
 mode and device class, which the host selects.
 
+## Activation summary CSV exports
+
+Some generators export one summary row per activation instead of sampled
+values. `contracts/electrosurgical_activations.py` reads this format:
+
+```text
+,t,hfmode,hfmode_options,effect,duration_s,P_avg_W,E_tot_J,slot_number,instrument
+3,2000-01-03 09:00:06.000000,endoCUT Q,"interval: 6, duration: 1",3.0,2.1,5.0,11.0,2,Monopolar
+```
+
+```python
+from lx_dtypes.models.contracts.electrosurgical_activations import (
+    read_electrosurgical_activation_csv,
+)
+
+log = read_electrosurgical_activation_csv(path, source_timezone="Europe/Berlin")
+```
+
+| Column | Field | Rule |
+| --- | --- | --- |
+| unnamed index | `source_row_index` | Non-negative integer, strictly increasing |
+| `t` | `started_at` | Local time of the activation **start**, converted to UTC with `source_timezone` |
+| `hfmode`, `hfmode_options` | `mode_label`, `mode_options` | Manufacturer text kept verbatim; empty options become `null` |
+| `effect`, `duration_s`, `P_avg_W`, `E_tot_J` | `effect`, `duration_s`, `average_power_w`, `energy_j` | Finite, non-negative `Decimal`; never rounded |
+| `slot_number`, `instrument` | same | Integer ≥ 1; non-empty text |
+
+The export has no timezone, so the caller must name the generator clock's zone.
+Local times that are skipped or repeated at a daylight-saving change are
+rejected. `t` is validated as the start: two activations may not overlap beyond
+half the 0.1 s duration resolution. The header must match exactly. Files are
+limited to 16 MiB and 100,000 rows. Any error raises
+`ElectrosurgicalActivationCsvError` and returns nothing partial.
+`source_sha256`, `parser_id` and `parser_version` record provenance.
+
+These rows are summaries, not curves: they cannot feed
+`extract_application_sections`. `P_avg_W` is the measured average power, not
+the power setting. Mode labels are not mapped to the generic
+`electrosurgery_mode` choices, because that mapping is device-specific.
+
 ## Boundaries
 
 This package owns only the typed contracts and pure deterministic functions.

@@ -1,0 +1,24 @@
+# Repository-authored vocabulary (local_vocabulary); no external guideline attribution is asserted.
+- model: finding
+  name: "endoscopy_electrosurgery_status"
+  name_de: "HF-Chirurgie-Status der Endoskopie"
+  name_en: "Endoscopy electrosurgery status"
+  description: "Explizite Dokumentation, ob während der Untersuchung HF-Strom appliziert wurde."
+  finding_types:
+    - baseline
+  classifications:
+    - endoscopy_electrosurgery_documentation_status
+
+- model: finding
+  name: "endoscopy_electrosurgery_application"
+  name_de: "HF-Applikation während der Endoskopie"
+  name_en: "Electrosurgical application during endoscopy"
+  description: "Eine einzelne HF-Aktivierung mit Modus, tatsächlich eingestellter Leistung, gemessener Dauer und Energie sowie dem Ergebnis des Kurvenvergleichs. Für jede weitere Aktivierung wird der Befund wiederholt."
+  finding_types:
+    - baseline
+  classifications:
+    - electrosurgery_mode
+    - electrosurgery_power_setting
+    - electrosurgery_activation_duration
+    - electrosurgery_delivered_energy
+    - electrosurgery_curve_comparison

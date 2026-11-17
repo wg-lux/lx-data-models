@@ -10,6 +10,11 @@ from .examiner import (
     l_examiner_django_lookup,
     l_examiner_django_models,
 )
+from .p_electrical_application import (
+    LPElectricalApplicationDjangoLookupType,
+    l_p_electrical_application_django_lookup,
+    l_p_electrical_application_django_models,
+)
 from .p_examination import (
     LPExaminationDjangoLookupType,
     l_p_examination_django_lookup,
@@ -60,6 +65,11 @@ from .p_interventions import (
     l_p_finding_interventions_django_lookup,
     l_p_finding_interventions_django_models,
 )
+from .p_time_offset import (
+    LPTimeOffsetDjangoLookupType,
+    l_p_time_offset_django_lookup,
+    l_p_time_offset_django_models,
+)
 from .patient import (
     LPatientDjangoLookupType,
     l_patient_django_lookup,
@@ -81,6 +91,8 @@ from .video_file import (
 
 
 class LedgerModelsDjangoLookupType(
+    LPElectricalApplicationDjangoLookupType,
+    LPTimeOffsetDjangoLookupType,
     LCenterDjangoLookupType,
     LPExaminationDjangoLookupType,
     LExaminerDjangoLookupType,
@@ -102,6 +114,8 @@ class LedgerModelsDjangoLookupType(
 
 ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
     LedgerModelsDjangoLookupType(
+        **l_p_time_offset_django_lookup,
+        **l_p_electrical_application_django_lookup,
         **l_center_django_lookup,
         **l_p_examination_django_lookup,
         **l_examiner_django_lookup,
@@ -122,6 +136,8 @@ ledger_models_django_lookup: LedgerModelsDjangoLookupType = (
 
 
 L_MODELS_DJANGO = Union[
+    l_p_electrical_application_django_models,
+    l_p_time_offset_django_models,
     l_center_django_models,
     l_p_examination_django_models,
     l_examiner_django_models,

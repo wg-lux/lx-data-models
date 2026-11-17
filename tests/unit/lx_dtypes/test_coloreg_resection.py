@@ -44,7 +44,8 @@ def test_resection_template_exports_complete_inputs(kb: KnowledgeBase) -> None:
     assert template["version"] == "2.0.0"
     assert template["readiness"]["can_publish"] is True
     assert template["readiness"]["blocking_issues"] == 0
-    assert len(template["report_sections"]) == 3
+    assert len(template["report_sections"]) == 4
+    assert template["report_sections"][-1]["section_kind"] == "medications"
     assert kb.classification["coloreg_resection_technique"].classification_choices == [
         "coloreg_technique_emr",
         "coloreg_technique_esd",

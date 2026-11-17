@@ -11,6 +11,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 import yaml
 
+from lx_dtypes.evaluation import assess_examination
 from lx_dtypes.language import DEFAULT_LANGUAGE, LanguageCode, validate_language
 from lx_dtypes.models.base.app_base_model.pydantic.InterfaceMixIns import (
     ListFieldSerializationMixIn,
@@ -33,7 +34,6 @@ from lx_dtypes.terminology.terminology_service import TerminologyService
 from lx_dtypes.utils.kb_package_lint import check_kb_package
 from lx_dtypes.utils.kb_yaml_lint import KbYamlLintIssue, discover_yaml_files
 from lx_dtypes.utils.parser import camel_to_snake
-from lx_dtypes.evaluation import assess_examination
 
 
 @dataclass(frozen=True)

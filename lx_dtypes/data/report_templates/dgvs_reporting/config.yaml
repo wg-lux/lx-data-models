@@ -1,10 +1,12 @@
 name: dgvs_reporting
 name_de: Dgvs reporting
 description: DGVS guideline-derived structured reporting templates.
-version: 0.1.0
+version: 0.2.0
 medical_field: gastroenterology
 modules: []
 depends_on:
+- report_medications
+- report_electrosurgery
 - DGVS_Terminology
 data:
   files:

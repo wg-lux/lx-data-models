@@ -118,10 +118,6 @@ def __getattr__(name: str) -> Any:
 
 
 __all__ = [
-    "DtypesModel",
-    "DtypesRootModel",
-    "FrozenContractModel",
-    "StrictContractModel",
     "DDICTS",
     "KB_DDICTS",
     "KB_MODELS",
@@ -137,6 +133,9 @@ __all__ = [
     "MODELS_DJANGO",
     "MODEL_NAMES",
     "MODEL_NAMES_LITERAL",
+    "DtypesModel",
+    "DtypesRootModel",
+    "FrozenContractModel",
     "KnowledgeBaseModelsDjangoLookupType",
     "KnowledgeBaseModelsLookupType",
     "LedgerModelsDjangoLookupType",
@@ -145,6 +144,7 @@ __all__ = [
     "SensitiveMetaDataDict",
     "SensitiveMetaState",
     "SensitiveMetaStateDataDict",
+    "StrictContractModel",
     "knowledge_base_models_django_lookup",
     "knowledge_base_models_lookup",
     "ledger_models_django_lookup",

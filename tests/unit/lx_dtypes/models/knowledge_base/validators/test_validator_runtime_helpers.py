@@ -628,6 +628,8 @@ def test_intervention_validator_runtime_covers_condition_missing_and_unsupported
                 (),
                 {
                     "name": "bad_intervention",
+                    "name_de": "",
+                    "name_en": "",
                     "finding": "colon_polyp",
                     "intervention": "resection",
                     "operator": "invalid",
@@ -733,6 +735,8 @@ def test_unit_validator_runtime_covers_exists_missing_condition_and_unsupported(
                 (),
                 {
                     "name": "bad_unit",
+                    "name_de": "",
+                    "name_en": "",
                     "finding": "colon_polyp",
                     "classification": "size_mm",
                     "unit": "mm",
@@ -822,6 +826,8 @@ def test_classification_validator_runtime_covers_missing_condition_and_unsupport
                 (),
                 {
                     "name": "bad_classification",
+                    "name_de": "",
+                    "name_en": "",
                     "finding": "colon_polyp",
                     "classification": "lst",
                     "operator": "invalid",

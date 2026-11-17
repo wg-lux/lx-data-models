@@ -37,6 +37,11 @@ participation to keep the community safe and productive.
    uv sync --extra dev
    ```
 
+   With Nix/devenv, run `direnv allow` followed by
+   `devenv tasks run agent:sync`. This explicitly installs the locked development
+   and documentation dependencies. Shell entry and reload reuse the existing
+   environment; sync only when no tests or workers are using it.
+
 3. **Keep your branch updated**
 
    ```bash

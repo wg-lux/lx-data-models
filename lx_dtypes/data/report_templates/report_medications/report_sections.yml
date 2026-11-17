@@ -1,0 +1,41 @@
+# Local reporting composition; clinical concepts are owned by lx_findings.
+- model: report_template_section
+  name: report_medications
+  name_de: Medikation
+  name_en: Medications
+  title_de: Medikation
+  title_en: Medications
+  position: 1000
+  section_kind: medications
+  fields:
+  - key: medications
+    label: Aktuelle Medikation
+    source: patient
+    required: false
+  findings:
+  - koloskopie_medikationsstatus
+  - koloskopie_medikamentengabe
+- model: report_finding
+  name: koloskopie_medikationsstatus
+  name_de: "Medikationsstatus der Endoskopie"
+  finding: endoscopy_medication_status
+  required: true
+  multiple_allowed: false
+  classifications:
+  - classification: endoscopy_medication_documentation_status
+    required: true
+- model: report_finding
+  name: koloskopie_medikamentengabe
+  name_de: "Medikamentenverabreichung während der Endoskopie"
+  finding: endoscopy_medication_administration
+  required: false
+  multiple_allowed: true
+  classifications:
+  - classification: endoscopy_medication_product_and_dose
+    required: true
+  - classification: medication_administration_route
+    required: true
+  - classification: medication_administration_method
+    required: true
+  - classification: medication_administration_time
+    required: true

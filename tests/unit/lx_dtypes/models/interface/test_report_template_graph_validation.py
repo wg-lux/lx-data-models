@@ -38,7 +38,8 @@ def test_report_template_structure_validation_from_examples() -> None:
     assert base_result.ok is True
     assert base_result.graph.template_name == "base_report_template"
     assert base_result.graph.ordered_section_node_ids == [
-        "section:base_required_section"
+        "section:base_required_section",
+        "section:report_medications",
     ]
 
 

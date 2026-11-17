@@ -43,6 +43,10 @@ from lx_dtypes.models.knowledge_base.unit.UnitDjango import UnitDjango
 from lx_dtypes.models.knowledge_base.unit.UnitTypeDjango import UnitTypeDjango
 from lx_dtypes.models.ledger.center.Django import CenterDjango
 from lx_dtypes.models.ledger.examiner.Django import ExaminerDjango
+from lx_dtypes.models.ledger.p_electrical_application.Django import (
+    PElectricalApplicationDjango,
+    PElectricalCurveComparisonDjango,
+)
 from lx_dtypes.models.ledger.p_examination.Django import PExaminationDjango
 from lx_dtypes.models.ledger.p_finding.Django import PFindingDjango
 from lx_dtypes.models.ledger.p_finding_classification_choice.Django import (
@@ -65,6 +69,7 @@ from lx_dtypes.models.ledger.p_intervention.Django import PFindingInterventionDj
 from lx_dtypes.models.ledger.p_interventions.Django import (
     PFindingInterventionsDjango,
 )
+from lx_dtypes.models.ledger.p_time_offset.Django import PTimeOffsetDjango
 from lx_dtypes.models.ledger.patient.Django import PatientDjango
 from lx_dtypes.models.ledger.video_file.Django import VideoFileDjango
 
@@ -86,6 +91,8 @@ __all__ = [
     "InformationSourceTypeDjango",
     "InterventionDjango",
     "InterventionTypeDjango",
+    "PElectricalApplicationDjango",
+    "PElectricalCurveComparisonDjango",
     "PExaminationDjango",
     "PFindingClassificationChoiceDescriptorDjango",
     "PFindingClassificationChoiceDjango",
@@ -96,6 +103,7 @@ __all__ = [
     "PIndicationClassificationDescriptorDjango",
     "PIndicationClassificationDjango",
     "PIndicationDjango",
+    "PTimeOffsetDjango",
     "PatientDjango",
     "UnitDjango",
     "UnitTypeDjango",

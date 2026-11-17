@@ -1,0 +1,10 @@
+name: report_medications
+name_de: Medikationsabschnitt
+name_en: Medication section
+version: '0.1.0'
+modules: []
+depends_on:
+- lx_findings
+data:
+  files:
+  - ./report_sections.yml

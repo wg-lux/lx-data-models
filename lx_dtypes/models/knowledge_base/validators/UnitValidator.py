@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from typing import Literal, cast
 
 from pydantic import Field, field_validator, model_validator
@@ -10,6 +9,11 @@ from lx_dtypes.models.base.app_base_model.pydantic.KnowledgebaseBaseModel import
 from lx_dtypes.models.knowledge_base.validators.FindingsValidator import (
     FindingsValidatorConditionClause,
     _normalize_value,
+)
+from lx_dtypes.models.knowledge_base.validators.QueryNormalization import (
+    align_query,
+    normalize_query_defaults,
+    validate_operator_condition,
 )
 from lx_dtypes.models.knowledge_base.validators.UnitValidatorDataDict import (
     UnitValidatorConditionDataDict,
@@ -81,16 +85,7 @@ class UnitValidatorQuery(DtypesModel):
 
     @model_validator(mode="after")
     def validate_operator_semantics(self) -> "UnitValidatorQuery":
-        if self.operator == "condition":
-            if self.condition is None:
-                raise ValueError(
-                    "operator 'condition' requires a populated `condition` block."
-                )
-            return self
-        if self.condition is not None:
-            raise ValueError(
-                f"operator '{self.operator}' does not allow a `condition` block."
-            )
+        validate_operator_condition(self.operator, self.condition)
         return self
 
     @property
@@ -127,39 +122,22 @@ class UnitValidator(KnowledgebaseBaseModel[UnitValidatorDataDict]):
     @model_validator(mode="before")
     @classmethod
     def normalize_query_defaults(cls, value: object) -> object:
-        if not isinstance(value, Mapping):
-            return value
-        data = dict(value)
-        query_raw = data.get("query")
-        query = dict(query_raw) if isinstance(query_raw, Mapping) else {}
-        for field_name in ("finding", "classification", "unit", "operator"):
-            if field_name not in data and field_name in query:
-                data[field_name] = query[field_name]
-            if field_name in data and field_name not in query:
-                query[field_name] = data[field_name]
-        data["query"] = query
-        return data
+        return normalize_query_defaults(
+            value, UnitValidatorQuery, ("finding", "classification", "unit", "operator")
+        )
 
     @model_validator(mode="after")
     def validate_query_alignment(self) -> "UnitValidator":
-        if self.query.finding is None:
-            self.query.finding = self.finding
-        if self.query.classification is None:
-            self.query.classification = self.classification
-        if self.query.unit is None:
-            self.query.unit = self.unit
-        if self.query.finding != self.finding:
-            raise ValueError("query.finding must match the top-level `finding` value.")
-        if self.query.classification != self.classification:
-            raise ValueError(
-                "query.classification must match the top-level `classification` value."
-            )
-        if self.query.unit != self.unit:
-            raise ValueError("query.unit must match the top-level `unit` value.")
-        if self.query.operator != self.operator:
-            raise ValueError(
-                "query.operator must match the top-level `operator` value."
-            )
+        self.query = align_query(
+            self.query,
+            {
+                "finding": self.finding,
+                "classification": self.classification,
+                "unit": self.unit,
+                "operator": self.operator,
+            },
+            suffix="",
+        )
         return self
 
     @classmethod

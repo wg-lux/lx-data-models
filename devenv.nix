@@ -38,7 +38,7 @@ let
 
   _module.args.buildInputs = baseBuildInputs;
 
-  SYNC_CMD = "uv sync --extra dev --extra docs --frozen --python .devenv/state/venv";  
+  SYNC_CMD = "uv sync --extra dev --extra docs --frozen --python ${python}/bin/python";
   DJANGO_APP_NAME = "lx_dtypes.django";
   DJANGO_APP_LABEL = "lx_dtypes_django";
   DJANGO_APP_DIR = "./lx_dtypes/contrib/${DJANGO_APP_NAME}";
@@ -78,10 +78,12 @@ in
   languages.python = {
     enable = true;
     package = python;
+    # Shell reloads must not recreate an environment used by active processes.
+    venv.enable = false;
     uv = {
       enable = true;
       package = uvPackage;
-      sync.enable = true;
+      sync.enable = false;
     };
   };
 
@@ -129,6 +131,11 @@ in
 
   tasks = {
 
+    "agent:sync" = {
+      description = "Explicitly sync development and documentation dependencies";
+      exec = SYNC_CMD;
+    };
+
     "env:clean" = {
       description = "Remove the uv virtual environment and lock file for a clean sync";
       exec = ''
@@ -136,7 +143,7 @@ in
         rm -rf .devenv/state/venv
         echo "Removing uv lock file: uv.lock"
         rm -f uv.lock
-        echo "Environment cleaned. Re-enter the shell (e.g., 'exit' then 'devenv up') to trigger uv sync."
+        echo "Environment cleaned. Run 'devenv tasks run agent:sync' after restoring or updating the lock file."
       '';
     };
 
@@ -146,30 +153,8 @@ in
   };
 
   enterShell = ''
-
-    export SYNC_CMD="${SYNC_CMD}"
-    source .devenv/state/venv/bin/activate
-
-    # Ensure dependencies are synced using uv
-    # Check if venv exists. If not, run sync verbosely. If it exists, sync quietly.
-    if [ ! -d ".devenv/state/venv" ]; then
-       echo "Virtual environment not found. Running initial uv sync..."
-       $SYNC_CMD || echo "Error: Initial uv sync failed. Please check network and pyproject.toml."
-    else
-       # Sync quietly if venv exists
-       echo "Syncing Python dependencies with uv..."
-       $SYNC_CMD --quiet || echo "Warning: uv sync failed. Environment might be outdated."
-    fi
-
-    # Activate Python virtual environment managed by uv
-    ACTIVATED=false
-    if [ -f ".devenv/state/venv/bin/activate" ]; then
-      source .devenv/state/venv/bin/activate
-      ACTIVATED=true
-      echo "Virtual environment activated."
-    else
-      echo "Warning: uv virtual environment activation script not found. Run 'devenv task run env:clean' and re-enter shell."
-    fi
+    export VIRTUAL_ENV="$UV_PROJECT_ENVIRONMENT"
+    export PATH="$VIRTUAL_ENV/bin:$PATH"
 
     env-setup
 

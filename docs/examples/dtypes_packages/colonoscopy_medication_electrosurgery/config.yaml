@@ -1,0 +1,11 @@
+name: colonoscopy_medication_electrosurgery
+version: "1.0.0"
+description: Synthetic colonoscopy report template evaluating medication and electrosurgery. Not clinically approved.
+modules: []
+depends_on:
+  - report_medications
+  - report_electrosurgery
+  - DGVS_Terminology
+data:
+  files:
+    - report_templates.yml

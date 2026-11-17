@@ -51,6 +51,7 @@ class ClassificationValidatorHintDataDict(TypedDict):
     data_type_hint: ClassificationValidatorHintDataTypeLiteral
     choice_names: NotRequired[list[str]]
     descriptor_types: NotRequired[list[str]]
+    descriptor_free_choice_names: NotRequired[list[str]]
     allows_multiple: NotRequired[bool]
 
 

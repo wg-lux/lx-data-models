@@ -626,6 +626,7 @@
   - coloreg_colonoscopy_polyps
   - coloreg_polyp_resection_section
   - coloreg_polyp_follow_up_section
+  - report_medications
   validators:
     examination_validators: []
     classification_validators: []

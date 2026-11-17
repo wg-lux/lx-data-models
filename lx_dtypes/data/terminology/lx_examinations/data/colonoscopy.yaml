@@ -16,6 +16,9 @@
     - sedation_endoscopy
     - endoscopy_medication_status
     - endoscopy_medication_administration
+    # Repository-authored electrosurgery vocabulary (local_vocabulary).
+    - endoscopy_electrosurgery_status
+    - endoscopy_electrosurgery_application
     - endoscopy_sedation_monitoring_measurement
     - endoscopy_supplemental_oxygen_administration
     - endoscopy_intravenous_fluid_status

@@ -41,6 +41,7 @@
         - "Local baseline coverage reference"
   report_sections:
     - upper_gi_mini_baseline
+    - report_medications
   validators:
     examination_validators: []
     findings_validators: []
@@ -348,6 +349,7 @@
     - star_upper_gi_standard_anatomy
     - star_upper_gi_standard_abnormalities
     - star_upper_gi_standard_postprocedure
+    - report_medications
   validators:
     examination_validators: []
     findings_validators: []

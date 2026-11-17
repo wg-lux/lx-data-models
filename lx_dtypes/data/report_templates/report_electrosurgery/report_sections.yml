@@ -1,0 +1,70 @@
+# Shared report section "HF-Chirurgie" (electrosurgery). Clinical concepts are
+# owned by lx_findings; this file only decides what the report asks.
+- model: report_template_section
+  name: report_electrosurgery
+  name_de: HF-Chirurgie
+  name_en: Electrosurgery
+  title_de: HF-Chirurgie
+  title_en: Electrosurgery
+  position: 1010
+  section_kind: findings
+  findings:
+  - elektrochirurgie_status
+  - elektrochirurgie_applikation
+# "Was high-frequency current used?" Optional by default.
+- model: report_finding
+  name: elektrochirurgie_status
+  name_de: "HF-Chirurgie-Status der Endoskopie"
+  name_en: "Endoscopy electrosurgery status"
+  finding: endoscopy_electrosurgery_status
+  required: false
+  multiple_allowed: false
+  classifications:
+  - classification: endoscopy_electrosurgery_documentation_status
+    required: true
+# One entry per use of HF current: mode and power setting must be answered;
+# duration, energy and the curve comparison are filled in when measured.
+- model: report_finding
+  name: elektrochirurgie_applikation
+  name_de: "HF-Applikation während der Endoskopie"
+  name_en: "Electrosurgical application during endoscopy"
+  finding: endoscopy_electrosurgery_application
+  required: false
+  multiple_allowed: true
+  classifications:
+  - classification: electrosurgery_mode
+    required: true
+  - classification: electrosurgery_power_setting
+    required: true
+  - classification: electrosurgery_activation_duration
+    required: false
+  - classification: electrosurgery_delivered_energy
+    required: false
+  - classification: electrosurgery_curve_comparison
+    required: false
+# Ready-made rules. They apply only when a template lists them under `validators`.
+- model: findings_validator
+  name: elektrochirurgie_status_dokumentiert
+  name_de: "Dokumentation: HF-Chirurgie-Status der Endoskopie"
+  name_en: "Documentation: endoscopy electrosurgery status"
+  finding: endoscopy_electrosurgery_status
+  operator: exists
+  query:
+    finding: endoscopy_electrosurgery_status
+    operator: exists
+- model: classification_validator
+  name: elektrochirurgie_modus_vollstaendig
+  name_de: "Vollständigkeit: HF-Applikation – HF-Modus"
+  name_en: "Completeness: electrosurgical application – mode"
+  finding: endoscopy_electrosurgery_application
+  classification: electrosurgery_mode
+  operator: exists
+  precedence: optional
+- model: classification_validator
+  name: elektrochirurgie_leistung_vollstaendig
+  name_de: "Vollständigkeit: HF-Applikation – Leistungseinstellung"
+  name_en: "Completeness: electrosurgical application – power setting"
+  finding: endoscopy_electrosurgery_application
+  classification: electrosurgery_power_setting
+  operator: exists
+  precedence: optional

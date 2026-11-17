@@ -169,7 +169,7 @@ def test_coloreg_package_preserves_aliased_reference_metadata() -> None:
     "module,version",
     [
         ("coloreg", "0.3.0"),
-        ("dgvs_reporting", "0.1.0"),
+        ("dgvs_reporting", "0.2.0"),
         ("mst_3_0", "3.0.0"),
         ("report_template_examples", "0.1.1"),
         ("star_upper_gi", "0.1.2"),

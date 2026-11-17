@@ -1,0 +1,42 @@
+# Provenance: lx_dtypes/data/definitions.yml -> source_provenance.module_sources.lx_descriptors
+# Repository-authored vocabulary (local_vocabulary); no external guideline attribution is asserted.
+# Numeric bounds are technical plausibility limits, not clinical recommendations or presets.
+- model: classification_choice_descriptor
+  name: "electrosurgery_power_setting_watt_value"
+  name_de: "Eingestellte HF-Leistung in Watt"
+  name_en: "Electrosurgical power setting in watts"
+  description: "Tatsächlich am HF-Generator eingestellte Leistung in Watt."
+  unit: "watt"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 400
+
+- model: classification_choice_descriptor
+  name: "electrosurgery_activation_duration_seconds_value"
+  name_de: "Aktivierungsdauer in Sekunden"
+  name_en: "Activation duration in seconds"
+  description: "Gemessene Dauer einer einzelnen HF-Aktivierung in Sekunden."
+  unit: "seconds"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 600
+
+- model: classification_choice_descriptor
+  name: "electrosurgery_delivered_energy_joule_value"
+  name_de: "Abgegebene Energie in Joule"
+  name_en: "Delivered energy in joules"
+  description: "Vom HF-Generator für diese Aktivierung gemeldete abgegebene Energie in Joule."
+  unit: "joule"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 100000
+
+- model: classification_choice_descriptor
+  name: "electrosurgery_curve_distance_value"
+  name_de: "Mittlere quadrierte Mahalanobis-Distanz"
+  name_en: "Mean squared Mahalanobis distance"
+  description: "Ergebnis des Regressionsvergleichs der Aktivierungskurve mit früheren Kurven (PElectricalCurveComparison.result.mean_mahalanobis_squared); dimensionslos."
+  unit: "ratio"
+  classification_choice_descriptor_type: "numeric"
+  numeric_min: 0
+  numeric_max: 1000000000

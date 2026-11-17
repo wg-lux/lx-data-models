@@ -48,11 +48,12 @@ keywords = [
 license = {file = "LICENSE"}
 maintainers = [
   {name = "Thomas J. Lux", email = "lux_t1@ukw.de"},
+  {name = "Max Hild", email = "hild_m@ukw.de"}
 ]
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.6.6"
+version = "0.6.9"
 
 [project.optional-dependencies]
 dev = [

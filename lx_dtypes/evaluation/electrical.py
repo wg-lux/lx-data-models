@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from bisect import bisect_left
 from fractions import Fraction
+from typing import NamedTuple
 
 from lx_dtypes.models.contracts.electrical_video_alignment import (
     ElectricalAlignmentError,
@@ -115,6 +116,31 @@ def _validate_inputs(
     return sync
 
 
+class _FrameIdentity(NamedTuple):
+    """Where one output frame sits on the generation and recording timelines."""
+
+    output_frame_index: int
+    presentation_timestamp: int
+    recording_frame_index: int
+    recording_start_timestamp: int
+    recording_end_timestamp: int | None
+
+
+def _frame_window(
+    frame: _FrameIdentity,
+    status: ElectricalFrameWindowStatus,
+    sample_range: tuple[int, int] | None = None,
+    channels: list[ElectricalChannelStatistics] | None = None,
+) -> ElectricalFrameWindow:
+    return ElectricalFrameWindow(
+        **frame._asdict(),
+        status=status,
+        sample_start_index=None if sample_range is None else sample_range[0],
+        sample_end_index=None if sample_range is None else sample_range[1],
+        channels=channels or [],
+    )
+
+
 def align_electrosurgical_measurements(
     proof: VideoProvenanceBundle,
     series: ElectrosurgicalMeasurementSeries,
@@ -169,33 +195,24 @@ def align_electrosurgical_measurements(
         start = recording_ticks[recording_index]
         end = window_ends[position]
 
-        def window(
-            status: ElectricalFrameWindowStatus,
-            sample_range: tuple[int, int] | None = None,
-            channels: list[ElectricalChannelStatistics] | None = None,
-        ) -> ElectricalFrameWindow:
-            return ElectricalFrameWindow(
-                output_frame_index=position,
-                presentation_timestamp=output.presentation_timestamps[position],
-                recording_frame_index=recording_index,
-                recording_start_timestamp=start,
-                recording_end_timestamp=end,
-                status=status,
-                sample_start_index=None if sample_range is None else sample_range[0],
-                sample_end_index=None if sample_range is None else sample_range[1],
-                channels=channels or [],
-            )
+        frame = _FrameIdentity(
+            output_frame_index=position,
+            presentation_timestamp=output.presentation_timestamps[position],
+            recording_frame_index=recording_index,
+            recording_start_timestamp=start,
+            recording_end_timestamp=end,
+        )
 
         if end is None:
-            frames.append(window("unbounded_interval"))
+            frames.append(_frame_window(frame, "unbounded_interval"))
             continue
         if start < first_anchor or end > last_anchor:
-            frames.append(window("outside_synchronization"))
+            frames.append(_frame_window(frame, "outside_synchronization"))
             continue
         window_start = recording_to_electrical_ticks(sync, start)
         window_end = recording_to_electrical_ticks(sync, end)
         if window_start < electrical_ticks[0] or window_end > electrical_ticks[-1]:
-            frames.append(window("outside_electrical_recording"))
+            frames.append(_frame_window(frame, "outside_electrical_recording"))
             continue
         low = bisect_left(electrical_ticks, window_start)
         high = bisect_left(electrical_ticks, window_end)
@@ -227,7 +244,7 @@ def align_electrosurgical_measurements(
             if status == "complete"
             else []
         )
-        frames.append(window(status, (low, high), statistics))
+        frames.append(_frame_window(frame, status, (low, high), statistics))
 
     return ElectricalVideoAlignment(
         profile=profile,

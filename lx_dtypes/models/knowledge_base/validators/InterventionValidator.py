@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from typing import Literal, cast
 
 from pydantic import Field, field_validator, model_validator
@@ -17,6 +16,11 @@ from lx_dtypes.models.knowledge_base.validators.InterventionValidatorDataDict im
     InterventionValidatorOperatorLiteral,
     InterventionValidatorPrecedenceLiteral,
     InterventionValidatorQueryDataDict,
+)
+from lx_dtypes.models.knowledge_base.validators.QueryNormalization import (
+    align_query,
+    normalize_query_defaults,
+    validate_operator_condition,
 )
 from lx_dtypes.models.knowledge_base.validators.ValidatorRequirementReference import (
     ValidatorRequirementReference,
@@ -82,16 +86,7 @@ class InterventionValidatorQuery(DtypesModel):
 
     @model_validator(mode="after")
     def validate_operator_semantics(self) -> "InterventionValidatorQuery":
-        if self.operator == "condition":
-            if self.condition is None:
-                raise ValueError(
-                    "operator 'condition' requires a populated `condition` block."
-                )
-            return self
-        if self.condition is not None:
-            raise ValueError(
-                f"operator '{self.operator}' does not allow a `condition` block."
-            )
+        validate_operator_condition(self.operator, self.condition)
         return self
 
     @property
@@ -129,35 +124,21 @@ class InterventionValidator(KnowledgebaseBaseModel[InterventionValidatorDataDict
     @model_validator(mode="before")
     @classmethod
     def normalize_query_defaults(cls, value: object) -> object:
-        if not isinstance(value, Mapping):
-            return value
-        data = dict(value)
-        query_raw = data.get("query")
-        query = dict(query_raw) if isinstance(query_raw, Mapping) else {}
-        for field_name in ("finding", "intervention", "operator"):
-            if field_name not in data and field_name in query:
-                data[field_name] = query[field_name]
-            if field_name in data and field_name not in query:
-                query[field_name] = data[field_name]
-        data["query"] = query
-        return data
+        return normalize_query_defaults(
+            value, InterventionValidatorQuery, ("finding", "intervention", "operator")
+        )
 
     @model_validator(mode="after")
     def validate_query_alignment(self) -> "InterventionValidator":
-        if self.query.finding is None:
-            self.query.finding = self.finding
-        if self.query.intervention is None:
-            self.query.intervention = self.intervention
-        if self.query.finding != self.finding:
-            raise ValueError("query.finding must match the top-level `finding` value.")
-        if self.query.intervention != self.intervention:
-            raise ValueError(
-                "query.intervention must match the top-level `intervention` value."
-            )
-        if self.query.operator != self.operator:
-            raise ValueError(
-                "query.operator must match the top-level `operator` value."
-            )
+        self.query = align_query(
+            self.query,
+            {
+                "finding": self.finding,
+                "intervention": self.intervention,
+                "operator": self.operator,
+            },
+            suffix="",
+        )
         return self
 
     @classmethod

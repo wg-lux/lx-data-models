@@ -26,6 +26,10 @@ from lx_dtypes.utils.report_template_registry import (
 )
 
 GENERATED_DIR_NAME = "generated_templates"
+# The medication section is composed once in the shared reporting package.
+# Built templates reference it by name instead of copying its records.
+MEDICATION_SECTION_MODULE = "report_medications"
+MEDICATION_SECTION_NAME = "report_medications"
 
 DEFAULT_PATIENT_INFO_FIELDS = [
     {"key": "first_name", "label": "Vorname", "source": "patient", "required": False},
@@ -112,7 +116,9 @@ class ReportTemplateBuilderSection(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
     id: str | None = None
-    section_type: Literal["logo", "patient_info", "clinic_address", "findings"]
+    section_type: Literal[
+        "logo", "patient_info", "clinic_address", "findings", "medications"
+    ]
     name: str = Field(min_length=1)
     description: str = ""
     fields: list[ReportTemplateBuilderField] = Field(default_factory=list)
@@ -124,6 +130,11 @@ class ReportTemplateBuilderSection(DtypesModel):
             raise ValueError("Findings sections must contain at least one finding.")
         if self.section_type != "findings" and self.findings:
             raise ValueError("Only findings sections may define findings.")
+        if self.section_type == "medications" and self.fields:
+            raise ValueError(
+                "The medication section references the shared "
+                f"'{MEDICATION_SECTION_NAME}' section and cannot define fields."
+            )
         return self
 
 
@@ -135,6 +146,16 @@ class SaveReportTemplateRequest(DtypesModel):
     examination: str = Field(min_length=1)
     description: str = ""
     sections: list[ReportTemplateBuilderSection] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_single_medication_section(self) -> SaveReportTemplateRequest:
+        if sum(s.section_type == "medications" for s in self.sections) > 1:
+            raise ValueError("A report template may reference one medication section.")
+        return self
+
+    @property
+    def references_medication_section(self) -> bool:
+        return any(s.section_type == "medications" for s in self.sections)
 
 
 class SaveReportTemplateResponse(DtypesModel):
@@ -274,6 +295,22 @@ def ensure_module_config_supports_generated_templates(module_path: Path) -> None
     (module_path / GENERATED_DIR_NAME).mkdir(parents=True, exist_ok=True)
 
 
+def _require_medication_section_dependency(module_path: Path) -> None:
+    """Reject a medication reference the target module cannot resolve."""
+    config_path = module_path / "config.yaml"
+    loaded = (
+        yaml.safe_load(config_path.read_text(encoding="utf-8"))
+        if config_path.exists()
+        else None
+    )
+    depends_on = loaded.get("depends_on") if isinstance(loaded, dict) else None
+    if not isinstance(depends_on, list) or MEDICATION_SECTION_MODULE not in depends_on:
+        raise ValueError(
+            "A template with a medication section requires the module to depend on "
+            f"'{MEDICATION_SECTION_MODULE}'."
+        )
+
+
 def _build_section_fields(
     section: ReportTemplateBuilderSection,
 ) -> list[dict[str, Any]]:
@@ -392,6 +429,9 @@ def build_yaml_records(payload: SaveReportTemplateRequest) -> list[dict[str, Any
     findings_validator_names: list[str] = []
 
     for section_index, section in enumerate(payload.sections):
+        if section.section_type == "medications":
+            report_section_names.append(MEDICATION_SECTION_NAME)
+            continue
         section_slug = slugify_name(section.name)
         section_record: dict[str, Any] = {
             "model": "report_template_section",
@@ -458,6 +498,14 @@ def build_report_template_package(
         raise ValueError(
             "Package dependencies must include the source terminology module."
         )
+    if (
+        payload.references_medication_section
+        and MEDICATION_SECTION_MODULE not in payload.depends_on
+    ):
+        raise ValueError(
+            "A package with a medication section must depend on "
+            f"'{MEDICATION_SECTION_MODULE}'."
+        )
     config = {
         "name": payload.package_name,
         "version": payload.package_version,
@@ -508,6 +556,8 @@ def save_report_template_definition(
         raise FileExistsError(f"Template file already exists: {output_path.name}")
 
     records = build_yaml_records(payload)
+    if payload.references_medication_section:
+        _require_medication_section_dependency(module_path)
     ensure_module_config_supports_generated_templates(module_path)
     # Never overwrite a competing writer's file after the existence check.
     with output_path.open("x", encoding="utf-8") as handle:
