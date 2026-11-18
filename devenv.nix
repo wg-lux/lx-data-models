@@ -38,7 +38,7 @@ let
 
   _module.args.buildInputs = baseBuildInputs;
 
-  SYNC_CMD = "uv sync --extra dev --extra docs --frozen --python ${python}/bin/python";
+  SYNC_CMD = "uv sync --extra dev --extra docs --frozen";
   DJANGO_APP_NAME = "lx_dtypes.django";
   DJANGO_APP_LABEL = "lx_dtypes_django";
   DJANGO_APP_DIR = "./lx_dtypes/contrib/${DJANGO_APP_NAME}";

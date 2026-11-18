@@ -12,6 +12,11 @@ repos:
         args: ["lx_dtypes", "tests"]
         always_run: true
         pass_filenames: false
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.13.9
+    hooks:
+      - id: uv-lock
   - repo: local
     hooks:
       - id: structure-lint
