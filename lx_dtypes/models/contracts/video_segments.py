@@ -145,6 +145,7 @@ class SegmentCrudPayload(DtypesModel):
         extra="allow", populate_by_name=True, str_strip_whitespace=True
     )
 
+    study_cohort_id: int | None = Field(default=None, strict=True, gt=0)
     ai_dataset_id: int | None = Field(default=None, ge=1)
     video_id: int | None = Field(default=None, ge=1)
     video_file: int | None = Field(default=None, ge=1)
@@ -227,6 +228,7 @@ class SegmentBlackenOutsidePayload(DtypesModel):
 class SegmentValidationPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
+    study_cohort_id: int | None = Field(default=None, strict=True, gt=0)
     is_validated: bool = True
     information_source_name: str = "manual_annotation"
     annotator: str | None = None
@@ -318,6 +320,7 @@ class SegmentBulkValidationItem(DtypesModel):
 class SegmentBulkValidationPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
+    study_cohort_id: int | None = Field(default=None, strict=True, gt=0)
     segment_ids: list[int] = Field(default_factory=_empty_segment_id_list)
     segments: list[SegmentBulkValidationItem] = Field(
         default_factory=_empty_bulk_validation_item_list
@@ -411,6 +414,7 @@ class SegmentPredictionImportItem(DtypesModel):
 class SegmentPredictionImportPayload(DtypesModel):
     model_config = ConfigDict(extra="ignore")
 
+    study_cohort_id: int | None = Field(default=None, strict=True, gt=0)
     segments: list[SegmentPredictionImportItem] = Field(min_length=1)
     replace_existing: bool = True
 

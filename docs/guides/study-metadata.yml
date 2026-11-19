@@ -10,6 +10,32 @@ boundaries:
   - A StudyPreset remains a knowledge-base record; a StudySetupDefinition remains a separate portable configuration document.
   - Metadata never grants center access, imports patient data, activates packages, or chooses host filesystem paths.
 fields:
+  label_presentation:
+    description: Optional annotation label display configuration; absent or null preserves the unscoped catalog.
+    labels: Ordered canonical name references with optional display_name and six-digit hex color.
+    scopes: Ordered expertise presentation groups with unique name, display_name and ordered labels referencing the configured labels.
+    locked: When true, the configured label names are the allowed-label whitelist for requests explicitly scoped to this study; an empty list allows no new label assignments.
+    boundaries:
+      - Display names and colors never change canonical annotation or prediction identities.
+      - Scopes organize presentation; they are not roles and do not grant authorization.
+      - Study selection is optional; unscoped annotation remains unchanged and existing annotations remain visible.
+      - Hosts enforce whitelists on mutation, resolve references against their catalog and retain access checks.
+    example:
+      locked: true
+      labels:
+        - name: low_quality
+          display_name: Low quality
+          color: '#B45309'
+        - name: nice_1
+          display_name: NICE 1
+          color: '#2563EB'
+      scopes:
+        - name: basic
+          display_name: Basic review
+          labels: [low_quality]
+        - name: advanced
+          display_name: Advanced review
+          labels: [nice_1]
   participating_centers:
     identity: center_key
     description: Stable center key and human-readable name; duplicate keys are rejected.

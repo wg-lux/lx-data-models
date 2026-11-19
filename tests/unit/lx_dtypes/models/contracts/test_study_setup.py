@@ -153,6 +153,25 @@ def test_definition_digest_ignores_yaml_formatting_but_binds_content() -> None:
     )
 
 
+def test_label_presentation_yaml_preserves_legacy_digest_and_binds_new_configuration():
+    definition = parse_study_setup_yaml(template())
+    assert (
+        definition.content_sha256
+        == "965a647e39fdcaef55da183564b4c71cd89d613f90fa9f33dc7c003b77dd89a5"
+    )
+    payload = definition.model_dump(mode="json")
+    payload["cohorts"][0]["study_metadata"]["label_presentation"] = {
+        "locked": True,
+        "labels": [{"name": "low_quality", "display_name": "Low quality"}],
+    }
+    import yaml
+
+    configured = parse_study_setup_yaml(yaml.safe_dump(payload))
+    assert configured.cohorts[0].study_metadata.label_presentation is not None
+    assert configured.cohorts[0].study_metadata.label_presentation.locked is True
+    assert configured.content_sha256 != definition.content_sha256
+
+
 def test_legacy_setup_digest_is_unchanged_without_analysis_definitions() -> None:
     definition = StudySetupDefinition.model_validate(
         {

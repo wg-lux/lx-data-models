@@ -1,6 +1,13 @@
+from pathlib import Path
+
 import pytest
+import yaml
 from pydantic import ValidationError
 
+from lx_dtypes.models.contracts.study_label_presentation import (
+    StudyAnnotationLabelCatalog,
+    StudyLabelPresentation,
+)
 from lx_dtypes.models.contracts.study_metadata import StudyMetadata
 from lx_dtypes.models.interface.data_roots import package_data_root
 from lx_dtypes.models.knowledge_base.study_preset import StudyPreset
@@ -30,6 +37,77 @@ def metadata_payload():
             }
         ],
     }
+
+
+def label_presentation_payload():
+    document = Path(__file__).resolve().parents[5] / "docs/guides/study-metadata.yml"
+    return yaml.safe_load(document.read_text())["fields"]["label_presentation"][
+        "example"
+    ]
+
+
+def test_documented_label_presentation_round_trips_without_changing_identities():
+    presentation = label_presentation_payload()
+    metadata = StudyMetadata(label_presentation=presentation)
+    preset = StudyPreset(name="research", study_metadata=metadata)
+    assert StudyPreset.model_validate(preset.ddict).study_metadata == metadata
+    assert StudyMetadata.model_validate_json(metadata.model_dump_json()) == metadata
+    assert metadata.label_presentation is not None
+    assert [row.name for row in metadata.label_presentation.labels] == [
+        "low_quality",
+        "nice_1",
+    ]
+    catalog = StudyAnnotationLabelCatalog.model_validate(
+        {
+            "study_cohort_id": 7,
+            "locked": True,
+            "labels": [
+                {"id": index + 1, **label}
+                for index, label in enumerate(presentation["labels"])
+            ],
+            "scopes": presentation["scopes"],
+        }
+    )
+    assert catalog.labels[0].name == "low_quality"
+    assert catalog.labels[0].display_name == "Low quality"
+
+
+@pytest.mark.parametrize(
+    "invalid",
+    [
+        {"locked": "true"},
+        {"labels": [{"name": " "}]},
+        {"labels": [{"name": "low_quality", "display_name": " "}]},
+        {"labels": [{"name": "low_quality", "color": "red"}]},
+        {"labels": [{"name": "low_quality", "color": "#123"}]},
+        {"labels": [{"name": "low_quality", "color": "#12345678"}]},
+        {"labels": [{"name": "low_quality"}, {"name": "low_quality"}]},
+        {"scopes": [{"name": "basic", "display_name": "Basic", "labels": ["unknown"]}]},
+        {"scopes": [{"name": "basic", "display_name": "Basic"}] * 2},
+        {
+            "scopes": [
+                {
+                    "name": "basic",
+                    "display_name": "Basic",
+                    "labels": ["low_quality"] * 2,
+                }
+            ]
+        },
+        {"scopes": [{"name": "not a key", "display_name": "Basic"}]},
+        {"permissions": ["admin"]},
+    ],
+)
+def test_label_presentation_rejects_invalid_or_ambiguous_configuration(invalid):
+    with pytest.raises(ValidationError):
+        StudyLabelPresentation.model_validate(invalid)
+
+
+def test_absent_and_explicitly_empty_locked_label_configuration_are_distinct():
+    assert StudyMetadata().label_presentation is None
+    configured = StudyMetadata.model_validate({"label_presentation": {"locked": True}})
+    assert configured.label_presentation is not None
+    assert configured.label_presentation.locked is True
+    assert configured.label_presentation.labels == []
 
 
 def test_metadata_and_preset_round_trip_preserve_exact_versions():

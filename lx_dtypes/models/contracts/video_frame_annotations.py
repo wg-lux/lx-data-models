@@ -27,6 +27,7 @@ class FrameAnnotationBulkItemData(TypedDict):
 
 
 class FrameAnnotationBulkEnvelopeData(TypedDict, total=False):
+    study_cohort_id: int | None
     video_id: int | None
     ai_dataset_id: int | None
     annotations: list[JsonObject]
@@ -43,6 +44,7 @@ class FrameBoxAnnotationBulkItemData(FrameAnnotationBulkItemData, total=False):
 
 
 class FrameBoxAnnotationBulkEnvelopeData(TypedDict, total=False):
+    study_cohort_id: int | None
     frame_id: int | None
     video_id: int | None
     replace: bool
@@ -84,6 +86,7 @@ class FrameAnnotationBulkItemPayload(DtypesModel):
 
 
 class FrameAnnotationBulkEnvelopePayload(DtypesModel):
+    study_cohort_id: int | None = Field(default=None, strict=True, gt=0)
     video_id: int | None = Field(default=None, ge=1)
     ai_dataset_id: int | None = Field(default=None, ge=1)
     annotations: list[FrameAnnotationBulkItemPayload]
@@ -92,6 +95,7 @@ class FrameAnnotationBulkEnvelopePayload(DtypesModel):
 class FrameAnnotationSkipPayload(DtypesModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
+    study_cohort_id: int | None = Field(default=None, strict=True, gt=0)
     frame_id: int = Field(ge=1)
     video_id: int | None = Field(default=None, ge=1)
     annotator: str | None = None
@@ -133,6 +137,7 @@ class FrameBoxAnnotationBulkItemPayload(FrameAnnotationBulkItemPayload):
 class FrameBoxAnnotationBulkEnvelopePayload(DtypesModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
+    study_cohort_id: int | None = Field(default=None, strict=True, gt=0)
     frame_id: int | None = Field(default=None, ge=1)
     video_id: int | None = Field(default=None, ge=1)
     replace: bool = False

@@ -12,12 +12,53 @@ from lx_dtypes.models.contracts import (
     validate_segment_prediction_import_payload,
     validate_video_segments_payload,
 )
+from lx_dtypes.models.contracts.video_segments import (
+    SegmentPredictionImportPayload,
+    SegmentValidationPayload,
+)
 
 
 def test_video_segments_payload_accepts_json_array_frame_ranges() -> None:
     payload = validate_video_segments_payload({"instrument": [[12, 34], [56, 78]]})
 
     assert payload.as_dict == {"instrument": [(12, 34), (56, 78)]}
+
+
+@pytest.mark.parametrize("study_cohort_id", [None, 1, 7])
+def test_segment_requests_preserve_optional_study_context(study_cohort_id):
+    for contract, payload in (
+        (SegmentCrudPayload, {}),
+        (SegmentValidationPayload, {}),
+        (SegmentBulkValidationPayload, {}),
+        (
+            SegmentPredictionImportPayload,
+            {"segments": [{"label": "polyp", "start_time": 0, "end_time": 1}]},
+        ),
+    ):
+        assert (
+            contract.model_validate(
+                {**payload, "study_cohort_id": study_cohort_id}
+            ).study_cohort_id
+            == study_cohort_id
+        )
+
+
+@pytest.mark.parametrize("study_cohort_id", [0, -1, True, "7"])
+def test_segment_requests_reject_invalid_study_context(study_cohort_id):
+    for contract in (
+        SegmentCrudPayload,
+        SegmentValidationPayload,
+        SegmentBulkValidationPayload,
+    ):
+        with pytest.raises(ValidationError):
+            contract.model_validate({"study_cohort_id": study_cohort_id})
+    with pytest.raises(ValidationError):
+        SegmentPredictionImportPayload.model_validate(
+            {
+                "study_cohort_id": study_cohort_id,
+                "segments": [{"label": "polyp", "start_time": 0, "end_time": 1}],
+            }
+        )
 
 
 @pytest.mark.parametrize(

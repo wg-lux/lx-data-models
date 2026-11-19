@@ -405,6 +405,20 @@ versions. Names must be nonempty and at most 255 characters. Duplicate natural
 identities are invalid; two label sets may share a name if their versions differ.
 Do not populate `centers[].examiners`; use the optional employee record below.
 
+To ship annotation display defaults, put `label_presentation` inside the
+preset's `study_metadata`. Its ordered `labels` preserve canonical `name`
+references while supplying optional `display_name` and `color` (`#RRGGBB`).
+Ordered `scopes` group these references by expertise for presentation; they do
+not define user permissions. See the executable example in
+[the metadata contract](study-metadata.yml).
+
+`locked: true` makes the configured names the allowed-label whitelist when an
+annotation request explicitly selects this study; an empty locked list permits
+no new assignments. Study selection remains optional, existing annotations stay
+visible, and requests without a study context retain their existing behavior.
+Hosts must preserve this metadata during import and enforce the whitelist when
+writing annotations. Package registration alone does not apply runtime settings.
+
 The host preserves existing primary keys. It rejects ambiguous legacy matches
 instead of selecting an arbitrary row. The reused ledger models expose more
 fields than this host projection persists: UUIDs, tags, contact data, and other

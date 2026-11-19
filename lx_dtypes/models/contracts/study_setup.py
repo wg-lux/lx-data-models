@@ -54,6 +54,7 @@ class StudySetupDefinition(StrictContractModel):
                 "analysis_definitions",
                 "text_extraction",
                 "classification_text_extraction",
+                "label_presentation",
             ):
                 if not metadata[optional]:
                     metadata.pop(optional)

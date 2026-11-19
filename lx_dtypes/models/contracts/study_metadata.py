@@ -12,6 +12,10 @@ from .deployment_setup import PackageName, PackageVersion
 from .finding_extraction import FindingPresence
 from .json_types import JsonObject, JsonValue
 from .study_analysis import StudyAnalysisDefinition
+from .study_label_presentation import (
+    StudyLabelPresentation,
+    StudyLabelPresentationDataDict,
+)
 
 
 class StudyMetadataModel(StrictContractModel):
@@ -105,6 +109,7 @@ class StudyClassificationTextRule(StudyTextRuleModel):
 
 
 class StudyMetadata(StudyMetadataModel):
+    label_presentation: StudyLabelPresentation | None = None
     participating_centers: list[ParticipatingCenter] = Field(
         default_factory=list, max_length=500
     )
@@ -210,6 +215,7 @@ class StudyClassificationTextRuleDataDict(StudyTerminologyRequirementDataDict):
 
 
 class StudyMetadataDataDict(TypedDict):
+    label_presentation: StudyLabelPresentationDataDict | None
     participating_centers: list[ParticipatingCenterDataDict]
     age_groups: list[StudyAgeGroupDataDict]
     terminology_requirements: list[StudyTerminologyRequirementDataDict]

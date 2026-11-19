@@ -311,3 +311,29 @@ def test_frame_box_null_wrapper_values_roundtrip_as_null() -> None:
         )
         == result
     )
+
+
+@pytest.mark.parametrize("study_cohort_id", [None, 1, 7])
+def test_frame_requests_preserve_optional_study_context(study_cohort_id):
+    for contract, payload in (
+        (FrameAnnotationBulkEnvelopePayload, {"annotations": []}),
+        (FrameBoxAnnotationBulkEnvelopePayload, {"annotations": []}),
+        (FrameAnnotationSkipPayload, {"frame_id": 1}),
+    ):
+        assert (
+            contract.model_validate(
+                {**payload, "study_cohort_id": study_cohort_id}
+            ).study_cohort_id
+            == study_cohort_id
+        )
+
+
+@pytest.mark.parametrize("study_cohort_id", [0, -1, True, "7"])
+def test_frame_requests_reject_invalid_study_context(study_cohort_id):
+    for contract, payload in (
+        (FrameAnnotationBulkEnvelopePayload, {"annotations": []}),
+        (FrameBoxAnnotationBulkEnvelopePayload, {"annotations": []}),
+        (FrameAnnotationSkipPayload, {"frame_id": 1}),
+    ):
+        with pytest.raises(ValidationError):
+            contract.model_validate({**payload, "study_cohort_id": study_cohort_id})
