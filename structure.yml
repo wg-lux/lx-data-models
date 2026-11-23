@@ -69,6 +69,7 @@ files:
 - pyproject.toml
 - .pre-commit-config.yaml
 - .github/workflows/ci.yml
+- .github/workflows/publish.yml
 - features
 - templates
 - typings

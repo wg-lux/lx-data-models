@@ -9,6 +9,7 @@ from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelNamesUUIDTags imp
 )
 from lx_dtypes.models.base.file.pydantic.FilesAndDirs import FilesAndDirsModel
 from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
+from lx_dtypes.models.contracts.package_kind import PackageKind
 
 
 class KnowledgeBaseConfig(AppBaseModelNamesUUIDTags):
@@ -19,6 +20,8 @@ class KnowledgeBaseConfig(AppBaseModelNamesUUIDTags):
     version: str = Field(min_length=1)
     medical_field: str | None = None
     author: str | None = None
+    # Absent means unclassified; there is deliberately no default kind.
+    package_kind: PackageKind | None = None
 
     @field_validator("depends_on", "modules")
     @classmethod

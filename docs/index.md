@@ -62,6 +62,10 @@ guides/concept-relationships
 guides/knowledge-base-authoring
 guides/terminology
 guides/dtypes-package-structure
+guides/study-metadata
+guides/study-inference
+guides/coloreg-resection-study
+guides/package-kinds
 guides/kb-yaml-linting
 guides/knowledge-base-contract-migration
 guides/knowledge-base-graph-api

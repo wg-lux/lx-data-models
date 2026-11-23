@@ -94,6 +94,18 @@ class UnitValidatorQuery(DtypesModel):
 
 
 class UnitValidator(KnowledgebaseBaseModel[UnitValidatorDataDict]):
+    """Knowledge-base rule that checks the unit of a classification value.
+
+    Attributes:
+        query: Optional sub-query with a condition on the occurrence.
+        finding: Name of the finding whose occurrences are checked.
+        classification: Classification whose descriptor value is checked.
+        unit: Expected unit name.
+        operator: ``"exists"``, ``"missing"``, or ``"condition"``.
+        precedence: ``"optional"`` or ``"required"``; see
+            :class:`ClassificationValidator`.
+    """
+
     query: UnitValidatorQuery = Field(default_factory=UnitValidatorQuery)
     finding: str = Field(default_factory=str_unknown_factory)
     classification: str = Field(default_factory=str_unknown_factory)

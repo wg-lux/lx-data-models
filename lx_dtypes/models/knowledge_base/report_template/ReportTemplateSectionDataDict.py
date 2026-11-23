@@ -9,6 +9,8 @@ from lx_dtypes.models.knowledge_base.report_template.ReportFindingDataDict impor
 
 
 class ReportTemplateSectionFieldDataDict(KnowledgebaseBaseModelDataDict):
+    """Serialized :class:`ReportTemplateSectionField`."""
+
     key: str
     required: bool
     label: str
@@ -16,6 +18,8 @@ class ReportTemplateSectionFieldDataDict(KnowledgebaseBaseModelDataDict):
 
 
 class ReportTemplateSectionDataDict(KnowledgebaseBaseModelDataDict):
+    """Serialized :class:`ReportTemplateSection` knowledge-base record."""
+
     title_de: str
     title_en: str
     position: int

@@ -8,6 +8,7 @@ from typing import Any, Protocol, TypeVar
 
 from ninja.errors import HttpError  # type: ignore[import-untyped]
 
+from lx_dtypes.models.contracts.json_types import JsonObject
 from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
 from lx_dtypes.models.contracts.knowledge_base_graph import (
     ExaminationReportingContext,
@@ -111,10 +112,43 @@ def register_knowledge_base_graph_routes(
         module_name: str,
         version: str,
     ) -> dict[str, Any]:
-        """Return one deterministic, fully resolved terminology graph snapshot."""
+        """Return the terminology graph of one knowledge-base version.
+
+        The snapshot is deterministic for a given ``module_name`` and ``version``
+        and contains every concept node and relationship edge. Results are cached.
+        No authentication is required.
+
+        Errors: ``409`` if the knowledge base cannot produce a coherent graph.
+        """
 
         del request
         return load_graph(module_name, version).snapshot.model_dump(mode="json")
+
+    @api.get(
+        "/knowledge-bases/{module_name}/{version}/examinations/"
+        "{examination_name}/indications"
+    )
+    def examination_indications(
+        request: BaseRequest,
+        module_name: str,
+        version: str,
+        examination_name: str,
+    ) -> list[JsonObject]:
+        """List declared indications without host database IDs or template placement.
+
+        Returns core indication records sorted by name, including localized names
+        and classification/intervention references. No authentication is required.
+        Errors: ``404`` for an unknown examination, ``409`` for an invalid graph.
+        """
+        del request
+        graph = load_graph(module_name, version)
+        try:
+            indications = graph.resolver.indications_for_examination(examination_name)
+        except KeyError as exc:
+            raise HttpError(
+                404, "The requested examination is unknown to this knowledge base."
+            ) from exc
+        return [indication.model_dump(mode="json") for indication in indications]
 
     @api.get(
         "/knowledge-bases/{module_name}/{version}/examinations/"
@@ -126,7 +160,15 @@ def register_knowledge_base_graph_routes(
         version: str,
         examination_name: str,
     ) -> dict[str, Any]:
-        """Return the closed terminology/template projection for one examination."""
+        """Return the terminology and templates relevant to one examination.
+
+        The response is a closed projection of the graph: the examination, its
+        findings, classifications, choices, indications, and report templates. No
+        authentication is required.
+
+        Errors: ``404`` if the examination is unknown, ``409`` if the knowledge
+        base cannot produce a coherent context.
+        """
 
         del request
         graph = load_graph(module_name, version)

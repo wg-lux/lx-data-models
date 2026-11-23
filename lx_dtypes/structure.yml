@@ -34,10 +34,14 @@ entrypoints:
   purpose: Compatibility imports for the canonical evaluation API
 - name: Package workflow
   file: packages.py
-  purpose: Create, build, import, export, load, and validate packages through the core KB and ledger contracts
+  purpose: Create, build, import, export, load, and validate packages through the core KB and ledger contracts;
+    write and verify lx-package.json, audit package-kind dependencies and install verified channel bytes
+- name: Legacy package kind migration
+  file: package_kinds.py
+  purpose: Shared record-based infer_legacy_package_kind rule over a package's own and composed modules
 - name: Package archive boundary
   file: package_archive.py
-  purpose: Shared bounded ZIP decoding and portable member paths for authoring and registry uploads
+  purpose: Shared bounded ZIP decoding, portable member paths and lx-package.json agreement with config.yaml
 - name: FHIR mapping
   file: utils/fhir_lxdm_mapping.py
   purpose: FHIR and LXDM conversions

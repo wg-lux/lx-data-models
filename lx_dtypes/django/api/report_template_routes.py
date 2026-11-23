@@ -50,9 +50,10 @@ def _compile_report_template(
     template_name: str,
     *,
     mode: Literal["preview", "publish", "production"],
+    language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
 ) -> dict[str, Any]:
     validator = ReportTemplateValidator(kb=kb, compiler=ReportTemplateCompiler(kb=kb))
-    return validator.validate_and_compile(template_name, mode=mode)
+    return validator.validate_and_compile(template_name, mode=mode, language=language)
 
 
 def _attach_resolved_kb_identity(
@@ -148,6 +149,16 @@ def register_report_template_routes(
     def export_report_template_package(
         request: BaseRequest, payload: BuildReportTemplatePackageRequest
     ) -> ReportTemplatePackageResponse:
+        """Build a downloadable knowledge-base package from report-template builder input.
+
+        The response contains the generated ``config.yaml``, report-template YAML,
+        and validator YAML as strings. Nothing is written to disk.
+
+        Authentication: requires the ``report_template:write`` capability.
+
+        Errors: ``401`` without credentials, ``403`` without the capability,
+        ``400`` if the builder input cannot form a valid package.
+        """
         require_builder_access(request, "report_template:write")
         try:
             return build_report_template_package(payload)
@@ -159,8 +170,18 @@ def register_report_template_routes(
         request: BaseRequest,
         payload: SaveReportTemplateRequest,
     ) -> SaveReportTemplateResponse:
-        """
-        Persist a new report-template YAML file into one lx_dtypes knowledge-base module.
+        """Save a new draft report template into a knowledge-base module.
+
+        The template is written as YAML into the module identified by
+        ``module_name`` and ``module_version``, then compiled in preview mode. The
+        response includes the written file and the template's readiness summary.
+        New templates are saved as drafts; publish them separately.
+
+        Authentication: requires the ``report_template:write`` capability.
+
+        Errors: ``401``/``403`` for missing credentials or capability, ``400`` for
+        an invalid template or missing version, ``409`` if the template file
+        already exists.
         """
         require_builder_access(request, "report_template:write")
         module_name = payload.module_name.strip()
@@ -192,8 +213,13 @@ def register_report_template_routes(
     def report_templates_by_examination(
         request: BaseRequest, module_name: str, examination_name: str, version: str
     ) -> list[dict[str, Any]]:
-        """
-        Return all resolved report templates for the given examination in one module.
+        """List the published report templates for one examination.
+
+        Only templates whose lifecycle status is ``published`` and that pass
+        production compilation are returned. Each entry carries the resolved
+        knowledge-base module and version. No authentication is required.
+
+        Errors: ``400`` if ``version`` is empty.
         """
         del request
         version = require_version(version)
@@ -230,7 +256,16 @@ def register_report_template_routes(
     def builder_report_templates_by_examination(
         request: BaseRequest, module_name: str, examination_name: str, version: str
     ) -> list[dict[str, Any]]:
-        """Return preview exports for all builder templates, including drafts."""
+        """List all report templates for one examination, including drafts.
+
+        Returns builder preview exports, which include draft templates and their
+        readiness information.
+
+        Authentication: requires the ``report_template:read`` capability.
+
+        Errors: ``401``/``403`` for missing credentials or capability, ``400`` if
+        ``version`` is empty.
+        """
         require_builder_access(request, "report_template:read")
         version = require_version(version)
         kb = load_module_kb(module_name, version=version)
@@ -259,8 +294,14 @@ def register_report_template_routes(
     def report_template_by_name(
         request: BaseRequest, module_name: str, template_name: str, version: str
     ) -> dict[str, Any]:
-        """
-        Return a resolved report template JSON payload by module/template name.
+        """Return one published report template.
+
+        The template is resolved from the exact ``module_name`` and ``version``
+        and returned with its knowledge-base identity. No authentication is
+        required.
+
+        Errors: ``400`` if ``version`` is empty, ``404`` if no published template
+        has this name.
         """
         del request
         kb = load_module_kb(module_name, version=require_version(version))
@@ -281,6 +322,13 @@ def register_report_template_routes(
     def preview_report_template_by_name(
         request: BaseRequest, module_name: str, template_name: str, version: str
     ) -> dict[str, Any]:
+        """Return the builder preview of one report template, including drafts.
+
+        Authentication: requires the ``report_template:read`` capability.
+
+        Errors: ``401``/``403`` for missing credentials or capability, ``400`` if
+        ``version`` is empty, ``404`` if the template does not exist.
+        """
         require_builder_access(request, "report_template:read")
         kb = load_module_kb(module_name, version=require_version(version))
         try:
@@ -302,6 +350,19 @@ def register_report_template_routes(
     def publish_report_template(
         request: BaseRequest, module_name: str, template_name: str, version: str
     ) -> PublishReportTemplateResponse:
+        """Publish a draft report template.
+
+        The template is compiled in publish mode first. Publishing is refused while
+        the readiness summary reports blocking issues. On success the stored
+        lifecycle status becomes ``published`` and the response includes the
+        production readiness summary.
+
+        Authentication: requires the ``report_template:write`` capability.
+
+        Errors: ``401``/``403`` for missing credentials or capability, ``400`` if
+        ``version`` is empty, ``404`` if the template does not exist, ``409`` if
+        blocking issues remain.
+        """
         require_builder_access(request, "report_template:write")
         version = require_version(version)
         location = resolve_builder_module_location(module_name, version)
@@ -352,6 +413,15 @@ def register_report_template_routes(
     def unpublish_report_template(
         request: BaseRequest, module_name: str, template_name: str, version: str
     ) -> PublishReportTemplateResponse:
+        """Return a published report template to draft status.
+
+        Draft templates are no longer offered by the published listing routes.
+
+        Authentication: requires the ``report_template:write`` capability.
+
+        Errors: ``401``/``403`` for missing credentials or capability, ``400`` if
+        ``version`` is empty, ``404`` if the template does not exist.
+        """
         require_builder_access(request, "report_template:write")
         version = require_version(version)
         location = resolve_builder_module_location(module_name, version)
@@ -396,8 +466,17 @@ def register_report_template_routes(
         payload: PExamination,
         language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> dict[str, Any]:
-        """
-        Execute report-template validator logic against typed patient examination state.
+        """Validate a patient examination against a report template's rules.
+
+        The request body is a complete ``PExamination``. Its knowledge-base module
+        and version must match the route and the ``version`` query parameter. The
+        response contains the result of every template validator and a
+        ``concept_coverage`` section. Findings are advisory and nothing is
+        persisted. No authentication is required.
+
+        Errors: ``404`` if no published template has this name, ``409`` if the
+        payload's knowledge-base identity differs from the request, ``422`` if the
+        payload is not admissible for the knowledge base.
         """
         del request
         resolved_module_name, resolved_version = resolve_payload_kb_identity(
@@ -448,6 +527,15 @@ def register_report_template_routes(
         request: BaseRequest,
         patient_examination_id: int,
     ) -> dict[str, Any]:
+        """Return the persisted LXDM record of a patient examination.
+
+        Returns an empty object if the examination has no record yet.
+
+        This route performs no authentication or authorization itself. Hosts that
+        mount it must restrict access to the examination.
+
+        Errors: ``404`` if the patient examination does not exist.
+        """
         del request
         patient_examination_model = orm_models()["PatientExamination"]
         patient_examination = patient_examination_model.objects.filter(
@@ -469,6 +557,18 @@ def register_report_template_routes(
         patient_examination_id: int,
         payload: PExamination,
     ) -> dict[str, Any]:
+        """Replace the persisted LXDM record of a patient examination.
+
+        The request body is a complete ``PExamination``. Persistence is delegated
+        to the host's ``persist_patient_examination_dtypes_record`` callback.
+
+        This route performs no authentication or authorization itself. Hosts that
+        mount it must restrict access to the examination.
+
+        Errors: ``404`` if the patient examination does not exist, ``422`` if the
+        host rejects the record, ``501`` if the host has not configured
+        persistence.
+        """
         del request
         patient_examination_model = orm_models()["PatientExamination"]
         patient_examination = patient_examination_model.objects.filter(
@@ -500,6 +600,19 @@ def register_report_template_routes(
         version: str,
         language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> dict[str, Any]:
+        """Validate a stored patient examination against a report template's rules.
+
+        Like the ``validate`` route, but the ``PExamination`` is built from the
+        host's ledger records for ``patient_examination_id`` instead of being sent
+        in the request. Nothing is persisted.
+
+        This route performs no authentication or authorization itself. Hosts that
+        mount it must restrict access to the examination.
+
+        Errors: ``404`` if the examination or published template does not exist,
+        ``409`` if the ledger's knowledge-base version differs from ``version``,
+        ``422`` if the ledger cannot be converted or is not admissible.
+        """
         del request
         patient_examination_model = orm_models()["PatientExamination"]
         patient_examination = patient_examination_model.objects.filter(
@@ -563,8 +676,22 @@ def register_report_template_routes(
 
     @api.get("/report-templates/{module_name}/{template_name}/validate-definition")
     def validate_report_template_definition(
-        request: BaseRequest, module_name: str, template_name: str, version: str
+        request: BaseRequest,
+        module_name: str,
+        template_name: str,
+        version: str,
+        language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> dict[str, Any]:
+        """Check a report template definition and return its readiness summary.
+
+        Compiles the template in preview mode without patient data. Use this to
+        find blocking issues before publishing.
+
+        Authentication: requires the ``report_template:read`` capability.
+
+        Errors: ``401``/``403`` for missing credentials or capability, ``400`` if
+        ``version`` is empty, ``404`` if the template does not exist.
+        """
         require_builder_access(request, "report_template:read")
         version = require_version(version)
         kb = load_module_kb(module_name, version=version)
@@ -579,7 +706,9 @@ def register_report_template_routes(
                 f"Report template '{template_name}' not found in module '{module_name}'.",
             )
         try:
-            compiled = _compile_report_template(kb, template_name, mode="preview")
+            compiled = _compile_report_template(
+                kb, template_name, mode="preview", language=language
+            )
         except KeyError as exc:
             raise HttpError(
                 404,
@@ -597,6 +726,18 @@ def register_report_template_routes(
         payload: PExamination,
         language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     ) -> dict[str, Any]:
+        """Evaluate one named validator against a patient examination.
+
+        ``validator_kind`` is one of ``findings_validator``,
+        ``classification_validator``, ``intervention_validator``,
+        ``unit_validator``, or ``examination_validator``. The request body is a
+        complete ``PExamination`` whose knowledge-base identity must match the
+        request. Nothing is persisted. No authentication is required.
+
+        Errors: ``404`` for an unknown validator kind or name, ``409`` if the
+        payload's knowledge-base identity differs from the request, ``422`` if the
+        payload is not admissible.
+        """
         del request
         resolved_module_name, resolved_version = resolve_payload_kb_identity(
             module_name, payload

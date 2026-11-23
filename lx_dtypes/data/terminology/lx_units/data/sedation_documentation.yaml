@@ -16,13 +16,6 @@
   description: "Pressure unit used for blood pressure."
 
 - model: unit
-  name: "liters_per_minute"
-  abbreviation: "l/min"
-  name_de: "Liter pro Minute"
-  name_en: "Litres per minute"
-  description: "Flow-rate unit used for supplemental oxygen."
-
-- model: unit
   name: "milliliter"
   abbreviation: "ml"
   name_de: "Milliliter"

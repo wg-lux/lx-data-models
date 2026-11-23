@@ -39,33 +39,7 @@
       "title": "DeploymentPackage",
       "type": "object"
     },
-    "DeploymentSite": {
-      "additionalProperties": false,
-      "properties": {
-        "center_key": {
-          "description": "Immutable host center key; selects the local application default.",
-          "maxLength": 255,
-          "minLength": 1,
-          "pattern": "^[a-z0-9][a-z0-9_-]*$",
-          "title": "Center Key",
-          "type": "string"
-        },
-        "name": {
-          "description": "Center name. Existing rows with a different name are conflicts.",
-          "maxLength": 255,
-          "minLength": 1,
-          "title": "Name",
-          "type": "string"
-        }
-      },
-      "required": [
-        "center_key",
-        "name"
-      ],
-      "title": "DeploymentSite",
-      "type": "object"
-    },
-    "DeploymentStudyPackage": {
+    "DeploymentReportTemplatePackage": {
       "additionalProperties": false,
       "properties": {
         "module": {
@@ -98,7 +72,7 @@
         },
         "activate": {
           "default": false,
-          "description": "Select this registered terminology after database commit. False leaves active selection unchanged; no study records are created.",
+          "description": "Select this registered report-template package after database commit. False leaves the active selection unchanged. At most one selection may activate.",
           "title": "Activate",
           "type": "boolean"
         }
@@ -107,14 +81,41 @@
         "module",
         "version"
       ],
-      "title": "DeploymentStudyPackage",
+      "title": "DeploymentReportTemplatePackage",
+      "type": "object"
+    },
+    "DeploymentSite": {
+      "additionalProperties": false,
+      "properties": {
+        "center_key": {
+          "description": "Immutable host center key; selects the local application default.",
+          "maxLength": 255,
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9_-]*$",
+          "title": "Center Key",
+          "type": "string"
+        },
+        "name": {
+          "description": "Center name. Existing rows with a different name are conflicts.",
+          "maxLength": 255,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "center_key",
+        "name"
+      ],
+      "title": "DeploymentSite",
       "type": "object"
     }
   },
   "additionalProperties": false,
+  "description": "v2 deployment document with explicit, kind-checked package roles.",
   "properties": {
     "schema_version": {
-      "const": "1.0",
+      "const": "2.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -122,6 +123,7 @@
       "$ref": "#/$defs/DeploymentSite"
     },
     "reference_packages": {
+      "description": "application_data packages; the host projects their reference catalogue closure.",
       "items": {
         "$ref": "#/$defs/DeploymentPackage"
       },
@@ -129,9 +131,28 @@
       "title": "Reference Packages",
       "type": "array"
     },
-    "study_packages": {
+    "terminology_packages": {
+      "description": "terminology packages registered for the site.",
       "items": {
-        "$ref": "#/$defs/DeploymentStudyPackage"
+        "$ref": "#/$defs/DeploymentPackage"
+      },
+      "maxItems": 100,
+      "title": "Terminology Packages",
+      "type": "array"
+    },
+    "report_template_packages": {
+      "description": "report_templates packages; at most one may activate.",
+      "items": {
+        "$ref": "#/$defs/DeploymentReportTemplatePackage"
+      },
+      "maxItems": 100,
+      "title": "Report Template Packages",
+      "type": "array"
+    },
+    "study_packages": {
+      "description": "study packages; never activated by the setup document.",
+      "items": {
+        "$ref": "#/$defs/DeploymentPackage"
       },
       "maxItems": 100,
       "title": "Study Packages",

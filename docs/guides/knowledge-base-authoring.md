@@ -381,10 +381,8 @@ This verifies that:
 ## Reproduce and maintain versioned numeric classifications
 
 Owner: **lx_dtypes maintainers**. This section is the canonical workflow for
-the classification-versioning demonstration and publication reconciliation.
-The machine-readable [reconciliation inventory](../data-reconciliation.yml)
-records the compared PR commit, exact MST prefix hashes, counts, and STAR repairs.
-It is an artifact inventory, not a production-readiness assessment.
+the classification-versioning demonstration and the historical STAR and MST
+artifacts it relies on.
 
 ### Run the example
 
@@ -543,11 +541,11 @@ uv run make -C docs linkcheck
 The KB linter checks the selected concept files. The versioning tests separately
 validate the rules sidecar, real ledger preservation, boundaries, identity
 mismatches, unavailable versions and strict inputs. MST reconciliation verifies
-the PR additions byte-for-byte against the existing source prefixes and validates
+the earlier MST additions byte-for-byte against the existing source prefixes and validates
 the full core graph. These checks establish software consistency, not a complete
 independent audit against every clinical source table.
 
-### Reconcile the manuscript
+### Historical STAR and MST artifacts
 
 The historical `demo-data/star_upper_gi` is retained unchanged as evidence; new
 examples should resolve a catalog artifact. Its 22 findings, 21 classifications
@@ -562,18 +560,14 @@ descriptions inherited from the demo. It is a reproducibility artifact, not an
 updated clinical reporting interface. These warnings do not affect core-reference
 validation or the numeric comparison; the operational STAR default remains 0.1.2.
 
-The two MST files in PR #32 were already present before the Excel reconciliation.
-That historical artifact had 357 findings, 39 classifications, 285 choices,
-142 indications, 40 interventions and 12 examinations. Those counts describe
-that artifact, not complete structured coverage of MST. The PDF check of §7.3
-concerned actions and outcomes only. The supplied Excel workbook separately
-contains an explicit five-level `Adv event severity` sheet; the importer below
-uses that sheet as its severity source.
-
-The [editorial replacement specification](../manuscript-reconciliation.yml)
-and `scripts/revise_lxdm_manuscript.py` produce a separate revised DOCX with an
-audit of replacements. They never overwrite the original. Follow the command
-in that YAML file; review the resulting document before submitting it.
+Before the Excel import, the MST 3.0 artifact had 357 findings, 39
+classifications, 285 choices, 142 indications, 40 interventions and 12
+examinations. Those counts describe that artifact, not complete structured
+coverage of MST. A targeted check against section 7.3 of the
+[MST 3.0 PDF](https://www.worldendo.org/assets-craft/pdf/resources/mst-3-0.pdf)
+covered actions and outcomes only; that section contains no severity table.
+The Excel workbook contains an explicit five-level `Adv event severity` sheet,
+and the importer below uses that sheet as its severity source.
 
 ### Reproduce the MST 3.0 Excel import
 
@@ -648,16 +642,15 @@ approval or downstream host persistence of every new field.
 
 ## Related Guides
 
-- KB linting details: `docs/guides/kb-yaml-linting.md`
-- Terminology editor workflow: `lx-terminology-editor/README.md`
-- Monorepo overview of local publication: `/home/admin/endoreg-db/README.md`
+- [KB YAML linting](kb-yaml-linting.md)
+- [Terminology](terminology.md)
+- [Structure of a valid lx-dtypes package](dtypes-package-structure.md)
 
 ## Dataset and live-cohort setup templates
 
 The packaged [`research.yml`](../../lx_dtypes/data/study_metadata/research.yml)
 defines image/video datasets and saved live cohort definitions. It is a separate
-versioned contract from clinical knowledge-base bundles. Its canonical scope and
-readiness record is `endoreg-db/feature-tracking/DtypesStudyDefinitions.yml`.
+versioned contract from clinical knowledge-base bundles.
 
 Validate without database access:
 

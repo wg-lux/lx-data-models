@@ -1,0 +1,15 @@
+locked: true
+labels:
+  - name: low_quality
+    display_name: Low quality
+    color: '#B45309'
+  - name: nice_1
+    display_name: NICE 1
+    color: '#2563EB'
+scopes:
+  - name: basic
+    display_name: Basic review
+    labels: [low_quality]
+  - name: advanced
+    display_name: Advanced review
+    labels: [nice_1]

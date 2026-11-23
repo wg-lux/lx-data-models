@@ -46,6 +46,8 @@ class InterventionValidatorHintDataDict(TypedDict, total=False):
 
 
 class InterventionValidatorDataDict(KnowledgebaseBaseModelDataDict):
+    """Serialized :class:`InterventionValidator` knowledge-base record."""
+
     query: InterventionValidatorQueryDataDict
     finding: str
     intervention: str

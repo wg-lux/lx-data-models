@@ -159,6 +159,16 @@ def register_indications_routes(
         module_version: str | None = None,
         patient_examination_id: int | None = None,
     ) -> list[dict[str, Any]]:
+        """List the indications available for a host examination.
+
+        Only indications that the knowledge base defines for this examination are
+        returned. The knowledge base is chosen as in ``findings_by_examination``.
+        No authentication is required.
+
+        Errors: ``404`` if the examination or patient examination does not exist
+        or they do not belong together, ``409`` if the knowledge-base identity is
+        incomplete or conflicting.
+        """
         del request
         try:
             module_name, resolved_version = (
@@ -222,6 +232,17 @@ def register_indications_routes(
         module_version: str | None = None,
         patient_examination_id: int | None = None,
     ) -> list[dict[str, Any]]:
+        """Return the indications with the examinations they apply to.
+
+        Each indication lists the host examinations where the knowledge base
+        allows it, with their available findings. Covers every host
+        examination, or only the examination of ``patient_examination_id``
+        when given. The knowledge base is chosen as in
+        ``findings_by_examination``. No authentication is required.
+
+        Errors: ``404`` if the patient examination does not exist, ``409`` if the
+        knowledge-base identity is incomplete or conflicting.
+        """
         del request
         try:
             module_name, resolved_version = (

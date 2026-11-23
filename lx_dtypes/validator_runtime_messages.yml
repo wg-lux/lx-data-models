@@ -42,6 +42,24 @@ de:
   missing_data_requirement: "Für diese Prüfung fehlen noch Angaben: {requirements}."
   conditional_classification_requirement: Aufgrund der bisherigen Angaben fehlt '{classification}'{additional}.
   additional_requirements: ' und {requirements}'
+  # Report template structure and readiness diagnostics.
+  structure_missing_section: Vorlage '{template}' verweist auf den unbekannten Abschnitt '{section}'.
+  structure_duplicate_section_reference: Vorlage '{template}' verweist mehrfach auf denselben Abschnitt.
+  structure_empty_template_sections: Vorlage '{template}' hat keine Berichtsabschnitte.
+  structure_empty_section_findings: Abschnitt '{section}' enthält keine Befunde.
+  structure_non_finding_section_has_findings: Abschnitt '{section}' ist vom Typ '{section_kind}', definiert aber auch Befunde.
+  structure_findings_section_has_fields: Befundabschnitt '{section}' definiert zusätzlich Metadatenfelder.
+  structure_invalid_section_field: Abschnitt '{section}' enthält ein Feld ohne Schlüssel.
+  structure_duplicate_section_field: Abschnitt '{section}' enthält den Feldschlüssel '{field_key}' mehrfach.
+  structure_unknown_section_field_key: Abschnitt '{section}' verwendet den unbekannten Feldschlüssel '{field_key}'.
+  structure_section_field_kind_mismatch: Feld '{field_key}' ist für Abschnitte vom Typ '{expected_kind}' vorgesehen, wird aber in '{section_kind}' verwendet.
+  structure_history_field_source_mismatch: Feld '{field_key}' im Verlaufsabschnitt '{section}' verwendet die Quelle '{field_source}'.
+  structure_field_history_source_mismatch: Feld '{field_key}' im Abschnitt '{section}' ({section_kind}) verwendet die Quelle 'history'.
+  structure_invalid_finding_reference: Abschnitt '{section}' enthält einen ungültigen Befundverweis.
+  structure_unknown_finding_reference: Befund '{finding}' wird von Vorlage '{template}' verwendet, ist aber nicht in der Wissensbasis enthalten.
+  readiness_unknown_template_examination: Vorlage '{template}' verweist auf die unbekannte Untersuchung '{examination}'.
+  readiness_validator_finding_missing: Befundprüfregel '{validator_name}' bezieht sich auf den unbekannten Befund '{finding}'.
+
 en:
   unknown_finding: Finding '{finding}' is not in the KB.
   finding_not_present: Please document the finding '{target_finding}'.
@@ -82,3 +100,20 @@ en:
   missing_data_requirement: "Further information is needed for this check: {requirements}."
   conditional_classification_requirement: Based on the answers so far, '{classification}'{additional} is required.
   additional_requirements: ' and {requirements}'
+  # Report template structure and readiness diagnostics.
+  structure_missing_section: Template '{template}' references unknown section '{section}'.
+  structure_duplicate_section_reference: Template '{template}' references at least one section more than once.
+  structure_empty_template_sections: Template '{template}' has no report sections.
+  structure_empty_section_findings: Section '{section}' has no findings.
+  structure_non_finding_section_has_findings: Section '{section}' is '{section_kind}' but also defines findings.
+  structure_findings_section_has_fields: Section '{section}' is a findings section but also defines metadata fields.
+  structure_invalid_section_field: Section '{section}' contains a field without a key.
+  structure_duplicate_section_field: Section '{section}' contains duplicate field key '{field_key}'.
+  structure_unknown_section_field_key: Section '{section}' uses unknown field key '{field_key}'.
+  structure_section_field_kind_mismatch: Field '{field_key}' is intended for '{expected_kind}' sections but is used in '{section_kind}'.
+  structure_history_field_source_mismatch: Field '{field_key}' in history section '{section}' uses source '{field_source}'.
+  structure_field_history_source_mismatch: Field '{field_key}' in {section_kind} section '{section}' uses source 'history'.
+  structure_invalid_finding_reference: Section '{section}' contains an invalid finding reference.
+  structure_unknown_finding_reference: Finding '{finding}' is used by template '{template}' but is not present in the knowledge base.
+  readiness_unknown_template_examination: Template '{template}' references unknown examination '{examination}'.
+  readiness_validator_finding_missing: Findings validator '{validator_name}' targets unknown finding '{finding}'.

@@ -15,6 +15,15 @@ from lx_dtypes.models.model import DtypesModel
 
 
 class ReportTemplateSectionField(DtypesModel):
+    """Non-finding data field shown in a report section.
+
+    Attributes:
+        key: Field identifier, for example ``"examination_date"``.
+        required: Whether the field must be filled.
+        label: Optional display label.
+        source: Host data source that provides the value.
+    """
+
     key: str
     required: bool = False
     label: str | None = None
@@ -22,6 +31,18 @@ class ReportTemplateSectionField(DtypesModel):
 
 
 class ReportTemplateSection(KnowledgebaseBaseModel[ReportTemplateSectionDataDict]):
+    """Knowledge-base record for one section of a report template.
+
+    Attributes:
+        title_de: German title; defaults to ``name_de`` or ``name``.
+        title_en: English title; defaults to ``name_en`` or ``name``.
+        position: Sort position within the report.
+        types: Section type tags.
+        section_kind: Kind of content the section holds.
+        fields: Non-finding data fields, for patient-data or history sections.
+        findings: Expected findings, inline or by :class:`ReportFinding` name.
+    """
+
     title_de: str = ""
     title_en: str = ""
     position: int = 0
@@ -52,8 +73,10 @@ class ReportTemplateSection(KnowledgebaseBaseModel[ReportTemplateSectionDataDict
 
     @classmethod
     def list_type_fields(cls) -> list[str]:
+        """Return fields stored as lists; sections have none."""
         return []
 
     @property
     def ddict_class(self) -> type[ReportTemplateSectionDataDict]:
+        """Typed dictionary class used for serialization."""
         return ReportTemplateSectionDataDict

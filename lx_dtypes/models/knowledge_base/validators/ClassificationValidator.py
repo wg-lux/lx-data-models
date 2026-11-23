@@ -117,6 +117,17 @@ class ClassificationValidatorQuery(DtypesModel):
 
 
 class ClassificationValidator(KnowledgebaseBaseModel[ClassificationValidatorDataDict]):
+    """Knowledge-base rule that checks a classification on a reported finding.
+
+    Attributes:
+        query: Optional sub-query with a condition on the occurrence.
+        finding: Name of the finding whose occurrences are checked.
+        classification: Classification that must carry a value.
+        operator: ``"exists"``, ``"missing"``, or ``"condition"``.
+        precedence: With ``"optional"``, the rule passes when the finding was
+            not reported at all; with ``"required"``, an absent finding fails.
+    """
+
     query: ClassificationValidatorQuery = Field(
         default_factory=ClassificationValidatorQuery
     )

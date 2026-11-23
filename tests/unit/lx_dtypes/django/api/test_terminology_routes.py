@@ -359,6 +359,8 @@ def test_list_terminology_bundles_reports_no_active_selection(
             "module_name": "published_terminology",
             "version": "2026.04.30",
             "medical_field": "gastroenterology",
+            "package_kind": "terminology",
+            "package_kind_source": "migrated",
             "is_active": False,
         }
     ]
@@ -404,7 +406,17 @@ def test_list_terminology_bundles_does_not_expose_storage_source(
 
     assert response.status_code == 200
     bundle = response.json()["bundles"][0]
-    assert set(bundle) == {"module_name", "version", "medical_field", "is_active"}
+    assert set(bundle) == {
+        "module_name",
+        "version",
+        "medical_field",
+        "package_kind",
+        "package_kind_source",
+        "is_active",
+    }
+    # Remote sources are never fetched for a listing, so nothing is migrated.
+    assert bundle["package_kind"] is None
+    assert bundle["package_kind_source"] is None
     assert source_url.encode() not in response.content
     assert str(registry_path).encode() not in response.content
 
@@ -434,6 +446,8 @@ def test_select_terminology_bundle_sets_active_runtime_selection(
         "module_name": "published_terminology",
         "version": "2026.04.30",
         "medical_field": "gastroenterology",
+        "package_kind": "terminology",
+        "package_kind_source": "migrated",
         "is_active": True,
     }
     assert payload["counts"]["unit"] == 1
@@ -582,6 +596,8 @@ def test_import_terminology_bundle_zip_registers_without_changing_active_selecti
         "module_name": "published_terminology",
         "version": "2026.05.04",
         "medical_field": "gastroenterology",
+        "package_kind": "terminology",
+        "package_kind_source": "migrated",
         "is_active": False,
     }
     assert payload["revision"] == _registry_revision(service.registry_path)

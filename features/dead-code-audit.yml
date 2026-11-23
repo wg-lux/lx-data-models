@@ -1,0 +1,455 @@
+owner: lx_dtypes maintainers
+canonical_topic: Publication dead-code and duplication audit
+review_date: '2026-10-12'
+base_revision: 2ee454a1789f9d7c1e1502e98691ff96e964d83c
+scope:
+  python:
+  - lx_dtypes
+  - scripts
+  - tests
+  - lx_kb_lint.py
+  - manage.py
+  vulture_min_confidence: 60
+  exclusions: []
+  limitations:
+  - Vulture flags framework fields, registered callbacks and external contracts; absence
+    of local references is not deletion authority.
+  - The local quality/dead_code_baseline.yml, scripts/check_dead_code.py and quality:dead-code
+    task do not exist; this is an inventory, not an allowlist.
+  - Nix and YAML semantics are outside Vulture coverage. No additional analyzer was
+    installed.
+  - Known downstream Python consumers were searched in endoreg-db. lx-annotate was
+    not available at the expected sibling path; other external consumers remain unverified.
+  - Pre-existing staged edits were preserved. The scan describes the working tree,
+    not the base revision alone.
+scan:
+  command: .venv/bin/vulture lx_dtypes scripts tests lx_kb_lint.py manage.py --min-confidence
+    60
+  before_findings: 2736
+  after_findings: 2731
+  exit_code: 3
+  interpretation: Findings remain; no claim of a clean dead-code guard or exhaustive
+    publication readiness.
+  raw_evidence: temp/dead-code-publication/vulture-before.json
+confirmed_removals:
+- path: lx_dtypes/terminology/terminology.py
+  original_line: 24
+  symbols:
+  - _http_errors
+  - register_terminology_routes
+  classification: compatibility_contract
+  action: Remove duplicate implementation, retain the public register_terminology_routes
+    import as an explicit canonical re-export.
+  evidence:
+  - AST comparison found identical route bodies in django/api/terminology_routes.py.
+  - main.py registers the canonical adapter; no direct downstream use of the legacy
+    path was found in the searched repository.
+  - The existing HTTP suite now runs through both canonical and legacy registration
+    imports, exercising successful reads/imports/selects and invalid payloads, authorization,
+    conflicts and missing state.
+  risk: Legacy module-level monkeypatches of incidental imported service helpers no
+    longer affect the canonical adapter; the supported registration signature and
+    injectable callbacks are unchanged.
+- paths:
+  - lx_dtypes/models/interface/KnowledgeBaseConfig.py
+  - lx_dtypes/models/interface/DataLoader.py
+  - lx_dtypes/utils/kb_package_lint.py
+  classification: compatibility_contract
+  action: Centralize file-backed source attribution and path normalization in KnowledgeBaseConfig.from_yaml_file;
+    remove duplicate caller setup.
+  evidence:
+  - Repository search found the DataLoader and package linter as production file-loading
+    callers.
+  - Explicit normalize_data_paths remains supported and idempotent for the same manifest.
+  - Tests cover all four data path selectors rejecting parent, absolute and symlink
+    escapes; valid paths, attribution and in-memory behavior are checked.
+  behavior_change: Direct file-loading callers receive resolved paths and earlier
+    rejection of escaping paths. In-memory validation retains relative paths. No registry,
+    version, hydration or clinical defaults were introduced.
+- path: docs/index.md
+  action: Replace a stale translated guide link with the existing canonical concept-relationships
+    guide.
+  evidence: HTML build originally reported missing konzept-verknuepfungen and orphan
+    concept-relationships; both warnings disappear with the corrected toctree.
+- path: pyproject.toml
+  action: Exclude temp and temp/** from source distributions; set core metadata 2.4
+    for both artifacts to match the declared Twine 6.x release toolchain.
+  evidence: An isolated build included 1691 temporary artifact entries and failed
+    while extracting a test symlink; these are not package sources.
+  verification: Isolated sdist and wheel build passed; no temp entries in sdist; wheel
+    contains py.typed, catalog.json and the compatibility module; Twine accepted both
+    distributions.
+- paths:
+  - lx_dtypes/models/knowledge_base/finding/_FindingDjango.py
+  - lx_dtypes/django/migrations/0007_findingdjango_text_extraction.py
+  - lx_dtypes/django/migrations/max_migration.txt
+  action: Preserve canonical Finding.text_extraction rules in the Django projection,
+    with an independent empty-list default and additive migration.
+  evidence: Full pytest exposed 1 failure and 13 setup errors because the DataDict
+    contained text_extraction but FindingDjango had no such field.
+  verification: Typed rules round-trip and clear on update; invalid rules fail typed
+    validation; defaults are independent. Real SQLite migration checks covered an
+    existing row, forward/reverse/reapply, and zero makemigrations drift.
+  compatibility: Hosts must apply migration 0007 before importing findings; no application
+    extraction workflow was introduced.
+retained_contracts:
+- path: lx_dtypes/django/api/main.py
+  line: 88
+  symbol: exc_class
+  message: unused variable 'exc_class'
+  confidence: 100
+  size: 1
+  classification: protocol_signature
+  evidence: _TypedApi.exception_handler must accept the exception class used for route
+    error registration.
+- path: lx_dtypes/django/api/stubs.py
+  line: 8
+  symbol: request_params
+  message: unused variable 'request_params'
+  confidence: 100
+  size: 1
+  classification: protocol_signature
+  evidence: TypedNinjaAPIClient.get models arbitrary Ninja test-client request keywords.
+- path: lx_dtypes/models/interface/DbInterface.py
+  line: 357
+  symbol: patient_finding_classification_choice
+  message: unused variable 'patient_finding_classification_choice'
+  confidence: 100
+  size: 1
+  classification: compatibility_contract
+  evidence: Reserved public create_classification_choice_descriptor signature explicitly
+    raises NotImplementedError before mutation.
+- path: lx_dtypes/models/interface/DbInterface.py
+  line: 359
+  symbol: descriptor_data
+  message: unused variable 'descriptor_data'
+  confidence: 100
+  size: 1
+  classification: compatibility_contract
+  evidence: Same reserved public signature; deleting parameters would break external
+    callers without implementing the operation.
+uncertain_candidates:
+- paths:
+  - lx_dtypes/django/api/main.py
+  - lx_dtypes/django/api/findings_routes.py
+  symbols:
+  - _serialize_choice
+  - _serialize_classification
+  - _split_classifications
+  - _serialize_patient_finding_classification
+  classification: uncertain
+  evidence: Repeated implementation bodies; neighboring validation and resolver paths
+    differ.
+  next_action: Audit the complete legacy call graph and host monkeypatch/import seams
+    before replacing the larger API helper strand.
+- paths:
+  - lx_dtypes/models/contracts/ai_prediction.py
+  - lx_dtypes/models/contracts/model_meta.py
+  symbols:
+  - _coerce_float
+  - _coerce_int
+  - _normalize_float_triplet
+  classification: uncertain
+  evidence: Shared coercion behavior but distinct strict payloads and list/tuple axis
+    contracts.
+  next_action: Consolidate only with paired valid/invalid payload and serialization
+    tests preserving these differences.
+- paths:
+  - lx_dtypes/models/knowledge_base/validators
+  symbols:
+  - validate_operator_semantics
+  - normalize_query_defaults
+  classification: framework_contract
+  evidence: Pydantic callbacks participate in construction, including YAML loading;
+    Vulture does not model decorator reachability.
+  next_action: Retain model names and schemas; review generic/shared query logic only
+    with all validator-kind schema and runtime tests.
+- classification: uncertain
+  scope: Other raw 60-percent Vulture findings
+  next_action: Review individual public, dynamic and external consumers before deletion;
+    raw findings are not approved removals.
+metrics:
+  method: radon.raw.analyze and radon.complexity.cc_visit called directly from Python;
+    before/after JSON in the evidence directory.
+  production_lines_before: 765
+  production_lines_after: 677
+  net_production_lines: -88
+  complexity:
+    canonical_register_terminology_routes: 1 -> 1; duplicate removed
+    DataLoader.load_module_configs: 3 -> 3
+    lint_kb_package: 21 -> 21
+    KnowledgeBaseConfig.from_yaml_file: 'new orchestration method: 1'
+  interpretation: Reduced duplicate ownership; no claim that remaining algorithmic
+    complexity or test coverage decreased.
+verification:
+  pyright: 'Before, after consolidation and after projection repair: 0 errors, 0 warnings.'
+  focused_before: 82 passed under python -m trace.
+  focused_after: 113 passed under python -m trace; 31 extra cases from compatibility-path
+    parametrization and path validation.
+  trace: from_yaml_file and normalization executed 427 times; canonical adapter exercised
+    both imports, successful operations and 401/403 paths.
+  ruff: 'Changed Python files: check and format passed.'
+  documentation: HTML and linkcheck passed without warnings after toctree correction.
+  broad_tests: 'Verified after the finding projection and warning cleanup: 1460 passed,
+    2 skipped, 438 warnings; no failures or errors. See review-20261012/tests-standard.txt.'
+  artifact_directory: temp/dead-code-publication
+  coverage_limit: Trace establishes reachability only for the selected scenarios;
+    no full coverage percentage comparison was requested or claimed.
+  commands:
+    pyright: .venv/bin/pyright
+    focused_trace: .venv/bin/python -m trace --count -C /home/admin/lx-data-models/temp/dead-code-publication/trace-after
+      --module pytest tests/unit/lx_dtypes/models/interface/test_knowledge_base_config.py
+      tests/unit/lx_dtypes/models/interface/test_data_loader.py tests/unit/lx_dtypes/utils/test_kb_package_lint.py
+      tests/unit/lx_dtypes/django/api/test_terminology_routes.py -q --basetemp=temp/dead-code-publication/pytest-focused
+    full: PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest -q --basetemp=/tmp/lx-run-cleanup-verified
+    html: .venv/bin/sphinx-build -b html docs docs/_build/html
+    linkcheck: .venv/bin/sphinx-build -b linkcheck docs docs/_build/linkcheck
+    build: .venv/bin/python -m build --outdir /tmp/lx-dtypes-publication-dist-20261012
+  package_build: Isolated sdist and wheel build passed; Twine checks passed for both
+    after choosing metadata 2.4. Initial non-isolated attempt lacked hatchling; isolated
+    mode resolves the declared build dependency.
+  kb_yaml_lint: '31 packages and 203 YAML files checked: 0 errors, 0 warnings.'
+  isolated_harnesses: A combined invocation with terminology/verification failed at
+    plugin setup because that harness replaces Django; these directories must run
+    separately without Django plugin autoload.
+
+artifact_review:
+  owner: lx_dtypes maintainers
+  review_date: '2026-10-12'
+  evidence_directory: temp/dead-code-publication/review-20261012
+  cleanup:
+    removed: Copied pytest trees and before/after trace output; summarized results and metrics are retained above.
+    retained: Compact logs, raw scan inventories, metrics and review evidence remain local and ignored.
+    git_policy: All 13228 staged temp entries removed from the index; no generated evidence belongs in a release.
+    deleted_files: 15768
+    reclaimed_mib: 101.46
+    retained_exports: Earlier and corrected manuscript DOCX files with their specifications and provenance.
+    storage_contract: docs/guides/terminology.md#storage-ownership-and-lifetime
+    verification: 45 focused tests passed; Pyright and Ruff clean; fresh wheel and sdist passed scratch-storage, migration, exact packaged-data and Twine checks; HTML and linkcheck passed.
+  interpretation:
+    dead_code_publication: Historical scan, trace, build and test evidence; pytest-* directories are disposable test copies, not source packages.
+    generated_exports: Generated demos, test snapshots and manuscript outputs; do not import these into canonical package data.
+    old_logs: Preserve failed runs as history; the review directory holds the newer verification results.
+  actions:
+  - Verified the previously applied compatibility re-export, path normalization and finding projection repairs; no repeat deletion needed.
+  - Repaired the isolated route double with deterministic instance_id and asserted serialized identity; 72 route tests passed.
+  - Aligned the terminology harness with the documented None-root default, retaining rejection of invalid explicit paths and checking no storage creation.
+  - Reconciled the generated manuscript against the current MST workbook import; see docs/data-reconciliation.yml.
+  retained_candidates:
+  - The four 100-percent Vulture findings still match the protocol and compatibility contracts above; no confirmed dead implementation was identified in this cohort.
+  - Numeric coercion consolidation remains deferred pending paired contract tests; list-versus-tuple axes and permissive numeric-string behavior must not silently change.
+  - Legacy API serializers remain deferred pending a complete compatibility and monkeypatch-seam review; current route registrations are live consumers.
+  guard_limit: The configured dead-code guard, baseline and feature tracker still do not exist in this repository; the raw scan is not a baseline pass.
+  verification:
+    pyright: 0 errors, 0 warnings
+    ruff: Changed test files passed.
+    routes: 72 passed, no warnings
+    terminology: 58 passed, 660 historical-release concept warnings
+    mst: 17 passed, no warnings
+    broad_suite: Previous task verified 1460 passed, 2 skipped, 438 warnings; this follow-up changes only isolated harness fixtures/tests and editorial YAML.
+    route_command: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider lx_dtypes/django/api/tests -q
+    terminology_command: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -c /dev/null --rootdir=. -p no:cacheprovider lx_dtypes/terminology/verification -q
+    vulture_command: .venv/bin/python -m vulture lx_dtypes scripts tests lx_kb_lint.py manage.py --min-confidence 100
+    vulture_result: Exit 3; four retained findings, recorded in vulture-100.txt. The earlier 60-percent scan is preserved, not replaced or reclassified en masse.
+
+review_20261123:
+  owner: lx_dtypes maintainers
+  review_date: '2026-11-23'
+  base_revision: 151275949712f8b41afa6b8213fe47dfd728bad3
+  mode: Inventory only; no production code, tests or public imports changed.
+  historical_record: Earlier sections describe October work and are not current verification.
+  evidence_directory: temp/dead-code-audit-20261123
+  scope:
+    python: [lx_dtypes, scripts, tests, lx_kb_lint.py, manage.py]
+    confidence: 60
+    exclusions: []
+    working_tree: Pre-existing staged, unstaged and untracked changes were preserved; findings describe the working tree, not HEAD alone.
+    tracking: No local feature-tracking directory exists; no local lock or inbox command is available.
+    baseline: No quality/dead_code_baseline.yml, scripts/check_dead_code.py or quality:dead-code task exists; no baseline was created or changed.
+    coverage_gaps:
+    - Non-Python semantics, documentation duplication, generated resources and Python outside the listed roots were not audited by Vulture.
+    - Only endoreg-db was searched for downstream symbol consumers; lx-annotate is absent at the expected sibling path and other consumers remain unverified.
+    - Most low-confidence fields, methods and public contracts remain unreviewed; their raw findings are not deletion approvals.
+    - Source hashes are a later working-tree snapshot; concurrent edits prevent treating all checks as one immutable revision.
+    - Raw evidence is ignored local output; the durable findings and commands are summarized here.
+  scan:
+    command: .venv/bin/vulture lx_dtypes scripts tests lx_kb_lint.py manage.py --min-confidence 60
+    exit_code: 3
+    findings: 2619
+    confidence_counts: {60: 2616, 100: 3}
+    root_counts: {lx_dtypes: 2567, scripts: 14, tests: 38}
+    evidence: [vulture.txt, vulture.json, source-inventory.json, source-sha256.json, git-status.txt]
+    interpretation: Exit 3 means candidates remain. The difference from October is not attributable to this audit; no clean guard or exhaustive absence of dead code is claimed.
+  confirmed_dead_candidates:
+  - path: lx_dtypes/models/contracts/adapters.py
+    line: 144
+    symbol: _KnowledgeBaseSection
+    confidence: 60
+    size: 2
+    classification: confirmed_dead
+    evidence: Definition-only reference search; absent from explicit exports and lazy export map. The active _KnowledgeBaseLike protocol uses Mapping directly, with no reference to this protocol or runtime registration.
+    risk: Low within searched scope; unknown downstream private imports remain possible. This file already has user edits.
+    action: Propose removing the unused protocol in a separate authorized cohort; retain Iterable where used by other adapters.
+    verification: Pyright, test_core_concepts_adapters.py, Vulture and structure lint.
+  - path: lx_dtypes/models/knowledge_base/validators/ValidatorRuntime.py
+    line: 291
+    symbol: _condition_matches
+    confidence: 60
+    size: 5
+    classification: confirmed_dead
+    evidence: Definition-only reference search, no decorator or export. Active runtime evaluators call _condition_evaluation directly at lines 633, 897, 1089 and 1270.
+    risk: Low within searched scope; preserve the tri-state _condition_evaluation implementation. This file already has user edits.
+    action: Propose removing this obsolete boolean wrapper together with _classification_condition_matches after authorization.
+    verification: Pyright; validator runtime engine and helper tests covering matched, unmatched and missing-data cases; isolated trace and Vulture.
+  - path: lx_dtypes/models/knowledge_base/validators/ValidatorRuntime.py
+    line: 298
+    symbol: _classification_condition_matches
+    confidence: 60
+    size: 9
+    classification: confirmed_dead
+    evidence: Definition-only reference search; undecorated, absent from exports and not used by active runtime evaluators. Same obsolete boolean projection as _condition_matches.
+    risk: Low within searched scope; external private imports cannot be ruled out globally.
+    action: Include in the same authorized validator wrapper cohort.
+    verification: Same checks as _condition_matches; preserve all condition model imports still used elsewhere.
+  - path: lx_dtypes/models/meta/ReportMeta.py
+    line: 495
+    symbol: _has_signal
+    confidence: 60
+    size: 8
+    classification: confirmed_dead
+    evidence: Definition-only reference search; undecorated and absent from __all__. No callback registration or dynamic name lookup targets the helper. Searched endoreg-db consumers import public report contracts.
+    risk: Low within searched scope; preserve _NULL_STRINGS and normalization functions used elsewhere.
+    action: Propose removal in a separate authorized metadata cohort.
+    verification: Pyright, test_sensitive_meta_anonymizer_contract.py, isolated trace and Vulture.
+  retained_contracts:
+  - path: lx_dtypes/django/api/main.py
+    line: 88
+    symbol: exc_class
+    confidence: 100
+    size: 1
+    classification: protocol_signature
+    evidence: _TypedApi.exception_handler models the Ninja exception-handler registration signature.
+    action: Retain; removing the parameter changes the typed interface.
+  - path: lx_dtypes/django/api/stubs.py
+    line: 8
+    symbol: request_params
+    confidence: 100
+    size: 1
+    classification: protocol_signature
+    evidence: TypedNinjaAPIClient.get accepts arbitrary request keyword arguments through its protocol signature.
+    action: Retain.
+  - path: lx_dtypes/models/interface/DbInterface.py
+    line: 357
+    symbol: patient_finding_classification_choice
+    confidence: 100
+    size: 1
+    classification: compatibility_contract
+    evidence: Reserved public method raises NotImplementedError before mutation; test_runtime_validation.py exercises this contract.
+    action: Retain its signature, including descriptor_data, even though descriptor_data is no longer reported by this scan.
+  - paths: [lx_dtypes/django/api, lx_dtypes/models/contracts/__init__.py, lx_dtypes/models/ledger/__init__.py]
+    symbols: [__call__, __dir__, import_terminology_bundle]
+    classification: framework_contract
+    evidence: Protocol call signatures, Python directory-discovery hooks and decorated Ninja routes are invoked without direct name references.
+    action: Retain; do not equate missing direct calls with runtime non-use.
+  duplication:
+    method: AST-identical function bodies across production and script files, minimum six physical lines; signatures, decorators and names excluded from the equality key.
+    groups: 16
+    evidence: duplicate-bodies.json
+    limitations: Equal bodies do not prove interchangeable annotations, decorators, globals, error behavior or public paths. Small functions, aliases and documentation duplicates are not covered by this comparison.
+    uncertain_candidates:
+    - paths: [lx_dtypes/django/api/main.py, lx_dtypes/django/api/findings_routes.py]
+      symbols: [_serialize_choice, _serialize_classification, _split_classifications, _serialize_patient_finding_classification]
+      classification: uncertain
+      evidence: Four equal-body groups persist. main.py's serializer chain has no discovered entry caller; registered findings routes and examinations_routes use findings_routes implementations. Vulture's global name matching does not identify this duplicate chain as unused.
+      risk: main.py retains host-injected callbacks and monkeypatch seams; a complete transitive dependency review is still required.
+      action: Review the complete main.py serializer strand before removing any shared helper; trace focused route tests and search downstream module-qualified imports.
+    - paths: [lx_dtypes/models/contracts/ai_prediction.py, lx_dtypes/models/contracts/model_meta.py]
+      symbols: [_coerce_float, _normalize_float_triplet]
+      classification: uncertain
+      evidence: Two equal-body groups remain; _coerce_int was not an equal-body group in this scan. Existing typed payload and axis-shape differences still require paired tests.
+      action: Preserve signatures and valid/invalid serialization behavior before considering consolidation.
+    - paths: [lx_dtypes/models/contracts, lx_dtypes/models/knowledge_base/validators, lx_dtypes/models/ledger/medical]
+      classification: framework_contract
+      evidence: Remaining ten groups contain normalization helpers and Pydantic validators, including four validate_branches callbacks. Decorators and field ownership remain significant despite matching bodies.
+      action: Retain unless a separate contract-preserving consolidation is justified and tested.
+  metrics:
+    method: radon.complexity.cc_visit called directly from Python for lx_dtypes and scripts; no dependency installed.
+    evidence: complexity.json
+    highest_function: 'lx_dtypes/stats/study_linkage.py:82 assemble_coloreg_analysis_units: 78'
+    interpretation: Complexity is prioritization evidence only, not proof of dead code.
+    production_line_delta: 0
+    removals: []
+  verification:
+    structure: 'uv run python scripts/lint_structure.py: passed.'
+    pyright: 'uv run pyright: exit 1; tests/unit/lx_dtypes/test_coloreg_resection.py:278:37 reports OptionalMemberAccess on predicates of None. File was already modified; no Python files were changed by this audit.'
+    pyright_evidence: pyright.txt
+    focused_tests: 129 passed in 20.85s; exit 0. Pyright ran before pytest.
+    focused_command: uv run pytest tests/test_structure.py tests/test_sensitive_meta_anonymizer_contract.py tests/unit/lx_dtypes/models/contracts/test_core_concepts_adapters.py tests/unit/lx_dtypes/models/interface/test_runtime_validation.py tests/unit/lx_dtypes/models/knowledge_base/validators/test_validator_runtime_helpers.py tests/unit/lx_dtypes/models/knowledge_base/validators/test_validator_runtime_engine.py -q
+    tests_evidence: pytest.txt
+    broad_tests: Not run; audit-only YAML change, and an unrelated endoreg-db pytest process was already running.
+    trace: Not run; no removal or behavior-preserving refactor performed. Required before a runtime removal cohort.
+    documentation_build: Not run; no Sphinx documentation changed.
+
+cleanup_20261123:
+  owner: lx_dtypes maintainers
+  review_date: '2026-11-23'
+  base_revision: 151275949712f8b41afa6b8213fe47dfd728bad3
+  authorization: User requested implementation with subagents and explicitly included verified API serializer cleanup.
+  evidence_directory: temp/dead-code-cleanup-20261123
+  isolation: Three subagents owned disjoint source files; exact before snapshots preserve unrelated working-tree changes. No files or architectural boundaries added or removed.
+  downstream_verification:
+    consumers_named_by_user:
+    - /home/admin/endoreg-db/endoreg_db/root_urls.py
+    - /home/admin/dev/lx-annotate/lx_annotate/dtypes_api_urls.py
+    - /home/admin/dev/lx-annotate/tests/system/test_openapi_type_generation.py
+    findings: Both URL adapters import main.api; schema consumers use api.get_openapi_schema. lx-annotate export_openapi.py dynamically imports the same api object. No private serializer references found in the searched application/tests.
+    correction: lx-annotate is available under /home/admin/dev/lx-annotate; the earlier expected sibling path was wrong.
+    other_candidates: No references to the four private audit candidates in lx-annotate application or tests.
+    limitation: Downstream services and real host ORM CRUD were not exercised; only static consumer checks and local route/schema verification.
+  removals:
+  - path: lx_dtypes/models/knowledge_base/validators/ValidatorRuntime.py
+    symbols: [_condition_matches, _classification_condition_matches]
+    classification: confirmed_dead
+    evidence: Definition-only references; active evaluators call _condition_evaluation directly; no decorators or exports. Baseline trace executed neither wrapper body.
+    physical_lines_removed: 18
+    complexity: Both wrappers had CC 1; remaining implementations unchanged.
+  - path: lx_dtypes/models/meta/ReportMeta.py
+    symbols: [_has_signal]
+    classification: confirmed_dead
+    evidence: Definition-only references, no registration or export; _NULL_STRINGS and live normalizers retained.
+    physical_lines_removed: 10
+    complexity: Removed helper had CC 4.
+  - path: lx_dtypes/models/contracts/adapters.py
+    symbols: [_KnowledgeBaseSection]
+    classification: confirmed_dead
+    evidence: Unused private protocol; active interfaces use Mapping. Iterable and Protocol remain required elsewhere and are retained.
+    physical_lines_removed: 4
+    complexity: Removed protocol had Radon class CC 2.
+  - path: lx_dtypes/django/api/main.py
+    symbols: [_serialize_choice, _serialize_classification, _split_classifications, _serialize_finding, _serialize_patient_finding_classification, _serialize_patient_finding]
+    classification: confirmed_dead
+    evidence: Complete local serializer chain has no incoming caller; live routes use findings_routes. Named downstream consumers use api only. Host guide identifies undocumented internals as unstable.
+    physical_lines_removed: 115
+    compatibility: api, route registration, callbacks, host lookup and live findings_routes serializers remain unchanged.
+  documentation:
+    path: docs/guides/knowledge-base-contract-migration.md
+    change: Point serializer optimization advice at live findings_routes helpers; retain main.py registration and host responsibilities.
+  verification:
+    status: Completed authorized cleanup; final focused tests, type and static checks passed.
+    focused_tests: 240 passed in 31.30s; exit 0, after final Pyright.
+    focused_evidence: pytest-after.txt
+    focused_command: uv run pytest tests/test_structure.py tests/test_sensitive_meta_anonymizer_contract.py tests/unit/lx_dtypes/models/contracts/test_core_concepts_adapters.py tests/unit/lx_dtypes/models/interface/test_runtime_validation.py tests/unit/lx_dtypes/models/knowledge_base/validators/test_validator_runtime_helpers.py tests/unit/lx_dtypes/models/knowledge_base/validators/test_validator_runtime_engine.py tests/unit/lx_dtypes/django/api/test_findings_resolution_helpers.py tests/unit/lx_dtypes/django/api/isolated_routes/test_central_resolver.py tests/unit/lx_dtypes/django/api/test_knowledge_base_graph_api.py -q
+    baseline_pyright: 'uv run pyright: existing OptionalMemberAccess error at tests/unit/lx_dtypes/test_coloreg_resection.py:278:37; no other diagnostics.'
+    final_pyright: 'uv run pyright: 0 errors, 0 warnings; exit 0. The earlier test diagnostic was resolved by concurrent work; this cleanup did not modify that test.'
+    baseline_vulture: 2619 findings at confidence 60; exit 3.
+    final_vulture: 2615 findings; exit 3. After normalizing line numbers, exactly the four private audit findings disappeared and no new findings appeared. The API duplicate chain was invisible to Vulture global name matching.
+    production_line_delta: -147
+    ast_comparison: Immediately after cleanup, all four Python files matched their before AST exactly after excluding the ten named definitions. A later concurrent reporting_languages docstring edit is preserved separately.
+    static_checks: Ruff check, Ruff format --check and structure lint passed.
+    baseline_trace: Validator 27 passed, metadata 68 passed, API 111 passed (206 total); deleted function bodies were unexecuted. Exact commands and logs retained in evidence directory.
+    openapi: Cleanup-only before/after canonical JSON byte-identical for 33 paths; SHA256 535280af025990cbdfd7e5a56d794efcd494a81a4be4d541222a4ce496648461.
+    concurrent_schema_changes: Final snapshot differs from cleanup snapshot only in 36 endpoint descriptions introduced by concurrent documentation edits; schema structure is unchanged. See api/schema-concurrent-delta.json.
+    openapi_command: PYTHONPATH=. DJANGO_SETTINGS_MODULE=tests.django_settings .venv/bin/python temp/dead-code-cleanup-20261123/api/schema_snapshot.py after
+    coverage: Existing valid/invalid contract tests are reused; no test coverage percentage equivalence claimed. Trace describes selected scenarios only.
+    broad_tests: A separate full pytest run was already active; no second broad suite was started.
+    guard: Local dead-code baseline, guard task and feature tracker remain absent; direct configured-scope Vulture scan used.

@@ -1,3 +1,11 @@
+"""Canonical cross-layer shapes for knowledge-base terminology concepts.
+
+Each ``*Core`` model is the storage- and API-neutral projection of one
+knowledge-base record type. Relationships between concepts are expressed by
+*name*, and :class:`CoreConceptCollection` checks that every referenced name
+exists within the same snapshot.
+"""
+
 from __future__ import annotations
 
 from math import isfinite
@@ -29,33 +37,60 @@ class CoreConceptBase(DtypesModel):
     @field_validator("tags")
     @classmethod
     def validate_tags(cls, values: list[str]) -> list[str]:
+        """Reject empty or duplicate tag names."""
         return _validate_names(values, field_name="tags")
 
 
 class ClassificationCore(CoreConceptBase):
+    """Classification that groups selectable choices.
+
+    Attributes:
+        classification_choices: Names of the choices a user may select.
+        classification_types: Names of the classification types it belongs to.
+    """
+
     classification_choices: list[str] = Field(default_factory=list)
     classification_types: list[str] = Field(default_factory=list)
 
     @field_validator("classification_choices", "classification_types")
     @classmethod
     def validate_references(cls, values: list[str]) -> list[str]:
+        """Reject empty or duplicate choice and type references."""
         return _validate_names(values, field_name="classification references")
 
 
 class ClassificationTypeCore(CoreConceptBase):
-    pass
+    """Category used to group related classifications."""
 
 
 class ClassificationChoiceCore(CoreConceptBase):
+    """Selectable value of a classification.
+
+    Attributes:
+        classification_choice_descriptors: Names of descriptors that capture
+            additional values (for example a size or a free-text note) when
+            this choice is selected.
+    """
+
     classification_choice_descriptors: list[str] = Field(default_factory=list)
 
     @field_validator("classification_choice_descriptors")
     @classmethod
     def validate_references(cls, values: list[str]) -> list[str]:
+        """Reject empty or duplicate descriptor references."""
         return _validate_names(values, field_name="classification choice descriptors")
 
 
 class ClassificationChoiceDescriptorCore(CoreConceptBase):
+    """Typed value captured alongside a classification choice.
+
+    A descriptor describes one numeric, text, boolean, or selection value.
+    Only the fields that match ``classification_choice_descriptor_type`` are
+    expected to be set. Numeric bounds, defaults, and distribution parameters
+    must be finite, and ``selection_default_options`` maps option names to
+    probabilities in ``[0, 1]``.
+    """
+
     classification_choice_descriptor_type: str | None = None
     unit: str | None = None
     numeric_min: float | None = None
@@ -77,6 +112,7 @@ class ClassificationChoiceDescriptorCore(CoreConceptBase):
     @field_validator("numeric_min", "numeric_max", "default_value_num")
     @classmethod
     def validate_finite_numeric_value(cls, value: float | None) -> float | None:
+        """Reject ``NaN`` and infinite numeric bounds and defaults."""
         if value is not None and not isfinite(value):
             raise ValueError("descriptor numeric values must be finite")
         return value
@@ -86,6 +122,7 @@ class ClassificationChoiceDescriptorCore(CoreConceptBase):
     def validate_finite_distribution_params(
         cls, values: dict[str, str | float | int]
     ) -> dict[str, str | float | int]:
+        """Reject ``NaN`` and infinite distribution parameters."""
         for key, value in values.items():
             if isinstance(value, float) and not isfinite(value):
                 raise ValueError(f"numeric_distribution_params.{key} must be finite")
@@ -96,6 +133,7 @@ class ClassificationChoiceDescriptorCore(CoreConceptBase):
     def validate_selection_probabilities(
         cls, values: dict[str, float]
     ) -> dict[str, float]:
+        """Require each default-option probability to lie in ``[0, 1]``."""
         for option, probability in values.items():
             if not isfinite(probability) or not 0 <= probability <= 1:
                 raise ValueError(
@@ -105,6 +143,7 @@ class ClassificationChoiceDescriptorCore(CoreConceptBase):
 
     @model_validator(mode="after")
     def validate_descriptor_bounds(self) -> Self:
+        """Check that ranges are ordered and defaults name known options."""
         if (
             self.numeric_min is not None
             and self.numeric_max is not None
@@ -131,6 +170,14 @@ class ClassificationChoiceDescriptorCore(CoreConceptBase):
 
 
 class ExaminationCore(CoreConceptBase):
+    """Examination (for example a colonoscopy) and the concepts it may record.
+
+    Attributes:
+        findings: Names of findings that may be documented.
+        examination_types: Names of the examination types it belongs to.
+        indications: Names of indications that may justify the examination.
+    """
+
     findings: list[str] = Field(default_factory=list)
     examination_types: list[str] = Field(default_factory=list)
     indications: list[str] = Field(default_factory=list)
@@ -138,14 +185,25 @@ class ExaminationCore(CoreConceptBase):
     @field_validator("findings", "examination_types", "indications")
     @classmethod
     def validate_references(cls, values: list[str]) -> list[str]:
+        """Reject empty or duplicate finding, type, and indication references."""
         return _validate_names(values, field_name="examination references")
 
 
 class KnowledgeBaseExaminationTypeCore(CoreConceptBase):
-    pass
+    """Category used to group related examinations."""
 
 
 class FindingCore(CoreConceptBase):
+    """Observation that may be documented during an examination.
+
+    Attributes:
+        finding_types: Names of the finding types it belongs to.
+        classifications: Names of classifications that describe the finding.
+        interventions: Names of interventions that may treat the finding.
+        caused_by_interventions: Names of interventions that may cause it, for
+            example a complication.
+    """
+
     finding_types: list[str] = Field(default_factory=list)
     classifications: list[str] = Field(default_factory=list)
     interventions: list[str] = Field(default_factory=list)
@@ -159,14 +217,23 @@ class FindingCore(CoreConceptBase):
     )
     @classmethod
     def validate_references(cls, values: list[str]) -> list[str]:
+        """Reject empty or duplicate finding references."""
         return _validate_names(values, field_name="finding references")
 
 
 class FindingTypeCore(CoreConceptBase):
-    pass
+    """Category used to group related findings."""
 
 
 class IndicationCore(CoreConceptBase):
+    """Clinical reason for performing an examination.
+
+    Attributes:
+        indication_types: Names of the indication types it belongs to.
+        classifications: Names of classifications that describe the indication.
+        interventions: Names of interventions associated with the indication.
+    """
+
     indication_types: list[str] = Field(default_factory=list)
     classifications: list[str] = Field(default_factory=list)
     interventions: list[str] = Field(default_factory=list)
@@ -174,54 +241,84 @@ class IndicationCore(CoreConceptBase):
     @field_validator("indication_types", "classifications", "interventions")
     @classmethod
     def validate_references(cls, values: list[str]) -> list[str]:
+        """Reject empty or duplicate indication references."""
         return _validate_names(values, field_name="indication references")
 
 
 class IndicationTypeCore(CoreConceptBase):
-    pass
+    """Category used to group related indications."""
 
 
 class InterventionCore(CoreConceptBase):
+    """Procedure performed during an examination, such as a polypectomy.
+
+    Attributes:
+        intervention_types: Names of the intervention types it belongs to.
+    """
+
     intervention_types: list[str] = Field(default_factory=list)
 
     @field_validator("intervention_types")
     @classmethod
     def validate_references(cls, values: list[str]) -> list[str]:
+        """Reject empty or duplicate intervention type references."""
         return _validate_names(values, field_name="intervention types")
 
 
 class InterventionTypeCore(CoreConceptBase):
-    pass
+    """Category used to group related interventions."""
 
 
 class UnitCore(CoreConceptBase):
+    """Unit of measurement used by numeric descriptors.
+
+    Attributes:
+        abbreviation: Display symbol, for example ``mm``.
+        unit_types: Names of the unit types it belongs to.
+    """
+
     abbreviation: str | None = None
     unit_types: list[str] = Field(default_factory=list)
 
     @field_validator("unit_types")
     @classmethod
     def validate_references(cls, values: list[str]) -> list[str]:
+        """Reject empty or duplicate unit type references."""
         return _validate_names(values, field_name="unit types")
 
 
 class UnitTypeCore(CoreConceptBase):
-    pass
+    """Category used to group related units, for example lengths."""
 
 
 class InformationSourceCore(CoreConceptBase):
+    """Origin of recorded data, such as an examiner or an AI model.
+
+    Attributes:
+        information_source_types: Names of the source types it belongs to.
+    """
+
     information_source_types: list[str] = Field(default_factory=list)
 
     @field_validator("information_source_types")
     @classmethod
     def validate_references(cls, values: list[str]) -> list[str]:
+        """Reject empty or duplicate information source type references."""
         return _validate_names(values, field_name="information source types")
 
 
 class InformationSourceTypeCore(CoreConceptBase):
-    pass
+    """Category used to group related information sources."""
 
 
 class CitationCore(CoreConceptBase):
+    """Bibliographic reference that supports terminology definitions.
+
+    ``citation_key`` and ``title`` are required. The remaining fields follow
+    common BibTeX entry fields; ``identifiers`` holds additional identifiers
+    such as PubMed IDs, keyed by identifier scheme.
+    """
+
     citation_key: str = Field(min_length=1)
     title: str = Field(min_length=1)
     abstract: str | None = None
@@ -309,6 +406,13 @@ class CoreConceptCollection(DtypesModel):
 
     @model_validator(mode="after")
     def validate_graph(self) -> Self:
+        """Validate identity, uniqueness, and cross-references in the snapshot.
+
+        Raises:
+            ValueError: If the knowledge-base identity is inconsistent, a name or
+                UUID is duplicated, or a record references a concept that is not
+                part of this collection.
+        """
         identity = validate_optional_knowledge_base_identity(
             self.knowledge_base_module,
             self.knowledge_base_version,

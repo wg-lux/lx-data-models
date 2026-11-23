@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
-"""Small release helper for lx-dtypes."""
+"""Release helper for lx-dtypes.
+
+``prepare X.Y.Z`` sets the package version in every tracked release file and
+refreshes ``uv.lock``. ``check-version`` reports files that disagree with
+``pyproject.toml``. Knowledge-base module versions are independent of the
+package version and are never changed.
+"""
 
 from __future__ import annotations
 
 import argparse
+import datetime
 import hashlib
 import re
 import subprocess
@@ -15,6 +22,14 @@ from pathlib import Path, PurePosixPath
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(?:[A-Za-z0-9._+-]*)?$")
 PROJECT_VERSION_RE = re.compile(r'(?ms)^(\[project\].*?^\s*version\s*=\s*")([^"]+)(")')
 INIT_VERSION_RE = re.compile(r'(?m)^(__version__\s*=\s*")([^"]+)(")')
+CITATION_VERSION_RE = re.compile(
+    r"""(?m)^(version:[ \t]*)["']?([^"'\s]+)["']?[ \t]*$"""
+)
+CITATION_DATE_RE = re.compile(r"(?m)^(date-released:[ \t]*)\S+[ \t]*$")
+LOCK_VERSION_RE = re.compile(
+    r'(?m)^\[\[package\]\]\nname = "lx-dtypes"\nversion = "([^"]+)"$'
+)
+CHANGELOG_UNRELEASED_RE = re.compile(r"(?m)^## \[Unreleased\][ \t]*$")
 MIGRATION_FILE_RE = re.compile(r"^\d{4}_.+\.py$")
 MIGRATION_PACKAGE_PATH = PurePosixPath("lx_dtypes/django/migrations")
 KNOWLEDGE_BASE_DATA_PATH = PurePosixPath("lx_dtypes/data")
@@ -30,6 +45,18 @@ def _pyproject_path() -> Path:
 
 def _init_path() -> Path:
     return _project_root() / "lx_dtypes" / "__init__.py"
+
+
+def _citation_path() -> Path:
+    return _project_root() / "CITATION.cff"
+
+
+def _changelog_path() -> Path:
+    return _project_root() / "CHANGELOG.md"
+
+
+def _lock_path() -> Path:
+    return _project_root() / "uv.lock"
 
 
 def _validate_version(version: str) -> str:
@@ -70,6 +97,77 @@ def write_project_version(version: str) -> None:
         )
         if init_count == 1:
             init_path.write_text(updated_init)
+
+
+def write_citation_version(version: str, release_date: datetime.date) -> None:
+    """Set ``version`` and ``date-released`` in CITATION.cff."""
+    path = _citation_path()
+    text = path.read_text(encoding="utf-8")
+    # Quote the version: YAML would read an unquoted "1.0" as a number.
+    text, count = CITATION_VERSION_RE.subn(rf'\g<1>"{version}"', text, count=1)
+    if count != 1:
+        raise SystemExit("Could not find version in CITATION.cff.")
+    date_line = f"date-released: {release_date.isoformat()}"
+    text, count = CITATION_DATE_RE.subn(date_line, text, count=1)
+    if count != 1:
+        text = text.rstrip("\n") + f"\n{date_line}\n"
+    path.write_text(text, encoding="utf-8")
+
+
+def update_changelog_heading(version: str) -> str:
+    """Name the ``[Unreleased]`` section after ``version`` and describe the result.
+
+    Release notes are never written or invented here. If the changelog has
+    neither a section for ``version`` nor an ``[Unreleased]`` section, the
+    maintainer must add one.
+    """
+    path = _changelog_path()
+    text = path.read_text(encoding="utf-8")
+    if re.search(rf"(?m)^## \[{re.escape(version)}\]", text):
+        return f"CHANGELOG.md already has a section for {version}."
+    text, count = CHANGELOG_UNRELEASED_RE.subn(
+        f"## [{version}] - Unreleased", text, count=1
+    )
+    if count == 1:
+        path.write_text(text, encoding="utf-8")
+        return f"Renamed the [Unreleased] section of CHANGELOG.md to [{version}]."
+    return f"Add a '## [{version}]' section with release notes to CHANGELOG.md."
+
+
+def read_version_locations() -> dict[str, str | None]:
+    """Return the version recorded in each release file (``None`` if absent)."""
+    locations: dict[str, str | None] = {"pyproject.toml": read_project_version()}
+    init_path = _init_path()
+    if init_path.exists():
+        match = INIT_VERSION_RE.search(init_path.read_text(encoding="utf-8"))
+        if match is not None:
+            locations["lx_dtypes/__init__.py"] = match.group(2)
+    citation_path = _citation_path()
+    if citation_path.exists():
+        match = CITATION_VERSION_RE.search(citation_path.read_text(encoding="utf-8"))
+        locations["CITATION.cff"] = match.group(2) if match else None
+    lock_path = _lock_path()
+    if lock_path.exists():
+        match = LOCK_VERSION_RE.search(lock_path.read_text(encoding="utf-8"))
+        locations["uv.lock"] = match.group(1) if match else None
+    return locations
+
+
+def version_mismatches() -> list[str]:
+    """Describe every release file that disagrees with ``pyproject.toml``."""
+    locations = read_version_locations()
+    expected = locations["pyproject.toml"]
+    problems = [
+        f"{name}: {found or 'missing'} (expected {expected})"
+        for name, found in locations.items()
+        if found != expected
+    ]
+    changelog_path = _changelog_path()
+    if changelog_path.exists() and expected is not None:
+        changelog = changelog_path.read_text(encoding="utf-8")
+        if not re.search(rf"(?m)^## \[{re.escape(expected)}\]", changelog):
+            problems.append(f"CHANGELOG.md: no section for {expected}")
+    return problems
 
 
 def run_command(args: list[str], *, cwd: Path) -> None:
@@ -247,12 +345,18 @@ def cmd_current(_: argparse.Namespace) -> int:
 
 
 def verify_storage_artifacts(*, version: str, artifacts: list[Path]) -> None:
-    """Reject scratch output and runtime storage, including archive symlinks."""
-    excluded = (
-        PurePosixPath("temp"),
-        PurePosixPath("storage"),
-        PurePosixPath("docs/_build"),
-    )
+    """Require library-only archive roots, including for symlink entries."""
+    sdist_roots = {
+        ".gitignore",  # Hatch includes VCS exclusion rules when rebuilding wheels.
+        "lx_dtypes",
+        "lx_kb_lint.py",
+        "pyproject.toml",
+        "README.md",
+        "LICENSE",
+        "CHANGELOG.md",
+        "CITATION.cff",
+        "PKG-INFO",
+    }
     for artifact in artifacts:
         if artifact.suffix == ".whl":
             with zipfile.ZipFile(artifact) as archive:
@@ -265,11 +369,23 @@ def verify_storage_artifacts(*, version: str, artifacts: list[Path]) -> None:
         else:
             raise SystemExit(f"Unsupported release artifact: {artifact.name}")
         for name in names:
-            if any(
-                PurePosixPath(name).is_relative_to(root / path) for path in excluded
-            ):
+            path = PurePosixPath(name)
+            if not path.is_relative_to(root) or ".." in path.parts:
+                raise SystemExit(f"{artifact.name} contains invalid member: {name}")
+            relative = path.relative_to(root)
+            if not relative.parts:
+                continue
+            top = relative.parts[0]
+            allowed = (
+                top in sdist_roots
+                if artifact.name.endswith(".tar.gz")
+                else top
+                in {"lx_dtypes", "lx_kb_lint.py", f"lx_dtypes-{version}.dist-info"}
+            )
+            if not allowed:
                 raise SystemExit(
-                    f"{artifact.name} contains generated/runtime storage: {name}"
+                    f"{artifact.name} contains generated/runtime storage or "
+                    f"repository-only files: {name}"
                 )
 
 
@@ -277,14 +393,46 @@ def cmd_prepare(args: argparse.Namespace) -> int:
     version = _validate_version(args.version)
     current = read_project_version()
     write_project_version(version)
-    print(f"Updated version: {current} -> {version}")
+    print(f"pyproject.toml: {current} -> {version}")
+    if _citation_path().exists():
+        write_citation_version(version, args.release_date)
+        print(f"CITATION.cff: {version}, released {args.release_date.isoformat()}")
+    if _changelog_path().exists():
+        print(update_changelog_heading(version))
+    if args.lock:
+        run_command(["uv", "lock"], cwd=_project_root())
+        print("uv.lock: refreshed")
+    else:
+        print("uv.lock: not refreshed (--no-lock); run 'uv lock' before committing")
+
+    problems = version_mismatches()
+    for problem in problems:
+        print(f"Still inconsistent: {problem}")
     print("Next steps:")
-    print(f"  1. Update CHANGELOG.md for {version}")
-    print("  2. Refresh the lock: uv lock")
-    print("  3. Run: lx-dtypes-release build")
-    print(f"  4. Tag and push: git tag v{version} && git push origin v{version}")
-    print("  5. Publish via GitHub release or workflow_dispatch")
+    print(f"  1. Review the release notes for {version} in CHANGELOG.md")
+    print("  2. Run: lx-dtypes-release build")
+    print(f"  3. Tag and push: git tag v{version} && git push origin v{version}")
+    print("  4. Publish via GitHub release or workflow_dispatch")
     return 0
+
+
+def cmd_check_version(_: argparse.Namespace) -> int:
+    problems = version_mismatches()
+    if not problems:
+        print(f"All release files use version {read_project_version()}.")
+        return 0
+    for problem in problems:
+        print(problem, file=sys.stderr)
+    return 1
+
+
+def _release_date(value: str) -> datetime.date:
+    try:
+        return datetime.date.fromisoformat(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            f"Expected YYYY-MM-DD, got {value!r}."
+        ) from exc
 
 
 def cmd_build(_: argparse.Namespace) -> int:
@@ -332,10 +480,32 @@ def build_parser() -> argparse.ArgumentParser:
     current_parser.set_defaults(func=cmd_current)
 
     prepare_parser = subparsers.add_parser(
-        "prepare", help="Update the package version in tracked release files."
+        "prepare",
+        help=(
+            "Set the package version in pyproject.toml, CITATION.cff, CHANGELOG.md "
+            "and uv.lock."
+        ),
     )
     prepare_parser.add_argument("version", help="New package version, e.g. 0.1.2")
+    prepare_parser.add_argument(
+        "--release-date",
+        type=_release_date,
+        default=datetime.datetime.now(tz=datetime.UTC).astimezone().date(),
+        help="date-released for CITATION.cff (YYYY-MM-DD, default: today)",
+    )
+    prepare_parser.add_argument(
+        "--no-lock",
+        dest="lock",
+        action="store_false",
+        help="do not run 'uv lock' afterwards",
+    )
     prepare_parser.set_defaults(func=cmd_prepare)
+
+    check_parser = subparsers.add_parser(
+        "check-version",
+        help="Fail if a release file disagrees with the pyproject.toml version.",
+    )
+    check_parser.set_defaults(func=cmd_check_version)
 
     build_parser = subparsers.add_parser(
         "build", help="Build sdist/wheel and run twine metadata checks."

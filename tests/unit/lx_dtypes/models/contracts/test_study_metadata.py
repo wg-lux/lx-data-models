@@ -40,10 +40,12 @@ def metadata_payload():
 
 
 def label_presentation_payload():
-    document = Path(__file__).resolve().parents[5] / "docs/guides/study-metadata.yml"
-    return yaml.safe_load(document.read_text())["fields"]["label_presentation"][
-        "example"
-    ]
+    # The same file is rendered in docs/guides/study-metadata.md.
+    document = (
+        Path(__file__).resolve().parents[5]
+        / "docs/examples/study_metadata/label_presentation.yml"
+    )
+    return yaml.safe_load(document.read_text())
 
 
 def test_documented_label_presentation_round_trips_without_changing_identities():

@@ -911,12 +911,42 @@ def lint_name_version(
     return issues
 
 
+def _german_name_problem(value: object, identifier: str) -> str | None:
+    if not isinstance(value, str) or not value.strip():
+        return "is missing or empty"
+    if value.strip() == identifier:
+        return "repeats the identifier"
+    return None
+
+
+def _lint_german_names(
+    item: _YamlItem, model_name: str, name: str
+) -> list[KbYamlLintIssue]:
+    """Users see German names; identifiers are never an acceptable display text."""
+    issues: list[KbYamlLintIssue] = []
+    problem = _german_name_problem(item.payload.get("name_de"), name)
+    if problem is not None:
+        issues.append(
+            _issue(
+                code="missing_german_name",
+                severity="error",
+                file=item.file,
+                line=item.line,
+                column=item.column,
+                message=f"'{model_name}' '{name}': name_de {problem}. Provide an "
+                "authored German display name.",
+            )
+        )
+    return issues
+
+
 def _lint_authoring_conventions(
     item: _YamlItem, model_name: str, name: str
 ) -> list[KbYamlLintIssue]:
     issues = lint_name_version(
         name, model_name=model_name, file=item.file, line=item.line, column=item.column
     )
+    issues.extend(_lint_german_names(item, model_name, name))
     if model_name not in _DISPLAY_NAME_MODELS:
         return issues
     missing: list[str] = []

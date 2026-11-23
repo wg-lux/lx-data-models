@@ -1,9 +1,12 @@
+"""Locations of the knowledge-base data shipped inside the installed package."""
+
 from __future__ import annotations
 
 from pathlib import Path
 
 
 def package_data_root() -> Path:
+    """Return the ``lx_dtypes/data`` directory of the installed package."""
     return Path(__file__).resolve().parents[2] / "data"
 
 
@@ -20,6 +23,11 @@ def default_data_roots() -> tuple[Path, ...]:
 
 
 def resolve_default_data_root() -> Path | None:
+    """Return the first packaged data root that exists, or ``None``.
+
+    The returned path contains only the immutable data bundled with this
+    installation. It is not influenced by the working directory or settings.
+    """
     roots = default_data_roots()
     for root in roots:
         if root.exists():

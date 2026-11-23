@@ -4,12 +4,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from pydantic import TypeAdapter
+
 from lx_dtypes.knowledge_bases import knowledge_base_content_sha256
 from lx_dtypes.models.contracts.deployment_setup import (
+    AnyDeploymentSetup,
     DeploymentLock,
+    DeploymentLockV1,
     DeploymentPackage,
     DeploymentPackageLock,
     DeploymentSetup,
+    DeploymentSetupV1,
     DeploymentSource,
     source_closure_digest,
 )
@@ -26,12 +31,31 @@ class ResolvedDeployment:
     knowledge_bases: dict[str, KnowledgeBase]
 
 
+_ANY_SETUP: TypeAdapter[DeploymentSetupV1 | DeploymentSetup] = TypeAdapter(
+    AnyDeploymentSetup
+)
+_ANY_LOCK: TypeAdapter[DeploymentLockV1 | DeploymentLock] = TypeAdapter(
+    DeploymentLockV1 | DeploymentLock
+)
+
+
 def parse_deployment_setup(raw: str) -> DeploymentSetup:
+    """Parse a v2 document; v1 must be migrated explicitly first."""
     return DeploymentSetup.model_validate(parse_setup_yaml(raw))
+
+
+def parse_any_deployment_setup(raw: str) -> DeploymentSetupV1 | DeploymentSetup:
+    """Parse v1 or v2 by ``schema_version`` (for explicit migration tooling)."""
+    return _ANY_SETUP.validate_python(parse_setup_yaml(raw))
 
 
 def parse_deployment_lock(raw: str) -> DeploymentLock:
     return DeploymentLock.model_validate(parse_setup_yaml(raw))
+
+
+def parse_any_deployment_lock(raw: str) -> DeploymentLockV1 | DeploymentLock:
+    """Parse a v1 or v2 lock by ``schema_version``; v1 locks cannot be applied."""
+    return _ANY_LOCK.validate_python(parse_setup_yaml(raw))
 
 
 def _source(config: KnowledgeBaseConfig) -> DeploymentSource:
@@ -54,7 +78,7 @@ def resolve_deployment(
     """
     setup = DeploymentSetup.model_validate_json(setup.model_dump_json())
     packages: dict[str, DeploymentPackage] = {
-        p.module: p for p in [*setup.reference_packages, *setup.study_packages]
+        p.module: p for p in setup.selected_packages()
     }
     locked: list[DeploymentPackageLock] = []
     bases: dict[str, KnowledgeBase] = {}

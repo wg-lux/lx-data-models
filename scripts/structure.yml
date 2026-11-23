@@ -26,6 +26,9 @@ entrypoints:
 - name: MST import
   file: import_mst_excel.py
   purpose: Explicit source conversion tooling
+- name: Manuscript revision
+  file: revise_lxdm_manuscript.py
+  purpose: Apply the reviewed replacements in manuscript/reconciliation.yml to a copy of the LXDM manuscript
 dependencies:
   internal:
   - ../lx_dtypes

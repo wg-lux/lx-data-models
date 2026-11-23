@@ -350,7 +350,7 @@ definition_of_done:
             Total coverage 85.10 percent; required 70 percent threshold passed.
             JUnit and coverage XML were generated locally, not published.
         - kind: command
-          reference: uv run --no-project --with build --with hatchling --python .venv/bin/python python -m build --wheel --no-isolation --outdir /tmp/lxd-clinical-dist
+          reference: uv run --no-project --with build --with hatchling -m build --wheel --no-isolation --outdir /tmp/lxd-clinical-dist
           note: >-
             Exit 0; built lx_dtypes-0.2.37-py3-none-any.whl. SHA256
             13026d7db775cbef1406575e2400eb4e30ccc2ea9627df0e659c184474b4c40a.

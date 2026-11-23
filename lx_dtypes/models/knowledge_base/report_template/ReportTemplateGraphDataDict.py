@@ -1,9 +1,13 @@
+"""Typed dictionary forms of the report template graph models."""
+
 from __future__ import annotations
 
 from typing import Literal, TypedDict
 
 
 class ReportTemplateGraphNodeDataDict(TypedDict):
+    """Serialized :class:`ReportTemplateGraphNode`."""
+
     node_id: str
     node_type: Literal[
         "template",
@@ -19,6 +23,8 @@ class ReportTemplateGraphNodeDataDict(TypedDict):
 
 
 class ReportTemplateGraphEdgeDataDict(TypedDict):
+    """Serialized :class:`ReportTemplateGraphEdge`."""
+
     source_node_id: str
     target_node_id: str
     edge_type: Literal[
@@ -34,6 +40,8 @@ class ReportTemplateGraphEdgeDataDict(TypedDict):
 
 
 class ReportTemplateGraphDataDict(TypedDict):
+    """Serialized :class:`ReportTemplateGraph`."""
+
     template_name: str
     examination: str
     start_node_id: str
@@ -43,6 +51,8 @@ class ReportTemplateGraphDataDict(TypedDict):
 
 
 class ReportTemplateStructureIssueDataDict(TypedDict):
+    """Serialized :class:`ReportTemplateStructureIssue`."""
+
     code: str
     message: str
     level: Literal["error", "warning"]
@@ -50,6 +60,8 @@ class ReportTemplateStructureIssueDataDict(TypedDict):
 
 
 class ReportTemplateStructureValidationResultDataDict(TypedDict):
+    """Serialized :class:`ReportTemplateStructureValidationResult`."""
+
     template_name: str
     ok: bool
     graph: ReportTemplateGraphDataDict

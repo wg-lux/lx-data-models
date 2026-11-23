@@ -141,10 +141,6 @@ class _KnowledgeBaseConfig(Protocol):
     def version(self) -> str: ...
 
 
-class _KnowledgeBaseSection(Protocol):
-    def values(self) -> Iterable[CoreConceptStorageRecord]: ...
-
-
 class _KnowledgeBaseLike(Protocol):
     @property
     def config(self) -> _KnowledgeBaseConfig | None: ...
@@ -457,6 +453,15 @@ def records_to_core_concepts(
     concept: CoreConceptName,
     records: Iterable[CoreConceptStorageRecord],
 ) -> list[CoreConceptModel]:
+    """Convert several storage records of one concept type to core models.
+
+    Args:
+        concept: Concept name, for example ``"finding"``.
+        records: Knowledge-base or storage records of that concept type.
+
+    Returns:
+        The converted core models, in input order.
+    """
     return [record_to_core_concept(concept, record) for record in records]
 
 

@@ -1,8 +1,25 @@
+"""Typed clinical data models, terminology, and interoperability contracts.
+
+The package root re-exports the most commonly used public API:
+
+* knowledge-base loading and resolution, such as :func:`load_knowledge_base`;
+* canonical terminology contracts, such as :class:`CoreConceptCollection`;
+* report templates, their validators, and runtime evaluation functions;
+* package-kind inference for legacy packages.
+
+These names are imported lazily on first access, so ``import lx_dtypes`` stays
+cheap and does not initialize Django or load knowledge-base data.
+Validation entry points live in :mod:`lx_dtypes.evaluation`.
+"""
+
 from __future__ import annotations
 
 from importlib import import_module
 from typing import TYPE_CHECKING, Any
 
+# Static type checkers and IDEs see the real imports below; at runtime the
+# names are resolved on demand by ``__getattr__`` (PEP 562). Keep this block,
+# the ``_*_EXPORTS`` sets, and ``__all__`` in sync when adding a public name.
 if TYPE_CHECKING:
     from lx_dtypes.models.contracts import (
         CitationCore,
@@ -22,6 +39,7 @@ if TYPE_CHECKING:
         InterventionCore,
         InterventionTypeCore,
         KnowledgeBaseIdentity,
+        PackageKind,
         PatientExaminationReportDraft,
         UnitCore,
         UnitTypeCore,
@@ -97,6 +115,10 @@ if TYPE_CHECKING:
         validate_report_template_knowledge_base,
         validate_report_template_structure,
     )
+    from lx_dtypes.package_kinds import (
+        PackageKindInference,
+        infer_legacy_package_kind,
+    )
 
 _REPORT_TEMPLATE_EXPORTS = {
     "ReportTemplate",
@@ -171,6 +193,7 @@ _CONTRACT_EXPORTS = {
     "CitationCore",
     "CoreConceptCollection",
     "KnowledgeBaseIdentity",
+    "PackageKind",
     "PatientExaminationReportDraft",
     "record_to_core_concept",
     "records_to_core_concepts",
@@ -194,8 +217,22 @@ _INTERFACE_EXPORTS = {
     "resolve_versioned_input_dirs",
 }
 
+_PACKAGE_KIND_EXPORTS = {
+    "PackageKindInference",
+    "infer_legacy_package_kind",
+}
+
 
 def __getattr__(name: str) -> Any:
+    """Import a public name from its defining subpackage on first access.
+
+    Python caches the defining module after the first import, so later
+    lookups of the same name are cheap.
+    """
+    if name in _PACKAGE_KIND_EXPORTS:
+        module = import_module("lx_dtypes.package_kinds")
+        return getattr(module, name)
+
     if name in _REPORT_TEMPLATE_EXPORTS:
         module = import_module("lx_dtypes.models.knowledge_base.report_template")
         return getattr(module, name)
@@ -249,6 +286,8 @@ __all__ = [
     "KnowledgeBaseVersionConflictError",
     "KnowledgeBaseVersionNotFoundError",
     "ModuleConfigNotFoundError",
+    "PackageKind",
+    "PackageKindInference",
     "PatientExaminationReportDraft",
     "ReportConceptApplicability",
     "ReportConceptApplicabilityStatus",
@@ -290,6 +329,7 @@ __all__ = [
     "evaluate_report_template_validators_runtime",
     "evaluate_unit_validator_runtime",
     "get_knowledge_base_identity",
+    "infer_legacy_package_kind",
     "kb_to_core_concepts_payload",
     "load_knowledge_base",
     "load_module_config",

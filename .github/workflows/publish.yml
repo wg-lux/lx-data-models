@@ -39,13 +39,10 @@ jobs:
       - name: Install build toolchain
         run: |
           python -m pip install --upgrade pip
-          pip install build==1.4.2 twine==7.0.0
+          pip install '.[dev]'
 
-      - name: Build distribution
-        run: python -m build
-
-      - name: Check metadata
-        run: twine check dist/*
+      - name: Build and verify distribution
+        run: python -m lx_dtypes.scripts.release build
 
       - name: Verify installed wheel report templates
         run: |

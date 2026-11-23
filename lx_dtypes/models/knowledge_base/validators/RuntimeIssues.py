@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
-from typing import Literal
+from typing import Any, Literal
 
 from lx_dtypes.language import LanguageCode, load_message_catalogue
 from lx_dtypes.models.base.app_base_model.pydantic.AppBaseModelNamesUUIDTags import (
@@ -44,6 +44,37 @@ def _runtime_display_names(
                 item.name,
             )
     return names
+
+
+_DISPLAY_NAME_FIELDS = ("name", "finding", "classification", "intervention", "unit")
+_DISPLAY_NAME_LIST_FIELDS = ("missing_required_classifications",)
+_DISPLAY_NAME_STATUS_FIELDS = (
+    "finding_validator_status",
+    "examination_validator_status",
+)
+
+
+def _with_display_names[Entry: Mapping[str, Any]](
+    entry: Entry, display_names: Mapping[str, str]
+) -> Entry:
+    """Add the entry's identifier -> display-name map; machine fields stay unchanged."""
+    identifiers: list[str] = [
+        value
+        for field in _DISPLAY_NAME_FIELDS
+        if isinstance(value := entry.get(field), str) and value
+    ]
+    for field in _DISPLAY_NAME_LIST_FIELDS:
+        identifiers.extend(v for v in entry.get(field) or [] if isinstance(v, str))
+    for field in _DISPLAY_NAME_STATUS_FIELDS:
+        identifiers.extend(
+            status["name"]
+            for status in entry.get(field) or []
+            if isinstance(status.get("name"), str)
+        )
+    names = dict(entry.get("display_names") or {})
+    names.update({value: display_names.get(value, value) for value in identifiers})
+    entry["display_names"] = names  # type: ignore[index]
+    return entry
 
 
 def _runtime_message(

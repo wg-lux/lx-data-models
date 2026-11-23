@@ -1,3 +1,18 @@
+"""Resolve, load, and cache knowledge bases by ``module@version`` identity.
+
+Two resolution modes exist:
+
+* **Registry-backed**: when ``LX_DTYPES_KB_REGISTRY`` is set (as a Django
+  setting or environment variable), every load must name an exact version and
+  the registry maps ``(module, version)`` to input directories or a verified
+  packaged provider.
+* **Unversioned development loads**: without a registry, a load without a
+  version reads from explicit ``input_dirs`` or the packaged data root.
+
+Resolved identities are checked against the loaded module configuration so a
+misconfigured registry fails instead of serving different terminology.
+"""
+
 from __future__ import annotations
 
 import json
@@ -247,6 +262,8 @@ def _load_registry_payload_cached(
     content_sha256: str,
     payload_bytes: bytes,
 ) -> dict[tuple[str, str], tuple[str, ...]]:
+    # The digest is only part of the lru_cache key: editing the registry file
+    # changes the digest and forces a re-parse even though the path is equal.
     del content_sha256
     try:
         raw_payload = json.loads(
@@ -308,6 +325,14 @@ def resolve_versioned_input_dirs(
     module_name: str,
     version: str,
 ) -> tuple[Path, ...]:
+    """Look up the input directories registered for ``module_name@version``.
+
+    Remote data roots in the registry are materialized to local paths.
+
+    Raises:
+        KnowledgeBaseVersionNotFoundError: If the registry has no such entry.
+        KnowledgeBaseRegistryError: If the registry is missing or malformed.
+    """
     registry = _load_registry()
     resolved = registry.get((module_name, version))
     if resolved is None:
@@ -329,6 +354,9 @@ def _resolve_input_dirs_for_identity(
     version: str | None,
     input_dirs: Sequence[Path] | None,
 ) -> tuple[Path, ...]:
+    # Unversioned loads are a development convenience. Once a registry is
+    # configured, an exact identity is mandatory so hosts cannot silently load
+    # a different terminology version than the one they recorded.
     if version is None:
         if input_dirs is not None:
             return tuple(input_dirs)
@@ -344,6 +372,8 @@ def _resolve_input_dirs_for_identity(
         _validate_resolved_identity(module_name, version, resolved_input_dirs)
         return resolved_input_dirs
 
+    # Versioned loads never fall back to the packaged data root: the version
+    # must be provisioned explicitly so deployments are reproducible.
     if _get_registry_path() is not None:
         resolved_input_dirs = resolve_versioned_input_dirs(module_name, version)
     else:
@@ -389,7 +419,20 @@ def _load_knowledge_base_cached(
 ) -> Any:
     loader = DataLoader(input_dirs=[Path(path) for path in input_dir_strings])
     loader.load_module_configs()
-    return loader.load_knowledge_base(module_name)
+    kb = loader.load_knowledge_base(module_name)
+    # Runtime loads fail closed; draft previews and package linting load through
+    # DataLoader directly and keep their source-located readiness diagnostics.
+    unresolved = kb.unresolved_template_validator_references()
+    if unresolved:
+        raise ValueError(
+            "Published report template validators must resolve within the package "
+            "and its dependency closure: "
+            + "; ".join(
+                f"template '{template}' references missing {model} '{name}'"
+                for template, model, name in unresolved
+            )
+        )
+    return kb
 
 
 def load_module_config(
@@ -398,6 +441,23 @@ def load_module_config(
     version: str | None = None,
     input_dirs: Sequence[Path] | None = None,
 ) -> KnowledgeBaseConfig:
+    """Load the module configuration of a knowledge base.
+
+    Args:
+        module_name: Knowledge-base module name.
+        version: Exact module version. Required when a registry is configured.
+        input_dirs: Explicit data directories that override registry lookup.
+
+    Returns:
+        The initialized module configuration. Results are cached per resolved
+        input directories.
+
+    Raises:
+        KnowledgeBaseIdentityRequiredError: If a registry is configured and no
+            version was given.
+        KnowledgeBaseVersionConflictError: If the resolved artifact reports a
+            different ``module@version`` than requested.
+    """
     resolved_input_dirs = _resolve_input_dirs_for_identity(
         module_name,
         version=version,
@@ -415,6 +475,11 @@ def get_knowledge_base_identity(
     version: str | None = None,
     input_dirs: Sequence[Path] | None = None,
 ) -> tuple[str, str]:
+    """Return the resolved ``(module_name, version)`` of a knowledge base.
+
+    Accepts the same arguments and raises the same errors as
+    :func:`load_module_config`.
+    """
     module_config = load_module_config(
         module_name,
         version=version,
@@ -429,6 +494,26 @@ def load_knowledge_base(
     version: str | None = None,
     input_dirs: Sequence[Path] | None = None,
 ) -> Any:
+    """Load a knowledge base with its dependency closure.
+
+    Args:
+        module_name: Knowledge-base module name.
+        version: Exact module version. Required when a registry is configured.
+        input_dirs: Explicit data directories that override registry lookup.
+
+    Returns:
+        The loaded :class:`~lx_dtypes.models.interface.KnowledgeBase.KnowledgeBase`.
+        Results are cached per resolved input directories; call
+        :func:`clear_knowledge_base_resolver_caches` after changing the data.
+
+    Raises:
+        KnowledgeBaseIdentityRequiredError: If a registry is configured and no
+            version was given.
+        KnowledgeBaseVersionConflictError: If the resolved artifact reports a
+            different identity than requested.
+        ValueError: If a published report template references a validator that
+            does not exist within the package and its dependencies.
+    """
     resolved_input_dirs = _resolve_input_dirs_for_identity(
         module_name,
         version=version,
@@ -441,6 +526,7 @@ def load_knowledge_base(
 
 
 def clear_knowledge_base_resolver_caches() -> None:
+    """Clear cached registries, module configurations, and knowledge bases."""
     _load_registry_payload_cached.cache_clear()
     _load_module_config_cached.cache_clear()
     _load_knowledge_base_cached.cache_clear()

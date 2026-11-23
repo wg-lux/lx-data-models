@@ -399,6 +399,14 @@ def test_section_titles_supply_language_coverage(tmp_path: Path) -> None:
     file.write_text(
         "- model: report_template_section\n  name: section\n  title_de: Abschnitt\n  title_en: Section\n"
     )
+    # Titles still establish language coverage, but the German display name
+    # of every record, sections included, is name_de.
+    assert [
+        issue.code for issue in lint_kb_yaml_files([file], check_authoring=True)
+    ] == ["missing_german_name"]
+    file.write_text(
+        "- model: report_template_section\n  name: section\n  name_de: Abschnitt\n  title_de: Abschnitt\n  title_en: Section\n"
+    )
     assert not lint_kb_yaml_files([file], check_authoring=True)
 
 

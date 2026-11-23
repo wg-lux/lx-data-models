@@ -37,7 +37,7 @@ or an incomplete procedure. A field called “success” alone does not define a
 reproducible outcome.
 
 For a worked study specification, see the
-[ColoReg capture and analysis example](coloreg-resection-study.yml). It explains
+[ColoReg capture and analysis example](coloreg-resection-study.md). It explains
 which observations and links support the study and which filters the host
 application must implement separately.
 

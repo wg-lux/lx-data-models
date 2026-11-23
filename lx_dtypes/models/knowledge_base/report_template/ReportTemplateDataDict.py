@@ -8,6 +8,8 @@ from lx_dtypes.models.contracts.reporting_types import ReportVerbosity
 
 
 class ReportTemplateValidatorsDataDict(TypedDict):
+    """Serialized :class:`ReportTemplateValidators`."""
+
     examination_validators: list[str]
     findings_validators: list[str]
     classification_validators: list[str]
@@ -16,6 +18,8 @@ class ReportTemplateValidatorsDataDict(TypedDict):
 
 
 class ReportTemplateGuidelineReferenceDataDict(TypedDict):
+    """Serialized :class:`ReportTemplateGuidelineReference`."""
+
     guideline_id: str
     title: str
     issuing_organization: str
@@ -26,6 +30,8 @@ class ReportTemplateGuidelineReferenceDataDict(TypedDict):
 
 
 class ReportTemplateDataDict(KnowledgebaseBaseModelDataDict):
+    """Serialized :class:`ReportTemplate` knowledge-base record."""
+
     examination: str
     verbosity_options: NotRequired[list[ReportVerbosity]]
     version: NotRequired[str | None]

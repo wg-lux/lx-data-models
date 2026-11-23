@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Self
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from lx_dtypes.models.model import DtypesModel
 
@@ -21,6 +21,13 @@ class LocalizedCatalogItem(DtypesModel):
     name_de: str = ""
     name_en: str = ""
     description: str | None = None
+
+    @field_validator("name_de", "name_en", mode="before")
+    @classmethod
+    def treat_null_localized_name_as_missing(cls, value: object) -> object:
+        # Host ORM localized-name columns are nullable; NULL means "not
+        # localized" and takes the same fallback as an empty name.
+        return "" if value is None else value
 
     @model_validator(mode="after")
     def guarantee_localized_names(self) -> Self:

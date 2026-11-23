@@ -45,6 +45,8 @@ class FindingsValidatorQueryDataDict(TypedDict, total=False):
 
 
 class FindingsValidatorDataDict(KnowledgebaseBaseModelDataDict):
+    """Serialized :class:`FindingsValidator` knowledge-base record."""
+
     query: FindingsValidatorQueryDataDict
     finding: str
     operator: FindingsValidatorOperatorLiteral

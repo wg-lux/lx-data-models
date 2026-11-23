@@ -89,6 +89,12 @@ entrypoints:
 - name: Study report text extraction
   file: contracts/study_text_extraction.py
   purpose: Cohort-scoped anonymized report evidence, review suggestions and explicit approval requests
+- name: Package kinds
+  file: contracts/package_kind.py
+  purpose: Explicit terminology, report_templates, study and application_data kinds with their dependency rules
+- name: Package manifest and channel index
+  file: contracts/package_channel.py
+  purpose: Strict lx-package/1 ZIP manifests and content-addressed lx-package-channel/1 indexes
 - name: Complete package snapshot
   file: contracts/package_snapshot.py
   purpose: Preserve every registered knowledge-base concept in a typed package snapshot

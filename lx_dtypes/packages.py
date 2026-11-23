@@ -4,6 +4,7 @@ import os
 import warnings
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from hashlib import sha256
 from io import BytesIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory
@@ -12,25 +13,48 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 import yaml
 
 from lx_dtypes.evaluation import assess_examination
+from lx_dtypes.knowledge_bases import (
+    PackagedKnowledgeBaseResourceError,
+    list_packaged_knowledge_bases,
+)
 from lx_dtypes.language import DEFAULT_LANGUAGE, LanguageCode, validate_language
 from lx_dtypes.models.base.app_base_model.pydantic.InterfaceMixIns import (
     ListFieldSerializationMixIn,
 )
+from lx_dtypes.models.contracts.package_channel import (
+    LX_PACKAGE_MANIFEST_FILENAME,
+    LX_PACKAGE_MANIFEST_SCHEMA,
+    LxPackageManifest,
+    PackageChannelEntry,
+)
+from lx_dtypes.models.contracts.package_kind import PackageKind
 from lx_dtypes.models.contracts.validation import ValidationReport
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.KnowledgeBaseConfig import KnowledgeBaseConfig
 from lx_dtypes.models.knowledge_base import KB_MODELS
 from lx_dtypes.package_archive import (
     BinaryUpload,
+    PackageArchiveError,
     package_member_path,
     read_package_zip,
+    verify_package_manifest,
+)
+from lx_dtypes.package_kinds import (
+    PackageKindDependencyFinding,
+    PackageKindInference,
+    audit_package_kind_dependencies,
+    infer_legacy_package_kind,
 )
 from lx_dtypes.serialization import parse_str_list
 from lx_dtypes.terminology.terminology_loader import (
     get_terminology_service,
     load_module_kb,
 )
-from lx_dtypes.terminology.terminology_service import TerminologyService
+from lx_dtypes.terminology.terminology_schemas import ImportTerminologyBundleResponse
+from lx_dtypes.terminology.terminology_service import (
+    TerminologyError,
+    TerminologyService,
+)
 from lx_dtypes.utils.kb_package_lint import check_kb_package
 from lx_dtypes.utils.kb_yaml_lint import KbYamlLintIssue, discover_yaml_files
 from lx_dtypes.utils.parser import camel_to_snake
@@ -55,6 +79,12 @@ class PackageValidationResult:
 
 
 class PackageValidationError(ValueError):
+    """Raised when a package fails strict validation.
+
+    The full :class:`PackageValidationResult` is available as ``result``; the
+    exception message lists every package issue and every examination error.
+    """
+
     def __init__(self, result: PackageValidationResult):
         self.result = result
         messages = [issue.format() for issue in result.issues]
@@ -65,6 +95,11 @@ class PackageValidationError(ValueError):
             if issue.level == "error"
         )
         super().__init__("\n".join(messages) or "Package could not be loaded.")
+
+
+# Authoring-quality errors that registered (historical) releases keep as warnings;
+# new artifacts are still rejected by the strict authoring gate.
+_HISTORICAL_AUTHORING_CODES = frozenset({"missing_german_name"})
 
 
 class PackageAuthoringWarning(UserWarning):
@@ -136,7 +171,8 @@ def load_registered_package(
         input_dirs=selected_service.source_paths(kb.config.name, kb.config.version),
     )
     if result.knowledge_base is None or any(
-        issue.severity == "error" for issue in result.issues
+        issue.severity == "error" and issue.code not in _HISTORICAL_AUTHORING_CODES
+        for issue in result.issues
     ):
         raise PackageValidationError(result)
     for issue in result.issues:
@@ -192,6 +228,8 @@ def read_package_archive(archive: Path | BinaryUpload) -> dict[str, bytes]:
             files = read_package_zip(source)
     else:
         files = read_package_zip(archive)
+    # A present lx-package.json must agree with config.yaml; legacy ZIPs omit it.
+    verify_package_manifest(files)
     with TemporaryDirectory(prefix="lx-package-read-") as temporary:
         build_package(Path(temporary) / "package", files)
     return files
@@ -209,8 +247,12 @@ def export_package_files(
 
     Existing internal layout and opaque resources are retained. Dependencies
     outside the package tree are placed under ``dependencies/<module>``.
+    A root ``lx-package.json`` is generated from the manifest when it declares
+    ``package_kind``. An existing root ``lx-package.json`` must agree with
+    ``config.yaml`` (otherwise ``PackageArchiveError``) and is rewritten in the
+    canonical byte form.
     """
-    load_package(config_path, input_dirs=input_dirs)
+    root_config = load_package(config_path, input_dirs=input_dirs).config
     config_path = config_path.resolve()
     configs: set[Path] = set()
     _, issues = discover_yaml_files(
@@ -242,6 +284,20 @@ def export_package_files(
             if name in files:
                 raise ValueError(f"Conflicting package resource: {name}")
             files[name] = source.read_bytes()
+    if LX_PACKAGE_MANIFEST_FILENAME in files:
+        # An existing root manifest must agree with config.yaml; it is then
+        # regenerated in the canonical byte form.
+        verify_package_manifest(files)
+        del files[LX_PACKAGE_MANIFEST_FILENAME]
+    if root_config.package_kind is not None:
+        files[LX_PACKAGE_MANIFEST_FILENAME] = LxPackageManifest.model_validate(
+            {
+                "schema": LX_PACKAGE_MANIFEST_SCHEMA,
+                "name": root_config.name,
+                "version": root_config.version,
+                "package_kind": root_config.package_kind,
+            }
+        ).to_json_bytes()
     # Check portability and the archive limits through the same import boundary.
     return read_package_archive(BytesIO(_archive_bytes(files)))
 
@@ -277,6 +333,89 @@ def export_package(
         # Link publication is atomic and cannot replace a concurrent destination.
         os.link(target.name, destination)
     return destination
+
+
+def install_channel_package(
+    entry: PackageChannelEntry,
+    payload: bytes,
+    *,
+    service: TerminologyService,
+) -> ImportTerminologyBundleResponse:
+    """Verify channel bytes against their validated entry, then import them.
+
+    The caller fetches ``payload`` (this library performs no network access).
+    Size and SHA-256 must match ``entry`` exactly, and the archive must carry an
+    ``lx-package.json`` declaring the entry's name, version and package kind.
+    Import and registration are those of ``service.import_zip``. Installing
+    identical bytes again returns the existing registration; different bytes
+    for a registered identity fail with 409. Nothing is selected or activated.
+    """
+    if not isinstance(entry, PackageChannelEntry):
+        raise TypeError("entry must be a validated PackageChannelEntry")
+    if len(payload) != entry.size:
+        raise TerminologyError(
+            400, "Channel package size does not match its channel entry."
+        )
+    if sha256(payload).hexdigest() != entry.sha256:
+        raise TerminologyError(
+            400, "Channel package SHA-256 does not match its channel entry."
+        )
+    try:
+        files = read_package_zip(
+            BytesIO(payload),
+            max_zip_bytes=service.max_zip_bytes,
+            max_unpacked_bytes=service.max_unpacked_bytes,
+            max_files=service.max_files,
+        )
+        manifest = verify_package_manifest(files)
+    except PackageArchiveError as exc:
+        raise TerminologyError(exc.status, str(exc)) from exc
+    if manifest is None:
+        raise TerminologyError(
+            400, f"Channel packages require a root {LX_PACKAGE_MANIFEST_FILENAME}."
+        )
+    if not entry.matches_manifest(manifest):
+        raise TerminologyError(
+            400,
+            f"{LX_PACKAGE_MANIFEST_FILENAME} does not match the channel entry "
+            f"{entry.name}@{entry.version}.",
+        )
+    # Re-installing identical bytes is a no-op returning the registration;
+    # different bytes for a registered identity remain a 409 conflict.
+    return service.import_zip(BytesIO(payload), accept_identical=True)
+
+
+def audit_packaged_kind_dependencies() -> tuple[PackageKindDependencyFinding, ...]:
+    """Audit every shipped catalog release with the catalog's reviewed kinds."""
+    descriptors = list_packaged_knowledge_bases()
+    reviewed: dict[tuple[str, str], PackageKind] = {}
+    for descriptor in descriptors:
+        if descriptor.package_kind is None:
+            raise PackagedKnowledgeBaseResourceError(
+                f"{descriptor.module_name}@{descriptor.version} lacks package_kind"
+            )
+        reviewed[(descriptor.module_name, descriptor.version)] = descriptor.package_kind
+    findings: dict[tuple[str, str, str, str], PackageKindDependencyFinding] = {}
+    for descriptor in descriptors:
+        module = descriptor.verified_resource_directory()
+        if not isinstance(module, Path):
+            raise PackagedKnowledgeBaseResourceError(
+                "Packaged knowledge bases must be installed as filesystem resources "
+                "to audit their dependency closure."
+            )
+        for finding in audit_package_kind_dependencies(
+            module / "config.yaml",
+            input_dirs=[descriptor.installed_data_root()],
+            package_kinds=reviewed,
+        ):
+            key = (
+                finding.module,
+                finding.version,
+                finding.dependency,
+                finding.dependency_version,
+            )
+            findings[key] = finding
+    return tuple(findings[key] for key in sorted(findings))
 
 
 def _publish_folder(staged: Path, destination: Path) -> None:
@@ -351,13 +490,19 @@ def create_package(
 
 __all__ = [
     "PackageAuthoringWarning",
+    "PackageKindDependencyFinding",
+    "PackageKindInference",
     "PackageValidationError",
     "PackageValidationResult",
+    "audit_package_kind_dependencies",
+    "audit_packaged_kind_dependencies",
     "build_package",
     "create_package",
     "export_package",
     "export_package_files",
     "import_package",
+    "infer_legacy_package_kind",
+    "install_channel_package",
     "load_package",
     "load_registered_package",
     "package_archive_bytes",

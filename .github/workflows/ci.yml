@@ -46,6 +46,9 @@ jobs:
       - name: Run tests
         run: pytest tests -q --cov=lx_dtypes --junitxml=junit.xml
 
+      - name: Build and verify distribution
+        run: python -m lx_dtypes.scripts.release build
+
       - name: Upload coverage reports to Codecov
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         uses: codecov/codecov-action@v7

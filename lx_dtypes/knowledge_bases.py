@@ -13,6 +13,7 @@ from typing import Literal, Self
 import yaml
 from pydantic import ConfigDict, Field, field_validator, model_validator
 
+from lx_dtypes.models.contracts.package_kind import PackageKind
 from lx_dtypes.models.interface.data_roots import module_search_root
 from lx_dtypes.models.model import DtypesModel
 
@@ -26,6 +27,7 @@ class _PackagedModuleIdentity(DtypesModel):
 
     name: str = Field(min_length=1)
     version: str = Field(min_length=1)
+    package_kind: PackageKind | None = None
 
 
 class PackagedKnowledgeBase(DtypesModel):
@@ -39,6 +41,9 @@ class PackagedKnowledgeBase(DtypesModel):
     resource_root: str = Field(min_length=1)
     content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     default: bool = False
+    # Optional only so retained catalogs of older hydrated copies stay readable;
+    # the installed wheel catalog requires it (``require_package_kinds``).
+    package_kind: PackageKind | None = None
 
     @field_validator("resource_root")
     @classmethod
@@ -76,6 +81,12 @@ class PackagedKnowledgeBase(DtypesModel):
                 "Packaged knowledge-base catalog identity conflicts with config.yaml: "
                 f"catalog {self.module_name}@{self.version}, config "
                 f"{config.name}@{config.version}"
+            )
+        if config.package_kind is not None and config.package_kind != self.package_kind:
+            raise PackagedKnowledgeBaseResourceError(
+                "Packaged knowledge-base catalog package_kind conflicts with "
+                f"config.yaml for {self.module_name}@{self.version}: catalog "
+                f"{self.package_kind}, config {config.package_kind}"
             )
         actual_digest = knowledge_base_content_sha256(resource)
         if actual_digest != self.content_sha256:
@@ -127,6 +138,21 @@ class PackagedKnowledgeBaseCatalog(DtypesModel):
             )
         return self
 
+    def require_package_kinds(self) -> Self:
+        """Fail unless every entry carries a reviewed ``package_kind``."""
+
+        missing = sorted(
+            f"{item.module_name}@{item.version}"
+            for item in self.knowledge_bases
+            if item.package_kind is None
+        )
+        if missing:
+            raise PackagedKnowledgeBaseResourceError(
+                "Packaged knowledge-base catalog entries lack package_kind: "
+                + ", ".join(missing)
+            )
+        return self
+
 
 class PackagedKnowledgeBaseResourceError(RuntimeError):
     """Raised when packaged resources cannot satisfy a loader contract."""
@@ -172,7 +198,7 @@ def get_packaged_knowledge_base_catalog() -> PackagedKnowledgeBaseCatalog:
         catalog_resource = catalog_resource.joinpath(component)
     return PackagedKnowledgeBaseCatalog.model_validate_json(
         catalog_resource.read_text(encoding="utf-8")
-    )
+    ).require_package_kinds()
 
 
 def list_packaged_knowledge_bases() -> tuple[PackagedKnowledgeBase, ...]:

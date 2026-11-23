@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from lx_dtypes.language import DEFAULT_LANGUAGE, LanguageCode, validate_language
 from lx_dtypes.models.interface.ReportTemplateCompiler import ReportTemplateCompiler
 from lx_dtypes.models.knowledge_base.report_template.ReportTemplateGraph import (
     validate_report_template_structure,
@@ -103,7 +104,32 @@ class ReportTemplateValidator:
         name: str,
         *,
         mode: Literal["preview", "publish", "production"] = "preview",
+        language: LanguageCode = DEFAULT_LANGUAGE,
     ) -> dict[str, Any]:
+        """Validate and compile; issue messages use display names in ``language``."""
+        from lx_dtypes.models.knowledge_base.validators.RuntimeIssues import (
+            _runtime_display_names,
+            _runtime_message,
+        )
+
+        validate_language(language)
+        display_names = _runtime_display_names(
+            language,
+            self.kb.report_template.values(),
+            self.kb.examination.values(),
+            self.kb.finding.values(),
+            self.kb.findings_validator.values(),
+            self.kb.examination_validator.values(),
+            self.kb.classification_validator.values(),
+            self.kb.intervention_validator.values(),
+            self.kb.unit_validator.values(),
+        )
+
+        def message(key: str, **values: str) -> str:
+            return _runtime_message(
+                key, language, display_names=display_names, **values
+            )
+
         template = self.kb.get_report_template(name)
         lifecycle_status = self.kb.get_report_template_lifecycle_status(name)
         issues: list[ReportTemplateReadinessIssue] = []
@@ -113,9 +139,10 @@ class ReportTemplateValidator:
                 self._make_report_template_issue(
                     code="unknown_template_examination",
                     severity="blocking",
-                    message=(
-                        f"Template '{name}' references unknown examination "
-                        f"'{template.examination}'."
+                    message=message(
+                        "readiness_unknown_template_examination",
+                        template=name,
+                        examination=template.examination,
                     ),
                     scope="examination",
                     reference=template.examination,
@@ -127,6 +154,7 @@ class ReportTemplateValidator:
             sections=self.kb.report_template_section,
             report_findings=self.kb.report_finding,
             findings=self.kb.finding,
+            language=language,
         )
         blocking_structure_codes = {
             "missing_section",
@@ -209,10 +237,7 @@ class ReportTemplateValidator:
                     self._make_report_template_issue(
                         code=code,
                         severity="warning",
-                        message=(
-                            f"Template '{name}' references missing {label} "
-                            f"'{validator_name}'."
-                        ),
+                        message=message(code, validator_name=validator_name),
                         scope="validator",
                         reference=validator_name,
                         can_preview=True,
@@ -228,9 +253,10 @@ class ReportTemplateValidator:
                     self._make_report_template_issue(
                         code="validator_finding_missing_in_knowledge_base",
                         severity="warning",
-                        message=(
-                            f"Findings validator '{validator_name}' targets unknown finding "
-                            f"'{validator.finding}'."
+                        message=message(
+                            "readiness_validator_finding_missing",
+                            validator_name=validator_name,
+                            finding=validator.finding,
                         ),
                         scope="validator",
                         reference=validator_name,

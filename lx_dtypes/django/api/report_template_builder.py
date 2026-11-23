@@ -509,6 +509,7 @@ def build_report_template_package(
     config = {
         "name": payload.package_name,
         "version": payload.package_version,
+        "package_kind": "report_templates",
         "modules": [],
         "depends_on": payload.depends_on,
         "data": {"files": ["./report_templates.yml", "./validators.yml"]},

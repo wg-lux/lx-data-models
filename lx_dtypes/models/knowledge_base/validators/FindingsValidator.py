@@ -221,6 +221,16 @@ class FindingsValidatorQuery(DtypesModel):
 
 
 class FindingsValidator(KnowledgebaseBaseModel[FindingsValidatorDataDict]):
+    """Knowledge-base rule that checks whether a finding was reported.
+
+    Attributes:
+        query: Optional sub-query restricting which occurrences are checked.
+        finding: Name of the finding to look for.
+        operator: ``"exists"`` requires at least one occurrence, ``"missing"``
+            requires none, and ``"condition"`` evaluates the query's condition
+            on each occurrence.
+    """
+
     query: FindingsValidatorQuery = Field(default_factory=FindingsValidatorQuery)
     finding: str = Field(default_factory=str_unknown_factory)
     operator: FindingsValidatorOperatorLiteral = "exists"

@@ -47,6 +47,7 @@ from lx_dtypes.models.knowledge_base.validators.RuntimeIssues import (
     _build_issue,
     _runtime_display_names,
     _runtime_message,
+    _with_display_names,
 )
 from lx_dtypes.models.knowledge_base.validators.UnitValidator import (
     UnitValidator,
@@ -285,24 +286,6 @@ def _condition_evaluation(
     if any_match is None or all_match is None:
         return None, sorted(missing)
     return True, []
-
-
-def _condition_matches(
-    condition: FindingsValidatorCondition,
-    classifications: Mapping[str, list[ValidationScalar]],
-) -> bool:
-    return _condition_evaluation(condition, classifications)[0] is True
-
-
-def _classification_condition_matches(
-    condition: (
-        ClassificationValidatorCondition
-        | InterventionValidatorCondition
-        | UnitValidatorCondition
-    ),
-    classifications: Mapping[str, list[ValidationScalar]],
-) -> bool:
-    return _condition_evaluation(condition, classifications)[0] is True
 
 
 def _missing_required_classifications(
@@ -547,6 +530,19 @@ def evaluate_findings_validator_runtime(
     language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     display_names: Mapping[str, str] | None = None,
 ) -> FindingsValidatorExecutionDataDict:
+    """Evaluate a findings validator against reported findings.
+
+    Args:
+        validator: Validator to evaluate.
+        reported_findings: Captured finding occurrences, each with a
+            ``"finding"`` name and its classifications.
+        language: Language for issue messages.
+        display_names: Overrides for names shown in messages.
+
+    Returns:
+        The execution result. Issues are advisory; the host decides whether
+        to block persistence.
+    """
     _validate_language(language)
     display_names = {
         **_runtime_display_names(language, [validator]),
@@ -700,15 +696,18 @@ def evaluate_findings_validator_runtime(
         )
 
     dedup_missing = sorted(set(missing_required_classifications))
-    return FindingsValidatorExecutionDataDict(
-        name=validator.name,
-        ok=ok,
-        operator=validator.operator,
-        finding=target_finding,
-        matched_occurrences=len(matched_occurrences),
-        triggered_occurrences=triggered_occurrences,
-        missing_required_classifications=dedup_missing,
-        issues=issues,
+    return _with_display_names(
+        FindingsValidatorExecutionDataDict(
+            name=validator.name,
+            ok=ok,
+            operator=validator.operator,
+            finding=target_finding,
+            matched_occurrences=len(matched_occurrences),
+            triggered_occurrences=triggered_occurrences,
+            missing_required_classifications=dedup_missing,
+            issues=issues,
+        ),
+        display_names,
     )
 
 
@@ -722,6 +721,24 @@ def evaluate_classification_validator_runtime(
     language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     display_names: Mapping[str, str] | None = None,
 ) -> ClassificationValidatorExecutionDataDict:
+    """Evaluate a classification validator against reported findings.
+
+    The classification, choice, and descriptor mappings are used to decide
+    whether a captured value is complete, for example whether a descriptor
+    value is required for the selected choice.
+
+    Args:
+        validator: Validator to evaluate.
+        classifications: Classification records by name.
+        classification_choices: Choice records by name.
+        classification_choice_descriptors: Descriptor records by name.
+        reported_findings: Captured finding occurrences.
+        language: Language for issue messages.
+        display_names: Overrides for names shown in messages.
+
+    Returns:
+        The execution result, including a value hint for the classification.
+    """
     _validate_language(language)
     display_names = {
         **_runtime_display_names(
@@ -941,17 +958,20 @@ def evaluate_classification_validator_runtime(
             )
         )
 
-    return ClassificationValidatorExecutionDataDict(
-        name=validator.name,
-        ok=ok,
-        operator=validator.operator,
-        finding=target_finding,
-        classification=target_classification,
-        precedence=validator.precedence,
-        matched_occurrences=len(matched_occurrences),
-        triggered_occurrences=triggered_occurrences,
-        hint=hint,
-        issues=issues,
+    return _with_display_names(
+        ClassificationValidatorExecutionDataDict(
+            name=validator.name,
+            ok=ok,
+            operator=validator.operator,
+            finding=target_finding,
+            classification=target_classification,
+            precedence=validator.precedence,
+            matched_occurrences=len(matched_occurrences),
+            triggered_occurrences=triggered_occurrences,
+            hint=hint,
+            issues=issues,
+        ),
+        display_names,
     )
 
 
@@ -963,6 +983,18 @@ def evaluate_intervention_validator_runtime(
     language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     display_names: Mapping[str, str] | None = None,
 ) -> InterventionValidatorExecutionDataDict:
+    """Evaluate an intervention validator against reported findings.
+
+    Args:
+        validator: Validator to evaluate.
+        interventions: Intervention records by name.
+        reported_findings: Captured finding occurrences.
+        language: Language for issue messages.
+        display_names: Overrides for names shown in messages.
+
+    Returns:
+        The execution result.
+    """
     _validate_language(language)
     display_names = {
         **_runtime_display_names(language, [validator], interventions.values()),
@@ -1106,17 +1138,20 @@ def evaluate_intervention_validator_runtime(
             )
         )
 
-    return InterventionValidatorExecutionDataDict(
-        name=validator.name,
-        ok=ok,
-        operator=validator.operator,
-        finding=validator.finding,
-        intervention=validator.intervention,
-        precedence=validator.precedence,
-        matched_occurrences=len(matched_occurrences),
-        triggered_occurrences=triggered_occurrences,
-        hint=hint,
-        issues=issues,
+    return _with_display_names(
+        InterventionValidatorExecutionDataDict(
+            name=validator.name,
+            ok=ok,
+            operator=validator.operator,
+            finding=validator.finding,
+            intervention=validator.intervention,
+            precedence=validator.precedence,
+            matched_occurrences=len(matched_occurrences),
+            triggered_occurrences=triggered_occurrences,
+            hint=hint,
+            issues=issues,
+        ),
+        display_names,
     )
 
 
@@ -1128,6 +1163,18 @@ def evaluate_unit_validator_runtime(
     language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     display_names: Mapping[str, str] | None = None,
 ) -> UnitValidatorExecutionDataDict:
+    """Evaluate a unit validator against reported findings.
+
+    Args:
+        validator: Validator to evaluate.
+        units: Unit records by name.
+        reported_findings: Captured finding occurrences.
+        language: Language for issue messages.
+        display_names: Overrides for names shown in messages.
+
+    Returns:
+        The execution result.
+    """
     _validate_language(language)
     display_names = {
         **_runtime_display_names(language, [validator], units.values()),
@@ -1269,18 +1316,21 @@ def evaluate_unit_validator_runtime(
             )
         )
 
-    return UnitValidatorExecutionDataDict(
-        name=validator.name,
-        ok=ok,
-        operator=validator.operator,
-        finding=validator.finding,
-        classification=validator.classification,
-        unit=validator.unit,
-        precedence=validator.precedence,
-        matched_occurrences=len(matched_occurrences),
-        triggered_occurrences=triggered_occurrences,
-        hint=hint,
-        issues=issues,
+    return _with_display_names(
+        UnitValidatorExecutionDataDict(
+            name=validator.name,
+            ok=ok,
+            operator=validator.operator,
+            finding=validator.finding,
+            classification=validator.classification,
+            unit=validator.unit,
+            precedence=validator.precedence,
+            matched_occurrences=len(matched_occurrences),
+            triggered_occurrences=triggered_occurrences,
+            hint=hint,
+            issues=issues,
+        ),
+        display_names,
     )
 
 
@@ -1302,6 +1352,26 @@ def evaluate_report_template_validators_runtime(
     language: RuntimeValidationLanguage = DEFAULT_LANGUAGE,
     display_names: Mapping[str, str] | None = None,
 ) -> ReportTemplateRuntimeValidationResultDataDict:
+    """Evaluate every validator a report template declares.
+
+    Each validator listed in ``template.validators`` is looked up in the
+    matching mapping and evaluated once against ``reported_findings``;
+    examination validators reuse the results of their dependencies.
+
+    Args:
+        template: Template whose validators are evaluated.
+        classification_validator_names: Optional subset of classification
+            validators to evaluate instead of the template's list.
+        reported_findings: Captured finding occurrences.
+        language: Language for issue messages.
+        display_names: Overrides for names shown in messages.
+
+        The remaining keyword arguments provide the validator and terminology
+        records of the knowledge base, keyed by name.
+
+    Returns:
+        The combined result for the template.
+    """
     _validate_language(language)
     display_names = {
         **_runtime_display_names(
@@ -1686,7 +1756,27 @@ def evaluate_report_template_validators_runtime(
         and all(result["ok"] for result in unit_results)
     )
 
+    for entries in (
+        classification_results,
+        intervention_results,
+        findings_results,
+        unit_results,
+        exam_results,
+    ):
+        for entry in entries:
+            _with_display_names(entry, display_names)
+    result_names = {template.name: display_names.get(template.name, template.name)}
+    for entries in (
+        classification_results,
+        intervention_results,
+        findings_results,
+        unit_results,
+        exam_results,
+    ):
+        for entry in entries:
+            result_names.update(entry.get("display_names", {}))
     return ReportTemplateRuntimeValidationResultDataDict(
+        display_names=result_names,
         template_name=template.name,
         ok=ok,
         evaluated_findings_count=len(normalized_findings),

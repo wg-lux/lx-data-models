@@ -17,6 +17,9 @@ entrypoints:
 - name: Sphinx config
   file: conf.py
   purpose: Documentation build configuration
+- name: OpenAPI reference extension
+  file: _ext/openapi_reference.py
+  purpose: Render the HTTP API reference and openapi.json from the Ninja schema at build time
 - name: Agent context
   file: agent_context.md
   purpose: Canonical context manifest protocol
@@ -36,12 +39,22 @@ contracts:
   doc: guides/dates-and-times.md
 - name: Configured study inference
   doc: guides/study-inference.md
+- name: Shared study protocol metadata
+  doc: guides/study-metadata.md
+- name: ColoReg resection study specification
+  doc: guides/coloreg-resection-study.md
+- name: Data-model concept map
+  doc: guides/data-model-concept-map.md
+- name: HTTP API reference
+  doc: api/http.rst
 - name: Standardized CSV exports
   doc: guides/standardized-csv-export.md
 - name: Record import and export formats
   doc: guides/record-data-formats.md
 - name: Package authoring
   doc: guides/dtypes-package-structure.md
+- name: Package kinds and channels
+  doc: guides/package-kinds.md
 - name: ePA FHIR compatibility
   doc: guides/epa-fhir-compatibility.md
 - name: Report template authoring for study staff
@@ -53,6 +66,7 @@ tests:
   command: uv run make -C docs html
 
 files:
+- examples/study_metadata
 - examples/dtypes_packages/time_references
 - examples/dtypes_packages/electrical_curves
 - examples/dtypes_packages/colonoscopy_medication_electrosurgery

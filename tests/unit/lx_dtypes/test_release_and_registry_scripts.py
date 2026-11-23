@@ -13,11 +13,14 @@ from _pytest.monkeypatch import MonkeyPatch
 
 from lx_dtypes.scripts.kb_registry import _add_entry
 from lx_dtypes.scripts.release import (
+    build_parser,
     cmd_build,
     read_project_version,
+    read_version_locations,
     verify_knowledge_base_artifacts,
     verify_migration_artifacts,
     verify_storage_artifacts,
+    version_mismatches,
     write_project_version,
 )
 
@@ -229,7 +232,19 @@ def test_verify_migration_artifacts_matches_source_tree(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("kind", ["whl", "tar.gz"])
 @pytest.mark.parametrize(
-    "entry", ["temp/run.yml", "storage/registry.json", "docs/_build/index.html"]
+    "entry",
+    [
+        "temp/run.yml",
+        "storage/registry.json",
+        "docs/_build/index.html",
+        ".envrc",
+        "output",
+        "demo-data/example.yml",
+        "tests/conftest.py",
+        ".agents/skills/example.md",
+        "devenv.nix",
+        "../escape.py",
+    ],
 )
 def test_release_rejects_runtime_storage(tmp_path: Path, kind: str, entry: str) -> None:
     artifact = tmp_path / f"lx_dtypes-0.2.16.{kind}"
@@ -243,7 +258,9 @@ def test_release_rejects_runtime_storage(tmp_path: Path, kind: str, entry: str) 
             info.type = tarfile.SYMTYPE
             info.linkname = "../source"
             archive.addfile(info)
-    with pytest.raises(SystemExit, match="contains generated/runtime storage"):
+    with pytest.raises(
+        SystemExit, match="contains (generated/runtime storage|invalid member)"
+    ):
         verify_storage_artifacts(version="0.2.16", artifacts=[artifact])
 
 
@@ -328,3 +345,104 @@ def test_verify_knowledge_base_artifacts_rejects_content_drift(
             version="0.2.17",
             artifacts=artifacts,
         )
+
+
+def _release_project(tmp_path: Path, monkeypatch: MonkeyPatch) -> Path:
+    """Create a minimal project with every versioned release file at 0.1.1."""
+    import lx_dtypes.scripts.release as release_module
+
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "lx-dtypes"\nversion = "0.1.1"\n'
+    )
+    (tmp_path / "CITATION.cff").write_text(
+        'cff-version: 1.2.0\ntitle: "lx-dtypes"\nversion: 0.1.1\n'
+        "date-released: 2026-01-01\n"
+    )
+    (tmp_path / "CHANGELOG.md").write_text(
+        "# Changelog\n\n## [Unreleased]\n\n### Added\n- Thing.\n\n"
+        "## [0.1.1] - 2026-01-01\n"
+    )
+    (tmp_path / "uv.lock").write_text(
+        '[[package]]\nname = "lx-dtypes"\nversion = "0.1.1"\n'
+        'source = { editable = "." }\n'
+    )
+    kb_config = tmp_path / "lx_dtypes" / "data" / "config.yaml"
+    kb_config.parent.mkdir(parents=True)
+    kb_config.write_text("name: star_upper_gi\nversion: 0.1.1\n")
+    monkeypatch.setattr(release_module, "_project_root", lambda: tmp_path)
+    monkeypatch.setattr(
+        release_module, "_pyproject_path", lambda: tmp_path / "pyproject.toml"
+    )
+    monkeypatch.setattr(
+        release_module, "_init_path", lambda: tmp_path / "lx_dtypes" / "__init__.py"
+    )
+    return tmp_path
+
+
+def test_prepare_updates_every_release_file(
+    monkeypatch: MonkeyPatch, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
+    import lx_dtypes.scripts.release as release_module
+
+    root = _release_project(tmp_path, monkeypatch)
+    commands: list[list[str]] = []
+
+    def fake_lock(args: list[str], *, cwd: Path) -> None:
+        commands.append(args)
+        lock = root / "uv.lock"
+        lock.write_text(lock.read_text().replace('"0.1.1"', '"0.2.0"'))
+
+    monkeypatch.setattr(release_module, "run_command", fake_lock)
+    args = build_parser().parse_args(
+        ["prepare", "0.2.0", "--release-date", "2026-11-23"]
+    )
+    assert args.func(args) == 0
+
+    assert commands == [["uv", "lock"]]
+    assert read_version_locations() == {
+        "pyproject.toml": "0.2.0",
+        "CITATION.cff": "0.2.0",
+        "uv.lock": "0.2.0",
+    }
+    citation = (root / "CITATION.cff").read_text()
+    assert 'version: "0.2.0"' in citation
+    assert "date-released: 2026-11-23" in citation
+    changelog = (root / "CHANGELOG.md").read_text()
+    assert "## [0.2.0] - Unreleased\n\n### Added\n- Thing." in changelog
+    assert "## [Unreleased]" not in changelog
+    # Knowledge-base module versions are independent of the package version.
+    assert "version: 0.1.1" in (root / "lx_dtypes/data/config.yaml").read_text()
+    assert version_mismatches() == []
+    assert "Still inconsistent" not in capsys.readouterr().out
+
+
+def test_prepare_does_not_invent_release_notes(
+    monkeypatch: MonkeyPatch, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
+    root = _release_project(tmp_path, monkeypatch)
+    (root / "CHANGELOG.md").write_text("# Changelog\n\n## [0.1.1] - 2026-01-01\n")
+    args = build_parser().parse_args(["prepare", "0.2.0", "--no-lock"])
+    assert args.func(args) == 0
+
+    assert "0.2.0" not in (root / "CHANGELOG.md").read_text()
+    output = capsys.readouterr().out
+    assert "Add a '## [0.2.0]' section" in output
+    assert "Still inconsistent: uv.lock: 0.1.1 (expected 0.2.0)" in output
+    assert "Still inconsistent: CHANGELOG.md: no section for 0.2.0" in output
+
+
+def test_check_version_reports_drift(
+    monkeypatch: MonkeyPatch, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
+    root = _release_project(tmp_path, monkeypatch)
+    args = build_parser().parse_args(["check-version"])
+    assert args.func(args) == 0
+
+    citation = root / "CITATION.cff"
+    citation.write_text(citation.read_text().replace("0.1.1", "0.0.9"))
+    assert args.func(args) == 1
+    assert "CITATION.cff: 0.0.9 (expected 0.1.1)" in capsys.readouterr().err
+
+
+def test_repository_release_files_agree() -> None:
+    assert version_mismatches() == []

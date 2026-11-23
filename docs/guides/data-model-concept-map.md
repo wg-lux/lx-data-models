@@ -5,10 +5,8 @@ Level 0 and stop when you have enough detail. The full inventory is split into
 levels because a single graph would contain hundreds of leaf payload types and
 would not be readable.
 
-The {download}`machine-readable map <../data-model-concept-map.yml>` is the source
-inventory for this page. It records every model area, the complete knowledge-base
-and ledger registries, important fields, and the current contract-module
-families.
+Owner: lx_dtypes maintainers. This page is the canonical map of the package's
+model areas, registries, important fields, and contract-module families.
 
 ## How to read the map
 
@@ -111,6 +109,10 @@ behavior rather than a separate registered `*Type` model.
 `module@version`. `CoreConceptCollection` is the strict cross-layer snapshot: it
 rejects duplicate concept names, reused UUIDs, dangling semantic-name
 references, unknown fields, and incomplete knowledge-base identity pairs.
+Descriptor numbers in the snapshot are finite, and their ranges, selection
+cardinalities, default options, and probabilities are consistent. Legacy
+knowledge bases that use infinity for an unbounded numeric range export that
+bound as `null` at the JSON boundary.
 
 ## Level 3 — patient ledger
 
@@ -136,7 +138,9 @@ Center ─┬─ Examiner
 ```
 
 Square brackets show the knowledge-base definition referenced by a patient
-record. Descriptor values are the actual patient values and accept string,
+record. `Examiner` and `Patient` belong to a `Center` and carry the shared
+person fields `first_name`, `last_name`, `dob`, `email`, `gender`, `phone`,
+`street`, `city`, `state`, `zip_code`, and `country`. Descriptor values are the actual patient values and accept string,
 integer, float, boolean, or a list of strings.
 
 ### Report, medical, and media branches
@@ -199,19 +203,20 @@ This separation answers three different questions:
 
 ## Level 5 — supporting contract families
 
-Leaf request, response, enum, `TypedDict`, and helper models are grouped below by
-their owning concept family. This is the readable final level; the YAML inventory
-contains the exact current module list for every group.
+Leaf request, response, enum, `TypedDict`, and helper models are grouped by
+their owning concept family. Every public module of
+`lx_dtypes.models.contracts` belongs to exactly one family:
 
-| Family | Included concepts |
+| Family | Modules in `lx_dtypes.models.contracts` |
 |---|---|
-| Contract infrastructure | canonical storage adapters and closed JSON value types |
-| Clinical and terminology | assessment, contraindication, events, examination time/type/indication, finding classification/intervention, information source, lab value, medication schedule, risks, subcategories |
-| Reporting and documents | report context/draft/anonymization, report submission and artifacts, PDF identity/metadata/redaction, document type |
-| Video and media | processor/ROI, video identity and format, frames and boxes, segments, correction, processing/history, cache, streaming, export, reimport, temporal inference |
-| AI and annotation | frame annotations, datasets and buckets, active learning, labels, prediction, model metadata, Hugging Face, multilabel classification, LLM extraction/service |
-| Privacy, identity, and audit | sensitive metadata, anonymization state/quality/metrics, pseudonymization, OCR/text detection, validated identity, authorization, audit ledger |
-| Transfer, configuration, and operations | application/Django/setup settings, persistence, DICOM, hub ingest/transfer, uploads, imports, migrations, repair, management commands, permissions, translation |
+| Contract infrastructure | `adapters`, `json_types`, `validation` |
+| Clinical and terminology | `assessment`, `contraindication`, `core_concepts`, `electrical_curve`, `electrosurgical_activations`, `electrosurgical_measurements`, `event`, `examination_indication`, `examination_time`, `examination_type`, `fhir_clinical`, `finding_classification`, `finding_intervention`, `german_fhir`, `information_source`, `kbv_key_tables`, `knowledge_base`, `knowledge_base_graph`, `lab_value`, `medication`, `numeric_classification`, `numeric_value_distribution`, `patient_examination`, `patient_finding`, `patient_finding_classification`, `patient_finding_classification_runtime`, `patient_finding_intervention`, `patient_view`, `reference_catalog`, `reference_catalog_snapshot`, `reference_metadata`, `subcategory_validation`, `terminology_catalog`, `time`, `time_reference` |
+| Reporting and documents | `document_type`, `examination_revision`, `finding_extraction`, `patient_examination_report`, `pdf_file`, `pdf_meta`, `pdf_redaction`, `report`, `report_anonymization`, `report_context`, `report_draft`, `reporting_types` |
+| Video and media | `electrical_video_alignment`, `endoscopy_processor`, `export_annotated`, `export_ready`, `ffmpeg_metadata`, `image_processing`, `label_video_segment_serializer`, `media_management`, `media_streaming`, `media_workflow`, `media_workflow_api`, `media_workflow_policy`, `nginx_accel`, `video_correction`, `video_examination`, `video_export`, `video_file`, `video_format`, `video_frame`, `video_frame_annotations`, `video_frame_box_annotations`, `video_frame_cache`, `video_frame_export`, `video_masks`, `video_processing`, `video_processing_history`, `video_provenance`, `video_reimport`, `video_segment_timeline`, `video_segment_validation`, `video_segments`, `video_state`, `video_temporal_inference`, `video_text_metadata` |
+| AI and annotation | `ai_dataset`, `ai_model`, `ai_prediction`, `aidataset_export`, `aidataset_frame_buckets`, `finding_review`, `frame_annotation`, `hub_active_learning`, `huggingface_model_meta`, `llm_extractor`, `llm_service`, `model_meta`, `model_meta_logic`, `multilabel_classification`, `text_embedding`, `video_ai_labels`, `video_prediction_logic` |
+| Privacy, identity, and audit | `anonymization`, `anonymization_metrics`, `anonymization_overview`, `anonymization_quality`, `audit_ledger`, `authz`, `case_resolution`, `frame_anonymization`, `pseudonymization`, `sensitive_meta_update`, `sensitive_patient_data`, `text_anonymization`, `text_detection`, `validated_identity` |
+| Studies and cohorts | `cohort_definition`, `study`, `study_analysis`, `study_cohort`, `study_collection`, `study_exchange`, `study_label_presentation`, `study_metadata`, `study_setup`, `study_text_extraction` |
+| Transfer, configuration, and operations | `application_settings`, `codemod_rename`, `dataset_lifecycle`, `deployment_setup`, `dicom_export`, `django_settings`, `dtypes_record_persistence`, `hub_ingest`, `hub_media_envelope`, `hub_transfer`, `legacy_data_import`, `lx_anonymizer_performance`, `maintenance_repair`, `management_command`, `migrate_data_dir`, `migrate_media_storage`, `name_fixtures`, `package_channel`, `package_kind`, `package_snapshot`, `permission_runtime`, `sap_ish_import`, `setup_config`, `table_import`, `transfer_validation`, `translation`, `upload` |
 
 The metadata branch adds three cross-cutting structures:
 
@@ -243,13 +248,63 @@ See the [versioning workflow](knowledge-base-authoring.md#reproduce-and-maintain
 | Django | Package adapters and explicit host contracts map selected models to persistence; transactions stay with the host application |
 | Public API | Snake-case Pydantic contracts are canonical; frontend casing belongs in one named transport adapter |
 
+## Cross-repository reuse
+
+Other applications consume these contracts:
+
+| Consumer | Uses |
+|---|---|
+| endoreg-db | Persistence adapters, API validation, datasets, and hub ingest |
+| lx-annotate | Annotation workflows and outbound hub payloads |
+| lx-anonymizer | OCR, media processing, report extraction, and anonymization |
+
+**Imports.** Public contract names resolve on demand. Import a contract through
+its public domain module or through `lx_dtypes.models.contracts`. Importing OCR,
+hub-transfer, video-processing, or dataset-export contracts does not require
+Django settings or an installed consumer application. Individual patient-video
+contracts do not load the aggregate Django registry, but the ledger registry
+exports still need the host's Django setup. Import isolation does not change
+installation dependencies: the distribution still declares Django and its
+scientific and media dependencies.
+
+**Aliases.** `AIDataSetScoredActiveLearningCandidateContractContract` is a
+compatibility alias of `AIDataSetScoredActiveLearningCandidateContract`; both
+names identify the same model. Use the canonical name in new code.
+
+**Separate representations are intentional:**
+
+- Pydantic models, `TypedDict` representations, and Django adapters serve
+  runtime validation, static transport typing, and persistence. Similar fields
+  do not make these classes interchangeable.
+- Named clinical concepts stay distinct even when their fields currently match.
+  Their semantic identities and schema names are part of the public contract.
+- JSON value aliases keep their domain's nullability and serialization
+  behavior. Similar recursive unions are not a reason to merge them.
+- The frame-cache manifest and validation payloads in
+  `contracts.video_frame_cache` share field definitions, but the
+  `Video`-prefixed variants are frozen and require `db_extracted_frame_count`,
+  while the mutable validation variant defaults it to zero.
+
+## Source locations
+
+| Area | Package path |
+|---|---|
+| Base models | `lx_dtypes/models/base` |
+| Knowledge base | `lx_dtypes/models/knowledge_base` |
+| Ledger | `lx_dtypes/models/ledger` |
+| Contracts | `lx_dtypes/models/contracts` |
+| Metadata | `lx_dtypes/models/meta` |
+| Interfaces | `lx_dtypes/models/interface` |
+| Django | `lx_dtypes/django` |
+| Serialization | `lx_dtypes/serialization` |
+
 ## Scope and maintenance
 
 This is a concept map, not a promise that every class is a database table and
 not a field-by-field API reference. Test fixtures, migrations, generated docs,
 and implementation-only helpers are outside the map. A new public model area
-must be added to the machine-readable inventory and to the appropriate level on
-this page; a changed relationship must update both in the same change.
+must be added to the appropriate level on this page in the same change. The
+test suite checks that every contract module appears in the Level 5 table.
 
 For detailed authoring and boundary rules, continue with
 [Knowledge-base authoring](knowledge-base-authoring.md),

@@ -2,9 +2,18 @@
 
 import stat
 import zipfile
+from collections.abc import Mapping
 from io import BytesIO
 from pathlib import PurePosixPath
 from typing import Protocol
+
+import yaml
+from pydantic import ValidationError
+
+from lx_dtypes.models.contracts.package_channel import (
+    LX_PACKAGE_MANIFEST_FILENAME,
+    LxPackageManifest,
+)
 
 
 class BinaryUpload(Protocol):
@@ -127,3 +136,49 @@ def read_package_zip(
             400, "Terminology ZIP must contain a root config.yaml."
         )
     return files
+
+
+def verify_package_manifest(files: Mapping[str, bytes]) -> LxPackageManifest | None:
+    """Validate an optional root ``lx-package.json`` against the root ``config.yaml``.
+
+    Archives without the manifest are legacy shares and return ``None``; their
+    kind, if any, is the one declared by ``config.yaml``. A present manifest
+    must be valid and agree exactly on ``name``, ``version`` and
+    ``package_kind``, otherwise the archive is rejected.
+    """
+    content = files.get(LX_PACKAGE_MANIFEST_FILENAME)
+    if content is None:
+        return None
+    try:
+        manifest = LxPackageManifest.model_validate_json(content)
+    except ValidationError as exc:
+        raise PackageArchiveError(
+            400, f"{LX_PACKAGE_MANIFEST_FILENAME} is not a valid lx-package/1 manifest."
+        ) from exc
+    try:
+        config = yaml.safe_load(files["config.yaml"].decode("utf-8"))
+    except (KeyError, UnicodeError, yaml.YAMLError) as exc:
+        raise PackageArchiveError(
+            400, "ZIP requires a valid UTF-8 root config.yaml."
+        ) from exc
+    if not isinstance(config, Mapping):
+        raise PackageArchiveError(400, "config.yaml must contain an object.")
+    declared = (
+        config.get("name"),
+        config.get("version"),
+        config.get("package_kind"),
+    )
+    expected = (manifest.name, manifest.version, manifest.package_kind.value)
+    if declared != expected:
+        mismatched = ", ".join(
+            field
+            for field, left, right in zip(
+                ("name", "version", "package_kind"), declared, expected, strict=True
+            )
+            if left != right
+        )
+        raise PackageArchiveError(
+            400,
+            f"{LX_PACKAGE_MANIFEST_FILENAME} does not match config.yaml: {mismatched}.",
+        )
+    return manifest

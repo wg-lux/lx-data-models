@@ -48,6 +48,8 @@ class UnitValidatorHintDataDict(TypedDict, total=False):
 
 
 class UnitValidatorDataDict(KnowledgebaseBaseModelDataDict):
+    """Serialized :class:`UnitValidator` knowledge-base record."""
+
     query: UnitValidatorQueryDataDict
     finding: str
     classification: str

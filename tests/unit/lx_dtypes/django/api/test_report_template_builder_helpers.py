@@ -92,6 +92,7 @@ def test_portable_package_matches_authoring_guide_and_selects_its_rules() -> Non
     assert config == {
         "name": "my_study",
         "version": "0.1.0",
+        "package_kind": "report_templates",
         "modules": [],
         "depends_on": ["coloreg"],
         "data": {"files": ["./report_templates.yml", "./validators.yml"]},

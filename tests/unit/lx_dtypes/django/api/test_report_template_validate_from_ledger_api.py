@@ -1,6 +1,7 @@
 import json
 from typing import Any, ClassVar
 
+import pytest
 from django.test import Client
 
 from lx_dtypes.django.api import main as api_main
@@ -133,6 +134,184 @@ def test_build_p_examination_payload_uses_canonical_examination_reference(
 
     assert len(payload.patient_findings) == 1
     assert payload.patient_findings[0].patient_examination == payload.examination
+
+
+def _indication_patient_exam(indication_rows: list[Any] | None) -> Any:
+    class _Exam:
+        name = "colonoscopy"
+
+    class _PatientExam:
+        id = 101
+        patient_id = 202
+        examination = _Exam()
+        examination_safe = _Exam()
+        knowledge_base_module = "report_template_examples"
+        knowledge_base_version = "0.1.0"
+        examiners: ClassVar[list[Any]] = []
+
+    patient_exam = _PatientExam()
+    if indication_rows is not None:
+        patient_exam.indications = _FakeRelation(indication_rows)  # type: ignore[attr-defined]
+    return patient_exam
+
+
+def _named(name: str, **attrs: Any) -> Any:
+    return type("_Named", (), {"name": name, **attrs})()
+
+
+def test_build_p_examination_payload_projects_host_indications(
+    monkeypatch: Any,
+) -> None:
+    # Required indication concepts read patient_indications; saved host
+    # indications must therefore reach the ledger record.
+    monkeypatch.setattr(
+        api_main,
+        "_active_patient_findings_queryset",
+        lambda: _FakeEmptyFindingsQueryset(),
+    )
+    choice = _named("sedation_planned", classification=_named("sedation"))
+    rows = [
+        type(
+            "_Row",
+            (),
+            {
+                "pk": 7,
+                "examination_indication": _named("colonoscopy_screening"),
+                "indication_choice": None,
+            },
+        )(),
+        type(
+            "_Row",
+            (),
+            {
+                "pk": 8,
+                "examination_indication": _named("colonoscopy_generic"),
+                "indication_choice": choice,
+            },
+        )(),
+    ]
+
+    payload = api_main._build_p_examination_payload_from_host_ledger(
+        _indication_patient_exam(rows), route_module_name="report_template_examples"
+    )
+
+    assert [item.indication for item in payload.patient_indications] == [
+        "colonoscopy_screening",
+        "colonoscopy_generic",
+    ]
+    assert all(
+        item.patient_examination == "colonoscopy"
+        for item in payload.patient_indications
+    )
+    assert payload.patient_indications[0].patient_indication_classifications == []
+    classification = payload.patient_indications[1].patient_indication_classifications[
+        0
+    ]
+    assert (classification.classification, classification.classification_choice) == (
+        "sedation",
+        "sedation_planned",
+    )
+    assert classification.patient_indication == str(payload.patient_indications[1].uuid)
+    rebuilt = api_main._build_p_examination_payload_from_host_ledger(
+        _indication_patient_exam(rows), route_module_name="report_template_examples"
+    )
+    assert [str(item.uuid) for item in rebuilt.patient_indications] == [
+        str(item.uuid) for item in payload.patient_indications
+    ]
+
+
+def _choice_row(pk: int, indication: Any, choice: Any) -> Any:
+    return type(
+        "_Row",
+        (),
+        {"pk": pk, "examination_indication": indication, "indication_choice": choice},
+    )()
+
+
+def test_build_p_examination_payload_resolves_many_to_many_choice_classification(
+    monkeypatch: Any,
+) -> None:
+    # endoreg-db links choices to classifications many-to-many; the selected
+    # classification is the one the choice shares with its indication.
+    monkeypatch.setattr(
+        api_main,
+        "_active_patient_findings_queryset",
+        lambda: _FakeEmptyFindingsQueryset(),
+    )
+    choice = _named(
+        "sedation_planned",
+        classifications=_FakeRelation([_named("sedation"), _named("other_use")]),
+    )
+    indication = _named(
+        "colonoscopy_generic", classifications=_FakeRelation([_named("sedation")])
+    )
+
+    payload = api_main._build_p_examination_payload_from_host_ledger(
+        _indication_patient_exam([_choice_row(5, indication, choice)]),
+        route_module_name="report_template_examples",
+    )
+
+    classification = payload.patient_indications[0].patient_indication_classifications[
+        0
+    ]
+    assert classification.classification == "sedation"
+
+
+def test_build_p_examination_payload_rejects_unresolvable_choice_classification(
+    monkeypatch: Any,
+) -> None:
+    monkeypatch.setattr(
+        api_main,
+        "_active_patient_findings_queryset",
+        lambda: _FakeEmptyFindingsQueryset(),
+    )
+    shared = _FakeRelation([_named("sedation"), _named("other_use")])
+    choice = _named("sedation_planned", classifications=shared)
+    indication = _named("colonoscopy_generic", classifications=shared)
+
+    with pytest.raises(ValueError, match="exactly one classification"):
+        api_main._build_p_examination_payload_from_host_ledger(
+            _indication_patient_exam([_choice_row(6, indication, choice)]),
+            route_module_name="report_template_examples",
+        )
+
+
+def test_build_p_examination_payload_without_host_indication_relation(
+    monkeypatch: Any,
+) -> None:
+    monkeypatch.setattr(
+        api_main,
+        "_active_patient_findings_queryset",
+        lambda: _FakeEmptyFindingsQueryset(),
+    )
+
+    payload = api_main._build_p_examination_payload_from_host_ledger(
+        _indication_patient_exam(None), route_module_name="report_template_examples"
+    )
+
+    assert payload.patient_indications == []
+
+
+def test_build_p_examination_payload_rejects_unnamed_host_indication(
+    monkeypatch: Any,
+) -> None:
+    monkeypatch.setattr(
+        api_main,
+        "_active_patient_findings_queryset",
+        lambda: _FakeEmptyFindingsQueryset(),
+    )
+    rows = [
+        type(
+            "_Row",
+            (),
+            {"pk": 9, "examination_indication": None, "indication_choice": None},
+        )()
+    ]
+
+    with pytest.raises(ValueError, match="without an indication name"):
+        api_main._build_p_examination_payload_from_host_ledger(
+            _indication_patient_exam(rows), route_module_name="report_template_examples"
+        )
 
 
 def test_validate_report_template_runtime_from_ledger_not_found(

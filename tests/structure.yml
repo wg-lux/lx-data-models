@@ -23,6 +23,12 @@ entrypoints:
 - name: Model boundary architecture tests
   file: test_model_boundaries.py
   purpose: Enforce common model inheritance, test ownership and reviewed dependency exceptions
+- name: Concept map completeness
+  file: test_docs_concept_map.py
+  purpose: Verify that every contract module appears in the data-model concept map
+- name: OpenAPI documentation completeness
+  file: unit/lx_dtypes/django/api/test_openapi_documentation.py
+  purpose: Require a description and an authentication statement for every HTTP operation
 - name: Evaluation boundary tests
   file: unit/lx_dtypes/test_evaluation_boundary.py
   purpose: Verify identical model rules across contract, KB and ledger parsing and Django-free registry imports
@@ -103,6 +109,18 @@ entrypoints:
 - name: Package workflow tests
   file: unit/lx_dtypes/test_packages.py
   purpose: Verify creation, portable ZIP roundtrips, archive rejection, explicit registry dependency loading, core graph checks, and ledger assessment
+- name: Package kind and channel tests
+  file: unit/lx_dtypes/test_package_kinds.py
+  purpose: Verify catalog kinds, lx-package.json export and mismatch rejection, legacy imports, listings, channel installs and the dependency audit
+- name: Package channel contract tests
+  file: unit/lx_dtypes/models/contracts/test_package_channel.py
+  purpose: Verify package kinds, dependency rules and strict lx-package/1 and lx-package-channel/1 documents
+- name: Package kind lint tests
+  file: unit/lx_dtypes/utils/test_kb_package_kind_lint.py
+  purpose: Verify kind, manifest, dependency, validator and German-name lint codes and lint every shipped release without errors
+- name: German rule message tests
+  file: unit/lx_dtypes/test_german_rule_messages.py
+  purpose: Verify German runtime, structure and readiness messages use German concept names and runtime results carry display names
 dependencies:
   internal:
   - ../lx_dtypes

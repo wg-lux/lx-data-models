@@ -8,9 +8,6 @@ and must not be treated as clinical defaults.
 
 For publishing and deployment, see [Knowledge-Base Authoring](knowledge-base-authoring.md).
 For application boundaries, see [Package Boundary Guide](package_boundary.md).
-Implementation/readiness evidence belongs to endoreg-db's
-`feature-tracking/DataLoading.yml` and `feature-tracking/DtypesStudyDefinitions.yml`,
-not this document.
 
 ## Start here: your first study package
 
@@ -26,7 +23,7 @@ these package files.
 | Define terminology, examinations, report templates, or validation rules | A package with `config.yaml` and selected `.yml` records |
 | Store packages in a location chosen by your application | `TerminologyService` with an explicit registry path and `register_local()` |
 | Upload a portable package through lx-annotate | The terminology ZIP upload workflow; selection is a separate step |
-| Choose a centre and approved packages for endoreg-db | A deployment setup `.yml` document; see “Deployment setup v1” below |
+| Choose a centre and approved packages for endoreg-db | A deployment setup `.yml` document; see “Deployment setup v2” below |
 | Define datasets or cohorts | A separate `StudySetupDefinition` document |
 | Check patient observations without interrupting capture | The [advisory validation API](cross-layer-validation.md#advisory-validation-during-data-capture) |
 
@@ -149,7 +146,9 @@ quality gate. ZIP decoding is shared with `TerminologyService`: the defaults
 are 32 MiB compressed, 128 MiB unpacked, and 4096 entries. Duplicate/conflicting
 paths, traversal, symlinks, and invalid packages fail before publication.
 Existing destination folders and ZIP files are never replaced. These functions
-do not register, activate, or persist clinical data.
+do not register, activate, or persist clinical data. Exports of packages that
+declare `package_kind` carry a root `lx-package.json`; imports reject a manifest
+that disagrees with `config.yaml` (see [package kinds](package-kinds.md)).
 
 Hosts owning filesystem policy can use `read_package_archive` and
 `export_package_files` for validated `dict[str, bytes]` mappings, and
@@ -368,6 +367,7 @@ select source files for parser evaluation; merged KBs include dependencies.
 | `name` | Required, nonempty module identity. Prefer a stable `snake_case` identifier. |
 | `version` | Required, nonempty string. Quote it; use a new version for published changes. |
 | `description`, `author`, `medical_field` | Optional descriptive metadata. |
+| `package_kind` | Optional: `terminology`, `report_templates`, `study` or `application_data`. Absent means unclassified; see [package kinds](package-kinds.md). |
 | `data.files` | Explicit list of data files relative to the module directory. |
 | `data.dirs` | Optional list of directories scanned recursively for `.yaml` and `.yml` data. |
 | `modules` | Names of composed modules that the loader must resolve. |
@@ -410,7 +410,7 @@ preset's `study_metadata`. Its ordered `labels` preserve canonical `name`
 references while supplying optional `display_name` and `color` (`#RRGGBB`).
 Ordered `scopes` group these references by expertise for presentation; they do
 not define user permissions. See the executable example in
-[the metadata contract](study-metadata.yml).
+[the metadata contract](study-metadata.md).
 
 `locked: true` makes the configured names the allowed-label whitelist when an
 annotation request explicitly selects this study; an empty locked list permits
@@ -441,8 +441,6 @@ operations.** `import_study_preset` creates examination types and examinations,
 but referenced findings and indications must already exist in the host database.
 It fails and rolls back the whole projection when a reference is missing. It
 does not provision every clinical model just because the package contains it.
-The wider clinical migration is tracked separately in endoreg-db's
-`feature-tracking/DtypesStudyDefinitions.yml`.
 
 ## 5. Employees are always optional
 
@@ -568,34 +566,64 @@ preset before adding optional names. Both use explicit package identities;
 neither selects an active study. The host option is `--module-version` because
 Django reserves `--version` for its own version output.
 
-## Deployment setup v1
+## Deployment setup v2
 
-The frozen v1 field contract is `DeploymentSetup` in
-`lx_dtypes.models.contracts.deployment_setup`. A deployment document is a YAML
-mapping with `schema_version: '1.0'`. All keys use `snake_case`; unknown fields
-and unsupported schema versions are errors.
+The field contract is `DeploymentSetup` in
+`lx_dtypes.models.contracts.deployment_setup` (also exported from
+`lx_dtypes.models.contracts`). A deployment document is a YAML mapping with
+`schema_version: '2.0'`. All keys use `snake_case`; unknown fields and
+unsupported schema versions are errors. Each package role requires exactly one
+[package kind](package-kinds.md):
 
 | Field | Contract |
 | --- | --- |
-| `schema_version` | The quoted literal `'1.0'`. |
+| `schema_version` | The quoted literal `'2.0'`. |
 | `site.center_key` | Required immutable host center identity, 1–255 characters: lowercase letters, digits, underscores and hyphens, beginning with a letter or digit. |
 | `site.name` | Required display name, 1–255 characters with no surrounding whitespace. |
-| `reference_packages` | Optional list, default empty; each selection has exact `module` and `version`, and optionally `content_sha256`. The host projects the resolved reference catalogue closure. |
-| `study_packages` | Optional list, default empty; the same identity/digest fields plus `activate`, default `false`. The host resolves definitions and can explicitly select one active registry knowledge base. |
+| `reference_packages` | `application_data` packages. The host projects the resolved reference catalogue closure. |
+| `terminology_packages` | `terminology` packages. |
+| `report_template_packages` | `report_templates` packages, each with optional `activate` (default `false`). At most one selection in the document may activate. |
+| `study_packages` | `study` packages. `activate` is not allowed. |
 | `content_sha256` | Optional 64-character lowercase hexadecimal digest of the complete resolved source dependency closure. Use the digest produced by planning, not a hash of this setup file. |
 | `adopt_existing` | Boolean, default `false`. Explicitly allow equivalent legacy reference rows to be adopted with preserved primary keys; never overwrite conflicting content. |
 
-Versions are exact strings, not range selectors. Each package role can select a
-module only once. The same module may appear in both roles only with matching
-version and digest pins. Conflicting selections and more than one
-`activate: true` are invalid.
+Every role is an optional list (default empty) of selections with exact
+`module` and `version`, and optionally `content_sha256`. Versions are exact
+strings, not range selectors. Each role can select a module only once. The same
+module may appear in several roles only with matching version and digest pins.
 Unknown selections fail; a missing package is never replaced by a default.
-When a digest is omitted, planning resolves it into the reviewed lock artifact.
-Applying requires a matching lock and checks content again.
+When a digest is omitted, planning resolves it into the reviewed lock artifact
+(`DeploymentLock`, `schema_version: '2.0'`). Applying requires a matching lock
+and checks content again.
+
+`check_deployment_setup_kinds(setup, kind_lookup)` is the pure role check.
+`kind_lookup` maps `(module, version)` to the registry's package kind
+(declared, catalog or migrated) or `None`. A selection whose kind is unknown,
+unclassified or different from its role raises `DeploymentKindError`; its
+`problems` list every offending package as a `DeploymentKindProblem`. The check
+never guesses a kind.
+
+### Migrating v1 documents
+
+v1 documents (`schema_version: '1.0'`, `DeploymentSetupV1`) remain readable
+through `parse_any_deployment_setup`, which selects the model by
+`schema_version`; `parse_deployment_setup` accepts v2 only. Convert them with
+`migrate_deployment_setup_v1_to_v2(setup_v1, kind_lookup)`:
+
+- v1 `reference_packages` stay `reference_packages`.
+- Each v1 `study_packages` selection moves to the role of its package kind.
+- `activate: true` is kept only when the selection becomes a
+  `report_template_packages` entry; otherwise migration fails.
+- An unclassified or unknown package fails migration, listing the package.
+- The result is kind-checked as v2.
+
+v1 locks (`DeploymentLockV1`) are readable through `parse_any_deployment_lock`
+but are not v2 locks.
 
 The host command exports templates directly from `lx_dtypes/setup_templates/`:
-`minimal`, `coloreg`, `training`, and `green_endoscopy`. Export one rather than
-copying a second maintained schema example:
+`minimal`, `coloreg`, `training`, and `green_endoscopy`. The `coloreg` template
+selects `coloreg@0.3.0` under `report_template_packages`. Export one rather
+than copying a second maintained schema example:
 
 ```sh
 python manage.py setup_deployment template coloreg --output setup.yml
@@ -603,9 +631,9 @@ python manage.py setup_deployment schema --output deployment_setup.schema.json
 ```
 
 The generated JSON Schema is the editor contract. The runtime Pydantic model
-also checks invariants that require validation across fields; registry and host
-checks happen after schema validation. To change the site's identity, edit the
-template before first import and preserve the chosen key thereafter.
+also checks invariants that require validation across fields; registry, kind
+and host checks happen after schema validation. To change the site's identity,
+edit the template before first import and preserve the chosen key thereafter.
 
 `activate: false` means leave the current active selection unchanged. Activation
 is registry knowledge-base selection, not clinical approval, dataset creation,
@@ -616,9 +644,9 @@ choose arbitrary filesystem/network sources, or execute code.
 
 Run `setup_deployment validate`, then `plan`, review its generated lock, and use
 `apply` as documented in the host guide. Package registration, database migrations
-and registry provisioning remain explicit operations. A change to this frozen
-document contract requires a schema-version decision and coordinated host
-support; do not silently reinterpret existing v1 fields.
+and registry provisioning remain explicit operations. A change to this document
+contract requires a schema-version decision and coordinated host support; do not
+silently reinterpret existing fields.
 
 ## Complete reference catalogues
 
@@ -726,12 +754,12 @@ identity is rejected.
 Dataset/cohort YAML using `StudySetupDefinition` is a separate document contract.
 Both cohorts and `StudyPreset` can carry validated `study_metadata` for participating
 centers, age groups, exact terminology dependencies, and inclusion criteria. See
-[the shared metadata contract](study-metadata.yml) for fields and host evaluation
+[the shared metadata contract](study-metadata.md) for fields and host evaluation
 semantics. Metadata does not grant patient access or activate terminology.
 Do not put it in a KB data directory or wrap it in `model: study_preset`. Follow
 the study-setup section of the authoring guide for that workflow.
 
-For the ColoReg resection study, see the [endpoint and linkage specification](coloreg-resection-study.yml).
+For the ColoReg resection study, see the [endpoint and linkage specification](coloreg-resection-study.md).
 Its [study document](../../lx_dtypes/data/study_metadata/coloreg_resection.yml) uses
 `StudySetupDefinition`; lesion-size filtering and longitudinal analysis remain
 explicit host operations.

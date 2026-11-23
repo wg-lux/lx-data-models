@@ -1,5 +1,6 @@
 - model: time_reference
   name: video_generator_event
+  name_de: Synthetisches Video-Generator-Ereignis
   description: A synthetic event observed on video and generator clocks.
   reference_kind: pts
   target_kind: electrosurgery

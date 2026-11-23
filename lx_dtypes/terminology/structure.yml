@@ -8,6 +8,7 @@ responsibilities:
 - Resolve exact knowledge-base identities and dependency closures
 - Validate registration, uploads, and source provenance
 - Reuse the shared package archive boundary and authoring gate for uploaded packages
+- Report each bundle's declared package_kind, or null when unclassified, without changing selection
 boundaries:
 - Framework-double verification belongs in tests/isolated/terminology and runs in a dedicated process.
 - Registration does not select a package or project host database rows

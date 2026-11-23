@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
 import pytest
-import yaml
 
 from lx_dtypes.knowledge_bases import get_packaged_knowledge_base
 from lx_dtypes.models.interface.data_roots import package_data_root
@@ -272,16 +270,21 @@ def test_study_hypotheses_pin_terminology_and_expose_explicit_analysis(
         "histology_no_specimen_among_documented",
         "histology_unknown_among_documented",
     }
-    spec = yaml.safe_load(
-        (
-            Path(__file__).resolve().parents[3]
-            / "docs/guides/coloreg-resection-study.yml"
-        ).read_text()
-    )
-    assert spec["population"]["size"]["minimum_inclusive"] == 20
-    assert spec["endpoints"]["primary_success"]["definition"].startswith(
-        "Protocol-defined"
-    )
+    # docs/guides/coloreg-resection-study.md documents these rules: every
+    # comparison selects lesions of at least 20 mm, and primary success stays a
+    # draft until the study specifies an approved protocol.
+    for cohort in study.cohorts:
+        definition = cohort.study_metadata.analysis_definitions[0]
+        assert definition.inclusion is not None
+        size = definition.inclusion.predicates[0]
+        assert (size.classification, size.operator, size.value) == (
+            "lesion_size_mm",
+            "ge",
+            20.0,
+        )
+    primary_success = study.cohorts[0].study_metadata.analysis_definitions[0]
+    assert primary_success.status == "draft"
+    assert "protocol" in " ".join(primary_success.unresolved_requirements)
     assert "not_performed" in " ".join(
         kb.classification["coloreg_follow_up_result"].classification_choices
     )

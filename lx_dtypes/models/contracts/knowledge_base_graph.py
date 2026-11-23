@@ -267,6 +267,21 @@ class KnowledgeBaseGraphResolver:
         for template in self._snapshot.report_templates:
             self._templates.setdefault(template.examination, []).append(template)
 
+    def indications_for_examination(
+        self, examination_name: str
+    ) -> list[IndicationCore]:
+        """Return declared indications by name; unknown examinations raise KeyError.
+
+        Results are isolated copies, independent of template section placement.
+        """
+        examination = self._examinations[examination_name]
+        return [
+            cast(IndicationCore, self._records["indication"][name]).model_copy(
+                deep=True
+            )
+            for name in sorted(examination.indications)
+        ]
+
     def reporting_context(self, examination_name: str) -> ExaminationReportingContext:
         snapshot = self._snapshot
         source = snapshot.concepts

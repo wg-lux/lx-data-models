@@ -3,8 +3,7 @@
 Owner: lx_dtypes maintainers. This is the canonical guide to the typed
 high-frequency (HF) electrosurgical measurement contract, its alignment to
 endoscopy video frames, and the knowledge-base and ledger fields for comparing
-application curves. Scope and production readiness are tracked only in
-endoreg-db `feature-tracking/backlog/ElectricalToVideoMapping.yml`.
+application curves.
 
 ## Terms
 

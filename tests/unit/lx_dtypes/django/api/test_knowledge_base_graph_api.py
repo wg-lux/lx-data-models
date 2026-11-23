@@ -491,8 +491,10 @@ def test_graph_and_reporting_context_endpoints_use_exact_identity(
     )
 
 
+@pytest.mark.parametrize("suffix", ["reporting-context", "indications"])
 def test_reporting_context_endpoint_rejects_unknown_examination(
     monkeypatch: pytest.MonkeyPatch,
+    suffix: str,
 ) -> None:
     monkeypatch.setattr(
         api_main,
@@ -501,8 +503,7 @@ def test_reporting_context_endpoint_rejects_unknown_examination(
     )
 
     response = Client().get(
-        "/base_api/knowledge-bases/demo_graph/1.2.3/examinations/"
-        "unknown/reporting-context",
+        f"/base_api/knowledge-bases/demo_graph/1.2.3/examinations/unknown/{suffix}",
         secure=True,
     )
 
@@ -510,8 +511,10 @@ def test_reporting_context_endpoint_rejects_unknown_examination(
     assert "unknown" in response.json()["detail"]
 
 
+@pytest.mark.parametrize("suffix", ["graph", "examinations/gastroscopy/indications"])
 def test_graph_api_does_not_echo_invalid_concept_content(
     monkeypatch: pytest.MonkeyPatch,
+    suffix: str,
 ) -> None:
     class InvalidGraphKb(_GraphKb):
         def export_core_concepts(self) -> dict[str, Any]:
@@ -523,7 +526,62 @@ def test_graph_api_does_not_echo_invalid_concept_content(
         api_main, "resolve_module_kb", lambda *args, **kwargs: InvalidGraphKb()
     )
     response = Client().get(
-        "/base_api/knowledge-bases/demo_graph/1.2.3/graph", secure=True
+        f"/base_api/knowledge-bases/demo_graph/1.2.3/{suffix}", secure=True
     )
     assert response.status_code == 409
     assert b"untrusted-content-marker" not in response.content
+
+
+@pytest.mark.parametrize("has_indications", [True, False])
+def test_direct_indications_are_versioned_and_examination_scoped(
+    monkeypatch: pytest.MonkeyPatch, has_indications: bool
+) -> None:
+    class IndicationsKb(_GraphKb):
+        def export_core_concepts(self) -> dict[str, Any]:
+            payload = _core_concepts()
+            payload["indication"].append({"name": "unrelated"})
+            payload["indication"][0].update(
+                name_de="Vorsorge", classifications=["lesion_size"]
+            )
+            if not has_indications:
+                payload["examination"][0]["indications"] = []
+            return payload
+
+    captured: list[tuple[str, str | None]] = []
+
+    def load(module_name: str, *, version: str | None = None) -> IndicationsKb:
+        captured.append((module_name, version))
+        return IndicationsKb()
+
+    monkeypatch.setattr(api_main, "resolve_module_kb", load)
+    response = Client().get(
+        "/base_api/knowledge-bases/demo_graph/1.2.3/examinations/gastroscopy/indications",
+        secure=True,
+    )
+    assert response.status_code == 200
+    assert captured == [("demo_graph", "1.2.3")]
+    assert [item["name"] for item in response.json()] == (
+        ["screening"] if has_indications else []
+    )
+    if has_indications:
+        assert response.json()[0]["name_de"] == "Vorsorge"
+        assert response.json()[0]["classifications"] == ["lesion_size"]
+        assert response.json()[0]["id"] is None
+
+
+def test_direct_indication_results_do_not_mutate_resolver() -> None:
+    resolver = KnowledgeBaseGraphResolver(
+        build_knowledge_base_graph_snapshot(
+            _GraphKb(),
+            identity=KnowledgeBaseIdentity(
+                knowledge_base_module="demo_graph", knowledge_base_version="1.2.3"
+            ),
+        )
+    )
+    indications = resolver.indications_for_examination("gastroscopy")
+    indications[0].indication_types.clear()
+    assert resolver.indications_for_examination("gastroscopy")[0].indication_types == [
+        "preventive"
+    ]
+    with pytest.raises(KeyError):
+        resolver.indications_for_examination("unknown")

@@ -1,70 +1,68 @@
-# Autoritative Befund- und Konzeptabdeckung
+# Authoritative Finding and Concept Coverage
 
-Dieses Dokument beschreibt den versionierten Coverage-Vertrag für klinische
-Berichtsvorlagen. Es ist die technische Referenz für Template-Autorinnen,
-Backend- und Frontend-Entwickler sowie für die fachliche Abnahme.
+Owner: lx_dtypes maintainers. This guide describes the versioned coverage
+contract for clinical report templates. It is the technical reference for
+template authors, backend and frontend developers, and clinical sign-off.
 
-## Zweck und Grenze
+## Purpose and limits
 
-Die Coverage beantwortet für jedes freigegebene Reporting-Konzept:
+For every approved reporting concept, coverage answers:
 
-- Ist das Konzept auf die aktuelle Untersuchung anwendbar?
-- Ist ein Wert dokumentiert?
-- Ist der Wert gemäß der autorisierten Wertemenge gültig?
-- Welche Validatoren und Payload-Pfade belegen das Ergebnis?
+- Does the concept apply to the current examination?
+- Is a value documented?
+- Is the value valid according to the authorized value set?
+- Which validators and payload paths support the result?
 
-Coverage ist kein Ersatz für:
+Coverage does not replace:
 
-- klinische Vollständigkeit,
-- Leitlinienadhärenz,
-- fachliche Richtigkeit der Konzeptmatrix,
-- eine Wirksamkeits- oder Qualitätsstudie.
+- clinical completeness,
+- guideline adherence,
+- clinical correctness of the concept matrix,
+- an effectiveness or quality study.
 
-Diese Aussagen benötigen eine separate klinisch annotierte Referenzmenge und
-eine dokumentierte fachliche Freigabe.
+Those statements need a separate, clinically annotated reference set and a
+documented clinical sign-off.
 
-## Autoritative Datenquelle
+## Authoritative data source
 
-Die autoritative Auflösung entsteht ausschließlich serverseitig aus:
+The authoritative result is computed on the server only, from:
 
-1. der tatsächlich geladenen KnowledgeBase,
-2. der identifizierten Berichtsvorlage,
-3. der typisierten `PExamination`-Payload,
-4. den ausgeführten Runtime-Validatoren.
+1. the knowledge base that was actually loaded,
+2. the identified report template,
+3. the typed `PExamination` payload,
+4. the runtime validators that were executed.
 
-Die Validierungsrouten liefern das Ergebnis unter `concept_coverage`:
+The validation routes return the result under `concept_coverage`:
 
 ```text
 POST /report-templates/{module}/{template}/validate?version={module_version}
 POST /report-templates/{module}/{template}/validate-from-ledger/{id}?version={module_version}
 ```
 
-Das Frontend zeigt die Serverantwort. Eine lokale Heuristik darf nur als
-sichtbar gekennzeichneter, nicht autoritativer Fallback für alte Antworten
-verwendet werden.
+See the [HTTP API reference](../api/http.rst) for both routes. Frontends show
+the server response. A local heuristic may only be used as a visibly labelled,
+non-authoritative fallback for older responses.
 
-## Identität und Provenienz
+## Identity and provenance
 
-Jedes Coverage-Ergebnis enthält:
+Every coverage result contains:
 
 - `contract_version` (`report_concept_coverage_v1`),
-- Modulname, Modulversion und Modul-Digest,
-- Template-Name, Template-Version und Template-Digest,
-- Resolvername und Resolverversion,
-- einen Digest aus Payload und Validatorresultat.
+- the module name, module version, and module digest,
+- the template name, template version, and template digest,
+- the resolver name and resolver version,
+- a digest of the payload and the validator results.
 
-Ein Identitäts- oder Digest-Mismatch darf nicht automatisch repariert werden.
-Der Vorgang muss laut fehlschlagen und darf kein klinisch gültiges Ergebnis
-behaupten.
+An identity or digest mismatch must never be repaired automatically. The
+operation must fail visibly and must not claim a clinically valid result.
 
-## Konzeptmetadaten in einer Vorlage
+## Concept metadata in a template
 
-Jede leitlinienbasierte Vorlage veröffentlicht außerdem ihre versionierte
-fachliche Provenienz unter `guideline_references`. Eine Referenz enthält eine
-stabile Leitlinien-ID, Herausgeber, Version, Publikationsdatum, kanonische
-HTTPS-Adresse und die tatsächlich verwendeten Statements, Tabellen oder
-Kapitel. Ein bloßer Kommentar im YAML ist keine ausreichende, für Consumer
-prüfbare Provenienz.
+Every guideline-based template also publishes its versioned clinical
+provenance under `guideline_references`. A reference contains a stable
+guideline ID, the issuing organization, version, publication date, canonical
+HTTPS address, and the statements, tables, or chapters actually used. A comment
+in the YAML is not sufficient provenance, because consumers cannot check it.
 
 ```yaml
 guideline_references:
@@ -76,16 +74,19 @@ guideline_references:
     canonical_url: https://www.dgvs.de/.../S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1.pdf
     cited_sections:
       - Statement 2.36
-      - Kapitel 6.1 Koloskopie
+      - Chapter 6.1 Colonoscopy
 ```
 
-Eine anwendbare Coverage-Konzeptdefinition benötigt mindestens:
+The `title` is the official title of the German guideline and stays in its
+original language.
+
+An applicable coverage concept needs at least:
 
 ```yaml
 coverage_version: report_concept_coverage_v1
 coverage_concepts:
   - concept_id: colon.polyp.size_mm
-    label: Polypengröße
+    label: Polyp size
     applicability_status: required
     validator_names:
       - colonoscopy_polyp_size_valid
@@ -103,93 +104,98 @@ coverage_concepts:
       - "10"
       - "12"
     guideline_citations:
-      - "AWMF-021-022 Kapitel 6.1.4: Polypenklassifikation"
+      - "AWMF-021-022 chapter 6.1.4: polyp classification"
 ```
 
-Die fachliche Vorlage muss die tatsächliche Wertsemantik festlegen. Beispiel-
-werte dürfen nicht ungeprüft als klinische Wertemenge übernommen werden.
-`guideline_citations` wird in das Runtime-Coverage-Element übernommen, damit
-Consumer die Fundstelle unmittelbar am Konzept anzeigen können.
+The clinical template must define the actual value semantics. Example values
+must not be adopted as a clinical value set without review.
+`guideline_citations` is copied into the runtime coverage item, so consumers
+can show the source directly next to the concept.
 
-Offene, nicht enumerierbare Identifikatoren dürfen nicht als künstliche
-`allowed_values`-Liste modelliert werden. Dafür stehen die geschlossenen
-Prüfungen `value_constraint: non_empty_string` und
-`value_constraint: non_empty_string_list` zur Verfügung. Sie prüfen Typ und
-Nicht-Leere strikt; eine Werteliste darf dann nicht zusätzlich angegeben sein.
-Numerische Descriptorwerte verwenden `value_constraint: number_range` zusammen
-mit `numeric_min` und `numeric_max`; boolesche und nicht-endliche Werte werden
-dabei ausdrücklich abgelehnt.
+Open identifiers that cannot be enumerated must not be modelled as an
+artificial `allowed_values` list. Use the closed checks
+`value_constraint: non_empty_string` and
+`value_constraint: non_empty_string_list` instead. They strictly check the type
+and that the value is not empty; an `allowed_values` list must then not be
+given as well. Numeric descriptor values use `value_constraint: number_range`
+together with `numeric_min` and `numeric_max`; boolean and non-finite values
+are explicitly rejected.
 
-Für wiederholte Befunde wird ein `finding_selector` verwendet. Der Builder
-prüft alle passenden Instanzen in stabiler Payload-Reihenfolge und liefert
-konkrete `evidence_paths`. Ein erster passender Treffer darf einen späteren
-ungültigen Treffer nicht verdecken.
+Use a `finding_selector` for repeated findings. The builder checks every
+matching instance in stable payload order and returns the concrete
+`evidence_paths`. A valid first match must not hide a later invalid one.
 
-Ein `classification_choice` darf nur zusammen mit `classification_name`
-angegeben werden. Für `not_applicable` ist kein Wertpfad erforderlich, aber ein
-fachlich begründeter `applicability_reason` ist Pflicht.
+A `classification_choice` may only be given together with a
+`classification_name`. A `not_applicable` concept needs no value path, but it
+must have a clinically justified `applicability_reason`.
 
-## Statussemantik
+## Status semantics
 
-| Status | Bedeutung |
+Each coverage item has an applicability status, set by the template, and a
+validation status, computed at runtime.
+
+| Validation status | Meaning |
 | --- | --- |
-| `present` | Wert vorhanden, explizit erlaubt und alle zugehörigen Validatoren erfolgreich |
-| `missing` | Kein passender Befund beziehungsweise keine passende Instanz gefunden |
-| `unknown` | Wert oder Kontext nicht auflösbar; keine positive Aussage zulässig |
-| `invalid` | Wert vorhanden, aber nicht erlaubt, oder ein Validator schlägt fehl |
-| `not_applicable` | Konzept ist aufgrund einer freigegebenen Regel nicht anwendbar |
+| `present` | A value is present, explicitly allowed, and all associated validators succeeded. |
+| `missing` | No matching finding or instance was found. |
+| `unknown` | The value or its context cannot be resolved, or a referenced validator returned no result. No positive statement is allowed. |
+| `invalid` | A value is present but not allowed, or a validator failed. |
+| `undetermined` | The concept is `not_applicable` under an approved rule, so it is not evaluated. |
 
-`present` darf niemals allein aus einem lexikalischen Befundnamen oder der
-Existenz eines JSON-Pfades abgeleitet werden. Fehlende Einheiten oder nicht
-aufgelöste Synonyme dürfen nicht stillschweigend als gültig gelten.
+`present` must never be derived from a lexical finding name alone or from the
+mere existence of a JSON path. Missing units or unresolved synonyms must not
+silently count as valid.
 
-## Einheiten und aktuelle Einschränkung
+## Units: current limitation
 
-Die derzeitigen `PExamination`-/`PFinding`-Persistenzmodelle führen für die
-patientenseitigen Befundwerte noch keine eigenständige, belastbare Einheit.
-Deshalb darf eine Template-Autorenschaft aktuell keine Einheit als erfüllt
-ausgeben, wenn sie nur aus KnowledgeBase-Metadaten stammt.
+The current `PExamination` and `PFinding` persistence models do not yet carry a
+separate, reliable unit for patient finding values. A template must therefore
+not report a unit as satisfied when the unit comes only from knowledge-base
+metadata.
 
-Die Einheitensicherheit benötigt einen eigenen, versionierten Vertrag für
-Wert, Einheit, Umrechnung und zulässige Toleranz. Bis dahin bleiben solche
-Konzepte `unknown` oder blockieren die Freigabe.
+Unit safety needs its own versioned contract for value, unit, conversion, and
+permitted tolerance. Until then, such concepts stay `unknown` or block
+approval.
 
-## Fail-Closed-Regeln
+## Fail-closed rules
 
-Die Runtime weist eine Vorlage mit `422` zurück, wenn unter anderem:
+The runtime rejects a template with `422` when, among other things:
 
-- `coverage_version` fehlt oder nicht unterstützt wird,
-- stabile Konzept-IDs fehlen,
-- eine anwendbare Regel keinen Wertpfad oder Selector besitzt,
-- weder erlaubte Werte noch eine passende typisierte Wertprüfung vorhanden ist,
-- ein referenzierter Validator nicht geliefert wird,
-- die Template-Identität nicht mit der Route übereinstimmt.
+- `coverage_version` is missing or not supported,
+- `coverage_concepts` is missing or empty, or stable concept IDs are missing,
+- an applicable rule has no value path or selector,
+- there are neither allowed values nor a matching typed value check,
+- the validator response is malformed or lists a validator twice,
+- the template identity does not match the route.
 
-Das ist beabsichtigt. Eine Vorlage ohne fachlich autorisierte Coverage-Matrix
-ist nicht produktionsfähig und darf keine scheinbar vollständige Auflösung
-liefern.
+This is intentional. A template without a clinically authorized coverage matrix
+is not ready for production and must not return a seemingly complete result.
 
-## Prüf- und Freigabeprozess
+A referenced validator that returns no result does not reject the template;
+the affected concept is reported as `unknown`.
 
-Vor einer klinischen Freigabe sind mindestens erforderlich:
+## Review and approval
 
-1. Fachlich annotierte Positiv-, Negativ-, Nicht-anwendbar- und Ungültig-Fälle.
-2. Tests für fehlende, unbekannte und nicht aufgelöste Werte.
-3. Tests für mehrere Befundinstanzen desselben Befundtyps.
-4. Nachweis von Modul-/Template-Version und Digest.
-5. Reproduzierbare Evidence-Pfade und Validatorresultate.
-6. Getrennte Prüfung von technischer Coverage und klinischer Vollständigkeit.
-7. Dokumentierte fachliche Freigabe der Wertemengen, Regeln und Einheiten.
+Before clinical approval, at least the following are required:
 
-Die Produktionsreife wird ausschließlich im Feature-Tracker bewertet. Dieses
-Dokument enthält keine eigene Fertigstellungsmarkierung.
+1. Clinically annotated positive, negative, not-applicable, and invalid cases.
+2. Tests for missing, unknown, and unresolved values.
+3. Tests for several instances of the same finding type.
+4. Evidence of the module and template version and digest.
+5. Reproducible evidence paths and validator results.
+6. Separate review of technical coverage and clinical completeness.
+7. Documented clinical approval of value sets, rules, and units.
 
-## Relevante Implementierung
+## Implementation
 
-- Vertrag: `lx_dtypes/models/knowledge_base/report_template/ReportConceptCoverage.py`
-- Template-Metadaten: `ReportTemplateCoverage.py`
-- Runtime-Builder: `ReportConceptCoverageBuilder.py`
+In this repository:
+
+- Contract: `lx_dtypes/models/knowledge_base/report_template/ReportConceptCoverage.py`
+- Template metadata: `ReportTemplateCoverage.py`
+- Runtime builder: `ReportConceptCoverageBuilder.py`
 - API: `lx_dtypes/django/api/report_template_routes.py`
-- Frontend-Vertrag: `frontend/src/types/reportTemplate.ts`
-- Frontend-Anzeige: `frontend/src/views/reporting/ReportingShell.vue`
-- Feature-Tracker: `feature-tracking/Colonoscopy.yml`
+
+In lx-annotate:
+
+- Frontend contract: `frontend/src/types/reportTemplate.ts`
+- Frontend display: `frontend/src/views/reporting/ReportingShell.vue`

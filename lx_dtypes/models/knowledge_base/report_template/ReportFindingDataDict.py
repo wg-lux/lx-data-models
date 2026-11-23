@@ -6,6 +6,8 @@ from lx_dtypes.models.base.app_base_model.ddict.KnowledgebaseBaseModelDataDict i
 
 
 class ReportTemplateClassificationRequirementDataDict(TypedDict):
+    """Serialized :class:`ReportTemplateClassificationRequirement`."""
+
     classification: str
     required: bool
     concept_id: NotRequired[str | None]
@@ -13,6 +15,8 @@ class ReportTemplateClassificationRequirementDataDict(TypedDict):
 
 
 class ReportTemplateFindingRequirementDataDict(TypedDict):
+    """Serialized :class:`ReportTemplateFindingRequirement`."""
+
     finding: str
     required: bool
     multiple_allowed: bool
@@ -25,4 +29,4 @@ class ReportFindingDataDict(
     KnowledgebaseBaseModelDataDict,
     ReportTemplateFindingRequirementDataDict,
 ):
-    pass
+    """Serialized :class:`ReportFinding` knowledge-base record."""

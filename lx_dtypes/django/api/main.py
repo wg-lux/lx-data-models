@@ -102,7 +102,11 @@ else:
 
 @api.get("/reporting/languages")
 def reporting_languages(request: BaseRequest) -> ReportLanguagesResponse:
-    """Return the report languages supported by LXDM concept labels."""
+    """Return the report languages supported by concept labels.
+
+    The response names the default language and lists every supported language
+    code with its display label. No authentication is required.
+    """
     del request
     return {
         "default_language": DEFAULT_LANGUAGE,
@@ -360,121 +364,6 @@ def _request_user_if_authenticated(request: BaseRequest) -> Any | None:
     if getattr(user, "is_authenticated", False):
         return user
     return None
-
-
-def _serialize_choice(choice: Any) -> dict[str, Any]:
-    return {
-        "id": choice.id,
-        "name": choice.name,
-        "description": choice.description,
-        "subcategories": choice.subcategories,
-        "numerical_descriptors": choice.numerical_descriptors,
-    }
-
-
-def _serialize_classification(
-    classification: Any, *, required: bool = False
-) -> dict[str, Any]:
-    choices = classification.choices.all()
-    classification_types = [
-        _norm_name(c_type.name) for c_type in classification.classification_types.all()
-    ]
-    return {
-        "id": classification.id,
-        "name": classification.name,
-        "description": classification.description,
-        "required": required,
-        "classification_types": classification_types,
-        "choices": [_serialize_choice(choice) for choice in choices],
-    }
-
-
-def _split_classifications(
-    classifications: list[dict[str, Any]],
-) -> dict[str, list[dict[str, Any]]]:
-    location: list[dict[str, Any]] = []
-    morphology: list[dict[str, Any]] = []
-    for classification in classifications:
-        c_types = {
-            _norm_name(v) for v in classification.get("classification_types", [])
-        }
-        if "location" in c_types:
-            location.append(classification)
-        if "morphology" in c_types:
-            morphology.append(classification)
-    return {
-        "location_classifications": location,
-        "morphology_classifications": morphology,
-    }
-
-
-def _serialize_finding(
-    finding: Any,
-    *,
-    allowed_classification_names: set[str] | None = None,
-    required_classification_names: set[str] | None = None,
-) -> dict[str, Any]:
-    all_classifications = finding.finding_classifications.all().prefetch_related(
-        "choices", "classification_types"
-    )
-    selected_classifications = []
-    for classification in all_classifications:
-        c_name = _norm_name(classification.name)
-        if allowed_classification_names and c_name not in allowed_classification_names:
-            continue
-        selected_classifications.append(
-            _serialize_classification(
-                classification,
-                required=(
-                    required_classification_names is not None
-                    and c_name in required_classification_names
-                ),
-            )
-        )
-    split = _split_classifications(selected_classifications)
-    return {
-        "id": finding.id,
-        "name": finding.name,
-        "description": finding.description,
-        "classifications": selected_classifications,
-        "location_classifications": split["location_classifications"],
-        "morphology_classifications": split["morphology_classifications"],
-        # Keep compatibility with legacy frontend field access:
-        "FindingClassifications": selected_classifications,
-    }
-
-
-def _serialize_patient_finding_classification(
-    item: Any,
-) -> dict[str, Any]:
-    return {
-        "id": item.id,
-        "classification": item.classification_id,
-        "classification_choice": item.classification_choice_id,
-        "classification_name": item.classification.name,
-        "classification_choice_name": item.classification_choice.name,
-        "subcategories": item.subcategories,
-        "numerical_descriptors": item.numerical_descriptors,
-        "is_active": item.is_active,
-    }
-
-
-def _serialize_patient_finding(item: Any) -> dict[str, Any]:
-    classifications = item.classifications.filter(is_active=True).select_related(
-        "classification", "classification_choice"
-    )
-    return {
-        "id": item.id,
-        "patient_examination": item.patient_examination_id,
-        "finding": item.finding_id,
-        "is_active": item.is_active,
-        "created_at": item.created_at.isoformat() if item.created_at else None,
-        "updated_at": item.updated_at.isoformat() if item.updated_at else None,
-        "classifications": [
-            _serialize_patient_finding_classification(classification)
-            for classification in classifications
-        ],
-    }
 
 
 def _resolve_exam_kb_finding_names(

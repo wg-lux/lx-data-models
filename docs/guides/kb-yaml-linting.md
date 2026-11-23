@@ -50,6 +50,18 @@ replace the default package list.
   require duplicate labels. Embedded host reference catalogues retain their own
   schema. This checks field coverage, not translation accuracy; descriptions have
   a single shared field and are not required in two languages.
+- An authored German name on every knowledge-base record shown to users, sections
+  and validators included (`missing_german_name`, error): `name_de` must be present,
+  nonblank and different from the identifier. `title_de` does not replace it.
+- Package kinds: an invalid `package_kind` (`invalid_package_kind`), a root
+  `lx-package.json` that disagrees with `config.yaml` (`package_manifest_mismatch`),
+  a declared kind contradicting the reviewed catalog kind (`package_kind_conflict`),
+  a dependency that breaks the kind rules when both kinds are known
+  (`package_kind_dependency_violation`), and validators in `study` or
+  `application_data` packages (`validators_in_package_kind`). Shipped releases
+  without a declared or catalog kind are reported by
+  `check_packaged_knowledge_bases` (`unclassified_shipped_package`). See
+  [package kinds](package-kinds.md).
 - Missing descriptions for template findings, broken classification input chains,
   descriptor units, and descriptor-backed coverage paths.
 - Runtime Pydantic model validation, dependency resolution, and definition conflicts.

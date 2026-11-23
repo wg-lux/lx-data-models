@@ -53,7 +53,7 @@ maintainers = [
 name = "lx-dtypes"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.12,<3.13"
-version = "0.6.9"
+version = "0.7.2"
 
 [project.optional-dependencies]
 dev = [
@@ -220,43 +220,16 @@ requires = ["hatchling"]
 
 [tool.hatch.build.targets.sdist]
 core-metadata-version = "2.4"
-exclude = [
-  "docs/_build",
-  "docs/_build/**",
-  ".devenv",
-  ".devenv/**",
-  ".direnv",
-  ".direnv/**",
-  "tests",
-  "tests/**",
-  "docs/production",
-  "docs/production/**",
-  "htmlcov",
-  "htmlcov/**",
-  "result",
-  "result/**",
-  "storage",
-  "storage/**",
-  "temp",
-  "temp/**",
+# Release only the library and metadata needed to rebuild its wheel.
+include = [
+  "/lx_dtypes",
+  "/lx_kb_lint.py",
+  "/pyproject.toml",
+  "/README.md",
+  "/LICENSE",
+  "/CHANGELOG.md",
+  "/CITATION.cff",
 ]
-
-[tool.hatch.build.targets.sdist.force-include]
-"lx_dtypes/data" = "lx_dtypes/data"
-"lx_dtypes/py.typed" = "lx_dtypes/py.typed"
-"lx_kb_lint.py" = "lx_kb_lint.py"
-
-# 🟢 HATCH ENVIRONMENTS (Bonus)
-# # You can define your test environment here instead of using tox
-# [tool.hatch.envs.default]
-# dependencies = [
-#   "pytest",
-#   "pytest-django",
-#   "lx-dtypes[dev,docs]", # Installs your own package with the extra
-# ]
-
-# [tool.hatch.envs.default.scripts]
-# test = "pytest"
 
 [tool.uv]
 # Resolve for macOS, Linux and Windows

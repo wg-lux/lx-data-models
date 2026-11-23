@@ -174,6 +174,8 @@ def test_editor_zip_import_is_immediately_available_through_graph_api(
         "module_name": "editor_graph_bundle",
         "version": "1.2.3",
         "medical_field": "gastroenterology",
+        "package_kind": "terminology",
+        "package_kind_source": "migrated",
         "is_active": False,
     }
     assert (

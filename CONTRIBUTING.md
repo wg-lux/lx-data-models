@@ -115,30 +115,37 @@ The development environment includes the documentation dependencies.
 
 ## Release Checklist
 
-1. Confirm `CHANGELOG.md` lists the new version and highlights key changes.
-2. Bump the version in `pyproject.toml`.
-3. Tag the release (`git tag vX.Y.Z && git push origin vX.Y.Z`).
-4. Build artifacts and upload:
+The source distribution contains `lx_dtypes/`, the compatibility module
+`lx_kb_lint.py`, and release metadata (project configuration, README, license,
+changelog, and citation), plus Hatch's `.gitignore` build input. The wheel
+contains the library, compatibility module, and wheel metadata. Tests, documentation sources, demo data, host scaffolding,
+and development environments stay in the repository. Packaged terminology,
+setup templates, migrations, and `py.typed` remain part of the library.
+
+1. Run the quality checks above and confirm `CHANGELOG.md` describes the release.
+2. Set the intended version in every release file:
    ```bash
-   rm -rf dist
-   python -m build
-   twine check dist/*
-   twine upload --repository testpypi dist/*
-   twine upload dist/*
+   uv run lx-dtypes-release prepare X.Y.Z
    ```
-5. Alternatively, trigger the `Publish` GitHub Action (release event or manual
-   dispatch) once Trusted Publishers are configured for TestPyPI/PyPI and the
-   `testpypi`/`pypi` environments are approved. The workflow builds packages,
-   uploads to TestPyPI, then PyPI for tagged releases—no API tokens required.
-6. Announce in the relevant channels and update documentation badges.
-
-Shortcut commands:
-
-```bash
-lx-dtypes-release prepare 0.1.2
-lx-dtypes-release build
-git tag v0.1.2 && git push origin v0.1.2
-```
+   This updates `pyproject.toml`, `CITATION.cff` (version and
+   `date-released`, today unless you pass `--release-date YYYY-MM-DD`), and
+   `uv.lock`. It renames an `## [Unreleased]` section of `CHANGELOG.md` to the
+   new version but never writes release notes for you. Knowledge-base module
+   versions are independent and stay unchanged. Check consistency at any time
+   with `uv run lx-dtypes-release check-version`; the test suite runs the same
+   check.
+3. Build and validate the artifacts:
+   ```bash
+   uv run lx-dtypes-release build
+   ```
+   This checks archive boundaries, migration and terminology integrity, report
+   templates, and metadata. CI runs the same checks before release. Only use the
+   two artifacts for the intended version; `dist/` can contain older builds.
+4. Commit the reviewed release changes, tag that commit with `vX.Y.Z`, and push
+   the tag. Publish its GitHub release to trigger the `Publish` workflow.
+5. The workflow also checks an installed wheel outside the checkout, then uses
+   the protected `testpypi` and `pypi` environments and Trusted Publishers.
+   Manual dispatch publishes to TestPyPI only.
 
 To provision a historical KB version for runtime lookup:
 

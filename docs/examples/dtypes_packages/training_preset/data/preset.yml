@@ -1,6 +1,7 @@
 # All entries in this package are synthetic documentation examples.
 - model: study_preset
   name: training_setup
+  name_de: Schulungseinrichtung (synthetisch)
   centers:
     - name: training_center
   genders:

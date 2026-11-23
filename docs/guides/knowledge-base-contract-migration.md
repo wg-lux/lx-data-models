@@ -17,10 +17,8 @@ The API may accept payloads without a version for backwards compatibility, but
 the boundary must normalize them to the current configured KB identity before
 loading or validating data.
 
-The main frontend caller is:
-
-`/home/admin/dev/lx-annotate/frontend/src/components/VideoExamination/VideoExaminationAnnotation.vue`
-
+The main frontend caller is the lx-annotate video examination annotation
+component (`frontend/src/components/VideoExamination/VideoExaminationAnnotation.vue`).
 That caller can continue to send the existing route payloads while the API fills
 the current KB version. New frontend work should include both
 `knowledge_base_module` and `knowledge_base_version` once the selected
@@ -99,10 +97,10 @@ The boundary should look like this:
 The following areas can be reduced or moved without changing persistence
 ownership:
 
-- Thin `lx_dtypes.django.api.main`: keep route registration, host-model lookup,
-  cache clearing, and KB identity resolution there; move serialization helpers
-  such as `_serialize_choice`, `_serialize_classification`, and
-  `_serialize_patient_finding` into typed contract adapters.
+- Keep route registration, host-model lookup, cache clearing, and KB identity
+  resolution in `lx_dtypes.django.api.main`. Serialization helpers such as
+  `_serialize_choice`, `_serialize_classification`, and `_serialize_patient_finding`
+  live in `findings_routes`; consider typed contract adapters for those live helpers.
 - Make builder-side report-template loading version-explicit through
   `KnowledgeBaseResolver` before calling `load_knowledge_base`; avoid relying
   on module-name-only loads in runtime API code.

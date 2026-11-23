@@ -56,6 +56,8 @@ class ClassificationValidatorHintDataDict(TypedDict):
 
 
 class ClassificationValidatorDataDict(KnowledgebaseBaseModelDataDict):
+    """Serialized :class:`ClassificationValidator` knowledge-base record."""
+
     query: ClassificationValidatorQueryDataDict
     finding: str
     classification: str

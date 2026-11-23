@@ -1,5 +1,6 @@
 - model: electrical_curve_profile
   name: synthetic_cut_impedance_response
+  name_de: Synthetisches Impedanzprofil Schneidestrom
   description: >-
     Synthetic example. Explains RMS current and power across one activation by
     phase and tissue impedance. Not a clinically approved parameter definition.

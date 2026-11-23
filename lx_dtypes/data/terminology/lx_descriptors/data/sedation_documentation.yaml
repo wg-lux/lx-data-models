@@ -62,7 +62,7 @@
   name_de: "Flussrate der zusätzlichen Sauerstoffgabe"
   name_en: "Supplemental oxygen flow rate"
   description: "Dokumentierte Sauerstoffflussrate."
-  unit: "liters_per_minute"
+  unit: "liters-per-minute"
   classification_choice_descriptor_type: "numeric"
   numeric_min: 0
   numeric_max: 30

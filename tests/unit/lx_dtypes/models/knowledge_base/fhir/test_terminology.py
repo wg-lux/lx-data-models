@@ -28,6 +28,7 @@ from lx_dtypes.models.knowledge_base.fhir.yaml import (
     write_fhir_yaml,
 )
 from lx_dtypes.models.knowledge_base.finding._Finding import Finding
+from lx_dtypes.models.knowledge_base.indication.Indication import Indication
 from lx_dtypes.models.knowledge_base.unit.Unit import Unit
 
 
@@ -175,7 +176,7 @@ def test_knowledge_base_exports_fhir_terminology_resources() -> None:
 
     code_systems = exported["code_systems"]
     value_sets = exported["value_sets"]
-    assert len(code_systems) == 6
+    assert len(code_systems) == 7
 
     examination_cs = _resource_by_id(code_systems, "lx-examination-cs")
     gastroscopy = _concept_by_code(examination_cs, "gastroscopy")
@@ -245,7 +246,7 @@ def test_knowledge_base_exports_fhir_terminology_bundle() -> None:
         "url": f"{DEFAULT_FHIR_BASE_URL}/StructureDefinition/lx-medical-field",
         "valueCode": "gastroenterology",
     } in bundle["entry"][0]["resource"]["extension"]
-    assert len(bundle["entry"]) == 12
+    assert len(bundle["entry"]) == 14
 
 
 def test_fhir_terminology_import_roundtrips_exported_concepts() -> None:
@@ -387,6 +388,34 @@ def test_fhir_creates_validated_knowledge_base_with_stable_codes() -> None:
         "la-grade-a",
         "la-grade-b",
     ]
+
+
+def test_fhir_terminology_exports_and_imports_indications() -> None:
+    # Host FHIR exports code Procedure.reasonCode against lx-indication-cs, so
+    # indications must be published and survive the import round trip.
+    source = _sample_knowledge_base()
+    source.indication["gastroscopy_screening"] = Indication(
+        name="gastroscopy_screening",
+        name_de="Vorsorge",
+        name_en="Screening",
+        description="Screening gastroscopy.",
+        kb_module_name="gastro_base",
+    )
+
+    exported = source.export_fhir_terminology()
+    indication_cs = _resource_by_id(exported["code_systems"], "lx-indication-cs")
+    assert (
+        indication_cs["url"] == f"{DEFAULT_FHIR_BASE_URL}/CodeSystem/lx-indication-cs"
+    )
+    assert _concept_by_code(indication_cs, "gastroscopy-screening")["display"]
+    assert _resource_by_id(exported["value_sets"], "lx-indication-vs")
+
+    imported = KnowledgeBase.from_fhir(
+        source.export_fhir_terminology(bundle=True), module_name="imported_gastro"
+    )
+    indication = imported.indication["gastroscopy-screening"]
+    assert (indication.name_de, indication.name_en) == ("Vorsorge", "Screening")
+    assert indication.classifications == []
 
 
 def test_fhir_to_yaml_roundtrips_through_knowledge_base_loader(

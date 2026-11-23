@@ -2,9 +2,7 @@
 
 The canonical contracts are `StudyAnalysisDefinition` and `StudyInference` in
 `lx_dtypes.models.contracts.study_analysis`; execution is local through
-`evaluate_study_dataset`. Scope and verification belong to
-[endoreg-db feature tracking](../../../../endoreg-db/feature-tracking/DtypesStudyDefinitions.yml),
-criterion `configured_statistical_inference`.
+`evaluate_study_dataset`.
 
 Study setup YAML stores `variables` and `inference` inside each
 `study_metadata.analysis_definitions` entry. The study editor exposes the same

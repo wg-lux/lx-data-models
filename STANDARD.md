@@ -1,15 +1,46 @@
-Im Folgenden wird zwischen einer definitorischen Terminologieebene und einer patientenbezogenen Instanzebene unterschieden. Diese Trennung ist notwendig, damit Terminologiestandards unabhängig von einzelnen Dokumentationsfällen strukturiert modelliert, validiert und später auf konkrete Untersuchungen angewandt werden können.
+# Terminology Level and Instance Level
 
-Untersuchungen sind auf der Terminologieebene definierte Untersuchungstypen, die festlegen, welche Befundtypen, Indikationen und Dokumentationsregeln in einem bestimmten Kontext zulässig oder erforderlich sind. Auf der Instanzebene sind Untersuchungen konkrete Prozesse, die an einem Patienten durchgeführt werden und das Vorhandensein möglicher Befunde überprüfen.
+The following distinguishes a definitional terminology level from a
+patient-specific instance level. This separation is necessary so that
+terminology standards can be modelled and validated in a structured way,
+independently of individual documentation cases, and later applied to concrete
+examinations.
 
-Befunde sind auf der Terminologieebene definierte Befundtypen, die innerhalb bestimmter Untersuchungstypen auftreten können. Sie legen fest, welche Klassifikationen und Behandlungen mit ihnen verknüpft werden dürfen. Auf der Instanzebene sind Befunde patientenbezogene Beobachtungen oder biologische Entitäten, die während einer konkreten Untersuchung dokumentiert werden.
+**Examinations** are, at the terminology level, defined examination types that
+specify which finding types, indications, and documentation rules are
+permitted or required in a given context. At the instance level, examinations
+are concrete procedures performed on a patient that check for the presence of
+possible findings.
 
-Klassifikationen sind definierte Beschreibungsdimensionen eines Befundes, beispielsweise hinsichtlich Lokalisation, Morphologie, Struktur oder weiterer fachlicher Merkmale. Sie werden nicht nur als freie Textangaben, sondern als strukturierte Merkmalsräume modelliert. Auf der Instanzebene werden sie einem konkreten Befund zugeordnet und auf Vollständigkeit sowie Plausibilität evaluiert. Eine Klassifikation kann eine oder mehrere Klassifikations-Typen sowie eine oder mehrere Klassifikations-Auswahlmöglichkeiten besitzen.
+**Findings** are, at the terminology level, defined finding types that can
+occur within certain examination types. They specify which classifications and
+treatments may be linked to them. At the instance level, findings are
+patient-specific observations or biological entities documented during a
+concrete examination.
 
-Mit Klassifikations-Typen kann festgelegt werden, welche Art der Klassifikation vorliegt. Sie umfassen Lokalisation, Morphologie, Labor oder Labor Referenz um den Kontext der MEssung und Erfassung zu dokumentieren. 
+**Classifications** are defined descriptive dimensions of a finding, for
+example its location, morphology, structure, or other clinical
+characteristics. They are modelled as structured feature spaces, not only as
+free-text entries. At the instance level, they are assigned to a concrete
+finding and evaluated for completeness and plausibility. A classification can
+have one or more classification types and one or more classification choices.
 
-Klassifikations-Auswahlmöglichkeiten sind die zulässigen Werte einer Klassifikation. Diese können nominal, ordinal oder binär modelliert werden. Ihre Struktur wird auf der Terminologieebene festgelegt und bei der Eingabe patientenbezogener Daten validiert.
+**Classification types** specify what kind of classification is present. They
+include location, morphology, laboratory, and laboratory reference, which
+document the context of the measurement and its capture.
 
-Voraussetzungen sind formalisierte Regeln, die definieren, unter welchen Bedingungen ein Befund, eine Klassifikation oder eine Dokumentation als vollständig oder regelkonform gilt. Sie können sich unter anderem auf Medikation, Vorerkrankungen, Untersuchungskontexte, Laborparameter oder bereits dokumentierte Befunde beziehen und werden auf konkrete Instanzen angewandt.
+**Classification choices** are the permitted values of a classification. They
+can be modelled as nominal, ordinal, or binary. Their structure is defined at
+the terminology level and validated when patient-specific data is entered.
 
-Behandlungen sind auf der Terminologieebene definierte Interventionsarten, die mit bestimmten Befundtypen verknüpft werden können. Auf der Instanzebene sind sie konkrete Maßnahmen, die im Zusammenhang mit einem patientenbezogenen Befund durchgeführt werden. Sie können in definierten Fällen Folge-Befunde oder weitere Dokumentationspflichten auslösen.
+**Requirements** are formalized rules that define under which conditions a
+finding, a classification, or a documentation is considered complete or
+compliant. They can refer to medication, previous illnesses, examination
+contexts, laboratory parameters, or findings already documented, among other
+things, and are applied to concrete instances.
+
+**Treatments** are, at the terminology level, defined intervention types that
+can be linked to certain finding types. At the instance level, they are
+concrete measures carried out in connection with a patient-specific finding.
+In defined cases, they can trigger follow-up findings or further documentation
+obligations.

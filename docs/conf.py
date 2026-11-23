@@ -20,6 +20,8 @@ django.setup()
 DOCS_PATH = Path(__file__).resolve().parent
 REPO_ROOT = DOCS_PATH.parent
 sys.path.insert(0, str(REPO_ROOT))
+# Local extensions, such as the OpenAPI endpoint reference.
+sys.path.insert(0, str(DOCS_PATH / "_ext"))
 
 project = "lx-dtypes"
 author = "Thomas J. Lux"
@@ -41,6 +43,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
+    "openapi_reference",
 ]
 
 myst_enable_extensions = [
@@ -60,6 +63,9 @@ intersphinx_mapping = {
 
 autosummary_generate = True
 autodoc_typehints = "description"
+# Render Google-style "Attributes:" sections as field lists. Autodoc already
+# documents Pydantic fields as attributes; separate entries would duplicate them.
+napoleon_use_ivar = True
 autodoc_default_options = {
     "members": True,
     "undoc-members": False,
@@ -75,6 +81,8 @@ exclude_patterns: list[str] = [
     "**/tests/**",
     "**/test_*",
     "guides/fixtures/**",
+    # Licensed BMP source documents summarized by medication_plan_specification_summary.
+    "german-medication-plan/**",
 ]
 
 html_theme = "furo"

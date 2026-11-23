@@ -25,11 +25,12 @@ labels without changing clinical identifiers or rules.
   references and reporting validators. These packages depend on terminology;
   they must not define findings, classifications, choices or other concepts.
 - **`catalog.json`** selects published knowledge-base releases and records their
-  integrity digests. Historical releases remain under `terminology/versions/`.
+  integrity digests and reviewed `package_kind`. Historical releases remain under `terminology/versions/`.
 
 Executable numeric rules are terminology contracts, even when authored for a
 particular study. Report templates are a separate authoring layer. Host reference catalogues such as workforce
-and sustainability definitions are also terminology; they are not cohort metadata.
+and sustainability definitions live under `terminology/` but are classified as
+`application_data` packages in `catalog.json`; they are not cohort metadata.
 Annotation mappings and numeric rules are separate sidecars, not ordinary KB lists.
 Study metadata must not be added to a terminology manifest's selected data files.
 No participating centres, age limits or eligibility rules should be inferred from
@@ -85,7 +86,7 @@ lesion-linked resection and longitudinal follow-up. The published `0.2.0` packag
 and its dependency closure remain under `terminology/versions/coloreg/0.2.0/`.
 The [study document](study_metadata/coloreg_resection.yml) stores the four
 comparison hypotheses separately from terminology. The canonical
-[endpoint and linkage specification](../../docs/guides/coloreg-resection-study.yml)
+[endpoint and linkage specification](../../docs/guides/coloreg-resection-study.md)
 explains protocol-defined primary success, denominators and host responsibilities.
 The study document's `analysis_definitions` contains executable descriptive
 rules for R0 and explicit draft definitions for protocol-dependent comparisons.

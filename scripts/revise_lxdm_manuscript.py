@@ -107,7 +107,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument(
-        "--spec", type=Path, default=Path("docs/manuscript-reconciliation.yml")
+        "--spec", type=Path, default=Path("scripts/manuscript/reconciliation.yml")
     )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()

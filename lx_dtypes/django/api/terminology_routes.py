@@ -56,6 +56,11 @@ def register_terminology_routes(
 
     @api.get("/terminology/bundles", response=TerminologyBundleListResponse)
     def list_terminology_bundles(request: BaseRequest) -> TerminologyBundleListResponse:
+        """List the installed terminology bundles and their versions.
+
+        The response names the active bundle and the registry ``revision``
+        that ``select`` expects. No authentication is required.
+        """
         with _http_errors():
             return service.list_bundles()
 
@@ -63,11 +68,23 @@ def register_terminology_routes(
     def list_report_template_catalog(
         request: BaseRequest, examination: str | None = None
     ) -> ReportTemplateCatalogResponse:
+        """List the report templates of all installed terminology bundles.
+
+        ``examination`` restricts the list to templates for that examination. No
+        authentication is required.
+        """
         with _http_errors():
             return service.list_report_templates(examination=examination)
 
     @api.get("/terminology/active/fhir", response=dict[str, Any])
     def export_active_terminology_fhir(request: BaseRequest) -> dict[str, Any]:
+        """Export the active terminology bundle as a FHIR Bundle.
+
+        No authentication is required.
+
+        Errors: ``404`` if no bundle is active, ``409`` if the bundle cannot
+        be exported.
+        """
         with _http_errors():
             return service.export_fhir()
 
@@ -79,6 +96,13 @@ def register_terminology_routes(
         module_name: str,
         version: str,
     ) -> dict[str, Any]:
+        """Export one installed terminology bundle version as a FHIR Bundle.
+
+        No authentication is required.
+
+        Errors: ``404`` if the bundle version is not installed, ``409`` if it
+        cannot be exported.
+        """
         with _http_errors():
             return service.export_fhir((module_name.strip(), version.strip()))
 
@@ -87,6 +111,17 @@ def register_terminology_routes(
         request: BaseRequest,
         file: File[UploadedFile],
     ) -> ImportTerminologyBundleResponse:
+        """Install a terminology bundle from an uploaded ZIP archive.
+
+        The archive is validated before installation. Importing does not activate
+        the bundle; use ``select`` for that.
+
+        Authentication: requires terminology write access, which the host must
+        configure.
+
+        Errors: ``401`` without credentials, ``403`` without write access or when
+        writes are not configured, ``400`` for an invalid upload.
+        """
         require_write_access(request)
         with _http_errors():
             if file.file is None:
@@ -100,6 +135,20 @@ def register_terminology_routes(
         request: BaseRequest,
         payload: SelectTerminologyBundleRequest,
     ) -> SelectTerminologyBundleResponse:
+        """Make an installed terminology bundle version the active one.
+
+        ``expected_revision`` guards against concurrent changes: the selection
+        fails if the active state changed since the caller read it. Application
+        caches are cleared after the switch.
+
+        Authentication: requires terminology write access, which the host must
+        configure.
+
+        Errors: ``401`` without credentials, ``403`` without write access or when
+        writes are not configured, ``404`` if the version is not installed,
+        ``409`` if ``expected_revision`` is stale or the loaded bundle reports a
+        different identity.
+        """
         require_write_access(request)
         with _http_errors():
             return service.select(

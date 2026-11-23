@@ -5,6 +5,72 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2]
+
+### Added
+- `lx-dtypes-release prepare X.Y.Z` sets the version in `pyproject.toml`,
+  `CITATION.cff` (with its release date), the `CHANGELOG.md` heading and
+  `uv.lock`. `lx-dtypes-release check-version` reports files that disagree.
+- Localized `display_names` mappings in runtime validator results, preserving
+  stable machine identifiers for consumers.
+- FHIR terminology export and import cover examination indications as the
+  `lx-indication-cs` CodeSystem and `lx-indication-vs` ValueSet, so host FHIR
+  exports can code `Procedure.reasonCode` against a published CodeSystem.
+  Terminology Bundles therefore contain two more resources.
+
+### Changed
+- Report-template structure and readiness messages use the requested language
+  and localized concept names, including German rule-evaluation output.
+- Source distributions include only the library and release metadata. CI and
+  publishing run the release helper's artifact verification before publication.
+- Consolidated study metadata and ColoReg resection guidance into Markdown,
+  with a standalone YAML example for study label presentation.
+
+### Fixed
+- `CITATION.cff` cited version 0.2.20 instead of the current release.
+- Examination and indication catalog routes (`examinations/`,
+  `examinations/{id}/`, `examinations/{id}/indications/`) no longer fail with
+  HTTP 500 when the host stores `NULL` localized names; such names now fall back
+  to the semantic name like empty ones.
+- Ledger payloads built from the host (`build_p_examination_payload_from_host_ledger`)
+  now include the patient examination's indications and their chosen
+  classification options as `patient_indications`. Before, saved indications were
+  missing from the record, so required indication concepts such as
+  `koloskopie.indikation` always validated as missing. Hosts without an
+  `indications` relation contribute no indications; a row without an
+  indication name is rejected. A chosen option is attributed to the one
+  classification it shares with its indication (hosts such as endoreg-db link
+  choices many-to-many); a choice that resolves to none or several
+  classifications is rejected.
+- FHIR terminology export failed with "duplicate concept codes" for every
+  package depending on `lx_units`, because `lx_units` defined both
+  `liters-per-minute` and `liters_per_minute`. The duplicate is removed and the
+  `supplemental_oxygen_flow_rate_value` descriptor uses `liters-per-minute`.
+  `lx_units` and `lx_descriptors` keep version 0.1.0 with new content digests
+  in `catalog.json`. Registries that already installed the previous 0.1.0
+  content keep it and must have those entries replaced by an operator; retained
+  releases `coloreg` 0.1.0/0.2.0 and `dgvs_reporting` 0.1.0 embed the old
+  definitions and still cannot be exported as FHIR terminology.
+
+## [0.7.1]
+
+### Added
+- Package kinds, deterministic `lx-package.json` manifests, shared legacy-kind
+  inference, and verified package-channel installation.
+- Package-kind provenance in terminology listings and dependency-kind validation.
+- A "Public API" reference page and docstrings for every name exported from
+  `lx_dtypes`, `lx_dtypes.evaluation`, and `lx_dtypes.packages`.
+- An HTTP API reference generated from the OpenAPI schema, and the schema
+  itself as `openapi.json` in the built documentation. Every operation now has
+  an OpenAPI description stating its authentication and error responses.
+
+### Changed
+- Deployment setup schema 2.0 separates reference, terminology, report-template,
+  and study package roles. Schema 1.0 remains readable for explicit migration;
+  consumers must migrate setup documents and regenerate their deployment locks.
+- Report-template validation resolves named validators within the dependency
+  closure and rejects ambiguous duplicate definitions.
+
 ## [0.6.7] - Unreleased
 
 ### Added

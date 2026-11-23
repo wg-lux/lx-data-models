@@ -16,9 +16,10 @@ database and does not expose Cypher, database identifiers, or persistence detail
 ```text
 GET /base_api/knowledge-bases/{module}/{version}/graph
 GET /base_api/knowledge-bases/{module}/{version}/examinations/{name}/reporting-context
+GET /base_api/knowledge-bases/{module}/{version}/examinations/{name}/indications
 ```
 
-Both routes require an exact module and version. Resolution is fail-closed; the
+All routes require an exact module and version. Resolution is fail-closed; the
 API does not silently substitute the active version.
 
 ## Complete graph snapshot
@@ -61,6 +62,29 @@ detect stale context without comparing individual collections.
 
 An unknown examination returns `404`. An identity mismatch or graph that cannot
 be validated returns `409` rather than a partial response.
+
+## Direct indication lookup
+
+The indications route returns a JSON array of `IndicationCore` records declared
+by the selected examination, sorted by semantic name. Records include localized
+names, descriptions, indication types, and classification/intervention references.
+These references are semantic names; use the reporting context when resolved
+classifications, choices, and interventions are also needed. No host ORM IDs or
+patient data are required. An examination with no indications returns `[]`; an
+unknown examination returns `404`, and an invalid graph returns `409`.
+
+For example, query
+`/base_api/knowledge-bases/coloreg/0.3.0/examinations/colonoscopy/indications`.
+This uses the same exact-version loader and graph cache as the other graph routes.
+Indication availability comes from the examination's terminology relationships,
+independently of whether a report section contains a field with key `indication`.
+That field controls where the host renders captured indications, not which
+indications are available. This endpoint lists available definitions, not a
+patient's selected indications.
+
+Python callers can use `resolver.indications_for_examination("colonoscopy")`.
+The method returns isolated typed records and raises `KeyError` for an unknown
+examination.
 
 ## Repeated resolution and integrity
 

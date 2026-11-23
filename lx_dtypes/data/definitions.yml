@@ -758,7 +758,7 @@ source_provenance:
       version: '3.0'
       url: https://www.worldendo.org/assets-craft/pdf/resources/mst-3-0.pdf
       scope: MST concepts with section references in the owning YAML; reporting adapters are repository-authored.
-      limitation: See docs/data-reconciliation.yml for the limits of the source audit; no unsupported severity table is claimed.
+      limitation: See docs/guides/knowledge-base-authoring.md for the limits of the source check; no unsupported severity table is claimed.
     esge_polypectomy_2024:
       kind: guideline_adaptation
       authority: ESGE
@@ -779,7 +779,7 @@ source_provenance:
     coloreg_protocol:
       kind: study_authored
       authority: ColoReg study authors
-      canonical_document: docs/guides/coloreg-resection-study.yml
+      canonical_document: docs/guides/coloreg-resection-study.md
       study_document: lx_dtypes/data/study_metadata/coloreg_resection.yml
       scope: Study capture and linkage definitions; cohort selection remains a separate host contract.
     synthetic_examples:

@@ -1,6 +1,6 @@
 # Owner: ColoReg study authors; structural contract: StudySetupDefinition.
 # Descriptive rules never imply a significance test; unresolved protocol choices remain drafts.
-# Canonical endpoint and linkage specification: docs/guides/coloreg-resection-study.yml.
+# Canonical endpoint and linkage specification: docs/guides/coloreg-resection-study.md.
 # These cohorts select candidate examinations, not an automatically evaluated >=20 mm analysis population.
 # Empty dataset_refs preserves the existing authorized scope; it does not grant access.
 schema_version: '1.0'

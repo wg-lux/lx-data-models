@@ -22,7 +22,7 @@ entrypoints:
   purpose: Canonical package and provenance inventory
 - name: Catalog
   file: catalog.json
-  purpose: Published release identities and digests
+  purpose: Published release identities, digests and reviewed package kinds
 dependencies:
   internal:
   - ../models

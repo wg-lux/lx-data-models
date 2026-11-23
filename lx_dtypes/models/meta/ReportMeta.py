@@ -492,16 +492,6 @@ def _normalize_string_list(value: Any) -> list[str]:
     return [str(value).strip()] if str(value).strip() else []
 
 
-def _has_signal(value: Any) -> bool:
-    if value is None:
-        return False
-    if isinstance(value, str):
-        return value.strip().casefold() not in _NULL_STRINGS
-    if isinstance(value, (list, dict, set, tuple)):
-        return len(value) > 0
-    return True
-
-
 def _parse_date_like(value: Any) -> date | None:
     if value is None:
         return None

@@ -37,13 +37,12 @@ def test_wheel_build_includes_knowledge_base_data() -> None:
     wheel_force_include = payload["tool"]["hatch"]["build"]["targets"]["wheel"][
         "force-include"
     ]
-    sdist_force_include = payload["tool"]["hatch"]["build"]["targets"]["sdist"][
-        "force-include"
-    ]
+    sdist_include = payload["tool"]["hatch"]["build"]["targets"]["sdist"]["include"]
 
     assert wheel_packages == ["lx_dtypes"]
     assert "demo-data" not in wheel_force_include
-    assert sdist_force_include["lx_dtypes/data"] == "lx_dtypes/data"
+    assert "/lx_dtypes" in sdist_include
+    assert "/demo-data" not in sdist_include
 
 
 def test_release_helpers_cover_validation_and_main(

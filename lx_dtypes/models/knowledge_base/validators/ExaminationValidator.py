@@ -10,6 +10,16 @@ from lx_dtypes.models.knowledge_base.validators.ExaminationValidatorDataDict imp
 
 
 class ExaminationValidator(KnowledgebaseBaseModel[ExaminationValidatorDataDict]):
+    """Knowledge-base rule that aggregates other validators for an examination.
+
+    The examination validator passes when every referenced findings validator
+    and nested examination validator passes.
+
+    Attributes:
+        finding_validators: Names of :class:`FindingsValidator` records.
+        examination_validators: Names of nested examination validators.
+    """
+
     finding_validators: str | list[str] = Field(default_factory=list_of_str_factory)
     examination_validators: str | list[str] = Field(default_factory=list_of_str_factory)
 

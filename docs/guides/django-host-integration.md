@@ -112,7 +112,9 @@ urlpatterns = [
 ]
 ```
 
-The shipped URL config exposes the API under `base_api/`.
+The shipped URL config exposes the API under `base_api/`. The
+[HTTP API reference](../api/http.rst) lists every route with its parameters,
+authentication, and error responses.
 
 ## Required Exported ORM Models
 

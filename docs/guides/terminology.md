@@ -217,6 +217,12 @@ storage layout, and multi-centre deployment responsibilities.
 
 API tests must configure their test root before importing modules that register routes and capture a service. Clearing `get_terminology_service.cache_clear()` allows a later factory call to read changed settings, but does not replace a service already retained by a route.
 
+Bundle listings include `package_kind` (`null` when unclassified). ZIP uploads
+with an `lx-package.json` that disagrees with `config.yaml` are rejected with
+HTTP 400. Verified channel packages are installed through
+`lx_dtypes.packages.install_channel_package`. See
+[package kinds and channels](package-kinds.md).
+
 ## Runtime behaviour and errors
 
 The shared factory caches service configuration, not the active identity. All processes intended to share terminology must use the same registry and have access to its registered resources. A matching path string on separate filesystems is not shared storage.

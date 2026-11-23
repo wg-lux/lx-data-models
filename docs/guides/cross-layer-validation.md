@@ -342,7 +342,7 @@ paginated examination preview.
 For ColoReg, `assemble_coloreg_analysis_units` binds the original polyp,
 index resection and follow-up roles using explicit lesion references. Missing
 or out-of-scope history remains unavailable. The
-[ColoReg specification](coloreg-resection-study.yml) owns endpoint meanings,
+[ColoReg specification](coloreg-resection-study.md) owns endpoint meanings,
 protocol decisions and denominator choices.
 
 This is a descriptive statistics method, not a hypothesis significance test.

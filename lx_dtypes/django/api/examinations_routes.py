@@ -85,6 +85,11 @@ def register_examinations_routes(
 ) -> None:
     @api.get("/examinations/")
     def examinations_catalog(request: BaseRequest) -> list[dict[str, Any]]:
+        """List all host examinations with their available findings.
+
+        Findings are filtered by the active knowledge-base version, which stays
+        the same for the whole response. No authentication is required.
+        """
         del request
         # Keep the same module AND version throughout this response.
         module_name, version = active_kb_identity()
@@ -101,6 +106,13 @@ def register_examinations_routes(
 
     @api.get("/examinations/{examination_id}/")
     def examination_detail(request: BaseRequest, examination_id: int) -> dict[str, Any]:
+        """Return one host examination with its available findings.
+
+        Findings are filtered by the active knowledge-base version. No
+        authentication is required.
+
+        Errors: ``404`` if the examination does not exist.
+        """
         del request
         examination_model = orm_models()["Examination"]
         examination = examination_model.objects.filter(id=examination_id).first()

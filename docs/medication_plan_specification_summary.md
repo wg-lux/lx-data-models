@@ -11,9 +11,9 @@ Derived from the four source documents in `docs/german-medication-plan/`:
 | `beispiel_1.xml` | Official sample carrier-segment XML (ground truth for the XML shape). |
 | `bmp_V2.8.xsd` | **Official W3C XML Schema for the carrier segment** (ground truth for element/attribute names, types, lengths, and validation constraints — supersedes any reconstruction from the PDF's text layer). |
 
-This summary is the normative-content extract needed to design data-model compatibility. It does **not** yet map anything onto our existing `LabValue`/`MedicationSchedule` models — that comparison is the next step.
+Owner: lx_dtypes maintainers. This page summarizes the normative content of the BMP specification. How `lx-dtypes` implements it is described in [Implementation in lx-dtypes](#implementation-in-lx-dtypes).
 
-With the official XSD and sample now available, §9–§12 below are **confirmed against ground truth**, not reconstructed from PDF text.
+§9 and §10 are **confirmed against the official XSD and sample**, not reconstructed from PDF text.
 
 ---
 
@@ -304,18 +304,23 @@ Selected rules most relevant to a data model (full list has 30 entries in Anhang
 
 **Practical implication for implementation**: a large share of the BMP's actual business rules live only in XSD `<xs:documentation>` annotations, not in machine-checkable schema constructs (no `xs:choice`/`xs:key`/`xs:assert` used for the cross-attribute mutual-exclusivity and conditional-requirement rules). An XSD-valid document is **necessary but not sufficient** for BMP conformance — our own import/export code must independently re-implement these documented constraints.
 
-## 11. Relevance to the existing `LabValue` / `MedicationSchedule` models (flag for next step)
+## Implementation in lx-dtypes
 
-- The BMP's **medication entries** map fairly directly onto something like a `MedicationSchedule` concept: substance(s), strength(s), dosage form, a structured W-X-Y-Z (or weekly, or free-text) dosing scheme, dose unit, notes, and treatment reason — plus PZN as an external drug-catalog key.
-- The BMP's **parameter block** (weight, height, creatinine, pregnant, breastfeeding, sex, allergies) is **not** a general lab-value model — it's exactly 3 numeric clinical values (weight/height/creatinine) plus boolean/categorical patient attributes, entered manually at print time, explicitly **never auto-populated** from stored patient data. If we want BMP-import/export to interoperate with our `LabValue` model, we'll need to decide: (a) treat these 3 values as a thin, special-cased subset mapped to specific LabValue types/units on import, and (b) decide whether pregnant/breastfeeding/sex/allergies belong in a patient-demographics model rather than `LabValue` at all.
-- `MedicationSchedule` compatibility will mainly be about the dosing-scheme representation (today's model vs. the mandatory 4-slot / weekly-via-`@wo` / free-text trichotomy, with the `dosierungTyp` value grammar) and whether we store/round-trip a PZN-keyed vs. free-text substance identity, since the spec treats those as mutually exclusive, order-correlated, and bound by strict mutual-exclusivity + line-break + length constraints.
-- Import/export of the **2D barcode carrier XML** is the actual interoperability surface (that's what other systems exchange) — not the print layout — and is now fully specified by `bmp_V2.8.xsd` (§9.1).
-- Still missing: the actual Anhang 4 (Dosiereinheit) code table mapping each of the 33 `[#0-9a-v]` single-char codes to its display name/unit — needed to round-trip dose units; not present in any of the four source documents (only referenced by OID/URL).
+- `PatientMedication` carries the BMP medication-entry fields: an optional PZN,
+  up to three ordered active substances with strengths, a structured dosing
+  schedule (day-segment quantities, an optional weekday, or free text), a coded
+  or free-text dosage form and dose unit, usage notes, and the treatment reason.
+- `PatientMedicationSchedule` models the ordered, headed blocks of the
+  medication table, each holding medication entries, compounded preparations,
+  or free-text lines.
+- `lx_dtypes.models.contracts.kbv_key_tables` provides the KBV key tables the
+  BMP binds, including `S_BMP_DOSIEREINHEIT` for single-character dose-unit
+  codes.
+- The mutual-exclusivity, conditional-requirement, and line-break rules that
+  the XSD states only in `<xs:documentation>` (§10) are enforced by the models,
+  not by XSD validation.
 
-## 12. Open items to resolve before implementation planning
-
-1. Obtain the published Dosiereinheiten keyword table (`S_BMP_DOSIEREINHEIT`, OID `1.2.276.0.76.3.1.1.5.2.41`) from KBV's `schluesseltabellen.asp` service to map each single-character `@du` code to its unit name — this is the one remaining externally-sourced table we don't have in the repo yet (the Zwischenüberschrift codes are now fully confirmed in the XSD, see §5.4).
-2. Decide how/whether the 3 BMP clinical parameters (weight, height, creatinine) and the pregnant/breastfeeding/sex/allergy attributes should round-trip through our `LabValue` model vs. a separate patient-demographics concept.
-3. Decide how our current dosing-schedule representation maps onto the confirmed 4-slot (`m`/`d`/`v`/`h`, `dosierungTyp`-constrained) / weekly (`wo` + 4-slot) / free-text (`t`) trichotomy on `<M>`.
-4. Decide how/whether to model PZN as a first-class external drug identifier on `MedicationSchedule`, including the "data minimization" convention (PZN present ⇒ other fields typically omitted and derived from a drug DB) and the combination-product (`Mehrkomponentenpräparat`/`Kombipräparat` with >3 substances, ≤3 `<W>` elements) special cases.
-5. Since many BMP business rules (mutual exclusivity, conditional requirements, tilde-count caps) live only in XSD documentation and are **not** machine-enforced by the schema itself, our own validation layer needs to re-implement them explicitly rather than relying on XSD validation alone.
+The parameter block (weight, height, creatinine, and patient attributes) is
+entered at print time and is not derived from stored lab values. For the eMP
+FHIR projection of medication entries, see
+[ePA FHIR compatibility](guides/epa-fhir-compatibility.md).

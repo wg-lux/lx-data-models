@@ -50,6 +50,14 @@ DOMAIN_CONFIG: dict[str, dict[str, str]] = {
         "title": "LX Finding Terminology",
         "description": "Terminology for medical findings from the LX knowledge base.",
     },
+    "indication": {
+        "id": "lx-indication-cs",
+        "name": "LxIndicationCodeSystem",
+        "title": "LX Indication Terminology",
+        "description": (
+            "Terminology for examination indications from the LX knowledge base."
+        ),
+    },
     "classification_type": {
         "id": "lx-classification-type-cs",
         "name": "LxClassificationTypeCodeSystem",
@@ -317,6 +325,7 @@ def import_fhir_terminology(
         "module_name": module_name,
         "examination": [],
         "finding": [],
+        "indication": [],
         "classification_type": [],
         "classification": [],
         "classification_choice": [],
@@ -689,6 +698,10 @@ def _record_from_concept(
         )
         record["interventions"] = []
         record["caused_by_interventions"] = []
+    elif domain == "indication":
+        record["indication_types"] = []
+        record["classifications"] = []
+        record["interventions"] = []
     elif domain == "classification":
         record["classification_types"] = _relation_names(
             properties,

@@ -16,15 +16,22 @@ from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 
 from lx_dtypes.knowledge_base_registry import (
+    FilesystemSource,
+    ProviderSource,
     RegistryActiveIdentity,
     RegistryEntry,
     RegistryPayload,
 )
+from lx_dtypes.knowledge_bases import (
+    BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+    get_packaged_knowledge_base,
+)
+from lx_dtypes.models.contracts.package_kind import PackageKind
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 from lx_dtypes.models.interface.KnowledgeBaseResolver import (
     clear_knowledge_base_resolver_caches,
@@ -42,6 +49,7 @@ from lx_dtypes.package_archive import (
     BinaryUpload,
     PackageArchiveError,
     read_package_zip,
+    verify_package_manifest,
 )
 from lx_dtypes.utils.parser import camel_to_snake
 
@@ -56,6 +64,7 @@ from .terminology_schemas import (
 )
 
 Identity = tuple[str, str]
+PackageKindSource = Literal["declared", "catalog", "migrated"]
 
 
 class TerminologyError(Exception):
@@ -169,6 +178,8 @@ class TerminologyService:
                 try:
                     metadata = self._bundle((name, version), entry, active)
                     bundle.medical_field = metadata.medical_field
+                    bundle.package_kind = metadata.package_kind
+                    bundle.package_kind_source = metadata.package_kind_source
                     kb = self._load((name, version), entry)
                     validator = ReportTemplateValidator(
                         kb=kb, compiler=ReportTemplateCompiler(kb=kb)
@@ -346,10 +357,23 @@ class TerminologyService:
             counts=counts,
         )
 
-    def import_zip(self, upload: BinaryUpload) -> ImportTerminologyBundleResponse:
+    def import_zip(
+        self, upload: BinaryUpload, *, accept_identical: bool = False
+    ) -> ImportTerminologyBundleResponse:
+        """Validate and register a package ZIP without selecting it.
+
+        An existing identity is a 409 conflict. With ``accept_identical`` an
+        identity previously installed by this method from the same files is
+        returned unchanged instead (idempotent channel installs).
+        """
         from lx_dtypes.packages import PackageValidationError, load_package
 
         files = self._zip_files(upload)
+        try:
+            # A present lx-package.json must agree with config.yaml (fail closed).
+            verify_package_manifest(files)
+        except PackageArchiveError as exc:
+            raise TerminologyError(exc.status, str(exc)) from exc
         try:
             config = yaml.safe_load(files["config.yaml"].decode("utf-8"))
         except (KeyError, UnicodeError, yaml.YAMLError) as exc:
@@ -361,6 +385,7 @@ class TerminologyService:
         name = _safe_identity(config.get("name"), "name")
         version = _safe_identity(config.get("version"), "version")
         medical_field = self._medical_field(config.get("medical_field"), status=400)
+        package_kind = self._package_kind_value(config.get("package_kind"), status=400)
         identity = name, version
         self.import_root.mkdir(parents=True, exist_ok=True)
         # Hash the identity for storage; unlike character replacement, this does not
@@ -379,8 +404,23 @@ class TerminologyService:
             except PackageValidationError as exc:
                 raise TerminologyError(400, str(exc)) from exc
             with self._lock():
-                payload, _ = self._snapshot(allow_missing=True)
+                payload, current_revision = self._snapshot(allow_missing=True)
                 versions = payload.modules.setdefault(name, {})
+                existing = versions.get(version)
+                if (
+                    accept_identical
+                    and existing is not None
+                    and self._is_identical_import(existing, destination, name, files)
+                ):
+                    kb = self._load_paths(identity, [destination])
+                    return ImportTerminologyBundleResponse(
+                        ok=True,
+                        revision=current_revision,
+                        imported=self._bundle(
+                            identity, existing, self._active(payload)
+                        ),
+                        counts=_counts(kb),
+                    )
                 if version in versions or destination.exists():
                     raise TerminologyError(
                         409,
@@ -390,12 +430,15 @@ class TerminologyService:
                 try:
                     kb = self._load_paths(identity, [destination])
                     counts = _counts(kb)
+                    metadata: dict[str, object] = {"medical_field": medical_field}
+                    if package_kind is not None:
+                        metadata["package_kind"] = package_kind.value
                     entry = RegistryEntry.model_validate(
                         {
                             "sources": [
                                 {"kind": "filesystem", "input_dirs": [str(destination)]}
                             ],
-                            "medical_field": medical_field,
+                            **metadata,
                         }
                     )
                     versions[version] = entry
@@ -411,6 +454,34 @@ class TerminologyService:
             revision=revision,
             imported=imported,
             counts=counts,
+        )
+
+    @staticmethod
+    def _is_identical_import(
+        entry: RegistryEntry,
+        destination: Path,
+        name: str,
+        files: Mapping[str, bytes],
+    ) -> bool:
+        """Whether ``entry`` is this service's ZIP install of exactly ``files``."""
+        if entry.sources is None or len(entry.sources) != 1:
+            return False
+        source = entry.sources[0]
+        if not isinstance(source, FilesystemSource) or source.input_dirs != [
+            str(destination)
+        ]:
+            return False
+        root = destination / name
+        if not root.is_dir():
+            return False
+        installed = {
+            path.relative_to(root).as_posix(): path
+            for path in root.rglob("*")
+            if path.is_file() and not path.is_symlink()
+        }
+        return set(installed) == set(files) and all(
+            installed[relative].read_bytes() == content
+            for relative, content in files.items()
         )
 
     def _snapshot(self, *, allow_missing: bool = False) -> tuple[RegistryPayload, str]:
@@ -496,6 +567,128 @@ class TerminologyService:
             raise TerminologyError(status, "medical_field must be a string.")
         return value.strip() or None
 
+    @staticmethod
+    def _package_kind_value(value: object, *, status: int) -> PackageKind | None:
+        if value is None:
+            return None
+        try:
+            return PackageKind(value)
+        except ValueError as exc:
+            raise TerminologyError(
+                status,
+                "package_kind must be one of: "
+                + ", ".join(kind.value for kind in PackageKind)
+                + ".",
+            ) from exc
+
+    @staticmethod
+    def _local_config(identity: Identity, entry: RegistryEntry) -> Mapping[str, Any]:
+        """Read ``<input>/<module>/config.yaml`` of local filesystem sources only.
+
+        Unlike loading, this never resolves remote or provider sources; an
+        unreadable manifest yields no declaration.
+        """
+        if entry.sources is not None:
+            inputs = [
+                value
+                for source in entry.sources
+                if isinstance(source, FilesystemSource)
+                for value in source.input_dirs
+            ]
+        else:
+            inputs = list(entry.input_dirs or [])
+        for value in inputs:
+            if is_remote_data_root(value) or not Path(value).is_absolute():
+                continue
+            config_path = Path(value) / identity[0] / "config.yaml"
+            if not config_path.is_file():
+                continue
+            try:
+                config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, yaml.YAMLError):
+                return {}
+            return config if isinstance(config, Mapping) else {}
+        return {}
+
+    @staticmethod
+    def _shipped_package_kind(
+        identity: Identity, entry: RegistryEntry
+    ) -> PackageKind | None:
+        """Return the reviewed catalog kind for an unmodified shipped provenance."""
+        try:
+            descriptor = get_packaged_knowledge_base(*identity)
+        except LookupError:
+            return None
+        if entry.sources is not None and len(entry.sources) == 1:
+            source = entry.sources[0]
+            if (
+                isinstance(source, ProviderSource)
+                and source.provider == BUILTIN_KNOWLEDGE_BASE_PROVIDER
+                and source.content_sha256 == descriptor.content_sha256
+            ):
+                return descriptor.package_kind
+        hydrated = (entry.model_extra or {}).get("hydrated_from_sha256")
+        if hydrated == descriptor.content_sha256:
+            return descriptor.package_kind
+        return None
+
+    def _package_kind(
+        self, identity: Identity, entry: RegistryEntry
+    ) -> tuple[PackageKind | None, PackageKindSource | None]:
+        """Resolve ``(kind, source)``; ``(None, None)`` means unclassified.
+
+        Registry metadata, the local ``config.yaml`` and the shipped catalog
+        (for shipped provenance) must agree whenever more than one declares it.
+        Without any declaration the shared legacy rule is applied to locally
+        available sources and reported as ``migrated``; it is never persisted.
+        """
+        declared: set[PackageKind] = set()
+        stored = (entry.model_extra or {}).get("package_kind")
+        if stored is not None:
+            kind = self._package_kind_value(stored, status=500)
+            if kind is not None:
+                declared.add(kind)
+        configured = self._package_kind_value(
+            self._local_config(identity, entry).get("package_kind"), status=409
+        )
+        if configured is not None:
+            declared.add(configured)
+        shipped = self._shipped_package_kind(identity, entry)
+        kinds = declared | ({shipped} if shipped is not None else set())
+        if len(kinds) > 1:
+            raise TerminologyError(
+                409,
+                f"Bundle '{identity[0]}@{identity[1]}' declares conflicting package kinds.",
+            )
+        if declared:
+            return next(iter(declared)), "declared"
+        if shipped is not None:
+            return shipped, "catalog"
+        migrated = self._migrated_package_kind(identity, entry)
+        return (migrated, "migrated") if migrated is not None else (None, None)
+
+    def _migrated_package_kind(
+        self, identity: Identity, entry: RegistryEntry
+    ) -> PackageKind | None:
+        """Infer a legacy kind from local sources; unloadable bundles stay unclassified.
+
+        Remote sources are never downloaded for a listing. Loading failures are
+        reported by load/select, not hidden behind a guessed kind.
+        """
+        from lx_dtypes.package_kinds import infer_legacy_package_kind
+
+        try:
+            inputs = self._source_inputs(identity, entry)
+        except TerminologyError:
+            return None
+        if any(is_remote_data_root(value) for value in inputs):
+            return None
+        try:
+            kb = self._load(identity, entry)
+        except TerminologyError:
+            return None
+        return infer_legacy_package_kind(kb).package_kind
+
     def _bundle(
         self,
         identity: Identity,
@@ -523,10 +716,13 @@ class TerminologyService:
                 except (OSError, UnicodeError, yaml.YAMLError):
                     pass
                 break
+        package_kind, package_kind_source = self._package_kind(identity, entry)
         return TerminologyBundleVersion(
             module_name=identity[0],
             version=identity[1],
             medical_field=medical_field,
+            package_kind=package_kind,
+            package_kind_source=package_kind_source,
             is_active=identity == active,
         )
 

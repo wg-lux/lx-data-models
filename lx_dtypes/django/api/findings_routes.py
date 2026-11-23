@@ -356,6 +356,93 @@ def _stored_descriptor_payloads(
     return result
 
 
+def _name_of(item: object) -> str:
+    return str(getattr(item, "name", "") or "").strip()
+
+
+def _relation_names(relation: object) -> set[str]:
+    all_items = getattr(relation, "all", None)
+    if not callable(all_items):
+        return set()
+    return {name for name in map(_name_of, all_items()) if name}
+
+
+def _indication_choice_classification(indication: object, choice: object) -> str | None:
+    """Name the one classification an indication choice was selected under.
+
+    Hosts may link a choice directly (``classification``) or through a
+    many-to-many ``classifications`` relation shared between indications. The
+    latter is narrowed to the indication's own classifications. Zero or several
+    candidates return None so the caller can reject the row.
+    """
+    direct = getattr(choice, "classification", None)
+    if direct is not None:
+        return _name_of(direct) or None
+    names = _relation_names(getattr(choice, "classifications", None))
+    indication_names = _relation_names(getattr(indication, "classifications", None))
+    if indication_names:
+        names &= indication_names
+    return next(iter(names)) if len(names) == 1 else None
+
+
+def _host_patient_indications_payload(
+    patient_examination: object,
+    *,
+    patient_examination_id: object,
+    examination_name: str,
+) -> list[dict[str, object]]:
+    """Project host ``indications`` rows (indication plus optional choice).
+
+    Hosts without the relation contribute no indications. A row without an
+    indication name is rejected rather than dropped, because required
+    indication concepts are evaluated from this list.
+    """
+    rows = getattr(patient_examination, "indications", None)
+    if rows is None:
+        return []
+    payload: list[dict[str, object]] = []
+    for row in rows.all():
+        indication_name = str(
+            getattr(getattr(row, "examination_indication", None), "name", "") or ""
+        ).strip()
+        if not indication_name:
+            raise ValueError(
+                f"PatientExamination '{patient_examination_id}' has an indication "
+                f"row '{getattr(row, 'pk', None)}' without an indication name."
+            )
+        indication_ref = f"pe_{patient_examination_id}_indication_{row.pk}"
+        classifications: list[dict[str, object]] = []
+        choice = getattr(row, "indication_choice", None)
+        if choice is not None:
+            choice_name = str(getattr(choice, "name", "") or "").strip()
+            classification_name = _indication_choice_classification(
+                getattr(row, "examination_indication", None), choice
+            )
+            if not choice_name or classification_name is None:
+                raise ValueError(
+                    f"PatientExamination '{patient_examination_id}' indication "
+                    f"'{indication_name}' has a classification choice that does not "
+                    "resolve to exactly one classification."
+                )
+            classifications.append(
+                {
+                    "uuid": f"{indication_ref}_choice",
+                    "classification": classification_name,
+                    "classification_choice": choice_name,
+                    "patient_indication": indication_ref,
+                }
+            )
+        payload.append(
+            {
+                "uuid": indication_ref,
+                "indication": indication_name,
+                "patient_examination": examination_name,
+                "patient_indication_classifications": classifications,
+            }
+        )
+    return payload
+
+
 def build_p_examination_payload_from_host_ledger(
     patient_examination: object,
     *,
@@ -545,6 +632,11 @@ def build_p_examination_payload_from_host_ledger(
         "knowledge_base_module": module_from_ledger or route_module_name,
         "knowledge_base_version": version_from_ledger or None,
         "patient_findings": patient_findings_payload,
+        "patient_indications": _host_patient_indications_payload(
+            patient_examination,
+            patient_examination_id=patient_examination_id,
+            examination_name=examination_name,
+        ),
     }
     return PExamination.model_validate(payload)
 
@@ -906,8 +998,11 @@ def register_findings_routes(
         module_name: str,
         module_version: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Return canonical core concept payloads for one KB module.
+        """Return the core terminology concepts of a knowledge-base module.
+
+        Without ``module_version`` the active version is used. The response adds
+        ``knowledge_base_module`` and ``knowledge_base_version`` so the caller can
+        record which version it received. No authentication is required.
         """
         del request
         kb = load_module_kb(module_name, version=module_version)
@@ -930,6 +1025,20 @@ def register_findings_routes(
         module_version: str | None = None,
         patient_examination_id: int | None = None,
     ) -> list[dict[str, Any]]:
+        """List the findings available for a host examination.
+
+        Only findings that the knowledge base defines for this examination are
+        returned, each with its allowed classifications. The knowledge base is
+        chosen as follows: an explicit ``module_name`` and ``module_version`` (both
+        required together); otherwise the version pinned on
+        ``patient_examination_id``; otherwise the active version. An explicit
+        identity must match a given patient examination. No authentication is
+        required.
+
+        Errors: ``404`` if the examination or patient examination does not exist
+        or they do not belong together, ``409`` if the knowledge-base identity is
+        incomplete or conflicts with the patient examination.
+        """
         del request
         try:
             module_name, resolved_version = _resolve_catalog_kb_identity(
@@ -999,6 +1108,14 @@ def register_findings_routes(
         module_version: str | None = None,
         patient_examination_id: int | None = None,
     ) -> list[dict[str, Any]]:
+        """List the classifications allowed for a host finding.
+
+        The knowledge base is chosen as in ``findings_by_examination``. No
+        authentication is required.
+
+        Errors: ``404`` if the finding or patient examination does not exist,
+        ``409`` if the knowledge-base identity is incomplete or conflicting.
+        """
         del request
         try:
             module_name, resolved_version = _resolve_catalog_kb_identity(
@@ -1034,6 +1151,14 @@ def register_findings_routes(
         module_version: str | None = None,
         patient_examination_id: int | None = None,
     ) -> dict[str, Any]:
+        """List the choices allowed for a host classification.
+
+        The response is an object with a ``choices`` list. The knowledge base is
+        chosen as in ``findings_by_examination``. No authentication is required.
+
+        Errors: ``404`` if the classification or patient examination does not
+        exist, ``409`` if the knowledge-base identity is incomplete or conflicting.
+        """
         del request
         try:
             module_name, resolved_version = _resolve_catalog_kb_identity(
@@ -1070,6 +1195,16 @@ def register_findings_routes(
     def list_patient_findings(
         request: BaseRequest, patient_examination: int | None = None
     ) -> list[dict[str, Any]]:
+        """List the active patient findings visible to the caller.
+
+        Results are limited by the host's ``patient_findings_queryset_for_request``
+        callback, normally to the caller's center. ``patient_examination`` filters
+        the list to one examination.
+
+        Authentication: required.
+
+        Errors: ``401`` without credentials.
+        """
         require_authenticated_actor(request)
         queryset = patient_findings_queryset_for_request(request)
         if patient_examination is not None:
@@ -1080,6 +1215,24 @@ def register_findings_routes(
     def create_patient_finding(
         request: BaseRequest, payload: PatientFindingCreateRequest
     ) -> dict[str, Any]:
+        """Record a finding for a patient examination.
+
+        The finding must be allowed for the examination by both the host and the
+        examination's knowledge-base version. Optional classifications are saved
+        with it, and the examination's LXDM record is refreshed in the same
+        transaction.
+
+        The request is idempotent when ``instance_id`` is set: repeating it with
+        the same finding and classifications returns the stored finding.
+
+        Authentication: required, with access to the patient examination.
+
+        Errors: ``401`` without credentials; ``404`` if the examination is missing
+        or not accessible, or the finding is missing; ``400`` for a finding or
+        choice that is not allowed, or a duplicate active finding; ``409`` if a
+        repeated ``instance_id`` request differs from the stored finding, or the
+        examination has no pinned knowledge-base version.
+        """
         require_authenticated_actor(request)
         patient_examination_model = orm_models()["PatientExamination"]
         finding_model = orm_models()["Finding"]
@@ -1202,6 +1355,19 @@ def register_findings_routes(
         patient_finding_id: int,
         payload: PatientFindingUpdateRequest,
     ) -> dict[str, Any]:
+        """Update a patient finding.
+
+        Each field is optional. ``finding`` replaces the finding type,
+        ``is_active`` deactivates or reactivates it (recording the actor and
+        time), and ``classifications`` replaces all classifications. The
+        examination's LXDM record is refreshed in the same transaction.
+
+        Authentication: required, with access to the patient finding.
+
+        Errors: ``401`` without credentials, ``404`` if the patient finding is
+        missing or not accessible, ``400`` for values not allowed by the knowledge
+        base, ``409`` if the examination has no pinned knowledge-base version.
+        """
         actor = require_authenticated_actor(request)
         patient_finding = (
             patient_findings_queryset_for_request(request)
@@ -1267,6 +1433,16 @@ def register_findings_routes(
     def delete_patient_finding(
         request: BaseRequest, patient_finding_id: int
     ) -> dict[str, Any]:
+        """Deactivate a patient finding.
+
+        The finding is not deleted: it is marked inactive with the actor and time.
+        The examination's LXDM record is refreshed in the same transaction.
+
+        Authentication: required, with access to the patient finding.
+
+        Errors: ``401`` without credentials, ``404`` if the patient finding is
+        missing or not accessible.
+        """
         actor = require_authenticated_actor(request)
 
         patient_finding = (
@@ -1299,6 +1475,20 @@ def register_findings_routes(
         patient_finding_id: int,
         payload: PatientFindingClassificationsRequest,
     ) -> dict[str, Any]:
+        """Set the classifications of a patient finding.
+
+        With ``replace`` (the default) existing classifications are removed first;
+        otherwise the given ones are added. Every classification and choice must
+        be allowed for the finding by the knowledge base. The examination's LXDM
+        record is refreshed in the same transaction.
+
+        Authentication: required, with access to the patient finding.
+
+        Errors: ``401`` without credentials, ``404`` if the patient finding is
+        missing or not accessible, ``400`` for unknown or disallowed
+        classifications or choices, ``409`` if the examination has no pinned
+        knowledge-base version.
+        """
         require_authenticated_actor(request)
         patient_finding = (
             patient_findings_queryset_for_request(request)

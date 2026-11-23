@@ -95,6 +95,17 @@ class InterventionValidatorQuery(DtypesModel):
 
 
 class InterventionValidator(KnowledgebaseBaseModel[InterventionValidatorDataDict]):
+    """Knowledge-base rule that checks an intervention on a reported finding.
+
+    Attributes:
+        query: Optional sub-query with a condition on the occurrence.
+        finding: Name of the finding whose occurrences are checked.
+        intervention: Intervention that must (or must not) be documented.
+        operator: ``"exists"``, ``"missing"``, or ``"condition"``.
+        precedence: ``"optional"`` or ``"required"``; see
+            :class:`ClassificationValidator`.
+    """
+
     query: InterventionValidatorQuery = Field(
         default_factory=InterventionValidatorQuery
     )

@@ -1,10 +1,18 @@
+"""Graph representation and structural validation of report templates.
+
+A template is projected into a directed graph of sections, findings,
+classifications, data fields, and validators. Structural validation walks this
+graph to report missing or inconsistent references before a template is used.
+"""
+
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import Field
 
+from lx_dtypes.language import DEFAULT_LANGUAGE, LanguageCode, validate_language
 from lx_dtypes.models.model import DtypesModel
 
 from .PropertyGraph import PropertyGraph, PropertyGraphEdge, PropertyGraphNode
@@ -57,6 +65,15 @@ def _tokenize(text: str | None) -> list[str]:
 
 
 class ReportTemplateGraphNode(DtypesModel):
+    """Node in a report template graph.
+
+    Attributes:
+        node_id: Unique identifier of the form ``"<node_type>:<name>"``.
+        node_type: Kind of template element the node represents.
+        name: Element name.
+        tokens: Lowercase search tokens derived from the element's labels.
+    """
+
     node_id: str
     node_type: Literal[
         "template",
@@ -71,10 +88,13 @@ class ReportTemplateGraphNode(DtypesModel):
     tokens: list[str] = Field(default_factory=list)
 
     def as_ddict(self) -> ReportTemplateGraphNodeDataDict:
+        """Return the node as a typed dictionary."""
         return cast(ReportTemplateGraphNodeDataDict, self.model_dump(mode="python"))
 
 
 class ReportTemplateGraphEdge(DtypesModel):
+    """Directed, weighted edge between two report template graph nodes."""
+
     source_node_id: str
     target_node_id: str
     edge_type: Literal[
@@ -89,10 +109,23 @@ class ReportTemplateGraphEdge(DtypesModel):
     weight: float = 1.0
 
     def as_ddict(self) -> ReportTemplateGraphEdgeDataDict:
+        """Return the edge as a typed dictionary."""
         return cast(ReportTemplateGraphEdgeDataDict, self.model_dump(mode="python"))
 
 
 class ReportTemplateGraph(DtypesModel):
+    """Directed graph of a report template and its referenced elements.
+
+    Attributes:
+        template_name: Name of the template.
+        examination: Examination the template reports on.
+        start_node_id: First section node, or the template node if there are
+            no sections.
+        ordered_section_node_ids: Section nodes in report order.
+        nodes: All graph nodes.
+        edges: All graph edges.
+    """
+
     template_name: str
     examination: str
     start_node_id: str
@@ -101,28 +134,45 @@ class ReportTemplateGraph(DtypesModel):
     edges: list[ReportTemplateGraphEdge] = Field(default_factory=list)
 
     def as_ddict(self) -> ReportTemplateGraphDataDict:
+        """Return the graph as a typed dictionary."""
         return cast(ReportTemplateGraphDataDict, self.model_dump(mode="python"))
 
 
 class ReportTemplateStructureIssue(DtypesModel):
+    """Problem found while validating a template's structure.
+
+    Attributes:
+        code: Stable machine-readable issue code.
+        message: Localized description.
+        level: ``"error"`` blocks use of the template; ``"warning"`` does not.
+        node_id: Graph node the issue refers to, if any.
+    """
+
     code: str
     message: str
     level: Literal["error", "warning"] = "error"
     node_id: str | None = None
 
     def as_ddict(self) -> ReportTemplateStructureIssueDataDict:
+        """Return the issue as a typed dictionary."""
         return cast(
             ReportTemplateStructureIssueDataDict, self.model_dump(mode="python")
         )
 
 
 class ReportTemplateStructureValidationResult(DtypesModel):
+    """Outcome of structural validation for one report template.
+
+    ``ok`` is ``False`` when at least one issue has level ``"error"``.
+    """
+
     template_name: str
     ok: bool
     graph: ReportTemplateGraph
     issues: list[ReportTemplateStructureIssue] = Field(default_factory=list)
 
     def as_ddict(self) -> ReportTemplateStructureValidationResultDataDict:
+        """Return the result as a typed dictionary."""
         return cast(
             ReportTemplateStructureValidationResultDataDict,
             self.model_dump(mode="python"),
@@ -419,6 +469,18 @@ def build_report_template_graph(
     sections: Mapping[str, ReportTemplateSection] | Mapping[str, Any],
     report_findings: Mapping[str, Any],
 ) -> ReportTemplateGraph:
+    """Build the graph of a report template.
+
+    Args:
+        template: Template to project.
+        sections: Section records by name, used to resolve
+            ``template.report_sections``.
+        report_findings: :class:`ReportFinding` records by name, used to
+            resolve findings that sections reference by name.
+
+    Returns:
+        The template graph with sections in report order.
+    """
     property_graph = ReportTemplatePropertyGraphAdapter().build(
         template,
         sections=sections,
@@ -488,13 +550,45 @@ def build_report_template_graph(
     )
 
 
+def _structure_messages(
+    language: LanguageCode,
+    template: ReportTemplate,
+    *collections: Mapping[str, Any],
+) -> Callable[..., str]:
+    """Bind the shared localized catalogue and concept display names."""
+    from lx_dtypes.models.knowledge_base.validators.RuntimeIssues import (
+        _runtime_display_names,
+        _runtime_message,
+    )
+
+    validate_language(language)
+    named = [
+        item
+        for item in (template, *(i for c in collections for i in c.values()))
+        if isinstance(getattr(item, "name", None), str)
+        and isinstance(getattr(item, "name_de", None), str)
+        and isinstance(getattr(item, "name_en", None), str)
+    ]
+    display_names = _runtime_display_names(language, named)
+
+    def message(key: str, **values: str) -> str:
+        return _runtime_message(key, language, display_names=display_names, **values)
+
+    return message
+
+
 def validate_report_template_structure(
     template: ReportTemplate,
     *,
     sections: Mapping[str, ReportTemplateSection] | Mapping[str, Any],
     report_findings: Mapping[str, Any],
     findings: Mapping[str, Any] | None = None,
+    language: LanguageCode = DEFAULT_LANGUAGE,
 ) -> ReportTemplateStructureValidationResult:
+    """Validate one template's structure; messages use display names in ``language``."""
+    message = _structure_messages(
+        language, template, sections, report_findings, findings or {}
+    )
     issues: list[ReportTemplateStructureIssue] = []
 
     for section_name in template.report_sections:
@@ -504,9 +598,10 @@ def validate_report_template_structure(
                     code="missing_section",
                     level="error",
                     node_id=f"section:{section_name}",
-                    message=(
-                        f"Template '{template.name}' references unknown section "
-                        f"'{section_name}'."
+                    message=message(
+                        "structure_missing_section",
+                        template=template.name,
+                        section=section_name,
                     ),
                 )
             )
@@ -517,9 +612,8 @@ def validate_report_template_structure(
                 code="duplicate_section_reference",
                 level="warning",
                 node_id=f"template:{template.name}",
-                message=(
-                    f"Template '{template.name}' references at least one section "
-                    "more than once."
+                message=message(
+                    "structure_duplicate_section_reference", template=template.name
                 ),
             )
         )
@@ -530,7 +624,9 @@ def validate_report_template_structure(
                 code="empty_template_sections",
                 level="warning",
                 node_id=f"template:{template.name}",
-                message=f"Template '{template.name}' has no report sections.",
+                message=message(
+                    "structure_empty_template_sections", template=template.name
+                ),
             )
         )
 
@@ -551,7 +647,9 @@ def validate_report_template_structure(
                     code="empty_section_findings",
                     level="warning",
                     node_id=f"section:{section_name}",
-                    message=f"Section '{section_name}' has no findings.",
+                    message=message(
+                        "structure_empty_section_findings", section=section_name
+                    ),
                 )
             )
 
@@ -561,9 +659,10 @@ def validate_report_template_structure(
                     code="non_finding_section_has_findings",
                     level="warning",
                     node_id=f"section:{section_name}",
-                    message=(
-                        f"Section '{section_name}' is '{section_kind}' but also defines "
-                        "findings."
+                    message=message(
+                        "structure_non_finding_section_has_findings",
+                        section=section_name,
+                        section_kind=section_kind,
                     ),
                 )
             )
@@ -574,9 +673,8 @@ def validate_report_template_structure(
                     code="findings_section_has_fields",
                     level="warning",
                     node_id=f"section:{section_name}",
-                    message=(
-                        f"Section '{section_name}' is a findings section but also "
-                        "defines metadata fields."
+                    message=message(
+                        "structure_findings_section_has_fields", section=section_name
                     ),
                 )
             )
@@ -590,8 +688,8 @@ def validate_report_template_structure(
                         code="invalid_section_field",
                         level="error",
                         node_id=f"section:{section_name}",
-                        message=(
-                            f"Section '{section_name}' contains a field without a key."
+                        message=message(
+                            "structure_invalid_section_field", section=section_name
                         ),
                     )
                 )
@@ -603,9 +701,10 @@ def validate_report_template_structure(
                         code="duplicate_section_field",
                         level="warning",
                         node_id=f"section:{section_name}",
-                        message=(
-                            f"Section '{section_name}' contains duplicate field key "
-                            f"'{field_key}'."
+                        message=message(
+                            "structure_duplicate_section_field",
+                            section=section_name,
+                            field_key=field_key,
                         ),
                     )
                 )
@@ -626,9 +725,10 @@ def validate_report_template_structure(
                         code="unknown_section_field_key",
                         level="warning",
                         node_id=f"section:{section_name}",
-                        message=(
-                            f"Section '{section_name}' uses unknown field key "
-                            f"'{field_key}'."
+                        message=message(
+                            "structure_unknown_section_field_key",
+                            section=section_name,
+                            field_key=field_key,
                         ),
                     )
                 )
@@ -638,9 +738,11 @@ def validate_report_template_structure(
                         code="section_field_kind_mismatch",
                         level="warning",
                         node_id=f"section:{section_name}",
-                        message=(
-                            f"Field '{field_key}' is intended for '{expected_kind}' "
-                            f"sections but is used in '{section_kind}'."
+                        message=message(
+                            "structure_section_field_kind_mismatch",
+                            field_key=field_key,
+                            expected_kind=expected_kind,
+                            section_kind=section_kind,
                         ),
                     )
                 )
@@ -655,9 +757,11 @@ def validate_report_template_structure(
                         code="section_field_source_mismatch",
                         level="warning",
                         node_id=f"section:{section_name}",
-                        message=(
-                            f"Field '{field_key}' in history section '{section_name}' "
-                            f"uses source '{field_source}'."
+                        message=message(
+                            "structure_history_field_source_mismatch",
+                            field_key=field_key,
+                            section=section_name,
+                            field_source=str(field_source),
                         ),
                     )
                 )
@@ -670,9 +774,11 @@ def validate_report_template_structure(
                         code="section_field_source_mismatch",
                         level="warning",
                         node_id=f"section:{section_name}",
-                        message=(
-                            f"Field '{field_key}' in {section_kind} section "
-                            f"'{section_name}' uses source 'history'."
+                        message=message(
+                            "structure_field_history_source_mismatch",
+                            field_key=field_key,
+                            section=section_name,
+                            section_kind=section_kind,
                         ),
                     )
                 )
@@ -691,9 +797,8 @@ def validate_report_template_structure(
                         code="invalid_finding_reference",
                         level="error",
                         node_id=f"section:{section_name}",
-                        message=(
-                            f"Section '{section_name}' contains an invalid finding "
-                            "reference."
+                        message=message(
+                            "structure_invalid_finding_reference", section=section_name
                         ),
                     )
                 )
@@ -705,9 +810,10 @@ def validate_report_template_structure(
                         code="unknown_finding_reference",
                         level="warning",
                         node_id=f"finding:{finding_name}",
-                        message=(
-                            f"Finding '{finding_name}' is used by template "
-                            f"'{template.name}' but is not present in the knowledge base."
+                        message=message(
+                            "structure_unknown_finding_reference",
+                            finding=finding_name,
+                            template=template.name,
                         ),
                     )
                 )
@@ -728,7 +834,18 @@ def validate_report_template_structure(
 
 def validate_report_template_knowledge_base(
     kb: Any,
+    *,
+    language: LanguageCode = DEFAULT_LANGUAGE,
 ) -> dict[str, ReportTemplateStructureValidationResult]:
+    """Validate the structure of every report template in a knowledge base.
+
+    Args:
+        kb: Loaded knowledge base.
+        language: Language for issue messages.
+
+    Returns:
+        Structural validation results keyed by template name.
+    """
     templates = cast(Mapping[str, ReportTemplate], getattr(kb, "report_template", {}))
     sections = cast(Mapping[str, Any], getattr(kb, "report_template_section", {}))
     report_findings = cast(Mapping[str, Any], getattr(kb, "report_finding", {}))
@@ -740,6 +857,7 @@ def validate_report_template_knowledge_base(
             sections=sections,
             report_findings=report_findings,
             findings=findings,
+            language=language,
         )
         for template_name, template in templates.items()
     }

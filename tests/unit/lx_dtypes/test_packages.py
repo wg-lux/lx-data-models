@@ -90,7 +90,11 @@ def test_reporting_package_uses_sibling_terminology(package: Path) -> None:
         name="reporting",
         version="1.0.0",
         depends_on=["terms"],
-        records=[ReportFinding(name="lesion_reference", finding="lesion")],
+        records=[
+            ReportFinding(
+                name="lesion_reference", name_de="Läsionsverweis", finding="lesion"
+            )
+        ],
     )
     kb = load_package(config)
     assert kb.finding["lesion"].kb_module_name == "terms"
@@ -141,7 +145,7 @@ def test_creation_does_not_mix_concepts_with_reporting(tmp_path: Path) -> None:
             version="1.0.0",
             records=[
                 Finding(name="lesion", name_de="Läsion", name_en="Lesion"),
-                ReportFinding(name="reference", finding="lesion"),
+                ReportFinding(name="reference", name_de="Verweis", finding="lesion"),
             ],
         )
     assert "report_template_concept_definition" in {
@@ -159,6 +163,7 @@ def test_created_template_uses_existing_study_engine(package: Path) -> None:
         records=[
             ReportTemplateSection(
                 name="baseline",
+                name_de="Befunde",
                 title_de="Befunde",
                 title_en="Findings",
                 findings=["lesion"],
@@ -212,7 +217,7 @@ def test_portable_zip_roundtrip_with_external_dependency(
         name="reporting",
         version="1.0.0",
         depends_on=["terms"],
-        records=[ReportFinding(name="reference", finding="lesion")],
+        records=[ReportFinding(name="reference", name_de="Verweis", finding="lesion")],
     )
     (config.parent / "opaque.bin").write_bytes(b"\x00\xffasset")
     archive = export_package(config, tmp_path / "package.zip")
@@ -330,7 +335,7 @@ def test_registered_package_retains_separate_explicit_dependency_roots(
         name="reporting",
         version="1.0.0",
         depends_on=["terms"],
-        records=[ReportFinding(name="reference", finding="lesion")],
+        records=[ReportFinding(name="reference", name_de="Verweis", finding="lesion")],
     )
     moved = tmp_path / "elsewhere/reporting"
     moved.parent.mkdir()

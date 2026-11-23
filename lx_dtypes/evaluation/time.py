@@ -21,6 +21,20 @@ def assess_time_offset(
     *,
     language: LanguageCode = DEFAULT_LANGUAGE,
 ) -> ValidationReport:
+    """Validate a time-offset payload against a knowledge base without raising.
+
+    The payload is first validated as a
+    :class:`~lx_dtypes.models.ledger.p_time_offset.PTimeOffset` contract and
+    then checked against the knowledge base's time references.
+
+    Args:
+        knowledge_base: Knowledge base that defines the time references.
+        payload: Untrusted time-offset data.
+        language: Language for issue messages.
+
+    Returns:
+        A report that records the knowledge-base identity and any issues.
+    """
     parsed = validate_contract(PTimeOffset, payload, language=language)
     identity = knowledge_base.config.knowledge_base_identity
     if parsed.value is None:

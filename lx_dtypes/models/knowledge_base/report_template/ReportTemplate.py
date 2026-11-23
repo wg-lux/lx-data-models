@@ -18,6 +18,11 @@ from lx_dtypes.models.model import DtypesModel, FrozenContractModel
 
 
 class ReportTemplateValidators(DtypesModel):
+    """Names of the validators a report template runs, grouped by kind.
+
+    Names must resolve within the template's package or its dependency closure.
+    """
+
     examination_validators: list[str] = Field(default_factory=list)
     findings_validators: list[str] = Field(default_factory=list)
     classification_validators: list[str] = Field(default_factory=list)
@@ -45,6 +50,20 @@ class ReportTemplateGuidelineReference(FrozenContractModel):
 
 
 class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):
+    """Knowledge-base record defining a structured report for an examination.
+
+    Attributes:
+        examination: Name of the examination the template reports on.
+        verbosity_options: Supported verbosity levels; must include
+            ``"standard"`` and be unique.
+        version: Template version, independent of the module version.
+        guideline_references: Guidelines the template implements.
+        coverage_version: Version of the declared coverage concepts.
+        coverage_concepts: Concepts the template is expected to cover.
+        report_sections: Ordered names of the sections in the report.
+        validators: Validators that check captured data against the template.
+    """
+
     examination: str
     verbosity_options: list[ReportVerbosity] = Field(
         default_factory=lambda: ["standard"]
@@ -77,6 +96,7 @@ class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):
 
     @classmethod
     def list_type_fields(cls) -> list[str]:
+        """Return fields that accept a comma-separated string or a list."""
         return ["report_sections"]
 
     @field_validator("verbosity_options")
@@ -84,10 +104,12 @@ class ReportTemplate(KnowledgebaseBaseModel[ReportTemplateDataDict]):
     def validate_verbosity_options(
         cls, value: list[ReportVerbosity]
     ) -> list[ReportVerbosity]:
+        """Require unique verbosity options that include ``"standard"``."""
         if "standard" not in value or len(set(value)) != len(value):
             raise ValueError("verbosity_options must be unique and include standard")
         return value
 
     @property
     def ddict_class(self) -> type[ReportTemplateDataDict]:
+        """Typed dictionary class used for serialization."""
         return ReportTemplateDataDict

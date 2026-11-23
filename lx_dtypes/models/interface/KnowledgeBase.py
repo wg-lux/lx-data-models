@@ -913,6 +913,68 @@ class KnowledgeBase(AppBaseModelUUIDTags):
         kb = cls.model_validate(data_dict)
         return kb
 
+    def resolved_module_configs(self) -> dict[str, KnowledgeBaseConfig]:
+        """Copies of the configs this KB was loaded from, keyed by module name.
+
+        ``modules`` of each copy lists that module's resolved closure.
+        """
+        configs = self._resolved_module_configs or {self.config.name: self.config}
+        return {name: config.model_copy(deep=True) for name, config in configs.items()}
+
+    def composed_module_names(self) -> frozenset[str]:
+        """Return the root module and the modules it composes through ``modules``.
+
+        Declared ``modules`` are read from each resolved manifest, so modules
+        reached only through ``depends_on`` (dependencies) are excluded.
+        """
+        configs = self._resolved_module_configs or {self.config.name: self.config}
+        composed = {self.config.name}
+        pending = [self.config.name]
+        while pending:
+            config = configs.get(pending.pop())
+            if config is None or config.source_file is None:
+                continue
+            declared = KnowledgeBaseConfig.from_yaml_file(config.source_file).modules
+            for child in declared:
+                if child not in composed:
+                    composed.add(child)
+                    pending.append(child)
+        return frozenset(composed)
+
+    def unresolved_template_validator_references(
+        self,
+    ) -> tuple[tuple[str, str, str], ...]:
+        """Return ``(template, validator_model, name)`` for unresolved names.
+
+        Only published templates are checked: drafts may reference validators
+        that are still being authored and report them as preview issues.
+        Names resolve only within the loaded package and its dependency closure.
+        """
+        missing: list[tuple[str, str, str]] = []
+        for template_name, template in sorted(self.report_template.items()):
+            if self.get_report_template_lifecycle_status(template_name) != "published":
+                continue
+            for model_name, names in (
+                ("examination_validator", template.validators.examination_validators),
+                ("findings_validator", template.validators.findings_validators),
+                (
+                    "classification_validator",
+                    template.validators.classification_validators,
+                ),
+                (
+                    "intervention_validator",
+                    template.validators.intervention_validators,
+                ),
+                ("unit_validator", template.validators.unit_validators),
+            ):
+                defined: Mapping[str, object] = getattr(self, model_name)
+                missing.extend(
+                    (template_name, model_name, name)
+                    for name in names
+                    if name not in defined
+                )
+        return tuple(missing)
+
     def import_knowledge_base(self, other: "KnowledgeBase") -> None:
         """
         Merge records from another KnowledgeBase into this instance.
