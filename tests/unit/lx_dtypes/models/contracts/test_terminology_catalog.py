@@ -4,6 +4,7 @@ from pydantic import ValidationError
 from lx_dtypes.models.contracts.terminology_catalog import (
     ExaminationCatalogDTO,
     IndicationCatalogDTO,
+    LocalizedCatalogItem,
 )
 
 
@@ -64,3 +65,18 @@ def test_catalog_dto_rejects_unknown_transport_fields() -> None:
         IndicationCatalogDTO.model_validate(
             {"id": 2, "name": "screening", "displayName": "simulated"}
         )
+
+
+def test_missing_text_is_shared_and_preserves_substantive_text() -> None:
+    from lx_dtypes.factories import normalize_missing_text
+
+    assert [normalize_missing_text(value) for value in (None, "", "unknown")] == [
+        "",
+        "",
+        "",
+    ]
+    for value in ("Unknown", "unknown diagnosis", "  clinical description  ", "yes"):
+        assert normalize_missing_text(value) == value
+    assert (
+        LocalizedCatalogItem(id=1, name="unknown", name_de="unknown").name == "unknown"
+    )

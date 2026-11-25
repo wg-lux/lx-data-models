@@ -294,7 +294,7 @@ This guide owns package structure and the shared deployment document contract.
 Example source files: [manifest](../examples/dtypes_packages/training_preset/config.yaml),
 [preset](../examples/dtypes_packages/training_preset/data/preset.yml),
 [examinations](../examples/dtypes_packages/training_preset/training_terminology/examinations.yml),
-and [optional employees](../examples/dtypes_packages/training_preset/optional/employees.yml).
+and [optional employees](../examples/dtypes_packages/training_preset/training_staff/employees.yml).
 
 ## 1. The directory contract
 
@@ -307,8 +307,9 @@ an_authoring_root/
     ├── training_terminology/        # terminology dependency bundled for portability
     │   ├── config.yaml
     │   └── examinations.yml         # ordinary clinical KB record format
-    └── optional/
-        └── employees.yml           # excluded unless config selects it
+    └── training_staff/              # optional application_data dependency
+        ├── config.yaml
+        └── employees.yml           # used only when listed in depends_on
 ```
 
 Use `.yml` for new data files. **Keep `config.yaml` named exactly this way**:
@@ -444,7 +445,7 @@ does not provision every clinical model just because the package contains it.
 
 ## 5. Employees are always optional
 
-```{literalinclude} ../examples/dtypes_packages/training_preset/optional/employees.yml
+```{literalinclude} ../examples/dtypes_packages/training_preset/training_staff/employees.yml
 :language: yaml
 ```
 
@@ -457,7 +458,10 @@ This is `CenterEmployeeList`, whose nested entries reuse
   The literal `unknown` is not a valid recognition name or center reference.
 - A supplied `center_employee_list` must contain at least one examiner. To
   provide no employees, omit the record or leave its file unselected.
-- Employees may be shipped in terminology packages; they are never required
+- Employees are application data and ship in their own `application_data`
+  package. Package kinds stay separate: a package's own records must belong to
+  its kind, so study presets and terminology packages reference employee lists
+  through `depends_on` instead of defining them. Employees are never required
   for package loading or study-preset import.
 - Host projection adds names to recognition lists. It neither deletes local
   names nor creates clinical examiner identities from this document.
@@ -465,7 +469,7 @@ This is `CenterEmployeeList`, whose nested entries reuse
   unset and lx-anonymizer uses its own configuration. Package validity alone
   does not establish anonymization quality.
 
-To enable the example, uncomment `optional/employees.yml` in `data.files`.
+To enable the example, uncomment `training_staff` in `depends_on`.
 Use neutral package/record identifiers rather than embedding employee names in
 those identifiers. Do not include patient records or secrets in presets.
 
@@ -668,23 +672,21 @@ versioned label sets use both name and integer version.
         description: 'An explicitly authored contraindication definition.'
 ```
 
-A complete executable package is shipped at `lx_dtypes/data/terminology/endoreg_reference`.
-Its `config.yaml` explicitly selects 50 `.yml` files. It preserves the previous
-EndoReg bootstrap catalogue as `endoreg_reference@1.0.0`, including clinical
-categories that do not fit the existing findings graph: diseases, medications,
-laboratory definitions and examination times. Operational records have explicit
-types too; patient records, employee names, model weights and active-model
-selection are outside this contract.
+The active application-data package at `lx_dtypes/data/terminology/endoreg_reference`
+is `endoreg_reference@2.0.0`. It contains application reference catalogues and depends on `lx_units` and
+`endoreg_information_sources` (which depends on `information_source_data`) for its
+external clinical references. It defines no examinations, findings, classifications,
+interventions, information sources or units of its own. Reporting packages supply
+their required terminology independently. Hosts project the exact dependency
+snapshot and application catalogue in one transaction; genuine clinical conflicts
+remain errors.
 
-`endoreg_reference@1.1.0`, shipped under
-`lx_dtypes/data/terminology/versions/endoreg_reference/1.1.0`, keeps every 1.0.0
-record unchanged and adds `gender_alias.yml`. Each `gender_alias` record maps
-one spelling found in source data, such as `weiblich` or `divers`, to a gender
-of the same catalogue. Its `name` is the spelling normalized by
-`normalize_gender_spelling` (case-folded, whitespace collapsed), so the
-catalogue's duplicate-identity check also rejects competing spellings. Hosts
-resolve source genders only through the projected names and aliases. The 1.0.0
-release stays the packaged default; hosts select 1.1.0 explicitly.
+Published `endoreg_reference@1.0.0` and `@1.1.0` are retained byte-for-byte under
+`lx_dtypes/data/terminology/versions/endoreg_reference` for historical identity and
+receipt verification. They are not the active bootstrap default. Existing databases
+must explicitly review conflicting legacy clinical rows rather than silently adopt
+new clinical meanings. Strict package-kind lint rejects clinical copies in an
+application package, including historical releases; there is no exception list.
 
 Optional packages use the same format:
 
@@ -750,6 +752,7 @@ identity is rejected.
 | Label-set import is invalid | Supply an integer `version` and valid label references. |
 | Package loads but host import fails | Clinical references may be absent, legacy identities ambiguous, or center keys incompatible. |
 | Edited installed files do not appear | Publish/register a new version instead of relying on mutation of cached package content. |
+| Digest mismatch or identity conflict for a shipped release | A published release was changed in place. See the error reference in [Terminology releases](terminology-releases.md) and run `uv run python scripts/kb_catalog.py status`. |
 
 Dataset/cohort YAML using `StudySetupDefinition` is a separate document contract.
 Both cohorts and `StudyPreset` can carry validated `study_metadata` for participating

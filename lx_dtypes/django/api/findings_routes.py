@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from functools import lru_cache
 from typing import (
     TYPE_CHECKING,
@@ -364,7 +364,10 @@ def _relation_names(relation: object) -> set[str]:
     all_items = getattr(relation, "all", None)
     if not callable(all_items):
         return set()
-    return {name for name in map(_name_of, all_items()) if name}
+    items = all_items()
+    if not isinstance(items, Iterable):
+        raise TypeError("Related manager all() must return an iterable.")
+    return {name for name in map(_name_of, items) if name}
 
 
 def _indication_choice_classification(indication: object, choice: object) -> str | None:
@@ -757,6 +760,43 @@ def _serialize_patient_finding(item: Any) -> dict[str, Any]:
             for classification in classifications
         ],
     }
+
+
+def _serialize_reporting_findings(examination: Any, rows: Any) -> list[dict[str, Any]]:
+    """Include occurrence-keyed study observations and active intervention details."""
+    descriptors = _stored_descriptor_payloads(
+        [examination.dtypes_record],
+        patient=str(examination.patient_id),
+        examination=examination.examination_safe.name,
+        module=examination.knowledge_base_module,
+        version=examination.knowledge_base_version or None,
+    )
+    result = []
+    for row in rows:
+        item = _serialize_patient_finding(row)
+        for classification in item["classifications"]:
+            key = (
+                str(row.instance_id),
+                row.finding.name,
+                classification["classification_name"],
+                classification["classification_choice_name"],
+            )
+            classification["stored_descriptors"] = descriptors.get(key, [])
+        item["interventions"] = [
+            {
+                "intervention_id": entry.intervention_id,
+                "intervention_name": entry.intervention.name,
+                "state": entry.state,
+                "date": entry.date,
+                "time_start": entry.time_start,
+                "time_end": entry.time_end,
+            }
+            for entry in row.interventions.filter(is_active=True).select_related(
+                "intervention"
+            )
+        ]
+        result.append(item)
+    return result
 
 
 def _resolve_exam_kb_finding_names(
@@ -1193,13 +1233,16 @@ def register_findings_routes(
 
     @api.get("/patient-findings/")
     def list_patient_findings(
-        request: BaseRequest, patient_examination: int | None = None
+        request: BaseRequest,
+        patient_examination: int | None = None,
+        reporting_fields: bool = False,
     ) -> list[dict[str, Any]]:
         """List the active patient findings visible to the caller.
 
         Results are limited by the host's ``patient_findings_queryset_for_request``
         callback, normally to the caller's center. ``patient_examination`` filters
-        the list to one examination.
+        the list to one examination. With ``reporting_fields``, each occurrence
+        also includes stored descriptor observations and active intervention details.
 
         Authentication: required.
 
@@ -1209,6 +1252,35 @@ def register_findings_routes(
         queryset = patient_findings_queryset_for_request(request)
         if patient_examination is not None:
             queryset = queryset.filter(patient_examination_id=patient_examination)
+        if reporting_fields:
+            if patient_examination is None:
+                api_error(
+                    400,
+                    "examination-required",
+                    "Reporting fields require a single examination.",
+                )
+            with transaction.atomic():
+                # Clinical writers lock the examination before updating its occurrences and ledger.
+                examination = (
+                    orm_models()["PatientExamination"]
+                    .objects.select_for_update(of=("self",))
+                    .filter(pk=patient_examination)
+                    .first()
+                )
+                if examination is None or not patient_examination_access_allowed(
+                    request, examination
+                ):
+                    api_error(404, "not-found", "Patient examination not found.")
+                try:
+                    return _serialize_reporting_findings(
+                        examination, queryset.select_related("finding")
+                    )
+                except ValueError:
+                    api_error(
+                        409,
+                        "inconsistent-ledger",
+                        "Stored reporting observations do not match the examination.",
+                    )
         return [_serialize_patient_finding(item) for item in queryset]
 
     @api.post("/patient-findings/")

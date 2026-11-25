@@ -6,7 +6,7 @@ site:
   name: Local Center
 reference_packages:
 - module: endoreg_reference
-  version: 1.0.0
+  version: 2.0.0
 terminology_packages: []
 report_template_packages:
 - module: coloreg

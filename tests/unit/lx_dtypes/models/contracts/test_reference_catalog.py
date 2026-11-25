@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from lx_dtypes.knowledge_bases import get_packaged_knowledge_base
 from lx_dtypes.models.contracts.knowledge_base import KnowledgeBaseIdentity
 from lx_dtypes.models.contracts.reference_catalog import ReferenceCatalogPayload
 from lx_dtypes.models.contracts.reference_catalog_snapshot import (
@@ -13,7 +14,9 @@ from lx_dtypes.models.interface.DataLoader import DataLoader
 
 
 def test_packaged_catalog_roundtrip_in_standard_loader():
-    root = Path(str(files("lx_dtypes").joinpath("data")))
+    root = get_packaged_knowledge_base(
+        "endoreg_reference", "1.0.0"
+    ).installed_data_root()
     kb = DataLoader(input_dirs=[root]).load_knowledge_base("endoreg_reference")
     records = [
         record.model_dump(mode="json", by_alias=True)
@@ -120,7 +123,14 @@ def test_optional_packages_have_closed_reference_graphs(
     module: str, count: int
 ) -> None:
     root = Path(str(files("lx_dtypes").joinpath("data")))
-    kb = DataLoader(input_dirs=[root]).load_knowledge_base(module)
+    kb = DataLoader(
+        input_dirs=[
+            root / "terminology" / module,
+            get_packaged_knowledge_base(
+                "endoreg_reference", "1.0.0"
+            ).installed_data_root(),
+        ]
+    ).load_knowledge_base(module)
     payload = ReferenceCatalogPayload.model_validate(
         {
             "records": [
@@ -205,7 +215,9 @@ def test_reference_1_1_0_only_adds_resolved_gender_aliases() -> None:
     )
 
     root = Path(str(files("lx_dtypes").joinpath("data")))
-    released = _packaged_records(root)
+    released = _packaged_records(
+        get_packaged_knowledge_base("endoreg_reference", "1.0.0").installed_data_root()
+    )
     current = _packaged_records(root / "terminology/versions/endoreg_reference/1.1.0")
     added = [record for record in current.records if record not in released.records]
     assert all(record in current.records for record in released.records)
@@ -287,3 +299,56 @@ def test_gender_alias_requires_gender_in_snapshot() -> None:
             payload=payload,
             snapshot_id=ReferenceCatalogSnapshot.content_digest(identity, payload),
         )
+
+
+def test_dependency_catalog_snapshot_is_closed_and_pins_source_dates() -> None:
+    from lx_dtypes.models.contracts.adapters import record_to_core_concept
+    from lx_dtypes.models.contracts.package_snapshot import build_package_snapshot
+
+    root = Path(str(files("lx_dtypes").joinpath("data")))
+    kb = DataLoader(input_dirs=[root]).load_knowledge_base("endoreg_reference")
+    payload = _packaged_records(root)
+    identity = KnowledgeBaseIdentity(
+        knowledge_base_module="endoreg_reference", knowledge_base_version="2.0.0"
+    )
+    package = build_package_snapshot(kb)
+    reloaded_package = build_package_snapshot(
+        DataLoader(input_dirs=[root]).load_knowledge_base("endoreg_reference")
+    )
+    assert ReferenceCatalogSnapshot.content_digest(
+        identity, payload, clinical_package=package
+    ) == ReferenceCatalogSnapshot.content_digest(
+        identity, payload, clinical_package=reloaded_package
+    )
+    snapshot = ReferenceCatalogSnapshot(
+        identity=identity,
+        payload=payload,
+        clinical_package=package,
+        snapshot_id=ReferenceCatalogSnapshot.content_digest(
+            identity, payload, clinical_package=package
+        ),
+    )
+    assert ReferenceCatalogSnapshot.model_validate_json(
+        snapshot.model_dump_json()
+    ).model_dump(mode="json") == snapshot.model_dump(mode="json")
+    with pytest.raises(ValidationError, match="Unresolved reference"):
+        ReferenceCatalogSnapshot(
+            identity=identity,
+            payload=payload,
+            snapshot_id=ReferenceCatalogSnapshot.content_digest(identity, payload),
+        )
+    raw = snapshot.model_dump(mode="json")
+    raw["clinical_package"] = None
+    with pytest.raises(ValidationError, match="digest mismatch"):
+        ReferenceCatalogSnapshot.model_validate(raw)
+    source = kb.information_source["guideline_quality_in_gi"]
+    assert (
+        record_to_core_concept("information_source", source).model_dump()["date"]
+        == "2025-01-01"
+    )
+    assert (
+        "date"
+        not in record_to_core_concept(
+            "information_source", kb.information_source["unknown"]
+        ).model_dump()
+    )

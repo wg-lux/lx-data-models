@@ -325,6 +325,8 @@ class TableImportReceiptPayload(DtypesModel):
 
     patient_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     examination_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
+    # Historical receipts predate the normalized gender terminology identifier.
+    gender: str | None = Field(default=None, min_length=1, max_length=255)
     record: DtypesRecordPersistencePayload
 
 
@@ -333,6 +335,7 @@ class TableImportResult(DtypesModel):
     created_count: int
     replayed_count: int
     patient_examination_ids: list[int]
+    receipt_ids: list[int]
     matched_video_count: int
     matched_report_count: int
     dry_run: bool

@@ -78,9 +78,9 @@
       "version": "1.0.0",
       "package_kind": "application_data",
       "medical_field": "gastroenterology",
-      "resource_root": "data/terminology/endoreg_reference",
+      "resource_root": "data/terminology/versions/endoreg_reference/1.0.0/endoreg_reference",
       "content_sha256": "c1c362543217bd79bbef41eecd72d668ac54ef704e7dd5442ebdeeab3101b962",
-      "default": true
+      "default": false
     },
     {
       "module_name": "endoreg_reference",
@@ -274,6 +274,23 @@
       "package_kind": "terminology",
       "resource_root": "data/terminology/lx_examinations",
       "content_sha256": "635393ac7b32cdf912f9dc5f390ae68bf2ae0e65d2d4bf635e2f6134d2cd0427",
+      "default": true
+    },
+    {
+      "module_name": "endoreg_reference",
+      "version": "2.0.0",
+      "package_kind": "application_data",
+      "medical_field": "gastroenterology",
+      "resource_root": "data/terminology/endoreg_reference",
+      "content_sha256": "8dd72020921eb4d962fc460c9e5b59e618cb40cb61c181b7eee177196298ca4d",
+      "default": true
+    },
+    {
+      "module_name": "endoreg_information_sources",
+      "version": "1.0.0",
+      "package_kind": "terminology",
+      "resource_root": "data/terminology/endoreg_information_sources",
+      "content_sha256": "02f57703f0e805c2576b810a64186f613756a8b4bfda3833f5259911b93521cd",
       "default": true
     }
   ]

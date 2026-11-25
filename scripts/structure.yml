@@ -20,6 +20,9 @@ entrypoints:
 - name: Context validator
   file: lint_structure.py
   purpose: Check strict schemas, references, and graph consistency
+- name: Terminology catalog maintenance
+  file: kb_catalog.py
+  purpose: Diagnose catalog integrity, retain releases with new-version and refresh unreleased digests
 - name: KB lint wrapper
   file: lint_kb_yaml.py
   purpose: Delegate to the canonical package linter
@@ -40,6 +43,8 @@ submodules: []
 contracts:
 - name: Model boundary inventory
   doc: ../docs/model-boundaries.yml
+- name: Terminology releases
+  doc: ../docs/guides/terminology-releases.md
 - name: KB linting
   doc: ../docs/guides/kb-yaml-linting.md
 - name: Agent context

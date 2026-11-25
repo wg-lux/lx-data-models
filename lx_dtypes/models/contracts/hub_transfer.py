@@ -521,6 +521,12 @@ class HubTransferStudyResourceRowsPayload(_StrictPayload):
         for link in value.patients:
             require_hub_record_pseudonym(link.patient_uuid)
             require_hub_record_pseudonym(link.patient_examination_uuid)
+        for collection in value.collections:
+            source = collection.report_source
+            if source is not None:
+                require_hub_record_pseudonym(source.report_uuid)
+                for document in source.source_document_uuids:
+                    require_hub_record_pseudonym(document)
         return value
 
 

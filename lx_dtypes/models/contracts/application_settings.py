@@ -1,12 +1,91 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Literal
+from enum import StrEnum
+from typing import Annotated, Literal
 
-from pydantic import Field, model_validator
+from pydantic import (
+    AfterValidator,
+    BeforeValidator,
+    Field,
+    TypeAdapter,
+    model_validator,
+)
 
 from lx_dtypes.models.contracts.ai_dataset import AIModelType, DatasetType
 from lx_dtypes.models.model import FrozenContractModel
+
+
+class AnnotationProfession(StrEnum):
+    """A professional category declared by the authenticated annotator."""
+
+    PHYSICIAN = "physician"
+    MEDICAL_STUDENT = "medical_student"
+    NURSE = "nurse"
+    MEDICAL_ASSISTANT = "medical_assistant"
+    MEDICAL_INFORMATICS = "medical_informatics"
+    NON_MEDICAL = "non_medical"
+
+
+class AnnotationAcademicTitle(StrEnum):
+    """Self-declared academic qualifications, independent of the annotator's profession."""
+
+    BSC = "bsc"
+    MSC = "msc"
+    DOCTORATE = "doctorate"
+    PROFESSOR = "professor"
+
+
+ANNOTATION_PROFESSION_LABELS_DE: dict[AnnotationProfession, str] = {
+    AnnotationProfession.PHYSICIAN: "Ärztin/Arzt",
+    AnnotationProfession.MEDICAL_STUDENT: "Medizinstudierende",
+    AnnotationProfession.NURSE: "Pflegefachkraft",
+    AnnotationProfession.MEDICAL_ASSISTANT: "Medizinische Fachassistenz",
+    AnnotationProfession.MEDICAL_INFORMATICS: "Medizininformatik",
+    AnnotationProfession.NON_MEDICAL: "Nichtmedizinisches Personal",
+}
+
+
+ANNOTATION_ACADEMIC_TITLE_LABELS_DE: dict[AnnotationAcademicTitle, str] = {
+    AnnotationAcademicTitle.BSC: "Bachelor (B.Sc.)",
+    AnnotationAcademicTitle.MSC: "Master (M.Sc.)",
+    AnnotationAcademicTitle.DOCTORATE: "Doktorgrad",
+    AnnotationAcademicTitle.PROFESSOR: "Professur",
+}
+
+
+def _academic_title(value: object) -> AnnotationAcademicTitle:
+    if not isinstance(value, str):
+        # Pydantic only wraps ValueError/AssertionError into ValidationError.
+        raise ValueError(  # noqa: TRY004
+            "An academic title must be a supported string code."
+        )
+    return AnnotationAcademicTitle(value)
+
+
+def _unique_titles(
+    titles: list[AnnotationAcademicTitle],
+) -> list[AnnotationAcademicTitle]:
+    if len(titles) != len(set(titles)):
+        raise ValueError("Academic titles must be unique.")
+    return [title for title in AnnotationAcademicTitle if title in titles]
+
+
+type AnnotationAcademicTitles = Annotated[
+    list[Annotated[AnnotationAcademicTitle, BeforeValidator(_academic_title)]],
+    Field(strict=True, max_length=len(AnnotationAcademicTitle)),
+    AfterValidator(_unique_titles),
+]
+
+
+_TITLES_ADAPTER: TypeAdapter[list[AnnotationAcademicTitle]] = TypeAdapter(
+    AnnotationAcademicTitles
+)
+
+
+def validated_annotation_academic_titles(value: object) -> list[str]:
+    return [title.value for title in _TITLES_ADAPTER.validate_python(value)]
+
 
 type ApplicationSettingsDeploymentRole = Literal[
     "standalone",
@@ -128,10 +207,16 @@ class ApplicationSettingsPayload(FrozenContractModel):
 
 
 __all__ = [
+    "ANNOTATION_ACADEMIC_TITLE_LABELS_DE",
+    "ANNOTATION_PROFESSION_LABELS_DE",
+    "AnnotationAcademicTitle",
+    "AnnotationAcademicTitles",
+    "AnnotationProfession",
     "ApplicationSettingsBackupSourcePayload",
     "ApplicationSettingsBackupStatusPayload",
     "ApplicationSettingsDataSetEntryPayload",
     "ApplicationSettingsDeploymentProfilePayload",
     "ApplicationSettingsDeploymentRole",
     "ApplicationSettingsPayload",
+    "validated_annotation_academic_titles",
 ]

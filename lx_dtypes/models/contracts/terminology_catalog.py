@@ -4,6 +4,7 @@ from typing import Self
 
 from pydantic import ConfigDict, Field, field_validator, model_validator
 
+from lx_dtypes.factories import normalize_missing_text
 from lx_dtypes.models.model import DtypesModel
 
 from .json_types import JsonObject
@@ -33,16 +34,8 @@ class LocalizedCatalogItem(DtypesModel):
     def guarantee_localized_names(self) -> Self:
         return self.model_copy(
             update={
-                "name_de": (
-                    self.name_de
-                    if self.name_de and self.name_de != "unknown"
-                    else self.name
-                ),
-                "name_en": (
-                    self.name_en
-                    if self.name_en and self.name_en != "unknown"
-                    else self.name
-                ),
+                "name_de": normalize_missing_text(self.name_de) or self.name,
+                "name_en": normalize_missing_text(self.name_en) or self.name,
             }
         )
 

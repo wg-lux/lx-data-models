@@ -70,6 +70,14 @@ See the [package boundary guide](docs/guides/package_boundary.md) for the full
 contract. Before authoring terminology YAML, read the
 [package structure guide](docs/guides/dtypes-package-structure.md).
 
+### Changing Shipped Terminology
+
+Published `module@version` releases in `lx_dtypes/data/` never change in place.
+Check the catalog with `uv run python scripts/kb_catalog.py status`, and publish
+changes with `uv run python scripts/kb_catalog.py new-version <module> <next-version>`.
+See [Terminology releases](docs/guides/terminology-releases.md) for the workflow
+and a reference of integrity errors.
+
 ## Pre-commit Hooks (optional but recommended)
 
 ```bash

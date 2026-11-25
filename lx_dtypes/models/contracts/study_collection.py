@@ -17,6 +17,7 @@ from pydantic import (
 from lx_dtypes.language import DEFAULT_LANGUAGE, LanguageCode
 from lx_dtypes.models.model import FrozenContractModel
 
+from .application_settings import AnnotationAcademicTitles, AnnotationProfession
 from .cohort_definition import CohortDefinition
 from .dtypes_record_persistence import (
     DtypesRecordPersistencePayload,
@@ -27,9 +28,29 @@ from .study import StudyDefinition
 from .validation import ValidationReport
 
 
+class StudyReportSource(FrozenContractModel):
+    """Observation provenance from the source site, independent of local account IDs."""
+
+    report_uuid: UUID
+    report_version: int = Field(gt=0)
+    author_profession: AnnotationProfession | None
+    author_academic_titles: AnnotationAcademicTitles = Field(default_factory=list)
+    source_document_uuids: list[UUID] = Field(default_factory=list)
+
+    @field_validator("source_document_uuids")
+    @classmethod
+    def unique_documents(cls, value: list[UUID]) -> list[UUID]:
+        if len(value) != len(set(value)):
+            raise ValueError("Source document UUIDs must be unique.")
+        return sorted(value)
+
+
 class StudyCollectionRecord(FrozenContractModel):
     """A ledger observation and its server-computed, version-pinned assessment."""
 
+    report_source: StudyReportSource | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     record_uuid: UUID
     study_uuid: UUID
     study_definition: StudyDefinition
@@ -112,4 +133,4 @@ class StudyCollectionRecord(FrozenContractModel):
         return self
 
 
-__all__ = ["StudyCollectionRecord"]
+__all__ = ["StudyCollectionRecord", "StudyReportSource"]

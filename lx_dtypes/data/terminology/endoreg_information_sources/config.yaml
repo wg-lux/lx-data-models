@@ -1,0 +1,11 @@
+name: endoreg_information_sources
+name_de: EndoReg Informationsquellen
+description: Information-source identities migrated from the legacy application catalogue.
+version: 1.0.0
+package_kind: terminology
+modules: []
+depends_on:
+- information_source_data
+data:
+  files:
+  - ./sources.yml

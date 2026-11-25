@@ -16,6 +16,7 @@ from lx_dtypes.models.contracts.package_kind import (
     PackageKind,
     package_kind_dependency_allowed,
 )
+from lx_dtypes.models.contracts.reference_catalog import TERMINOLOGY_REFERENCE_MODELS
 from lx_dtypes.models.interface.data_roots import module_search_root
 from lx_dtypes.models.interface.DataLoader import DataLoader
 from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
@@ -59,7 +60,39 @@ TERMINOLOGY_MODELS = frozenset(
     }
 )
 APPLICATION_DATA_MODELS = frozenset({"reference_catalog", "center_employee_list"})
+# Clinical ownership also applies inside the legacy reference_catalog envelope.
+# These host record kinds project terminology concepts; an application-data
+# package must depend on their owners instead of defining parallel copies.
+CLINICAL_REFERENCE_KINDS = frozenset(
+    kind.value for kind in TERMINOLOGY_REFERENCE_MODELS
+)
+
+
+def application_clinical_catalog_records(kb: KnowledgeBase) -> set[tuple[str, str]]:
+    """Identify clinical copies owned by an application catalogue, excluding dependencies."""
+    owners = kb.composed_module_names()
+    return {
+        (record.kind.value, record.identity.name)
+        for catalog in kb.reference_catalog.values()
+        if catalog.kb_module_name in owners
+        for record in catalog.payload.records
+        if record.kind.value in CLINICAL_REFERENCE_KINDS
+    }
+
+
 STUDY_MODELS = frozenset({"study_preset"})
+
+# Record models a package may define itself, per declared kind. Report-template
+# packages may still carry local terminology; that is reported separately by the
+# report-template concept warning and is not a package-kind breach.
+PACKAGE_KIND_OWN_MODELS: Mapping[PackageKind, frozenset[str]] = {
+    PackageKind.terminology: TERMINOLOGY_MODELS,
+    PackageKind.report_templates: REPORT_TEMPLATE_TRIGGER_MODELS
+    | REPORTING_REFERENCE_MODELS
+    | TERMINOLOGY_MODELS,
+    PackageKind.application_data: APPLICATION_DATA_MODELS,
+    PackageKind.study: STUDY_MODELS,
+}
 
 LEGACY_KIND_MODEL_GROUPS: Mapping[str, frozenset[str]] = {
     "report_template_trigger": REPORT_TEMPLATE_TRIGGER_MODELS,
@@ -89,6 +122,38 @@ def own_record_counts(kb: KnowledgeBase) -> dict[str, int]:
             1 for record in records.values() if record.kb_module_name in owners
         )
     return {field: count for field, count in counts.items() if count}
+
+
+@dataclass(frozen=True)
+class PackageKindContentViolations:
+    """Own records that do not belong to a package's declared kind."""
+
+    foreign_models: tuple[str, ...]
+    terminology_reference_kinds: tuple[str, ...]
+
+    def __bool__(self) -> bool:
+        return bool(self.foreign_models or self.terminology_reference_kinds)
+
+
+def package_kind_content_violations(
+    kb: KnowledgeBase, kind: PackageKind
+) -> PackageKindContentViolations:
+    """Find the package's own records that do not belong to its ``kind``.
+
+    Only the package's own and composed modules count; ``depends_on`` records
+    belong to their own packages. Application-data reference catalogs are also
+    checked record by record, because a catalog payload could otherwise carry
+    terminology definitions under an application-data kind.
+    """
+    foreign = tuple(sorted(set(own_record_counts(kb)) - PACKAGE_KIND_OWN_MODELS[kind]))
+    carried: tuple[str, ...] = ()
+    if kind is PackageKind.application_data:
+        carried = tuple(
+            sorted(
+                {kind_name for kind_name, _ in application_clinical_catalog_records(kb)}
+            )
+        )
+    return PackageKindContentViolations(foreign, carried)
 
 
 def infer_legacy_package_kind(
@@ -293,10 +358,13 @@ def audit_package_kind_dependencies(
 
 __all__ = [
     "LEGACY_KIND_MODEL_GROUPS",
+    "PACKAGE_KIND_OWN_MODELS",
+    "PackageKindContentViolations",
     "PackageKindDependencyFinding",
     "PackageKindInference",
     "audit_package_kind_dependencies",
     "infer_legacy_package_kind",
     "loaded_package_kind_findings",
     "own_record_counts",
+    "package_kind_content_violations",
 ]

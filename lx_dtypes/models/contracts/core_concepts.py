@@ -292,12 +292,13 @@ class UnitTypeCore(CoreConceptBase):
 
 
 class InformationSourceCore(CoreConceptBase):
-    """Origin of recorded data, such as an examiner or an AI model.
+    """Origin of recorded data, with an optional publication date."""
 
-    Attributes:
-        information_source_types: Names of the source types it belongs to.
-    """
-
+    date: str | None = Field(
+        default=None,
+        pattern=r"^\d{4}-\d{2}-\d{2}$",
+        exclude_if=lambda value: value is None,
+    )
     information_source_types: list[str] = Field(default_factory=list)
 
     @field_validator("information_source_types")

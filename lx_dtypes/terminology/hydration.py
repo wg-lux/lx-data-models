@@ -26,6 +26,7 @@ from lx_dtypes.knowledge_bases import (
     PackagedKnowledgeBase,
     PackagedKnowledgeBaseCatalog,
     knowledge_base_content_sha256,
+    registered_digest_remediation,
 )
 from lx_dtypes.models.interface.data_roots import module_search_root, package_data_root
 from lx_dtypes.models.interface.DataLoader import DataLoader
@@ -78,10 +79,15 @@ def _verify_source(source: Path, descriptor: PackagedKnowledgeBase) -> None:
         descriptor.module_name,
         descriptor.version,
     ):
-        raise ValueError("Shipped catalog identity conflicts with config.yaml")
+        raise ValueError(
+            "Shipped catalog identity conflicts with config.yaml for "
+            f"{descriptor.module_name}@{descriptor.version}.\n"
+            + descriptor.remediation()
+        )
     if knowledge_base_content_sha256(module) != descriptor.content_sha256:
         raise ValueError(
-            f"Shipped content digest mismatch: {descriptor.module_name}@{descriptor.version}"
+            f"Shipped content digest mismatch: {descriptor.module_name}@{descriptor.version}.\n"
+            + descriptor.remediation()
         )
 
 
@@ -102,7 +108,10 @@ def _needs_copy(
             if item.get("content_sha256") != descriptor.content_sha256:
                 raise ValueError(
                     "Registered provider digest conflicts with shipped "
-                    f"{descriptor.module_name}@{descriptor.version}"
+                    f"{descriptor.module_name}@{descriptor.version}.\n"
+                    + registered_digest_remediation(
+                        descriptor.module_name, descriptor.version
+                    )
                 )
             return True
         inputs = item.get("input_dirs", [])

@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.4]
+
+### Added
+- `scripts/kb_catalog.py` for terminology maintainers: `status` diagnoses every
+  catalog release with a fix for each problem, `new-version` retains the
+  published bytes and dependencies of a default release and starts a new
+  version, and `refresh-digest` updates unreleased digests only.
+- Retained release bundles, including their snapshotted dependency modules, are
+  pinned in `tests/fixtures/lx_dtypes/retained_release_bundles.json`; tests
+  resolve every shipped release through the provider registry and refuse
+  tampered installs.
+- [Terminology releases](docs/guides/terminology-releases.md) guide with the
+  release workflow and an integrity error reference.
+
+### Changed
+- Integrity errors for packaged knowledge bases, registry digests, identity
+  conflicts, missing versions and unresolved template validators now explain
+  how to fix them, for both host operators and terminology maintainers. Message
+  prefixes are unchanged. New public helpers:
+  `lx_dtypes.knowledge_bases.published_release_remediation` and
+  `registered_digest_remediation`.
+- Current deployment templates select `endoreg_reference@2.0.0`, whose clinical
+  definitions are owned by terminology dependencies. Schema migration preserves
+  existing package version pins.
+- Application-data packages may depend on terminology without owning its
+  clinical concepts. Information-source identities formerly embedded in the
+  reference catalogue are provided by `endoreg_information_sources@1.0.0`.
+
+### Fixed
+- Reference vocabulary checks resolve the current catalogue through the package
+  loader, and source provenance includes the extracted information-source package.
+
 ## [0.7.2]
 
 ### Added
@@ -25,6 +57,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   publishing run the release helper's artifact verification before publication.
 - Consolidated study metadata and ColoReg resection guidance into Markdown,
   with a standalone YAML example for study label presentation.
+- Package kinds stay separate: a package's own records must belong to its kind
+  (`PACKAGE_KIND_OWN_MODELS`), and `application_data` reference catalogs may not
+  carry terminology concepts (`TERMINOLOGY_REFERENCE_MODELS`). Breaches are the
+  lint error `package_kind_content_violation`, without exceptions, which new
+  imports and registered reads reject; packages without a declared kind are
+  checked against the kind their records imply.
+- The training preset example ships its employee list as a separate
+  `training_staff` application-data package referenced through `depends_on`,
+  instead of selecting it as a data file of the study preset.
 
 ### Fixed
 - `CITATION.cff` cited version 0.2.20 instead of the current release.

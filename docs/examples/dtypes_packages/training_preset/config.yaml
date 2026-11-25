@@ -5,8 +5,9 @@ description: Synthetic documentation example, not a clinical study definition.
 modules: []
 depends_on:
   - training_terminology
+  # Optional application data: enable only when center-specific employee hints
+  # are wanted. Employees stay in their own package kind.
+  # - training_staff
 data:
   files:
     - data/preset.yml
-    # Optional: enable only when center-specific employee hints are wanted.
-    # - optional/employees.yml

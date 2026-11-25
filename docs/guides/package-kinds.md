@@ -4,6 +4,67 @@ Every knowledge-base package can declare what it contains. Hosts use the kind to
 offer only fitting packages, for example only `report_templates` packages in a
 reporting package selector.
 
+This page is the canonical contract. Host-specific behavior is described in
+endoreg-db (`docs/package_kinds_host_guide.md`: what the database does with each
+kind) and lx-annotate (`docs/guides/package-kinds.md`: where each kind appears in
+the application).
+
+## Choosing a kind
+
+A package has exactly one kind, chosen by **what its own records are** and
+**who owns their meaning**. Everything else is referenced through `depends_on`.
+
+Ask in this order and stop at the first "yes":
+
+1. Does it define report templates or report sections? Use `report_templates`.
+2. Does it define clinical concepts or rules (findings, classifications,
+   examinations, indications, interventions, units, validators)? Use
+   `terminology`.
+3. Does it define a study preset? Use `study`.
+4. Does it provide host reference data (centers, labels, staff, hardware,
+   medications, sustainability catalogues)? Use `application_data`.
+5. Does it need records from several of these answers? Split it into several
+   packages linked by `depends_on`.
+
+| Kind | Use it when the package… | Do not use it for… | Shipped examples |
+| --- | --- | --- | --- |
+| `terminology` | defines the shared clinical vocabulary and its rules: findings, classifications and choices, examinations, indications, interventions, units, descriptors, validators | report layout, host configuration, study protocols | `lx_findings`, `lx_units`, `coloreg_terminology`, `DGVS_Terminology` |
+| `report_templates` | defines how a report is structured: templates, sections, report findings and template-specific validators, built on terminology | defining shared clinical concepts (put them in a terminology package; local concepts only trigger a warning) | `coloreg`, `dgvs_reporting`, `report_medications`, `report_electrosurgery` |
+| `study` | defines a study preset: how a study provisions centers, genders, labels and the examinations it uses | clinical definitions, staff lists, report layout | the `training_preset` documentation example |
+| `application_data` | provides reference data the host application needs to run: centers, labels and label sets, genders, AI model metadata, medications, workforce, hardware, sustainability catalogues | any clinical concept that terminology already defines (examinations, findings, classifications, indications, interventions, information sources, units) | `endoreg_workforce`, `endoreg_green_endoscopy`, `endoreg_reference` |
+
+Rules of thumb:
+
+- **One owner per concept.** A clinical concept is defined in exactly one
+  terminology package. Report templates, studies and application data refer to
+  it through `depends_on`; they never carry a copy.
+- **Ask who approves a change.** Clinical meaning (a new classification choice)
+  is reviewed by clinical owners and belongs in terminology. Report wording and
+  layout belong in report templates. Site setup (a new center, a staff list)
+  belongs in application data.
+- **Mixed content means more than one package.** For example, a study preset
+  that needs an employee list depends on a separate `application_data`
+  package (see the `training_preset` and `training_staff` example), and a
+  report template that needs a new finding depends on a terminology package
+  that defines it.
+- **Activate report templates, register everything else.** Hosts activate one
+  `report_templates` package for reporting. Terminology, application data and
+  study packages are registered and used through dependencies, deployment roles
+  or explicit host commands.
+- **Declare the kind.** Set `package_kind` in `config.yaml`. An undeclared
+  package is still checked against the kind its records imply, but declared
+  kinds make listings, selectors and deployment roles unambiguous.
+
+Common mistakes and how the lint reports them:
+
+| Mistake | Diagnostic | Fix |
+| --- | --- | --- |
+| Clinical concepts inside an `application_data` reference catalog | `package_kind_content_violation` | Move them to a terminology package and depend on it |
+| Validators in a `study` or `application_data` package | `validators_in_package_kind` | Move them to terminology or report templates |
+| Records of several kinds in one package | `package_kind_content_violation` | Split the package |
+| Terminology depending on report templates or a study | `package_kind_dependency_violation` | Reverse the dependency; terminology is the base layer |
+| Declared kind differs from the reviewed catalog kind | `package_kind_conflict` | Correct the declaration |
+
 ## Kinds
 
 | `package_kind` | Contains | May depend on |
@@ -11,10 +72,30 @@ reporting package selector.
 | `terminology` | Clinical concepts: findings, classifications, examinations, units, interventions, indications, validators, time references, electrical curve profiles | `terminology`, `application_data` |
 | `report_templates` | Report templates, sections and reporting validators | `terminology`, `report_templates`, `application_data` |
 | `study` | Study metadata, presets and analyses | `terminology`, `report_templates`, `application_data` |
-| `application_data` | Endoreg application and reference data: labels, genders, centers, workforce, hardware | `application_data` |
+| `application_data` | Endoreg application and reference data: labels, genders, centers, workforce, hardware | `application_data`, `terminology` |
 
 `PackageKind` is exported from `lx_dtypes` and `lx_dtypes.models.contracts`.
 `package_kind_dependency_allowed(kind, dependency_kind)` evaluates the table.
+
+## Kinds stay separate
+
+A package's own records (its root and `modules`, never `depends_on`) must belong
+to its kind; `PACKAGE_KIND_OWN_MODELS` in `lx_dtypes.package_kinds` lists them.
+Content of another kind is referenced through `depends_on` instead.
+
+- `application_data` reference catalogs may not carry terminology concepts
+  (examinations, examination types, indications, findings, classifications and
+  their choices and types, interventions, information sources, units;
+  `TERMINOLOGY_REFERENCE_MODELS`). Otherwise a host receives two competing
+  definitions of one clinical concept.
+- `report_templates` packages may still define local terminology; that is
+  reported by the separate report-template concept warning.
+- A package without a declared or reviewed kind is checked against the kind its
+  own records imply, so omitting `package_kind` never bypasses the rule.
+
+Breaches are `package_kind_content_violation` lint errors without exceptions:
+new imports and registered reads reject them. Move clinical definitions into
+terminology packages and reference them through `depends_on`.
 
 ## Declaring the kind
 

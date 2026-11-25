@@ -4,6 +4,7 @@ from pydantic import ValidationError
 from lx_dtypes.models.contracts.examination_revision import (
     CaseStudyExportSelection,
     ExaminationEvidence,
+    ExaminationEvidenceSelection,
     ExaminationRevisionSnapshot,
 )
 
@@ -14,6 +15,25 @@ from lx_dtypes.models.contracts.examination_revision import (
         {},
         {"report_id": 1, "report_version": 2},
         {"video_id": 3},
+        {
+            "report_id": 1,
+            "report_version": 2,
+            "report_author_id": 7,
+            "report_author_profession": "nurse",
+            "report_author_academic_titles": ["msc", "doctorate"],
+            "report_documents": [
+                {
+                    "document_id": 3,
+                    "document_uuid": "12345678-1234-1234-1234-123456789013",
+                    "processed_sha256": "a" * 64,
+                },
+                {
+                    "document_id": 4,
+                    "document_uuid": "12345678-1234-1234-1234-123456789014",
+                    "processed_sha256": "b" * 64,
+                },
+            ],
+        },
         {
             "report_id": 1,
             "report_version": 2,
@@ -45,6 +65,29 @@ def test_optional_evidence_roundtrip(evidence: dict[str, object]) -> None:
     "evidence",
     [
         {"report_id": 1},
+        {"report_author_id": 7},
+        {"report_id": 1, "report_version": 1, "report_author_profession": "physician"},
+        {
+            "report_documents": [
+                {
+                    "document_id": 3,
+                    "document_uuid": "12345678-1234-1234-1234-123456789013",
+                    "processed_sha256": "a" * 64,
+                }
+            ]
+        },
+        {
+            "report_id": 1,
+            "report_version": 1,
+            "report_documents": [
+                {
+                    "document_id": 3,
+                    "document_uuid": "12345678-1234-1234-1234-123456789013",
+                    "processed_sha256": "a" * 64,
+                }
+            ]
+            * 2,
+        },
         {"processed_sha256": "a" * 64},
         {"video_id": True},
         {"patient_name": "forbidden"},
@@ -139,3 +182,8 @@ def test_selected_export_validates_serialized_identity_and_finalization() -> Non
         SelectedCaseExport.model_validate_json(
             json.dumps({**payload, "examinations": [record, record]})
         )
+
+
+def test_expected_report_version_requires_selected_report() -> None:
+    with pytest.raises(ValidationError, match="requires report_id"):
+        ExaminationEvidenceSelection(report_version=2)

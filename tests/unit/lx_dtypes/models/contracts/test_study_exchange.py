@@ -7,12 +7,19 @@ from openpyxl import load_workbook
 from openpyxl.cell.cell import Cell
 from pydantic import ValidationError
 
+from lx_dtypes.models.contracts.application_settings import (
+    AnnotationAcademicTitle,
+    AnnotationProfession,
+)
 from lx_dtypes.models.contracts.dtypes_record_persistence import (
     DtypesRecordPersistencePayload,
 )
 from lx_dtypes.models.contracts.package_snapshot import build_package_snapshot
 from lx_dtypes.models.contracts.study import StudyDefinition
-from lx_dtypes.models.contracts.study_collection import StudyCollectionRecord
+from lx_dtypes.models.contracts.study_collection import (
+    StudyCollectionRecord,
+    StudyReportSource,
+)
 from lx_dtypes.models.contracts.study_exchange import (
     StudyExchangeBundle,
     StudyExchangePatientLink,
@@ -66,6 +73,36 @@ def bundle() -> StudyExchangeBundle:
             )
         ],
     )
+
+
+def test_report_evidence_round_trips_multiple_documents_and_self_declared_titles() -> (
+    None
+):
+    original = bundle()
+    source = StudyReportSource(
+        report_uuid=UUID(int=5),
+        report_version=2,
+        author_profession=AnnotationProfession.NURSE,
+        author_academic_titles=[
+            AnnotationAcademicTitle.MSC,
+            AnnotationAcademicTitle.DOCTORATE,
+        ],
+        source_document_uuids=[UUID(int=7), UUID(int=6)],
+    )
+    original.collections[0] = original.collections[0].model_copy(
+        update={"report_source": source}
+    )
+    exported = study_exchange_to_xlsx(original)
+    assert study_exchange_from_xlsx(exported).collections[0].report_source == source
+    workbook = load_workbook(BytesIO(exported))
+    sheet = workbook["Report sources"]
+    assert sheet.cell(2, 4).value == "Pflegefachkraft"
+    assert sheet.cell(2, 5).value == "Master (M.Sc.), Doktorgrad"
+    assert [sheet.cell(row, 6).value for row in (2, 3)] == [
+        str(UUID(int=6)),
+        str(UUID(int=7)),
+    ]
+    workbook.close()
 
 
 def test_lossless_workbook_preserves_package_and_ledger() -> None:
@@ -310,3 +347,28 @@ def test_hub_study_rows_require_hub_pseudonyms(
             HubTransferStudyResourceRowsPayload.model_validate(
                 {"study_exchange": exchange}
             )
+
+
+@pytest.mark.parametrize("local_reference", ["report", "document"])
+def test_hub_rejects_local_report_source_uuids(local_reference: str) -> None:
+    from lx_dtypes.models.contracts.hub_transfer import (
+        HubTransferStudyResourceRowsPayload,
+    )
+
+    pseudonym = UUID("821d81f1-fb20-8e38-b777-01c67fe03001")
+    local = UUID("821d81f1-fb20-4e38-b777-01c67fe03002")
+    exchange = _with_patient_link(bundle(), pseudonym, pseudonym)
+    exchange.collections[0] = exchange.collections[0].model_copy(
+        update={
+            "report_source": StudyReportSource(
+                report_uuid=local if local_reference == "report" else pseudonym,
+                source_document_uuids=[
+                    local if local_reference == "document" else pseudonym
+                ],
+                report_version=1,
+                author_profession=None,
+            )
+        }
+    )
+    with pytest.raises(ValidationError, match="UUIDv8 pseudonyms"):
+        HubTransferStudyResourceRowsPayload.model_validate({"study_exchange": exchange})

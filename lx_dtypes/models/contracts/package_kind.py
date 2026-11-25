@@ -40,7 +40,9 @@ PACKAGE_KIND_ALLOWED_DEPENDENCIES: Mapping[PackageKind, frozenset[PackageKind]] 
                     PackageKind.application_data,
                 }
             ),
-            PackageKind.application_data: frozenset({PackageKind.application_data}),
+            PackageKind.application_data: frozenset(
+                {PackageKind.application_data, PackageKind.terminology}
+            ),
         }
     )
 )

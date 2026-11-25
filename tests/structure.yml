@@ -91,6 +91,13 @@ entrypoints:
 - name: Study collection contract tests
   file: unit/lx_dtypes/models/contracts/test_study_collection.py
   purpose: Verify persistence provenance, strict boundaries, and observation round trips
+- name: Knowledge-base integrity tripwires
+  file: unit/lx_dtypes/models/interface/test_knowledge_base_integrity.py
+  purpose: Resolve every shipped release through the provider registry, enforce retained bundle pins from
+    fixtures/lx_dtypes/retained_release_bundles.json, refuse tampered installs with actionable guidance
+- name: Terminology catalog tool tests
+  file: test_kb_catalog_tool.py
+  purpose: Exercise status, new-version and refresh-digest on a synthetic git repository
 - name: Data format syntax tests
   file: unit/lx_dtypes/models/interface/test_data_formats.py
   purpose: Verify format identifiers, FHIR base syntax inheritance, lookups and unsupported-role failures

@@ -1,0 +1,3414 @@
+- model: reference_catalog
+  name: ai_model
+  name_de: KI-Modelle
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: image_multilabel_classification_colonoscopy_default
+      record_type: ai_model
+      description: Image multilabel classification model
+      model_type:
+        name: multilabel_classification
+        version: null
+      model_subtype: multilabel
+      video_segmentation_labelset:
+        name: colonoscopy_video_segmentation_raw
+        version: null
+- model: reference_catalog
+  name: center
+  name_de: Zentren
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: bbk_regensburg
+      record_type: center
+      center_key: bbk_regensburg
+      display_name: bbk_regensburg
+    - name: endoreg_db_demo
+      record_type: center
+      center_key: endoreg_db_demo
+      display_name: endoreg_db_demo
+    - name: rbk_stuttgart
+      record_type: center
+      center_key: rbk_stuttgart
+      display_name: rbk_stuttgart
+    - name: rkh_ludwigsburg
+      record_type: center
+      center_key: rkh_ludwigsburg
+      display_name: rkh_ludwigsburg
+    - name: uke_hamburg
+      record_type: center
+      center_key: uke_hamburg
+      display_name: uke_hamburg
+    - name: university_hospital_wuerzburg
+      record_type: center
+      center_key: university_hospital_wuerzburg
+      display_name: university_hospital_wuerzburg
+- model: reference_catalog
+  name: contraindication
+  name_de: Kontraindikationen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: anticoagulation-therapeutic
+      record_type: contraindication
+      description: Therapeutic anticoagulation
+    - name: thrombocytopenia-severe
+      record_type: contraindication
+      description: Thrombocyte count < 50.000/µl
+- model: reference_catalog
+  name: date_value_distribution
+  name_de: Datumswertverteilungen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: age-screening_colo_population
+      record_type: date_value_distribution
+      description: null
+      distribution_type: uniform
+      mode: timedelta
+      date_min: null
+      date_max: null
+      date_mean: null
+      date_std_dev: null
+      timedelta_days_min: 18250
+      timedelta_days_max: 32485
+      timedelta_days_mean: null
+      timedelta_days_std_dev: null
+- model: reference_catalog
+  name: disease
+  name_de: Erkrankungen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: chronic_kidney_disease
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: congestive_heart_failure
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: coronary_artery_disease
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: diabetes_mellitus_I
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: diabetes_mellitus_II
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: disease_is_malignoma_unspecified
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: hypertension
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: liver_cirrhosis
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+    - name: non_valvular_atrial_fibrillation
+      record_type: disease
+      subcategories: {}
+      numerical_descriptors: {}
+- model: reference_catalog
+  name: disease_classification
+  name_de: Erkrankungsklassifikationen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: chronic_kidney_disease_kdigo
+      record_type: disease_classification
+      disease:
+        name: chronic_kidney_disease
+        version: null
+    - name: coronary_artery_disease_base_classification
+      record_type: disease_classification
+      disease:
+        name: coronary_artery_disease
+        version: null
+- model: reference_catalog
+  name: disease_classification_choice
+  name_de: Auswahlwerte für Erkrankungsklassifikationen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: ckd_kdigo_1
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_2
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_3a
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_3b
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_4
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: ckd_kdigo_5
+      record_type: disease_classification_choice
+      disease_classification:
+        name: chronic_kidney_disease_kdigo
+        version: null
+    - name: khk_1_ge
+      record_type: disease_classification_choice
+      disease_classification:
+        name: coronary_artery_disease_base_classification
+        version: null
+    - name: khk_2_ge
+      record_type: disease_classification_choice
+      disease_classification:
+        name: coronary_artery_disease_base_classification
+        version: null
+    - name: khk_3_ge
+      record_type: disease_classification_choice
+      disease_classification:
+        name: coronary_artery_disease_base_classification
+        version: null
+- model: reference_catalog
+  name: endoscope
+  name_de: Endoskope
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: default_colonoscope_bbk
+      record_type: endoscope
+      sn: '5'
+      center:
+        name: bbk_regensburg
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_colonoscope_rbk
+      record_type: endoscope
+      sn: '3'
+      center:
+        name: rbk_stuttgart
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_colonoscope_rkh
+      record_type: endoscope
+      sn: '9'
+      center:
+        name: rkh_ludwigsburg
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_colonoscope_uke
+      record_type: endoscope
+      sn: '7'
+      center:
+        name: uke_hamburg
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_colonoscope_ukw
+      record_type: endoscope
+      sn: '1'
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      endoscope_type:
+        name: colonoscope
+        version: null
+    - name: default_gastroscope_bbk
+      record_type: endoscope
+      sn: '6'
+      center:
+        name: bbk_regensburg
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null
+    - name: default_gastroscope_rbk
+      record_type: endoscope
+      sn: '4'
+      center:
+        name: rbk_stuttgart
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null
+    - name: default_gastroscope_rkh
+      record_type: endoscope
+      sn: '10'
+      center:
+        name: rkh_ludwigsburg
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null
+    - name: default_gastroscope_uke
+      record_type: endoscope
+      sn: '8'
+      center:
+        name: uke_hamburg
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null
+    - name: default_gastroscope_ukw
+      record_type: endoscope
+      sn: '2'
+      center:
+        name: university_hospital_wuerzburg
+        version: null
+      endoscope_type:
+        name: gastroscope
+        version: null
+- model: reference_catalog
+  name: endoscope_type
+  name_de: Endoskoptypen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: colonoscope
+      record_type: endoscope_type
+    - name: gastroscope
+      record_type: endoscope_type
+- model: reference_catalog
+  name: endoscopy_processor
+  name_de: Endoskopieprozessoren
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: olympus_cv_1500
+      record_type: endoscopy_processor
+      image_width: 1920
+      image_height: 1080
+      endoscope_image_x: 550
+      endoscope_image_y: 0
+      endoscope_image_width: 1350
+      endoscope_image_height: 1080
+      examination_date_x: 0
+      examination_date_y: 0
+      examination_date_width: 390
+      examination_date_height: 40
+      examination_time_x: 240
+      examination_time_y: 7
+      examination_time_width: 115
+      examination_time_height: 35
+      patient_first_name_x: 80
+      patient_first_name_y: 110
+      patient_first_name_width: 440
+      patient_first_name_height: 33
+      patient_last_name_x: 70
+      patient_last_name_y: 83
+      patient_last_name_width: 450
+      patient_last_name_height: 27
+      patient_dob_x: 70
+      patient_dob_y: 180
+      patient_dob_width: 160
+      patient_dob_height: 50
+      endoscope_type_x: 70
+      endoscope_type_y: 630
+      endoscope_type_width: 280
+      endoscope_type_height: 35
+      endoscope_sn_x: 70
+      endoscope_sn_y: 670
+      endoscope_sn_width: 280
+      endoscope_sn_height: 35
+      centers:
+      - name: university_hospital_wuerzburg
+        version: null
+- model: reference_catalog
+  name: event
+  name_de: Ereignisse
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: complication_coro_stent_thrombosis
+      record_type: event
+      description: null
+    - name: coro_bms_implantation
+      record_type: event
+      description: null
+    - name: coro_des_implantation
+      record_type: event
+      description: null
+    - name: deep_vein_thrombosis
+      record_type: event
+      description: Deep Vein Thrombosis
+    - name: hip_replacement_surgery
+      record_type: event
+      description: Hip replacement surgery
+    - name: knee_replacement_surgery
+      record_type: event
+      description: Knee replacement surgery
+    - name: pulmonary_embolism
+      record_type: event
+      description: Pulmonary Embolism
+    - name: recurrent_thrombembolism
+      record_type: event
+      description: Recurrent Thrombembolism
+    - name: stroke
+      record_type: event
+      description: null
+    - name: transient_ischemic_attack
+      record_type: event
+      description: null
+- model: reference_catalog
+  name: examination_time
+  name_de: Untersuchungszeiten
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: cecum-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []
+    - name: colonoscopy-intervention-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []
+    - name: colonoscopy-total-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []
+    - name: intubation-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []
+    - name: withdrawal-time
+      record_type: examination_time
+      time_types:
+      - name: colonoscopy-time
+        version: null
+      information_sources: []
+- model: reference_catalog
+  name: examination_time_type
+  name_de: Untersuchungszeittypen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: colonoscopy-time
+      record_type: examination_time_type
+      examinations: []
+- model: reference_catalog
+  name: gender
+  name_de: Geschlechter
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: andy
+      record_type: gender
+      abbreviation: andy
+      description: null
+    - name: female
+      record_type: gender
+      abbreviation: f
+      description: null
+    - name: male
+      record_type: gender
+      abbreviation: m
+      description: null
+    - name: mostly_female
+      record_type: gender
+      abbreviation: mf
+      description: null
+    - name: mostly_male
+      record_type: gender
+      abbreviation: null
+      description: null
+    - name: other
+      record_type: gender
+      abbreviation: x
+      description: null
+    - name: unknown
+      record_type: gender
+      abbreviation: '?'
+      description: null
+- model: reference_catalog
+  name: lab_value
+  name_de: Laborwerte
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: activated_partial_thromboplastin_time
+      record_type: lab_value
+      abbreviation: aPTT
+      default_unit:
+        name: seconds
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 25.0
+        max: 35.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: alanine_aminotransferase
+      record_type: lab_value
+      abbreviation: ALT
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 10.0
+        max: 40.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: albumin
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: gram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 3.5
+        max: 5.5
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: alkaline_phosphatase
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 30.0
+        max: 120.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: ammonia
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: microgram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 40.0
+        max: 70.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: amylase
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 25.0
+        max: 125.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: antibiotic_resistance_report
+      record_type: lab_value
+      abbreviation: ARR
+      default_unit: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: aspartate_aminotransferase
+      record_type: lab_value
+      abbreviation: AST
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 10.0
+        max: 40.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: bands
+      record_type: lab_value
+      abbreviation: Bands
+      default_unit:
+        name: x 10^9 per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.0001
+        max: 1.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: bleeding_time
+      record_type: lab_value
+      abbreviation: BT
+      default_unit:
+        name: minutes
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.5
+        max: 8.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: blood_group
+      record_type: lab_value
+      abbreviation: BG
+      default_unit: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: blood_urea_nitrogen
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 8.0
+        max: 20.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: c_reactive_protein
+      record_type: lab_value
+      abbreviation: CRP
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.0
+        max: 0.5
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: ceruloplasmin
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 25.0
+        max: 43.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: chloride
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: milimole per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 95.0
+        max: 105.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: copper
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: microgram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 100.0
+        max: 200.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: creatine_kinase
+      record_type: lab_value
+      abbreviation: CK
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: null
+        max: null
+        male:
+          min: 55.0
+          max: 170.0
+        female:
+          min: 30.0
+          max: 135.0
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: true
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: creatine_kinase_mb_fraction
+      record_type: lab_value
+      abbreviation: CKMB%
+      default_unit:
+        name: percent
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.01
+        max: 5.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: creatinine
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.8
+        max: 1.3
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: cytology_report
+      record_type: lab_value
+      abbreviation: CR
+      default_unit: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: d_dimer
+      record_type: lab_value
+      abbreviation: D-Dimer
+      default_unit:
+        name: nanogram per mililiter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 50.0
+        max: 300.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: direct_bilirubin
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.1
+        max: 0.3
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: drug_screening_urine
+      record_type: lab_value
+      abbreviation: DSU
+      default_unit: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: eosinophils
+      record_type: lab_value
+      abbreviation: Eos
+      default_unit:
+        name: x 10^9 per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.01
+        max: 0.6
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: estimated_glomerular_filtration_rate
+      record_type: lab_value
+      abbreviation: eGFR
+      default_unit:
+        name: mililiter per minute per 1.73m^2
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 60.0
+        max: 120.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: ferritin
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: nanogram per mililiter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 24.0
+        max: 336.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: fibrinogen
+      record_type: lab_value
+      abbreviation: Fib
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 150.0
+        max: 350.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: free_thyroxine
+      record_type: lab_value
+      abbreviation: fT4
+      default_unit:
+        name: nanogram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.8
+        max: 2.8
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: free_triiodothyronine
+      record_type: lab_value
+      abbreviation: fT3
+      default_unit:
+        name: picogram per mililiter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 2.3
+        max: 4.2
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: gamma_glutamyl_transferase
+      record_type: lab_value
+      abbreviation: GGT
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: null
+        max: null
+        male:
+          min: 9.0
+          max: 50.0
+        female:
+          min: 8.0
+          max: 40.0
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: true
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: glucose
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 70.0
+        max: 99.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: glutamic_oxaloacetic_transaminase
+      record_type: lab_value
+      abbreviation: GOT
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 10.0
+        max: 40.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: glutamic_pyruvic_transaminase
+      record_type: lab_value
+      abbreviation: GPT
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 10.0
+        max: 40.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: glycosylated_hemoglobin
+      record_type: lab_value
+      abbreviation: HbA1c
+      default_unit:
+        name: percent
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 4.0
+        max: 5.6
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: hematocrit
+      record_type: lab_value
+      abbreviation: Hct
+      default_unit:
+        name: percent
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: null
+        max: null
+        male:
+          min: 42.0
+          max: 50.0
+        female:
+          min: 37.0
+          max: 47.0
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: true
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: hemoglobin
+      record_type: lab_value
+      abbreviation: Hb
+      default_unit:
+        name: gram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: null
+        max: null
+        male:
+          min: 14.0
+          max: 18.0
+        female:
+          min: 12.0
+          max: 16.0
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: true
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: high_density_lipoprotein
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: null
+        max: null
+        male:
+          min: 10.0
+          max: 40.0
+        female:
+          min: 10.0
+          max: 50.0
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: true
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: inorganic_phosphorous
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 3.0
+        max: 4.5
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: international_normalized_ratio
+      record_type: lab_value
+      abbreviation: INR
+      default_unit:
+        name: ratio
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.9
+        max: 1.2
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: ionized_calcium
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: milimole per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 1.12
+        max: 1.23
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: lactate_dehydrogenase
+      record_type: lab_value
+      abbreviation: LDH
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 60.0
+        max: 160.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: lipase
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: units per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 10.0
+        max: 140.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: low_density_lipoprotein
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 20.0
+        max: 100.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: lymphocytes
+      record_type: lab_value
+      abbreviation: Lym
+      default_unit:
+        name: x 10^9 per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 1.0
+        max: 4.8
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: magnesium
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 1.6
+        max: 2.6
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: mean_corpuscular_hemoglobin
+      record_type: lab_value
+      abbreviation: MCH
+      default_unit:
+        name: picogram
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 28.0
+        max: 32.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: mean_corpuscular_hemoglobin_concentration
+      record_type: lab_value
+      abbreviation: MCHC
+      default_unit:
+        name: gram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 33.0
+        max: 36.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: mean_corpuscular_volume
+      record_type: lab_value
+      abbreviation: MCV
+      default_unit:
+        name: femtoliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 80.0
+        max: 98.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: microbiology_pathogen_report
+      record_type: lab_value
+      abbreviation: MPR
+      default_unit: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: monocytes
+      record_type: lab_value
+      abbreviation: Mon
+      default_unit:
+        name: x 10^9 per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.2
+        max: 0.8
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: neutrophils
+      record_type: lab_value
+      abbreviation: Neu
+      default_unit:
+        name: x 10^9 per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 2.0
+        max: 8.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: phosphate
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 2.5
+        max: 4.5
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: platelets
+      record_type: lab_value
+      abbreviation: Plt
+      default_unit:
+        name: x 10^9 per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 150.0
+        max: 350.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: potassium
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miliequivalent per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 3.5
+        max: 5.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: prothrombin_time
+      record_type: lab_value
+      abbreviation: PTT
+      default_unit:
+        name: seconds
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 11.0
+        max: 13.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: pyruvate
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: milimole per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.08
+        max: 0.16
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: red_blood_cell_distribution_width
+      record_type: lab_value
+      abbreviation: RDW
+      default_unit:
+        name: percent
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 9.0
+        max: 14.5
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: reticulocytes
+      record_type: lab_value
+      abbreviation: Reti
+      default_unit:
+        name: percent
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.5
+        max: 1.5
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: sodium
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miliequivalent per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 136.0
+        max: 145.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: thyroid_stimulating_hormone
+      record_type: lab_value
+      abbreviation: TSH
+      default_unit:
+        name: microinternational units per mililiter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.5
+        max: 4.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: thyroxine_binding_globulin
+      record_type: lab_value
+      abbreviation: TBG
+      default_unit:
+        name: microgram per mililiter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 12.0
+        max: 27.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: total_bilirubin
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.3
+        max: 1.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: total_calcium
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: milimole per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 2.0
+        max: 2.6
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: total_cholesterol
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.0
+        max: 200.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: total_iron_binding_capacity
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: microgram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 250.0
+        max: 310.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: total_protein
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: gram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 5.5
+        max: 9.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: total_serum_iron
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: microgram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 50.0
+        max: 150.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: total_thyroxine
+      record_type: lab_value
+      abbreviation: T4
+      default_unit:
+        name: microgram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 5.0
+        max: 12.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: total_triiodothyronine
+      record_type: lab_value
+      abbreviation: T3
+      default_unit:
+        name: nanogram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 80.0
+        max: 180.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: transferrin
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 200.0
+        max: 400.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: triglycerides
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: miligram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.0
+        max: 150.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: urea
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: milimole per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 1.2
+        max: 3.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: uric_acid
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: milimole per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 0.18
+        max: 0.48
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: urine_bacteria_culture
+      record_type: lab_value
+      abbreviation: UBC
+      default_unit: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: white_blood_cells
+      record_type: lab_value
+      abbreviation: WBC
+      default_unit:
+        name: x 10^9 per liter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 4.0
+        max: 10.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+    - name: zinc
+      record_type: lab_value
+      abbreviation: null
+      default_unit:
+        name: microgram per deciliter
+        version: null
+      numeric_precision: 3
+      default_single_categorical_value_distribution: null
+      default_numerical_value_distribution:
+        name: uniform_default
+        version: null
+      default_multiple_categorical_value_distribution: null
+      default_date_value_distribution: null
+      default_normal_range:
+        min: 75.0
+        max: 140.0
+        male: null
+        female: null
+        other: null
+      normal_range_age_dependent: false
+      normal_range_gender_dependent: false
+      normal_range_special_case: false
+      bound_adjustment_factor: 0.1
+- model: reference_catalog
+  name: label
+  name_de: Kennzeichnungen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: appendix
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: blood
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: bubbles
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: clip
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: cold_snare
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: digital_chromo_endoscopy
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: diverticule
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: grasper
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: hot_snare
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: ileocaecalvalve
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: ileum
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: instrument
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: low_quality
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nbi
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: needle
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nice_1
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nice_2a
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nice_2b
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: nice_3
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: outside
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_1p
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_1s
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_2a
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_2b
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_2c
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: paris_3
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: polyp
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: smoke
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: snare
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: tissue_on_snare
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: uncertain
+      record_type: label
+      label_type: null
+      description: null
+    - name: water_jet
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+    - name: wound
+      record_type: label
+      label_type:
+        name: classification
+        version: null
+      description: null
+- model: reference_catalog
+  name: label_set
+  name_de: Kennzeichnungssätze
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: endoscopy_nice_classification
+      record_type: label_set
+      description: null
+      version: 1
+      labels:
+      - name: nice_1
+        version: null
+      - name: nice_2a
+        version: null
+      - name: nice_2b
+        version: null
+      - name: nice_3
+        version: null
+    - name: endoscopy_paris_classification
+      record_type: label_set
+      description: null
+      version: 1
+      labels:
+      - name: paris_1p
+        version: null
+      - name: paris_1s
+        version: null
+      - name: paris_2a
+        version: null
+      - name: paris_2b
+        version: null
+      - name: paris_2c
+        version: null
+      - name: paris_3
+        version: null
+    - name: multilabel_classification_colonoscopy_default
+      record_type: label_set
+      description: null
+      version: 1
+      labels:
+      - name: appendix
+        version: null
+      - name: blood
+        version: null
+      - name: bubbles
+        version: null
+      - name: cold_snare
+        version: null
+      - name: diverticule
+        version: null
+      - name: grasper
+        version: null
+      - name: hot_snare
+        version: null
+      - name: ileocaecalvalve
+        version: null
+      - name: ileum
+        version: null
+      - name: low_quality
+        version: null
+      - name: nbi
+        version: null
+      - name: needle
+        version: null
+      - name: outside
+        version: null
+      - name: polyp
+        version: null
+      - name: smoke
+        version: null
+      - name: snare
+        version: null
+      - name: tissue_on_snare
+        version: null
+      - name: water_jet
+        version: null
+      - name: wound
+        version: null
+    - name: multilabel_classification_colonoscopy_default
+      record_type: label_set
+      description: null
+      version: 2
+      labels:
+      - name: appendix
+        version: null
+      - name: blood
+        version: null
+      - name: digital_chromo_endoscopy
+        version: null
+      - name: ileocaecalvalve
+        version: null
+      - name: ileum
+        version: null
+      - name: instrument
+        version: null
+      - name: low_quality
+        version: null
+      - name: outside
+        version: null
+      - name: polyp
+        version: null
+      - name: water_jet
+        version: null
+      - name: wound
+        version: null
+    - name: multilabel_classification_colonoscopy_subset
+      record_type: label_set
+      description: null
+      version: 1
+      labels:
+      - name: clip
+        version: null
+      - name: grasper
+        version: null
+      - name: ileum
+        version: null
+      - name: nbi
+        version: null
+      - name: needle
+        version: null
+      - name: outside
+        version: null
+      - name: snare
+        version: null
+      - name: water_jet
+        version: null
+- model: reference_catalog
+  name: label_type
+  name_de: Kennzeichnungstypen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: classification
+      record_type: label_type
+      description: null
+    - name: object_detection
+      record_type: label_type
+      description: null
+- model: reference_catalog
+  name: medication
+  name_de: Medikamente
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: apixaban
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: true
+      adapt_to_weight: false
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: aspirin
+      record_type: medication
+      adapt_to_renal_function: false
+      adapt_to_hepatic_function: false
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null
+    - name: clopidogrel
+      record_type: medication
+      adapt_to_renal_function: false
+      adapt_to_hepatic_function: false
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null
+    - name: dabigatran
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: true
+      adapt_to_weight: false
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: edoxaban
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: true
+      adapt_to_weight: false
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: enoxaparin
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: false
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: true
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: prasugrel
+      record_type: medication
+      adapt_to_renal_function: false
+      adapt_to_hepatic_function: false
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null
+    - name: rivaroxaban
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: true
+      adapt_to_weight: false
+      adapt_to_risk: true
+      default_unit:
+        name: miligram
+        version: null
+    - name: ticagrelor
+      record_type: medication
+      adapt_to_renal_function: false
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null
+    - name: tirofiban
+      record_type: medication
+      adapt_to_renal_function: true
+      adapt_to_hepatic_function: true
+      adapt_to_indication: true
+      adapt_to_age: false
+      adapt_to_weight: false
+      adapt_to_risk: false
+      default_unit:
+        name: miligram
+        version: null
+- model: reference_catalog
+  name: medication_indication
+  name_de: Medikationsindikationen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: dvt_treatment-apixaban-3mo
+      record_type: medication_indication
+      indication_type:
+        name: deep_vein_thrombosis-treatment
+        version: null
+      medication_schedules:
+      - name: apixaban-5g-twice_daily_3mo
+        version: null
+      - name: apixaban-5g-twice_daily_7d
+        version: null
+      diseases: []
+      events:
+      - name: deep_vein_thrombosis
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: pe_treatment-apixaban-3mo
+      record_type: medication_indication
+      indication_type:
+        name: pulmonary_embolism-treatment
+        version: null
+      medication_schedules:
+      - name: apixaban-5g-twice_daily_3mo
+        version: null
+      - name: apixaban-5g-twice_daily_7d
+        version: null
+      diseases: []
+      events:
+      - name: pulmonary_embolism
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: pe_treatment-apixaban-6mo
+      record_type: medication_indication
+      indication_type:
+        name: pulmonary_embolism-treatment
+        version: null
+      medication_schedules:
+      - name: apixaban-5g-twice_daily_6mo
+        version: null
+      - name: apixaban-5g-twice_daily_7d
+        version: null
+      diseases: []
+      events:
+      - name: pulmonary_embolism
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-after_hip-apixaban
+      record_type: medication_indication
+      indication_type:
+        name: thromboembolism-prevention-after_hip_replacement
+        version: null
+      medication_schedules:
+      - name: apixaban-2.5mg-twice_daily_32d
+        version: null
+      diseases: []
+      events:
+      - name: hip_replacement_surgery
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-after_knee-apixaban
+      record_type: medication_indication
+      indication_type:
+        name: thromboembolism-prevention-after_knee_replacement
+        version: null
+      medication_schedules:
+      - name: apixaban-2.5mg-twice_daily_10d
+        version: null
+      diseases: []
+      events:
+      - name: knee_replacement_surgery
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-non_valvular_af-apixaban
+      record_type: medication_indication
+      indication_type:
+        name: thromboembolism-prevention-non_valvular_af
+        version: null
+      medication_schedules:
+      - name: apixaban-5mg-twice_daily
+        version: null
+      diseases:
+      - name: non_valvular_atrial_fibrillation
+        version: null
+      events: []
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-non_valvular_af-apixaban-dr
+      record_type: medication_indication
+      indication_type:
+        name: thromboembolism-prevention-non_valvular_af
+        version: null
+      medication_schedules:
+      - name: apixaban-2.5mg-twice_daily
+        version: null
+      diseases:
+      - name: non_valvular_atrial_fibrillation
+        version: null
+      events: []
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+    - name: te_prevention-recurrent-te-apixaban
+      record_type: medication_indication
+      indication_type:
+        name: thrombembolism-prevention-recurrent_thrombembolism
+        version: null
+      medication_schedules:
+      - name: apixaban-2.5mg-twice_daily
+        version: null
+      diseases: []
+      events:
+      - name: recurrent_thrombembolism
+        version: null
+      disease_classification_choices: []
+      sources:
+      - name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+        version: null
+- model: reference_catalog
+  name: medication_indication_type
+  name_de: Medikationsindikationstypen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: deep_vein_thrombosis-treatment
+      record_type: medication_indication_type
+    - name: disease
+      record_type: medication_indication_type
+    - name: event
+      record_type: medication_indication_type
+    - name: pulmonary_embolism-treatment
+      record_type: medication_indication_type
+    - name: thrombembolism-prevention-recurrent_thrombembolism
+      record_type: medication_indication_type
+    - name: thromboembolism-prevention-after_hip_replacement
+      record_type: medication_indication_type
+    - name: thromboembolism-prevention-after_knee_replacement
+      record_type: medication_indication_type
+    - name: thromboembolism-prevention-non_valvular_af
+      record_type: medication_indication_type
+    - name: thromboembolism-prevention-recurrent_thrombembolism
+      record_type: medication_indication_type
+- model: reference_catalog
+  name: medication_intake_time
+  name_de: Medikamenteneinnahmezeiten
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: daily-evening
+      record_type: medication_intake_time
+      repeats: daily
+      time: '19:00:00'
+    - name: daily-morning
+      record_type: medication_intake_time
+      repeats: daily
+      time: 07:00:00
+    - name: daily-night
+      record_type: medication_intake_time
+      repeats: daily
+      time: 01:00:00
+    - name: daily-noon
+      record_type: medication_intake_time
+      repeats: daily
+      time: '13:00:00'
+- model: reference_catalog
+  name: medication_schedule
+  name_de: Medikationspläne
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: apixaban-2.5mg-twice_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: null
+      dose: 2.5
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-2.5mg-twice_daily_10d
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 10.0
+      dose: 2.5
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-2.5mg-twice_daily_32d
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 32.0
+      dose: 2.5
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-5g-twice_daily_3mo
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 90.0
+      dose: 5.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-5g-twice_daily_6mo
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 180.0
+      dose: 5.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-5g-twice_daily_7d
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: 7.0
+      dose: 5.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: apixaban-5mg-twice_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: apixaban
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: null
+      dose: 5.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+    - name: ass-100mg-once_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: aspirin
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: -1.0
+      dose: 100.0
+      intake_times:
+      - name: daily-morning
+        version: null
+    - name: enoxaparin-40mg-one_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: enoxaparin
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: -1.0
+      dose: 40.0
+      intake_times:
+      - name: daily-morning
+        version: null
+    - name: enoxaparin-80mg-twice_daily
+      record_type: medication_schedule
+      description: null
+      medication:
+        name: enoxaparin
+        version: null
+      unit:
+        name: miligram
+        version: null
+      therapy_duration_d: -1.0
+      dose: 80.0
+      intake_times:
+      - name: daily-evening
+        version: null
+      - name: daily-morning
+        version: null
+- model: reference_catalog
+  name: model_type
+  name_de: Modelltypen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: multilabel_classification
+      record_type: model_type
+      description: null
+    - name: object_detection
+      record_type: model_type
+      description: null
+- model: reference_catalog
+  name: numeric_value_distribution
+  name_de: Numerische Wertverteilungen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: uniform_default
+      record_type: numeric_value_distribution
+      distribution_type: uniform
+      min_descriptor: min_x_1
+      max_descriptor: max_x_1
+      min_value: null
+      max_value: null
+      mean: null
+      std_dev: null
+      skewness: null
+    - name: uniform_high_x1.5
+      record_type: numeric_value_distribution
+      distribution_type: uniform
+      min_descriptor: min_x_1
+      max_descriptor: max_x_1.5
+      min_value: null
+      max_value: null
+      mean: null
+      std_dev: null
+      skewness: null
+- model: reference_catalog
+  name: organ
+  name_de: Organe
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: anal_canal
+      record_type: organ
+      description: null
+    - name: colon
+      record_type: organ
+      description: null
+    - name: ileum
+      record_type: organ
+      description: null
+    - name: rectum
+      record_type: organ
+      description: null
+    - name: small_bowel
+      record_type: organ
+      description: null
+- model: reference_catalog
+  name: patient_lab_sample_type
+  name_de: Laborprobentypen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: generic
+      record_type: patient_lab_sample_type
+      description: Generische Laborprobe
+- model: reference_catalog
+  name: pdf_type
+  name_de: PDF-Typen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: rkh-endoscopy-histology-report-generic
+      record_type: pdf_type
+      patient_info_line:
+        name: rkh-histology-generic-patient-info-line
+        version: null
+      endoscope_info_line:
+        name: ukw-examination-generic-endoscope-info-line
+        version: null
+      examiner_info_line:
+        name: ukw-examination-generic-examiner-info-line
+        version: null
+      cut_off_above_lines:
+      - name: ukw-examination-generic-anamnese-info-line
+        version: null
+      - name: ukw-examination-generic-endoscope-info-line
+        version: null
+      - name: ukw-examination-generic-examiner-info-line
+        version: null
+      cut_off_below_lines:
+      - name: rkh-histology-generic-cut-off-below-line
+        version: null
+    - name: ukw-endoscopy-examination-report-generic
+      record_type: pdf_type
+      patient_info_line:
+        name: ukw-examination-generic-patient-info-line
+        version: null
+      endoscope_info_line:
+        name: ukw-examination-generic-endoscope-info-line
+        version: null
+      examiner_info_line:
+        name: ukw-examination-generic-examiner-info-line
+        version: null
+      cut_off_above_lines:
+      - name: ukw-examination-generic-anamnese-info-line
+        version: null
+      - name: ukw-examination-generic-endoscope-info-line
+        version: null
+      - name: ukw-examination-generic-examiner-info-line
+        version: null
+      cut_off_below_lines:
+      - name: ukw-examination-generic-cut-off-below-line-01
+        version: null
+    - name: ukw-endoscopy-histology-report-generic
+      record_type: pdf_type
+      patient_info_line:
+        name: ukw-histology-generic-patient-info-line
+        version: null
+      endoscope_info_line:
+        name: ukw-histology-generic-endoscope-info-line
+        version: null
+      examiner_info_line:
+        name: ukw-histology-generic-examiner-info-line
+        version: null
+      cut_off_above_lines:
+      - name: ukw-histology-generic-patient-info-line
+        version: null
+      cut_off_below_lines:
+      - name: ukw-endoscopy-histology-cut-off-below-line-flag-01
+        version: null
+- model: reference_catalog
+  name: report_reader_flag
+  name_de: Befundleser-Markierungen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: rkh-histology-generic-cut-off-below-line
+      record_type: report_reader_flag
+      value: Mitkollegialen Grüßen
+    - name: rkh-histology-generic-patient-info-line
+      record_type: report_reader_flag
+      value: 'Pat.: '
+    - name: ukw-endoscopy-histology-cut-off-below-line-flag-01
+      record_type: report_reader_flag
+      value: $$-3
+    - name: ukw-examination-generic-anamnese-info-line
+      record_type: report_reader_flag
+      value: 'Anamnese: '
+    - name: ukw-examination-generic-cut-off-below-line-01
+      record_type: report_reader_flag
+      value: ________________
+    - name: ukw-examination-generic-endoscope-info-line
+      record_type: report_reader_flag
+      value: 'Gerät: '
+    - name: ukw-examination-generic-examiner-info-line
+      record_type: report_reader_flag
+      value: '1. Unters.:'
+    - name: ukw-examination-generic-patient-info-line
+      record_type: report_reader_flag
+      value: 'Patient: '
+    - name: ukw-histology-generic-cut-off-below-line-01
+      record_type: report_reader_flag
+      value: $$-3
+    - name: ukw-histology-generic-endoscope-info-line
+      record_type: report_reader_flag
+      value: ''
+    - name: ukw-histology-generic-examiner-info-line
+      record_type: report_reader_flag
+      value: 'Eingang am:'
+    - name: ukw-histology-generic-patient-info-line
+      record_type: report_reader_flag
+      value: 'Patient:'
+- model: reference_catalog
+  name: risk
+  name_de: Risiken
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: bleeding_high
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: High bleeding risk
+      risk_value: 3.0
+      risk_type:
+        name: bleeding
+        version: null
+    - name: bleeding_low
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Low bleeding risk
+      risk_value: 1.0
+      risk_type:
+        name: bleeding
+        version: null
+    - name: bleeding_unknown
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Unknown bleeding risk
+      risk_value: 0.0
+      risk_type:
+        name: bleeding
+        version: null
+    - name: thrombosis_high
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: High thrombosis risk
+      risk_value: 3.0
+      risk_type:
+        name: thrombosis
+        version: null
+    - name: thrombosis_low
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Low thrombosis risk
+      risk_value: 1.0
+      risk_type:
+        name: thrombosis
+        version: null
+    - name: thrombosis_medium
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Medium thrombosis risk
+      risk_value: 2.0
+      risk_type:
+        name: thrombosis
+        version: null
+    - name: thrombosis_unknown
+      record_type: risk
+      name_de: null
+      name_en: null
+      description: Unknown thrombosis risk
+      risk_value: 0.0
+      risk_type:
+        name: thrombosis
+        version: null
+- model: reference_catalog
+  name: risk_type
+  name_de: Risikotypen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: bleeding
+      record_type: risk_type
+      description: Bleeding risk
+    - name: infection
+      record_type: risk_type
+      description: Infection risk
+    - name: perforation
+      record_type: risk_type
+      description: Perforation risk
+    - name: thrombosis
+      record_type: risk_type
+      description: Thrombosis risk
+- model: reference_catalog
+  name: single_categorical_value_distribution
+  name_de: Verteilungen einzelner kategorialer Werte
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: gender_random
+      record_type: single_categorical_value_distribution
+      categories:
+        male: 0.5
+        female: 0.5
+- model: reference_catalog
+  name: tag
+  name_de: Schlagwörter
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: reviewed
+      record_type: tag
+    - name: to be reviewed
+      record_type: tag
+- model: reference_catalog
+  name: video_segmentation_label
+  name_de: Videosegmentierungskennzeichnungen
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: appendix
+      record_type: video_segmentation_label
+      description: Appendix
+      color: '#FF0000'
+      order_priority: 0
+    - name: bli
+      record_type: video_segmentation_label
+      description: Blue Light Imaging (high level for nbi and similar modes)
+      color: '#000080'
+      order_priority: 0
+    - name: blood
+      record_type: video_segmentation_label
+      description: Blood
+      color: '#00FF00'
+      order_priority: 0
+    - name: colon
+      record_type: video_segmentation_label
+      description: Colon
+      color: '#00FFFF'
+      order_priority: 0
+    - name: diverticule
+      record_type: video_segmentation_label
+      description: Diverticule
+      color: '#0000FF'
+      order_priority: 0
+    - name: duodenum
+      record_type: video_segmentation_label
+      description: Duodenum
+      color: '#FF00FF'
+      order_priority: 0
+    - name: esophagus
+      record_type: video_segmentation_label
+      description: Esophagus
+      color: '#0000FF'
+      order_priority: 0
+    - name: grasper
+      record_type: video_segmentation_label
+      description: Grasper
+      color: '#FFFF00'
+      order_priority: 0
+    - name: ileocaecalvalve
+      record_type: video_segmentation_label
+      description: Ileocaecalvalve
+      color: '#FF00FF'
+      order_priority: 0
+    - name: ileum
+      record_type: video_segmentation_label
+      description: Ileum
+      color: '#800000'
+      order_priority: 0
+    - name: instrument
+      record_type: video_segmentation_label
+      description: Instrument
+      color: '#808000'
+      order_priority: 0
+    - name: low_quality
+      record_type: video_segmentation_label
+      description: Low Quality
+      color: '#800080'
+      order_priority: 0
+    - name: lower_gi
+      record_type: video_segmentation_label
+      description: Lower GI
+      color: '#00FF00'
+      order_priority: 0
+    - name: nbi
+      record_type: video_segmentation_label
+      description: Narrow Band Imaging
+      color: '#00FFFF'
+      order_priority: 0
+    - name: needle
+      record_type: video_segmentation_label
+      description: Needle
+      color: '#800000'
+      order_priority: 0
+    - name: outside
+      record_type: video_segmentation_label
+      description: Out of Body
+      color: '#008000'
+      order_priority: 0
+    - name: polyp
+      record_type: video_segmentation_label
+      description: Polyp
+      color: '#008000'
+      order_priority: 0
+    - name: snare
+      record_type: video_segmentation_label
+      description: Snare
+      color: '#000080'
+      order_priority: 0
+    - name: stomach
+      record_type: video_segmentation_label
+      description: Stomach
+      color: '#FFFF00'
+      order_priority: 0
+    - name: upper_gi
+      record_type: video_segmentation_label
+      description: Upper GI
+      color: '#FF0000'
+      order_priority: 0
+    - name: water_jet
+      record_type: video_segmentation_label
+      description: Water Jet
+      color: '#800080'
+      order_priority: 0
+    - name: wound
+      record_type: video_segmentation_label
+      description: Wound
+      color: '#808000'
+      order_priority: 0
+- model: reference_catalog
+  name: video_segmentation_label_set
+  name_de: Videosegmentierungs-Kennzeichnungssätze
+  payload:
+    schema_version: '1.0'
+    records:
+    - name: colonoscopy_video_segmentation_raw
+      record_type: video_segmentation_label_set
+      description: null
+      labels:
+      - name: appendix
+        version: null
+      - name: blood
+        version: null
+      - name: diverticule
+        version: null
+      - name: grasper
+        version: null
+      - name: ileocaecalvalve
+        version: null
+      - name: ileum
+        version: null
+      - name: low_quality
+        version: null
+      - name: nbi
+        version: null
+      - name: needle
+        version: null
+      - name: outside
+        version: null
+      - name: polyp
+        version: null
+      - name: snare
+        version: null
+      - name: water_jet
+        version: null
+      - name: wound
+        version: null

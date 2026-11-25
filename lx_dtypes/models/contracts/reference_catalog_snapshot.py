@@ -9,7 +9,13 @@ from pydantic import ConfigDict, Field, model_validator
 from lx_dtypes.models.model import DtypesModel
 
 from .knowledge_base import KnowledgeBaseIdentity
-from .reference_catalog import CatalogIdentity, ReferenceCatalogPayload, ReferenceKind
+from .package_snapshot import PackageSnapshot
+from .reference_catalog import (
+    TERMINOLOGY_REFERENCE_MODELS,
+    CatalogIdentity,
+    ReferenceCatalogPayload,
+    ReferenceKind,
+)
 
 
 class ReferenceCatalogSnapshot(DtypesModel):
@@ -17,6 +23,7 @@ class ReferenceCatalogSnapshot(DtypesModel):
     identity: KnowledgeBaseIdentity
     projection: str = Field(default="all", min_length=1, max_length=2048)
     payload: ReferenceCatalogPayload
+    clinical_package: PackageSnapshot | None = None
     snapshot_id: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
 
     @staticmethod
@@ -24,13 +31,18 @@ class ReferenceCatalogSnapshot(DtypesModel):
         identity: KnowledgeBaseIdentity,
         payload: ReferenceCatalogPayload,
         projection: str = "all",
+        clinical_package: PackageSnapshot | None = None,
     ) -> str:
+        document = {
+            "identity": identity.model_dump(mode="json"),
+            "projection": projection,
+            "payload": payload.model_dump(mode="json", by_alias=True),
+        }
+        # Omit absent dependencies to preserve every historical digest.
+        if clinical_package is not None:
+            document["clinical_package"] = clinical_package.snapshot_id
         content = json.dumps(
-            {
-                "identity": identity.model_dump(mode="json"),
-                "projection": projection,
-                "payload": payload.model_dump(mode="json", by_alias=True),
-            },
+            document,
             sort_keys=True,
             separators=(",", ":"),
             ensure_ascii=False,
@@ -41,10 +53,28 @@ class ReferenceCatalogSnapshot(DtypesModel):
     @model_validator(mode="after")
     def validate_digest(self) -> Self:
         if self.snapshot_id != self.content_digest(
-            self.identity, self.payload, self.projection
+            self.identity, self.payload, self.projection, self.clinical_package
         ):
             raise ValueError("Reference catalogue content digest mismatch")
         keys = {record.key for record in self.payload.records}
+        if self.clinical_package is not None:
+            if self.clinical_package.identity != self.identity:
+                raise ValueError(
+                    "Catalogue dependency snapshot has a different package identity"
+                )
+            if any(
+                record.kind in TERMINOLOGY_REFERENCE_MODELS
+                for record in self.payload.records
+            ):
+                raise ValueError(
+                    "Application catalogue must reference clinical concepts, not redefine them"
+                )
+            keys.update(
+                (kind, record.name, None)
+                for kind, family in TERMINOLOGY_REFERENCE_MODELS.items()
+                for record in self.clinical_package.records[family]
+                if record.kb_module_name != self.identity.knowledge_base_module
+            )
         for record in self.payload.records:
             for field, kind, identity in record.references():
                 if (kind, identity.name, identity.version) not in keys:

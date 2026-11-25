@@ -11,6 +11,12 @@ boundaries:
 - Context metadata is not a KB record or package config.yaml
 - Patient data, runtime registries, and generated exports do not belong here
 entrypoints:
+- name: migrated information sources
+  file: terminology/endoreg_information_sources/config.yaml
+  purpose: Terminology ownership for source identities and dates referenced by application records.
+- name: Application reference catalogue
+  file: terminology/endoreg_reference/config.yaml
+  purpose: EndoReg 2.0 application records reference canonical unit and information-source terminology; historical catalogues remain archived.
 - name: ColoReg study analyses
   file: study_metadata/coloreg_resection.yml
   purpose: Versioned comparison hypotheses with explicit executable descriptive rules and unresolved protocol drafts

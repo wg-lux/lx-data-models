@@ -1,0 +1,9 @@
+# Application data stays in its own package kind; a study preset references it
+# through depends_on instead of selecting its records directly.
+name: training_staff
+version: "1.0.0"
+package_kind: application_data
+description: Synthetic center employee hints for the training preset example.
+data:
+  files:
+    - employees.yml

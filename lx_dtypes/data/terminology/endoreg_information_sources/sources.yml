@@ -1,0 +1,67 @@
+- model: information_source_type
+  name: annotation
+  name_de: Annotation
+- model: information_source_type
+  name: prediction
+  name_de: Vorhersage
+- model: information_source
+  name: annotation
+  name_de: Annotation
+  information_source_types: []
+- model: information_source
+  name: default_annotation
+  name_de: Standardannotation
+  information_source_types:
+  - annotation
+- model: information_source
+  name: default_prediction
+  name_de: Standardvorhersage
+  information_source_types:
+  - prediction
+- model: information_source
+  name: fachinformation-apixaban-eliquis_2.5mg-bristol_meyer_squibbs
+  name_de: Fachinformation Apixaban Eliquis 2,5 mg
+  information_source_types: []
+  date: '2024-04-28'
+- model: information_source
+  name: family_anamnestic
+  name_de: Familienanamnese
+  information_source_types: []
+- model: information_source
+  name: guideline_quality_in_gi
+  name_de: Leitlinie zur Qualität in der gastrointestinalen Endoskopie
+  information_source_types: []
+  date: '2025-01-01'
+- model: information_source
+  name: lx_anonymizer_evaluation
+  name_de: Auswertung des LX-Anonymisierers
+  information_source_types:
+  - annotation
+- model: information_source
+  name: patient_anamnestic
+  name_de: Patientenanamnese
+  information_source_types: []
+- model: information_source
+  name: physical_examination
+  name_de: Körperliche Untersuchung
+  information_source_types: []
+- model: information_source
+  name: physical_measurement
+  name_de: Physikalische Messung
+  information_source_types: []
+- model: information_source
+  name: physicians_note_anamnestic
+  name_de: Ärztliche Anamnesenotiz
+  information_source_types: []
+- model: information_source
+  name: prediction
+  name_de: Vorhersage
+  information_source_types: []
+- model: information_source
+  name: treating_physician
+  name_de: Behandelnde ärztliche Person
+  information_source_types: []
+- model: information_source
+  name: treating_physician_anamnestic
+  name_de: Anamnese durch die behandelnde ärztliche Person
+  information_source_types: []

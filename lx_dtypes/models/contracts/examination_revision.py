@@ -5,6 +5,10 @@ from uuid import UUID
 
 from pydantic import AwareDatetime, ConfigDict, Field, model_validator
 
+from lx_dtypes.models.contracts.application_settings import (
+    AnnotationAcademicTitles,
+    AnnotationProfession,
+)
 from lx_dtypes.models.contracts.dtypes_record_persistence import (
     DtypesRecordPersistencePayload,
 )
@@ -31,6 +35,7 @@ class ExaminationClinicalContent(RevisionContract):
 
 class ExaminationEvidenceSelection(RevisionContract):
     report_id: PositiveId | None = None
+    report_version: PositiveId | None = None
     video_id: PositiveId | None = None
     annotator: str | None = Field(default=None, min_length=1)
     medication_ids: list[PositiveId] = Field(default_factory=list)
@@ -38,6 +43,8 @@ class ExaminationEvidenceSelection(RevisionContract):
 
     @model_validator(mode="after")
     def validate_selection(self) -> Self:
+        if self.report_version is not None and self.report_id is None:
+            raise ValueError("report_version requires report_id")
         if self.annotator is not None and self.video_id is None:
             raise ValueError("annotator requires video_id")
         for ids in (self.medication_ids, self.lab_value_ids):
@@ -63,9 +70,23 @@ class ExaminationAnnotationSnapshot(RevisionContract):
     model_meta_id: PositiveId | None = None
 
 
+class ExaminationReportDocument(RevisionContract):
+    document_id: PositiveId
+    document_uuid: UUID = Field(strict=False)
+    processed_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
 class ExaminationEvidence(RevisionContract):
     report_id: PositiveId | None = None
     report_version: PositiveId | None = None
+    report_author_id: PositiveId | None = None
+    report_author_profession: (
+        Annotated[AnnotationProfession, Field(strict=False)] | None
+    ) = None
+    report_author_academic_titles: AnnotationAcademicTitles = Field(
+        default_factory=list
+    )
+    report_documents: list[ExaminationReportDocument] = Field(default_factory=list)
     report_text: str | None = None
     report_template_name: str | None = None
     report_template_version: str | None = None
@@ -81,6 +102,19 @@ class ExaminationEvidence(RevisionContract):
     def validate_provenance(self) -> Self:
         if (self.report_id is None) != (self.report_version is None):
             raise ValueError("report identity and version must be supplied together")
+        if (
+            self.report_author_profession is not None
+            or self.report_author_academic_titles
+        ) and self.report_author_id is None:
+            raise ValueError("report author metadata requires a recorded author")
+        if self.report_id is None and (
+            self.report_documents or self.report_author_id is not None
+        ):
+            raise ValueError("report provenance requires a selected report")
+        if len({doc.document_id for doc in self.report_documents}) != len(
+            self.report_documents
+        ):
+            raise ValueError("report document identities must be unique")
         if self.processed_sha256 is not None and self.video_id is None:
             raise ValueError("processed hash requires video identity")
         if self.annotations and self.video_id is None:

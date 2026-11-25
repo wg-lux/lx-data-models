@@ -5,6 +5,8 @@ from collections.abc import Iterator, Mapping
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from lx_dtypes.factories import normalize_missing_text
+
 if TYPE_CHECKING:
     from lx_dtypes.models.interface.KnowledgeBase import KnowledgeBase
 
@@ -891,8 +893,9 @@ def _common_properties(record: object) -> list[dict[str, str]]:
 def _designation(record: object) -> list[dict[str, str]]:
     designations: list[dict[str, str]] = []
     for language, field in (("de", "name_de"), ("en", "name_en")):
-        value = _read(record, field)
-        if value and value != "unknown":
+        raw = _read(record, field)
+        value = normalize_missing_text(str(raw) if raw else None)
+        if value:
             designations.append({"language": language, "value": str(value)})
     return designations
 
@@ -1094,8 +1097,11 @@ def _concept(
         "code": _slug(display),
         "display": display,
     }
-    description = _read(record, "description")
-    if description and description != "unknown":
+    raw_description = _read(record, "description")
+    description = normalize_missing_text(
+        str(raw_description) if raw_description else None
+    )
+    if description:
         concept["definition"] = str(description)
 
     designations = _designation(record)

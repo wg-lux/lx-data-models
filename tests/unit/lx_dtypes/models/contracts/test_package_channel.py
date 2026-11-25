@@ -57,7 +57,9 @@ def test_package_kinds_are_exactly_the_contract_set() -> None:
         ("study", "application_data", True),
         ("study", "study", False),
         ("application_data", "application_data", True),
-        ("application_data", "terminology", False),
+        ("application_data", "terminology", True),
+        ("application_data", "report_templates", False),
+        ("application_data", "study", False),
     ],
 )
 def test_dependency_rules(kind: str, dependency: str, allowed: bool) -> None:

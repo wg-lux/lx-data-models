@@ -2,38 +2,48 @@ schema_version: '1.0'
 owner: lx-dtypes maintainers
 purpose: Definition contracts and resource inventory; not a runtime package manifest.
 criteria:
-- Terminology uses a config.yaml with an exact name/version and explicitly selected flat model records.
-- Resolve each dependency closure without competing releases, then validate with DataLoader and strict
-  KB YAML lint.
-- Study documents use StudySetupDefinition or StudyMetadata and are never selected as KB record lists.
+- Terminology uses a config.yaml with an exact name/version and explicitly selected
+  flat model records.
+- Resolve each dependency closure without competing releases, then validate with DataLoader
+  and strict KB YAML lint.
+- Study documents use StudySetupDefinition or StudyMetadata and are never selected
+  as KB record lists.
 - Historical package YAML paths and bytes retain their published content_sha256.
-- Structural validity does not establish clinical approval or downstream host projection support.
-- Current report_templates packages contain reporting records and validators only; concept definitions
-  belong in terminology dependencies.
+- Structural validity does not establish clinical approval or downstream host projection
+  support.
+- Current report_templates packages contain reporting records and validators only;
+  concept definitions belong in terminology dependencies.
 resource_contracts:
   study_metadata:
-    purpose: Dataset, cohort, eligibility and analysis definitions; never clinical capture templates.
+    purpose: Dataset, cohort, eligibility and analysis definitions; never clinical
+      capture templates.
     contract: lx_dtypes.models.contracts.study_setup.StudySetupDefinition
     loader: lx_dtypes.utils.study_setup_yaml.parse_study_setup_yaml
-    selection: Explicit study setup import; never KB discovery or active terminology selection.
+    selection: Explicit study setup import; never KB discovery or active terminology
+      selection.
   terminology:
-    purpose: Reusable clinical concepts, examinations, classifications, units and reference catalogues.
+    purpose: Reusable clinical concepts, examinations, classifications, units and
+      reference catalogues.
     contract: lx_dtypes.models.interface.KnowledgeBaseConfig.KnowledgeBaseConfig
     loader: lx_dtypes.models.interface.KnowledgeBaseResolver.load_knowledge_base
-    selection: Exact registered module and version; concept-only packages need not ship report templates.
+    selection: Exact registered module and version; concept-only packages need not
+      ship report templates.
   report_templates:
-    purpose: Report layout, finding references and validation rules over terminology dependencies.
+    purpose: Report layout, finding references and validation rules over terminology
+      dependencies.
     contract: lx_dtypes.models.interface.KnowledgeBaseConfig.KnowledgeBaseConfig
     loader: lx_dtypes.models.interface.KnowledgeBaseResolver.load_knowledge_base
-    selection: Published usable template plus its exact owning module and version; not a study definition.
+    selection: Published usable template plus its exact owning module and version;
+      not a study definition.
 study_metadata:
 - path: study_metadata/research.yml
   contract: lx_dtypes.models.contracts.study_setup.StudySetupDefinition
-  purpose: Research dataset and cohort example; no approved center or age restrictions declared.
+  purpose: Research dataset and cohort example; no approved center or age restrictions
+    declared.
 - path: study_metadata/coloreg_resection.yml
   contract: lx_dtypes.models.contracts.study_setup.StudySetupDefinition
-  purpose: EMR/ESD hypotheses, candidate cohorts, exact terminology dependency, executable descriptive
-    R0 analysis and explicit protocol-dependent analysis drafts.
+  purpose: EMR/ESD hypotheses, candidate cohorts, exact terminology dependency, executable
+    descriptive R0 analysis and explicit protocol-dependent analysis drafts.
 terminology:
 - manifest: terminology/DGVS_Terminology/config.yaml
   module: DGVS_Terminology
@@ -56,10 +66,10 @@ terminology:
   required_checks:
   - exact_identity_loading
   - strict_kb_lint
-- manifest: terminology/endoreg_reference/config.yaml
+- manifest: terminology/versions/endoreg_reference/1.0.0/endoreg_reference/config.yaml
   module: endoreg_reference
   version: 1.0.0
-  role: current
+  role: historical
   required_checks:
   - exact_identity_loading
   - strict_kb_lint
@@ -72,6 +82,13 @@ terminology:
   - strict_kb_lint
 - manifest: terminology/endoreg_workforce/config.yaml
   module: endoreg_workforce
+  version: 1.0.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
+- manifest: terminology/endoreg_information_sources/config.yaml
+  module: endoreg_information_sources
   version: 1.0.0
   role: current
   required_checks:
@@ -161,8 +178,8 @@ terminology:
   required_checks:
   - exact_identity_loading
   - strict_kb_lint
-  notes: Empty compatibility module; canonical records are in endoreg_reference. Legacy unselected files
-    are outside packaged definitions.
+  notes: Empty compatibility module; canonical records are in endoreg_reference. Legacy
+    unselected files are outside packaged definitions.
 - manifest: terminology/lx_utils/tag/config.yaml
   module: tag_data
   version: 0.1.0
@@ -170,8 +187,8 @@ terminology:
   required_checks:
   - exact_identity_loading
   - strict_kb_lint
-  notes: Empty compatibility module; canonical records are in endoreg_reference. Legacy unselected files
-    are outside packaged definitions.
+  notes: Empty compatibility module; canonical records are in endoreg_reference. Legacy
+    unselected files are outside packaged definitions.
 - manifest: terminology/lx_utils/unit/config.yaml
   module: lx_utils_units
   version: 0.1.0
@@ -613,27 +630,37 @@ terminology:
   required_checks: &id004
   - exact_identity_loading
   - strict_kb_lint
+- manifest: terminology/endoreg_reference/config.yaml
+  module: endoreg_reference
+  version: 2.0.0
+  role: current
+  required_checks:
+  - exact_identity_loading
+  - strict_kb_lint
 sidecars:
 - path: table_import_vocabulary.yml
   contract: TableImportVocabulary
-  notes: Reviewed table header and exact value suggestions; not KB records or an executable mapping.
+  notes: Reviewed table header and exact value suggestions; not KB records or an executable
+    mapping.
   validation: load_table_import_vocabulary and focused vocabulary tests.
 - path: terminology/mst_3_0_terminology/excel_source.yml
   contract: MST Excel source evidence
-  notes: Workbook cells, attribute provenance and reviewed import decisions; not KB records.
-  validation: Regenerated and checked by scripts/import_mst_excel.py using ImportSpec and Workbook.
+  notes: Workbook cells, attribute provenance and reviewed import decisions; not KB
+    records.
+  validation: Regenerated and checked by scripts/import_mst_excel.py using ImportSpec
+    and Workbook.
 - path: terminology/coloreg_terminology/annotation_mappings.yml
   contract: coloreg_annotation_mapping_v1
-  notes: Mapping declares coloreg@0.1.0 intentionally; directory location does not change its declared
-    target.
+  notes: Mapping declares coloreg@0.1.0 intentionally; directory location does not
+    change its declared target.
   validation: Host-owned sidecar schema; not validated by the core KB record loader.
 - path: terminology/polyp_size_category/numeric_rules.yml
   contract: NumericClassificationRules
   notes: Versioned executable numeric classification rules.
 - path: terminology/versions/coloreg/0.1.0/coloreg/annotation_mappings.yml
   contract: coloreg_annotation_mapping_v1
-  notes: Mapping declares coloreg@0.1.0 intentionally; directory location does not change its declared
-    target.
+  notes: Mapping declares coloreg@0.1.0 intentionally; directory location does not
+    change its declared target.
   validation: Host-owned sidecar schema; not validated by the core KB record loader.
 - path: terminology/versions/polyp_size_category/1.0.0/polyp_size_category/numeric_rules.yml
   contract: NumericClassificationRules
@@ -644,33 +671,35 @@ sidecars:
   validation: Host-owned sidecar schema; not validated by the core KB record loader.
 historical_exceptions:
 - path: terminology/versions/coloreg/0.1.0/lx_utils/gender/default.yaml
-  reason: Unselected legacy Django fixture, not a valid KB model record. Retained only to preserve the
-    historical artifact.
+  reason: Unselected legacy Django fixture, not a valid KB model record. Retained
+    only to preserve the historical artifact.
 - path: terminology/versions/coloreg/0.1.0/lx_utils/tag/default.yaml
   reason: Unselected empty placeholder; not a definition.
 - path: terminology/versions/star_upper_gi/0.1.1.post1/star_upper_gi/star_u_gi_interventions/data.yaml
-  reason: Unselected biopsy intervention draft. It is not part of the resolved historical KB; retained
-    as published.
+  reason: Unselected biopsy intervention draft. It is not part of the resolved historical
+    KB; retained as published.
 - path: terminology/versions/star_upper_gi/0.1.1.post1/star_upper_gi/config.yaml
-  reason: 22 template_finding_missing_description warnings; use current star_upper_gi@0.1.2 for complete
-    descriptions.
+  reason: 22 template_finding_missing_description warnings; use current star_upper_gi@0.1.2
+    for complete descriptions.
 excluded_resources:
 - path: ../../demo-data/legacy_exports/
   reason: Legacy CSV exports and unselected Django gender fixture; not packaged definitions.
 - path: ../../demo-data/drafts/
-  reason: Incomplete authoring examples. ColoReg findings draft had an invalid modl key and no definition
-    identity; now an explicit empty record list.
+  reason: Incomplete authoring examples. ColoReg findings draft had an invalid modl
+    key and no definition identity; now an explicit empty record list.
 - path: ../../demo-data/drafts/coloreg/minor_bleeding.yml
-  reason: Preserved concurrent draft verbatim; finding bleeding is not declared in the ColoReg graph and
-    classification is empty. Requires author clarification before inclusion.
+  reason: Preserved concurrent draft verbatim; finding bleeding is not declared in
+    the ColoReg graph and classification is empty. Requires author clarification before
+    inclusion.
 migration:
   terminology: data/<package> -> data/terminology/<package>
   study_metadata: data/study_setup/research.yml -> data/study_metadata/research.yml
   dgvs_manifest: data/terminology/config.yaml -> data/terminology/DGVS_Terminology/config.yaml
-  compatibility: Reporting module names and versions are preserved; current paths, concept provenance
-    and content digests change. Historical release bytes and existing hydrated registry copies are unchanged.
-  report_templates: Current reporting packages move to data/report_templates/<package>; concept definitions
-    move to data/terminology/<package>_terminology.
+  compatibility: Reporting module names and versions are preserved; current paths,
+    concept provenance and content digests change. Historical release bytes and existing
+    hydrated registry copies are unchanged.
+  report_templates: Current reporting packages move to data/report_templates/<package>;
+    concept definitions move to data/terminology/<package>_terminology.
 report_templates:
 - manifest: report_templates/report_electrosurgery/config.yaml
   module: report_electrosurgery
@@ -713,32 +742,33 @@ report_templates:
   version: 0.1.2
   role: current
   required_checks: *id004
-
 source_provenance:
   owner: lx-dtypes maintainers
   scope: Current working packages; retained release bytes and attribution remain unchanged.
-  interpretation: >-
-    Module sources describe origin and applicability, not a claim that every record
-    is a verbatim guideline term. File-level source comments and report-template
+  interpretation: Module sources describe origin and applicability, not a claim that
+    every record is a verbatim guideline term. File-level source comments and report-template
     guideline_references identify the guideline-derived subsets. Unsourced legacy
     records remain explicitly local vocabulary; do not infer clinical approval.
-  translation_policy: >-
-    English display labels translate the existing German labels. Established score,
-    classification and product names may be identical in both languages. Labels do
-    not change identifiers, numerical boundaries, requiredness or clinical meaning.
+  translation_policy: English display labels translate the existing German labels.
+    Established score, classification and product names may be identical in both languages.
+    Labels do not change identifiers, numerical boundaries, requiredness or clinical
+    meaning.
   sources:
     local_vocabulary:
       kind: repository_authored
       authority: lx-dtypes maintainers
       canonical_document: README.md
-      scope: Legacy clinical vocabulary, technical types, units, device labels and composition modules.
-      limitation: No record-level external guideline attribution is asserted unless supplied in the owning YAML.
+      scope: Legacy clinical vocabulary, technical types, units, device labels and
+        composition modules.
+      limitation: No record-level external guideline attribution is asserted unless
+        supplied in the owning YAML.
     dgvs_quality_2_1:
       kind: guideline_adaptation
       authority: DGVS
       version: '2.1'
       url: https://www.dgvs.de/wp-content/uploads/2023/04/S2k-LL-Qualitaetsanforderungen-Endoskopie-v2.1_Langfassung_12.01.26.pdf
-      scope: Explicitly cited endoscopy documentation, process and quality requirements; see source comments and cited_sections.
+      scope: Explicitly cited endoscopy documentation, process and quality requirements;
+        see source comments and cited_sections.
     dgvs_sedation_2023:
       kind: guideline_adaptation
       authority: DGVS
@@ -751,73 +781,134 @@ source_provenance:
       version: '2025'
       url: https://www.esge.com/assets/downloads/pdfs/guidelines/2025_a-2652-8941.pdf
       doi: 10.1055/a-2652-8941
-      scope: Upper-GI reporting requirements and associated local capture terminology, not treatment recommendations.
+      scope: Upper-GI reporting requirements and associated local capture terminology,
+        not treatment recommendations.
     weo_mst_3_0:
       kind: terminology_adaptation
       authority: World Endoscopy Organization
       version: '3.0'
       url: https://www.worldendo.org/assets-craft/pdf/resources/mst-3-0.pdf
-      scope: MST concepts with section references in the owning YAML; reporting adapters are repository-authored.
-      limitation: See docs/guides/knowledge-base-authoring.md for the limits of the source check; no unsupported severity table is claimed.
+      scope: MST concepts with section references in the owning YAML; reporting adapters
+        are repository-authored.
+      limitation: See docs/guides/knowledge-base-authoring.md for the limits of the
+        source check; no unsupported severity table is claimed.
     esge_polypectomy_2024:
       kind: guideline_adaptation
       authority: ESGE
       version: '2024'
       url: https://www.esge.com/assets/downloads/pdfs/guidelines/2024_a-2304-3219.pdf
       doi: 10.1055/a-2304-3219
-      scope: Size grouping only; treatment recommendations and lesion context are outside this executable classifier.
+      scope: Size grouping only; treatment recommendations and lesion context are
+        outside this executable classifier.
     ucum:
       kind: technical_standard
       authority: UCUM
       url: https://ucum.org/ucum
-      scope: Only unit records explicitly citing UCUM; this catalogue is not a complete UCUM implementation.
+      scope: Only unit records explicitly citing UCUM; this catalogue is not a complete
+        UCUM implementation.
     endoreg_reference_snapshot:
       kind: repository_snapshot
       authority: EndoReg database reference catalogue maintainers
       canonical_document: docs/guides/dtypes-package-structure.md
-      scope: Typed reference, workforce and sustainability snapshots; no external clinical guideline attribution is inferred.
+      scope: Typed reference, workforce and sustainability snapshots; no external
+        clinical guideline attribution is inferred.
     coloreg_protocol:
       kind: study_authored
       authority: ColoReg study authors
       canonical_document: docs/guides/coloreg-resection-study.md
       study_document: lx_dtypes/data/study_metadata/coloreg_resection.yml
-      scope: Study capture and linkage definitions; cohort selection remains a separate host contract.
+      scope: Study capture and linkage definitions; cohort selection remains a separate
+        host contract.
     synthetic_examples:
       kind: educational
       authority: lx-dtypes maintainers
       canonical_document: lx_dtypes/data/report_templates/report_template_examples/README.md
-      scope: Synthetic authoring examples; not clinical or institutional reporting protocols.
+      scope: Synthetic authoring examples; not clinical or institutional reporting
+        protocols.
   module_sources:
-    DGVS_Terminology: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
-    citations: [local_vocabulary]
-    information_source_data: [local_vocabulary]
-    lx_classification_choices: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
-    lx_classifications: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
-    lx_descriptors: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
-    lx_examinations: [local_vocabulary]
-    lx_findings: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
-    lx_hardware: [local_vocabulary]
-    lx_indications: [local_vocabulary]
-    lx_interventions: [local_vocabulary, dgvs_quality_2_1]
-    lx_units: [local_vocabulary, ucum, dgvs_sedation_2023]
-    lx_utils: [local_vocabulary]
-    lx_utils_units: [local_vocabulary, ucum, dgvs_sedation_2023]
-    lx_unit_types: [local_vocabulary]
-    gender_data: [endoreg_reference_snapshot]
-    tag_data: [endoreg_reference_snapshot]
-    lx_knowledge_base: [local_vocabulary]
-    endoreg_reference: [endoreg_reference_snapshot]
-    endoreg_workforce: [endoreg_reference_snapshot]
-    endoreg_green_endoscopy: [endoreg_reference_snapshot]
-    polyp_size_category: [esge_polypectomy_2024]
-    coloreg_terminology: [coloreg_protocol]
-    coloreg: [coloreg_protocol]
-    mst_3_0_terminology: [weo_mst_3_0]
-    mst_3_0: [weo_mst_3_0]
-    star_upper_gi_terminology: [esge_star_2025]
-    star_upper_gi: [esge_star_2025]
-    report_template_examples_terminology: [synthetic_examples]
-    report_template_examples: [synthetic_examples]
-    report_medications: [local_vocabulary, dgvs_quality_2_1, dgvs_sedation_2023]
-    report_electrosurgery: [local_vocabulary]
-    dgvs_reporting: [dgvs_quality_2_1, dgvs_sedation_2023]
+    DGVS_Terminology:
+    - local_vocabulary
+    - dgvs_quality_2_1
+    - dgvs_sedation_2023
+    citations:
+    - local_vocabulary
+    information_source_data:
+    - local_vocabulary
+    lx_classification_choices:
+    - local_vocabulary
+    - dgvs_quality_2_1
+    - dgvs_sedation_2023
+    lx_classifications:
+    - local_vocabulary
+    - dgvs_quality_2_1
+    - dgvs_sedation_2023
+    lx_descriptors:
+    - local_vocabulary
+    - dgvs_quality_2_1
+    - dgvs_sedation_2023
+    lx_examinations:
+    - local_vocabulary
+    lx_findings:
+    - local_vocabulary
+    - dgvs_quality_2_1
+    - dgvs_sedation_2023
+    lx_hardware:
+    - local_vocabulary
+    lx_indications:
+    - local_vocabulary
+    lx_interventions:
+    - local_vocabulary
+    - dgvs_quality_2_1
+    lx_units:
+    - local_vocabulary
+    - ucum
+    - dgvs_sedation_2023
+    lx_utils:
+    - local_vocabulary
+    lx_utils_units:
+    - local_vocabulary
+    - ucum
+    - dgvs_sedation_2023
+    lx_unit_types:
+    - local_vocabulary
+    gender_data:
+    - endoreg_reference_snapshot
+    tag_data:
+    - endoreg_reference_snapshot
+    lx_knowledge_base:
+    - local_vocabulary
+    endoreg_reference:
+    - endoreg_reference_snapshot
+    endoreg_information_sources:
+    - endoreg_reference_snapshot
+    endoreg_workforce:
+    - endoreg_reference_snapshot
+    endoreg_green_endoscopy:
+    - endoreg_reference_snapshot
+    polyp_size_category:
+    - esge_polypectomy_2024
+    coloreg_terminology:
+    - coloreg_protocol
+    coloreg:
+    - coloreg_protocol
+    mst_3_0_terminology:
+    - weo_mst_3_0
+    mst_3_0:
+    - weo_mst_3_0
+    star_upper_gi_terminology:
+    - esge_star_2025
+    star_upper_gi:
+    - esge_star_2025
+    report_template_examples_terminology:
+    - synthetic_examples
+    report_template_examples:
+    - synthetic_examples
+    report_medications:
+    - local_vocabulary
+    - dgvs_quality_2_1
+    - dgvs_sedation_2023
+    report_electrosurgery:
+    - local_vocabulary
+    dgvs_reporting:
+    - dgvs_quality_2_1
+    - dgvs_sedation_2023

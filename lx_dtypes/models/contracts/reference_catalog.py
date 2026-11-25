@@ -114,6 +114,27 @@ class ReferenceKind(StrEnum):
     WASTE = "waste"
 
 
+# Canonical terminology families behind legacy host catalogue names. Application
+# catalogues reference these concepts through a pinned package snapshot.
+TERMINOLOGY_REFERENCE_MODELS: dict[ReferenceKind, str] = {
+    ReferenceKind.UNIT: "Unit",
+    ReferenceKind.EXAMINATION: "Examination",
+    ReferenceKind.EXAMINATION_TYPE: "ExaminationType",
+    ReferenceKind.EXAMINATION_INDICATION: "Indication",
+    ReferenceKind.EXAMINATION_INDICATION_CLASSIFICATION: "Classification",
+    ReferenceKind.EXAMINATION_INDICATION_CLASSIFICATION_CHOICE: "ClassificationChoice",
+    ReferenceKind.FINDING: "Finding",
+    ReferenceKind.FINDING_TYPE: "FindingType",
+    ReferenceKind.FINDING_CLASSIFICATION: "Classification",
+    ReferenceKind.FINDING_CLASSIFICATION_TYPE: "ClassificationType",
+    ReferenceKind.FINDING_CLASSIFICATION_CHOICE: "ClassificationChoice",
+    ReferenceKind.FINDING_INTERVENTION: "Intervention",
+    ReferenceKind.FINDING_INTERVENTION_TYPE: "InterventionType",
+    ReferenceKind.INFORMATION_SOURCE: "InformationSource",
+    ReferenceKind.INFORMATION_SOURCE_TYPE: "InformationSourceType",
+}
+
+
 class CatalogIdentity(FrozenContractModel):
     name: str = Field(min_length=1)
     version: int | None = None

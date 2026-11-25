@@ -3,6 +3,9 @@ from shutil import copytree
 
 import pytest
 
+from lx_dtypes.models.knowledge_base.electrical_curve_profile import (
+    ElectricalCurveProfile,
+)
 from lx_dtypes.models.knowledge_base.examination import Examination
 from lx_dtypes.models.knowledge_base.finding._Finding import Finding
 from lx_dtypes.models.knowledge_base.report_template import (
@@ -10,6 +13,8 @@ from lx_dtypes.models.knowledge_base.report_template import (
     ReportTemplate,
     ReportTemplateSection,
 )
+from lx_dtypes.models.knowledge_base.study_preset import StudyPreset
+from lx_dtypes.models.knowledge_base.time_reference import TimeReference
 from lx_dtypes.packages import (
     PackageValidationError,
     create_package,
@@ -18,6 +23,51 @@ from lx_dtypes.packages import (
 )
 from lx_dtypes.scripts import lint_kb_yaml
 from lx_dtypes.validation import assess_examination
+
+
+@pytest.mark.parametrize(
+    "family", ["time_reference", "electrical_curve_profile", "study_preset"]
+)
+def test_non_graph_package_records_require_and_preserve_german_names(
+    tmp_path: Path, family: str
+) -> None:
+    records = {
+        "time_reference": TimeReference(name="video_to_generator"),
+        "study_preset": StudyPreset(name="collection"),
+        "electrical_curve_profile": ElectricalCurveProfile(
+            name="power_response",
+            curve_quantities=["power"],
+            response_quantities=["power"],
+            phase_bins=8,
+            min_duration_num=1,
+            min_duration_den=20,
+            max_duration_num=30,
+            max_duration_den=1,
+            max_sample_gap_num=1,
+            max_sample_gap_den=100,
+            max_mean_mahalanobis_squared=2.5,
+        ),
+    }
+    record = records[family]
+    destination = tmp_path / "terms"
+    with pytest.raises(PackageValidationError, match="missing_german_name"):
+        create_package(destination, name="terms", version="1.0.0", records=[record])
+    assert not destination.exists()
+    record.name_de = {
+        "time_reference": "Zeitbezug zwischen Video und Generator",
+        "study_preset": "Studiensammlung",
+        "electrical_curve_profile": "Leistungsantwort",
+    }[family]
+    manifest = create_package(
+        destination, name="terms", version="1.0.0", records=[record]
+    )
+    restored = load_package(manifest)
+    restored_records = {
+        "time_reference": restored.time_reference,
+        "study_preset": restored.study_preset,
+        "electrical_curve_profile": restored.electrical_curve_profile,
+    }
+    assert restored_records[family][record.name].name_de == record.name_de
 
 
 @pytest.fixture
@@ -199,12 +249,21 @@ def test_training_package_and_optional_employees_share_runtime_registry(
     )
     root = copytree(source, tmp_path / "training_preset")
     config = root / "config.yaml"
-    config.write_text(config.read_text().replace("# - optional/", "- optional/"))
+    # Employees are application data: a separate package the preset depends on.
+    config.write_text(
+        config.read_text().replace("# - training_staff", "- training_staff")
+    )
     result = validate_package(config)
     assert result.ok, result.issues
-    assert result.knowledge_base is not None
-    assert len(result.knowledge_base.study_preset) == 1
-    assert len(result.knowledge_base.center_employee_list) == 1
+    kb = result.knowledge_base
+    assert kb is not None
+    assert len(kb.study_preset) == 1
+    assert len(kb.center_employee_list) == 1
+    owners = kb.composed_module_names()
+    assert all(
+        record.kb_module_name not in owners
+        for record in kb.center_employee_list.values()
+    )
 
 
 def test_portable_zip_roundtrip_with_external_dependency(

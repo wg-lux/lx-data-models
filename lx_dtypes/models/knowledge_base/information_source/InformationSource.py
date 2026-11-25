@@ -10,6 +10,12 @@ from lx_dtypes.names import INFORMATION_SOURCE_MODEL_LIST_TYPE_FIELDS
 
 
 class InformationSource(KnowledgebaseBaseModel[InformationSourceDataDict]):
+    date: str | None = Field(
+        default=None,
+        pattern=r"^\d{4}-\d{2}-\d{2}$",
+        exclude_if=lambda value: value is None,
+    )
+
     information_source_types: str | list[str] = Field(default_factory=list)
 
     @property

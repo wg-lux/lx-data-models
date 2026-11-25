@@ -4,6 +4,7 @@ from pydantic import ValidationError
 
 from lx_dtypes.models.contracts.table_import import TableImportVocabulary
 from lx_dtypes.models.interface.data_roots import package_data_root
+from lx_dtypes.models.interface.KnowledgeBaseResolver import load_knowledge_base
 from lx_dtypes.models.interface.table_import import load_table_import_vocabulary
 
 
@@ -35,8 +36,12 @@ def test_suggestions_preserve_ambiguity_and_do_not_guess_identity():
 def test_value_targets_exist_in_packaged_definitions():
     root = package_data_root() / "terminology"
     vocabulary = load_table_import_vocabulary()
-    gender = yaml.safe_load((root / "endoreg_reference/gender.yml").read_text())
-    genders = {record["name"] for record in gender[0]["payload"]["records"]}
+    reference = load_knowledge_base(
+        "endoreg_reference", input_dirs=[package_data_root()]
+    )
+    genders = {
+        record.name for record in reference.reference_catalog["gender"].payload.records
+    }
     examinations: set[str] = set()
     for path in (root / "lx_examinations/data").glob("*.yaml"):
         examinations.update(

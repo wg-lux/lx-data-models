@@ -257,6 +257,24 @@ def test_build_p_examination_payload_resolves_many_to_many_choice_classification
     assert classification.classification == "sedation"
 
 
+def test_build_p_examination_payload_rejects_non_iterable_classification_relation(
+    monkeypatch: Any,
+) -> None:
+    monkeypatch.setattr(
+        api_main,
+        "_active_patient_findings_queryset",
+        lambda: _FakeEmptyFindingsQueryset(),
+    )
+    relation = type("_InvalidRelation", (), {"all": lambda self: None})()
+    choice = _named("sedation_planned", classifications=relation)
+    indication = _named("colonoscopy_generic", classifications=relation)
+    with pytest.raises(TypeError, match="must return an iterable"):
+        api_main._build_p_examination_payload_from_host_ledger(
+            _indication_patient_exam([_choice_row(5, indication, choice)]),
+            route_module_name="report_template_examples",
+        )
+
+
 def test_build_p_examination_payload_rejects_unresolvable_choice_classification(
     monkeypatch: Any,
 ) -> None:

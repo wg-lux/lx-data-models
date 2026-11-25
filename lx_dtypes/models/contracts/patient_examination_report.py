@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import date, datetime
-from typing import Literal, NotRequired, TypedDict, cast
+from typing import Annotated, Literal, NotRequired, TypedDict, cast
 
 from pydantic import ConfigDict, Field, field_validator, model_validator
 
@@ -40,6 +40,7 @@ class PatientExaminationReportSubmissionData(TypedDict):
     history_limit: int
     report_id: NotRequired[int]
     expected_version: NotRequired[int]
+    source_document_ids: NotRequired[list[int]]
 
 
 class PreferredReportFrameData(TypedDict):
@@ -250,6 +251,7 @@ class PatientExaminationReportSubmissionPayload(DtypesModel):
     patient_data: ReportJsonObject = Field(default_factory=dict)
     indications: list[ReportJsonObject] = Field(default_factory=list)
     findings: list[ReportJsonObject] = Field(default_factory=list)
+    source_document_ids: list[Annotated[int, Field(strict=True, gt=0)]] | None = None
     expected_version: int | None = Field(default=None, ge=1)
     history_limit: int = Field(default=5, ge=1, le=50)
 

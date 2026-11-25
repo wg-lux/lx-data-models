@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "description": "Digest of every YAML file in each retained release bundle (the module and its snapshotted dependencies). Append-only: never edit an existing value. Maintained by `uv run python scripts/kb_catalog.py new-version`.",
+  "retained_releases": {
+    "coloreg@0.1.0": "6107967c4b097672c552f5621a2d577493b081cdce2de5db4c430b6ac795e864",
+    "coloreg@0.2.0": "dd798d92f74c7f8fd8b858a4e2ba76ef8003150cdb2b2e658b95575ea8bcb818",
+    "dgvs_reporting@0.1.0": "7b36feafc94c5b3399fed68a7f434efd7bee73593754d4031ffda1999e8c8bd9",
+    "endoreg_reference@1.0.0": "3edcc55ce9b427334dcf5a42414e2e873beb38d2814ec3b5a456f8ea9d6035a1",
+    "endoreg_reference@1.1.0": "df6a18541bbc1f2cae2e8735148554aade445a3b45c46d666cc37459e2dfa2a8",
+    "polyp_size_category@1.0.0": "a5d563ec2f2323e866d607ff6a78f8ecd7cea5162fe31b6bb3e4cb827c3f852b",
+    "star_upper_gi@0.1.1.post1": "206d9421b0e199d2be9db39da4617877faf994125b736eae62426b1f7cc474ed"
+  }
+}

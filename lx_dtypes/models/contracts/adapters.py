@@ -293,7 +293,7 @@ _SCALAR_EXTRA_FIELDS: dict[CoreConceptName, list[str]] = {
     "intervention_type": [],
     "unit": ["abbreviation"],
     "unit_type": [],
-    "information_source": [],
+    "information_source": ["date"],
     "information_source_type": [],
     "citation": [
         "citation_key",

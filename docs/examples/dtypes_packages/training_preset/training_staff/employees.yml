@@ -1,4 +1,5 @@
-# Synthetic names; this file is deliberately not selected by config.yaml.
+# Synthetic names. Owned by the training_staff application_data package; the
+# preset uses it only when it lists training_staff in depends_on.
 - model: center_employee_list
   name: training_staff
   name_de: Schulungspersonal (synthetisch)

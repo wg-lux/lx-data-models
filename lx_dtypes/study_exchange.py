@@ -11,6 +11,10 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.cell.cell import Cell
 from openpyxl.worksheet.worksheet import Worksheet
 
+from lx_dtypes.models.contracts.application_settings import (
+    ANNOTATION_ACADEMIC_TITLE_LABELS_DE,
+    ANNOTATION_PROFESSION_LABELS_DE,
+)
 from lx_dtypes.models.contracts.study_exchange import StudyExchangeBundle
 from lx_dtypes.package_archive import read_bounded_zip
 
@@ -166,6 +170,40 @@ def study_exchange_to_xlsx(bundle: StudyExchangeBundle) -> bytes:
                                 json.dumps(value, ensure_ascii=False),
                             ],
                         )
+    if any(item.report_source is not None for item in bundle.collections):
+        sources = workbook.create_sheet("Report sources")
+        _row(
+            sources,
+            [
+                "record_uuid",
+                "report_uuid",
+                "report_version",
+                "self_declared_profession",
+                "self_declared_academic_titles",
+                "source_document_uuid",
+            ],
+        )
+        for item in bundle.collections:
+            source = item.report_source
+            if source is None:
+                continue
+            for document in source.source_document_uuids or [None]:
+                _row(
+                    sources,
+                    [
+                        str(item.record_uuid),
+                        str(source.report_uuid),
+                        source.report_version,
+                        ANNOTATION_PROFESSION_LABELS_DE[source.author_profession]
+                        if source.author_profession
+                        else None,
+                        ", ".join(
+                            ANNOTATION_ACADEMIC_TITLE_LABELS_DE[title]
+                            for title in source.author_academic_titles
+                        ),
+                        str(document) if document else None,
+                    ],
+                )
     definitions = workbook.create_sheet("Definitions")
     _row(
         definitions,

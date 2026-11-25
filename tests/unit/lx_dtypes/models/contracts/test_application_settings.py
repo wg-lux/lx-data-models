@@ -4,11 +4,35 @@ import pytest
 from pydantic import ValidationError
 
 from lx_dtypes.models.contracts.application_settings import (
+    AnnotationAcademicTitle,
     ApplicationSettingsBackupSourcePayload,
     ApplicationSettingsBackupStatusPayload,
     ApplicationSettingsDataSetEntryPayload,
     ApplicationSettingsDeploymentProfilePayload,
+    validated_annotation_academic_titles,
 )
+
+
+def test_annotation_academic_titles_normalize_enum_and_persisted_codes() -> None:
+    assert validated_annotation_academic_titles(
+        ["professor", AnnotationAcademicTitle.BSC, "doctorate", "msc"]
+    ) == [
+        "bsc",
+        "msc",
+        "doctorate",
+        "professor",
+    ]
+    assert validated_annotation_academic_titles([]) == []
+
+
+@pytest.mark.parametrize(
+    "invalid", [None, "bsc", ("bsc",), ["bsc", "bsc"], ["unknown"], [5]]
+)
+def test_annotation_academic_titles_reject_invalid_shapes_and_codes(
+    invalid: object,
+) -> None:
+    with pytest.raises(ValidationError):
+        validated_annotation_academic_titles(invalid)
 
 
 def test_dataset_entry_accepts_compatible_typed_values() -> None:

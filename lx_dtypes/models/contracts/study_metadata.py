@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Literal, Self, TypedDict
+from typing import Annotated, Literal, NotRequired, Self, TypedDict
 
 from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from lx_dtypes.models.model import FrozenContractModel, StrictContractModel
 
+from .application_settings import AnnotationProfession
 from .deployment_setup import PackageName, PackageVersion
 from .finding_extraction import FindingPresence
 from .json_types import JsonObject, JsonValue
@@ -109,6 +110,9 @@ class StudyClassificationTextRule(StudyTextRuleModel):
 
 
 class StudyMetadata(StudyMetadataModel):
+    preferred_report_profession: (
+        Annotated[AnnotationProfession, Field(strict=False)] | None
+    ) = Field(default=None, exclude_if=lambda value: value is None)
     label_presentation: StudyLabelPresentation | None = None
     participating_centers: list[ParticipatingCenter] = Field(
         default_factory=list, max_length=500
@@ -215,6 +219,7 @@ class StudyClassificationTextRuleDataDict(StudyTerminologyRequirementDataDict):
 
 
 class StudyMetadataDataDict(TypedDict):
+    preferred_report_profession: NotRequired[str]
     label_presentation: StudyLabelPresentationDataDict | None
     participating_centers: list[ParticipatingCenterDataDict]
     age_groups: list[StudyAgeGroupDataDict]

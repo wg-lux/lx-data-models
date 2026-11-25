@@ -249,6 +249,45 @@ def _catalog_kinds(
     }
 
 
+def _kind_content_issue(
+    config_path: Path, kb: KnowledgeBase, kind: PackageKind
+) -> KbYamlLintIssue | None:
+    """Keep package kinds separate: own records must belong to the declared kind.
+
+    The error blocks new imports and registered reads; there are no exceptions.
+    """
+    from lx_dtypes.package_kinds import package_kind_content_violations
+
+    violations = package_kind_content_violations(kb, kind)
+    # Validators in study/application_data packages have their own diagnostic.
+    foreign = [
+        model
+        for model in violations.foreign_models
+        if not (
+            model.endswith("_validator")
+            and kind in (PackageKind.study, PackageKind.application_data)
+        )
+    ]
+    reasons: list[str] = []
+    if foreign:
+        reasons.append(f"defines {', '.join(foreign)} records")
+    if violations.terminology_reference_kinds:
+        reasons.append(
+            "carries terminology concepts in reference catalogs ("
+            + ", ".join(violations.terminology_reference_kinds)
+            + ")"
+        )
+    if not reasons:
+        return None
+    message = (
+        f"{kb.config.name}@{kb.config.version} is a {kind.value} package but "
+        + " and ".join(reasons)
+        + ". Keep package kinds separate: define clinical concepts in terminology "
+        "packages and reference them through depends_on."
+    )
+    return _config_issue(config_path, "package_kind_content_violation", message)
+
+
 def _config_issue(config_path: Path, code: str, message: str) -> KbYamlLintIssue:
     return KbYamlLintIssue(
         code=code, severity="error", file=config_path, line=1, column=1, message=message
@@ -300,6 +339,8 @@ def _kind_issues(
     reviewed: Mapping[tuple[str, str], PackageKind],
 ) -> list[KbYamlLintIssue]:
     from lx_dtypes.package_kinds import (
+        PACKAGE_KIND_OWN_MODELS,
+        infer_legacy_package_kind,
         loaded_package_kind_findings,
         own_record_counts,
     )
@@ -321,6 +362,30 @@ def _kind_issues(
                     + ". Move them into a terminology or report_templates package.",
                 )
             )
+    if kind is None:
+        # Undeclared, unreviewed packages are held to the kind their own records
+        # imply, so omitting package_kind never bypasses the content boundary.
+        content_kind = infer_legacy_package_kind(kb).package_kind
+        own_models = set(own_record_counts(kb))
+        if content_kind is None and not any(
+            own_models <= allowed for allowed in PACKAGE_KIND_OWN_MODELS.values()
+        ):
+            issues.append(
+                _config_issue(
+                    config_path,
+                    "package_kind_content_violation",
+                    f"{config.name}@{config.version} declares no package_kind and "
+                    "no single package kind may own all of its records ("
+                    + ", ".join(sorted(own_models))
+                    + "). Keep package kinds separate and declare package_kind.",
+                )
+            )
+    else:
+        content_kind = kind
+    if content_kind is not None:
+        content_issue = _kind_content_issue(config_path, kb, content_kind)
+        if content_issue is not None:
+            issues.append(content_issue)
     try:
         findings = loaded_package_kind_findings(kb, package_kinds=reviewed)
     except ValueError as exc:

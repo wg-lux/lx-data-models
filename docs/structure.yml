@@ -53,6 +53,8 @@ contracts:
   doc: guides/record-data-formats.md
 - name: Package authoring
   doc: guides/dtypes-package-structure.md
+- name: Terminology release immutability and integrity errors
+  doc: guides/terminology-releases.md
 - name: Package kinds and channels
   doc: guides/package-kinds.md
 - name: ePA FHIR compatibility

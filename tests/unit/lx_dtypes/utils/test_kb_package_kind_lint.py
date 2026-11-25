@@ -253,17 +253,107 @@ def test_shipped_package_without_kind_is_an_error() -> None:
     assert "unclassified_shipped_package" in {issue.code for issue in result.issues}
 
 
-def test_every_shipped_package_passes_lint_without_errors() -> None:
+def test_active_packages_pass_and_archived_clinical_copies_are_rejected() -> None:
     results = check_packaged_knowledge_bases()
     catalog = get_packaged_knowledge_base_catalog()
     assert set(results) == {
         (item.module_name, item.version) for item in catalog.knowledge_bases
     }
-    errors = [
-        issue.format()
-        for result in results.values()
-        for issue in result.issues
-        if issue.severity == "error"
-    ]
-    assert errors == []
+    for item in catalog.knowledge_bases:
+        result = results[(item.module_name, item.version)]
+        errors = [issue for issue in result.issues if issue.severity == "error"]
+        # Published legacy bytes remain inspectable, never lint-exempt. The
+        # active application release must pass the same ownership gate.
+        if item.module_name == "endoreg_reference" and not item.default:
+            assert {issue.code for issue in errors} == {
+                "package_kind_content_violation"
+            }
+        else:
+            assert errors == [], [issue.format() for issue in errors]
     assert all(result.knowledge_base is not None for result in results.values())
+
+
+# --- Package kinds stay separate: own records must belong to the kind --------
+
+PROFESSION_CATALOG = {
+    "model": "reference_catalog",
+    "name": "profession",
+    "payload": {
+        "schema_version": "1.0",
+        "records": [
+            {"record_type": "profession", "name": "nurse", "description": "Nurse"}
+        ],
+    },
+}
+FINDING_CATALOG = {
+    "model": "reference_catalog",
+    "name": "finding",
+    "payload": {
+        "schema_version": "1.0",
+        "records": [
+            {
+                "record_type": "finding",
+                "name": "lesion",
+                "description": None,
+                "finding_types": [],
+                "finding_interventions": [],
+                "caused_by_interventions": [],
+                "finding_classifications": [],
+                "information_sources": [],
+            }
+        ],
+    },
+}
+
+
+def test_application_data_with_its_own_catalogs_is_separate(tmp_path: Path) -> None:
+    config = module(
+        tmp_path, "workforce", [PROFESSION_CATALOG], kind="application_data"
+    )
+    assert "package_kind_content_violation" not in codes(config)
+
+
+def test_application_data_may_not_carry_terminology_in_catalogs(
+    tmp_path: Path,
+) -> None:
+    config = module(tmp_path, "reference", [FINDING_CATALOG], kind="application_data")
+    result = check_kb_package(config, package_kinds={})
+    issue = next(
+        issue
+        for issue in result.issues
+        if issue.code == "package_kind_content_violation"
+    )
+    assert issue.severity == "error"
+    assert "finding" in issue.message
+
+
+@pytest.mark.parametrize(
+    ("kind", "records"),
+    [
+        ("terminology", [*TERMS, PROFESSION_CATALOG]),
+        ("application_data", [*TERMS]),
+        ("study", [*TERMS]),
+    ],
+)
+def test_own_records_outside_the_declared_kind_are_errors(
+    tmp_path: Path, kind: str, records: list[dict[str, object]]
+) -> None:
+    config = module(tmp_path, "mixed", records, kind=kind)
+    assert "package_kind_content_violation" in codes(config)
+
+
+@pytest.mark.parametrize(
+    "records",
+    [[FINDING_CATALOG], [*TERMS, PROFESSION_CATALOG]],
+    ids=["terminology-in-catalog", "mixed-kinds"],
+)
+def test_omitting_package_kind_never_bypasses_the_boundary(
+    tmp_path: Path, records: list[dict[str, object]]
+) -> None:
+    config = module(tmp_path, "undeclared", records, kind=None)
+    assert "package_kind_content_violation" in codes(config)
+
+
+def test_undeclared_single_kind_package_passes(tmp_path: Path) -> None:
+    config = module(tmp_path, "undeclared", [PROFESSION_CATALOG], kind=None)
+    assert "package_kind_content_violation" not in codes(config)

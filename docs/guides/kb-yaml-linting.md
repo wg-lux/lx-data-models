@@ -57,8 +57,9 @@ replace the default package list.
   `lx-package.json` that disagrees with `config.yaml` (`package_manifest_mismatch`),
   a declared kind contradicting the reviewed catalog kind (`package_kind_conflict`),
   a dependency that breaks the kind rules when both kinds are known
-  (`package_kind_dependency_violation`), and validators in `study` or
-  `application_data` packages (`validators_in_package_kind`). Shipped releases
+  (`package_kind_dependency_violation`), validators in `study` or
+  `application_data` packages (`validators_in_package_kind`), and own records
+  that do not belong to the package's kind (`package_kind_content_violation`). Shipped releases
   without a declared or catalog kind are reported by
   `check_packaged_knowledge_bases` (`unclassified_shipped_package`). See
   [package kinds](package-kinds.md).

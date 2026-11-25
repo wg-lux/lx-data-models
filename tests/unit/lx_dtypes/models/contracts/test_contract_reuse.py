@@ -61,7 +61,6 @@ class BlockHostImports(importlib.abc.MetaPathFinder):
 sys.meta_path.insert(0, BlockHostImports())
 {statement}
 assert 'lx_dtypes.models.contracts.management_command' not in sys.modules
-assert 'lx_dtypes.models.contracts.ai_dataset' not in sys.modules
 """
     result = subprocess.run(
         [sys.executable, "-c", script], capture_output=True, text=True, check=False

@@ -374,6 +374,7 @@ This verifies that:
 - Prefer editing module content through `lx-terminology-editor`.
 - Keep the module folder name stable and intentional, because the current Nix package derives its module identity from that folder.
 - Lint before packaging.
+- Never edit a published release in place; publish changes with `scripts/kb_catalog.py new-version` (see [Terminology releases](terminology-releases.md)).
 - Treat the editor ZIP as an authoring handoff, not as an active runtime artifact.
 - Treat the registry entry written by the validated LX-Annotate import as the deployed filesystem handoff.
 - Treat the Nix-installed registry JSON as the deployable handoff artifact.
@@ -497,25 +498,22 @@ upper bound must be `null`. Every shared endpoint belongs to exactly one rule.
 This first schema intentionally does not represent multidimensional clinical
 decision rules or domains with an upper limit.
 
-For a new release:
+For a new release, follow [Terminology releases](terminology-releases.md). In
+short:
 
-1. Preserve the previous bundle bytes and its dependencies. Copy into a separate
-   release root, retain the module name, and change `version` in both config and
-   rules. Use new choice names when their meanings change; preserve names for
-   unchanged meanings.
-2. Edit the clinical definitions and rule boundaries together. Keep citations
+1. Run `uv run python scripts/kb_catalog.py new-version polyp_size_category <next-version>`.
+   It retains the previous bundle bytes and dependencies, sets `version` in
+   `config.yaml` and updates the catalog and bundle pins.
+2. Set the same version in the rules sidecar (the tool lists files that still
+   mention the old version). Use new choice names when their meanings change;
+   preserve names for unchanged meanings.
+3. Edit the clinical definitions and rule boundaries together. Keep citations
    and applicability precise. Update the synthetic expected-result fixture when
-   intentionally extending the comparison.
-3. Register the new artifact for authoring using `kb-registry add` with an
+   intentionally extending the comparison. Then run
+   `uv run python scripts/kb_catalog.py refresh-digest polyp_size_category`.
+4. Register the new artifact for authoring using `kb-registry add` with an
    `--input-dir` scoped to that release root. Broad roots containing several
    versions of the same module are not a version-selection mechanism.
-4. Before packaging, add a distinct `(module_name, version)` entry to
-   `lx_dtypes/data/catalog.json`. Exactly one release per logical module has
-   `default: true`. Compute `content_sha256` using
-   `lx_dtypes.knowledge_bases.knowledge_base_content_sha256(Path(resource_root))`
-   with the actual local bundle directory. The digest includes YAML paths and
-   bytes, including the rules sidecar and dependencies nested inside the bundle.
-   Preserve historical catalog entries; never change their bytes in place.
 5. Bootstrap a separate test registry, run the example and the checks below,
    and review the clinical changes independently of structural validity.
 
@@ -642,6 +640,7 @@ approval or downstream host persistence of every new field.
 
 ## Related Guides
 
+- [Terminology releases](terminology-releases.md): versioning, integrity errors and `scripts/kb_catalog.py`
 - [KB YAML linting](kb-yaml-linting.md)
 - [Terminology](terminology.md)
 - [Structure of a valid lx-dtypes package](dtypes-package-structure.md)

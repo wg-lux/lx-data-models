@@ -17,6 +17,7 @@ to the topic you need.
 | 5. Contribute what you learn | [Contributing](https://github.com/wg-lux/lx-data-models/blob/main/CONTRIBUTING.md) | Report a confusing step, improve an example, or prepare a code change. |
 
 For terminology work, continue with [knowledge-base authoring](guides/knowledge-base-authoring.md).
+Before changing shipped terminology, read [terminology releases](guides/terminology-releases.md).
 For reporting, use [report-template authoring](guides/report-template-authoring.md).
 The [API reference](api/index.md) provides details for individual models and functions.
 
@@ -60,6 +61,7 @@ guides/electrosurgical-video-alignment
 guides/fhir-lxdm-mapping-diagrams
 guides/concept-relationships
 guides/knowledge-base-authoring
+guides/terminology-releases
 guides/terminology
 guides/dtypes-package-structure
 guides/study-metadata

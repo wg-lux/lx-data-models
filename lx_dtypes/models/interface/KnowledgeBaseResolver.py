@@ -25,9 +25,11 @@ from typing import TYPE_CHECKING, Any
 
 from lx_dtypes.knowledge_bases import (
     BUILTIN_KNOWLEDGE_BASE_PROVIDER,
+    RELEASE_GUIDE,
     PackagedKnowledgeBaseIntegrityError,
     PackagedKnowledgeBaseResourceError,
     get_packaged_knowledge_base,
+    registered_digest_remediation,
 )
 from lx_dtypes.models.interface.data_roots import (
     default_data_roots,
@@ -124,7 +126,8 @@ def _resolve_provider_source(
         raise KnowledgeBaseVersionConflictError(
             "Registered knowledge-base digest conflicts with the installed provider "
             f"for {module_name}@{version}: expected {expected_digest}, installed "
-            f"{descriptor.content_sha256}."
+            f"{descriptor.content_sha256}.\n"
+            + registered_digest_remediation(module_name, version)
         )
     try:
         return str(descriptor.installed_data_root())
@@ -336,9 +339,23 @@ def resolve_versioned_input_dirs(
     registry = _load_registry()
     resolved = registry.get((module_name, version))
     if resolved is None:
+        available = sorted(
+            registered_version
+            for registered_module, registered_version in registry
+            if registered_module == module_name
+        )
+        available_text = (
+            "Registered versions of this module: " + ", ".join(available) + "."
+            if available
+            else "The registry has no version of this module."
+        )
         raise KnowledgeBaseVersionNotFoundError(
             "Knowledge-base version not provisioned locally for "
-            f"module '{module_name}' and version '{version}'."
+            f"module '{module_name}' and version '{version}'. {available_text}\n"
+            "Register the exact release, for example with `lx-dtypes-kb-registry "
+            f"add <registry.json> --module {module_name} --version {version} "
+            "--input-dir <release-root>`, or `lx-dtypes-kb-registry bootstrap` for "
+            f"packaged releases. See {RELEASE_GUIDE}."
         )
     return tuple(
         resolve_remote_data_root(path, module_name=module_name)
@@ -398,7 +415,14 @@ def _validate_resolved_identity(
         raise KnowledgeBaseVersionConflictError(
             "Resolved knowledge-base artifact identity "
             f"'{module_config.name}@{module_config.version}' conflicts with "
-            f"requested identity '{module_name}@{version}'."
+            f"requested identity '{module_name}@{version}'.\n"
+            f"The input directories {[str(path) for path in input_dirs]} contain "
+            f"config.yaml declaring version '{module_config.version}' "
+            f"(source: {module_config.source_file}). Point the registry entry or "
+            f"input_dirs at the directory of the '{module_name}@{version}' release. "
+            "If that config.yaml was edited to bump its version, also retain the "
+            "previous release and update the catalog; see "
+            f"{RELEASE_GUIDE}."
         )
 
 
@@ -431,6 +455,11 @@ def _load_knowledge_base_cached(
                 f"template '{template}' references missing {model} '{name}'"
                 for template, model, name in unresolved
             )
+            + ".\nDefine each missing validator in this package or in a module "
+            "listed in its `depends_on`, correct the name, or keep the template in "
+            "draft lifecycle status until its validators exist. Run "
+            "`uv run python scripts/lint_kb_yaml.py --config <package>/config.yaml` "
+            "to see source locations."
         )
     return kb
 

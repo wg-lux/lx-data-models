@@ -11,6 +11,7 @@ import pytest
 import yaml
 
 from lx_dtypes.knowledge_bases import (
+    PackagedKnowledgeBase,
     get_packaged_knowledge_base,
     list_packaged_knowledge_bases,
 )
@@ -69,6 +70,7 @@ REVIEWED_KINDS = {
     ("star_upper_gi_terminology", "0.1.2"): "terminology",
     ("endoreg_reference", "1.0.0"): "application_data",
     ("endoreg_reference", "1.1.0"): "application_data",
+    ("endoreg_reference", "2.0.0"): "application_data",
     ("endoreg_workforce", "1.0.0"): "application_data",
     ("endoreg_green_endoscopy", "1.0.0"): "application_data",
     ("DGVS_Terminology", "0.1.0"): "terminology",
@@ -80,6 +82,7 @@ REVIEWED_KINDS = {
     ("lx_findings", "0.1.0"): "terminology",
     ("lx_indications", "0.1.0"): "terminology",
     ("information_source_data", "0.1.0"): "terminology",
+    ("endoreg_information_sources", "1.0.0"): "terminology",
     ("lx_utils", "0.1.0"): "terminology",
     ("lx_hardware", "0.1.0"): "terminology",
     ("lx_examinations", "0.1.0"): "terminology",
@@ -647,3 +650,63 @@ def test_legacy_inference_counts_composed_modules_not_dependencies(
     )
     clear_knowledge_base_resolver_caches()
     assert infer_legacy_package_kind(root / "config.yaml").package_kind is None
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [
+        item
+        for item in list_packaged_knowledge_bases()
+        if item.package_kind == PackageKind.application_data and item.default
+    ],
+    ids=lambda item: f"{item.module_name}@{item.version}",
+)
+def test_application_packages_do_not_own_clinical_concepts(
+    entry: PackagedKnowledgeBase,
+) -> None:
+    from lx_dtypes.package_kinds import (
+        APPLICATION_DATA_MODELS,
+        application_clinical_catalog_records,
+        own_record_counts,
+    )
+
+    kb = load_knowledge_base(
+        entry.module_name,
+        version=entry.version,
+        input_dirs=[entry.installed_data_root()],
+    )
+    assert set(own_record_counts(kb)) <= APPLICATION_DATA_MODELS
+    copies = application_clinical_catalog_records(kb)
+    assert not copies, sorted(copies)
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [
+        item
+        for item in list_packaged_knowledge_bases()
+        if item.package_kind == PackageKind.report_templates
+    ],
+    ids=lambda item: f"{item.module_name}@{item.version}",
+)
+def test_reporting_packages_coexist_with_application_reference_ownership(
+    entry: PackagedKnowledgeBase,
+) -> None:
+    from lx_dtypes.package_kinds import application_clinical_catalog_records
+
+    # Load each exact dependency closure independently; a merged search path must
+    # never substitute another version of a terminology dependency.
+    reporting = load_knowledge_base(
+        entry.module_name,
+        version=entry.version,
+        input_dirs=[entry.installed_data_root()],
+    )
+    base_entry = get_packaged_knowledge_base("endoreg_reference")
+    base = load_knowledge_base(
+        base_entry.module_name,
+        version=base_entry.version,
+        input_dirs=[base_entry.installed_data_root()],
+    )
+    assert reporting.config.name == entry.module_name
+    copies = application_clinical_catalog_records(base)
+    assert not copies, sorted(copies)

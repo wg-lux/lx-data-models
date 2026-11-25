@@ -615,6 +615,23 @@ def test_base_api_patient_findings_crud_and_classifications() -> None:
     assert listed[0]["id"] == patient_finding_id
     assert len(listed[0]["classifications"]) == 1
 
+    # Reporting requests preserve the occurrence identity and all approved source fields.
+    detailed = client.get(
+        "/base_api/patient-findings/",
+        {"patient_examination": patient_examination.id, "reporting_fields": True},
+        secure=True,
+    )
+    assert detailed.status_code == 200, detailed.content.decode()
+    assert detailed.json()[0]["instance_id"] == created_payload["instance_id"]
+    assert detailed.json()[0]["interventions"] == []
+    assert detailed.json()[0]["classifications"][0]["stored_descriptors"] == []
+    assert (
+        client.get(
+            "/base_api/patient-findings/", {"reporting_fields": True}, secure=True
+        ).status_code
+        == 400
+    )
+
     set_classifications_res = client.post(
         f"/base_api/patient-findings/{patient_finding_id}/classifications/",
         data=json.dumps(

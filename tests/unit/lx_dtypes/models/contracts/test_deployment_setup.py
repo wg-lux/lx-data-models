@@ -63,6 +63,15 @@ def test_shipped_templates_are_v2_and_kind_consistent(name: str) -> None:
     assert not any(p.activate for p in setup.report_template_packages)
     assert not setup.adopt_existing
     check_deployment_setup_kinds(setup, CATALOG_KINDS)
+    if name in {"coloreg", "training"}:
+        assert (
+            next(
+                p.version
+                for p in setup.reference_packages
+                if p.module == "endoreg_reference"
+            )
+            == "2.0.0"
+        )
 
 
 def test_coloreg_template_selects_report_templates_role() -> None:
@@ -74,7 +83,9 @@ def test_coloreg_template_selects_report_templates_role() -> None:
 
 
 @pytest.mark.parametrize("name", TEMPLATES)
-def test_shipped_v1_templates_migrate_to_the_shipped_v2_templates(name: str) -> None:
+def test_shipped_v1_templates_migrate_roles_without_upgrading_package_pins(
+    name: str,
+) -> None:
     v1 = parse_any_deployment_setup(
         "schema_version: '1.0'\n"
         + V1_SITES.get(name, "site: {center_key: local-center, name: Local Center}\n")
@@ -82,9 +93,14 @@ def test_shipped_v1_templates_migrate_to_the_shipped_v2_templates(name: str) -> 
         + "adopt_existing: false\n"
     )
     assert isinstance(v1, DeploymentSetupV1)
-    assert migrate_deployment_setup_v1_to_v2(v1, CATALOG_KINDS) == (
-        parse_deployment_setup(_template(name))
+    migrated = migrate_deployment_setup_v1_to_v2(v1, CATALOG_KINDS)
+    assert migrated.reference_packages == v1.reference_packages
+    # Current templates select newer reference releases. Schema migration must
+    # preserve the operator's original pins while producing the same v2 roles.
+    expected = parse_deployment_setup(_template(name)).model_copy(
+        update={"reference_packages": v1.reference_packages}
     )
+    assert migrated == expected
 
 
 def test_generated_editor_schema_matches_contract() -> None:
