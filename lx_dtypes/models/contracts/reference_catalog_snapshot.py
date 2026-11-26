@@ -16,6 +16,7 @@ from .reference_catalog import (
     ReferenceCatalogPayload,
     ReferenceKind,
 )
+from .reference_migration import ReferenceRowMigration
 
 
 class ReferenceCatalogSnapshot(DtypesModel):
@@ -97,6 +98,9 @@ class ReferenceCatalogReceipt(DtypesModel):
     schema_version: Literal["1.0"] = "1.0"
     snapshot: ReferenceCatalogSnapshot
     bindings: list[CatalogBinding]
+    migrations: list[ReferenceRowMigration] = Field(
+        default_factory=list, exclude_if=lambda changes: not changes
+    )
 
     @model_validator(mode="after")
     def validate_bindings(self) -> Self:
@@ -109,5 +113,22 @@ class ReferenceCatalogReceipt(DtypesModel):
         }:
             raise ValueError(
                 "Receipt bindings must cover catalogue identities exactly once"
+            )
+        existing = {
+            (item.kind, item.identity.name, item.identity.version)
+            for item in self.bindings
+            if item.origin != "created"
+        }
+        migrated = {
+            (item.kind, item.identity.name, item.identity.version)
+            for item in self.migrations
+        }
+        if (
+            len(migrated) != len(self.migrations)
+            or not migrated.issubset(existing)
+            or any(not item.updates for item in self.migrations)
+        ):
+            raise ValueError(
+                "Migration history must describe updates to existing bindings"
             )
         return self

@@ -74,6 +74,9 @@ entrypoints:
 - name: Table import provenance
   file: contracts/table_import.py
   purpose: Typed row receipts preserve normalized gender for replay checks and import results identify persisted source rows.
+- name: Reference row migration
+  file: contracts/reference_migration.py
+  purpose: Classify persisted reference rows against a newer package; display labels, absent descriptions and reviewed rules migrate automatically, everything else is a reported conflict. Never writes.
 - name: Table import vocabulary
   file: interface/table_import.py
   purpose: Load validated header and value suggestions for explicit table mappings

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import Literal, cast
 
 import pytest
 
@@ -357,7 +357,14 @@ def test_hub_transfer_segment_rejects_legacy_identity_name() -> None:
         HubTransferVideoSegmentPayload.model_validate(payload)
 
 
-def test_unresolved_provenance_preserves_pts_without_claiming_frame_identity() -> None:
+@pytest.mark.parametrize(
+    "method", ["operator_acknowledged_unresolved_v1", "decoded_processed_timeline_v1"]
+)
+def test_unresolved_provenance_preserves_pts_without_claiming_frame_identity(
+    method: Literal[
+        "operator_acknowledged_unresolved_v1", "decoded_processed_timeline_v1"
+    ],
+) -> None:
     from lx_dtypes.models.contracts.hub_transfer import HubTransferProvenancePayload
 
     timeline = VideoFrameTimeline(
@@ -367,6 +374,7 @@ def test_unresolved_provenance_preserves_pts_without_claiming_frame_identity() -
         presentation_timestamps=[9000, 12000, 17000],
     )
     recovery = VideoProvenanceRecovery(
+        method=method,
         recording_hash="a" * 64,
         processed_timeline=timeline,
         recording_started_at="2026-10-13T10:00:00+02:00",

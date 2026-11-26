@@ -643,6 +643,11 @@ sidecars:
   notes: Reviewed table header and exact value suggestions; not KB records or an executable
     mapping.
   validation: load_table_import_vocabulary and focused vocabulary tests.
+- path: reference_migrations.yml
+  contract: ReferenceMigrationCatalog
+  notes: Reviewed field changes for migrating existing host reference rows into an
+    exact target package; not KB records. Safe classes need no entry.
+  validation: load_reference_migrations and tests/unit/lx_dtypes/models/contracts/test_reference_migration.py.
 - path: terminology/mst_3_0_terminology/excel_source.yml
   contract: MST Excel source evidence
   notes: Workbook cells, attribute provenance and reviewed import decisions; not KB

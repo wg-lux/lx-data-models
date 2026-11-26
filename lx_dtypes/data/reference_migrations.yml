@@ -1,0 +1,9 @@
+# Reviewed migrations of existing host reference rows into a target package.
+# Contract: lx_dtypes.models.contracts.reference_migration.ReferenceMigrationCatalog
+#
+# Display labels (name_de) and absent descriptions migrate automatically and
+# need no rule. Append a target for a new package release when it requires a
+# reviewed change. A rule applies only when the row holds exactly `existing`.
+# EndoReg records applied changes with the target package's import receipt.
+schema_version: 1
+targets: []

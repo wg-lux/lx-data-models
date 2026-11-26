@@ -162,13 +162,13 @@ class RecordingTimeRange(FrozenContractModel):
 
 
 class VideoProvenanceRecovery(RecordingTimeRange):
-    """Explicitly acknowledged missing ancestry; never a frame correspondence proof."""
+    """Processed frames with unresolved recording ancestry. The method identifies the evidence."""
 
     schema_version: Literal["1"] = "1"
     mapping_status: Literal["unresolved"] = "unresolved"
-    method: Literal["operator_acknowledged_unresolved_v1"] = (
-        "operator_acknowledged_unresolved_v1"
-    )
+    method: Literal[
+        "operator_acknowledged_unresolved_v1", "decoded_processed_timeline_v1"
+    ] = "operator_acknowledged_unresolved_v1"
     electrical_matching_eligible: Literal[False] = False
     recording_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     original_timeline: VideoFrameTimeline | None = None

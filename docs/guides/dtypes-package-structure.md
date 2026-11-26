@@ -684,8 +684,8 @@ remain errors.
 Published `endoreg_reference@1.0.0` and `@1.1.0` are retained byte-for-byte under
 `lx_dtypes/data/terminology/versions/endoreg_reference` for historical identity and
 receipt verification. They are not the active bootstrap default. Existing databases
-must explicitly review conflicting legacy clinical rows rather than silently adopt
-new clinical meanings. Strict package-kind lint rejects clinical copies in an
+migrate legacy rows through the reference migration contract below; genuine
+conflicts are still reviewed rather than silently adopted. Strict package-kind lint rejects clinical copies in an
 application package, including historical releases; there is no exception list.
 
 Optional packages use the same format:
@@ -716,6 +716,42 @@ See the endoreg-db dataloader guide for dry-run reconciliation, explicit legacy
 adoption, projection selection and transaction semantics. New identities or
 clinical changes require new package versions; changing bytes under an imported
 identity is rejected.
+
+### Migrating existing rows to a newer package during loading
+
+EndoReg applies safe reference updates during `load_base_db_data`,
+`import_reference_catalog`, and `import_clinical_reference_data`. This also
+covers terminology projected as a dependency of an application package. Use
+`--dry-run` to inspect pending updates and conflicts. Each successful import
+records its applied field changes alongside
+the immutable receipt for the exact package and projection. The receipt and
+row updates commit together. Repeating the same import returns its recorded
+history without replaying it. Use `--verify` to compare the stored rows against
+the selected package.
+
+The shared `reference_migration` planner classifies changes to fields that
+EndoReg projects into database rows. For standalone terminology, this includes
+authored German display names, descriptions and other explicitly projected
+attributes. Graph-only terminology stays in the package snapshot. Identity,
+relationship and other clinical meaning changes still require a dedicated
+migration.
+
+| Difference | Decision |
+|---|---|
+| An authored `name_de` changed | `update_display`, automatic |
+| `description` absent (null, empty or `unknown`) and the package authors text | `fill_missing`, automatic |
+| Exact old and new value listed in `lx_dtypes/data/reference_migrations.yml` for the target `module@version` | `declared`, automatic |
+| Anything else, including overwriting or erasing existing text | `conflict` |
+
+A conflict blocks the entire import. Add reviewed scalar corrections to
+`reference_migrations.yml` under the new release's exact target identity.
+Include the previous value, the value authored by the release, and a reason.
+Leave previously released targets stable so the same migration remains
+available to installations upgrading later.
+
+For example, `endoreg_reference@1.1.0` stored `InformationSource` `unknown` with
+no description, while `@2.0.0` ships `Data source is unknown.` That is a
+`fill_missing` change and needs no rule.
 
 ## 8. Agent and reviewer checklist
 

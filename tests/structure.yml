@@ -41,6 +41,9 @@ entrypoints:
 - name: Time KB and ledger tests
   file: unit/lx_dtypes/models/contracts/test_time_reference.py
   purpose: Validate YAML training packages, exact video PTS references, ledger exports and pinned KB identity
+- name: Reference migration tests
+  file: unit/lx_dtypes/models/contracts/test_reference_migration.py
+  purpose: Verify automatic field classification and reviewed migration rules.
 - name: Time contract tests
   file: unit/lx_dtypes/models/contracts/test_time.py
   purpose: Verify exact mixed-clock offsets, timestamp validation and YAML persistence

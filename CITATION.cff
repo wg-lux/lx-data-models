@@ -9,5 +9,4 @@ authors:
 repository-code: "https://github.com/wg-lux/lx-data-models"
 url: "https://pypi.org/project/lx-dtypes/"
 license: MIT
-version: "0.7.4"
-date-released: 2026-11-23
+version: "0.7.6"

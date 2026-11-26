@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.6] - Unreleased
+
+### Added
+
+- Shared reference-data migration rules and typed import history for EndoReg
+  catalogue and terminology projection. Reviewed corrections are pinned to the
+  target package version.
+
+## [0.7.5] - 2026-11-26
+
+- Published the 0.7.5 source and wheel distributions.
+
 ## [0.7.4]
 
 ### Added

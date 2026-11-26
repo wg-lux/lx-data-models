@@ -47,6 +47,7 @@ files:
 - report_templates/report_medications
 - report_templates/report_electrosurgery
 - table_import_vocabulary.yml
+- reference_migrations.yml
 - terminology
 - report_templates
 - study_metadata
