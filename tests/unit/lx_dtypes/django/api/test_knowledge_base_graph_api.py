@@ -381,6 +381,32 @@ def test_packaged_reporting_bundle_builds_versioned_graph_snapshot(
     } == expected_templates
 
 
+def test_coloreg_template_findings_include_localized_capture_concepts() -> None:
+    kb = DataLoader().load_knowledge_base("coloreg")
+    snapshot = build_knowledge_base_graph_snapshot(
+        kb, identity=kb.config.knowledge_base_identity
+    )
+    context = build_examination_reporting_context(
+        snapshot, examination_name="colonoscopy"
+    )
+    concepts = context.concepts
+    findings = {record.name: record for record in concepts.finding}
+    assert findings["coloreg_polyp_resection"].name_de == "Polypenresektion"
+    assert findings["coloreg_polyp_follow_up"].name_de == "Resektionsnachsorge"
+    for finding_name in ("coloreg_polyp_resection", "coloreg_polyp_follow_up"):
+        finding = findings[finding_name]
+        for names, records in (
+            (finding.classifications, concepts.classification),
+            (finding.interventions, concepts.intervention),
+        ):
+            assert set(names) <= {record.name for record in records if record.name_de}
+    assert any(
+        item.name == "lesion_size_mm_value"
+        and item.name_de == "Läsionsgröße in Millimetern"
+        for item in concepts.classification_choice_descriptor
+    )
+
+
 def test_packaged_provider_registry_serves_full_dgvs_reporting_context(
     terminology_root: Path,
 ) -> None:

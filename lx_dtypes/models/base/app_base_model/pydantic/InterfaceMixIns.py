@@ -18,14 +18,17 @@ class DDictMixIn(Generic[DDictT], ABC):
     @property
     def ddict(self) -> DDictT:
         """Materialize the associated DataDict from the model's data."""
-        data = cast(Any, self).model_dump()
+        # The concrete class combines this mixin with a Pydantic BaseModel.
+        data = cast(Any, self).model_dump()  # pylint: disable=no-member
         return self.ddict_class(**data)
 
     @classmethod
     def validate_ddict(cls, input_dict: Mapping[str, Any]) -> bool:
         """Validate that `input_dict` can construct the model and its DataDict."""
         try:
-            instance = cls.model_validate(dict(input_dict))  # type: ignore
+            instance = cls.model_validate(  # type: ignore  # pylint: disable=no-member
+                dict(input_dict)
+            )
             _ = instance.ddict
             return True
         except Exception as exc:  # pragma: no cover - propagates context
@@ -83,7 +86,11 @@ class ListFieldSerializationMixIn(ABC):
 
     def model_dump(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         """Serialize list fields to their configured string representation."""
-        dumped = cast(dict[str, Any], super().model_dump(*args, **kwargs))  # type: ignore
+        # The next class in the MRO is the Pydantic BaseModel this mixin decorates.
+        dumped = cast(
+            dict[str, Any],
+            super().model_dump(*args, **kwargs),  # type: ignore  # pylint: disable=no-member
+        )
         for field in self._get_all_list_fields():
             value = dumped.get(field)
             if isinstance(value, str):

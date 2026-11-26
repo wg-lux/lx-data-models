@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from cv2 import VideoWriter_fourcc
 
 # Video specifications
 width, height = 1920, 1080
@@ -11,7 +10,7 @@ output_file = "random_noise.mp4"
 
 
 fourcc_chars = tuple(map(ord, "mp4v"))
-fourcc = VideoWriter_fourcc(*fourcc_chars)
+fourcc = cv2.VideoWriter_fourcc(*fourcc_chars)
 out = cv2.VideoWriter(output_file, fourcc, fps, (width, height))
 
 print(f"Generating {num_frames} frames...")

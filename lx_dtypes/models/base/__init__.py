@@ -2,7 +2,10 @@ from .app_base_model import AppBaseModelsLookupType, app_base_models_lookup
 from .file.ddict import FileModelsDDictsLookupType, file_models_ddicts_lookup
 
 
-class BaseModelsLookupType(AppBaseModelsLookupType, FileModelsDDictsLookupType):
+# Pylint reports both TypedDict parents as the same base; the merge is intentional.
+class BaseModelsLookupType(  # pylint: disable=duplicate-bases
+    AppBaseModelsLookupType, FileModelsDDictsLookupType
+):
     pass
 
 

@@ -449,9 +449,11 @@ class SegmentAnnotationEnsurePayload(DtypesModel):
 
     @model_validator(mode="after")
     def _validate_ids(self) -> SegmentAnnotationEnsurePayload:
-        for field_name in ("video_ids", "segment_ids"):
-            values = getattr(self, field_name)
-            if values is not None and any(value <= 0 for value in values):
+        for field_name, values in (
+            ("video_ids", self.video_ids),
+            ("segment_ids", self.segment_ids),
+        ):
+            if any(value <= 0 for value in values or ()):
                 raise ValueError(f"{field_name} must contain positive integers")
         return self
 

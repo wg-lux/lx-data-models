@@ -179,11 +179,9 @@ class VideoCorrectionFrameRemovalPayload(VideoCorrectionProcessingMethodMixin):
 
     @model_validator(mode="after")
     def validate_frame_selection(self) -> VideoCorrectionFrameRemovalPayload:
-        if self.frame_list is not None and any(frame < 0 for frame in self.frame_list):
+        if any(frame < 0 for frame in self.frame_list or ()):
             raise ValueError("frame_list must contain non-negative integers")
-        if self.manual_frames is not None and any(
-            frame < 0 for frame in self.manual_frames
-        ):
+        if any(frame < 0 for frame in self.manual_frames or ()):
             raise ValueError("manual_frames must contain non-negative integers")
         if self.frame_ranges:
             parse_video_correction_frame_ranges(self.frame_ranges)

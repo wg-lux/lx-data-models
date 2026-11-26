@@ -82,6 +82,7 @@ dev = [
   "opencv-python-headless>=4.12.0.88",
   "vulture>=2.16",
   "types-defusedxml>=0.7.0",
+  "pylint>=4.1.4",
 ]
 
 docs = [
@@ -163,6 +164,11 @@ markers = [
   "localfiles: depends on files present only on dev machines",
 ]
 testpaths = ["tests"]
+
+[tool.pylint.typecheck]
+# Django injects `_meta` through its model metaclass; cv2 members come from a
+# compiled extension that pylint cannot introspect.
+generated-members = ["_meta", "cv2\\..*"]
 
 [tool.ruff]
 line-length = 88

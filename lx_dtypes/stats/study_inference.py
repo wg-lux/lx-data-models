@@ -1,6 +1,7 @@
 """Local two-sided inference on validated, independent patient observations."""
 
 import math
+import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -129,7 +130,7 @@ def evaluate_inference(
         residual = y - x @ beta
         rss = float(residual @ residual)
         total = float(np.sum((y - y.mean()) ** 2))
-        if total <= 0 or rss <= np.finfo(float).eps * total:
+        if total <= 0 or rss <= sys.float_info.epsilon * total:
             raise ValueError(
                 "regression requires nonconstant outcomes and nonzero residual variance"
             )

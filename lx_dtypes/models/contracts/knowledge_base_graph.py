@@ -4,9 +4,9 @@ import hashlib
 import json
 from collections.abc import Mapping
 from copy import deepcopy
-from typing import Any, Literal, Protocol, cast
+from typing import Any, Literal, Protocol, TypedDict, cast
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, TypeAdapter, model_validator
 from pydantic_core import to_jsonable_python
 
 from lx_dtypes.models.model import DtypesModel, FrozenContractModel
@@ -73,6 +73,18 @@ class KnowledgeBaseGraphEdge(FrozenContractModel):
     source: KnowledgeBaseGraphNodeRef
     relationship: GraphRelationship
     target: KnowledgeBaseGraphNodeRef
+
+
+class _ClassificationReference(TypedDict):
+    classification: str
+
+
+class _FindingReference(TypedDict):
+    finding: str
+    classifications: list[_ClassificationReference]
+
+
+_section_findings = TypeAdapter(list[_FindingReference])
 
 
 class ReportTemplateGraphProjection(DtypesModel):
@@ -297,6 +309,18 @@ class KnowledgeBaseGraphResolver:
         selected["finding"].update(examination.findings)
         selected["indication"].update(examination.indications)
 
+        templates = self._templates.get(examination_name, [])
+        for template in templates:
+            for section in template.report_sections:
+                for reference in _section_findings.validate_python(
+                    section.get("findings", [])
+                ):
+                    selected["finding"].add(reference["finding"])
+                    selected["classification"].update(
+                        entry["classification"]
+                        for entry in reference["classifications"]
+                    )
+
         records = self._records
 
         for finding_name in sorted(selected["finding"]):
@@ -365,7 +389,6 @@ class KnowledgeBaseGraphResolver:
                 },
             }
         )
-        templates = self._templates.get(examination_name, [])
         included_nodes = {
             (cast(GraphNodeKind, collection_name), record.name)
             for collection_name in _concept_collection_names()

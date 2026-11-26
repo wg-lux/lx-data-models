@@ -22,8 +22,9 @@ class ClassificationSubcategoryDefinition(FrozenContractModel):
             raise ValueError("choices must not be empty")
         if self.default is not None and self.default not in self.choices:
             raise ValueError("default must be one of choices")
-        if self.probability is not None and any(
-            probability < 0.0 or probability > 1.0 for probability in self.probability
+        if any(
+            probability < 0.0 or probability > 1.0
+            for probability in self.probability or ()
         ):
             raise ValueError("probability values must be between 0 and 1")
         return self

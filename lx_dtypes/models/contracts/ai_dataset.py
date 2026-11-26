@@ -187,9 +187,11 @@ class AIDataSetCreateContract(StrictContractModel):
         if not isinstance(value, Mapping):
             return value
         candidate = dict(cast(Mapping[object, object], value))
-        dataset_type = candidate.get(
-            "dataset_type", cls.model_fields["dataset_type"].default
-        )
+        # Pylint cannot infer Pydantic's decorated `model_fields` class property.
+        default_dataset_type = cls.model_fields[  # pylint: disable=unsubscriptable-object
+            "dataset_type"
+        ].default
+        dataset_type = candidate.get("dataset_type", default_dataset_type)
         expected_by_dataset_type: dict[object, AIModelType] = {
             "image": "image_multilabel_classification",
             "video": "video_segment_classification",

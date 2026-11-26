@@ -11,7 +11,9 @@ class _EmptyAwarePydanticModel(pandas_engine.PydanticModel):  # pyright: ignore[
 
     def coerce(self, data_container: PandasObject) -> PandasObject:
         if data_container.empty:
-            self._check_column_names(data_container, list(self.type.model_fields))
+            # Pandera stores the Pydantic model class in `type`; pylint infers a Field.
+            model_fields = self.type.model_fields  # pylint: disable=no-member
+            self._check_column_names(data_container, list(model_fields))
             return data_container
         return super().coerce(data_container)
 
